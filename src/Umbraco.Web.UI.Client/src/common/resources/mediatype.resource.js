@@ -3,7 +3,7 @@
     * @name umbraco.resources.mediaTypeResource
     * @description Loads in data for media types
     **/
-function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
+function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, localizationService) {
 
     return {
 
@@ -38,7 +38,38 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        query),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
+               /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#getWhereCompositionIsUsedInContentTypes
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Returns a list of media types which use a specific composition with a given id
+         *
+         * ##usage
+         * <pre>
+         * mediaTypeResource.getWhereCompositionIsUsedInContentTypes(1234)
+         *    .then(function(mediaTypeList) {
+         *        console.log(mediaTypeList);
+         *    });
+         * </pre>
+         * @param {Int} contentTypeId id of the composition content type to retrieve the list of the media types where it has been used
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getWhereCompositionIsUsedInContentTypes: function (contentTypeId) {
+            var query = {
+                contentTypeId: contentTypeId
+            };
 
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "mediaTypeApiBaseUrl",
+                        "GetWhereCompositionIsUsedInContentTypes"),
+                    query),
+                'Failed to retrieve data for content type id ' + contentTypeId);
+        },
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaTypeResource#getAllowedTypes
@@ -122,6 +153,18 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to delete content type contaier');
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#save
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Saves or update a media type
+         *
+         * @param {Object} content data type object to create/update
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         save: function (contentType) {
 
             var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
@@ -165,13 +208,15 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("media_moveFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
-                'Failed to move content');
+                    }, { responseType: 'text' }),
+                promise);
         },
 
         copy: function (args) {
@@ -185,33 +230,39 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("media_copyFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostCopy"),
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
-                'Failed to copy content');
+                    }, { responseType: 'text' }),
+                promise);
         },
 
         createContainer: function(parentId, name) {
+
+            var promise = localizationService.localize("media_createFolderFailed", [parentId]);
 
             return umbRequestHelper.resourcePromise(
                  $http.post(
                     umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "PostCreateContainer",
-                       { parentId: parentId, name: name })),
-                'Failed to create a folder under parent id ' + parentId);
+                        { parentId: parentId, name: encodeURIComponent(name) })),
+                promise);
         },
 
         renameContainer: function (id, name) {
+
+            var promise = localizationService.localize("media_renameFolderFailed", [id]);
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl",
                     "PostRenameContainer",
                     { id: id, name: name })),
-                "Failed to rename the folder with id " + id
+                promise
             );
 
         }

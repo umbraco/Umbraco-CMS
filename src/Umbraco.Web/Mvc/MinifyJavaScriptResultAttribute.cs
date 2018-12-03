@@ -25,11 +25,11 @@ namespace Umbraco.Web.Mvc
             var jsResult = filterContext.Result as JavaScriptResult;
             if (jsResult == null) return;
             if (filterContext.HttpContext.IsDebuggingEnabled) return;
-            
+
             //minify the result
             var result = jsResult.Script;
             var minifier = new JSMin();
-            var minified = minifier.Minify(result);            
+            var minified = minifier.Minify(result);
             jsResult.Script = minified;
         }
 

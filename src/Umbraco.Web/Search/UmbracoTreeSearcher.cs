@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using AutoMapper;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -38,17 +39,16 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var searcher = Constants.Examine.InternalSearcher;
+            var indexer = Constants.Examine.InternalIndexer;
             var fields = new[] { "id", "__NodeId" };
 
             var umbracoContext = umbracoHelper.UmbracoContext;
-            var appContext = umbracoContext.Application;
 
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
+                    indexer = Constants.Examine.InternalMemberIndexer;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -60,19 +60,19 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(appContext.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, appContext.Services.EntityService);
+                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(Current.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, Current.Services.EntityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(appContext.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, appContext.Services.EntityService);
+                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(Current.Services.EntityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, Current.Services.EntityService);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = ExamineManager.Instance.GetSearcher(indexer);
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Search
             sb.Append("+__IndexType:");
             sb.Append(type);
 
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString());
 
             var result = internalSearcher
                 //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
@@ -207,6 +207,10 @@ namespace Umbraco.Web.Search
         {
             if (sb == null) throw new ArgumentNullException("sb");
             if (entityService == null) throw new ArgumentNullException("entityService");
+
+            Udi udi;
+            Udi.TryParse(searchFrom, true, out udi);
+            searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
 
             int searchFromId;
             var entityPath = int.TryParse(searchFrom, out searchFromId) && searchFromId > 0
@@ -273,10 +277,10 @@ namespace Umbraco.Web.Search
                     m.Icon = "icon-user";
                 }
 
-                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
+                var searchResult = results.First(x => x.Id == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];
+                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Fields["email"];
                 }
                 if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
                 {
@@ -325,7 +329,7 @@ namespace Umbraco.Web.Search
                 var intId = m.Id.TryConvertTo<int>();
                 if (intId.Success)
                 {
-                    m.AdditionalData["Url"] = umbracoHelper.NiceUrl(intId.Result);
+                    m.AdditionalData["Url"] = umbracoHelper.Url(intId.Result);
                 }
             }
             return mapped;

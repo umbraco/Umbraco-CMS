@@ -1,18 +1,13 @@
 .umb-user-cards {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: -10px;
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .umb-user-card {
-    padding: 10px;
     box-sizing: border-box;
-    flex: 0 0 100%;
     max-width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
 }
 
 .umb-user-card:hover,
@@ -21,55 +16,12 @@
     text-decoration: none !important;
 }
 
-@media (min-width: 768px) {
-    .umb-user-card {
-        flex: 0 0 50%;
-        max-width: 50%;
-    }
-}
-
-@media (min-width: 1200px) {
-    .umb-user-card {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-}
-
-@media (min-width: 1400px) {
-    .umb-user-card {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
-
-@media (min-width: 1700px) {
-    .umb-user-card {
-        flex: 0 0 20%;
-        max-width: 20%;
-    }
-}
-
-
-@media (min-width: 1900px) {
-    .umb-user-card {
-        flex: 0 0 16.66%;
-        max-width: 16.66%;
-    }
-}
-
-@media (min-width: 2200px) {
-    .umb-user-card {
-        flex: 0 0 14.28%;
-        max-width: 14.28%;
-    }
-}
-
 .umb-user-card__content {
     position: relative;
     padding: 15px;
     flex: 1 1 auto;
-    background-color: @gray-10;
-    border: 1px solid @gray-9;
+    background-color: @white;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
     border-radius: 3px;
     box-sizing: border-box;
     display: flex;

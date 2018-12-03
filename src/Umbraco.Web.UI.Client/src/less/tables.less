@@ -13,22 +13,20 @@ table {
   border-spacing: 0;
 }
 
-table thead {
-  background-color: @gray-10;
-}
-
-
 // BASELINE STYLES
 // ---------------
 
 .table {
   width: 100%;
   margin-bottom: @baseLineHeight;
-  border: 1px solid @gray-8;
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+  background: @tableBackground;
+  border-radius: @baseBorderRadius;
+  font-size: 14px;
   // Cells
   th,
   td {
-    padding: 10px 8px;
+    padding: 10px 20px;
     line-height: @baseLineHeight;
     text-align: left;
     border-top: 1px solid @tableBorder;
@@ -38,6 +36,9 @@ table thead {
   }
   // Bottom align for column headings
   thead th {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    color: @gray-3;
     vertical-align: bottom;
   }
   // Remove top border from thead by default
@@ -65,11 +66,12 @@ table thead {
 // CONDENSED TABLE W/ HALF PADDING
 // -------------------------------
 
-.table-condensed {
-  th,
-  td {
-    padding: 4px 5px;
-  }
+.table-condensed tbody td {
+    padding: 5px 10px;
+}
+
+.table-condensed thead th {
+  padding: 10px;
 }
 
 
@@ -81,6 +83,7 @@ table thead {
   border-collapse: separate; // Done so we can round those corners!
   *border-collapse: collapse; // IE7 can't round corners anyway
   border-left: 0;
+  box-shadow: none;
   .border-radius(@baseBorderRadius);
   th,
   td {
@@ -246,4 +249,9 @@ table th[class*="span"],
   &.info:hover > td {
     background-color: darken(@infoBackground, 5%);
   }
+}
+
+// table sortable
+.table-sortable tbody tr {
+  cursor: move;
 }

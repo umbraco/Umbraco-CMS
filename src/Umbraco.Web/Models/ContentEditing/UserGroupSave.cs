@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -21,11 +21,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "action", IsRequired = true)]
         [Required]
         public ContentSaveAction Action { get; set; }
-        
+
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
         public override string Alias { get; set; }
-        
+
         [DataMember(Name = "sections")]
         public IEnumerable<string> Sections { get; set; }
 
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Models.ContentEditing
                         yield return new ValidationResult("A permission value cannot be null or empty", new[] { "AssignedPermissions" });
                 }
             }
-            
+
         }
     }
 }

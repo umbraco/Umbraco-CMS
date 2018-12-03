@@ -26,7 +26,7 @@ namespace Umbraco.Web.Controllers
 
             MembershipCreateStatus status;
             var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
-            
+
             switch (status)
             {
                 case MembershipCreateStatus.Success:
@@ -39,6 +39,7 @@ namespace Umbraco.Web.Controllers
                         return Redirect(model.RedirectUrl);
                     }
                     //redirect to current page by default
+
                     return RedirectToCurrentUmbracoPage();
                 case MembershipCreateStatus.InvalidUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    [SqlSyntaxProvider(Constants.DatabaseProviders.MySql)]
+    [SqlSyntaxProvider(Constants.DbProviderNames.MySql)]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         private readonly ILogger _logger;
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             InitColumnTypeMap();
         }
 
-        public override IEnumerable<string> GetTablesInSchema(Database db)
+        public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             List<string> list;
             try
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             List<ColumnInfo> list;
             try
@@ -78,7 +79,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        /// <inheritdoc />
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             List<Tuple<string, string>> list;
             try
@@ -100,7 +102,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        /// <inheritdoc />
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             List<Tuple<string, string, string>> list;
             try
@@ -126,7 +129,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
-        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        /// <inheritdoc />
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             List<Tuple<string, string, string, bool>> list;
             try
@@ -155,7 +159,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             return list;
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        public override bool DoesTableExist(IDatabase db, string tableName)
         {
             long result;
             try
@@ -178,9 +182,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             return result > 0;
         }
 
-        public override Sql SelectTop(Sql sql, int top)
+        public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
-            return new Sql(string.Concat(sql.SQL, " LIMIT ", top), sql.Arguments);
+            return new Sql<ISqlContext>(sql.SqlContext, string.Concat(sql.SQL, " LIMIT ", top), sql.Arguments);
         }
 
         public override bool SupportsClustered()
@@ -330,14 +334,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return null; // NOT SUPPORTED!
-                                 //return "NEWID()";                
+                    return null; // NOT SUPPORTED!             
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
-                    //case SystemMethods.NewSequentialId:
-                    //    return "NEWSEQUENTIALID()";
-                    //case SystemMethods.CurrentUTCDateTime:
-                    //    return "GETUTCDATE()";
             }
 
             return null;
@@ -369,7 +368,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         public override string ConvertDateToOrderableString { get { return "DATE_FORMAT({0}, '%Y%m%d')"; } }
         public override string ConvertDecimalToOrderableString { get { return "LPAD(FORMAT({0}, 9), 20, '0')"; } }
 
-        public override bool? SupportsCaseInsensitiveQueries(Database db)
+        public override bool? SupportsCaseInsensitiveQueries(IDatabase db)
         {
             bool? supportsCaseInsensitiveQueries = null;
 
@@ -384,21 +383,21 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             }
             catch (Exception ex)
             {
-                _logger.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
+                _logger.Error<MySqlSyntaxProvider>(ex, "Error querying for lower_case support");
             }
             finally
             {
                 db.CloseSharedConnection();
             }
 
-            // Could return null, which means testing failed, 
+            // Could return null, which means testing failed,
             // add message to check with their hosting provider
             return supportsCaseInsensitiveQueries;
         }
 
         public override string EscapeString(string val)
         {
-            return PetaPocoExtensions.EscapeAtSymbols(MySql.Data.MySqlClient.MySqlHelper.EscapeString(val));
+            return NPocoDatabaseExtensions.EscapeAtSymbols(MySql.Data.MySqlClient.MySqlHelper.EscapeString(val));
         }
     }
 }

@@ -31,5 +31,5 @@ namespace Umbraco.Web.Models.ContentEditing
         public int[] IdSortOrder { get; set; }
 
     }
-    
+
 }

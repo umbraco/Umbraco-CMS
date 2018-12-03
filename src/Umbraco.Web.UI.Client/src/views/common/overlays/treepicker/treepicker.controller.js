@@ -26,7 +26,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //Some trees can have no items (dictionary & forms email templates)
         $scope.hasItems = true;
         $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
-
+        var node = dialogOptions.currentNode;
 
         //This is called from ng-init
         //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init. 
@@ -83,11 +83,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //if a alternative startnode is used, we need to check if it is a container
         if ($scope.enableSearh && dialogOptions.startNodeId && dialogOptions.startNodeId !== -1 && dialogOptions.startNodeId !== "-1") {
             entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function(node) {
-                    if (node.metaData.IsContainer) {
-                        openMiniListView(node);
-                    }
-                    initTree();
-                });
+                if (node.metaData.IsContainer) {
+                    openMiniListView(node);
+                }
+                initTree();
+            });
         }
         else {
             initTree();
@@ -109,7 +109,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             else {
                 if (dialogOptions.filter.startsWith("!")) {
                     dialogOptions.filterExclude = true;
-                    dialogOptions.filter = dialogOptions.filter.substring(1);
+                    dialogOptions.filterTypes = dialogOptions.filter.substring(1);
+                } else {
+                    dialogOptions.filterExclude = false;
+                    dialogOptions.filterTypes = dialogOptions.filter;
                 }
 
                 //used advanced filtering
@@ -119,6 +122,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     dialogOptions.filter = angular.fromJson(dialogOptions.filter);
                 }
             }
+
+            $scope.filter = {
+                filterAdvanced: dialogOptions.filterAdvanced,
+                filterExclude: dialogOptions.filterExclude,
+                filter: dialogOptions.filterTypes
+            };
         }
 
         function initTree() {
@@ -161,6 +170,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             $scope.hasItems = args.tree.root.children.length > 0;
 
             tree = args.tree;
+
+            var nodeHasPath = typeof node !== "undefined" && typeof node.path !== "undefined";
+            var startNodeNotDefined = typeof dialogOptions.startNodeId === "undefined" || dialogOptions.startNodeId === "" || dialogOptions.startNodeId === "-1";
+            if (startNodeNotDefined && nodeHasPath) {
+                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
+            }
+
         }
 
         //wires up selection
@@ -269,7 +285,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             var foundIndex = 0;
 
             if ($scope.model.selection.length > 0) {
-                for (i = 0; $scope.model.selection.length > i; i++) {
+                for (var i = 0; $scope.model.selection.length > i; i++) {
                     var selectedItem = $scope.model.selection[i];
                     if (selectedItem.id === item.id) {
                         found = true;
@@ -315,7 +331,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     }
                 });
             } else {
-                var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
+                var a = dialogOptions.filterTypes.toLowerCase().replace(/\s/g, '').split(',');
                 angular.forEach(nodes, function (value, key) {
 
                     var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;

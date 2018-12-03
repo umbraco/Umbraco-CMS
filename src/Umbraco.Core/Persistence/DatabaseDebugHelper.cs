@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlServerCe;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
@@ -16,8 +18,8 @@ namespace Umbraco.Core.Persistence
 
         public static void SetCommand(IDbCommand command, string context)
         {
-            var prof = command as StackExchange.Profiling.Data.ProfiledDbCommand;
-            if (prof != null) command = prof.InternalCommand;
+            command = command.UnwrapUmbraco();
+
             lock (Commands)
             {
                 Commands.Enqueue(Tuple.Create(context, new WeakReference<IDbCommand>(command)));
@@ -29,40 +31,39 @@ namespace Umbraco.Core.Persistence
         {
             lock (Commands)
             {
-                var tuple = Commands.FirstOrDefault(x =>
-                {
-                    IDbCommand c;
-                    return x.Item2.TryGetTarget(out c) && c == command;
-                });
+                var tuple = Commands.FirstOrDefault(x => x.Item2.TryGetTarget(out var c) && c == command);
                 return tuple == null ? "?" : tuple.Item1;
             }
         }
 
         public static string GetReferencedObjects(IDbConnection con)
         {
-            var prof = con as StackExchange.Profiling.Data.ProfiledDbConnection;
-            if (prof != null) con = prof.InnerConnection;
-            var ceCon = con as System.Data.SqlServerCe.SqlCeConnection;
-            if (ceCon != null) return null; // "NotSupported: SqlCE";
-            var dbCon = con as DbConnection;
-            return dbCon == null
-                ? "NotSupported: " + con.GetType()
-                : GetReferencedObjects(dbCon);
+            con = con.UnwrapUmbraco();
+
+            if (con is SqlCeConnection) return null; // "NotSupported: SqlCE";
+
+            return con is DbConnection dbCon
+                ? GetReferencedObjects(dbCon)
+                : "NotSupported: " + con.GetType();
         }
 
         public static string GetReferencedObjects(DbConnection con)
         {
-            var t = con.GetType();
+            if (con.UnwrapUmbraco() is DbConnection ucon && !(ucon is SqlCeConnection))
+                con = ucon;
+            else
+                return "NotSupported: " + con.GetType();
 
+            var t = con.GetType();
             var field = t.GetField("_innerConnection", BindingFlags.Instance | BindingFlags.NonPublic);
             if (field == null) throw new Exception("panic: _innerConnection (" + t + ").");
             var innerConnection = field.GetValue(con);
 
-            var tin = innerConnection.GetType();
 
+            var tin = innerConnection.GetType();
             var fi = con is System.Data.SqlClient.SqlConnection
-                ? tin.BaseType.BaseType.GetField("_referenceCollection", BindingFlags.Instance | BindingFlags.NonPublic)
-                : tin.BaseType.GetField("_referenceCollection", BindingFlags.Instance | BindingFlags.NonPublic);
+                ? tin.BaseType?.BaseType?.GetField("_referenceCollection", BindingFlags.Instance | BindingFlags.NonPublic)
+                : tin.BaseType?.GetField("_referenceCollection", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi == null)
                 //return "";
                 throw new Exception("panic: referenceCollection.");
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Persistence
                 //return "";
                 throw new Exception("panic: innerCollection.");
 
-            field = rc.GetType().BaseType.GetField("_items", BindingFlags.Instance | BindingFlags.NonPublic);
+            field = rc.GetType().BaseType?.GetField("_items", BindingFlags.Instance | BindingFlags.NonPublic);
             if (field == null) throw new Exception("panic: items.");
             var items = field.GetValue(rc);
             var prop = items.GetType().GetProperty("Length", BindingFlags.Instance | BindingFlags.Public);
@@ -115,21 +116,26 @@ namespace Umbraco.Core.Persistence
                     i, inUse, objTarget.GetType(), objTarget.GetHashCode());
 
                 DbCommand cmd = null;
-                if (objTarget is DbDataReader)
+                switch (objTarget)
                 {
-                    //var rdr = objTarget as DbDataReader;
-                    try
-                    {
-                        cmd = objTarget.GetType().GetProperty("Command", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(objTarget, null) as DbCommand;
-                    }
-                    catch (Exception e)
-                    {
-                        result.AppendFormat("\t\tObjTarget: DbDataReader, Exception: {0}" + Environment.NewLine, e);
-                    }
-                }
-                else if (objTarget is DbCommand)
-                {
-                    cmd = objTarget as DbCommand;
+                    case DbDataReader _:
+                        //var rdr = objTarget as DbDataReader;
+                        try
+                        {
+                            var commandProp = objTarget.GetType().GetProperty("Command", BindingFlags.Instance | BindingFlags.NonPublic);
+                            if (commandProp == null)
+                                throw new Exception($"panic: failed to get Command property of {objTarget.GetType().FullName}.");
+                            cmd = commandProp.GetValue(objTarget, null) as DbCommand;
+                        }
+                        catch (Exception e)
+                        {
+                            result.AppendFormat("\t\tObjTarget: DbDataReader, Exception: {0}" + Environment.NewLine, e);
+                        }
+
+                        break;
+                    case DbCommand command:
+                        cmd = command;
+                        break;
                 }
                 if (cmd == null)
                 {
@@ -151,7 +157,9 @@ namespace Umbraco.Core.Persistence
 
                     if (pi.PropertyType != typeof (DbConnection) || pi.Name != "Connection") continue;
 
-                    var con1 = pi.GetValue(cmd, null) as DbConnection;
+                    var con0 = pi.GetValue(cmd, null);
+                    if (!(con0 is DbConnection con1))
+                        throw new Exception($"panic: expected DbConnection, got {con0?.GetType().FullName ?? "null"}.");
                     result.AppendFormat("\t\t\tConnection type=\"{0}\" state=\"{1}\" hashCode=\"{2}\"" + Environment.NewLine,
                         con1.GetType(), con1.State, con1.GetHashCode());
 
@@ -164,7 +172,7 @@ namespace Umbraco.Core.Persistence
                 }
             }
 
-            return result == null ? null : result.ToString();
+            return result?.ToString();
         }
     }
 }

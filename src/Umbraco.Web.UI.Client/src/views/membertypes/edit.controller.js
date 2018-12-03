@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MemberType.EditController
+ * @name Umbraco.Editors.MemberTypes.EditController
  * @function
  *
  * @description
@@ -12,7 +12,6 @@
     function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.save = save;
 
@@ -21,38 +20,60 @@
         vm.page = {};
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
-        vm.page.navigation = [
-			{
-			    "name": localizationService.localize("general_design"),
-			    "icon": "icon-document-dashed-line",
-			    "view": "views/membertypes/views/design/design.html",
-			    "active": true
-			}
+        vm.labels = {};
+
+        var labelKeys = [
+            "general_design",
+            "shortcuts_shortcut",
+            "shortcuts_addTab",
+            "shortcuts_addProperty",
+            "shortcuts_addEditor",
+            "shortcuts_editDataType"
         ];
 
-        vm.page.keyboardShortcutsOverview = [
-			{
-                "name": localizationService.localize("shortcuts_shortcut"),
-			    "shortcuts": [
-					{
-					    "description": localizationService.localize("shortcuts_addTab"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-					},
-					{
-					    "description": localizationService.localize("shortcuts_addProperty"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-					},
-					{
-					    "description": localizationService.localize("shortcuts_addEditor"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-					},
-					{
-					    "description": localizationService.localize("shortcuts_editDataType"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-					}
-			    ]
-			}
-        ];
+        localizationService.localizeMany(labelKeys).then(function(values){
+
+            vm.labels.design = values[0];
+            vm.labels.shortcut = values[1];
+            vm.labels.addTab = values[2];
+            vm.labels.addProperty = values[3];
+            vm.labels.addEditor = values[4];
+            vm.labels.editDataType = values[5];
+
+            vm.page.navigation = [
+                {
+                    "name": vm.labels.design,
+                    "icon": "icon-document-dashed-line",
+                    "view": "views/membertypes/views/design/design.html",
+                    "active": true
+                }
+            ];
+
+            vm.page.keyboardShortcutsOverview = [
+                {
+                    "name": vm.labels.shortcut,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.addTab,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                        },
+                        {
+                            "description": vm.labels.addProperty,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                        },
+                        {
+                            "description": vm.labels.addEditor,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
+                        },
+                        {
+                            "description": vm.labels.editDataType,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                        }
+                    ]
+                }
+            ];
+
+        });
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;
@@ -87,7 +108,7 @@
 
                             contentTypeHelper.generateModels().then(function (result) {
 
-                                if (result.success) { 
+                                if (!result.lastError) { 
 
                                     //re-check model status
                                     contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {
@@ -156,7 +177,6 @@
                 vm.page.saveButtonState = "busy";
 
                 contentEditingHelper.contentEditorPerformSave({
-                    statusMessage: localizeSaving,
                     saveMethod: memberTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,

@@ -10,7 +10,9 @@
                 name="vm.userGroup.name"
                 alias="vm.userGroup.alias"
                 icon="vm.userGroup.icon"
-                hide-description="true">
+                hide-description="true"
+                on-back="vm.goToPage(vm.breadcrumbs[0])"
+                show-back-button="vm.showBackButton">
             </umb-editor-header>
 
             <umb-editor-container>
@@ -145,27 +147,28 @@
 
                         <div class="umb-package-details__sidebar">
 
-                            <div class="umb-package-details__section">
+                            <umb-box>
+                                <umb-box-header title-key="sections_users"></umb-box-header>
+                                <umb-box-content>
+                                    
+                                    <umb-user-preview
+                                        ng-repeat="user in vm.userGroup.users"
+                                        name="user.name"
+                                        avatars="user.avatars"
+                                        allow-remove="true"
+                                        on-remove="vm.removeSelectedItem($index, vm.userGroup.users)">
+                                    </umb-user-preview>
 
-                                <div class="umb-package-details__section-title"><localize key="sections_users">Users</localize></div>
+                                    <a href=""
+                                        style="max-width: 100%;"
+                                        class="umb-node-preview-add"
+                                        ng-click="vm.openUserPicker()"
+                                        prevent-default>
+                                        <localize key="general_add">Add</localize>
+                                    </a>
 
-                                <umb-user-preview
-                                    ng-repeat="user in vm.userGroup.users"
-                                    name="user.name"
-                                    avatars="user.avatars"
-                                    allow-remove="true"
-                                    on-remove="vm.removeSelectedItem($index, vm.userGroup.users)">
-                                </umb-user-preview>
-
-                                <a href=""
-                                    style="max-width: 100%;"
-                                    class="umb-node-preview-add"
-                                    ng-click="vm.openUserPicker()"
-                                    prevent-default>
-                                    <localize key="general_add">Add</localize>
-                                </a>
-
-                            </div>
+                                </umb-box-content>
+                            </umb-box>
 
                         </div>
 
@@ -192,13 +195,6 @@
 
                     <umb-button
                         type="button"
-                        action="vm.goToPage(vm.breadcrumbs[0])"
-                        label="Return to list"
-                        label-key="buttons_returnToList">
-                    </umb-button>
-
-                    <umb-button
-                        type="button"
                         action="vm.save()"
                         state="vm.page.saveButtonState"
                         button-style="success"
@@ -214,40 +210,5 @@
         </umb-editor-view>
 
     </form>
-
-    <umb-overlay
-        ng-if="vm.sectionPicker.show"
-        model="vm.sectionPicker"
-        view="vm.sectionPicker.view"
-        position="right">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.contentPicker.show"
-        model="vm.contentPicker"
-        view="vm.contentPicker.view"
-        position="right">
-    </umb-overlay>
-    
-    <umb-overlay
-        ng-if="vm.mediaPicker.show"
-        model="vm.mediaPicker"
-        view="vm.mediaPicker.view"
-        position="right">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.userPicker.show"
-        model="vm.userPicker"
-        view="vm.userPicker.view"
-        position="right">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.nodePermissions.show"
-        model="vm.nodePermissions"
-        view="vm.nodePermissions.view"
-        position="right">
-    </umb-overlay>
 
 </div>

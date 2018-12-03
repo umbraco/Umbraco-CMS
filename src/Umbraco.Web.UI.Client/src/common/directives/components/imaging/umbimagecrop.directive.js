@@ -53,7 +53,7 @@ angular.module("umbraco.directives")
 					var $container = element.find(".crop-container");
 
 					//default constraints for drag n drop
-					var constraints = {left: {max: scope.dimensions.margin, min: scope.dimensions.margin}, top: {max: scope.dimensions.margin, min: scope.dimensions.margin}, };
+					var constraints = {left: {max: scope.dimensions.margin, min: scope.dimensions.margin}, top: {max: scope.dimensions.margin, min: scope.dimensions.margin} };
 					scope.constraints = constraints;
 
 
@@ -264,7 +264,7 @@ angular.module("umbraco.directives")
 					});
 
 					//ie hack
-					if(window.navigator.userAgent.indexOf("MSIE ")){
+					if(window.navigator.userAgent.indexOf("MSIE ") >= 0){
 						var ranger = element.find("input");
 						ranger.bind("change",function(){
 							scope.$apply(function(){

@@ -1,6 +1,6 @@
-<div ng-controller="Umbraco.PrevalueEditors.TreeSourceController" class="umb-editor umb-contentpicker">
+<div ng-controller="Umbraco.PrevalueEditors.TreeSourceController" class="umb-property-editor umb-contentpicker">
 
-	<select ng-model="model.value.type" class="umb-editor" ng-change="clear()">
+	<select ng-model="model.value.type" class="umb-property-editor" ng-change="clear()">
 		<option value="content">Content</option>
 		<option value="media">Media</option>
 		<option value="member">Members</option>
@@ -37,7 +37,7 @@
 			
 			<input type="text" 
 				ng-model="model.value.query" 
-				class="umb-editor umb-textstring" 
+				class="umb-property-editor umb-textstring" 
 				placeholder="Enter xpath query">
 
 				<ul class="unstyled list-icons" style="margin-top: 15px">	
@@ -76,12 +76,5 @@
 				</ul>
 		</span>
 	</div>
-
-	<umb-overlay
-		ng-if="treePickerOverlay.show"
-		model="treePickerOverlay"
-		position="right"
-		view="treePickerOverlay.view">
-	</umb-overlay>
 
 </div>

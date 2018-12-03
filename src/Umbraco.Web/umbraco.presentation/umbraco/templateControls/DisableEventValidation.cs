@@ -11,7 +11,7 @@ namespace umbraco.presentation.templateControls
     /// This control disables request validation (equalevant of setting validateRequest to false in page directive)
     /// </summary>
     [ToolboxData("<{0}:DisableRequestValidation runat=\"server\"></{0}:Item>")]
-	[Designer("umbraco.presentation.templateControls.ItemDesigner, umbraco")]
+    [Designer("umbraco.presentation.templateControls.ItemDesigner, Umbraco.Web")]
     public class DisableRequestValidation : System.Web.UI.WebControls.WebControl
     {
         protected override void OnInit(EventArgs e)

@@ -3,11 +3,13 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings.Css;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StylesheetHelperTests
+    public class StylesheetHelperTests : UmbracoTestBase
     {
         [Test]
         public void Replace_Rule()
@@ -65,18 +67,18 @@ p {
         [TestCase("Test", "p", @"font-size: 1em;
 color:red; font-weight:bold;
 
-text-align:left;", @"/** umb_name: Test */ p { font-size: 1em; 
+text-align:left;", @"/** umb_name: Test */ p { font-size: 1em;
 color:red; font-weight:bold;
 
-text-align:left; 
+text-align:left;
 
 }")]
         // All on one line with no spaces
         [TestCase("Test", "p", "font-size: 1em;", @"/**UMB_NAME:Test*/p{font-size: 1em;}")]
         // Has a name with spaces
-        [TestCase("Hello world", "p", "font-size: 1em;", @"/**UMB_NAME:Hello world */p{font-size: 1em;}")]        
+        [TestCase("Hello world", "p", "font-size: 1em;", @"/**UMB_NAME:Hello world */p{font-size: 1em;}")]
         // Every part on a new line
-        [TestCase("Test", "p", "font-size: 1em;", @"/** 
+        [TestCase("Test", "p", "font-size: 1em;", @"/**
 umb_name:
 Test
 */
@@ -86,7 +88,7 @@ font-size: 1em;
 }")]
         public void ParseRules_Parses(string name, string selector, string styles, string css)
         {
-            
+
             // Act
             var results = StylesheetHelper.ParseRules(css);
 
@@ -117,17 +119,96 @@ p, h2
         //Only a single asterisk
         [TestCase("/* umb_name: Test */ p { font-size: 1em; }")]
         // Has a name with spaces over multiple lines
-        [TestCase(@"/**UMB_NAME:Hello 
+        [TestCase(@"/**UMB_NAME:Hello
 
 world */p{font-size: 1em;}")]
         public void ParseRules_DoesntParse(string css)
         {
-         
+
             // Act
             var results = StylesheetHelper.ParseRules(css);
 
             // Assert
-            Assert.IsTrue(results.Count() == 0);
+            Assert.IsTrue(results.Any() == false);
         }
+
+        [Test]
+        public void AppendRules_IsFormatted()
+        {
+            // base CSS
+            var css = Tabbed(
+@"body {
+#font-family:Arial;
+}");
+            // add a couple of rules
+            var result = StylesheetHelper.AppendRule(css, new StylesheetRule
+            {
+                Name = "Test",
+                Selector = ".test",
+                Styles = "font-color: red;margin: 1rem;"
+            });
+            result = StylesheetHelper.AppendRule(result, new StylesheetRule
+            {
+                Name = "Test2",
+                Selector = ".test2",
+                Styles = "font-color: green;"
+            });
+
+            // verify the CSS formatting including the indents
+            Assert.AreEqual(Tabbed(
+@"body {
+#font-family:Arial;
+}
+
+/**umb_name:Test*/
+.test {
+#font-color: red;
+#margin: 1rem;
+}
+
+/**umb_name:Test2*/
+.test2 {
+#font-color: green;
+}"), result
+            );
+        }
+
+        [Test]
+        public void ParseFormattedRules_CanParse()
+        {
+            // base CSS
+            var css = Tabbed(
+@"body {
+#font-family:Arial;
+}
+
+/**umb_name:Test*/
+.test {
+#font-color: red;
+#margin: 1rem;
+}
+
+/**umb_name:Test2*/
+.test2 {
+#font-color: green;
+}");
+            var rules = StylesheetHelper.ParseRules(css);
+            Assert.AreEqual(2, rules.Count());
+
+            Assert.AreEqual("Test", rules.First().Name);
+            Assert.AreEqual(".test", rules.First().Selector);
+            Assert.AreEqual(
+@"font-color: red;
+margin: 1rem;", rules.First().Styles);
+
+            Assert.AreEqual("Test2", rules.Last().Name);
+            Assert.AreEqual(".test2", rules.Last().Selector);
+            Assert.AreEqual("font-color: green;", rules.Last().Styles);
+        }
+
+        // can't put tabs in verbatim strings, so this will replace # with \t to test the CSS indents
+        // - and it's tabs because the editor uses tabs, not spaces...
+        private static string Tabbed(string input) => input.Replace("#", "\t");
+
     }
 }

@@ -1,28 +1,28 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
-  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
-      
+app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
+    function (userService, $q, $log, $rootScope, $route, $location, urlHelper, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
+
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
         // it cannot be static
         $.ajaxSetup({
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
-              if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
-                xhr.setRequestHeader("X-UMB-DEBUG", "true");
-              }
+                var queryStrings = urlHelper.getQueryStringParams();
+                if (queryStrings.umbDebug === "true" || queryStrings.umbdebug === "true") {
+                    xhr.setRequestHeader("X-UMB-DEBUG", "true");
+                }
             }
         });
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
-        eventsService.on("app.authenticated", function(evt, data) {
-            
-            assetsService._loadInitAssets().then(function() {
-                
-                //Register all of the tours on the server
+        eventsService.on("app.authenticated", function (evt, data) {
+
+            assetsService._loadInitAssets().then(function () {
+
+                appReady(data);
+
                 tourService.registerAllTours().then(function () {
-                    appReady(data);
-                    
                     // Auto start intro tour
                     tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
                         // start intro tour if it hasn't been completed or disabled
@@ -30,11 +30,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                             tourService.startTour(introTour);
                         }
                     });
-
-                }, function(){
-                    appReady(data);
                 });
-
             });
 
         });
@@ -46,8 +42,12 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
             returnToPath = null, returnToSearch = null;
         }
 
+        var currentRouteParams = null;
+        
         /** execute code on each successful route */
-        $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
+        $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+
+            currentRouteParams = angular.copy(current.params); //store this so we can reference it in $routeUpdate
 
             var deployConfig = Umbraco.Sys.ServerVariables.deploy;
             var deployEnv, deployEnvTitle;
@@ -56,7 +56,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 deployEnvTitle = "(" + deployEnv + ") ";
             }
 
-            if(current.params.section) {
+            if (current.params.section) {
 
                 //Uppercase the current section, content, media, settings, developer, forms
                 var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
@@ -64,18 +64,18 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 var baseTitle = currentSection + " - " + $location.$$host;
 
                 //Check deploy for Global Umbraco.Sys obj workspace
-                if(deployEnv){
+                if (deployEnv) {
                     $rootScope.locationTitle = deployEnvTitle + baseTitle;
                 }
                 else {
                     $rootScope.locationTitle = baseTitle;
                 }
-                
+
             }
             else {
 
-                if(deployEnv) {
-                     $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
+                if (deployEnv) {
+                    $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
                 }
 
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
@@ -92,29 +92,62 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
             wiring up it's controller, etc... and then redirect to the rejected URL.   */
-        $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
-            event.preventDefault();
+        $rootScope.$on('$routeChangeError', function (event, current, previous, rejection) {
 
-            var returnPath = null;
-            if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
-                //Set the current path before redirecting so we know where to redirect back to
-                returnPath = encodeURIComponent($location.url());
-            }
+            if (rejection.path) {
+                event.preventDefault();
 
-            $location.path(rejection.path)
-            if (returnPath) {
-                $location.search("returnPath", returnPath);
+                var returnPath = null;
+                if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                    //Set the current path before redirecting so we know where to redirect back to
+                    returnPath = encodeURIComponent($location.url());
+                }
+
+                $location.path(rejection.path)
+                if (returnPath) {
+                    $location.search("returnPath", returnPath);
+                }
             }
 
         });
 
+        //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
+        //This is the case when a route uses reloadOnSearch: false which is the case for many or our routes so that we are able to maintain
+        //global state query strings without force re-loading views.
+        //We can then detect if it's a location change that should force a route or not programatically.
+        $rootScope.$on('$routeUpdate', function (event, next) {
 
-        /* this will initialize the navigation service once the application has started */
-        navigationService.init();
+            if (!currentRouteParams) {
+                //if there is no current route then always route which is done with reload
+                $route.reload();
+            }
+            else {
+                
+                //check if the location being changed is only due to global/state query strings which means the location change
+                //isn't actually going to cause a route change.
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
+                    //The location change will cause a route change. We need to ensure that the global/state
+                    //query strings have not been stripped out. If they have, we'll re-add them and re-route.
+
+                    var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
+                    if (toRetain) {
+                        $route.updateParams(toRetain);
+                    }
+                    else {
+                        //continue the route
+                        $route.reload();
+                    }
+                }
+                else {
+                    //navigation is not changing but we should update the currentRouteParams to include all current parameters
+                    currentRouteParams = angular.copy(next.params); 
+                }
+            }
+        });
 
         //check for touch device, add to global appState
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
-        var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
+        var touchDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
         appState.setGlobalState("touchDevice", touchDevice);
 
     }]);

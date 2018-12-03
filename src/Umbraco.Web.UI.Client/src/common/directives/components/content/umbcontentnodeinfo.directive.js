@@ -1,30 +1,54 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
+    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
 
-        function link(scope, element, attrs, ctrl) {
+        function link(scope, element, attrs, umbVariantContentCtrl) {
 
             var evts = [];
             var isInfoTab = false;
-            scope.publishStatus = {};
-            
+            var auditTrailLoaded = false;
+            var labels = {};
+            scope.publishStatus = [];
+
+            scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+            scope.allowChangeDocumentType = false;
+            scope.allowChangeTemplate = false;
+
             function onInit() {
 
-                scope.allowOpen = true;
+                // if there are any infinite editors open we are in infinite editing
+                scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
 
-                scope.datePickerConfig = {
-                    pickDate: true,
-                    pickTime: true,
-                    useSeconds: false,
-                    format: "YYYY-MM-DD HH:mm",
-                    icons: {
-                        time: "icon-time",
-                        date: "icon-calendar",
-                        up: "icon-chevron-up",
-                        down: "icon-chevron-down"
-                    }
-                };
+                userService.getCurrentUser().then(function(user){
+                        // only allow change of media type if user has access to the settings sections
+                        angular.forEach(user.sections, function(section){
+                            if(section.alias === "settings" && !scope.isInfiniteMode) {
+                                scope.allowChangeDocumentType = true;
+                                scope.allowChangeTemplate = true;
+                            }
+                        });
+                    });
+
+                var keys = [
+                    "general_deleted", 
+                    "content_unpublished", 
+                    "content_published",
+                    "content_publishedPendingChanges",
+                    "content_notCreated"
+                ];
+
+                localizationService.localizeMany(keys)
+                    .then(function(data){
+                        labels.deleted = data[0];
+                        labels.unpublished = data[1]; //aka draft
+                        labels.published = data[2];
+                        labels.publishedPendingChanges = data[3];
+                        labels.notCreated = data[4];
+
+                        setNodePublishStatus(scope.node);
+
+                    });
 
                 scope.auditTrailOptions = {
                     "id": scope.node.id
@@ -36,47 +60,83 @@
                 // get document type details
                 scope.documentType = scope.node.documentType;
 
-                // make sure dates are formatted to the user's locale
-                formatDatesToLocal();
+                //default setting for redirect url management
+                scope.urlTrackerDisabled = false;
 
-                setNodePublishStatus(scope.node);
-                
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                if (scope.documentType !== null) {
+                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                }
+
+                //load in the audit trail if we are currently looking at the INFO tab
+                if (umbVariantContentCtrl) {
+                    var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
+                    if (activeApp.alias === "umbInfo") {
+                        isInfoTab = true;
+                        loadAuditTrail();
+                        loadRedirectUrls();
+                    }
+                }
+
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
                 scope.auditTrailOptions.pageNumber = pageNumber;
+                auditTrailLoaded = false;
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {               
-                var url = "/settings/documenttypes/edit/" + documentType.id;
-                $location.path(url);
+            scope.openDocumentType = function (documentType) {
+                var editor = {
+                    id: documentType.id,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.documentTypeEditor(editor);
             };
+
+            scope.openTemplate = function () {
+                var templateEditor = {
+                    id: scope.node.templateId,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.templateEditor(templateEditor);
+            }
 
             scope.updateTemplate = function (templateAlias) {
-
                 // update template value
                 scope.node.template = templateAlias;
-
             };
 
-            scope.datePickerChange = function (event, type) {
-                if (type === 'publish') {
-                    setPublishDate(event.date.format("YYYY-MM-DD HH:mm"));
-                } else if (type === 'unpublish') {
-                    setUnpublishDate(event.date.format("YYYY-MM-DD HH:mm"));
-                }
-            };
-
-            scope.clearPublishDate = function () {
-                clearPublishDate();
-            };
-
-            scope.clearUnpublishDate = function () {
-                clearUnpublishDate();
+            scope.openRollback = function() {
+                
+                var rollback = {
+                    node: scope.node,
+                    submit: function(model) {
+                        const args = { node: scope.node };
+                        eventsService.emit("editors.content.reload", args);
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.rollback(rollback);
             };
 
             function loadAuditTrail() {
+
+                //don't load this if it's already done
+                if (auditTrailLoaded) { return; };
 
                 scope.loadingAuditTrail = true;
 
@@ -85,11 +145,11 @@
 
                         // get current backoffice user and format dates
                         userService.getCurrentUser().then(function (currentUser) {
-                            angular.forEach(data.items, function(item) {
+                            angular.forEach(data.items, function (item) {
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
-                    
+
                         scope.auditTrail = data.items;
                         scope.auditTrailOptions.pageNumber = data.pageNumber;
                         scope.auditTrailOptions.pageSize = data.pageSize;
@@ -97,19 +157,41 @@
                         scope.auditTrailOptions.totalPages = data.totalPages;
 
                         setAuditTrailLogTypeColor(scope.auditTrail);
-                        
+
                         scope.loadingAuditTrail = false;
+
+                        auditTrailLoaded = true;
                     });
 
+            }
+            function loadRedirectUrls() {
+                scope.loadingRedirectUrls = true;
+                //check if Redirect Url Management is enabled
+                redirectUrlsResource.getEnableState().then(function (response) {
+                    scope.urlTrackerDisabled = response.enabled !== true;
+                    if (scope.urlTrackerDisabled === false) {
+
+                        redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
+                            .then(function (data) {
+                                scope.redirectUrls = data.searchResults;
+                                scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
+                                scope.loadingRedirectUrls = false;
+                            });
+                    }
+                    else {
+                        scope.loadingRedirectUrls = false;
+                    }
+                });
             }
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
+
                     switch (item.logType) {
                         case "Publish":
                             item.logTypeColor = "success";
                             break;
-                        case "UnPublish":
+                        case "Unpublish":
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;
@@ -120,145 +202,75 @@
             }
 
             function setNodePublishStatus(node) {
-                
+
+                scope.publishStatus = [];
+
                 // deleted node
-                if(node.trashed === true) {
-                    scope.publishStatus.label = localizationService.localize("general_deleted");
-                    scope.publishStatus.color = "danger";
-                }
-
-                // unpublished node
-                if(node.published === false && node.trashed === false) {
-                    scope.publishStatus.label = localizationService.localize("content_unpublished");
-                    scope.publishStatus.color = "gray";
-                }
-
-                // published node
-                if(node.hasPublishedVersion === true && node.publishDate && node.published === true) {
-                    scope.publishStatus.label = localizationService.localize("content_published");
-                    scope.publishStatus.color = "success";
-                }
-
-                // published node with pending changes
-                if(node.hasPublishedVersion === true && node.publishDate && node.published === false) {
-                    scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
-                    scope.publishStatus.color = "success"
-                }
-
-            }
-
-            function setPublishDate(date) {
-
-                if (!date) {
+                if (node.trashed === true) {
+                    scope.publishStatus.push({
+                        label: labels.deleted,
+                        color: "danger"
+                    });
                     return;
                 }
 
-                //The date being passed in here is the user's local date/time that they have selected
-                //we need to convert this date back to the server date on the model.
+                if (node.variants) {
+                    for (var i = 0; i < node.variants.length; i++) {
 
-                var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+                        var variant = node.variants[i];
 
-                // update publish value
-                scope.node.releaseDate = serverTime;
+                        var status = {
+                            culture: variant.language ? variant.language.culture : null
+                        };
 
-                // make sure dates are formatted to the user's locale
-                formatDatesToLocal();
-
-                // emit event
-                var args = { node: scope.node, date: date };
-                eventsService.emit("editors.content.changePublishDate", args);
-
-            }
-
-            function clearPublishDate() {
-
-                // update publish value
-                scope.node.releaseDate = null;
-
-                // emit event
-                var args = { node: scope.node, date: null };
-                eventsService.emit("editors.content.changePublishDate", args);
-
-            }
-
-            function setUnpublishDate(date) {
-
-                if (!date) {
-                    return;
+                        if (variant.state === "NotCreated") {
+                            status.label = labels.notCreated;
+                            status.color = "gray";
+                        }
+                        else if (variant.state === "Draft") {
+                            // draft node
+                            status.label = labels.unpublished;
+                            status.color = "gray";
+                        }
+                        else if (variant.state === "Published") {
+                            // published node
+                            status.label = labels.published;
+                            status.color = "success";
+                        }
+                        else if (variant.state === "PublishedPendingChanges") {
+                            // published node with pending changes
+                            status.label = labels.publishedPendingChanges;
+                            status.color = "success";
+                        }
+                        
+                        scope.publishStatus.push(status);
+                    }
                 }
-
-                //The date being passed in here is the user's local date/time that they have selected
-                //we need to convert this date back to the server date on the model.
-
-                var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
-
-                // update publish value
-                scope.node.removeDate = serverTime;
-
-                // make sure dates are formatted to the user's locale
-                formatDatesToLocal();
-
-                // emit event
-                var args = { node: scope.node, date: date };
-                eventsService.emit("editors.content.changeUnpublishDate", args);
-
             }
 
-            function clearUnpublishDate() {
-
-                // update publish value
-                scope.node.removeDate = null;
-
-                // emit event
-                var args = { node: scope.node, date: null };
-                eventsService.emit("editors.content.changeUnpublishDate", args);
-
-            }
-            
-            function ucfirst(string) {
-                return string.charAt(0).toUpperCase() + string.slice(1);
-            }
-
-            function formatDatesToLocal() {
-                // get current backoffice user and format dates
-                userService.getCurrentUser().then(function (currentUser) {
-                    scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
-                    
-                    scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
-                    scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
-                    scope.node.releaseDateDayNumber = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'DD')) : null;
-                    scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
-                    scope.node.releaseDateTime = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'HH:mm')) : null;
-                    
-                    scope.node.removeDateYear = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'YYYY')) : null;
-                    scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
-                    scope.node.removeDateDayNumber = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'DD')) : null;
-                    scope.node.removeDateDay = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
-                    scope.node.removeDateTime = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'HH:mm')) : null;
-                });
-            }
-
-            // load audit trail when on the info tab
+            // load audit trail and redirects when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
-                $timeout(function(){
-                    if (args.id === -1) {
+                $timeout(function () {
+                    if (args.alias === "umbInfo") {
                         isInfoTab = true;
                         loadAuditTrail();
+                        loadRedirectUrls();
                     } else {
                         isInfoTab = false;
                     }
                 });
             }));
 
-            // watch for content updates - reload content when node is saved, published etc.
-            scope.$watch('node.updateDate', function(newValue, oldValue){
+            // watch for content state updates
+            scope.$watch('node.updateDate', function (newValue, oldValue) {
 
-                if(!newValue) { return; }
-                if(newValue === oldValue) { return; }             
-                
-                if(isInfoTab) {
+                if (!newValue) { return; }
+                if (newValue === oldValue) { return; }
+
+                if (isInfoTab) {
+                    auditTrailLoaded = false;
                     loadAuditTrail();
-                    formatDatesToLocal();
+                    loadRedirectUrls();
                     setNodePublishStatus(scope.node);
                 }
             });
@@ -275,6 +287,7 @@
         }
 
         var directive = {
+            require: '^^umbVariantContent',
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/content/umb-content-node-info.html',

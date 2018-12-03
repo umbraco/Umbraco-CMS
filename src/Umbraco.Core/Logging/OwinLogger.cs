@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 
 namespace Umbraco.Core.Logging
@@ -26,34 +26,34 @@ namespace Umbraco.Core.Logging
             switch (eventType)
             {
                 case TraceEventType.Critical:
-                    _logger.Error(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state), exception ?? new Exception("Critical error"));
+                    _logger.Fatal(_type.Value, exception, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Error:
-                    _logger.Error(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state), exception ?? new Exception("Error"));
+                    _logger.Error(_type.Value, exception, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Warning:
-                    _logger.Warn(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Warn(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Information:
-                    _logger.Info(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Info(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Verbose:
-                    _logger.Debug(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Debug(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Start:
-                    _logger.Debug(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Debug(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Stop:
-                    _logger.Debug(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Debug(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Suspend:
-                    _logger.Debug(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Debug(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Resume:
-                    _logger.Debug(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Debug(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Transfer:
-                    _logger.Debug(_type.Value, string.Format("Event Id: {0}, state: {1}", eventId, state));
+                    _logger.Debug(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 default:
                     throw new ArgumentOutOfRangeException("eventType");

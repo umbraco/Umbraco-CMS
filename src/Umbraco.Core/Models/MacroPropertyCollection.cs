@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Core.Models
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class MacroPropertyCollection : ObservableDictionary<string, IMacroProperty>, IDeepCloneable
     {
-        public MacroPropertyCollection() 
+        public MacroPropertyCollection()
             : base(property => property.Alias)
         {
         }
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Models
         /// <param name="currentAlias">
         /// The existing property alias
         /// </param>
-        /// <param name="newAlias"></param>        
+        /// <param name="newAlias"></param>
         public void UpdateProperty(string currentAlias, string name = null, int? sortOrder = null, string editorAlias = null, string newAlias = null)
         {
             var prop = this[currentAlias];
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Models
 
             if (name.IsNullOrWhiteSpace() == false)
             {
-                prop.Name = name;    
+                prop.Name = name;
             }
             if (sortOrder.HasValue)
             {

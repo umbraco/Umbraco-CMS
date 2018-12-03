@@ -4,11 +4,12 @@
 // -------------------------
 .umb-grid IFRAME {
     overflow: hidden;
+    width: 100%;
 }
 
 
 
-// Sortabel
+// Sortable
 // -------------------------
 
 // sortable-helper
@@ -127,6 +128,16 @@
     position: relative;
     margin-bottom: 40px;
     padding-top: 10px;
+
+    &:hover {
+        background-color: @grayLighter;
+    }
+
+    &[ng-click],
+    &[data-ng-click],
+    &[x-ng-click] {
+        cursor: pointer;
+    }
 }
 
 .umb-grid .row-tools a {
@@ -280,7 +291,6 @@
 .umb-grid .umb-control {
     position: relative;
     display: block;
-    overflow: hidden;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
@@ -432,7 +442,7 @@
     background-color: @gray-10;
 
     .umb-row-title-bar {
-        cursor: default;
+        cursor: inherit;
     }
 
     .umb-row-title {
@@ -528,15 +538,11 @@
 .umb-grid textarea.textstring {
     display: block;
     overflow: hidden;
-    border: none;
     background: @white;
     outline: none;
     resize: none;
     color: @gray-3;
-}
-
-.umb-grid .umb-cell-rte textarea.mceNoEditor {
-    display: none !important;
+    min-width: 100%;
 }
 
 .umb-grid .umb-cell-media .caption {
@@ -557,11 +563,6 @@
 .umb-grid .umb-cell-embed iframe {
     width: 100%;
 }
-
-.umb-grid .umb-cell-rte {
-    border-color: transparent;
-}
-
 
 
 // ICONS

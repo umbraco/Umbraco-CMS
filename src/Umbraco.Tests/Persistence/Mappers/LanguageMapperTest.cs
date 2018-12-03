@@ -10,11 +10,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new LanguageMapper().Map("Id");
+            string column = new LanguageMapper().Map(new SqlCeSyntaxProvider(), "Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoLanguage].[id]"));
@@ -23,11 +21,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_IsoCode_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new LanguageMapper().Map("IsoCode");
+            string column = new LanguageMapper().Map(new SqlCeSyntaxProvider(), "IsoCode");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageISOCode]"));
@@ -36,11 +32,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_CultureName_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new LanguageMapper().Map("CultureName");
+            string column = new LanguageMapper().Map(new SqlCeSyntaxProvider(), "CultureName");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageCultureName]"));

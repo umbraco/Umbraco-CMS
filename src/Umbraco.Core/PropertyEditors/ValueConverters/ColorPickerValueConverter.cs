@@ -1,42 +1,23 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    public class ColorPickerValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    public class ColorPickerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-	        if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-	        {
-				return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ColorPickerAlias);
-			}
-	        return false;
-        }
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ColorPicker);
 
-        public Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return UseLabel(propertyType) ? typeof(PickedColor) : typeof(string);
-        }
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+            => UseLabel(propertyType) ? typeof(PickedColor) : typeof(string);
 
-        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
-        {
-            return PropertyCacheLevel.Content;
-        }
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
 
-        private bool UseLabel(PublishedPropertyType propertyType)
-        {
-            var preValues = ApplicationContext.Current.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
-            PreValue preValue;
-            return preValues.PreValuesAsDictionary.TryGetValue("useLabel", out preValue) && preValue.Value == "1";
-        }
-
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             var useLabel = UseLabel(propertyType);
 
@@ -58,6 +39,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return ssource;
         }
 
+        private bool UseLabel(PublishedPropertyType propertyType)
+        {
+            return ConfigurationEditor.ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Configuration).UseLabel;
+        }
+
         public class PickedColor
         {
             public PickedColor(string color, string label)
@@ -66,13 +52,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 Label = label;
             }
 
-            public string Color { get; private set; }
-            public string Label { get; private set; }
+            public string Color { get; }
+            public string Label { get; }
 
-            public override string ToString()
-            {
-                return Color;
-            }
+            public override string ToString() => Color;
         }
     }
 }

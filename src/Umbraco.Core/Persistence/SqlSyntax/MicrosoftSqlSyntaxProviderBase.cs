@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Persistence.Querying;
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         where TSyntax : ISqlSyntaxProvider
     {
         protected MicrosoftSqlSyntaxProviderBase()
-        {            
+        {
             AutoIncrementDefinition = "IDENTITY(1,1)";
             GuidColumnDefinition = "UniqueIdentifier";
             RealColumnDefinition = "FLOAT";
@@ -25,28 +25,22 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             InitColumnTypeMap();
         }
 
-        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
+        public override string RenameTable => "sp_rename '{0}', '{1}'";
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
         public override string GetQuotedTableName(string tableName)
         {
             if (tableName.Contains(".") == false)
-                return string.Format("[{0}]", tableName);
+                return $"[{tableName}]";
 
             var tableNameParts = tableName.Split(new[] { '.' }, 2);
-            return string.Format("[{0}].[{1}]", tableNameParts[0], tableNameParts[1]);
+            return $"[{tableNameParts[0]}].[{tableNameParts[1]}]";
         }
 
-        public override string GetQuotedColumnName(string columnName)
-        {
-            return string.Format("[{0}]", columnName);
-        }
+        public override string GetQuotedColumnName(string columnName) => $"[{columnName}]";
 
-        public override string GetQuotedName(string name)
-        {
-            return string.Format("[{0}]", name);
-        }
+        public override string GetQuotedName(string name) => $"[{name}]";
 
         public override string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType)
         {
@@ -56,9 +50,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     return base.GetStringColumnEqualComparison(column, paramIndex, columnType);
                 case TextColumnType.NText:
                     //MSSQL doesn't allow for = comparison with NText columns but allows this syntax
-                    return string.Format("{0} LIKE @{1}", column, paramIndex);
+                    return $"{column} LIKE @{paramIndex}";
                 default:
-                    throw new ArgumentOutOfRangeException("columnType");
+                    throw new ArgumentOutOfRangeException(nameof(columnType));
             }
         }
 
@@ -70,69 +64,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     return base.GetStringColumnWildcardComparison(column, paramIndex, columnType);
                 case TextColumnType.NText:
                     //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE @{1}", column, paramIndex);
+                    return $"{column} LIKE @{paramIndex}";
                 default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnStartsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '{1}%'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEndsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '%{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '%{1}%'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return string.Format("{0} LIKE '{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
+                    throw new ArgumentOutOfRangeException(nameof(columnType));
             }
         }
 
@@ -154,7 +88,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// <returns></returns>
         public virtual SqlDbType GetSqlDbType(DbType dbType)
         {
-            var sqlDbType = SqlDbType.NVarChar;
+            SqlDbType sqlDbType;
 
             //SEE: https://msdn.microsoft.com/en-us/library/cc716729(v=vs.110).aspx
             // and https://msdn.microsoft.com/en-us/library/yy6y35y8%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396

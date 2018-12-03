@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.packager;
-using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
 
@@ -15,15 +16,15 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
-        private readonly ApplicationContext _applicationContext;
-        private readonly WebSecurity _security;
-        private readonly HttpContextBase _httpContext;
+        private readonly InstallHelper _installHelper;
+        private readonly UmbracoContext _umbracoContext;
+        private readonly IContentService _contentService;
 
-        public StarterKitDownloadStep(ApplicationContext applicationContext, WebSecurity security, HttpContextBase httpContext)
+        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper, UmbracoContext umbracoContext)
         {
-            _applicationContext = applicationContext;
-            _security = security;
-            _httpContext = httpContext;
+            _installHelper = installHelper;
+            _umbracoContext = umbracoContext;
+            _contentService = contentService;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
@@ -33,8 +34,7 @@ namespace Umbraco.Web.Install.InstallSteps
             //if there is no value assigned then use the default starter kit
             if (starterKitId.HasValue == false)
             {
-                var installHelper = new InstallHelper(UmbracoContext.Current);
-                var starterKits = installHelper.GetStarterKits().FirstOrDefault();
+                var starterKits = _installHelper.GetStarterKits().FirstOrDefault();
                 if (starterKits != null)
                     starterKitId = starterKits.Id;
                 else
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var result = DownloadPackageFiles(starterKitId.Value);
 
-            _applicationContext.RestartApplicationPool(_httpContext);
+            Current.RestartAppPool();
 
             return new InstallSetupResult(new Dictionary<string, object>
             {
@@ -59,11 +59,11 @@ namespace Umbraco.Web.Install.InstallSteps
         }
 
         private Tuple<string, int> DownloadPackageFiles(Guid kitGuid)
-        {          
+        {
             var installer = new Installer();
 
             //Go get the package file from the package repo
-            var packageFile = _applicationContext.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _security.GetUserId());
+            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (InstalledPackage.GetAllInstalledPackages().Count > 0)
                 return false;
 
-            if (_applicationContext.Services.ContentService.GetRootContent().Any())
+            if (_contentService.GetRootContent().Any())
                 return false;
 
             return true;

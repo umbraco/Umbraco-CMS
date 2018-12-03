@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -19,11 +19,11 @@ namespace Umbraco.Core.Persistence.Factories
             try
             {
                 userGroup.DisableChangeTracking();
-                userGroup.Id = dto.Id;                
+                userGroup.Id = dto.Id;
                 userGroup.CreateDate = dto.CreateDate;
-                userGroup.UpdateDate = dto.UpdateDate;                
-                userGroup.StartContentId = dto.StartContentId;                
-                userGroup.StartMediaId = dto.StartMediaId;                
+                userGroup.UpdateDate = dto.UpdateDate;
+                userGroup.StartContentId = dto.StartContentId;
+                userGroup.StartMediaId = dto.StartMediaId;
                 if (dto.UserGroup2AppDtos != null)
                 {
                     foreach (var app in dto.UserGroup2AppDtos)

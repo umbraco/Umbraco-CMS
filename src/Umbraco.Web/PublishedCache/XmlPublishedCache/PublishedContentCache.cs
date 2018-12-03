@@ -1,72 +1,98 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
-using umbraco;
 using System.Linq;
-using umbraco.BusinessLogic;
-using umbraco.presentation.preview;
-using Umbraco.Core.Services;
-using GlobalSettings = umbraco.GlobalSettings;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
-    internal class PublishedContentCache : IPublishedContentCache
+    internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
     {
-        #region Routes cache
+        private readonly ICacheProvider _cacheProvider;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly RoutesCache _routesCache;
+        private readonly IDomainCache _domainCache;
+        private readonly DomainHelper _domainHelper;
+        private readonly PublishedContentTypeCache _contentTypeCache;
 
-        private readonly RoutesCache _routesCache = new RoutesCache(!UnitTesting);
-
-        private DomainHelper _domainHelper;
-
-        private DomainHelper GetDomainHelper(IDomainService domainService)
+        // initialize a PublishedContentCache instance with
+        // an XmlStore containing the master xml
+        // an ICacheProvider that should be at request-level
+        // a RoutesCache - need to cleanup that one
+        // a preview token string (or null if not previewing)
+        public PublishedContentCache(
+            XmlStore xmlStore, // an XmlStore containing the master xml
+            IDomainCache domainCache, // an IDomainCache implementation
+            ICacheProvider cacheProvider, // an ICacheProvider that should be at request-level
+            IGlobalSettings globalSettings,
+            ISiteDomainHelper siteDomainHelper,
+            PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
+            RoutesCache routesCache, // a RoutesCache
+            string previewToken) // a preview token string (or null if not previewing)
+            : base(previewToken.IsNullOrWhiteSpace() == false)
         {
-            return _domainHelper ?? (_domainHelper = new DomainHelper(domainService));
+            _cacheProvider = cacheProvider;
+            _globalSettings = globalSettings;
+            _routesCache = routesCache; // may be null for unit-testing
+            _contentTypeCache = contentTypeCache;
+            _domainCache = domainCache;
+            _domainHelper = new DomainHelper(_domainCache, siteDomainHelper);
+
+            _xmlStore = xmlStore;
+            _xml = _xmlStore.Xml; // capture - because the cache has to remain consistent
+
+            if (previewToken.IsNullOrWhiteSpace() == false)
+                _previewContent = new PreviewContent(_xmlStore, previewToken);
         }
 
-        // for INTERNAL, UNIT TESTS use ONLY
-        internal RoutesCache RoutesCache { get { return _routesCache; } }
+        #region Unit Tests
 
         // for INTERNAL, UNIT TESTS use ONLY
-        internal static bool UnitTesting = false;
+        internal RoutesCache RoutesCache => _routesCache;
 
-        public virtual IPublishedContent GetByRoute(UmbracoContext umbracoContext, bool preview, string route, bool? hideTopLevelNode = null)
+        // for INTERNAL, UNIT TESTS use ONLY
+        internal XmlStore XmlStore => _xmlStore;
+
+        #endregion
+
+        #region Routes
+
+        public virtual IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            if (route == null) throw new ArgumentNullException("route");
+            if (route == null) throw new ArgumentNullException(nameof(route));
 
             // try to get from cache if not previewing
-            var contentId = preview ? 0 : _routesCache.GetNodeId(route);
+            var contentId = preview || _routesCache == null ? 0 : _routesCache.GetNodeId(route);
 
             // if found id in cache then get corresponding content
             // and clear cache if not found - for whatever reason
             IPublishedContent content = null;
             if (contentId > 0)
             {
-                content = GetById(umbracoContext, preview, contentId);
+                content = GetById(preview, contentId);
                 if (content == null)
-                    _routesCache.ClearNode(contentId);
+                    _routesCache?.ClearNode(contentId);
             }
 
             // still have nothing? actually determine the id
-            hideTopLevelNode = hideTopLevelNode ?? GlobalSettings.HideTopLevelNodeFromPath; // default = settings
-            content = content ?? DetermineIdByRoute(umbracoContext, preview, route, hideTopLevelNode.Value);
+            hideTopLevelNode = hideTopLevelNode ?? _globalSettings.HideTopLevelNodeFromPath; // default = settings
+            content = content ?? DetermineIdByRoute(preview, route, hideTopLevelNode.Value);
 
             // cache if we have a content and not previewing
-            if (content != null && preview == false)
-                AddToCacheIfDeepestRoute(umbracoContext, content, route);
+            if (content != null && preview == false && _routesCache != null)
+                AddToCacheIfDeepestRoute(content, route);
 
             return content;
         }
 
-        private void AddToCacheIfDeepestRoute(UmbracoContext umbracoContext, IPublishedContent content, string route)
+        private void AddToCacheIfDeepestRoute(IPublishedContent content, string route)
         {
             var domainRootNodeId = route.StartsWith("/") ? -1 : int.Parse(route.Substring(0, route.IndexOf('/')));
 
@@ -76,24 +102,28 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // that would be returned - the "deepest" route - and that is the route we want to cache, *not* the
             // longer one - so make sure we don't cache the wrong route
 
-            var deepest = UnitTesting == false
-                && DomainHelper.ExistsDomainInPath(umbracoContext.Application.Services.DomainService.GetAll(false), content.Path, domainRootNodeId) == false;
+            var deepest = DomainHelper.ExistsDomainInPath(_domainCache.GetAll(false), content.Path, domainRootNodeId) == false;
 
             if (deepest)
                 _routesCache.Store(content.Id, route, true); // trusted route
         }
 
-        public virtual string GetRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
+        {
+            return GetByRoute(PreviewDefault, route, hideTopLevelNode);
+        }
+
+        public virtual string GetRouteById(bool preview, int contentId, string culture = null)
         {
             // try to get from cache if not previewing
-            var route = preview ? null : _routesCache.GetRoute(contentId);
+            var route = preview || _routesCache == null ? null : _routesCache.GetRoute(contentId);
 
             // if found in cache then return
             if (route != null)
                 return route;
 
             // else actually determine the route
-            route = DetermineRouteById(umbracoContext, preview, contentId);
+            route = DetermineRouteById(preview, contentId);
 
             // node not found
             if (route == null)
@@ -108,20 +138,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return route;
         }
 
-        IPublishedContent DetermineIdByRoute(UmbracoContext umbracoContext, bool preview, string route, bool hideTopLevelNode)
+        public string GetRouteById(int contentId, string culture = null)
         {
-            if (route == null) throw new ArgumentNullException("route");
+            return GetRouteById(PreviewDefault, contentId, culture);
+        }
 
+        IPublishedContent DetermineIdByRoute(bool preview, string route, bool hideTopLevelNode)
+        {
             //the route always needs to be lower case because we only store the urlName attribute in lower case
-            route = route.ToLowerInvariant();
+            route = route?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(route));
 
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
 
             //check if we can find the node in our xml cache
-            var id = NavigateRoute(umbracoContext, preview, startNodeId, path, hideTopLevelNode);
-            return id > 0 ? GetById(umbracoContext, preview, id) : null;
+            var id = NavigateRoute(preview, startNodeId, path, hideTopLevelNode);
+            return id > 0 ? GetById(preview, id) : null;
         }
 
         private static XmlElement GetXmlElementChildWithLowestSortOrder(XmlNode element)
@@ -142,9 +175,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return elt;
         }
 
-        private int NavigateRoute(UmbracoContext umbracoContext, bool preview, int startNodeId, string path, bool hideTopLevelNode)
+        private int NavigateRoute(bool preview, int startNodeId, string path, bool hideTopLevelNode)
         {
-            var xml = GetXml(umbracoContext, preview);
+            var xml = GetXml(preview);
             XmlElement elt;
 
             // empty path
@@ -188,11 +221,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return NavigateElementRoute(elt, urlParts);
         }
 
-        private static bool UseLegacySchema
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
-        }
-
         private static int NavigateElementRoute(XmlElement elt, string[] urlParts)
         {
             var found = true;
@@ -208,9 +236,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     var child = o as XmlElement;
                     if (child == null) continue;
 
-                    var noNode = UseLegacySchema
-                        ? child.Name != "node"
-                        : child.GetAttributeNode("isDoc") == null;
+                    var noNode = child.GetAttributeNode("isDoc") == null;
                     if (noNode) continue;
                     if (child.GetAttribute("urlName") != urlParts[i]) continue;
 
@@ -227,41 +253,36 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return found ? int.Parse(elt.GetAttribute("id")) : -1;
         }
 
-        string DetermineRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
+        string DetermineRouteById(bool preview, int contentId)
         {
-            var xml = GetXml(umbracoContext, preview);
-            var elt = xml.GetElementById(contentId.ToString(CultureInfo.InvariantCulture));
-            if (elt == null) return null;
-
-            var domainHelper = GetDomainHelper(umbracoContext.Application.Services.DomainService);
+            var node = GetById(preview, contentId);
+            if (node == null) return null;
 
             // walk up from that node until we hit a node with a domain,
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
-            var eltId = int.Parse(elt.GetAttribute("id"));
-            var eltParentId = int.Parse(((XmlElement) elt.ParentNode).GetAttribute("id"));
-            var e = elt;
-            var id = eltId;
-            var hasDomains = domainHelper.NodeHasDomains(id);
-            while (hasDomains == false && id != -1)
+            var n = node;
+            var hasDomains = _domainHelper.NodeHasDomains(n.Id);
+            while (hasDomains == false && n != null) // n is null at root
             {
                 // get the url
-                var urlName = e.GetAttribute("urlName");
+                var urlName = n.UrlSegment;
                 pathParts.Add(urlName);
 
                 // move to parent node
-                e = (XmlElement) e.ParentNode;
-                id = int.Parse(e.GetAttribute("id"), CultureInfo.InvariantCulture);
-                hasDomains = id != -1 && domainHelper.NodeHasDomains(id);
+                n = n.Parent;
+                hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-            if (hasDomains == false && GlobalSettings.HideTopLevelNodeFromPath)
+            if (hasDomains == false && _globalSettings.HideTopLevelNodeFromPath)
             {
-                if (eltParentId == -1)
+                if (node.Parent == null)
                 {
-                    var rootNode = GetXmlElementChildWithLowestSortOrder(xml.DocumentElement);
-                    if (rootNode != null && rootNode == elt)
+                    var rootNode = GetByRoute(preview, "/", true);
+                    if (rootNode == null)
+                        throw new Exception("Failed to get node at /.");
+                    if (rootNode.Id == node.Id) // remove only if we're the default node
                         pathParts.RemoveAt(pathParts.Count - 1);
                 }
                 else
@@ -273,7 +294,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // assemble the route
             pathParts.Reverse();
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-            var route = (id == -1 ? "" : id.ToString(CultureInfo.InvariantCulture)) + path;
+            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
 
             return route;
         }
@@ -282,210 +303,247 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region XPath Strings
 
-        class XPathStringsDefinition
-		{
-			public int Version { get; private set; }
+        static class XPathStrings
+        {
+            public const string Root = "/root";
+            public const string RootDocuments = "/root/* [@isDoc]";
+        }
 
-			public string RootDocuments { get; private set; }
-
-			public XPathStringsDefinition(int version)
-			{
-				Version = version;
-
-				switch (version)
-				{
-					// legacy XML schema
-					case 0:
-						RootDocuments = "/root/node";
-						break;
-
-					// default XML schema as of 4.10
-					case 1:
-						RootDocuments = "/root/* [@isDoc]";
-						break;
-
-					default:
-						throw new Exception(string.Format("Unsupported Xml schema version '{0}').", version));
-				}
-			}
-		}
-
-		static XPathStringsDefinition _xPathStringsValue;
-		static XPathStringsDefinition XPathStrings
-		{
-			get
-			{
-				// in theory XPathStrings should be a static variable that
-				// we should initialize in a static ctor - but then test cases
-				// that switch schemas fail - so cache and refresh when needed,
-				// ie never when running the actual site
-
-				var version = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? 0 : 1;
-				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
-					_xPathStringsValue = new XPathStringsDefinition(version);
-				return _xPathStringsValue;
-			}
-		}
-
-		#endregion
+        #endregion
 
         #region Converters
 
-        private static IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
-		{
-		    return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing);
-		}
+        private IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
+        {
+            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _cacheProvider, _contentTypeCache);
+        }
 
-        private static IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
+        private IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
             return xmlNodes.Cast<XmlNode>()
-                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing));
+                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _cacheProvider, _contentTypeCache));
         }
 
         #endregion
 
         #region Getters
 
-        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int nodeId)
-    	{
-    		return ConvertToDocument(GetXml(umbracoContext, preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)), preview);
-    	}
-
-        public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
+        public override IPublishedContent GetById(bool preview, int nodeId)
         {
-            return ConvertToDocuments(GetXml(umbracoContext, preview).SelectNodes(XPathStrings.RootDocuments), preview);
-		}
+            return ConvertToDocument(GetXml(preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)), preview);
+        }
 
-        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, params XPathVariable[] vars)
+        public override IPublishedContent GetById(bool preview, Guid nodeId)
         {
-            if (xpath == null) throw new ArgumentNullException("xpath");
+            // implement this, but in a more efficient way
+            //const string xpath = "//* [@isDoc and @key=$guid]";
+            //return GetSingleByXPath(preview, xpath, new[] { new XPathVariable("guid", nodeId.ToString()) });
+
+            var keyMatch = nodeId.ToString();
+
+            var nav = GetXml(preview).CreateNavigator();
+            if (nav.MoveToFirstChild() == false) return null; // from / to /root
+            if (nav.MoveToFirstChild() == false) return null; // from /root to /root/*
+
+            while (true)
+            {
+                var isDoc = false;
+                string key = null;
+
+                if (nav.HasAttributes)
+                {
+                    nav.MoveToFirstAttribute();
+                    do
+                    {
+                        if (nav.Name == "isDoc") isDoc = true;
+                        if (nav.Name == "key") key = nav.Value;
+                        if (isDoc && key != null) break;
+                    } while (nav.MoveToNextAttribute());
+                    nav.MoveToParent();
+                }
+
+                if (isDoc == false || key != keyMatch)
+                {
+                    if (isDoc && nav.MoveToFirstChild())
+                        continue;
+                    while (nav.MoveToNext(XPathNodeType.Element) == false)
+                        if (nav.MoveToParent() == false || nav.NodeType == XPathNodeType.Root) return null;
+                    continue;
+                }
+
+                var elt = nav.UnderlyingObject as XmlNode;
+                return ConvertToDocument(elt, preview);
+            }
+        }
+
+        public override bool HasById(bool preview, int contentId)
+        {
+            return GetXml(preview).CreateNavigator().MoveToId(contentId.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
+        {
+            return ConvertToDocuments(GetXml(preview).SelectNodes(XPathStrings.RootDocuments), preview);
+        }
+
+        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
+        {
+            if (xpath == null) throw new ArgumentNullException(nameof(xpath));
             if (string.IsNullOrWhiteSpace(xpath)) return null;
 
-            var xml = GetXml(umbracoContext, preview);
+            var xml = GetXml(preview);
             var node = vars == null
                 ? xml.SelectSingleNode(xpath)
                 : xml.SelectSingleNode(xpath, vars);
             return ConvertToDocument(node, preview);
         }
 
-        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, params XPathVariable[] vars)
+        public override IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
         {
-            if (xpath == null) throw new ArgumentNullException("xpath");
+            if (xpath == null) throw new ArgumentNullException(nameof(xpath));
 
-            var xml = GetXml(umbracoContext, preview);
+            var xml = GetXml(preview);
             var node = vars == null
                 ? xml.SelectSingleNode(xpath)
                 : xml.SelectSingleNode(xpath, vars);
             return ConvertToDocument(node, preview);
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, params XPathVariable[] vars)
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
         {
-            if (xpath == null) throw new ArgumentNullException("xpath");
+            if (xpath == null) throw new ArgumentNullException(nameof(xpath));
             if (string.IsNullOrWhiteSpace(xpath)) return Enumerable.Empty<IPublishedContent>();
 
-            var xml = GetXml(umbracoContext, preview);
+            var xml = GetXml(preview);
             var nodes = vars == null
                 ? xml.SelectNodes(xpath)
                 : xml.SelectNodes(xpath, vars);
             return ConvertToDocuments(nodes, preview);
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, params XPathVariable[] vars)
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
         {
-            if (xpath == null) throw new ArgumentNullException("xpath");
+            if (xpath == null) throw new ArgumentNullException(nameof(xpath));
 
-            var xml = GetXml(umbracoContext, preview);
+            var xml = GetXml(preview);
             var nodes = vars == null
                 ? xml.SelectNodes(xpath)
                 : xml.SelectNodes(xpath, vars);
             return ConvertToDocuments(nodes, preview);
         }
 
-        public virtual bool HasContent(UmbracoContext umbracoContext, bool preview)
+        public override bool HasContent(bool preview)
         {
-	        var xml = GetXml(umbracoContext, preview);
-			if (xml == null)
-				return false;
-			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
-			return node != null;
+            var xml = GetXml(preview);
+            var node = xml?.SelectSingleNode(XPathStrings.RootDocuments);
+            return node != null;
         }
 
-        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext, bool preview)
+        public override XPathNavigator CreateNavigator(bool preview)
         {
-            var xml = GetXml(umbracoContext, preview);
+            var xml = GetXml(preview);
             return xml.CreateNavigator();
         }
 
-        public virtual bool XPathNavigatorIsNavigable { get { return false; } }
+        public override XPathNavigator CreateNodeNavigator(int id, bool preview)
+        {
+            // hackish - backward compatibility ;-(
+
+            XPathNavigator navigator = null;
+
+            if (preview)
+            {
+                var node = _xmlStore.GetPreviewXmlNode(id);
+                if (node != null)
+                {
+                    navigator = node.CreateNavigator();
+                }
+            }
+            else
+            {
+                var node = GetXml(false).GetElementById(id.ToInvariantString());
+                if (node != null)
+                {
+                    var doc = new XmlDocument();
+                    var clone = doc.ImportNode(node, false);
+                    var props = node.SelectNodes("./* [not(@id)]");
+                    if (props == null) throw new Exception("oops");
+                    foreach (var n in props.Cast<XmlNode>())
+                        clone.AppendChild(doc.ImportNode(n, true));
+                    navigator = node.CreateNavigator();
+                }
+            }
+
+            return navigator;
+        }
 
         #endregion
 
         #region Legacy Xml
 
-        static readonly ConditionalWeakTable<UmbracoContext, PreviewContent> PreviewContentCache
-            = new ConditionalWeakTable<UmbracoContext, PreviewContent>();
+        private readonly XmlStore _xmlStore;
+        private XmlDocument _xml;
+        private readonly PreviewContent _previewContent;
 
-        private Func<UmbracoContext, bool, XmlDocument> _xmlDelegate;
-
-        /// <summary>
-        /// Gets/sets the delegate used to retrieve the Xml content, generally the setter is only used for unit tests
-        /// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
-        /// </summary>
-        /// <remarks>
-        /// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
-        /// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
-        /// that when run inside of a unit test fails.
-        /// </remarks>
-        internal Func<UmbracoContext, bool, XmlDocument> GetXmlDelegate
+        internal XmlDocument GetXml(bool preview)
         {
-            get
+            // not trying to be thread-safe here, that's not the point
+
+            if (preview == false)
             {
-                return _xmlDelegate ?? (_xmlDelegate = (context, preview) =>
-                {
-                    if (preview)
-                    {
-                        var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
-                        previewContent.EnsureInitialized(context.UmbracoUser, StateHelper.Cookies.Preview.GetValue(), true, () =>
-                        {
-                            if (previewContent.ValidPreviewSet)
-                                previewContent.LoadPreviewset();
-                        });
-                        if (previewContent.ValidPreviewSet)
-                            return previewContent.XmlContent;
-                    }
-                    return content.Instance.XmlContent;
-                });
+                // if there's a current enlisted reader/writer, use its xml
+                var tempXml = _xmlStore.TempXml;
+                if (tempXml != null) return tempXml;
+                return _xml;
             }
-            set
-            {
-                _xmlDelegate = value;
-            }
+
+            // Xml cache does not support retrieving preview content when not previewing
+            if (_previewContent == null)
+                throw new InvalidOperationException("Cannot retrieve preview content when not previewing.");
+
+            // PreviewContent tries to load the Xml once and if it fails,
+            // it invalidates itself and always return null for XmlContent.
+            var previewXml = _previewContent.XmlContent;
+            return previewXml ?? _xml;
         }
 
-        internal XmlDocument GetXml(UmbracoContext umbracoContext, bool preview)
+        internal void Resync(XmlDocument xml)
         {
-            var xml = GetXmlDelegate(umbracoContext, preview);
-            if (xml == null)
-                throw new Exception("The Xml cache is corrupt. Use the Health Check data integrity dashboard to fix it.");
-            return xml;
+            _xml = xml; // re-capture
+
+            // note: we're not resyncing "preview" because that would mean re-building the whole
+            // preview set which is costly, so basically when previewing, there will be no resync.
+
+            // clear recursive properties cached by XmlPublishedContent.GetProperty
+            // assume that nothing else is going to cache IPublishedProperty items (else would need to do ByKeySearch)
+            // NOTE also clears all the media cache properties, which is OK (see media cache)
+            _cacheProvider.ClearCacheObjectTypes<IPublishedProperty>();
+            //_cacheProvider.ClearCacheByKeySearch("XmlPublishedCache.PublishedContentCache:RecursiveProperty-");
         }
 
         #endregion
 
         #region XPathQuery
 
-        static readonly char[] SlashChar = new[] { '/' };
+        static readonly char[] SlashChar = { '/' };
 
         #endregion
 
-        #region Detached
+        #region Content types
 
-        public IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing)
+        public override PublishedContentType GetContentType(int id)
         {
-            if (propertyType.IsDetachedOrNested == false)
-                throw new ArgumentException("Property type is neither detached nor nested.", "propertyType");
-            return new XmlPublishedProperty(propertyType, isPreviewing, value.ToString());
+            return _contentTypeCache.Get(PublishedItemType.Content, id);
+        }
+
+        public override PublishedContentType GetContentType(string alias)
+        {
+            return _contentTypeCache.Get(PublishedItemType.Content, alias);
+        }
+
+        public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

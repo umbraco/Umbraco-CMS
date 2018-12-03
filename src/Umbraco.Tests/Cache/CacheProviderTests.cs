@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Cache
         public virtual void TearDown()
         {
             Provider.ClearAllCache();
-        } 
+        }
 
         [Test]
         public void Throws_On_Reentry()
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Cache
             var counter = 0;
 
             object result;
-            
+
             result = Provider.GetCacheItem("Blah", () =>
             {
                 counter++;
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Cache
             Assert.AreEqual(2, GetTotalItemCount);
         }
 
-        [Test] 
+        [Test]
         public void Can_Clear_All_Items()
         {
             var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");

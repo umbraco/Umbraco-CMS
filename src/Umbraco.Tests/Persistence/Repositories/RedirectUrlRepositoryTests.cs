@@ -4,53 +4,49 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class RedirectUrlRepositoryTests : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class RedirectUrlRepositoryTests : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
-            CreateTestData();
-        }
+            base.SetUp();
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
+            CreateTestData();
         }
 
         [Test]
         public void CanSaveAndGet()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurl = repo.GetMostRecentUrl("blah");
-                uow.Commit();
+                scope.Complete();
 
                 Assert.IsNotNull(rurl);
                 Assert.AreEqual(_textpage.Id, rurl.ContentId);
@@ -60,20 +56,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetMostRecent()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
             Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
 
@@ -88,17 +84,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "blah",
                     CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurl = repo.GetMostRecentUrl("blah");
-                uow.Commit();
+                scope.Complete();
 
                 Assert.IsNotNull(rurl);
                 Assert.AreEqual(_otherpage.Id, rurl.ContentId);
@@ -108,18 +104,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetByContent()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
 
@@ -131,17 +127,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "durg",
                     CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
-                uow.Commit();
+                scope.Complete();
 
                 Assert.AreEqual(2, rurls.Length);
                 Assert.AreEqual("durg", rurls[0].Url);
@@ -152,18 +148,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndDelete()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
 
@@ -172,17 +168,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                     ContentKey = _otherpage.Key,
                     Url = "durg"
                 };
-                repo.AddOrUpdate(rurl);
-                uow.Commit();
+                repo.Save(rurl);
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.GetUnitOfWork())
-            using (var repo = CreateRepository(uow))
+            using (var scope = provider.CreateScope())
             {
+                var repo = CreateRepository(provider);
                 repo.DeleteContentUrls(_textpage.Key);
-                uow.Commit();
+                scope.Complete();
 
                 var rurls = repo.GetContentUrls(_textpage.Key);
 
@@ -190,9 +186,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IRedirectUrlRepository CreateRepository(IScopeUnitOfWork uow)
+        private IRedirectUrlRepository CreateRepository(IScopeProvider provider)
         {
-            return new RedirectUrlRepository(uow, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax);
+            return new RedirectUrlRepository((IScopeAccessor) provider, CacheHelper, Logger);
         }
 
         private IContent _textpage, _subpage, _otherpage, _trashed;
@@ -202,6 +198,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = Guid.NewGuid();
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)

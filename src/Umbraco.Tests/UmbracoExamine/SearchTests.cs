@@ -1,49 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Examine;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
-using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Index;
-using Umbraco.Tests.TestHelpers;
+using Moq;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
+using Umbraco.Examine;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SearchTests : ExamineBaseTest
     {
 
         [Test]
         public void Test_Sort_Order_Sorting()
         {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer, null,
-                    new TestDataService()
-                    {
-                        ContentService = new TestContentService(TestFiles.umbraco_sort)
-                    },
-                    supportUnpublishedContent: true))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
-            {                
-                indexer.RebuildIndex();                
+            long totalRecs;
+            var demoData = new ExamineDemoDataContentService(TestFiles.umbraco_sort);
+            var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
+                .Root
+                .Elements()
+                .Select(x => Mock.Of<IContent>(
+                    m =>
+                        m.Id == (int)x.Attribute("id") &&
+                        m.ParentId == (int)x.Attribute("parentID") &&
+                        m.Level == (int)x.Attribute("level") &&
+                        m.CreatorId == 0 &&
+                        m.SortOrder == (int)x.Attribute("sortOrder") &&
+                        m.CreateDate == (DateTime)x.Attribute("createDate") &&
+                        m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
+                        m.Name == (string)x.Attribute("nodeName") &&
+                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
+                        m.Path == (string)x.Attribute("path") &&
+                        m.Properties == new PropertyCollection() &&
+                        m.Published == true &&
+                        m.ContentType == Mock.Of<IContentType>(mt =>
+                            mt.Icon == "test" &&
+                            mt.Alias == x.Name.LocalName &&
+                            mt.Id == (int)x.Attribute("nodeType"))))
+                .ToArray();
+            var contentService = Mock.Of<IContentService>(
+                x => x.GetPagedDescendants(
+                    It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
+                    ==
+                    allRecs);
 
-                var s = (LuceneSearcher)searcher;
-                var luceneSearcher = s.GetSearcher();
-                var i = (LuceneIndexer)indexer;
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, contentService: contentService))
+            using (indexer.ProcessNonAsync())
+            {
+                indexer.RebuildIndex();
+                
 
-                var numberSortedCriteria = searcher.CreateSearchCriteria()
+                var searcher = indexer.GetSearcher();
+
+                var numberSortedCriteria = searcher.CreateCriteria()
                     .ParentId(1148).And()
                     .OrderBy(new SortableField("sortOrder", SortType.Int));
                 var numberSortedResult = searcher.Search(numberSortedCriteria.Compile());
 
-                var stringSortedCriteria = searcher.CreateSearchCriteria()
+                var stringSortedCriteria = searcher.CreateCriteria()
                     .ParentId(1148).And()
                     .OrderBy("sortOrder"); //will default to string
                 var stringSortedResult = searcher.Search(stringSortedCriteria.Compile());
@@ -69,7 +93,25 @@ namespace Umbraco.Tests.UmbracoExamine
                 currentSort = sort;
             }
             return true;
-        }        
+        }
+
+        //[Test]
+        //public void Test_Index_Type_With_German_Analyzer()
+        //{
+        //    using (var luceneDir = new RandomIdRamDirectory())
+        //    {
+        //        var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
+        //            new GermanAnalyzer());
+        //        indexer.RebuildIndex();
+        //        var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+        //    }
+        //}
+
+        //private readonly TestContentService _contentService = new TestContentService();
+        //private readonly TestMediaService _mediaService = new TestMediaService();
+        //private static UmbracoExamineSearcher _searcher;
+        //private static UmbracoContentIndexer _indexer;
+        //private Lucene.Net.Store.Directory _luceneDir;
 
     }
 }

@@ -2,10 +2,11 @@
 using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using umbraco.BusinessLogic;
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Tests.Testing;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TreesAndSections
 {
@@ -13,16 +14,19 @@ namespace Umbraco.Tests.TreesAndSections
     ///This is a test class for ApplicationTest and is intended
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
-    [RequiresAutoMapperMappings]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture()]
-    public class SectionTests : BaseDatabaseFactoryTest
+    [TestFixture]
+    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class SectionTests : TestWithDatabaseBase
     {
-
-        [SetUp]
-        public override void Initialize()
+        protected override void Compose()
         {
-            base.Initialize();
+            base.Compose();
+            Container.Register<ISectionService, SectionService>();
+        }
+
+        public override void SetUp()
+        {
+            base.SetUp();
 
             var treesConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/trees.config");
             var appConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/applications.config");
@@ -40,10 +44,10 @@ namespace Umbraco.Tests.TreesAndSections
             SectionService.AppConfigFilePath = appConfig;
         }
 
-        [TearDown]
         public override void TearDown()
         {
             base.TearDown();
+
             if (Directory.Exists(TestHelper.MapPathForTest("~/TEMP/TreesAndSections")))
             {
                 Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);
@@ -59,15 +63,15 @@ namespace Umbraco.Tests.TreesAndSections
         public void Application_Make_New()
         {
             var name = Guid.NewGuid().ToString("N");
-            ApplicationContext.Current.Services.SectionService.MakeNew(name, name, "icon.jpg");
-            
+            ServiceContext.SectionService.MakeNew(name, name, "icon.jpg");
+
             //check if it exists
-            var app = ApplicationContext.Current.Services.SectionService.GetByAlias(name);
+            var app = ServiceContext.SectionService.GetByAlias(name);
             Assert.IsNotNull(app);
 
             //now remove it
-            ApplicationContext.Current.Services.SectionService.DeleteSection(app);
-            Assert.IsNull(ApplicationContext.Current.Services.SectionService.GetByAlias(name));
+            ServiceContext.SectionService.DeleteSection(app);
+            Assert.IsNull(ServiceContext.SectionService.GetByAlias(name));
         }
 
         #region Tests to write
@@ -107,7 +111,7 @@ namespace Umbraco.Tests.TreesAndSections
         //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
         //}
 
-       
+
 
         ///// <summary>
         /////A test for MakeNew
@@ -213,11 +217,11 @@ namespace Umbraco.Tests.TreesAndSections
         //    actual = target.name;
         //    Assert.AreEqual(expected, actual);
         //    Assert.Inconclusive("Verify the correctness of this test method.");
-        //} 
+        //}
         #endregion
 
         #region Additional test attributes
-        // 
+        //
         //You can use the following additional attributes as you write your tests:
         //
         //Use ClassInitialize to run code before running the first test in the class

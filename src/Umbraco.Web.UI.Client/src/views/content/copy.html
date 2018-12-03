@@ -51,7 +51,8 @@
                             hideheader="{{treeModel.hideHeader}}"
                             hideoptions="true"
                             isdialog="true"
-                            eventhandler="dialogTreeEventHandler"
+                            api="dialogTreeApi"
+                            on-init="onTreeInit()"
                             enablelistviewexpand="true"
                             enablecheckboxes="true">
                         </umb-tree>
@@ -68,13 +69,13 @@
 
                 <umb-pane>
                     <umb-control-group  localize="label" label="@defaultdialogs_relateToOriginalLabel">
-                        <input type="checkbox" ng-model="$parent.$parent.relateToOriginal"/>
+                        <umb-toggle checked="$parent.$parent.relateToOriginal" on-click="$parent.$parent.toggle('relate')"></umb-toggle>
                     </umb-control-group>
                 </umb-pane>
 
                 <umb-pane>
-                    <umb-control-group localize="label" label="@defaultdialogs_includeDescendants"> 
-                        <input type="checkbox" ng-model="$parent.$parent.recursive" />
+                    <umb-control-group localize="label" label="@defaultdialogs_includeDescendants">
+                        <umb-toggle checked="$parent.$parent.recursive" on-click="$parent.$parent.toggle('recursive')"></umb-toggle>
                     </umb-control-group>
                 </umb-pane>
 
@@ -83,10 +84,10 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-if="!busy">
+        <a class="btn btn-link" ng-click="closeDialog()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
         </a>
-        <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy">
+        <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">
             <localize key="actions_copy">Copy</localize>
         </button>
     </div>

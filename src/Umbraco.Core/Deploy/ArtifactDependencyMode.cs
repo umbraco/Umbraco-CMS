@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Deploy
+﻿namespace Umbraco.Core.Deploy
 {
     /// <summary>
     /// Indicates the mode of the dependency.

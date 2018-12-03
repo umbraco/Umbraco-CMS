@@ -7,12 +7,13 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This inspects the result of the action that returns a collection of content and removes 
+    /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
     internal class FilterAllowedOutgoingMediaAttribute : ActionFilterAttribute
@@ -34,20 +35,14 @@ namespace Umbraco.Web.WebApi.Filters
         /// <summary>
         /// Returns true so that other filters can execute along with this one
         /// </summary>
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+        public override bool AllowMultiple => true;
 
         protected virtual int[] GetUserStartNodes(IUser user)
         {
-            return user.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
+            return user.CalculateMediaStartNodeIds(Current.Services.EntityService);
         }
 
-        protected virtual int RecycleBinId
-        {
-            get { return Constants.System.RecycleBinMedia; }
-        }
+        protected virtual int RecycleBinId => Constants.System.RecycleBinMedia;
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
@@ -85,7 +80,7 @@ namespace Umbraco.Web.WebApi.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
+                var hasPathAccess = (item != null && ContentPermissionsHelper.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
                 if (hasPathAccess == false)
                 {
                     toRemove.Add(item);

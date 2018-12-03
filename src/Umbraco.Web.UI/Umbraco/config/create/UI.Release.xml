@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<createUI>
+    <nodeType alias="initmacros">
+        <header>Macro</header>
+        <usercontrol>/create/simple.ascx</usercontrol>
+        <tasks>
+            <create assembly="Umbraco.Web" type="macroTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="macros">
+        <header>Macro</header>
+        <usercontrol>/create/simple.ascx</usercontrol>
+        <tasks>
+            <create assembly="Umbraco.Web" type="macroTasks" />
+            <delete assembly="Umbraco.Web" type="macroTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="initpackager">
+        <header>Package</header>
+        <usercontrol>/create/simple.ascx</usercontrol>
+        <tasks>
+            <create assembly="Umbraco.Web" type="CreatedPackageTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="packager">
+        <header>Package</header>
+        <usercontrol>/create/simple.ascx</usercontrol>
+        <tasks>
+            <create assembly="Umbraco.Web" type="CreatedPackageTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="createdPackages">
+        <header>Package</header>
+        <usercontrol>/create/simple.ascx</usercontrol>
+        <tasks>
+            <create assembly="Umbraco.Web" type="CreatedPackageTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="createdPackageInstance">
+        <header>Package</header>
+        <usercontrol>/create/simple.ascx</usercontrol>
+        <tasks>
+            <delete assembly="Umbraco.Web" type="CreatedPackageTasks" />
+        </tasks>
+    </nodeType>
+</createUI>

@@ -20,11 +20,6 @@
             /// <summary>
             /// Guid for a Image PropertyTypeGroup object.
             /// </summary>
-            public const string Contents = "79995FA2-63EE-453C-A29B-2E66F324CDBE";
-
-            /// <summary>
-            /// Guid for a Image PropertyTypeGroup object.
-            /// </summary>
             public const string Membership = "0756729D-D665-46E3-B84A-37ACEAA614F8";
         }
     }

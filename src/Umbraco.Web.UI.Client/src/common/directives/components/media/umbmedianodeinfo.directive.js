@@ -1,18 +1,31 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
 
+            scope.allowChangeMediaType = false;
+
             function onInit() {
-                scope.allowOpenMediaType = true;
+
+                userService.getCurrentUser().then(function(user){
+                    // only allow change of media type if user has access to the settings sections
+                    angular.forEach(user.sections, function(section){
+                        if(section.alias === "settings") {
+                            scope.allowChangeMediaType = true;
+                        }
+                    });
+                });
+
                 // get document type details
                 scope.mediaType = scope.node.contentType;
-                // get node url
-                scope.nodeUrl = scope.node.mediaLink;
+
+                // set the media link initially
+                setMediaLink();
+
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
             }
@@ -25,16 +38,32 @@
                 });
             }
 
+            function setMediaLink(){
+                scope.nodeUrl = scope.node.mediaLink;
+            }
+
             scope.openMediaType = function (mediaType) {
-                // remove first "#" from url if it is prefixed else the path won't work
-                var url = "/settings/mediaTypes/edit/" + mediaType.id;
-                $location.path(url);
+                var editor = {
+                    id: mediaType.id,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.mediaTypeEditor(editor);
             };
-            
+
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){
                 if(!newValue) { return; }
                 if(newValue === oldValue) { return; }
+
+                // Update the media link
+                setMediaLink();
+
+                // Update the create and update dates
                 formatDatesToLocal();
             });
 
@@ -46,7 +75,6 @@
             });
 
             onInit();
-
         }
 
         var directive = {

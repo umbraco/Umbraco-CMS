@@ -48,7 +48,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            StaticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString)); 
+            StaticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString));
         }
 
         public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Cache
         public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
         {
             return (from KeyValuePair<string, object> c in StaticCache
-                    where Regex.IsMatch(c.Key, regexString) 
+                    where Regex.IsMatch(c.Key, regexString)
                     select c.Value).ToList();
         }
 
@@ -74,6 +74,6 @@ namespace Umbraco.Core.Cache
         public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return StaticCache.GetOrAdd(cacheKey, key => getCacheItem());
-        }        
+        }
     }
 }

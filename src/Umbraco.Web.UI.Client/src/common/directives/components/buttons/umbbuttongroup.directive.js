@@ -89,27 +89,52 @@ Use this directive to render a button with a dropdown of alternative actions.
 @param {string=} float Set the float of the dropdown. ("left", "right").
 **/
 
-(function() {
-   'use strict';
+(function () {
+    'use strict';
 
-   function ButtonGroupDirective() {
+    function ButtonGroupDirective() {
 
-      var directive = {
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/buttons/umb-button-group.html',
-         scope: {
-            defaultButton: "=",
-            subButtons: "=",
-            state: "=?",
-            direction: "@?",
-            float: "@?"
-         }
-      };
+        function link(scope) {
 
-      return directive;
-   }
+            scope.dropdown = {
+                isOpen: false
+            };
 
-   angular.module('umbraco.directives').directive('umbButtonGroup', ButtonGroupDirective);
+            scope.toggleDropdown = function() {
+                scope.dropdown.isOpen = !scope.dropdown.isOpen;
+            };
+
+            scope.closeDropdown = function() {
+                scope.dropdown.isOpen = false;
+            };
+
+            scope.executeMenuItem = function(subButton) {
+                subButton.handler();
+                scope.closeDropdown();
+            };
+
+        }
+
+        var directive = {
+            restrict: 'E',
+            replace: true,
+            templateUrl: 'views/components/buttons/umb-button-group.html',
+            scope: {
+                defaultButton: "=",
+                subButtons: "=",
+                state: "=?",
+                direction: "@?",
+                float: "@?",
+                buttonStyle: "@?",
+                size: "@?",
+                icon: "@?"
+            },
+            link: link
+        };
+
+        return directive;
+    }
+
+    angular.module('umbraco.directives').directive('umbButtonGroup', ButtonGroupDirective);
 
 })();

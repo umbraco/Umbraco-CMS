@@ -173,7 +173,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
                     }
                 }
 
-                // Perform an extra check in the delay interval. Should prevent from accidentally ending up with the value of -1 that will block a thread indefinitely. 
+                // Perform an extra check in the delay interval. Should prevent from accidentally ending up with the value of -1 that will block a thread indefinitely.
                 // In addition, any other negative numbers will cause an ArgumentOutOfRangeException fault that will be thrown by Thread.Sleep.
                 if (delay.TotalMilliseconds < 0)
                 {
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         protected virtual void OnRetrying(int retryCount, Exception lastError, TimeSpan delay)
         {
             if (this.Retrying != null)
-            {               
+            {
                 this.Retrying(this, new RetryingEventArgs(retryCount, delay, lastError));
             }
         }

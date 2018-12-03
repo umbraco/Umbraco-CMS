@@ -2,116 +2,83 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class UserRepositoryTest : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
+    public class UserRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        private MediaRepository CreateMediaRepository(IScopeProvider provider, out IMediaTypeRepository mediaTypeRepository)
         {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
-        private MediaRepository CreateMediaRepository(IScopeUnitOfWork unitOfWork, out IMediaTypeRepository mediaTypeRepository)
-        {
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new MediaRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            var accessor = (IScopeAccessor) provider;
+            mediaTypeRepository = new MediaTypeRepository(accessor, CacheHelper, Mock.Of<ILogger>());
+            var tagRepository = new TagRepository(accessor, CacheHelper, Mock.Of<ILogger>());
+            var repository = new MediaRepository(accessor, CacheHelper, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
             return repository;
         }
 
-        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateContentRepository(IScopeProvider provider, out IContentTypeRepository contentTypeRepository)
         {
             ITemplateRepository tr;
-            return CreateContentRepository(unitOfWork, out contentTypeRepository, out tr);
+            return CreateContentRepository(provider, out contentTypeRepository, out tr);
         }
 
-        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
+        private DocumentRepository CreateContentRepository(IScopeProvider provider, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
         {
-            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var accessor = (IScopeAccessor) provider;
+            templateRepository = new TemplateRepository(accessor, CacheHelper, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            var tagRepository = new TagRepository(accessor, CacheHelper, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, CacheHelper, Logger);
+            var repository = new DocumentRepository(accessor, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
-        private UserRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        private UserRepository CreateRepository(IScopeProvider provider)
         {
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            var accessor = (IScopeAccessor) provider;
+            var repository = new UserRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers, TestObjects.GetGlobalSettings());
             return repository;
         }
 
-        private UserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork unitOfWork)
+        private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
-            return new UserGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            var accessor = (IScopeAccessor) provider;
+            return new UserGroupRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Logger);
         }
 
         [Test]
         public void Can_Perform_Add_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var user = MockedUser.CreateUser();
 
                 // Act
-                repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                repository.Save(user);
+                
 
                 // Assert
                 Assert.That(user.HasIdentity, Is.True);
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Add_With_Group()
-        {
-            var group = MockedUserGroup.CreateUserGroup();
-
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateUserGroupRepository(unitOfWork))
-            {
-                repository.AddOrUpdate(group);
-                unitOfWork.Commit();
-            }
-
-            using (var repository = CreateRepository(unitOfWork))
-            {                
-                IUser user = MockedUser.CreateUser();
-                user.AddGroup(group.ToReadOnlyGroup());
-
-                // Act
-                repository.AddOrUpdate(user);
-                unitOfWork.Commit();
-
-                user = repository.Get(user.Id);
-
-                // Assert
-                Assert.That(user.HasIdentity, Is.True);
-                Assert.AreEqual(1, user.Groups.Count());
-                Assert.AreEqual(group.Alias, user.Groups.ElementAt(0).Alias);
             }
         }
 
@@ -119,18 +86,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Multiple_Adds_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var user1 = MockedUser.CreateUser("1");
                 var use2 = MockedUser.CreateUser("2");
 
                 // Act
-                repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
-                repository.AddOrUpdate(use2);
-                unitOfWork.Commit();
+                repository.Save(user1);
+                
+                repository.Save(use2);
+                
 
                 // Assert
                 Assert.That(user1.HasIdentity, Is.True);
@@ -142,13 +110,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var user = MockedUser.CreateUser();
-                repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                repository.Save(user);
+                
 
                 // Act
                 var resolved = repository.Get((int)user.Id);
@@ -168,31 +137,30 @@ namespace Umbraco.Tests.Persistence.Repositories
             var media = MockedMedia.CreateSimpleMedia(mt, "asdf", -1);
 
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            IContentTypeRepository contentTypeRepo;
-            IMediaTypeRepository mediaTypeRepo;
-            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepo))
-            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepo))
-            using (contentTypeRepo)
-            using(mediaTypeRepo)
-            using (var userRepository = CreateRepository(unitOfWork))
-            using (var userGroupRepository = CreateUserGroupRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                contentTypeRepo.AddOrUpdate(ct);
-                mediaTypeRepo.AddOrUpdate(mt);
-                unitOfWork.Commit();
+                var userRepository = CreateRepository(provider);
+                var contentRepository = CreateContentRepository(provider, out var contentTypeRepo);
+                var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepo);
+                var userGroupRepository = CreateUserGroupRepository(provider);
 
-                contentRepository.AddOrUpdate(content);
-                mediaRepository.AddOrUpdate(media);
-                unitOfWork.Commit();
+                contentTypeRepo.Save(ct);
+                mediaTypeRepo.Save(mt);
+                
 
-                var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository, unitOfWork);
+                contentRepository.Save(content);
+                mediaRepository.Save(media);
+                
+
+                var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);
 
                 // Act
-                var resolved = (User)userRepository.Get((int)user.Id);
+                var resolved = (User) userRepository.Get(user.Id);
 
                 resolved.Name = "New Name";
+                //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
+                //resolved.DefaultPermissions = "ZYX";
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
                 resolved.RawPasswordValue = "new";
@@ -202,9 +170,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.Email = "new@new.com";
                 resolved.Username = "newName";
 
-                userRepository.AddOrUpdate(resolved);
-                unitOfWork.Commit();
-                var updatedItem = (User)userRepository.Get((int)user.Id);
+                userRepository.Save(resolved);
+                
+                var updatedItem = (User) userRepository.Get(user.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
@@ -217,9 +185,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(resolved.StartMediaIds));
                 Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
                 Assert.That(updatedItem.Username, Is.EqualTo(resolved.Username));
-                Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
-                Assert.IsTrue(updatedItem.AllowedSections.Contains("content"));
-                Assert.IsTrue(updatedItem.AllowedSections.Contains("media"));
+                Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(resolved.AllowedSections.Count()));
+                foreach (var allowedSection in resolved.AllowedSections)
+                    Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
             }
         }
 
@@ -227,73 +195,48 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
 
                 var user = MockedUser.CreateUser();
 
                 // Act
-                repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                repository.Save(user);
+                
                 var id = user.Id;
 
-                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-                {
-                    repository2.Delete(user);
-                    unitOfWork.Commit();
+                var repository2 = new UserRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
 
-                    var resolved = repository2.Get((int) id);
+                repository2.Delete(user);
+                
 
-                    // Assert
-                    Assert.That(resolved, Is.Null);
-                }
+                var resolved = repository2.Get((int) id);
+
+                // Assert
+                Assert.That(resolved, Is.Null);
             }
         }
-
-        //[Test]
-        //public void Can_Perform_Delete_On_UserRepository_With_Permissions_Assigned()
-        //{
-        //    // Arrange
-        //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
-        //    var unitOfWork = provider.GetUnitOfWork();
-        //using (var repository = CreateRepository(unitOfWork))
-        //{
-
-        //    var user = MockedUser.CreateUser(CreateAndCommitUserType());
-        //    //repository.AssignPermissions()
-
-        //    // Act
-        //    repository.AddOrUpdate(user);
-        //    unitOfWork.Commit();
-        //    var id = user.Id;
-
-        //    var repository2 = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-        //    repository2.Delete(user);
-        //    unitOfWork.Commit();
-
-        //    var resolved = repository2.Get((int)id);
-
-        //    // Assert
-        //    Assert.That(resolved, Is.Null);
-        //}
-
-        //}
 
         [Test]
         public void Can_Perform_Get_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
-            using (var userGroupRepository = CreateUserGroupRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository, unitOfWork);
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
 
                 // Act
-                var updatedItem = repository.Get((int)user.Id);
+                var updatedItem = repository.Get(user.Id);
+
+                // fixme
+                // this test cannot work, user has 2 sections but the way it's created,
+                // they don't show, so the comparison with updatedItem fails - fix!
 
                 // Assert
                 AssertPropertyValues(updatedItem, user);
@@ -304,15 +247,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var repository = CreateRepository(provider);
+
+                CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                var query = Query<IUser>.Builder.Where(x => x.Username == "TestUser1");
-                var result = repository.GetByQuery(query);
+                var query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
@@ -323,14 +267,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Param_Ids_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                var result = repository.GetAll((int) users[0].Id, (int) users[1].Id);
+                var result = repository.GetMany((int) users[0].Id, (int) users[1].Id);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -343,14 +288,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var repository = CreateRepository(provider);
+
+                CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                var result = repository.GetAll();
+                var result = repository.GetMany();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -363,14 +309,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                var exists = repository.Exists((int) users[0].Id);
+                var exists = repository.Exists(users[0].Id);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -381,18 +328,84 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                var query = Query<IUser>.Builder.Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 var result = repository.Count(query);
 
                 // Assert
-                Assert.That(result, Is.GreaterThanOrEqualTo(2));
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+                var query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                            excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                            filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
+
+                    // Assert
+                    Assert.AreEqual(2, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+            
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_With_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                        includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
+                        excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
+
+                    // Assert
+                    Assert.AreEqual(1, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
             }
         }
 
@@ -408,34 +421,33 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
-            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
-            Assert.IsTrue(updatedItem.AllowedSections.Contains("media"));
-            Assert.IsTrue(updatedItem.AllowedSections.Contains("content"));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
+            foreach (var allowedSection in originalUser.AllowedSections)
+                Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
         }
 
-        private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository, IDatabaseUnitOfWork unitOfWork)
+        private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
-            
             var user = MockedUser.CreateUser();
-            repository.AddOrUpdate(user);
-            unitOfWork.Commit();
+            repository.Save(user);
+            
 
             var group = MockedUserGroup.CreateUserGroup();
-            userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] {user.Id});
-            unitOfWork.Commit();
+            userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });
+
+            user.AddGroup(group);
 
             return user;
         }
 
-        private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository, IUnitOfWork unitOfWork)
+        private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository)
         {
             var user1 = MockedUser.CreateUser("1");
             var user2 = MockedUser.CreateUser("2");
             var user3 = MockedUser.CreateUser("3");
-            repository.AddOrUpdate(user1);
-            repository.AddOrUpdate(user2);
-            repository.AddOrUpdate(user3);
-            unitOfWork.Commit();
+            repository.Save(user1);
+            repository.Save(user2);
+            repository.Save(user3);
             return new IUser[] { user1, user2, user3 };
         }
     }

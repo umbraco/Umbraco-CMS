@@ -40,18 +40,26 @@
                 <umb-editor-footer-content-right>
 
                     <umb-button
+                        ng-if="model.infiniteMode"
+                        action="vm.close()"
+                        button-style="link"
+                        label-key="general_close"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
                         ng-if="!vm.page.modelsBuilder"
                         type="button"
                         action="vm.save()"
                         state="vm.page.saveButtonState"
                         button-style="success"
                         shortcut="ctrl+s"
-                        label="Save"
-                        label-key="buttons_save">
+                        label-key="{{vm.saveButtonKey}}">
                     </umb-button>
 
                     <umb-button-group
                         ng-if="vm.page.modelsBuilder"
+                        button-style="success"
                         default-button="vm.page.defaultButton"
                         sub-buttons="vm.page.subButtons"
                         state="vm.page.saveButtonState"

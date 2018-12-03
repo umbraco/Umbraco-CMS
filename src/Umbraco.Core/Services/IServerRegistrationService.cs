@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
@@ -30,8 +30,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Return all active servers.
         /// </summary>
+        /// <param name="refresh">A value indicating whether to force-refresh the cache.</param>
         /// <returns>All active servers.</returns>
-        IEnumerable<IServerRegistration> GetActiveServers();
+        /// <remarks>By default this method will rely on the repository's cache, which is updated each
+        /// time the current server is touched, and the period depends on the configuration. Use the
+        /// <paramref name="refresh"/> parameter to force a cache refresh and reload active servers
+        /// from the database.</remarks>
+        IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false);
 
         /// <summary>
         /// Gets the current server identity.

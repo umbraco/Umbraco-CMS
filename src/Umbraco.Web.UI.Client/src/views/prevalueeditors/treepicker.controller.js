@@ -1,20 +1,20 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
-.controller("Umbraco.PrevalueEditors.TreePickerController",
-	
-	function($scope, dialogService, entityResource, $log, iconHelper){
-		$scope.renderModel = [];
-		$scope.ids = [];
+    .controller("Umbraco.PrevalueEditors.TreePickerController",
 
-		$scope.allowRemove = true;
-		$scope.allowEdit = true;
-		$scope.sortable = false;
+    function ($scope, entityResource, iconHelper, editorService) {
+        $scope.renderModel = [];
+        $scope.ids = [];
 
-	    var config = {
-	        multiPicker: false,
-	        entityType: "Document",
-	        type: "content",
+        $scope.allowRemove = true;
+        $scope.allowEdit = true;
+        $scope.sortable = false;
+
+        var config = {
+            multiPicker: false,
+            entityType: "Document",
+            type: "content",
             treeAlias: "content",
             idType: "int"
         };
@@ -23,107 +23,108 @@ angular.module('umbraco')
         if ($scope.model.config) {
             angular.extend(config, $scope.model.config);
         }
-		
-		if($scope.model.value){
-			$scope.ids = $scope.model.value.split(',');
-			entityResource.getByIds($scope.ids, config.entityType).then(function (data) {
-			    _.each(data, function (item, i) {
 
-					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-					$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon, udi: item.udi});
-					
-					// store the index of the new item in the renderModel collection so we can find it again
-					var itemRenderIndex = $scope.renderModel.length - 1;
-					// get and update the path for the picked node
-					entityResource.getUrl(item.id, config.entityType).then(function(data){
-						$scope.renderModel[itemRenderIndex].path = data;
-					});
+        if ($scope.model.value) {
 
-			    });
-			});
-		}
+            if (Array.isArray($scope.model.value)) {
+                $scope.ids = $scope.model.value.split(",");
+            } else {
+                $scope.ids.push($scope.model.value);
+            }
 
-		$scope.openContentPicker = function() {
-            $scope.treePickerOverlay = config;		
-            $scope.treePickerOverlay.section = config.type;
-			$scope.treePickerOverlay.view = "treePicker";
-            $scope.treePickerOverlay.show = true;
+            entityResource.getByIds($scope.ids, config.entityType).then(function (data) {
+                _.each(data, function (item, i) {
 
-			$scope.treePickerOverlay.submit = function(model) {
+                    item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+                    $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
 
-				if(config.multiPicker) {
-					populate(model.selection);
-				} else {
-					populate(model.selection[0]);
-				}
+                    // store the index of the new item in the renderModel collection so we can find it again
+                    var itemRenderIndex = $scope.renderModel.length - 1;
+                    // get and update the path for the picked node
+                    entityResource.getUrl(item.id, config.entityType).then(function (data) {
+                        $scope.renderModel[itemRenderIndex].path = data;
+                    });
 
-				$scope.treePickerOverlay.show = false;
-				$scope.treePickerOverlay = null;
-			};
+                });
+            });
+        }
 
-			$scope.treePickerOverlay.close = function(oldModel) {
-				$scope.treePickerOverlay.show = false;
-				$scope.treePickerOverlay = null;
-			};
+        $scope.openContentPicker = function () {
+            var treePicker = config;
+            treePicker.section = config.type;
 
-		}
-		
-		$scope.remove =function(index){
-			$scope.renderModel.splice(index, 1);
-			$scope.ids.splice(index, 1);
-			$scope.model.value = trim($scope.ids.join(), ",");
-		};
+            treePicker.submit = function (model) {
+                if (config.multiPicker) {
+                    populate(model.selection);
+                } else {
+                    populate(model.selection[0]);
+                }
+                editorService.close();
+            };
 
-		$scope.clear = function() {
-		    $scope.model.value = "";
-		    $scope.renderModel = [];
-		    $scope.ids = [];
-		};
-		
+            treePicker.close = function () {
+                editorService.close();
+            };
+
+            editorService.treePicker(treePicker);
+        };
+
+        $scope.remove = function (index) {
+            $scope.renderModel.splice(index, 1);
+            $scope.ids.splice(index, 1);
+            $scope.model.value = trim($scope.ids.join(), ",");
+        };
+
+        $scope.clear = function () {
+            $scope.model.value = "";
+            $scope.renderModel = [];
+            $scope.ids = [];
+        };
+
         $scope.add = function (item) {
 
             var itemId = config.idType === "udi" ? item.udi : item.id;
 
-            if ($scope.ids.indexOf(itemId) < 0){
-				
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.ids.push(itemId);
-				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon, udi: item.udi});
-				$scope.model.value = trim($scope.ids.join(), ",");
+            if ($scope.ids.indexOf(itemId) < 0) {
 
-				// store the index of the new item in the renderModel collection so we can find it again
-				var itemRenderIndex = $scope.renderModel.length - 1;
-				// get and update the path for the picked node
-				entityResource.getUrl(item.id, config.entityType).then(function(data){
-					$scope.renderModel[itemRenderIndex].path = data;
-				});
+                item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+                $scope.ids.push(itemId);
+                $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, udi: item.udi });
+                $scope.model.value = trim($scope.ids.join(), ",");
 
-			}
-		};
+                // store the index of the new item in the renderModel collection so we can find it again
+                var itemRenderIndex = $scope.renderModel.length - 1;
+                // get and update the path for the picked node
+                entityResource.getUrl(item.id, config.entityType).then(function (data) {
+                    $scope.renderModel[itemRenderIndex].path = data;
+                });
+
+            }
+        };
 
 
-	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-			$scope.model.value = trim($scope.ids.join(), ",");
-	    });
+        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+            $scope.model.value = trim($scope.ids.join(), ",");
+        });
 
-	    //when the scope is destroyed we need to unsubscribe
-	    $scope.$on('$destroy', function () {
-	        unsubscribe();
-	    });
+        //when the scope is destroyed we need to unsubscribe
+        $scope.$on('$destroy', function () {
+            unsubscribe();
+        });
 
-		function trim(str, chr) {
-			var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+chr+'+|'+chr+'+$', 'g');
-			return str.replace(rgxtrim, '');
-		}
+        function trim(str, chr) {
+            var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
+            return str.replace(rgxtrim, '');
+        }
 
-		function populate(data){
-			if(angular.isArray(data)){
-			    _.each(data, function (item, i) {
-					$scope.add(item);
-				});
-			}else{
-				$scope.clear();
-				$scope.add(data);
-			}
-		}
-});
+        function populate(data) {
+            if (angular.isArray(data)) {
+                _.each(data, function (item, i) {
+                    $scope.add(item);
+                });
+            } else {
+                $scope.clear();
+                $scope.add(data);
+            }
+        }
+    });

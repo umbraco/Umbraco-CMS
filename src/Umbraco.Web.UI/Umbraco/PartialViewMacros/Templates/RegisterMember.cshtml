@@ -1,53 +1,52 @@
-﻿@inherits Umbraco.Web.Macros.PartialViewMacroPage
-
-@using System.Web.Mvc.Html
+﻿@using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
 @using Umbraco.Web
 @using Umbraco.Web.Controllers
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @{
     @*
-        You can specify a custom member type alias in the constructor, the default is 'Member'    
+        You can specify a custom member type alias in the constructor, the default is 'Member'
         for example, to use 'Custom Member' you'd use this syntax:
-    
+
         var registerModel = Members.CreateRegistrationModel("Custom Member");
     *@
-    
+
     var registerModel = Members.CreateRegistrationModel();
-    
+
     @*
-        Configurable here:           
-    
-        registerModel.RedirectUrl       - Optional. What path to redirect to if registration is successful. 
-                                          By default the member will be redirected to the current umbraco page 
+        Configurable here:
+
+        registerModel.RedirectUrl       - Optional. What path to redirect to if registration is successful.
+                                          By default the member will be redirected to the current umbraco page
                                           unless this is specified.
-    
+
         registerModel.UsernameIsEmail   - the default is true
                                           if you want the username to be different from the email
                                           address, set this to true and add a new Username field in
                                           the form below
-    
+
                                           @Html.LabelFor(m => registerModel.Username)
                                           @Html.TextBoxFor(m => registerModel.Username)
                                           @Html.ValidationMessageFor(m => registerModel.Username)
     *@
-  
+
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
-    Html.RequiresJs("/umbraco_client/ui/jquery.js");
-    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
-    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
-    
+    Html.RequiresJs("/umbraco/lib/jquery/jquery.min.js");
+    Html.RequiresJs("/umbraco/lib/jquery-validate/jquery.validate.min.js");
+    Html.RequiresJs("/umbraco/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
+
     var success = TempData["FormSuccess"] != null;
 }
 
 @*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
 @Html.RenderJsHere()
 
-@if (success) 
-{ 
+@if (success)
+{
     @* This message will show if RedirectOnSucces is set to false (default) *@
-    <p>Registration succeeeded.</p>
+    <p>Registration succeeded.</p>
 }
 else
 {

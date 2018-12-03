@@ -6,65 +6,41 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
-using System.Web.Script.Serialization;
-using System.Web.UI;
+using LightInject;
 using Semver;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
-
 namespace Umbraco.Web.Install
 {
-    internal class InstallHelper
+    public sealed class InstallHelper
     {
-        private readonly UmbracoContext _umbContext;
+        private static HttpClient _httpClient;
+        private readonly DatabaseBuilder _databaseBuilder;
+        private readonly HttpContextBase _httpContext;
+        private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
         private InstallationType? _installationType;
 
-        internal InstallHelper(UmbracoContext umbContext)
+        public InstallHelper(UmbracoContext umbracoContext,
+            DatabaseBuilder databaseBuilder,
+            ILogger logger, IGlobalSettings globalSettings)
         {
-            _umbContext = umbContext;
-        }
-
-        /// <summary>
-        /// Get the installer steps
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// The step order returned here is how they will appear on the front-end if they have views assigned
-        /// </remarks>
-        public IEnumerable<InstallSetupStep> GetAllSteps()
-        {
-            return new List<InstallSetupStep>
-            {
-                new NewInstallStep(_umbContext.HttpContext, _umbContext.Application),
-                new UpgradeStep(_umbContext.Application),
-                new FilePermissionsStep(),
-                new MajorVersion7UpgradeReport(_umbContext.Application),
-                new Version73FileCleanup(_umbContext.HttpContext, _umbContext.Application.ProfilingLogger.Logger),
-                new DatabaseConfigureStep(_umbContext.Application),
-                new ConfigureMachineKey(_umbContext.Application),
-                new DatabaseInstallStep(_umbContext.Application),
-                new DatabaseUpgradeStep(_umbContext.Application),
-                new StarterKitDownloadStep(_umbContext.Application, _umbContext.Security, _umbContext.HttpContext),
-                new StarterKitInstallStep(_umbContext.Application, _umbContext.HttpContext),
-                new StarterKitCleanupStep(_umbContext.Application),
-                new SetUmbracoVersionStep(_umbContext.Application, _umbContext.HttpContext),
-            };
-        }
-
-        /// <summary>
-        /// Returns the steps that are used only for the current installation type
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<InstallSetupStep> GetStepsForCurrentInstallType()
-        {
-            return GetAllSteps().Where(x => x.InstallTypeTarget.HasFlag(GetInstallationType()));
+            _httpContext = umbracoContext.HttpContext;
+            _logger = logger;
+            _globalSettings = globalSettings;
+            _databaseBuilder = databaseBuilder;
         }
 
         public InstallationType GetInstallationType()
@@ -72,7 +48,7 @@ namespace Umbraco.Web.Install
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-        internal void DeleteLegacyInstaller()
+        internal static void DeleteLegacyInstaller()
         {
             if (Directory.Exists(IOHelper.MapPath(SystemDirectories.Install)))
             {
@@ -101,27 +77,32 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                string userAgent = _umbContext.HttpContext.Request.UserAgent;
+                var userAgent = _httpContext.Request.UserAgent;
 
                 // Check for current install Id
                 var installId = Guid.NewGuid();
-                var installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
-                if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
+
+                var installCookie = _httpContext.Request.GetCookieValue(Constants.Web.InstallerCookieName);
+                if (string.IsNullOrEmpty(installCookie) == false)
                 {
-                    if (Guid.TryParse(installCookie.GetValue(), out installId))
+                    if (Guid.TryParse(installCookie, out installId))
                     {
                         // check that it's a valid Guid
                         if (installId == Guid.Empty)
                             installId = Guid.NewGuid();
                     }
                 }
-                installCookie.SetValue(installId.ToString());
+                _httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, "1"));
 
-                string dbProvider = string.Empty;
+                var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
-                    dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                {
+                    // we don't have DatabaseProvider anymore... doing it differently
+                    //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                    dbProvider = GetDbProviderString(Current.SqlContext);
+                }
 
-                org.umbraco.update.CheckForUpgrade check = new org.umbraco.update.CheckForUpgrade();
+                var check = new org.umbraco.update.CheckForUpgrade();
                 check.Install(installId,
                     IsBrandNewInstall == false,
                     isCompleted,
@@ -129,15 +110,34 @@ namespace Umbraco.Web.Install
                     UmbracoVersion.Current.Major,
                     UmbracoVersion.Current.Minor,
                     UmbracoVersion.Current.Build,
-                    UmbracoVersion.CurrentComment,
+                    UmbracoVersion.Comment,
                     errorMsg,
                     userAgent,
                     dbProvider);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
+                _logger.Error<InstallHelper>(ex, "An error occurred in InstallStatus trying to check upgrades");
             }
+        }
+
+        internal static string GetDbProviderString(ISqlContext sqlContext)
+        {
+            var dbProvider = string.Empty;
+
+            // we don't have DatabaseProvider anymore...
+            //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+            //
+            // doing it differently
+            var syntax = sqlContext.SqlSyntax;
+            if (syntax is SqlCeSyntaxProvider)
+                dbProvider = "SqlServerCE";
+            else if (syntax is MySqlSyntaxProvider)
+                dbProvider = "MySql";
+            else if (syntax is SqlServerSyntaxProvider)
+                dbProvider = (syntax as SqlServerSyntaxProvider).ServerVersion.IsAzure ? "SqlAzure" : "SqlServer";
+
+            return dbProvider;
         }
 
         /// <summary>
@@ -148,8 +148,8 @@ namespace Umbraco.Web.Install
             get
             {
                 var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
-                if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
-                    && _umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false)
+                if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
+                    && _databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false)
                 {
                     //no version or conn string configured, must be a brand new install
                     return true;
@@ -157,57 +157,35 @@ namespace Umbraco.Web.Install
 
                 //now we have to check if this is really a new install, the db might be configured and might contain data
 
-                if (_umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false
-                    || _umbContext.Application.DatabaseContext.IsDatabaseConfigured == false)
+                if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false
+                    || _databaseBuilder.IsDatabaseConfigured == false)
                 {
                     return true;
                 }
 
-                //check if we have the default user configured already
-                var result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
-                    "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
-                if (result == 1)
-                {
-                    //the user has not been configured
-                    //this is always true on UaaS, need to check if there's multiple users too
-                    var usersResult = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
-                    return usersResult == 1;
-                }
-
-                //                //check if there are any content types configured, if there isn't then we will consider this a new install
-                //                result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
-                //                    @"SELECT COUNT(*) FROM cmsContentType 
-                //                        INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-                //                        WHERE umbracoNode.nodeObjectType = @contentType", new {contentType = Constants.ObjectTypes.DocumentType});
-                //                if (result == 0)
-                //                {
-                //                    //no content types have been created
-                //                    return true;
-                //                }
-
-                return false;
+                return _databaseBuilder.HasSomeNonDefaultUser() == false;
             }
         }
 
         internal IEnumerable<Package> GetStarterKits()
         {
-            var packages = new List<Package>();
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
 
+            var packages = new List<Package>();
             try
             {
-                var requestUri = string.Format("http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={0}",
-                    UmbracoVersion.Current);
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (var httpClient = new HttpClient())
-                using (var response = httpClient.SendAsync(request).Result)
                 {
+                    var response = _httpClient.SendAsync(request).Result;
                     packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
                 }
             }
             catch (AggregateException ex)
             {
-                LogHelper.Error<InstallHelper>("Could not download list of available starter kits", ex);
+                _logger.Error<InstallHelper>(ex, "Could not download list of available starter kits");
             }
 
             return packages;

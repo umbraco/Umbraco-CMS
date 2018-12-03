@@ -1,74 +1,49 @@
 ﻿using System;
-using System.ComponentModel;
 using Umbraco.Core;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Represents an Umbraco domain and its normalized uri.
+    /// Represents a published snapshot domain with its normalized uri.
     /// </summary>
     /// <remarks>
     /// <para>In Umbraco it is valid to create domains with name such as <c>example.com</c>, <c>https://www.example.com</c>, <c>example.com/foo/</c>.</para>
     /// <para>The normalized uri of a domain begins with a scheme and ends with no slash, eg <c>http://example.com/</c>, <c>https://www.example.com/</c>, <c>http://example.com/foo/</c>.</para>
     /// </remarks>
-    public class DomainAndUri
+    public class DomainAndUri : Domain
     {
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a uri scheme.
+        /// Initializes a new instance of the <see cref="DomainAndUri"/> class.
         /// </summary>
-        /// <param name="domain">The domain.</param>
-        /// <param name="scheme">The uri scheme.</param>
-        public DomainAndUri(IDomain domain, string scheme)
+        /// <param name="domain">The original domain.</param>
+        /// <param name="currentUri">The context current Uri.</param>
+        public DomainAndUri(Domain domain, Uri currentUri)
+            : base(domain)
         {
-            UmbracoDomain = domain;
             try
             {
-                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.DomainName, scheme)));
+                // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
+                var name = Name.StartsWith("/") && currentUri != null
+                    ? currentUri.GetLeftPart(UriPartial.Authority) + Name
+                    : Name;
+                var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
+                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
             }
             catch (UriFormatException)
             {
-                var name = domain.DomainName.ToCSharpString();
-                throw new ArgumentException(string.Format("Failed to parse invalid domain: node id={0}, hostname=\"{1}\"."
-                    + " Hostname should be a valid uri.", domain.RootContentId, name), "domain");
+                throw new ArgumentException($"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{Name.ToCSharpString()}\"."
+                    + " Hostname should be a valid uri.", nameof(domain));
             }
         }
 
-        [Obsolete("This should not be used, use the other contructor specifying the non legacy IDomain instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public DomainAndUri(Domain domain, string scheme)
-            : this(domain.DomainEntity, scheme)
-        {
-            
-        }
-
-        
-        [Obsolete("This should not be used, use the non-legacy property called UmbracoDomain instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Domain Domain
-        {
-            get { return new Domain(UmbracoDomain); }
-        }
-
         /// <summary>
-        /// Gets the Umbraco domain.
+        /// Gets the normalized uri of the domain, within the current context.
         /// </summary>
-        public IDomain UmbracoDomain { get; private set; }
+        public Uri Uri { get; }
 
-        /// <summary>
-        /// Gets or sets the normalized uri of the domain.
-        /// </summary>
-        public Uri Uri { get; private set; }
-
-        /// <summary>
-        /// Gets a string that represents the <see cref="DomainAndUri"/> instance.
-        /// </summary>
-        /// <returns>A string that represents the current <see cref="DomainAndUri"/> instance.</returns>
         public override string ToString()
         {
-            return string.Format("{{ \"{0}\", \"{1}\" }}", UmbracoDomain.DomainName, Uri);
+            return $"{{ \"{Name}\", \"{Uri}\" }}";
         }
     }
 }

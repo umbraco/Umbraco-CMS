@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Install.Models
 {
@@ -7,10 +7,10 @@ namespace Umbraco.Web.Install.Models
     {
         [DataMember(Name = "name")]
         public string Name { get; set; }
-        
+
         [DataMember(Name = "email")]
         public string Email { get; set; }
-        
+
         [DataMember(Name = "password")]
         public string Password { get; set; }
 

@@ -1,45 +1,19 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [MigrationAttribute("6.0.0", 0, "Test")]
     public class AlterUserTableMigrationStub : MigrationBase
     {
+        public AlterUserTableMigrationStub(IMigrationContext context)
+            : base(context)
+        { }
 
-        public AlterUserTableMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
-        public override void Up()
+        public override void Migrate()
         {
             Alter.Table("umbracoUser")
                  .AddColumn("Birthday")
                  .AsDateTime()
                  .Nullable();
-        }
-
-        public override void Down()
-        {
-        }
-    }
-
-
-    [MigrationAttribute("1.0.0", 0, "Test")]
-    public class DropForeignKeyMigrationStub : MigrationBase
-    {
-        public DropForeignKeyMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
-        public override void Up()
-        {
-            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id");
-        }
-
-        public override void Down()
-        {
         }
     }
 }

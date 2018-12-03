@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Macro : Entity, IMacro
+    public class Macro : EntityBase, IMacro
     {
         public Macro()
         {
@@ -34,14 +34,11 @@ namespace Umbraco.Core.Models
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
-        /// <param name="controlType"></param>
-        /// <param name="controlAssembly"></param>
-        /// <param name="xsltPath"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
-        /// <param name="scriptPath"></param>
-        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
+        /// <param name="macroSource"></param>
+        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
             : this()
         {
             Id = id;
@@ -50,13 +47,11 @@ namespace Umbraco.Core.Models
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
-            ControlType = controlType;
-            ControlAssembly = controlAssembly;
-            XsltPath = xsltPath;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
             DontRender = dontRender;
-            ScriptPath = scriptPath;
+            MacroSource = macroSource;
+            MacroType = macroType;
         }
 
         /// <summary>
@@ -66,18 +61,13 @@ namespace Umbraco.Core.Models
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
-        /// <param name="controlType"></param>
-        /// <param name="controlAssembly"></param>
-        /// <param name="xsltPath"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
-        /// <param name="scriptPath"></param>
+        /// <param name="macroSource"></param>
         public Macro(string @alias, string name,
-            string controlType = "",
-            string controlAssembly = "",
-            string xsltPath = "",
-            string scriptPath = "",
+            string macroSource,
+            MacroTypes macroType,
             bool cacheByPage = false,
             bool cacheByMember = false,
             bool dontRender = true,
@@ -89,13 +79,11 @@ namespace Umbraco.Core.Models
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
-            ControlType = controlType;
-            ControlAssembly = controlAssembly;
-            XsltPath = xsltPath;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
             DontRender = dontRender;
-            ScriptPath = scriptPath;
+            MacroSource = macroSource;
+            MacroType = macroType;
         }
 
         private string _alias;
@@ -105,10 +93,8 @@ namespace Umbraco.Core.Models
         private bool _cacheByPage;
         private bool _cacheByMember;
         private bool _dontRender;
-        private string _scriptFile;
-        private string _scriptAssembly;
-        private string _scriptPath;
-        private string _xslt;
+        private string _macroSource;
+        private MacroTypes _macroType = MacroTypes.Unknown;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
@@ -124,10 +110,8 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo CacheByPageSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByPage);
             public readonly PropertyInfo CacheByMemberSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByMember);
             public readonly PropertyInfo DontRenderSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.DontRender);
-            public readonly PropertyInfo ControlPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlType);
-            public readonly PropertyInfo ControlAssemblySelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlAssembly);
-            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ScriptPath);
-            public readonly PropertyInfo XsltPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.XsltPath);
+            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.MacroSource);
+            public readonly PropertyInfo MacroTypeSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroTypes>(x => x.MacroType);
             public readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
         }
 
@@ -173,15 +157,15 @@ namespace Umbraco.Core.Models
         {
             OnPropertyChanged(Ps.Value.PropertiesSelector);
         }
-        
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
             _addedProperties.Clear();
             _removedProperties.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
             foreach (var prop in Properties)
             {
-                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                ((BeingDirtyBase)prop).ResetDirtyProperties(rememberDirty);
             }
         }
 
@@ -272,46 +256,23 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the path to user control or the Control Type to render
+        /// Gets or set the path to the Partial View to render
         /// </summary>
         [DataMember]
-        public string ControlType
+        public string MacroSource
         {
-            get { return _scriptFile; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptFile, Ps.Value.ControlPathSelector); }
+            get { return _macroSource; }
+            set { SetPropertyValueAndDetectChanges(value, ref _macroSource, Ps.Value.ScriptPathSelector); }
         }
 
         /// <summary>
-        /// Gets or sets the name of the assembly, which should be used by the Macro
+        /// Gets or set the path to the Partial View to render
         /// </summary>
-        /// <remarks>Will usually only be filled if the ControlType is a Usercontrol</remarks>
         [DataMember]
-        public string ControlAssembly
+        public MacroTypes MacroType
         {
-            get { return _scriptAssembly; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptAssembly, Ps.Value.ControlAssemblySelector); }
-        }
-
-        /// <summary>
-        /// Gets or set the path to the Python file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        public string ScriptPath
-        {
-            get { return _scriptPath; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptPath, Ps.Value.ScriptPathSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the path to the Xslt file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        public string XsltPath
-        {
-            get { return _xslt; }
-            set { SetPropertyValueAndDetectChanges(value, ref _xslt, Ps.Value.XsltPathSelector); }
+            get { return _macroType; }
+            set { SetPropertyValueAndDetectChanges(value, ref _macroType, Ps.Value.MacroTypeSelector); }
         }
 
         /// <summary>
@@ -320,25 +281,21 @@ namespace Umbraco.Core.Models
         [DataMember]
         public MacroPropertyCollection Properties
         {
-            get { return _properties; }            
+            get { return _properties; }
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Macro)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            clone._addedProperties = new List<string>();
-            clone._removedProperties = new List<string>();
-            clone._properties = (MacroPropertyCollection)Properties.DeepClone();
-            //re-assign the event handler
-            clone._properties.CollectionChanged += clone.PropertiesChanged;
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+            base.PerformDeepClone(clone);
 
-            return clone;
+            var clonedEntity = (Macro)clone;
+            
+            clonedEntity._addedProperties = new List<string>();
+            clonedEntity._removedProperties = new List<string>();
+            clonedEntity._properties = (MacroPropertyCollection)Properties.DeepClone();
+            //re-assign the event handler
+            clonedEntity._properties.CollectionChanged += clonedEntity.PropertiesChanged;
+            
         }
     }
 }

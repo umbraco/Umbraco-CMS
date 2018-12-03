@@ -4,8 +4,7 @@
     function ScriptsCreateController($scope, $location, navigationService, formHelper, codefileResource, localizationService, appState) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
-        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
+        var node = $scope.currentNode;
 
         vm.creatingFolder = false;
         vm.folderName = "";
@@ -15,6 +14,7 @@
         vm.createFile = createFile;
         vm.showCreateFolder = showCreateFolder;
         vm.createFolder = createFolder;
+        vm.close = close;
 
         function createFile() {
             $location.path("/settings/scripts/edit/" + node.id).search("create", "true");
@@ -27,7 +27,7 @@
 
         function createFolder(form) {
 
-            if (formHelper.submitForm({scope: $scope, formCtrl: form, statusMessage: localizeCreateFolder})) {
+            if (formHelper.submitForm({scope: $scope, formCtrl: form })) {
 
                 codefileResource.createContainer("scripts", node.id, vm.folderName).then(function (saved) {
 
@@ -40,20 +40,22 @@
                         activate: true
                     });
 
-                    formHelper.resetForm({
-                        scope: $scope
-                    });
+                    formHelper.resetForm({ scope: $scope });
 
                     var section = appState.getSectionState("currentSection");
 
                 }, function(err) {
 
                   vm.createFolderError = err;
-                  formHelper.showNotifications(err.data);
                     
                 });
             }
 
+        }
+
+        function close() {
+            const showMenu = true;
+            navigationService.hideDialog(showMenu);
         }
 
     }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Models
 {
@@ -16,6 +16,20 @@ namespace Umbraco.Core.Models
         /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
+
+        /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateId">The template id to check</param>
+        /// <returns>True if AllowedTemplates contains the templateId else False</returns>
+        bool IsAllowedTemplate(int templateId);
+
+        /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateAlias">The template alias to check</param>
+        /// <returns>True if AllowedTemplates contains the templateAlias else False</returns>
+        bool IsAllowedTemplate(string templateAlias);
 
         /// <summary>
         /// Sets the default template for the ContentType

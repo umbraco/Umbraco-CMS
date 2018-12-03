@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -49,7 +47,7 @@ namespace Umbraco.Web.Editors
             var template = Services.FileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             return Mapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
@@ -87,7 +85,7 @@ namespace Umbraco.Web.Editors
 
             var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
-           
+
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
         }
@@ -105,7 +103,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             if (display.Id > 0)
             {
                 // update
@@ -138,7 +136,7 @@ namespace Umbraco.Web.Editors
                             {
                                 //template ID to find
                                 var templateIdInPath = "," + display.Id + ",";
-                                
+
                                 if (string.IsNullOrEmpty(childTemplate.Path))
                                 {
                                     continue;
@@ -186,8 +184,7 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Content, master);
-                //template = Services.FileService.GetTemplate(template.Id);
+                var template = Services.FileService.CreateTemplateWithIdentity(display.Alias, display.Content, master);
                 Mapper.Map(template, display);
             }
 

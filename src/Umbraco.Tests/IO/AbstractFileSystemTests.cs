@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.IO
 {
-    [TestFixture, RequiresSTA]
-    public abstract class AbstractFileSystemTests 
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    public abstract class AbstractFileSystemTests
     {
         protected IFileSystem _fileSystem;
 
@@ -49,13 +51,15 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Cant_Overwrite_File()
         {
-            _fileSystem.AddFile("test.txt", CreateStream());
-            _fileSystem.AddFile("test.txt", CreateStream(), false);
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                _fileSystem.AddFile("test.txt", CreateStream());
+                _fileSystem.AddFile("test.txt", CreateStream(), false);
 
-            _fileSystem.DeleteFile("test.txt");
+                _fileSystem.DeleteFile("test.txt");
+            });
         }
 
         [Test]
@@ -119,12 +123,12 @@ namespace Umbraco.Tests.IO
             var created = _fileSystem.GetCreated("test.txt");
             var modified = _fileSystem.GetLastModified("test.txt");
 
-            Assert.AreEqual(DateTime.Today.Year, created.Year);
-            Assert.AreEqual(DateTime.Today.Month, created.Month);
+            Assert.AreEqual(DateTime.UtcNow.Year, created.Year);
+            Assert.AreEqual(DateTime.UtcNow.Month, created.Month);
             Assert.AreEqual(DateTime.UtcNow.Date, created.Date);
 
-            Assert.AreEqual(DateTime.Today.Year, modified.Year);
-            Assert.AreEqual(DateTime.Today.Month, modified.Month);
+            Assert.AreEqual(DateTime.UtcNow.Year, modified.Year);
+            Assert.AreEqual(DateTime.UtcNow.Month, modified.Month);
             Assert.AreEqual(DateTime.UtcNow.Date, modified.Date);
 
             _fileSystem.DeleteFile("test.txt");

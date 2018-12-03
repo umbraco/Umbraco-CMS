@@ -1,34 +1,38 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Services.Description;
 using AutoMapper;
-using umbraco;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.template;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
-    [LegacyBaseTree(typeof (loadTemplates))]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:1)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:6)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+            //check if there are any templates
+            root.HasChildren = Services.FileService.GetTemplates(-1).Any();
+            return root;
+        }
+
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -44,8 +48,8 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var found = id == Constants.System.Root.ToInvariantString() 
-                ? Services.FileService.GetTemplates(-1) 
+            var found = id == Constants.System.Root.ToInvariantString()
+                ? Services.FileService.GetTemplates(-1)
                 : Services.FileService.GetTemplates(int.Parse(id));
 
             nodes.AddRange(found.Select(template => CreateTreeNode(
@@ -57,7 +61,7 @@ namespace Umbraco.Web.Trees
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
                 template.IsMasterTemplate,
                 GetEditorPath(template, queryStrings),
-                Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.TemplateTypeGuid), template.Key)
+                Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
             )));
 
             return nodes;
@@ -72,16 +76,15 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
-            //Create the normal create action
-            var item = menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-            item.NavigateToRoute(string.Format("{0}/templates/edit/{1}?create=true", queryStrings.GetValue<string>("application"), id));
 
+            //Create the normal create action
+            var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            item.NavigateToRoute($"{queryStrings.GetValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                
                 //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
             }
@@ -94,25 +97,25 @@ namespace Umbraco.Web.Trees
             if (template.IsMasterTemplate == false)
             {
                 //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias), true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
             }
 
             //add refresh
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
-            
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
+
 
             return menu;
         }
 
-        private UmbracoEntity FromTemplate(ITemplate template)
+        private EntitySlim FromTemplate(ITemplate template)
         {
-            return new UmbracoEntity
+            return new EntitySlim
             {
                 CreateDate = template.CreateDate,
                 Id = template.Id,
                 Key = template.Key,
                 Name = template.Name,
-                NodeObjectTypeId = new Guid(Constants.ObjectTypes.Template),
+                NodeObjectType = Constants.ObjectTypes.Template,
                 //TODO: Fix parent/paths on templates
                 ParentId = -1,
                 Path = template.Path,
@@ -132,7 +135,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound, filter: query);
             return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }

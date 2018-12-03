@@ -1,37 +1,33 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using System;
+using Newtonsoft.Json;
+using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
 {
     /// <summary>
-    /// Represents a manifest file for packages
+    /// Represents the content of a package manifest.
     /// </summary>
-    internal class PackageManifest
+    public class PackageManifest
     {
-        /// <summary>
-        /// The json array used to initialize the application with the JS dependencies required
-        /// </summary>
-        public JArray JavaScriptInitialize { get; set; }
+        [JsonProperty("javascript")]
+        public string[] Scripts { get; set; } = Array.Empty<string>();
 
-        /// <summary>
-        /// The json array used to initialize the application with the CSS dependencies required
-        /// </summary>
-        public JArray StylesheetInitialize { get; set; }
+        [JsonProperty("css")]
+        public string[] Stylesheets { get; set; }= Array.Empty<string>();
 
-        /// <summary>
-        /// The json array of property editors
-        /// </summary>
-        public JArray PropertyEditors { get; set; }
+        [JsonProperty("propertyEditors")]
+        public IDataEditor[] PropertyEditors { get; set; } = Array.Empty<IDataEditor>();
 
-        /// <summary>
-        /// The json array of parameter editors
-        /// </summary>
-        public JArray ParameterEditors { get; set; }
+        [JsonProperty("parameterEditors")]
+        public IDataEditor[] ParameterEditors { get; set; } = Array.Empty<IDataEditor>();
         
-        /// <summary>
-        /// The json array of grid editors
-        /// </summary>
-        public JArray GridEditors { get; set; }
+        [JsonProperty("gridEditors")]
+        public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();
+
+        [JsonProperty("contentApps")]
+        public IContentAppDefinition[] ContentApps { get; set; } = Array.Empty<IContentAppDefinition>();
 
         /// <summary>
         /// The dictionary of dashboards

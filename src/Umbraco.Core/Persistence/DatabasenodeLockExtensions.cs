@@ -8,11 +8,11 @@ namespace Umbraco.Core.Persistence
     internal static class DatabaseNodeLockExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ValidateDatabase(UmbracoDatabase database)
+        private static void ValidateDatabase(IUmbracoDatabase database)
         {
             if (database == null)
                 throw new ArgumentNullException("database");
-            if (database.CurrentTransactionIsolationLevel < IsolationLevel.RepeatableRead)
+            if (database.GetCurrentTransactionIsolationLevel() < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
         }
 
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence
         // that record which will be kept until the transaction is ended, effectively locking
         // out all other accesses to that record - thus obtaining an exclusive lock over the
         // protected resources.
-        public static void AcquireLockNodeWriteLock(this UmbracoDatabase database, int nodeId)
+        public static void AcquireLockNodeWriteLock(this IUmbracoDatabase database, int nodeId)
         {
             ValidateDatabase(database);
 
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence
         // that record which will be kept until the transaction is ended, effectively preventing
         // other write accesses to that record - thus obtaining a shared lock over the protected
         // resources.
-        public static void AcquireLockNodeReadLock(this UmbracoDatabase database, int nodeId)
+        public static void AcquireLockNodeReadLock(this IUmbracoDatabase database, int nodeId)
         {
             ValidateDatabase(database);
 

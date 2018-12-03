@@ -1,0 +1,20 @@
+﻿<div class="umb-split-views">
+    <div class="umb-split-view"
+         ng-repeat="editor in vm.editors track by editor.culture"
+         ng-class="{'umb-split-view--collapsed': editor.collapsed}">
+
+        <umb-variant-content
+            page="vm.page"
+            content="vm.content"
+            editor="editor"
+            editor-index="$index"
+            editor-count="vm.editors.length"
+            open-variants="vm.openVariants"
+            on-open-split-view="vm.openSplitView(variant)"
+            on-close-split-view="vm.closeSplitView($index)"
+            on-select-variant="vm.selectVariant(variant, $index)"
+            on-select-app="vm.selectApp(app)">
+        </umb-variant-content>
+
+    </div>
+</div>

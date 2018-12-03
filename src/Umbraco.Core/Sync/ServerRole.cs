@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Sync
+﻿namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// The role of a server in an application environment.
@@ -16,9 +16,9 @@ namespace Umbraco.Core.Sync
         Single = 1,
 
         /// <summary>
-        /// In a multi-servers environment, the server is a slave server.
+        /// In a multi-servers environment, the server is a replica server.
         /// </summary>
-        Slave = 2,
+        Replica = 2,
 
         /// <summary>
         /// In a multi-servers environment, the server is the master server.

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService) {
 
         var vm = this;
 
@@ -31,6 +31,8 @@
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
         vm.unlockUser = unlockUser;
+        vm.resendInvite = resendInvite;
+        vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
         vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
@@ -49,7 +51,9 @@
                 "sections_users",
                 "content_contentRoot",
                 "media_mediaRoot",
-                "user_noStartNodes"
+                "user_noStartNodes",
+                "user_defaultInvitationMessage",
+                "user_deleteUserConfirmation"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -61,6 +65,8 @@
                 vm.labels.contentRoot = values[5];
                 vm.labels.mediaRoot = values[6];
                 vm.labels.noStartNodes = values[7];
+                vm.labels.defaultInvitationMessage = values[8];
+                vm.labels.deleteUserConfirmation = values[9];
             });
 
             // get user
@@ -87,8 +93,14 @@
                   //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
                   //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
                   //the authorization check is also done on the server side when submitted.
-                  vm.changePasswordModel.config.allowManuallyChangingPassword = !vm.user.isCurrentUser;
-                  
+                    
+                  // only update the setting if not the current logged in user, otherwise leave the value as it is
+                  // currently set in the web.config
+                  if (!vm.user.isCurrentUser)
+                  {
+                      vm.changePasswordModel.config.allowManuallyChangingPassword = true;
+                  }
+                    
                   vm.loading = false;
                 });
             });
@@ -119,7 +131,7 @@
 
         function save() {
 
-            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
+            if (formHelper.submitForm({ scope: $scope })) {
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
@@ -138,11 +150,8 @@
                         //if the user saved, then try to execute all extended save options
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
-                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
-                        }, function(err) {
-                            //otherwise show the notifications for the user being saved
-                            formHelper.showNotifications(saved);
-                        });
+                            formHelper.resetForm({ scope: $scope });
+                        }, angular.noop);
                         
                         vm.user = _.omit(saved, "navigation");
                         //restore
@@ -162,10 +171,7 @@
                             redirectOnFailure: false,
                             err: err
                         });
-                        //show any notifications
-                        if (err.data) {
-                            formHelper.showNotifications(err.data);
-                        }
+                        
                         vm.page.saveButtonState = "error";
                     });
             }
@@ -203,38 +209,33 @@
         }
 
         function openUserGroupPicker() {
-            vm.userGroupPicker = {
-                view: "usergrouppicker",
+            var oldSelection = angular.copy(vm.user.userGroups);
+            var userGroupPicker = {
                 selection: vm.user.userGroups,
-                closeButtonLabel: vm.labels.cancel,
-                show: true,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
                         vm.user.userGroups = model.selection;
                     }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    // rollback on close
-                    if (oldModel.selection) {
-                        vm.user.userGroups = oldModel.selection;
-                    }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                close: function () {
+                    // roll back the selection
+                    vm.user.userGroups = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.userGroupPicker(userGroupPicker);
         }
 
         function openContentPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                section: "content",
+                treeAlias: "content",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     // select items
                     if (model.selection) {
@@ -246,22 +247,18 @@
                             multiSelectItem(item, vm.user.startContentIds);
                         });
                     }
-                    // close overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    // close overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            vm.mediaPicker = {
+            var mediaPicker = {
                 title: vm.labels.selectMediaStartNode,
-                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
@@ -280,15 +277,14 @@
                         });
                     }
                     // close overlay
-                    vm.mediaPicker.show = false;
-                    vm.mediaPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
+                close: function () {
                     // close overlay
-                    vm.mediaPicker.show = false;
-                    vm.mediaPicker = null;
+                    editorService.close();
                 }
             };
+            editorService.treePicker(mediaPicker);
         }
 
         function multiSelectItem(item, selection) {
@@ -317,10 +313,10 @@
                 vm.user.userState = 1;
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
-                formHelper.showNotifications(data);
+                
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
+                
             });
         }
 
@@ -330,10 +326,8 @@
                 vm.user.userState = 0;
                 setUserDisplayState();
                 vm.enableUserButtonState = "success";
-                formHelper.showNotifications(data);
             }, function (error) {
                 vm.enableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -341,11 +335,49 @@
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers([vm.user.id]).then(function (data) {
                 vm.user.userState = 0;
+                vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
-                formHelper.showNotifications(data);
+                
             }, function (error) {
                 vm.unlockUserButtonState = "error";
+            });
+        }
+
+        function resendInvite() {
+            vm.resendInviteButtonState = "busy";
+
+            if (vm.resendInviteMessage) {
+                vm.user.message = vm.resendInviteMessage;
+            }
+            else {
+                vm.user.message = vm.labels.defaultInvitationMessage;
+            }
+
+            usersResource.inviteUser(vm.user).then(function (data) {
+                vm.resendInviteButtonState = "success";
+                vm.resendInviteMessage = "";
+                formHelper.showNotifications(data);
+            }, function (error) {
+                vm.resendInviteButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
+
+        function deleteNonLoggedInUser() {
+            vm.deleteNotLoggedInUserButtonState = "busy";
+
+            var confirmationMessage = vm.labels.deleteUserConfirmation;
+            if (!confirm(confirmationMessage)) {
+                vm.deleteNotLoggedInUserButtonState = "danger";
+                return;
+            }
+
+            usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
+                formHelper.showNotifications(data);
+                goToPage(vm.breadcrumbs[0]);
+            }, function (error) {
+                vm.deleteNotLoggedInUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
         }

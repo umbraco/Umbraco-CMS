@@ -13,7 +13,12 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Gets the scope database.
         /// </summary>
-        UmbracoDatabase Database { get; }
+        IUmbracoDatabase Database { get; }
+
+        /// <summary>
+        /// Gets the Sql context.
+        /// </summary>
+        ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Gets the scope event messages.
@@ -21,17 +26,17 @@ namespace Umbraco.Core.Scoping
         EventMessages Messages { get; }
 
         /// <summary>
-        /// Gets the event manager
+        /// Gets the scope event dispatcher.
         /// </summary>
         IEventDispatcher Events { get; }
 
         /// <summary>
-        /// Gets the repository cache mode.
+        /// Gets the repositories cache mode.
         /// </summary>
         RepositoryCacheMode RepositoryCacheMode { get; }
 
         /// <summary>
-        /// Gets the isolated cache.
+        /// Gets the scope isolated cache.
         /// </summary>
         IsolatedRuntimeCache IsolatedRuntimeCache { get; }
 
@@ -41,5 +46,17 @@ namespace Umbraco.Core.Scoping
         /// <returns>A value indicating whether the scope has been successfully completed.</returns>
         /// <remarks>Can return false if any child scope has not completed.</remarks>
         bool Complete();
+
+        /// <summary>
+        /// Read-locks some lock objects.
+        /// </summary>
+        /// <param name="lockIds">The lock object identifiers.</param>
+        void ReadLock(params int[] lockIds);
+
+        /// <summary>
+        /// Write-locks some lock objects.
+        /// </summary>
+        /// <param name="lockIds">The lock object identifiers.</param>
+        void WriteLock(params int[] lockIds);
     }
 }

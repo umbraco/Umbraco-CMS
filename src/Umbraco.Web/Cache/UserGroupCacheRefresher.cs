@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Web.Cache
 {
@@ -14,25 +14,28 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresher>
     {
-        protected override UserGroupCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        public UserGroupCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.UserGroupCacheRefresherId); }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "User group cache refresher"; }
-        }
+        protected override UserGroupCacheRefresher This => this;
+
+        public static readonly Guid UniqueId = Guid.Parse("45178038-B232-4FE8-AA1A-F2B949C44762");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "User Group Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
             ClearAllIsolatedCacheByEntityType<IUserGroup>();
-            var userGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
             if (userGroupCache)
             {
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
@@ -52,10 +55,10 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var userGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserGroup>(id));
+                userGroupCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IUserGroup>(id));
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
 
@@ -64,6 +67,7 @@ namespace Umbraco.Web.Cache
 
             base.Remove(id);
         }
-        
+
+        #endregion
     }
 }

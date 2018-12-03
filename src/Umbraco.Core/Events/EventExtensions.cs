@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Umbraco.Core.Persistence.UnitOfWork;
+﻿using System;
 
 namespace Umbraco.Core.Events
 {
-	/// <summary>
-	/// Extension methods for cancellable event operations
-	/// </summary>
-	public static class EventExtensions
-	{
+    /// <summary>
+    /// Extension methods for cancellable event operations
+    /// </summary>
+    public static class EventExtensions
+    {
         // keep these two for backward compatibility reasons but understand that
         // they are *not* part of any scope / event dispatcher / anything...
 
@@ -26,12 +21,12 @@ namespace Umbraco.Core.Events
         /// <returns>A value indicating whether the cancelable event should be cancelled</returns>
         /// <remarks>A cancelable event is raised by a component when it is about to perform an action that can be canceled.</remarks>
         public static bool IsRaisedEventCancelled<TSender, TArgs>(this TypedEventHandler<TSender, TArgs> eventHandler, TArgs args, TSender sender)
-			where TArgs : CancellableEventArgs
+            where TArgs : CancellableEventArgs
         {
             if (eventHandler == null) return args.Cancel;
-			eventHandler(sender, args);
-			return args.Cancel;
-		}
+            eventHandler(sender, args);
+            return args.Cancel;
+        }
 
         /// <summary>
         /// Raises an event.

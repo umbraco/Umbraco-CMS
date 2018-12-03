@@ -19,15 +19,17 @@ namespace Umbraco.Tests.Web.AngularIntegration
         [Test]
         public void Parse_Main()
         {
-            var result = JsInitialization.ParseMain(new[] {"[World]", "Hello" });
+            var result = JsInitialization.WriteScript("[World]", "Hello", "Blah");
 
             Assert.AreEqual(@"LazyLoad.js([World], function () {
     //we need to set the legacy UmbClientMgr path
-    UmbClientMgr.setUmbracoPath('Hello');
+    if ((typeof UmbClientMgr) !== ""undefined"") {
+        UmbClientMgr.setUmbracoPath('Hello');
+    }
 
     jQuery(document).ready(function () {
 
-        angular.bootstrap(document, ['umbraco']);
+        angular.bootstrap(document, ['Blah']);
 
     });
 });".StripWhitespace(), result.StripWhitespace());

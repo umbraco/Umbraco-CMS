@@ -13,8 +13,10 @@
             url += "&mode=crop";
         }
     }
+
+    var altText = Model.value.altText ?? Model.value.caption ?? string.Empty;
     
-    <img src="@url" alt="@Model.value.caption">
+    <img src="@url" alt="@altText">
     
     if (Model.value.caption != null)
     {

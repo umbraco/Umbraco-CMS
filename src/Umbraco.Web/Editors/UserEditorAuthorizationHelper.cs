@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Checks if the current user has access to save the user data 
+        /// Checks if the current user has access to save the user data
         /// </summary>
         /// <param name="currentUser">The current user trying to save user data</param>
         /// <param name="savingUser">The user instance being saved (can be null if it's a new user)</param>
@@ -41,7 +42,7 @@ namespace Umbraco.Web.Editors
             // a) A non-admin cannot save an admin
 
             if (savingUser != null)
-            {                
+            {
                 if (savingUser.IsAdmin() && currentIsAdmin == false)
                     return Attempt.Fail("The current user is not an administrator so cannot save another administrator");
             }
@@ -65,9 +66,9 @@ namespace Umbraco.Web.Editors
             var pathResult = AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
             if (pathResult == false)
                 return pathResult;
-            
+
             // c) an admin can manage any group or section access
-            
+
             if (currentIsAdmin)
                 return Attempt<string>.Succeed();
 
@@ -91,16 +92,16 @@ namespace Umbraco.Web.Editors
                     // d) A user cannot assign a group to another user that they do not belong to
 
                     var currentUserGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
-                    
+
                     foreach (var group in newGroups)
                     {
                         if (currentUserGroups.Contains(group) == false)
                         {
                             return Attempt.Fail("Cannot assign the group " + group + ", the current user is not a member");
                         }
-                    }                    
+                    }
                 }
-            }            
+            }
 
             return Attempt<string>.Succeed();
         }
@@ -113,7 +114,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (contentId == Constants.System.Root)
                     {
-                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
+                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the content root");
                     }
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (mediaId == Constants.System.Root)
                     {
-                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
+                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the media root");
                     }
@@ -145,8 +146,8 @@ namespace Umbraco.Web.Editors
                         var hasAccess = currentUser.HasPathAccess(media, _entityService);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the media path " + media.Path);
-                    }                    
-                }                
+                    }
+                }
             }
 
             return Attempt<string>.Succeed();

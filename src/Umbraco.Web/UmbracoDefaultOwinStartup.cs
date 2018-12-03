@@ -2,9 +2,14 @@
 using Microsoft.Owin;
 using Owin;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.Security.Identity;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Security;
+
 
 [assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 
@@ -18,6 +23,12 @@ namespace Umbraco.Web
     /// </remarks>
     public class UmbracoDefaultOwinStartup
     {
+        protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
+        protected IGlobalSettings GlobalSettings => UmbracoConfig.For.GlobalSettings();
+        protected IUmbracoSettingsSection UmbracoSettings => UmbracoConfig.For.UmbracoSettings();
+        protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
+        protected ServiceContext Services => Current.Services;
+
         /// <summary>
         /// Main startup method
         /// </summary>
@@ -26,7 +37,11 @@ namespace Umbraco.Web
         {
             app.SanitizeThreadCulture();
 
-            ConfigureServices(app);
+            // there's nothing we can do really
+            if (RuntimeState.Level == RuntimeLevel.BootFailed)
+                return;
+
+            ConfigureServices(app, Services);
             ConfigureMiddleware(app);
         }
 
@@ -34,7 +49,8 @@ namespace Umbraco.Web
         /// Configures services to be created in the OWIN context (CreatePerOwinContext)
         /// </summary>
         /// <param name="app"></param>
-        protected virtual void ConfigureServices(IAppBuilder app)
+        /// <param name="services"></param>
+        protected virtual void ConfigureServices(IAppBuilder app, ServiceContext services)
         {
             app.SetUmbracoLoggerFactory();
             ConfigureUmbracoUserManager(app);
@@ -51,7 +67,7 @@ namespace Umbraco.Web
             ConfigureUmbracoAuthentication(app);
 
             app
-                .UseSignalR()
+                .UseSignalR(GlobalSettings)
                 .FinalizeMiddlewareConfiguration();
         }
 
@@ -63,7 +79,9 @@ namespace Umbraco.Web
         {
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
-                ApplicationContext,
+                Services,
+                UmbracoSettings.Content,
+                GlobalSettings,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
         }
 
@@ -76,25 +94,16 @@ namespace Umbraco.Web
             // Ensure owin is configured for Umbraco back office authentication.
             // Front-end OWIN cookie configuration must be declared after this code.
             app
-                .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
-                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(ApplicationContext, PipelineStage.Authorize);
+                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authenticate)
+                .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, PipelineStage.Authenticate)
+                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authorize);
         }
 
-        /// <summary>
-        /// Raised when the middleware has been configured
-        /// </summary>
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;
-
-        protected virtual ApplicationContext ApplicationContext
-        {
-            get { return ApplicationContext.Current; }
-        }
 
         internal static void OnMiddlewareConfigured(OwinMiddlewareConfiguredEventArgs args)
         {
-            var handler = MiddlewareConfigured;
-            if (handler != null) handler(null, args);
+            MiddlewareConfigured?.Invoke(null, args);
         }
     }
 }

@@ -151,7 +151,7 @@
       controller: 'Umbraco.Editors.Users.ChangePasswordDirectiveController',
       scope: {
         isNew: "=?",
-        passwordValues: "=",        
+        passwordValues: "=",
         config: "="        
       }
     };

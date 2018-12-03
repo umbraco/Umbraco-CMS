@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Key, group.Key);
             Assert.AreEqual(clone.UpdateDate, group.UpdateDate);
             Assert.AreEqual(clone.Name, group.Name);
-            
+
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)

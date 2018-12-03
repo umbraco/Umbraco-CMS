@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,6 +8,9 @@ using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebServices;
@@ -26,7 +29,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetExamineManagementServicePath(this UrlHelper url)
         {
-            var result = url.GetUmbracoApiService<ExamineManagementApiController>("GetIndexerDetails");
+            // TODO: Possibly remove this method, I think it's unused...
+            var result = url.GetUmbracoApiService<ExamineManagementController>("GetIndexerDetails");
             return result.TrimEnd("GetIndexerDetails").EnsureEndsWith('/');
         }
 
@@ -91,12 +95,12 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, Type apiControllerType, RouteValueDictionary routeVals = null)
         {
-            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
-            Mandate.ParameterNotNull(apiControllerType, "apiControllerType");
+            if (string.IsNullOrEmpty(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
+            if (apiControllerType == null) throw new ArgumentNullException(nameof(apiControllerType));
 
             var area = "";
 
-            var apiController = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
+            var apiController = Current.UmbracoApiControllerTypes
                 .SingleOrDefault(x => x == apiControllerType);
             if (apiController == null)
                 throw new InvalidOperationException("Could not find the umbraco api controller of type " + apiControllerType.FullName);
@@ -133,8 +137,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, string controllerName, string area, RouteValueDictionary routeVals = null)
         {
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (string.IsNullOrEmpty(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
 
             if (routeVals == null)
             {
@@ -162,28 +166,28 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUrlWithCacheBust(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
         {
-            var applicationJs = url.Action(actionName, controllerName, routeVals);          
+            var applicationJs = url.Action(actionName, controllerName, routeVals);
             applicationJs = applicationJs + "?umb__rnd=" + GetCacheBustHash();
             return applicationJs;
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public static string GetCacheBustHash()
         {
             //make a hash of umbraco and client dependency version
             //in case the user bypasses the installer and just bumps the web.config or clientdep config
-            
+
             //if in debug mode, always burst the cache
             if (GlobalSettings.DebugMode)
             {
                 return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
             }
 
-            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
-            return string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash();
+            var version = Current.RuntimeState.SemanticVersion.ToSemanticString();
+            return $"{version}.{ClientDependencySettings.Instance.Version}".GenerateHash();
         }
     }
 }

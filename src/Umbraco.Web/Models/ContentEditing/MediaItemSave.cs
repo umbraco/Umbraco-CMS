@@ -1,5 +1,6 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Umbraco.Core.Models;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -7,8 +8,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a media item to be saved
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class MediaItemSave : ContentBaseItemSave<IMedia>
+    public class MediaItemSave : ContentBaseSave<IMedia>
     {
-
     }
 }

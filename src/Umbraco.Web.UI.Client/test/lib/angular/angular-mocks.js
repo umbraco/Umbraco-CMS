@@ -1420,13 +1420,13 @@ function MockXhr() {
         var header = this.$$respHeaders[name];
         if (header) return header;
 
-        name = angular.lowercase(name);
+        name = name.toLowerCase();
         header = this.$$respHeaders[name];
         if (header) return header;
 
         header = undefined;
         angular.forEach(this.$$respHeaders, function (headerVal, headerName) {
-            if (!header && angular.lowercase(headerName) == name) header = headerVal;
+            if (!header && headerName.toLowerCase() == name) header = headerVal;
         });
         return header;
     };

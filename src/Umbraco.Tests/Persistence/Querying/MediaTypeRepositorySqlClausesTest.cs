@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Querying
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectTypeId = new Guid(Constants.ObjectTypes.MediaType);
+            var NodeObjectTypeId = Constants.ObjectTypes.MediaType;
 
             var expected = new Sql();
             expected.Select("*")
@@ -22,8 +23,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 .InnerJoin("[umbracoNode]").On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e"));
 
-            var sql = new Sql();
-            sql.Select("*")
+            var sql = Sql();
+            sql.SelectAll()
                 .From<ContentTypeDto>()
                 .InnerJoin<NodeDto>()
                 .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)

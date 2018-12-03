@@ -1,42 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.IO;
 using System.Security.AccessControl;
 using Umbraco.Core.IO;
-using umbraco;
+using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Install
 {
     internal class FilePermissionHelper
     {
-        internal static readonly string[] PermissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.Xslt, SystemDirectories.UserControls, SystemDirectories.Preview };
-        internal static readonly string[] PermissionFiles = { };
-        internal static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.UserControls, SystemDirectories.Packages };
+        // ensure that these directories exist and Umbraco can write to them
+        private static readonly string[] PermissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.UserControls, SystemDirectories.Preview };
+        private static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.UserControls, SystemDirectories.Packages };
 
-        public static bool RunFilePermissionTestSuite(out Dictionary<string, List<string>> errorReport)
+        // ensure Umbraco can write to these files (the directories must exist)
+        private static readonly string[] PermissionFiles = { };
+
+        public static bool RunFilePermissionTestSuite(out Dictionary<string, IEnumerable<string>> report)
         {
-            errorReport = new Dictionary<string, List<string>>();
+            report = new Dictionary<string, IEnumerable<string>>();
 
-            List<string> errors;
+            IEnumerable<string> errors;
 
-            if (TestDirectories(PermissionDirs, out errors) == false)
-                errorReport["Folder creation failed"] = errors.ToList();
+            if (EnsureDirectories(PermissionDirs, out errors) == false)
+                report["Folder creation failed"] = errors.ToList();
 
-            if (TestDirectories(PackagesPermissionsDirs, out errors) == false)
-                errorReport["File writing for packages failed"] = errors.ToList();
+            if (EnsureDirectories(PackagesPermissionsDirs, out errors) == false)
+                report["File writing for packages failed"] = errors.ToList();
 
-            if (TestFiles(PermissionFiles, out errors) == false)
-                errorReport["File writing failed"] = errors.ToList();
+            if (EnsureFiles(PermissionFiles, out errors) == false)
+                report["File writing failed"] = errors.ToList();
 
-            if (TestContentXml(out errors) == false)
-                errorReport["Cache file writing failed"] = errors.ToList();
+            if (TestPublishedSnapshotService(out errors) == false)
+                report["Published snapshot environment check failed"] = errors.ToList();
 
-            if (TestFolderCreation(SystemDirectories.Media, out errors) == false)
-                errorReport["Media folder creation failed"] = errors.ToList();
+            if (EnsureCanCreateSubDirectory(SystemDirectories.Media, out errors) == false)
+                report["Media folder creation failed"] = errors.ToList();
 
-            return errorReport.Any() == false;
+            return report.Count == 0;
         }
 
         /// <summary>
@@ -50,97 +53,83 @@ namespace Umbraco.Web.Install
         /// reliable but we cannot write a file since it will cause an app domain restart.
         /// </param>
         /// <returns></returns>
-        public static bool TestDirectories(string[] directories, out List<string> errorReport, bool writeCausesRestart = false)
+        public static bool EnsureDirectories(string[] dirs, out IEnumerable<string> errors, bool writeCausesRestart = false)
         {
-            errorReport = new List<string>();
-            bool succes = true;
-            foreach (string dir in directories)
+            List<string> temp = null;
+            var success = true;
+            foreach (var dir in dirs)
             {
-                if (Directory.Exists(dir) == false) continue;
+                // we don't want to create/ship unnecessary directories, so
+                // here we just ensure we can access the directory, not create it
+                var tryAccess = TryAccessDirectory(dir, !writeCausesRestart);
+                if (tryAccess) continue;
 
-                var folder = IOHelper.MapPath(dir);
-
-                var result = writeCausesRestart
-                    ? HasWritePermissionOnDir(folder)
-                    : SaveAndDeleteFile(Path.Combine(folder, "configWizardPermissionTest.txt"));
-
-                if (result == false)
-                {
-                    succes = false;
-                    errorReport.Add(dir);
-                }
+                if (temp == null) temp = new List<string>();
+                temp.Add(dir);
+                success = false;
             }
 
-            return succes;
+            errors = success ? Enumerable.Empty<string>() : temp;
+            return success;
         }
 
-        public static bool TestFiles(string[] files, out List<string> errorReport)
+        public static bool EnsureFiles(string[] files, out IEnumerable<string> errors)
         {
-            errorReport = new List<string>();
-            bool succes = true;
-            foreach (string file in files)
+            List<string> temp = null;
+            var success = true;
+            foreach (var file in files)
             {
-                bool result = OpenFileForWrite(IOHelper.MapPath(file));
-                if (result == false)
-                {
-                    errorReport.Add(file);
-                    succes = false;
-                }
+                var canWrite = TryWriteFile(file);
+                if (canWrite) continue;
+
+                if (temp == null) temp = new List<string>();
+                temp.Add(file);
+                success = false;
             }
 
-            return succes;
+            errors = success ? Enumerable.Empty<string>() : temp;
+            return success;
         }
 
-        public static bool TestFolderCreation(string folder, out List<string> errorReport)
+        public static bool EnsureCanCreateSubDirectory(string dir, out IEnumerable<string> errors)
         {
-            errorReport = new List<string>();
-            try
-            {
-                string tempDir = IOHelper.MapPath(folder + "/testCreatedByConfigWizard");
-                Directory.CreateDirectory(tempDir);
-                Directory.Delete(tempDir);
-                return true;
-            }
-            catch
-            {
-                errorReport.Add(folder);
-                return false;
-            }
+            return EnsureCanCreateSubDirectories(new[] { dir }, out errors);
         }
 
-        public static bool TestContentXml(out List<string> errorReport)
+        public static bool EnsureCanCreateSubDirectories(IEnumerable<string> dirs, out IEnumerable<string> errors)
         {
-            errorReport = new List<string>();
-            // Test creating/saving/deleting a file in the same location as the content xml file
-            // NOTE: We cannot modify the xml file directly because a background thread is responsible for 
-            // that and we might get lock issues.
-            try
+            List<string> temp = null;
+            var success = true;
+            foreach (var dir in dirs)
             {
-                var xmlFile = content.GetUmbracoXmlDiskFileName() + ".tmp";
-                SaveAndDeleteFile(xmlFile);
-                return true;
+                var canCreate = TryCreateSubDirectory(dir);
+                if (canCreate) continue;
+
+                if (temp == null) temp = new List<string>();
+                temp.Add(dir);
+                success = false;
             }
-            catch
-            {
-                errorReport.Add(SystemFiles.ContentCacheXml);
-                return false;    
-            }
+
+            errors = success ? Enumerable.Empty<string>() : temp;
+            return success;
         }
 
-        private static bool SaveAndDeleteFile(string file)
+        public static bool TestPublishedSnapshotService(out IEnumerable<string> errors)
+        {
+            var publishedSnapshotService = Current.PublishedSnapshotService;
+            return publishedSnapshotService.EnsureEnvironment(out errors);
+        }
+
+        // tries to create a sub-directory
+        // if successful, the sub-directory is deleted
+        // creates the directory if needed - does not delete it
+        private static bool TryCreateSubDirectory(string dir)
         {
             try
             {
-                //first check if the directory of the file exists, and if not try to create that first.
-                FileInfo fi = new FileInfo(file);
-                if (fi.Directory.Exists == false)
-                {
-                    fi.Directory.Create();
-                }
-
-                File.WriteAllText(file,
-                                  "This file has been created by the umbraco configuration wizard. It is safe to delete it!");
-                File.Delete(file);
+                var path = IOHelper.MapPath(dir + "/" + CreateRandomName());
+                Directory.CreateDirectory(path);
+                Directory.Delete(path);
                 return true;
             }
             catch
@@ -149,7 +138,65 @@ namespace Umbraco.Web.Install
             }
         }
 
-        private static bool HasWritePermissionOnDir(string path)
+        // tries to create a file
+        // if successful, the file is deleted
+        // creates the directory if needed - does not delete it
+        public static bool TryCreateDirectory(string dir)
+        {
+            try
+            {
+                var dirPath = IOHelper.MapPath(dir);
+
+                if (Directory.Exists(dirPath) == false)
+                    Directory.CreateDirectory(dirPath);
+
+                var filePath = dirPath + "/" + CreateRandomName() + ".tmp";
+                File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
+                File.Delete(filePath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // tries to create a file
+        // if successful, the file is deleted
+        //
+        // or
+        //
+        // use the ACL APIs to avoid creating files
+        //
+        // if the directory does not exist, do nothing & success
+        public static bool TryAccessDirectory(string dir, bool canWrite)
+        {
+            try
+            {
+                var dirPath = IOHelper.MapPath(dir);
+
+                if (Directory.Exists(dirPath) == false)
+                    return true;
+
+                if (canWrite)
+                {
+                    var filePath = dirPath + "/" + CreateRandomName() + ".tmp";
+                    File.WriteAllText(filePath, "This is an Umbraco internal test file. It is safe to delete it.");
+                    File.Delete(filePath);
+                    return true;
+                }
+                else
+                {
+                    return HasWritePermission(dirPath);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool HasWritePermission(string path)
         {
             var writeAllow = false;
             var writeDeny = false;
@@ -163,7 +210,7 @@ namespace Umbraco.Web.Install
                 if (accessRules == null)
                     return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //This is not 100% accurate btw because it could turn out that the current user doesn't
                 //have access to read the current permissions but does have write access.
@@ -185,17 +232,25 @@ namespace Umbraco.Web.Install
             return writeAllow && writeDeny == false;
         }
 
-        private static bool OpenFileForWrite(string file)
+        // tries to write into a file
+        // fails if the directory does not exist
+        private static bool TryWriteFile(string file)
         {
             try
             {
-                File.AppendText(file).Close();
+                var path = IOHelper.MapPath(file);
+                File.AppendText(path).Close();
+                return true;
             }
             catch
             {
                 return false;
             }
-            return true;
+        }
+
+        private static string CreateRandomName()
+        {
+            return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }
     }
 }

@@ -8,20 +8,12 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal enum MacroTypes
+    public enum MacroTypes
     {
-        [EnumMember]
-        Xslt = 1,
-        [EnumMember]
-        CustomControl = 2,
         [EnumMember]
         UserControl = 3,
         [EnumMember]
         Unknown = 4,
-        [EnumMember]
-        Python = 5,
-        [EnumMember]
-        Script = 6,
         [EnumMember]
         PartialView = 7
     }

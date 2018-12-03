@@ -1,86 +1,70 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Sync;
-using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
+using LightInject;
+using Moq;
+using Umbraco.Core.Events;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    public class ScopedRepositoryTests : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
+    public class ScopedRepositoryTests : TestWithDatabaseBase
     {
-        private CacheRefresherEventHandler _cacheHandler;
+        private CacheRefresherComponent _cacheRefresher;
 
-        // setup
-        public override void Initialize()
+        protected override void Compose()
         {
-            base.Initialize();
+            base.Compose();
 
-            Assert.IsNull(DatabaseContext.ScopeProvider.AmbientScope); // gone
+            // the cache refresher component needs to trigger to refresh caches
+            // but then, it requires a lot of plumbing ;(
+            // fixme - and we cannot inject a DistributedCache yet
+            // so doing all this mess
+            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
+            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
         }
 
-        protected override void FreezeResolution()
+        protected override void ComposeCacheHelper()
         {
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
-                new DistributedCacheTests.TestServerRegistrar());
-            ServerMessengerResolver.Current = new ServerMessengerResolver(
-                new DatabaseServerMessenger(ApplicationContext, false, new DatabaseServerMessengerOptions()));
-            CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[]
-                {
-                    typeof(PageCacheRefresher),
-                    typeof(UnpublishedPageCacheRefresher),
-                    typeof(DomainCacheRefresher),
-                    typeof(MacroCacheRefresher),
-                    typeof(UserCacheRefresher),
-                    typeof(LanguageCacheRefresher),
-                    typeof(DictionaryCacheRefresher)
-                });
-
-            base.FreezeResolution();
+            // this is what's created core web runtime
+            var cacheHelper = new CacheHelper(
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
+                new StaticCacheProvider(),
+                NullCacheProvider.Instance,
+                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+            Container.RegisterSingleton(f => cacheHelper);
+            Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
         }
 
         [TearDown]
         public void Teardown()
         {
-            if (_cacheHandler != null)
-                _cacheHandler.Unbind();
-            _cacheHandler = null;
-
-            ServerRegistrarResolver.Reset();
-            ServerMessengerResolver.Reset();
-            CacheRefreshersResolver.Reset();
-        }
-
-        protected override CacheHelper CreateCacheHelper()
-        {
-            //return CacheHelper.CreateDisabledCacheHelper();
-            return new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(),
-                new StaticCacheProvider(),
-                new NullCacheProvider(),
-                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
+            _cacheRefresher?.Unbind();
+            _cacheRefresher = null;
         }
 
         [TestCase(true)]
         [TestCase(false)]
         public void DefaultRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var service = ApplicationContext.Services.UserService;
-            var globalCache = ApplicationContext.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof(IUser));
+            var scopeProvider = ScopeProvider;
+            var service = Current.Services.UserService;
+            var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof(IUser));
 
-            var user = (IUser) new User("name", "email", "username", "rawPassword");
+            var user = (IUser)new User("name", "email", "username", "rawPassword");
             service.Save(user);
 
             // global cache contains the entity
@@ -89,13 +73,16 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
 
-            _cacheHandler = new CacheRefresherEventHandler(true);
-            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
+            // get user again - else we'd modify the one that's in the cache
+            user = service.GetUserById(user.Id);
+
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize(new DistributedCache());
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                Assert.IsInstanceOf<Scope>(scope);
+                Assert.IsInstanceOf<Core.Scoping.Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
@@ -123,7 +110,7 @@ namespace Umbraco.Tests.Scoping
             }
             Assert.IsNull(scopeProvider.AmbientScope);
 
-            globalCached = (IUser)globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
+            globalCached = (IUser) globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
             if (complete)
             {
                 // global cache has been cleared
@@ -150,9 +137,9 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void FullDataSetRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var service = ApplicationContext.Services.LocalizationService;
-            var globalCache = ApplicationContext.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (ILanguage));
+            var scopeProvider = ScopeProvider;
+            var service = Current.Services.LocalizationService;
+            var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (ILanguage));
 
             var lang = (ILanguage) new Language("fr-FR");
             service.Save(lang);
@@ -170,13 +157,13 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
 
-            _cacheHandler = new CacheRefresherEventHandler(true);
-            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize(new DistributedCache());
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                Assert.IsInstanceOf<Scope>(scope);
+                Assert.IsInstanceOf<Core.Scoping.Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
@@ -242,9 +229,9 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void SingleItemsOnlyRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var service = ApplicationContext.Services.LocalizationService;
-            var globalCache = ApplicationContext.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
+            var scopeProvider = ScopeProvider;
+            var service = Current.Services.LocalizationService;
+            var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
 
             var lang = (ILanguage)new Language("fr-FR");
             service.Save(lang);
@@ -262,13 +249,13 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
 
-            _cacheHandler = new CacheRefresherEventHandler(true);
-            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize(new DistributedCache());
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                Assert.IsInstanceOf<Scope>(scope);
+                Assert.IsInstanceOf<Core.Scoping.Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
@@ -321,12 +308,36 @@ namespace Umbraco.Tests.Scoping
 
         public static string GetCacheIdKey<T>(object id)
         {
-            return string.Format("{0}{1}", GetCacheTypeKey<T>(), id);
+            return $"{GetCacheTypeKey<T>()}{id}";
         }
 
         public static string GetCacheTypeKey<T>()
         {
-            return string.Format("uRepo_{0}_", typeof(T).Name);
+            return $"uRepo_{typeof (T).Name}_";
+        }
+
+        public class PassiveEventDispatcher : QueuingEventDispatcherBase
+        {
+            public PassiveEventDispatcher()
+                : base(false)
+            { }
+
+            protected override void ScopeExitCompleted()
+            {
+                // do nothing
+            }
+        }
+
+        public class LocalServerMessenger : ServerMessengerBase
+        {
+            public LocalServerMessenger()
+                : base(false)
+            { }
+
+            protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

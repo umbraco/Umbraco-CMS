@@ -95,19 +95,19 @@
 	overflow: hidden;
 	font-size: 12px;
 	text-align: center;
-
 	width: 100px;
-	height: 105px;
-
 	box-sizing: border-box;
+	position: relative;
 }
 
 .umb-card-grid li.-four-in-row {
-	flex: 0 0 25%;
+    flex: 0 0 25%;
+    max-width: 25%;
 }
 
 .umb-card-grid li.-three-in-row {
 	flex: 0 0 33.33%;
+    max-width:33.33%;
 }
 
 .umb-card-grid .umb-card-grid-item {
@@ -115,6 +115,7 @@
 	width: 100%;
 	height: 100%;
 	border-radius: 3px;
+    padding-bottom: 5px;
 }
 
 
@@ -141,8 +142,14 @@
 	  color: @gray-3;
  }
 
-
-
+ .umb-card-grid .umb-card-grid-item__loading {
+	 position: absolute;
+	 background-color: rgba(255,255,255,0.8);
+	 top: 0;
+	 right: 0;
+	 bottom: 0;
+	 left: 0;
+ }
 
 
 //Round icon-like button - this should be somewhere else
@@ -184,4 +191,31 @@
 .umb-btn-round.no-border{
     border: none !important;
     background: none !important;
+}
+
+.umb-training-videos {
+	display: grid;
+	grid-gap: 10px;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.umb-training-video {
+	background: @white;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+	border-radius: @baseBorderRadius;
+	transition: box-shadow 0.1s ease-in-out, border 0.1s ease-in-out;
+	box-sizing: border-box;
+	padding: 20px;
+}
+
+.umb-training-video:hover {
+	box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
+	text-decoration: none;
+}
+
+.umb-training-video__label {
+    font-weight: bold;
+	margin-top: 20px;
+	display: block;
+	text-align: center;
 }

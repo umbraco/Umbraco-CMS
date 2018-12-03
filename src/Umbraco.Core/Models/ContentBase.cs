@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Web;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -17,83 +16,60 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
-    public abstract class ContentBase : Entity, IContentBase
+    public abstract class ContentBase : TreeEntityBase, IContentBase
     {
-        protected IContentTypeComposition ContentTypeBase;
-        
-        private Lazy<int> _parentId;
-        private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
-        private int _sortOrder;
-        private int _level;
-        private string _path;
-        private int _creatorId;
-        private bool _trashed;
+        protected static readonly ContentCultureInfosCollection NoInfos = new ContentCultureInfosCollection();
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         private int _contentTypeId;
+        protected IContentTypeComposition ContentTypeBase;
+        private int _writerId;
         private PropertyCollection _properties;
-        private readonly List<Property> _lastInvalidProperties = new List<Property>();
+        private ContentCultureInfosCollection _cultureInfos;
 
         /// <summary>
-        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        /// <param name="name">Localized Name of the entity</param>
-        /// <param name="parentId"></param>
-        /// <param name="contentType"></param>
-        /// <param name="properties"></param>
-        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties)
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+            : this(name, contentType, properties, culture)
         {
-            Mandate.ParameterCondition(parentId != 0, "parentId");
-            Mandate.ParameterNotNull(contentType, "contentType");
-            Mandate.ParameterNotNull(properties, "properties");
-
-            ContentTypeBase = contentType;
-            Version = Guid.NewGuid();
-
-            _parentId = new Lazy<int>(() => parentId);
-            _name = name;
-            _contentTypeId = contentType.Id;
-            _properties = properties;
-            _properties.EnsurePropertyTypes(PropertyTypes);
-            _additionalData = new Dictionary<string, object>();
+            if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
+            ParentId = parentId;
         }
 
         /// <summary>
-        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        /// <param name="name">Localized Name of the entity</param>
-        /// <param name="parent"></param>
-        /// <param name="contentType"></param>
-        /// <param name="properties"></param>
-        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
-		{
-			Mandate.ParameterNotNull(parent, "parent");
-			Mandate.ParameterNotNull(contentType, "contentType");
-			Mandate.ParameterNotNull(properties, "properties");
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+            : this(name, contentType, properties, culture)
+        {
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
+            SetParent(parent);
+        }
 
-            ContentTypeBase = contentType;
-            Version = Guid.NewGuid();
+        private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        {
+            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
 
-			_parentId = new Lazy<int>(() => parent.Id);
-            _name = name;
-			_contentTypeId = contentType.Id;
-			_properties = properties;
-			_properties.EnsurePropertyTypes(PropertyTypes);
-            _additionalData = new Dictionary<string, object>();
-		}
+            // initially, all new instances have
+            Id = 0; // no identity
+            VersionId = 0; // no versions
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+            SetCultureName(name, culture);
 
+            _contentTypeId = contentType.Id;
+            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            _properties.EnsurePropertyTypes(PropertyTypes);
+        }
+
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
-            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ParentId);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
-            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
-            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
-        }        
+            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
+            public readonly PropertyInfo CultureInfosSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.CultureInfos);
+        }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -101,94 +77,17 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Id of the Parent entity
+        /// Id of the user who wrote/updated this entity
         /// </summary>
         [DataMember]
-        public virtual int ParentId
+        public virtual int WriterId
         {
-            get
-            {
-	            var val = _parentId.Value;
-				if (val == 0)
-				{
-					throw new InvalidOperationException("The ParentId cannot have a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
-				}
-				return val;
-            }
-            set
-            {
-                _parentId = new Lazy<int>(() => value);
-                OnPropertyChanged(Ps.Value.ParentIdSelector);
-            }
+            get => _writerId;
+            set => SetPropertyValueAndDetectChanges(value, ref _writerId, Ps.Value.WriterSelector);
         }
 
-        /// <summary>
-        /// Gets or sets the name of the entity
-        /// </summary>
-        [DataMember]
-        public virtual string Name
-        {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the sort order of the content entity
-        /// </summary>
-        [DataMember]
-        public virtual int SortOrder
-        {
-            get { return _sortOrder; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the level of the content entity
-        /// </summary>
-        [DataMember]
-        public virtual int Level
-        {
-            get { return _level; }
-            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the path
-        /// </summary>
-        [DataMember]
-        public virtual string Path //Setting this value should be handled by the class not the user
-        {
-            get { return _path; }
-            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
-        }
-
-        /// <summary>
-        /// Profile of the user who created this Content
-        /// </summary>
-        [DataMember]
-        public virtual int CreatorId
-        {
-            get { return _creatorId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
-        }
-        
-        /// <summary>
-        /// Boolean indicating whether this Content is Trashed or not.
-        /// If Content is Trashed it will be located in the Recyclebin.
-        /// </summary>
-        /// <remarks>When content is trashed it should be unpublished</remarks>
-        [DataMember]
-        public virtual bool Trashed //Setting this value should be handled by the class not the user
-        {
-            get { return _trashed; }
-            internal set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
-        }
-
-        /// <summary>
-        /// Guid Id of the curent Version
-        /// </summary>
-        [DataMember]
-        public Guid Version { get; internal set; }
+        [IgnoreDataMember]
+        public int VersionId { get; internal set; }
 
         /// <summary>
         /// Integer Id of the default ContentType
@@ -206,16 +105,20 @@ namespace Umbraco.Core.Models
                 }
                 return _contentTypeId;
             }
-            protected set { SetPropertyValueAndDetectChanges(value, ref _contentTypeId, Ps.Value.DefaultContentTypeIdSelector); }
+            protected set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, Ps.Value.DefaultContentTypeIdSelector);
         }
 
         /// <summary>
-        /// Collection of properties, which make up all the data available for this Content object
+        /// Gets or sets the collection of properties for the entity.
         /// </summary>
+        /// <remarks>
+        /// Marked DoNotClone since we'll manually clone the underlying field to deal with the event handling
+        /// </remarks>
         [DataMember]
+        [DoNotClone]
         public virtual PropertyCollection Properties
         {
-            get { return _properties; }
+            get => _properties;
             set
             {
                 _properties = value;
@@ -223,327 +126,382 @@ namespace Umbraco.Core.Models
             }
         }
 
-        private readonly IDictionary<string, object> _additionalData;
+        /// <summary>
+        /// Gets the enumeration of property groups for the entity.
+        /// fixme is a proxy, kill this
+        /// </summary>
+        [IgnoreDataMember]
+        public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
 
         /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// Gets the numeration of property types for the entity.
+        /// fixme is a proxy, kill this
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData
+        [IgnoreDataMember]
+        public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
+
+        #region Cultures
+
+        // notes - common rules
+        // - setting a variant value on an invariant content type throws
+        // - getting a variant value on an invariant content type returns null
+        // - setting and getting the invariant value is always possible
+        // - setting a null value clears the value
+
+        /// <inheritdoc />
+        public IEnumerable<string> AvailableCultures
+            => _cultureInfos?.Keys ?? Enumerable.Empty<string>();
+
+        /// <inheritdoc />
+        public bool IsCultureAvailable(string culture)
+            => _cultureInfos != null && _cultureInfos.ContainsKey(culture);
+
+        /// <inheritdoc />
+        [DataMember]
+        public virtual IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos => _cultureInfos ?? NoInfos;
+
+        /// <inheritdoc />
+        public string GetCultureName(string culture)
         {
-            get { return _additionalData; }
+            if (culture.IsNullOrWhiteSpace()) return Name;
+            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (_cultureInfos == null) return null;
+            return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
+        }
+
+        /// <inheritdoc />
+        public DateTime? GetUpdateDate(string culture)
+        {
+            if (culture.IsNullOrWhiteSpace()) return null;
+            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (_cultureInfos == null) return null;
+            return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
+        }
+
+        /// <inheritdoc />
+        public void SetCultureName(string name, string culture)
+        {
+            if (ContentTypeBase.VariesByCulture()) // set on variant content type
+            {
+                if (culture.IsNullOrWhiteSpace()) // invariant is ok
+                {
+                    Name = name; // may be null
+                }
+                else if (name.IsNullOrWhiteSpace()) // clear
+                {
+                    ClearCultureInfo(culture);
+                }
+                else // set
+                {
+                    SetCultureInfo(culture, name, DateTime.Now);
+                }
+            }
+            else // set on invariant content type
+            {
+                if (!culture.IsNullOrWhiteSpace()) // invariant is NOT ok
+                    throw new NotSupportedException("Content type does not vary by culture.");
+
+                Name = name; // may be null
+            }
+        }
+
+        protected void ClearCultureInfos()
+        {
+            _cultureInfos?.Clear();
+            _cultureInfos = null;
+        }
+
+        protected void ClearCultureInfo(string culture)
+        {
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_cultureInfos == null) return;
+            _cultureInfos.Remove(culture);
+            if (_cultureInfos.Count == 0)
+                _cultureInfos = null;
+        }
+
+        protected void TouchCultureInfo(string culture)
+        {
+            if (_cultureInfos == null || !_cultureInfos.TryGetValue(culture, out var infos)) return;
+            _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
+        }
+
+        // internal for repository
+        internal void SetCultureInfo(string culture, string name, DateTime date)
+        {
+            if (name.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_cultureInfos == null)
+            {
+                _cultureInfos = new ContentCultureInfosCollection();
+                _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
+            }
+
+            _cultureInfos.AddOrUpdate(culture, name, date);
         }
 
         /// <summary>
-        /// List of PropertyGroups available on this Content object
+        /// Handles culture infos collection changes.
         /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyGroup> PropertyGroups { get { return ContentTypeBase.CompositionPropertyGroups; } }
+        private void CultureInfosCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(Ps.Value.CultureInfosSelector);
+        }
 
-        /// <summary>
-        /// List of PropertyTypes available on this Content object
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes { get { return ContentTypeBase.CompositionPropertyTypes; } }
+        #endregion
 
-        /// <summary>
-        /// Indicates whether the content object has a property with the supplied alias
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns>True if Property with given alias exists, otherwise False</returns>
+        #region Has, Get, Set, Publish Property Value
+
+        /// <inheritdoc />
         public virtual bool HasProperty(string propertyTypeAlias)
+            => Properties.Contains(propertyTypeAlias);
+
+        /// <inheritdoc />
+        public virtual object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias);
+            return Properties.TryGetValue(propertyTypeAlias, out var property)
+                ? property.GetValue(culture, segment, published)
+                : null;
         }
 
-        /// <summary>
-        /// Gets the value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
-        public virtual object GetValue(string propertyTypeAlias)
+        /// <inheritdoc />
+        public virtual TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].Value : null;
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
+                return default;
+
+            var convertAttempt = property.GetValue(culture, segment, published).TryConvertTo<TValue>();
+            return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
-        /// <summary>
-        /// Gets the value of a Property
-        /// </summary>
-        /// <typeparam name="TPassType">Type of the value to return</typeparam>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
-        public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
-        {
-            if (Properties.Contains(propertyTypeAlias) == false)
-            {
-                return default(TPassType);
-            }
-
-            var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
-            return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Object"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetValue(string propertyTypeAlias, object value)
-        {
-            if (value == null)
-            {
-                SetValueOnProperty(propertyTypeAlias, value);
-                return;
-            }
-
-            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature 
-            ((dynamic)this).SetPropertyValue(propertyTypeAlias, (dynamic)value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.String"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, string value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Int32"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Int64"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, long value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Decimal"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, decimal value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Double"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, double value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Boolean"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, bool value)
-        {
-            int val = Convert.ToInt32(value);
-            SetValueOnProperty(propertyTypeAlias, val);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.DateTime"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, DateTime value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Web.HttpPostedFile"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>        
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Web.HttpPostedFileBase"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the <see cref="System.Web.HttpPostedFileWrapper"/> value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileWrapper value)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Private method to set the value of a property
-        /// </summary>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="value"></param>
-        private void SetValueOnProperty(string propertyTypeAlias, object value)
+        /// <inheritdoc />
+        public virtual void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
         {
             if (Properties.Contains(propertyTypeAlias))
             {
-                Properties[propertyTypeAlias].Value = value;
+                Properties[propertyTypeAlias].SetValue(value, culture, segment);
                 return;
             }
 
             var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
+                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
+
+            var property = propertyType.CreateProperty();
+            property.SetValue(value, culture, segment);
+            Properties.Add(property);
+        }
+
+        #endregion
+
+        #region Copy
+
+        /// <inheritdoc />
+        public virtual void CopyFrom(IContent other, string culture = "*")
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            culture = culture?.ToLowerInvariant().NullOrWhiteSpaceAsNull();
+
+            // the variation should be supported by the content type properties
+            //  if the content type is invariant, only '*' and 'null' is ok
+            //  if the content type varies, everything is ok because some properties may be invariant
+            if (!ContentTypeBase.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentTypeBase.Alias}\" with variation \"{ContentTypeBase.Variations}\".");
+
+            // copying from the same Id and VersionPk
+            var copyingFromSelf = Id == other.Id && VersionId == other.VersionId;
+            var published = copyingFromSelf;
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties for the specified culture
+            foreach (var property in Properties)
             {
-                throw new Exception(String.Format("No PropertyType exists with the supplied alias: {0}", propertyTypeAlias));
+                // each property type may or may not support the variation
+                if (!property.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (property.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        property.SetValue(null, pvalue.Culture, pvalue.Segment);
+                    }
             }
-            Properties.Add(propertyType.CreatePropertyFromValue(value));
+
+            // copy properties from 'other'
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                if (!otherProperty.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                        SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                    }
+                }
+            }
+
+            // copy names, too
+
+            if (culture == "*")
+                ClearCultureInfos();
+
+            if (culture == null || culture == "*")
+                Name = other.Name;
+
+            foreach (var (otherCulture, otherInfos) in other.CultureInfos)
+            {
+                if (culture == "*" || culture == otherCulture)
+                    SetCultureName(otherInfos.Name, otherCulture);
+            }
         }
 
-        /// <summary>
-        /// Boolean indicating whether the content and its properties are valid
-        /// </summary>
-        /// <returns>True if content is valid otherwise false</returns>
-        public virtual bool IsValid()
+        #endregion
+
+        #region Validation
+
+        /// <inheritdoc />
+        public virtual Property[] ValidateProperties(string culture = "*")
         {
-            _lastInvalidProperties.Clear();
-            _lastInvalidProperties.AddRange(Properties.Where(property => property.IsValid() == false));
-            return _lastInvalidProperties.Any() == false;
+            var alsoInvariant = culture != null && culture != "*";
+
+            return Properties.Where(x => // select properties...
+                    x.PropertyType.SupportsVariation(culture, "*", true) && // that support the variation
+                    (!x.IsValid(culture) || (alsoInvariant && !x.IsValid(null)))) // and are not valid
+                .ToArray();
         }
 
-        /// <summary>
-        /// Returns a collection of the result of the last validation process, this collection contains all invalid properties.
-        /// </summary>
-        [IgnoreDataMember]
-        internal IEnumerable<Property> LastInvalidProperties
+        #endregion
+
+        #region Dirty
+
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
-            get { return _lastInvalidProperties; }
-        }
+            base.ResetDirtyProperties(rememberDirty);
 
-        public abstract void ChangeTrashedState(bool isTrashed, int parentId = -20);
-
-        #region Dirty property handling
-
-        /// <summary>
-        /// We will override this method to ensure that when we reset the dirty properties that we 
-        /// also reset the dirty changes made to the content's Properties (user defined)
-        /// </summary>
-        /// <param name="rememberPreviouslyChangedProperties"></param>
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
-        {
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
-
+            // also reset dirty changes made to user's properties
             foreach (var prop in Properties)
-            {
-                prop.ResetDirtyProperties(rememberPreviouslyChangedProperties);
-            }
+                prop.ResetDirtyProperties(rememberDirty);
+
+            // take care of culture infos
+            if (_cultureInfos == null) return;
+
+            foreach (var cultureInfo in _cultureInfos)
+                cultureInfo.ResetDirtyProperties(rememberDirty);
         }
 
-        /// <summary>
-        /// Indicates whether the current entity is dirty.
-        /// </summary>
-        /// <returns>True if entity is dirty, otherwise False</returns>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool IsDirty()
         {
             return IsEntityDirty() || this.IsAnyUserPropertyDirty();
         }
 
-        /// <summary>
-        /// Indicates whether the current entity was dirty.
-        /// </summary>
-        /// <returns>True if entity was dirty, otherwise False</returns>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool WasDirty()
         {
             return WasEntityDirty() || this.WasAnyUserPropertyDirty();
         }
 
         /// <summary>
-        /// Returns true if only the entity properties are dirty
+        /// Gets a value indicating whether the current entity's own properties (not user) are dirty.
         /// </summary>
-        /// <returns></returns>
         public bool IsEntityDirty()
         {
             return base.IsDirty();
         }
 
         /// <summary>
-        /// Returns true if only the entity properties were dirty
+        /// Gets a value indicating whether the current entity's own properties (not user) were dirty.
         /// </summary>
-        /// <returns></returns>
         public bool WasEntityDirty()
         {
             return base.WasDirty();
         }
 
-        /// <summary>
-        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
-        /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>
-        /// True if any of the class properties are dirty or 
-        /// True if any of the user defined PropertyType properties are dirty based on their alias, 
-        /// otherwise False
-        /// </returns>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool IsPropertyDirty(string propertyName)
         {
-            bool existsInEntity = base.IsPropertyDirty(propertyName);
-            if (existsInEntity)
+            if (base.IsPropertyDirty(propertyName))
                 return true;
 
-            if (Properties.Contains(propertyName))
-            {
-                return Properties[propertyName].IsDirty();
-            }
-
-            return false;
+            return Properties.Contains(propertyName) && Properties[propertyName].IsDirty();
         }
 
-        /// <summary>
-        /// Indicates whether a specific property on the current entity was changed and the changes were committed
-        /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>
-        /// True if any of the class properties are dirty or 
-        /// True if any of the user defined PropertyType properties are dirty based on their alias, 
-        /// otherwise False
-        /// </returns>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool WasPropertyDirty(string propertyName)
         {
-            bool existsInEntity = base.WasPropertyDirty(propertyName);
-            if (existsInEntity)
+            if (base.WasPropertyDirty(propertyName))
                 return true;
 
-            if (Properties.Contains(propertyName))
-            {
-                return Properties[propertyName].WasDirty();
-            }
+            return Properties.Contains(propertyName) && Properties[propertyName].WasDirty();
+        }
 
-            return false;
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
+        public override IEnumerable<string> GetDirtyProperties()
+        {
+            var instanceProperties = base.GetDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
+        public override IEnumerable<string> GetWereDirtyProperties()
+        {
+            var instanceProperties = base.GetWereDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.WasDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
         }
 
         #endregion
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// Overriden to deal with specific object instances
+        /// </remarks>
+        protected override void PerformDeepClone(object clone)
+        {
+            base.PerformDeepClone(clone);
+
+            var clonedContent = (ContentBase)clone;
+
+            //if culture infos exist then deal with event bindings
+            if (clonedContent._cultureInfos != null)
+            {
+                clonedContent._cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;          //clear this event handler if any
+                clonedContent._cultureInfos = (ContentCultureInfosCollection) _cultureInfos.DeepClone(); //manually deep clone
+                clonedContent._cultureInfos.CollectionChanged += clonedContent.CultureInfosCollectionChanged;    //re-assign correct event handler
+            }
+
+            //if properties exist then deal with event bindings
+            if (clonedContent._properties != null)
+            {
+                clonedContent._properties.CollectionChanged -= PropertiesChanged;         //clear this event handler if any
+                clonedContent._properties = (PropertyCollection) _properties.DeepClone(); //manually deep clone
+                clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
+            }
+        }
     }
 }

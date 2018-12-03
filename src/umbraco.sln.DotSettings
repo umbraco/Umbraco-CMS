@@ -1,20 +1,9 @@
-<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/FilterSettingsManager/CoverageFilterXml/@EntryValue">&lt;data&gt;&lt;IncludeFilters /&gt;&lt;ExcludeFilters /&gt;&lt;/data&gt;</s:String>
 	<s:String x:Key="/Default/FilterSettingsManager/AttributeFilterXml/@EntryValue">&lt;data /&gt;</s:String>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/@KeyIndexDefined">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/Comment/@EntryValue">Replace with $var$ == false for readability</s:String>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/CustomPatternPlaceholder/=var/@KeyIndexDefined">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/CustomPatternPlaceholder/=var/Properties/=ExactType/@EntryIndexedValue">False</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/CustomPatternPlaceholder/=var/Properties/=ExpressionType/@EntryIndexedValue"></s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/CustomPatternPlaceholder/=var/Type/@EntryValue">ExpressionPlaceholder</s:String>
-	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/IsReplacePattern/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/LanguageName/@EntryValue">CSHARP</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/ReplaceComment/@EntryValue">Replace with $var$ == false for readability</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/ReplacePattern/@EntryValue">$var$ == false</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/SearchPattern/@EntryValue">!$var$</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=20542643108ECE41A3B98A0F6E5BC1FF/Severity/@EntryValue">SUGGESTION</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=2DA32DA040A7D74599ABE288C7224CF0/Comment/@EntryValue">Disposable construction</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=2DA32DA040A7D74599ABE288C7224CF0/Severity/@EntryValue">HINT</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=37A0B37A0ABAA34AA5CB32A93653C4FE/@KeyIndexDefined">False</s:Boolean>
-	<s:String x:Key="/Default/CodeInspection/CSharpLanguageProject/LanguageLevel/@EntryValue">CSharp50</s:String></wpf:ResourceDictionary>
-</wpf:ResourceDictionary>
+	<s:String x:Key="/Default/CodeInspection/CSharpLanguageProject/LanguageLevel/@EntryValue">CSharp71</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=unpublish/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=unpublishing/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

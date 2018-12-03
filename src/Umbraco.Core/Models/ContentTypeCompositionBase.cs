@@ -14,17 +14,17 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
         internal List<int> RemovedContentTypeKeyTracker = new List<int>();
 
         protected ContentTypeCompositionBase(int parentId) : base(parentId)
-        {
-        }
+        { }
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent)
             : this(parent, null)
-        {
-        }
+        { }
 
         protected ContentTypeCompositionBase(IContentTypeComposition parent, string alias)
             : base(parent, alias)
@@ -32,8 +32,7 @@ namespace Umbraco.Core.Models
             AddContentType(parent);
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo ContentTypeCompositionSelector =
@@ -46,7 +45,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public IEnumerable<IContentTypeComposition> ContentTypeComposition
         {
-            get { return _contentTypeComposition; }
+            get => _contentTypeComposition;
             set
             {
                 _contentTypeComposition = value.ToList();
@@ -62,8 +61,28 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var groups = ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups).Union(PropertyGroups);
-                return groups;
+                // we need to "acquire" composition groups and properties here, ie get our own clones,
+                // so that we can change their variation according to this content type variations.
+                //
+                // it would be nice to cache the resulting enumerable, but alas we cannot, otherwise
+                // any change to compositions are ignored and that breaks many things - and tracking
+                // changes to refresh the cache would be expensive.
+
+                void AcquireProperty(PropertyType propertyType)
+                {
+                    propertyType.Variations = propertyType.Variations & Variations;
+                    propertyType.ResetDirtyProperties(false);
+                }
+
+                return ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
+                    .Select(group =>
+                    {
+                        group = (PropertyGroup) group.DeepClone();
+                        foreach (var property in group.PropertyTypes)
+                            AcquireProperty(property);
+                        return group;
+                    })
+                    .Union(PropertyGroups);
             }
         }
 
@@ -75,9 +94,45 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var propertyTypes = ContentTypeComposition.SelectMany(x => x.CompositionPropertyTypes).Union(PropertyTypes);
-                return propertyTypes;
+                // we need to "acquire" composition properties here, ie get our own clones,
+                // so that we can change their variation according to this content type variations.
+                //
+                // see note in CompositionPropertyGroups for comments on caching the resulting enumerable
+
+                PropertyType AcquireProperty(PropertyType propertyType)
+                {
+                    propertyType = (PropertyType) propertyType.DeepClone();
+                    propertyType.Variations = propertyType.Variations & Variations;
+                    propertyType.ResetDirtyProperties(false);
+                    return propertyType;
+                }
+
+                return ContentTypeComposition
+                    .SelectMany(x => x.CompositionPropertyTypes)
+                    .Select(AcquireProperty)
+                    .Union(PropertyTypes);
             }
+        }
+
+        /// <summary>
+        /// Gets the property types obtained via composition.
+        /// </summary>
+        /// <remarks>
+        /// <para>Gets them raw, ie with their original variation.</para>
+        /// </remarks>
+        [IgnoreDataMember]
+        internal IEnumerable<PropertyType> RawComposedPropertyTypes => GetRawComposedPropertyTypes();
+
+        private IEnumerable<PropertyType> GetRawComposedPropertyTypes(bool start = true)
+        {
+            var propertyTypes = ContentTypeComposition
+                .Cast<ContentTypeCompositionBase>()
+                .SelectMany(x => start ? x.GetRawComposedPropertyTypes(false) : x.CompositionPropertyTypes);
+
+            if (!start)
+                propertyTypes = propertyTypes.Union(PropertyTypes);
+
+            return propertyTypes;
         }
 
         /// <summary>
@@ -181,7 +236,7 @@ namespace Umbraco.Core.Models
                 return null;
 
             // create the new group
-            var group = new PropertyGroup { Name = name, SortOrder = 0 };
+            var group = new PropertyGroup(IsPublishing) { Name = name, SortOrder = 0 };
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort
@@ -233,7 +288,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a list of ContentType aliases from the current composition 
+        /// Gets a list of ContentType aliases from the current composition
         /// </summary>
         /// <returns>An enumerable list of string aliases</returns>
         /// <remarks>Does not contain the alias of the Current ContentType</remarks>
@@ -245,7 +300,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a list of ContentType Ids from the current composition 
+        /// Gets a list of ContentType Ids from the current composition
         /// </summary>
         /// <returns>An enumerable list of integer ids</returns>
         /// <remarks>Does not contain the Id of the Current ContentType</remarks>
@@ -256,20 +311,15 @@ namespace Umbraco.Core.Models
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (ContentTypeCompositionBase)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            //need to manually assign since this is an internal field and will not be automatically mapped
-            clone.RemovedContentTypeKeyTracker = new List<int>();
-            clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+            base.PerformDeepClone(clone);
 
-            return clone;
+            var clonedEntity = (ContentTypeCompositionBase)clone;
+            
+            //need to manually assign since this is an internal field and will not be automatically mapped
+            clonedEntity.RemovedContentTypeKeyTracker = new List<int>();
+            clonedEntity._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
         }
     }
 }

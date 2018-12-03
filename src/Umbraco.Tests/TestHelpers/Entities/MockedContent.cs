@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static Content CreateBasicContent(IContentType contentType)
         {
             var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
-           
+
             content.ResetDirtyProperties(false);
 
             return content;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId)
+        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string culture = null, string segment = null)
         {
             var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
             object obj =
@@ -45,30 +46,34 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     author = "John Doe"
                 };
 
-            content.PropertyValues(obj);
+            content.PropertyValues(obj, culture, segment);
 
             content.ResetDirtyProperties(false);
 
             return content;
         }
 
-		public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent)
-		{
-			var content = new Content(name, parent, contentType) { CreatorId = 0, WriterId = 0 };
-			object obj =
-				new
-				{
-					title = name + " Subpage",
-					bodyText = "This is a subpage",
-					author = "John Doe"
-				};
+        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null, bool setPropertyValues = true)
+        {
+            var content = new Content(name, parent, contentType, culture) { CreatorId = 0, WriterId = 0 };
 
-			content.PropertyValues(obj);
+            if (setPropertyValues)
+            {
+                object obj =
+                new
+                {
+                    title = name + " Subpage",
+                    bodyText = "This is a subpage",
+                    author = "John Doe"
+                };
+
+                content.PropertyValues(obj, culture, segment);
+            }
 
             content.ResetDirtyProperties(false);
 
-			return content;
-		}
+            return content;
+        }
 
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {

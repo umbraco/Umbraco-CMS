@@ -1,13 +1,17 @@
-<div class="umb-editor">
-    <input name="integerField"
-           type="number"
-           pattern="[0-9]*"
-           class="umb-editor umb-number"
-           ng-model="model.value"
-           id="{{model.alias}}"
-           val-server="value"
-           fix-number min="{{model.config.min}}" max="{{model.config.max}}" step="{{model.config.step}}" />
-    
-    <span class="help-inline" val-msg-for="integerField" val-toggle-msg="number"><localize key="validation_invalidNumber">Not a number</localize></span>
-    <span class="help-inline" val-msg-for="integerField" val-toggle-msg="valServer">{{propertyForm.requiredField.errorMsg}}</span>
+<div class="umb-property-editor">
+    <ng-form name="integerFieldForm">
+        <input name="integerField"
+               type="number"
+               pattern="[0-9]*"
+               class="umb-property-editor umb-number"
+               ng-model="model.value"
+               id="{{model.alias}}"
+               val-server="value"
+               fix-number min="{{model.config.min}}" max="{{model.config.max}}" step="{{model.config.step}}" />
+
+        <span ng-messages="integerFieldForm.integerField.$error" show-validation-on-submit >
+            <span class="help-inline" ng-message="number"><localize key="validation_invalidNumber">Not a number</localize></span>
+            <span class="help-inline" ng-message="valServer">{{integerFieldForm.integerField.errorMsg}}</span>
+        </span>
+    </ng-form>
 </div>

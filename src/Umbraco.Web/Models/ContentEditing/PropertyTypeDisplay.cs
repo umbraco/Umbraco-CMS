@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "editor")]
         [ReadOnly(true)]
         public string Editor { get; set; }
-        
+
         [DataMember(Name = "view")]
         [ReadOnly(true)]
         public string View { get; set; }
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "config")]
         [ReadOnly(true)]
         public IDictionary<string, object> Config { get; set; }
-        
+
         /// <summary>
         /// Gets a value indicating whether this property should be locked when editing.
         /// </summary>
@@ -29,9 +29,9 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool Locked { get; set; }
 
         /// <summary>
-        /// This is required for the UI editor to know if this particular property belongs to 
+        /// This is required for the UI editor to know if this particular property belongs to
         /// an inherited item or the current item.
-        /// </summary>        
+        /// </summary>
         [DataMember(Name = "contentTypeId")]
         [ReadOnly(true)]
         public int ContentTypeId { get; set; }

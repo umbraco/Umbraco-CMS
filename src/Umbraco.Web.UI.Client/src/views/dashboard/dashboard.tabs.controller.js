@@ -18,7 +18,7 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController($timeout, dashboardResource, assetsService, tourService, eventsService) {
+function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
     var evts = [];
 
@@ -44,12 +44,12 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
             {
                 title: "Documentation",
                 description: "Find the answers to your Umbraco questions",
-                url: "https://our.umbraco.org/documentation/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
+                url: "https://our.umbraco.com/documentation/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
             },
             {
                 title: "Community",
                 description: "Find the answers or ask your Umbraco questions",
-                url: "https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum"
+                url: "https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum"
             },
             {
                 title: "Umbraco.tv",
@@ -75,7 +75,7 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
                 title: "Our Umbraco - The Friendliest Community",
                 description: "Our Umbraco - the official community site is your one stop for everything Umbraco. Whether you need a question answered or looking for cool plugins, the world's best and friendliest community is just a click away.",
                 img: "views/dashboard/default/ourumbraco.jpg",
-                url: "https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our",
+                url: "https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our",
                 altText: "Our Umbraco",
                 buttonText: "Visit Our Umbraco"
             }
@@ -95,7 +95,7 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     }));
     
     //proxy remote css through the local server
-    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
     dashboardResource.getRemoteDashboardContent("content").then(
         function (data) {
 
@@ -125,28 +125,46 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
-function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
+function FormsController($scope, $route, $cookies, packageResource, localizationService) {
+
+    var labels = {};
+    var labelKeys = [
+        "packager_installStateDownloading",
+        "packager_installStateImporting",
+        "packager_installStateInstalling",
+        "packager_installStateRestarting",
+        "packager_installStateComplete"
+    ];
+
+    localizationService.localizeMany(labelKeys).then(function(values){
+        labels.installStateDownloading = values[0];
+        labels.installStateImporting = values[1];
+        labels.installStateInstalling = values[2];
+        labels.installStateRestarting = values[3];
+        labels.installStateComplete = values[4];
+    });
+
     $scope.installForms = function(){
-        $scope.state = localizationService.localize("packager_installStateDownloading");
+        $scope.state = labels.installStateDownloading;
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateImporting");
+                    $scope.state = labels.installStateImporting;
                     return packageResource.import(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateInstalling");
+                $scope.state = labels.installStateInstalling;
                     return packageResource.installFiles(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateRestarting");
+                $scope.state = labels.installStateRestarting;
                     return packageResource.installData(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateComplete");
+                $scope.state = installStateComplete;
                     return packageResource.cleanUp(pack);
                 },
                 $scope.error)
@@ -155,7 +173,7 @@ function FormsController($scope, $route, $cookieStore, packageResource, localiza
 
     $scope.complete = function(result){
         var url = window.location.href + "?init=true";
-        $cookieStore.put("umbPackageInstallId", result.packageGuid);
+        $cookies.putObject("umbPackageInstallId", result.packageGuid);
         window.location.reload(true);
     };
 

@@ -46,7 +46,7 @@ function entityResource($q, $http, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                       "GetSafeAlias", { value: value, camelCase: camelCase })),
+                        "GetSafeAlias", { value: encodeURIComponent(value), camelCase: camelCase })),
                'Failed to retrieve content type scaffold');
         },
 
@@ -288,17 +288,19 @@ function entityResource($q, $http, umbRequestHelper) {
          * Gets ancestor entities for a given item
          *        
          * 
-         * @param {string} type Object type name        
+         * @param {string} type Object type name
+         * @param {string} culture Culture
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id, type) {            
+        getAncestors: function (id, type, culture) {
+            if (culture === undefined) culture = "";
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [{id: id}, {type: type}])),
+                        [{ id: id }, { type: type }, { culture: culture }])),
                'Failed to retrieve ancestor data for id ' + id);
         },
         
@@ -406,7 +408,7 @@ function entityResource($q, $http, umbRequestHelper) {
           *
           * ##usage
           * <pre>
-          * entityResource.getPagedDescendants(1234, "Content", {pageSize: 10, pageNumber: 2})
+          * entityResource.getPagedDescendants(1234, "Document", {pageSize: 10, pageNumber: 2})
           *    .then(function(contentArray) {
           *        var children = contentArray; 
           *        alert('they are here!');
@@ -416,8 +418,8 @@ function entityResource($q, $http, umbRequestHelper) {
           * @param {Int} parentid id of content item to return descendants of
           * @param {string} type Object type name
           * @param {Object} options optional options object
-          * @param {Int} options.pageSize if paging data, number of nodes per page, default = 1
-          * @param {Int} options.pageNumber if paging data, current page index, default = 100
+          * @param {Int} options.pageSize if paging data, number of nodes per page, default = 100
+          * @param {Int} options.pageNumber if paging data, current page index, default = 1
           * @param {String} options.filter if provided, query will only return those with names matching the filter
           * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Ascending`
           * @param {String} options.orderBy property to order items by, default: `SortOrder`
@@ -427,8 +429,8 @@ function entityResource($q, $http, umbRequestHelper) {
         getPagedDescendants: function (parentId, type, options) {
 
             var defaults = {
-                pageSize: 1,
-                pageNumber: 100,
+                pageSize: 100,
+                pageNumber: 1,
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder"

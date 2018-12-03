@@ -27,9 +27,16 @@
 }
 
 .umb-iconpicker-item a:hover,
-.umb-iconpicker-item a:focus{
+.umb-iconpicker-item a:focus {
     background: @gray-10;
     outline: none;
+}
+
+.umb-iconpicker-item.-selected {
+    background: @gray-10;
+    border: solid 1px @turquoise-d1;
+    border-radius: @baseBorderRadius;
+    box-sizing: border-box;
 }
 
 .umb-iconpicker-item a:active {
@@ -39,3 +46,27 @@
 .umb-iconpicker-item i {
     font-size: 30px;
 }
+
+
+// Color swatch
+ .button {
+        border: none;
+        color: white;
+        padding: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+        border-radius: 3px;
+    }
+
+    // Circle behind the checkmark
+    i.small.active{
+        font-size: 14px;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: rgba(0,0,0,.15);
+        float: right;
+    }

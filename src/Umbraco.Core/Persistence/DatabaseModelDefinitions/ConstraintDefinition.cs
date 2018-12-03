@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
@@ -6,13 +6,13 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
     {
         public ConstraintDefinition(ConstraintType type)
         {
-            constraintType = type;
+            _constraintType = type;
         }
 
-        private ConstraintType constraintType;
-        public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
-        public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
-        public bool IsNonUniqueConstraint { get { return ConstraintType.NonUnique == constraintType; } }
+        private readonly ConstraintType _constraintType;
+        public bool IsPrimaryKeyConstraint => ConstraintType.PrimaryKey == _constraintType;
+        public bool IsUniqueConstraint => ConstraintType.Unique == _constraintType;
+        public bool IsNonUniqueConstraint => ConstraintType.NonUnique == _constraintType;
 
         public string SchemaName { get; set; }
         public string ConstraintName { get; set; }

@@ -1,0 +1,65 @@
+<div ng-controller="Umbraco.Overlays.SendToPublishController as vm">
+
+    <div style="margin-bottom: 15px;">
+        <p><localize key="content_languagesToSendForApproval"></localize></p>
+    </div>
+
+    <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
+
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.modifiedVariantFilter">
+            <ng-form name="publishVariantSelectorForm">
+                <div class="flex">
+                    <input id="{{variant.htmlId}}"
+                           name="publishVariantSelector"
+                           type="checkbox"
+                           ng-model="variant.save"
+                           ng-change="vm.changeSelection(variant)"
+                           style="margin-right: 8px;"
+                           val-server-field="{{variant.htmlId}}" />
+                    <div>
+                        <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
+                            <span>{{ variant.language.name }}</span>
+                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                        </label>
+
+                        <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                            <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                        </div>
+
+                        <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                            <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
+                        </div>
+
+                        <div ng-repeat="notification in variant.notifications">
+                            <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </ng-form>
+        </div>
+        <br />
+    </div>
+
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unmodifiedVariantFilter).length > 0">
+        <div style="margin-bottom: 15px; font-weight: bold;">
+            <p><localize key="content_unmodifiedLanguages"></localize></p>
+        </div>
+
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.unmodifiedVariantFilter">
+            <div>
+                <div style="margin-bottom: 2px;">
+                    <span>{{ variant.language.name }}</span>
+                    <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                </div>
+                <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+            </div>
+        </div>
+    </div>
+
+</div>

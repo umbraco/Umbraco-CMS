@@ -6,7 +6,7 @@
         var vm = this;
         var evts = [];
 
-        vm.title = localizationService.localize("general_help");
+        vm.title = "";
         vm.subtitle = "Umbraco version" + " " + Umbraco.Sys.ServerVariables.application.version;
         vm.section = $routeParams.section;
         vm.tree = $routeParams.tree;
@@ -26,6 +26,11 @@
 
         function oninit() {
 
+            // set title
+            localizationService.localize("general_help").then(function(data){
+                vm.title = data;
+            });
+
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
                 getTourGroupCompletedPercentage();
@@ -43,15 +48,17 @@
             setSectionName();
 
             userService.getCurrentUser().then(function (user) {
-
+                
                 vm.userType = user.userType;
                 vm.userLang = user.locale;
+
+                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
 
                 evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
                     handleSectionChange();
                 }));
 
-                findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
             
@@ -76,17 +83,20 @@
                     vm.tree = $routeParams.tree;
 
                     setSectionName();
-                    findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                    findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
                 }
             });
         }
 
         function findHelp(section, tree, usertype, userLang) {
+
+            if (vm.hasAccessToSettings) {
+                helpService.getContextHelpForPage(section, tree).then(function (topics) {
+                    vm.topics = topics;
+                });
+            }
             
-            helpService.getContextHelpForPage(section, tree).then(function (topics) {
-                vm.topics = topics;
-            });
 
             var rq = {};
             rq.section = vm.section;
@@ -108,10 +118,12 @@
                 rq.path = rq.section + "/" + $routeParams.tree + "/" + $routeParams.method;
             }
 
-            helpService.findVideos(rq).then(function(videos){
-    	        vm.videos = videos;
-            });
-            
+
+            if (vm.hasAccessToSettings) {
+                helpService.findVideos(rq).then(function (videos) {
+                    vm.videos = videos;
+                });
+            }                       
         }
 
         function setSectionName() {

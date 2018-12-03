@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.IO;
 using Umbraco.Core.Packaging;
 
 namespace Umbraco.Tests.Packaging
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.Packaging
         private static string GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
-            string path = Path.Combine(Core.Configuration.GlobalSettings.FullpathToRoot, testPackagesDirName, packageName);
+            string path = Path.Combine(IOHelper.GetRootDirectorySafe(), testPackagesDirName, packageName);
             return path;
         }
 

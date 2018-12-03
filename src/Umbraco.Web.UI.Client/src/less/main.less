@@ -11,7 +11,7 @@
 	min-height: 100%;
 }
 .shadow {
-	box-shadow: 3px 0px 7px @gray-8;
+	box-shadow: 3px 0px 7px rgba(0,0,0,0.16);
 }
 
 .umb-scrollable, .umb-auto-overflow {
@@ -23,7 +23,7 @@
     margin-top: 0px;
     margin-bottom: 15px;
     font-size: 14px;
-    color: @gray-7; 
+    color: @gray-7;
 }
 
 h5{
@@ -48,6 +48,7 @@ h5.-black {
     border: none
 }
 .bootstrap-datetimepicker-widget {
+  width: auto !important;
     td {
         &.active, span.active {
             background: @turquoise !important;
@@ -116,7 +117,7 @@ h5.-black {
 
 /* FORM GRID */
 .umb-pane {
-  margin: 30px 20px;
+  margin: 20px;
 }
 .umb-control-group {
   border-bottom: 1px solid @gray-10;
@@ -128,13 +129,19 @@ h5.-black {
   border: none;
 }
 
+.umb-property:last-of-type .umb-control-group {
+  border: none;
+  margin-bottom: 0 !important;
+  padding-bottom: 0;
+}
+
 /* BLOCK MODE */
 .block-form .umb-control-group {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-.block-form .umb-control-group label .help-block, 
+.block-form .umb-control-group label .help-block,
 .block-form .umb-control-group label small {
   font-size: 13px;
   padding-top: 2px;
@@ -182,6 +189,14 @@ h5.-black {
   margin-left: 0;
 }
 
+label[for=""] {
+  cursor: default;
+}
+
+label:not([for]) {
+  cursor: default;
+}
+
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;
@@ -220,12 +235,12 @@ h5.-black {
   align-items: center;
 }
 
-.controls-row > .vertical-align-items > input.umb-editor-tiny {
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny {
   margin-left: 5px;
   margin-right: 5px;
 }
 
-.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny:first-child {
   margin-left: 0;
 }
 
@@ -235,9 +250,9 @@ h5.-black {
 }
 
 .umb-version {
-    color: @gray-7; 
-    position: absolute; 
-    bottom: 5px; 
+    color: @gray-7;
+    position: absolute;
+    bottom: 5px;
     right: 20px;
 }
 
@@ -441,15 +456,6 @@ table thead a {
     height: 100%;
 }
 
-#search-form .form-search div {
-    margin-top:3px;
-}
-#search-form .form-search div .btn {
-    position:relative;
-    top:0;
-    left:0;
-}
-
 /* DICTIONARY */
 #dictionaryItems tr {
     border-top:solid 1px @gray-8;
@@ -645,3 +651,24 @@ input[type=checkbox]:checked + .input-label--small {
 .bootstrap-datetimepicker-widget td span {
 	border-radius: 0 !important;
 }
+
+.diff del {
+  background-color: @red-l3;
+}
+
+.diff ins {
+  background-color: @green-l3;
+  text-decoration: none;
+}
+
+.visuallyhidden{
+    position: absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+	clip: rect(1px, 1px, 1px, 1px);
+	padding:0 !important;
+	border:0 !important;
+	height: 1px !important;
+	width: 1px !important;
+	overflow: hidden;
+}
+

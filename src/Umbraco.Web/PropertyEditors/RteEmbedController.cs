@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web.Http;
 using System.Xml;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Media;
 using System.IO;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -23,14 +18,13 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class RteEmbedController : UmbracoAuthorizedJsonController
     {
-
         public Result GetEmbed(string url, int width, int height)
         {
             var result = new Result();
 
             //todo cache embed doc
             var xmlConfig = new XmlDocument();
-            xmlConfig.Load(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
+            xmlConfig.Load(IOHelper.GetRootDirectorySafe() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
 
             foreach (XmlNode node in xmlConfig.SelectNodes("//provider"))
             {
@@ -69,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch(Exception ex)
                     {
-                        LogHelper.Error<RteEmbedController>(string.Format("Error embedding url {0} - width: {1} height: {2}", url, width, height), ex);
+                        Logger.Error<RteEmbedController>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
                         result.Status = Status.Error;
                     }
 

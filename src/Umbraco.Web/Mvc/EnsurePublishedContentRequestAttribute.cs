@@ -1,11 +1,10 @@
-using System;
-using System.Globalization;
-using System.Linq;
+﻿using System;
 using System.Web.Mvc;
-using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
-using Language = umbraco.cms.businesslogic.language.Language;
+using Umbraco.Core.Models.PublishedContent;
+using LightInject;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -15,15 +14,14 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     /// <remarks>
     /// This is inspired from this discussion:
-    /// http://our.umbraco.org/forum/developers/extending-umbraco/41367-Umbraco-6-MVC-Custom-MVC-Route?p=3
-    /// 
+    /// https://our.umbraco.com/forum/developers/extending-umbraco/41367-Umbraco-6-MVC-Custom-MVC-Route?p=3
+    ///
     /// which is based on custom routing found here:
     /// http://shazwazza.com/post/Custom-MVC-routing-in-Umbraco
     /// </remarks>
     public class EnsurePublishedContentRequestAttribute : ActionFilterAttribute
     {
         private readonly string _dataTokenName;
-        private readonly string _culture;
         private UmbracoContext _umbracoContext;
         private readonly int? _contentId;
         private UmbracoHelper _helper;
@@ -33,13 +31,11 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="contentId"></param>
-        /// <param name="culture"></param>
-        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId, string culture = null)
+        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             _umbracoContext = umbracoContext;
             _contentId = contentId;
-            _culture = culture;
         }
 
         /// <summary>
@@ -65,64 +61,57 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="dataTokenName"></param>
-        /// <param name="culture"></param>
-        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName, string culture = null)
+        public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             _umbracoContext = umbracoContext;
             _dataTokenName = dataTokenName;
-            _culture = culture;
         }
 
         /// <summary>
         /// Exposes the UmbracoContext
         /// </summary>
-        protected UmbracoContext UmbracoContext
-        {
-            get { return _umbracoContext ?? (_umbracoContext = UmbracoContext.Current); }
-        }
+        protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
+
+        // todo - try lazy property injection?
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Container.GetInstance<PublishedRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper
         /// </summary>
-        protected UmbracoHelper Umbraco
-        {
-            get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext.Current)); }
-        }
+        protected UmbracoHelper Umbraco => _helper
+            ?? (_helper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache));
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             base.OnActionExecuted(filterContext);
 
             //First we need to check if the pcr has been set, if it has we're going to ignore this and not actually do anything
-            if (UmbracoContext.Current.PublishedContentRequest != null)
+            if (UmbracoContext.Current.PublishedRequest != null)
             {
                 return;
             }
 
-            UmbracoContext.Current.PublishedContentRequest =
-                new PublishedContentRequest(
-                    UmbracoContext.Current.CleanedUmbracoUrl, UmbracoContext.Current.RoutingContext);
-
-            ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedContentRequest, filterContext);
+            UmbracoContext.Current.PublishedRequest = PublishedRouter.CreateRequest(UmbracoContext.Current);
+            ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedRequest, filterContext);
         }
 
         /// <summary>
-        /// This assigns the published content to the request, developers can override this to specify 
+        /// This assigns the published content to the request, developers can override this to specify
         /// any other custom attributes required.
         /// </summary>
-        /// <param name="pcr"></param>
+        /// <param name="request"></param>
         /// <param name="filterContext"></param>
-        protected virtual void ConfigurePublishedContentRequest(PublishedContentRequest pcr, ActionExecutedContext filterContext)
+        protected virtual void ConfigurePublishedContentRequest(PublishedRequest request, ActionExecutedContext filterContext)
         {
             if (_contentId.HasValue)
             {
-                var content = Umbraco.TypedContent(_contentId);
+                var content = Umbraco.Content(_contentId);
                 if (content == null)
                 {
                     throw new InvalidOperationException("Could not resolve content with id " + _contentId);
                 }
-                pcr.PublishedContent = content;
+                request.PublishedContent = content;
             }
             else if (_dataTokenName.IsNullOrWhiteSpace() == false)
             {
@@ -131,15 +120,14 @@ namespace Umbraco.Web.Mvc
                 {
                     throw new InvalidOperationException("No data token could be found with the name " + _dataTokenName);
                 }
-                if ((result is IPublishedContent) == false)
+                if (result is IPublishedContent == false)
                 {
                     throw new InvalidOperationException("The data token resolved with name " + _dataTokenName + " was not an instance of " + typeof(IPublishedContent));
                 }
-                pcr.PublishedContent = (IPublishedContent) result;
+                request.PublishedContent = (IPublishedContent) result;
             }
 
-            pcr.Prepare();
+            PublishedRouter.PrepareRequest(request);
         }
-
     }
 }

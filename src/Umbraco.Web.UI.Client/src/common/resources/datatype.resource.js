@@ -344,7 +344,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -355,7 +355,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
                         "PostCreateContainer",
-                        { parentId: parentId, name: name })),
+                        { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
         },
 

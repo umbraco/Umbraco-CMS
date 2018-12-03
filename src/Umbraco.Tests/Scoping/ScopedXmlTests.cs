@@ -1,163 +1,137 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
+using System.Xml;
 using Moq;
 using NUnit.Framework;
-using umbraco;
-using Umbraco.Core;
+using LightInject;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    public class ScopedXmlTests : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
+    public class ScopedXmlTests : TestWithDatabaseBase
     {
-        private CacheRefresherEventHandler _cacheHandler;
+        private CacheRefresherComponent _cacheRefresher;
 
-        protected override void FreezeResolution()
+        protected override void Compose()
         {
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
-                new DistributedCacheTests.TestServerRegistrar());
-            ServerMessengerResolver.Current = new ServerMessengerResolver(
-                new DatabaseServerMessenger(ApplicationContext, false, new DatabaseServerMessengerOptions()));
-            CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-                new ActivatorServiceProvider(), Mock.Of<ILogger>(), () => new[]
-                {
-                    typeof(PageCacheRefresher),
-                    typeof(UnpublishedPageCacheRefresher),
+            base.Compose();
 
-                    typeof(DomainCacheRefresher),
-                    typeof(MacroCacheRefresher)
-                });
-
-            base.FreezeResolution();
+            // the cache refresher component needs to trigger to refresh caches
+            // but then, it requires a lot of plumbing ;(
+            // fixme - and we cannot inject a DistributedCache yet
+            // so doing all this mess
+            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
+            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
         }
 
         [TearDown]
         public void Teardown()
         {
-            if (_cacheHandler != null)
-                _cacheHandler.Unbind();
-            _cacheHandler = null;
+            _cacheRefresher?.Unbind();
+            _cacheRefresher = null;
 
             _onPublishedAssertAction = null;
-            content.HttpContextItemsGetter = null;
             ContentService.Published -= OnPublishedAssert;
             SafeXmlReaderWriter.Cloning = null;
-
-            ServerRegistrarResolver.Reset();
-            ServerMessengerResolver.Reset();
-            CacheRefreshersResolver.Reset();
         }
 
-        [Test]
-        public void TestNoScope()
+        private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
         {
-            content.TestingUpdateSitemapProvider = false;
-
-            var settings = SettingsForTests.GenerateMockSettings();
-            var contentMock = Mock.Get(settings.Content);
-            contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
-
-            var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test"};
-            ApplicationContext.Services.ContentTypeService.Save(contentType);
-
-            _cacheHandler = new CacheRefresherEventHandler(true);
-            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
-
-            var xml = content.Instance.XmlContent;
-            Assert.IsNotNull(xml);
-            var beforeXml = xml.OuterXml;
-            var item = new Content("name", -1, contentType);
-            ApplicationContext.Services.ContentService.SaveAndPublishWithStatus(item);
-
-            Console.WriteLine("Xml Before:");
-            Console.WriteLine(xml.OuterXml);
-            Assert.AreEqual(beforeXml, xml.OuterXml);
-
-            xml = content.Instance.XmlContent;
-            Assert.IsNotNull(xml);
-            Console.WriteLine("Xml After:");
-            Console.WriteLine(xml.OuterXml);
-            var node = xml.GetElementById(item.Id.ToString());
-            Assert.IsNotNull(node);
-        }
-
-        private void OnPublishedAssert(IPublishingStrategy sender, PublishEventArgs<IContent> args)
-        {
-            if (_onPublishedAssertAction != null)
-                _onPublishedAssertAction();
+            _onPublishedAssertAction?.Invoke();
         }
 
         private Action _onPublishedAssertAction;
+
+        // in 7.6, content.Instance
+        //  .XmlContent - comes from .XmlContentInternal and is cached in context items for current request
+        //  .XmlContentInternal - the actual main xml document
+        // become in 8
+        //  xmlStore.Xml - the actual main xml document
+        //  publishedContentCache.GetXml() - the captured xml
+
+        private static XmlStore XmlStore => (Current.Container.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
+        private static XmlDocument XmlMaster => XmlStore.Xml;
+        private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
 
         [TestCase(true)]
         [TestCase(false)]
         public void TestScope(bool complete)
         {
-            content.TestingUpdateSitemapProvider = false;
+            var umbracoContext = GetUmbracoContext("http://example.com/", setSingleton: true);
 
-            var httpContextItems = new Hashtable();
-            content.HttpContextItemsGetter = () => httpContextItems;
+            // sanity checks
+            Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
+            Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
 
-            var settings = SettingsForTests.GenerateMockSettings();
+            // settings
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
 
-            var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test"};
-            ApplicationContext.Services.ContentTypeService.Save(contentType);
-
-            _cacheHandler = new CacheRefresherEventHandler(true);
-            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
-
-            var xml = content.Instance.XmlContent;
-            Assert.IsNotNull(xml);
-            Assert.AreSame(xml, httpContextItems[content.XmlContextContentItemKey]);
-            var beforeXml = xml;
-            var beforeOuterXml = beforeXml.OuterXml;
+            // create document type, document
+            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            Current.Services.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
+            // wire cache refresher
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize(new DistributedCache());
+
+            // check xml in context = "before"
+            var xml = XmlInContext;
+            var beforeXml = xml;
+            var beforeOuterXml = beforeXml.OuterXml;
             Console.WriteLine("Xml Before:");
             Console.WriteLine(xml.OuterXml);
 
+            // event handler
             var evented = 0;
             _onPublishedAssertAction = () =>
             {
                 evented++;
-                xml = content.Instance.XmlContent;
-                Assert.IsNotNull(xml);
+
+                // should see the changes in context, not in master
+                xml = XmlInContext;
                 Assert.AreNotSame(beforeXml, xml);
                 Console.WriteLine("Xml Event:");
                 Console.WriteLine(xml.OuterXml);
                 var node = xml.GetElementById(item.Id.ToString());
                 Assert.IsNotNull(node);
+
+                xml = XmlMaster;
+                Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
             };
 
             ContentService.Published += OnPublishedAssert;
 
-            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                ApplicationContext.Services.ContentService.SaveAndPublishWithStatus(item); // should create an xml clone
+                Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                ApplicationContext.Services.ContentService.SaveAndPublishWithStatus(item); // should re-use the xml clone
+                Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
                 Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
                 // this does not change, other thread don't see the changes
-                xml = content.Instance.XmlContentInternal;
-                Assert.IsNotNull(xml);
+                xml = XmlMaster;
                 Assert.AreSame(beforeXml, xml);
                 Console.WriteLine("XmlInternal During:");
                 Console.WriteLine(xml.OuterXml);
@@ -165,13 +139,14 @@ namespace Umbraco.Tests.Scoping
 
                 // this does not change during the scope (only in events)
                 // because it is the events that trigger the changes
-                xml = content.Instance.XmlContent;
+                xml = XmlInContext;
                 Assert.IsNotNull(xml);
                 Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml);
 
                 // note
                 // this means that, as long as ppl don't create scopes, they'll see their
-                // changes right after SaveAndPublishWithStatus, but if they create scopes,
+                // changes right after SaveAndPublish, but if they create scopes,
                 // they will have to wail until the scope is completed, ie wait until the
                 // events trigger, to use eg GetUrl etc
 
@@ -180,16 +155,27 @@ namespace Umbraco.Tests.Scoping
             }
 
             //The reason why there is only 1 event occuring is because we are publishing twice for the same event for the same
-            //object and the scope deduplicates the events (uses the latest)
-            Assert.AreEqual(complete ? 1 : 0, evented);
+            //object and the scope deduplicates the events(uses the latest)
+            Assert.AreEqual(complete? 1 : 0, evented);
 
             // this should never change
             Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
-            xml = content.Instance.XmlContent;
-            Assert.IsNotNull(xml);
+            xml = XmlInContext;
             Console.WriteLine("Xml After:");
             Console.WriteLine(xml.OuterXml);
+            if (complete)
+            {
+                var node = xml.GetElementById(item.Id.ToString());
+                Assert.IsNotNull(node);
+            }
+            else
+            {
+                Assert.AreSame(beforeXml, xml);
+                Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
+            }
+
+            xml = XmlMaster;
             if (complete)
             {
                 var node = xml.GetElementById(item.Id.ToString());
@@ -206,21 +192,28 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void TestScopeMany(bool complete)
         {
-            content.TestingUpdateSitemapProvider = false;
+            var umbracoContext = GetUmbracoContext("http://example.com/", setSingleton: true);
 
-            var settings = SettingsForTests.GenerateMockSettings();
+            // sanity checks
+            Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
+            Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.ContentCache).XmlStore);
+
+            // settings
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
 
-            var contentType = new ContentType(-1) { Alias = "contenttype", Name = "test" };
-            ApplicationContext.Services.ContentTypeService.Save(contentType);
+            // create document type
+            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            Current.Services.ContentTypeService.Save(contentType);
 
-            _cacheHandler = new CacheRefresherEventHandler(true);
-            _cacheHandler.OnApplicationStarted(null, ApplicationContext);
+            // wire cache refresher
+            _cacheRefresher = new CacheRefresherComponent(true);
+            _cacheRefresher.Initialize(new DistributedCache());
 
-            var xml = content.Instance.XmlContent;
-            Assert.IsNotNull(xml);
+            // check xml in context = "before"
+            var xml = XmlInContext;
             var beforeXml = xml;
             var beforeOuterXml = beforeXml.OuterXml;
             var item = new Content("name", -1, contentType);
@@ -233,21 +226,21 @@ namespace Umbraco.Tests.Scoping
             Console.WriteLine("Xml Before:");
             Console.WriteLine(xml.OuterXml);
 
-            using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                ApplicationContext.Services.ContentService.SaveAndPublishWithStatus(item);
+                Current.Services.ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    ApplicationContext.Services.ContentService.SaveAndPublishWithStatus(temp);
+                    Current.Services.ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }
 
                 // this should never change
                 Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
-                xml = content.Instance.XmlContent;
+                xml = XmlMaster;
                 Assert.IsNotNull(xml);
                 Console.WriteLine("Xml InScope (before complete):");
                 Console.WriteLine(xml.OuterXml);
@@ -256,14 +249,14 @@ namespace Umbraco.Tests.Scoping
                 if (complete)
                     scope.Complete();
 
-                xml = content.Instance.XmlContent;
+                xml = XmlMaster;
                 Assert.IsNotNull(xml);
                 Console.WriteLine("Xml InScope (after complete):");
                 Console.WriteLine(xml.OuterXml);
                 Assert.AreEqual(beforeOuterXml, xml.OuterXml);
             }
 
-            var scopeProvider = ApplicationContext.Current.ScopeProvider as IScopeProviderInternal;
+            var scopeProvider = ScopeProvider;
             Assert.IsNotNull(scopeProvider);
             // ambient scope may be null, or maybe not, depending on whether the code that
             // was called did proper scoped work, or some direct (NoScope) use of the database
@@ -275,7 +268,7 @@ namespace Umbraco.Tests.Scoping
             // this should never change
             Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
 
-            xml = content.Instance.XmlContent;
+            xml = XmlMaster;
             Assert.IsNotNull(xml);
             Console.WriteLine("Xml After:");
             Console.WriteLine(xml.OuterXml);
@@ -293,6 +286,18 @@ namespace Umbraco.Tests.Scoping
             else
             {
                 Assert.AreEqual(beforeOuterXml, xml.OuterXml); // nothing has changed!
+            }
+        }
+
+        public class LocalServerMessenger : ServerMessengerBase
+        {
+            public LocalServerMessenger()
+                : base(false)
+            { }
+
+            protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+            {
+                throw new NotImplementedException();
             }
         }
     }

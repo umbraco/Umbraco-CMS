@@ -1,4 +1,4 @@
-using System.Configuration;
+﻿using System.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Configuration
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration
         private readonly string[] _defaultValue;
 
         public OptionalCommaDelimitedConfigurationElement()
-        {            
+        {
         }
 
         public OptionalCommaDelimitedConfigurationElement(CommaDelimitedConfigurationElement wrapped, string[] defaultValue)

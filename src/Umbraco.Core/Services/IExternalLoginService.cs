@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.Identity;
 
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services
         IEnumerable<IIdentityUserLogin> GetAll(int userId);
 
         /// <summary>
-        /// Returns all logins matching the login info - generally there should only be one but in some cases 
+        /// Returns all logins matching the login info - generally there should only be one but in some cases
         /// there might be more than one depending on if an adminstrator has been editing/removing members
         /// </summary>
         /// <param name="login"></param>

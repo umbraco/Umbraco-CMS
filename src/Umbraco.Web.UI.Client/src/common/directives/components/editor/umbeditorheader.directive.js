@@ -201,39 +201,52 @@ Use this directive to construct a header inside the main editor window.
 
 **/
 
-(function() {
+(function () {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper) {
+    function EditorHeaderDirective(editorService) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
 
-            scope.openIconPicker = function() {
-                scope.dialogModel = {
-                    view: "iconpicker",
-                    show: true,
+            scope.vm = {};
+            scope.vm.dropdownOpen = false;
+            scope.vm.currentVariant = "";
+
+            scope.goBack = function () {
+                if (scope.onBack) {
+                    scope.onBack();
+                }
+            };
+
+            scope.selectNavigationItem = function(item) {
+                if(scope.onSelectNavigationItem) {
+                    scope.onSelectNavigationItem({"item": item});
+                }
+            }
+
+            scope.openIconPicker = function () {
+                var iconPicker = {
+                    icon: scope.icon.split(' ')[0],
+                    color: scope.icon.split(' ')[1],
                     submit: function (model) {
-
-                        /* ensure an icon is selected, because on focus on close button
-                           or an element in background no icon is submitted. So don't clear/update existing icon/preview.
-                        */
                         if (model.icon) {
-
                             if (model.color) {
                                 scope.icon = model.icon + " " + model.color;
                             } else {
                                 scope.icon = model.icon;
                             }
-
                             // set the icon form to dirty
                             scope.iconForm.$setDirty();
                         }
-
-                        scope.dialogModel.show = false;
-                        scope.dialogModel = null;
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
                     }
                 };
+                editorService.iconPicker(iconPicker);
             };
+
         }
 
         var directive = {
@@ -242,11 +255,10 @@ Use this directive to construct a header inside the main editor window.
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-header.html',
             scope: {
-                tabs: "=",
-                actions: "=",
                 name: "=",
                 nameLocked: "=",
                 menu: "=",
+                hideMenu: "<?",
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
@@ -255,7 +267,10 @@ Use this directive to construct a header inside the main editor window.
                 hideDescription: "@",
                 descriptionLocked: "@",
                 navigation: "=",
-                key: "="
+                onSelectNavigationItem: "&?",
+                key: "=",
+                onBack: "&?",
+                showBackButton: "<?"
             },
             link: link
         };

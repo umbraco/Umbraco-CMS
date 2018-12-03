@@ -8,7 +8,6 @@
 
 .umb-healthcheck-help-text {
 	line-height: 1.6em;
-	margin-bottom: 30px;
 	max-width: 750px;
 }
 
@@ -24,18 +23,20 @@
 	display: flex;
 	flex-wrap: wrap;
 	flex-direction: column;
-	background: @gray-10;
+	background: @white;
 	border-radius: 3px;
-	padding: 15px 10px;
+	padding: 20px;
 	box-sizing: border-box;
 	text-align: center;
-	border: 1px solid @gray-8;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 	height: 100%;
+	box-sizing: border-box;
 }
 
 .umb-healthcheck-group:hover {
-	border: 1px solid @turquoise;
+	box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
 	cursor: pointer;
+	transition: box-shadow 150ms ease-in-out;
 }
 
 .umb-healthcheck-group__load-container {
@@ -60,7 +61,7 @@
 
 .umb-healthcheck-message {
 	position: relative;
-	background: @white;
+	background: @gray-10;
     border-radius: 50px;
     display: inline-flex;
 	align-items: center;
@@ -125,6 +126,12 @@
 	margin-bottom: 40px;
 }
 
+.umb-healthcheck-group__details-group {
+	background: @white;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+	border-radius: @baseBorderRadius;
+}
+
 .umb-healthcheck-group__details-group-title {
 	background-color: @purple-l1;
 	padding: 10px 20px;
@@ -141,9 +148,9 @@
 }
 
 .umb-healthcheck-group__details-checks {
-	border: 1px solid @gray-8;
 	border-top: none;
 	border-radius: 0 0 3px 3px;
+	background: @white;
 }
 
 .umb-healthcheck-group__details-check {
@@ -152,14 +159,13 @@
 
 .umb-healthcheck-group__details-check-title {
 	padding: 15px 20px;
-	background-color: @gray-10;
 }
 
 .umb-healthcheck-group__details-check-name {
 	font-size: 15px;
 	color: @black;
 	font-weight: bold;
-	margin-bottom: 5px;
+	margin-bottom: 3px;
 }
 
 .umb-healthcheck-group__details-check-description {
@@ -171,7 +177,7 @@
 .umb-healthcheck-group__details-status {
 	padding: 15px 0;
 	display: flex;
-	border-bottom: 2px solid @gray-10;
+	border-top: 2px solid @gray-10;
 }
 
 .umb-healthcheck-group__details-status-overlay {

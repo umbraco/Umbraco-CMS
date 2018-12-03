@@ -1,5 +1,42 @@
 function ColorPickerController($scope) {
 
+    //setup the default config
+    var config = {
+        items: [],
+        multiple: false
+    };
+    
+    //map the user config
+    angular.extend(config, $scope.model.config);
+
+    //map back to the model
+    $scope.model.config = config;
+
+    //TODO: This isn't used
+    function convertArrayToDictionaryArray(model) {
+        //now we need to format the items in the dictionary because we always want to have an array
+        var newItems = [];
+        for (var i = 0; i < model.length; i++) {
+            newItems.push({ id: model[i], sortOrder: 0, value: model[i] });
+        }
+
+        return newItems;
+    }
+
+    //TODO: This isn't used
+    function convertObjectToDictionaryArray(model) {
+        //now we need to format the items in the dictionary because we always want to have an array
+        var newItems = [];
+        var vals = _.values($scope.model.config.items);
+        var keys = _.keys($scope.model.config.items);
+
+        for (var i = 0; i < vals.length; i++) {
+            var label = vals[i].value ? vals[i].value : vals[i];
+            newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: label });
+        }
+
+        return newItems;
+    }
     $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
 
     if ($scope.isConfigured) {
@@ -13,9 +50,38 @@ function ColorPickerController($scope) {
         initActiveColor();
     }
 
+    if (!angular.isArray($scope.model.config.items)) {
+        //make an array from the dictionary
+        var items = [];
+        for (var i in $scope.model.config.items) {
+            var oldValue = $scope.model.config.items[i];
+            if (oldValue.hasOwnProperty("value")) {
+                items.push({
+                    value: oldValue.value,
+                    label: oldValue.label,
+                    sortOrder: oldValue.sortOrder,
+                    id: i
+                });
+            } else {
+                items.push({
+                    value: oldValue,
+                    label: oldValue,
+                    sortOrder: sortOrder,
+                    id: i
+                });
+            }
+        }
+
+        //ensure the items are sorted by the provided sort order
+        items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+
+        //now make the editor model the array
+        $scope.model.config.items = items;
+    }
+
     $scope.toggleItem = function (color) {
 
-        var currentColor = $scope.model.value.hasOwnProperty("value")
+        var currentColor = ($scope.model.value && $scope.model.value.hasOwnProperty("value"))
             ? $scope.model.value.value
             : $scope.model.value;
 
@@ -124,7 +190,7 @@ function ColorPickerController($scope) {
 
     // figures out if a value is trueish enough
     function isTrue(bool) {
-        return !!bool && bool !== "0" && angular.lowercase(bool) !== "false";
+        return !!bool && bool !== "0" && bool.toString().toLowerCase() !== "false";
     }
 }
 

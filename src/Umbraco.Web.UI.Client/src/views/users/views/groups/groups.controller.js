@@ -9,7 +9,7 @@
         vm.selection = [];
 
         vm.createUserGroup = createUserGroup;
-        vm.clickUserGroup = clickUserGroup;
+        vm.goToUserGroup = goToUserGroup;
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
@@ -43,18 +43,12 @@
             $location.path('users/users/group/-1').search("create", "true");;
         }
 
-        function clickUserGroup(userGroup) {
-
+        function goToUserGroup(userGroup) {
             // only allow editing if user is member of the group or admin
             if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
-
-            if (vm.selection.length > 0) {
-                selectUserGroup(userGroup, vm.selection);
-            } else {
-                goToUserGroup(userGroup.group.id);
-            }
+            $location.path('users/users/group/' + userGroup.group.id).search("create", null);
         }
 
         function selectUserGroup(userGroup, selection, event) {
@@ -78,7 +72,6 @@
             }
 
             if(event){
-                event.preventDefault();
                 event.stopPropagation();
             }
         }
@@ -96,10 +89,7 @@
                             userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
                                 clearSelection();
                                 onInit();
-                                formHelper.showNotifications(data);
-                            }, function(error) {
-                                formHelper.showNotifications(error.data);
-                            });
+                            }, angular.noop);
                         }
 
                     });
@@ -112,10 +102,6 @@
                 userGroup.selected = false;
             });
             vm.selection = [];
-        }
-
-        function goToUserGroup(userGroupId) {
-            $location.path('users/users/group/' + userGroupId).search("create", null);
         }
 
         onInit();

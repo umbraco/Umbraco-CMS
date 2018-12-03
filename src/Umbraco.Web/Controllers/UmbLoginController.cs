@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using System.Web.Security;
-using umbraco.cms.businesslogic.member;
+﻿using System.Web.Mvc;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
@@ -31,21 +28,15 @@ namespace Umbraco.Web.Controllers
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
                 // validate the redirect url
-                if (Url.IsLocalUrl(model.RedirectUrl))
-                {
-                    return Redirect(model.RedirectUrl);
-                }
-                else
-                {
-                    // if it's not a local url we'll redirect to the root of the current site
-                    return Redirect(base.CurrentPage.Site().Url);
-                }
+                // if it's not a local url we'll redirect to the root of the current site
+                return Redirect(Url.IsLocalUrl(model.RedirectUrl)
+                    ? model.RedirectUrl
+                    : CurrentPage.AncestorOrSelf(1).Url);
             }
 
             //redirect to current page by default
 
             return RedirectToCurrentUmbracoPage();
-            //return RedirectToCurrentUmbracoUrl();
         }
     }
 }

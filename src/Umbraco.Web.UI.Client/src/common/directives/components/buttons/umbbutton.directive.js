@@ -65,99 +65,149 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {string=} icon Set a button icon.
 @param {string=} size Set a button icon ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
+@param {string=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
+@param {string=} showCaret Shows a caret on the right side of the button label
+
 **/
 
-(function() {
-   'use strict';
+(function () {
+    'use strict';
 
-   function ButtonDirective($timeout) {
-
-      function link(scope, el, attr, ctrl) {
-
-         scope.style = null;
-
-         function activate() {
-
-             scope.blockElement = false;
-
-            if (!scope.state) {
-               scope.state = "init";
+    angular
+        .module('umbraco.directives')
+        .component('umbButton', {
+            transclude: true,
+            templateUrl: 'views/components/buttons/umb-button.html',
+            controller: UmbButtonController,
+            controllerAs: 'vm',
+            bindings: {
+                action: "&?",
+                href: "@?",
+                type: "@",
+                buttonStyle: "@?",
+                state: "<?",
+                shortcut: "@?",
+                shortcutWhenHidden: "@",
+                label: "@?",
+                labelKey: "@?",
+                icon: "@?",
+                disabled: "<?",
+                size: "@?",
+                alias: "@?",
+                addEllipsis: "@?",
+                showCaret: "@?"
             }
+        });
 
-            if (scope.buttonStyle) {
+    //TODO: This doesn't seem necessary?
+    UmbButtonController.$inject = ['$timeout', 'localizationService'];
+
+    function UmbButtonController($timeout, localizationService) {
+
+        var vm = this;
+
+        vm.$onInit = onInit;
+        vm.$onChanges = onChanges;
+        vm.clickButton = clickButton;
+
+        function onInit() {
+
+            vm.blockElement = false;
+            vm.style = null;
+            vm.innerState = "init";
+
+            vm.buttonLabel = vm.label;
+
+            if (vm.buttonStyle) {
 
                 // make it possible to pass in multiple styles
-                if(scope.buttonStyle.startsWith("[") && scope.buttonStyle.endsWith("]")) {
+                if(vm.buttonStyle.startsWith("[") && vm.buttonStyle.endsWith("]")) {
                     
                     // when using an attr it will always be a string so we need to remove square brackets
                     // and turn it into and array
-                    var withoutBrackets = scope.buttonStyle.replace(/[\[\]']+/g,'');
+                    var withoutBrackets = vm.buttonStyle.replace(/[\[\]']+/g,'');
                     // split array by , + make sure to catch whitespaces
                     var array = withoutBrackets.split(/\s?,\s?/g);
                     
                     angular.forEach(array, function(item){
-                        scope.style = scope.style + " " + "btn-" + item;
+                        vm.style = vm.style + " " + "btn-" + item;
                         if(item === "block") {
-                            scope.blockElement = true;
+                            vm.blockElement = true;
                         }
                     });
 
                 } else {
-                    scope.style = "btn-" + scope.buttonStyle;
-                    if(scope.buttonStyle === "block") {
-                        scope.blockElement = true;
+                    vm.style = "btn-" + vm.buttonStyle;
+                    if(vm.buttonStyle === "block") {
+                        vm.blockElement = true;
                     }
                 }
 
             }
 
-         }
+            setButtonLabel();
 
-         activate();
+        }
 
-         var unbindStateWatcher = scope.$watch('state', function(newValue, oldValue) {
+        function onChanges(changes) {
 
-            if (newValue === 'success' || newValue === 'error') {
-               $timeout(function() {
-                  scope.state = 'init';
-               }, 2000);
+            // watch for state changes
+            if (changes.state) {
+                if(changes.state.currentValue) {
+                    vm.innerState = changes.state.currentValue;
+                }
+                if (changes.state.currentValue === 'success' || changes.state.currentValue === 'error') {
+                    // set the state back to 'init' after a success or error 
+                    $timeout(function () {
+                        vm.innerState = 'init';
+                    }, 2000);
+                }
             }
 
-         });
+            // watch for disabled changes
+            if(changes.disabled) {
+                if(changes.disabled.currentValue) {
+                    vm.disabled = changes.disabled.currentValue;
+                }
+            }
 
-         scope.$on('$destroy', function() {
-            unbindStateWatcher();
-         });
+            // watch for label changes
+            if(changes.label && changes.label.currentValue) {
+                vm.buttonLabel = changes.label.currentValue;
+                setButtonLabel();
+            }
 
-      }
+            // watch for label key changes
+            if(changes.labelKey && changes.labelKey.currentValue) {
+                setButtonLabel();
+            }
 
-      var directive = {
-         transclude: true,
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/buttons/umb-button.html',
-         link: link,
-         scope: {
-            action: "&?",
-            href: "@?",
-            type: "@",
-            buttonStyle: "@?",
-            state: "=?",
-            shortcut: "@?",
-            shortcutWhenHidden: "@",
-            label: "@?",
-            labelKey: "@?",
-            icon: "@?",
-            disabled: "=",
-            size: "@?",
-            alias: "@?"
-         }
-      };
+        }
 
-      return directive;
+        function clickButton(event) {
+            if(vm.action) {
+                vm.action({$event: event});
+            }
+        }
 
-   }
+        function setButtonLabel() {
+            // if the button opens a dialog add "..." to the label
+            if(vm.addEllipsis === "true") {
+                vm.buttonLabel = vm.buttonLabel + "...";
+            }
 
-   angular.module('umbraco.directives').directive('umbButton', ButtonDirective);
+            // look up localization key
+            if(vm.labelKey) {
+                localizationService.localize(vm.labelKey).then(function(value){
+                    vm.buttonLabel = value;
+                    // if the button opens a dialog add "..." to the label
+                    if(vm.addEllipsis === "true") {
+                        vm.buttonLabel = vm.buttonLabel + "...";
+                    }
+                });
+            }
+        }
+
+    }
 
 })();

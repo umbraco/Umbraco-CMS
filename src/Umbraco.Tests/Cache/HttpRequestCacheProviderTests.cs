@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Cache
     [TestFixture]
     public class StaticCacheProviderTests : CacheProviderTests
     {
-        private StaticCacheProvider _provider;        
+        private StaticCacheProvider _provider;
 
         public override void Setup()
         {

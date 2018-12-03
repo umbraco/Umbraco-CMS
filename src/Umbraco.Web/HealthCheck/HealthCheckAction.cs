@@ -1,15 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.HealthCheck
 {
     [DataContract(Name = "healtCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
-        private readonly ILocalizedTextService _textService;
-
         /// <summary>
         /// Empty ctor used for serialization
         /// </summary>
@@ -47,7 +46,6 @@ namespace Umbraco.Web.HealthCheck
         /// </summary>
         [DataMember(Name = "actionParameters")]
         public Dictionary<string, object> ActionParameters { get; set; }
-
 
         /// <summary>
         /// The name of the action - this is used to name the fix button

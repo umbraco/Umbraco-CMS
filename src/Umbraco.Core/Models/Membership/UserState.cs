@@ -9,6 +9,7 @@
         Active = 0,
         Disabled = 1,
         LockedOut = 2,
-        Invited = 3
+        Invited = 3,
+        Inactive = 4
     }
 }

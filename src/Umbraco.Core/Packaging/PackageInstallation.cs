@@ -8,9 +8,8 @@ using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
-using umbraco.interfaces;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging
@@ -26,18 +25,18 @@ namespace Umbraco.Core.Packaging
 
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,
             IFileService fileService, IPackageExtraction packageExtraction)
-            : this(packagingService, macroService, fileService, packageExtraction, GlobalSettings.FullpathToRoot)
+            : this(packagingService, macroService, fileService, packageExtraction, IOHelper.GetRootDirectorySafe())
         {}
 
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,
             IFileService fileService, IPackageExtraction packageExtraction, string fullPathToRoot)
         {
-            if (packageExtraction != null) _packageExtraction = packageExtraction; 
+            if (packageExtraction != null) _packageExtraction = packageExtraction;
             else throw new ArgumentNullException("packageExtraction");
-            
+
             if (macroService != null) _macroService = macroService;
             else throw new ArgumentNullException("macroService");
-            
+
             if (fileService != null) _fileService = fileService;
             else throw new ArgumentNullException("fileService");
 
@@ -46,7 +45,7 @@ namespace Umbraco.Core.Packaging
 
             _fullPathToRoot = fullPathToRoot;
         }
-        
+
         public IConflictingPackageData ConflictingPackageData
         {
             private get
@@ -78,7 +77,7 @@ namespace Umbraco.Core.Packaging
                 _fullPathToRoot = value;
             }
         }
-        
+
         public MetaData GetMetaData(string packageFilePath)
         {
             try
@@ -97,7 +96,7 @@ namespace Umbraco.Core.Packaging
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFilePath);
-                return GetPreInstallWarnings(packageFilePath, rootElement);
+                return GetPreInstallWarnings(rootElement);
             }
             catch (Exception e)
             {
@@ -120,7 +119,7 @@ namespace Umbraco.Core.Packaging
             XElement actions;
             MetaData metaData;
             InstallationSummary installationSummary;
-            
+
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFile);
@@ -148,7 +147,7 @@ namespace Umbraco.Core.Packaging
 
             try
             {
-                var dataTypeDefinitions = EmptyEnumerableIfNull<IDataTypeDefinition>(dataTypes) ?? InstallDataTypes(dataTypes, userId);
+                var dataTypeDefinitions = EmptyEnumerableIfNull<IDataType>(dataTypes) ?? InstallDataTypes(dataTypes, userId);
                 installationSummary.DataTypesInstalled = dataTypeDefinitions;
 
                 var languagesInstalled = EmptyEnumerableIfNull<ILanguage>(languages) ?? InstallLanguages(languages, userId);
@@ -169,11 +168,11 @@ namespace Umbraco.Core.Packaging
                 var documentTypesInstalled = EmptyEnumerableIfNull<IContentType>(documentTypes) ?? InstallDocumentTypes(documentTypes, userId);
                 installationSummary.ContentTypesInstalled =documentTypesInstalled;
 
-                var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
+                var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets);
                 installationSummary.StylesheetsInstalled = stylesheetsInstalled;
 
-                var documentsInstalled = documents != null ? InstallDocuments(documents, userId) 
-                    : EmptyEnumerableIfNull<IContent>(documentSet) 
+                var documentsInstalled = documents != null ? InstallDocuments(documents, userId)
+                    : EmptyEnumerableIfNull<IContent>(documentSet)
                     ?? InstallDocuments(documentSet, userId);
                 installationSummary.ContentInstalled = documentsInstalled;
 
@@ -213,9 +212,8 @@ namespace Umbraco.Core.Packaging
 
         private XDocument GetConfigXmlDoc(string packageFilePath)
         {
-            string filePathInPackage;
-            string configXmlContent = _packageExtraction.ReadTextFileFromArchive(packageFilePath,
-                Constants.Packaging.PackageXmlFileName, out filePathInPackage);
+            var configXmlContent = _packageExtraction.ReadTextFileFromArchive(packageFilePath,
+                Constants.Packaging.PackageXmlFileName, out _);
 
             return XDocument.Parse(configXmlContent);
         }
@@ -289,21 +287,19 @@ namespace Umbraco.Core.Packaging
 
                     var packageAction = new PackageAction
                     {
-                        XmlData = elemet, 
+                        XmlData = elemet,
                         Alias = aliasAttr.Value,
                         PackageName = packageName,
                     };
 
 
-                    XAttribute attr = elemet.Attribute(Constants.Packaging.RunatNodeAttribute);
+                    var attr = elemet.Attribute(Constants.Packaging.RunatNodeAttribute);
 
-                    ActionRunAt runAt;
-                    if (attr != null && Enum.TryParse(attr.Value, true, out runAt)) { packageAction.RunAt = runAt; }
+                    if (attr != null && Enum.TryParse(attr.Value, true, out ActionRunAt runAt)) { packageAction.RunAt = runAt; }
 
                     attr = elemet.Attribute(Constants.Packaging.UndoNodeAttribute);
 
-                    bool undo;
-                    if (attr != null && bool.TryParse(attr.Value, out undo)) { packageAction.Undo = undo; }
+                    if (attr != null && bool.TryParse(attr.Value, out var undo)) { packageAction.Undo = undo; }
 
 
                     return packageAction;
@@ -328,7 +324,7 @@ namespace Umbraco.Core.Packaging
                     .ToArray();
         }
 
-        private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
+        private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement)
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName) == false)
             {
@@ -372,7 +368,7 @@ namespace Umbraco.Core.Packaging
             sourceDestination = AppendRootToDestination(FullPathToRoot, sourceDestination);
 
             _packageExtraction.CopyFilesFromArchive(packageFilePath, sourceDestination);
-            
+
             return sourceDestination.Select(sd => sd.Value).ToArray();
         }
 
@@ -413,7 +409,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportLanguages(languageElement, userId);
         }
 
-        private IEnumerable<IDataTypeDefinition> InstallDataTypes(XElement dataTypeElements, int userId = 0)
+        private IEnumerable<IDataType> InstallDataTypes(XElement dataTypeElements, int userId = 0)
         {
             if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName) == false)
             {
@@ -425,13 +421,13 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId);
         }
 
-        private PreInstallWarnings GetPreInstallWarnings(string packagePath, XElement rootElement)
+        private PreInstallWarnings GetPreInstallWarnings(XElement rootElement)
         {
             XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
             XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
             XElement templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
             XElement alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
-            
+
             var sourceDestination = EmptyArrayIfNull<KeyValuePair<string, string>>(files) ?? ExtractSourceDestinationFileInformation(files);
 
             var installWarnings = new PreInstallWarnings();
@@ -444,30 +440,16 @@ namespace Umbraco.Core.Packaging
 
             var stylesheetNames = EmptyEnumerableIfNull<IFile>(styleSheets) ?? ConflictingPackageData.FindConflictingStylesheets(styleSheets);
             installWarnings.ConflictingStylesheetNames = stylesheetNames;
-            
+
             installWarnings.UnsecureFiles = FindUnsecureFiles(sourceDestination);
             installWarnings.FilesReplaced = FindFilesToBeReplaced(sourceDestination);
-            installWarnings.AssembliesWithLegacyPropertyEditors = FindLegacyPropertyEditors(packagePath, sourceDestination);
-            
+
             return installWarnings;
         }
 
         private KeyValuePair<string, string>[] FindFilesToBeReplaced(IEnumerable<KeyValuePair<string, string>> sourceDestination)
         {
             return sourceDestination.Where(sd => File.Exists(Path.Combine(FullPathToRoot, sd.Value))).ToArray();
-        }
-
-        private IEnumerable<string> FindLegacyPropertyEditors(string packagePath, IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
-        {
-            var dlls = sourceDestinationPair.Where(
-                sd => (Path.GetExtension(sd.Value) ?? string.Empty).Equals(".dll", StringComparison.InvariantCultureIgnoreCase)).Select(sd => sd.Key).ToArray();
-
-            if (dlls.Any() == false) { return new List<string>(); }
-            
-            // Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
-            string[] assemblyErrors;
-            IEnumerable<byte[]> assemblyesToScan =_packageExtraction.ReadFilesFromArchive(packagePath, dlls);
-            return PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(assemblyesToScan, out assemblyErrors).ToArray();
         }
 
         private KeyValuePair<string, string>[] FindUnsecureFiles(IEnumerable<KeyValuePair<string, string>> sourceDestinationPair)
@@ -484,7 +466,7 @@ namespace Umbraco.Core.Packaging
             string extension = Path.GetExtension(destination);
             return extension != null && extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase);
         }
-        
+
         private KeyValuePair<string, string>[] ExtractSourceDestinationFileInformation(XElement filesElement)
         {
             if (string.Equals(Constants.Packaging.FilesNodeName, filesElement.Name.LocalName) == false)
@@ -520,7 +502,7 @@ namespace Umbraco.Core.Packaging
                     var relativeDir = UpdatePathPlaceholders(PrepareAsFilePathElement(orgPathElement.Value));
 
                     var relativePath = Path.Combine(relativeDir, fileName);
-                    
+
 
                     return new KeyValuePair<string, string>(guidElement.Value, relativePath);
                 }).ToArray();
@@ -585,17 +567,15 @@ namespace Umbraco.Core.Packaging
 
         private static int IntValue(XElement xElement, int defaultValue = 0)
         {
-            int val;
-            return xElement == null ? defaultValue : int.TryParse(xElement.Value, out val) ? val : defaultValue;
+            return xElement == null ? defaultValue : int.TryParse(xElement.Value, out var val) ? val : defaultValue;
         }
-        
+
         private static string UpdatePathPlaceholders(string path)
         {
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
                 path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
-                path = path.Replace("[$UMBRACOCLIENT]", SystemDirectories.UmbracoClient);
                 path = path.Replace("[$CONFIG]", SystemDirectories.Config);
                 path = path.Replace("[$DATA]", SystemDirectories.Data);
             }

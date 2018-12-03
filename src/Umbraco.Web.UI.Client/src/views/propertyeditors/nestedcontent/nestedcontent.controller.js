@@ -37,6 +37,18 @@
             });
         });
 
+        $scope.selectableDocTypesFor = function (config) {
+            // return all doctypes that are:
+            // 1. either already selected for this config, or
+            // 2. not selected in any other config
+            return _.filter($scope.model.docTypes, function (docType) {
+                return docType.alias === config.ncAlias || !_.find($scope.model.value, function(c) {
+                    return docType.alias === c.ncAlias;
+                });
+            });
+
+        }
+
         if (!$scope.model.value) {
             $scope.model.value = [];
             $scope.add();
@@ -104,11 +116,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.showIcons = $scope.model.config.showIcons || true;
         $scope.wideMode = $scope.model.config.hideLabel == "1";
 
-        $scope.overlayMenu = {
-            show: false,
-            style: {}
-        };
-
         // helper to force the current form into the dirty state
         $scope.setDirty = function () {
             if ($scope.propertyForm) {
@@ -123,40 +130,54 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
             $scope.currentNode = newNode;
             $scope.setDirty();
-
-            $scope.closeNodeTypePicker();
         };
 
-        $scope.openNodeTypePicker = function (event) {
+        $scope.openNodeTypePicker = function ($event) {
             if ($scope.nodes.length >= $scope.maxItems) {
                 return;
             }
 
+            $scope.overlayMenu = {
+                title: localizationService.localize('grid_insertControl'),
+                show: false,
+                style: {},
+                filter: $scope.scaffolds.length > 15 ? true : false,
+                view: "itempicker",
+                event: $event,
+                submit: function(model) {                    
+                    if(model && model.selectedItem) {
+                        $scope.addNode(model.selectedItem.alias);
+                    }
+                    $scope.overlayMenu.show = false;
+                    $scope.overlayMenu = null;
+                },
+                close: function() {
+                    $scope.overlayMenu.show = false;
+                    $scope.overlayMenu = null;
+                }
+            };
+
             // this could be used for future limiting on node types
-            $scope.overlayMenu.scaffolds = [];
+            $scope.overlayMenu.availableItems = [];
             _.each($scope.scaffolds, function (scaffold) {
-                $scope.overlayMenu.scaffolds.push({
+                $scope.overlayMenu.availableItems.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
                     icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
                 });
             });
 
-            if ($scope.overlayMenu.scaffolds.length == 0) {
+            if ($scope.overlayMenu.availableItems.length === 0) {
                 return;
             }
 
-            if ($scope.overlayMenu.scaffolds.length == 1) {
+            if ($scope.overlayMenu.availableItems.length === 1) {
                 // only one scaffold type - no need to display the picker
                 $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                 return;
             }
 
             $scope.overlayMenu.show = true;
-        };
-
-        $scope.closeNodeTypePicker = function () {
-            $scope.overlayMenu.show = false;
         };
 
         $scope.editNode = function (idx) {
@@ -228,10 +249,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.sortableOptions = {
             axis: 'y',
             cursor: "move",
-            handle: ".nested-content__icon--move",
+            handle: ".umb-nested-content__icon--move",
             start: function (ev, ui) {
+                updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
-                $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                     $(this).css("visibility", "hidden");
                 });
@@ -243,7 +265,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $scope.setDirty();
             },
             stop: function (ev, ui) {
-                $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceAddEditor', true, $(this).attr('id'));
                     $(this).css("visibility", "visible");
                 });
@@ -267,11 +289,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         var notSupported = [
-          "Umbraco.CheckBoxList",
-          "Umbraco.DropDownMultiple",
-          "Umbraco.MacroContainer",
-          "Umbraco.RadioButtonList",
-          "Umbraco.MultipleTextstring",
           "Umbraco.Tags",
           "Umbraco.UploadField",
           "Umbraco.ImageCropper"
@@ -283,7 +300,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
                 // remove all tabs except the specified tab
-                var tab = _.find(scaffold.tabs, function (tab) {
+                var tabs = scaffold.variants[0].tabs;
+                var tab = _.find(tabs, function (tab) {
                     return tab.id != 0 && (tab.alias.toLowerCase() == contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias == "");
                 });
                 scaffold.tabs = [];

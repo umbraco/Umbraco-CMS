@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -14,25 +15,25 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// to use that converter for values whose .ToString() would depend on other content.</para>
     /// </remarks>
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(string))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MustBeStringValueConverter : PropertyValueConverterBase
     {
         private static readonly string[] Aliases =
         {
-            Constants.PropertyEditors.MultiNodeTreePickerAlias,
-            Constants.PropertyEditors.MultipleMediaPickerAlias
+            Constants.PropertyEditors.Aliases.MultiNodeTreePicker
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Aliases.Contains(propertyType.PropertyEditorAlias);
-        }
+            => Aliases.Contains(propertyType.EditorAlias);
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+            => typeof (string);
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
+
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return null;
-            return source.ToString();
+            return source?.ToString();
         }
     }
 }

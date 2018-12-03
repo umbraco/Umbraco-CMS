@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController" class="umb-editor umb-membergrouppicker">
+<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController" class="umb-property-editor umb-membergrouppicker">
 
 	<div ng-model="renderModel">
 		<umb-node-preview
@@ -17,12 +17,5 @@
 		prevent-default>
 		<localize key="general_add">Add</localize>
 	</a>
-
-   <umb-overlay
-      ng-if="memberGroupPicker.show"
-      model="memberGroupPicker"
-      position="right"
-      view="memberGroupPicker.view">
-   </umb-overlay>
 
 </div>

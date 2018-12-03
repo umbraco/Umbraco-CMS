@@ -4,9 +4,7 @@ using System.Collections.Generic;
 namespace Umbraco.Core.Models.PublishedContent
 {
     //
-    // This class has two purposes.
-    //
-    // - First, we cannot implement strongly-typed content by inheriting from some sort
+    // we cannot implement strongly-typed content by inheriting from some sort
     // of "master content" because that master content depends on the actual content cache
     // that is being used. It can be an XmlPublishedContent with the XmlPublishedCache,
     // or just anything else.
@@ -15,11 +13,6 @@ namespace Umbraco.Core.Models.PublishedContent
     // returned by the content cache, and providing extra properties (mostly) or
     // methods or whatever. This class provides the base for such encapsulation.
     //
-    // - Second, any time a content is used in a content set obtained from
-    // IEnumerable<IPublishedContent>.ToContentSet(), it needs to be cloned and extended
-    // in order to know about its position in the set.  This class provides the base
-    // for implementing such extension.
-    //
 
     /// <summary>
     /// Provides an abstract base class for <c>IPublishedContent</c> implementations that
@@ -27,180 +20,118 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     public abstract class PublishedContentWrapped : IPublishedContent
     {
-        protected readonly IPublishedContent Content;
+        private readonly IPublishedContent _content;
 
         /// <summary>
         /// Initialize a new instance of the <see cref="PublishedContentWrapped"/> class
-        /// with an <c>IPublishedContent</c> instance to wrap and extend.
+        /// with an <c>IPublishedContent</c> instance to wrap.
         /// </summary>
-        /// <param name="content">The content to wrap and extend.</param>
+        /// <param name="content">The content to wrap.</param>
         protected PublishedContentWrapped(IPublishedContent content)
         {
-            Content = content;
+            _content = content;
         }
 
         /// <summary>
         /// Gets the wrapped content.
         /// </summary>
         /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
-        public IPublishedContent Unwrap()
-        {
-            return Content;
-        }
-
-        #region ContentSet
-
-        public virtual IEnumerable<IPublishedContent> ContentSet
-        {
-            get { return Content.ContentSet; }
-        }
-
-        #endregion
+        public IPublishedContent Unwrap() => _content;
 
         #region ContentType
 
-        public virtual PublishedContentType ContentType { get { return Content.ContentType; } }
+        /// <inheritdoc />
+        public virtual PublishedContentType ContentType => _content.ContentType;
 
         #endregion
 
-        #region Content
+        #region PublishedElement
 
-        public virtual int Id
-        {
-            get { return Content.Id; }
-        }
+        /// <inheritdoc />
+        public Guid Key => _content.Key;
 
-        public virtual int TemplateId
-        {
-            get { return Content.TemplateId; }
-        }
+        #endregion
 
-        public virtual int SortOrder
-        {
-            get { return Content.SortOrder; }
-        }
+        #region PublishedContent
 
-        public virtual string Name
-        {
-            get { return Content.Name; }
-        }
+        /// <inheritdoc />
+        public virtual int Id => _content.Id;
 
-        public virtual string UrlName
-        {
-            get { return Content.UrlName; }
-        }
+        /// <inheritdoc />
+        public virtual string Name => _content.Name;
 
-        public virtual string DocumentTypeAlias
-        {
-            get { return Content.DocumentTypeAlias; }
-        }
+        /// <inheritdoc />
+        public virtual string UrlSegment => _content.UrlSegment;
 
-        public virtual int DocumentTypeId
-        {
-            get { return Content.DocumentTypeId; }
-        }
+        /// <inheritdoc />
+        public virtual int SortOrder => _content.SortOrder;
 
-        public virtual string WriterName
-        {
-            get { return Content.WriterName; }
-        }
+        /// <inheritdoc />
+        public virtual int Level => _content.Level;
 
-        public virtual string CreatorName
-        {
-            get { return Content.CreatorName; }
-        }
+        /// <inheritdoc />
+        public virtual string Path => _content.Path;
 
-        public virtual int WriterId
-        {
-            get { return Content.WriterId; }
-        }
+        /// <inheritdoc />
+        public virtual int TemplateId => _content.TemplateId;
 
-        public virtual int CreatorId
-        {
-            get { return Content.CreatorId; }
-        }
+        /// <inheritdoc />
+        public virtual int CreatorId => _content.CreatorId;
 
-        public virtual string Path
-        {
-            get { return Content.Path; }
-        }
+        /// <inheritdoc />
+        public virtual string CreatorName => _content.CreatorName;
 
-        public virtual DateTime CreateDate
-        {
-            get { return Content.CreateDate; }
-        }
+        /// <inheritdoc />
+        public virtual DateTime CreateDate => _content.CreateDate;
 
-        public virtual DateTime UpdateDate
-        {
-            get { return Content.UpdateDate; }
-        }
+        /// <inheritdoc />
+        public virtual int WriterId => _content.WriterId;
 
-        public virtual Guid Version
-        {
-            get { return Content.Version; }
-        }
+        /// <inheritdoc />
+        public virtual string WriterName => _content.WriterName;
 
-        public virtual int Level
-        {
-            get { return Content.Level; }
-        }
+        /// <inheritdoc />
+        public virtual DateTime UpdateDate => _content.UpdateDate;
 
-        public virtual string Url
-        {
-            get { return Content.Url; }
-        }
+        /// <inheritdoc />
+        public virtual string Url => _content.Url;
 
-        public virtual PublishedItemType ItemType
-        {
-            get { return Content.ItemType; }
-        }
+        /// <inheritdoc />
+        public virtual string GetUrl(string culture = null) => _content.GetUrl(culture);
 
-        public virtual bool IsDraft
-        {
-            get { return Content.IsDraft; }
-        }
+        /// <inheritdoc />
+        public PublishedCultureInfo GetCulture(string culture = null) => _content.GetCulture(culture);
 
-        public virtual int GetIndex()
-        {
-            return Content.GetIndex();
-        }
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
+
+        /// <inheritdoc />
+        public virtual PublishedItemType ItemType => _content.ItemType;
+
+        /// <inheritdoc />
+        public virtual bool IsDraft => _content.IsDraft;
 
         #endregion
 
         #region Tree
 
-        public virtual IPublishedContent Parent
-        {
-            get { return Content.Parent; }
-        }
+        /// <inheritdoc />
+        public virtual IPublishedContent Parent => _content.Parent;
 
-        public virtual IEnumerable<IPublishedContent> Children
-        {
-            get { return Content.Children; }
-        }
+        /// <inheritdoc />
+        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
         #endregion
 
         #region Properties
 
-        public virtual ICollection<IPublishedProperty> Properties
-        {
-            get { return Content.Properties; }
-        }
+        /// <inheritdoc cref="IPublishedElement.Properties"/>
+        public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
-        public virtual object this[string alias]
-        {
-            get { return Content[alias]; }
-        }
-
+        /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public virtual IPublishedProperty GetProperty(string alias)
         {
-            return Content.GetProperty(alias);
-        }
-
-        public virtual IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            return Content.GetProperty(alias, recurse);
+            return _content.GetProperty(alias);
         }
 
         #endregion

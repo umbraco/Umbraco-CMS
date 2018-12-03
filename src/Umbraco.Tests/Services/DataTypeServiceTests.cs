@@ -1,47 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Services
 {
     /// <summary>
     /// Tests covering the DataTypeService
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
-    public class DataTypeServiceTests : BaseServiceTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class DataTypeServiceTests : TestWithSomeContentBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
-
-
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()
         {
+            // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
 
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.Save(dataTypeDefinition);
+            // Act
+            IDataType dataType = new DataType(new LabelPropertyEditor(Logger)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            dataTypeService.Save(dataType);
 
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+            // Assert
+            Assert.That(dataType, Is.Not.Null);
+            Assert.That(dataType.HasIdentity, Is.True);
 
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            Assert.That(dataTypeDefinition, Is.Not.Null);
+            dataType = dataTypeService.GetDataType(dataType.Id);
+            Assert.That(dataType, Is.Not.Null);
         }
 
         [Test]
@@ -50,177 +45,22 @@ namespace Umbraco.Tests.Services
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
             var textfieldId = "Umbraco.Textbox";
-            var dataTypeDefinitions = dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(textfieldId);
+            var dataTypeDefinitions = dataTypeService.GetByEditorAlias(textfieldId);
 
             // Act
             var definition = dataTypeDefinitions.First();
             var definitionId = definition.Id;
             dataTypeService.Delete(definition);
 
-            var deletedDefinition = dataTypeService.GetDataTypeDefinitionById(definitionId);
+            var deletedDefinition = dataTypeService.GetDataType(definitionId);
 
             // Assert
             Assert.That(deletedDefinition, Is.Null);
 
             //Further assertions against the ContentType that contains PropertyTypes based on the TextField
-            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed+1);
             Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
-        }
-
-        [Test]
-        public void DataTypeService_Can_Persist_Dictionary_Based_Pre_Values()
-        {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
-
-            // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.Save(dataTypeDefinition);
-            dataTypeService.SavePreValues(dataTypeDefinition, new Dictionary<string, PreValue>
-                {
-                    {"preVal1", new PreValue("Hello")},
-                    {"preVal2", new PreValue("World")}
-                });
-            //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
-            Assert.AreEqual(true, preVals.IsDictionaryBased);
-            Assert.AreEqual(2, preVals.PreValuesAsDictionary.Keys.Count);
-            Assert.AreEqual("preVal1", preVals.PreValuesAsDictionary.Keys.First());
-            Assert.AreEqual("preVal2", preVals.PreValuesAsDictionary.Keys.Last());
-            Assert.AreEqual("Hello", preVals.PreValuesAsDictionary["preVal1"].Value);
-            Assert.AreEqual("World", preVals.PreValuesAsDictionary["preVal2"].Value);
-        }
-
-        [Test]
-        public void DataTypeService_Can_Persist_Dtd_And_Dictionary_Based_Pre_Values()
-        {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
-
-            // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
-                {
-                    {"preVal1", new PreValue("Hello")},
-                    {"preVal2", new PreValue("World")}
-                });
-            //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
-            Assert.AreEqual(true, preVals.IsDictionaryBased);
-            Assert.AreEqual(2, preVals.PreValuesAsDictionary.Keys.Count);
-            Assert.AreEqual("preVal1", preVals.PreValuesAsDictionary.Keys.First());
-            Assert.AreEqual("preVal2", preVals.PreValuesAsDictionary.Keys.Last());
-            Assert.AreEqual("Hello", preVals.PreValuesAsDictionary["preVal1"].Value);
-            Assert.AreEqual("World", preVals.PreValuesAsDictionary["preVal2"].Value);
-        }
-
-        [Test]
-        public void DataTypeService_Can_Update_Pre_Values()
-        {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
-
-            // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
-                {
-                    {"preVal1", new PreValue("Hello")},
-                    {"preVal2", new PreValue("World")}
-                });
-            //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            //update them (ensure Ids are there!)
-            var asDictionary = preVals.FormatAsDictionary();
-            asDictionary["preVal1"].Value = "Hello2";
-            asDictionary["preVal2"].Value = "World2";
-
-            dataTypeService.SavePreValues(dataTypeDefinition, asDictionary);
-
-            var preValsAgain = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            // Assert
-
-            Assert.AreEqual(preVals.PreValuesAsDictionary.Values.First().Id, preValsAgain.PreValuesAsDictionary.Values.First().Id);
-            Assert.AreEqual(preVals.PreValuesAsDictionary.Values.Last().Id, preValsAgain.PreValuesAsDictionary.Values.Last().Id);
-            Assert.AreEqual("preVal1", preValsAgain.PreValuesAsDictionary.Keys.First());
-            Assert.AreEqual("preVal2", preValsAgain.PreValuesAsDictionary.Keys.Last());
-            Assert.AreEqual("Hello2", preValsAgain.PreValuesAsDictionary["preVal1"].Value);
-            Assert.AreEqual("World2", preValsAgain.PreValuesAsDictionary["preVal2"].Value);
-        }
-
-        [Test]
-        public void DataTypeService_Can_Remove_Pre_Value()
-        {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
-
-            // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
-                {
-                    {"preVal1", new PreValue("Hello")},
-                    {"preVal2", new PreValue("World")}
-                });
-            //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            //update them (ensure Ids are there!)
-            var asDictionary = preVals.FormatAsDictionary();
-            asDictionary.Remove("preVal2");
-
-            dataTypeService.SavePreValues(dataTypeDefinition, asDictionary);
-
-            var preValsAgain = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            // Assert
-
-            Assert.AreEqual(1, preValsAgain.FormatAsDictionary().Count);
-            Assert.AreEqual(preVals.PreValuesAsDictionary.Values.First().Id, preValsAgain.PreValuesAsDictionary.Values.First().Id);
-            Assert.AreEqual("preVal1", preValsAgain.PreValuesAsDictionary.Keys.First());
-
-        }
-
-        [Test]
-        public void DataTypeService_Can_Persist_Array_Based_Pre_Values()
-        {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
-
-            // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.Save(dataTypeDefinition);
-            dataTypeService.SavePreValues(dataTypeDefinition.Id, new[] {"preVal1", "preVal2"});
-
-            //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
-
-            // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
-            Assert.AreEqual(false, preVals.IsDictionaryBased);
-            Assert.AreEqual(2, preVals.PreValuesAsArray.Count());
-            Assert.AreEqual("preVal1", preVals.PreValuesAsArray.First().Value);
-            Assert.AreEqual("preVal2", preVals.PreValuesAsArray.Last().Value);
         }
 
         [Test]
@@ -230,7 +70,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = DataTypeDatabaseType.Ntext };
+            var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));

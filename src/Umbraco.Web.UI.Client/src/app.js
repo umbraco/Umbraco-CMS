@@ -6,13 +6,37 @@ var app = angular.module('umbraco', [
 	'umbraco.packages',
 	'umbraco.views',
 
+    'ngRoute',
+	'ngAnimate',
     'ngCookies',
     'ngSanitize',
-    'ngMobile',
+    'ngTouch',
+    'ngMessages',
     'tmh.dynamicLocale',
     'ngFileUpload',
     'LocalStorageModule'
 ]);
+
+app.config(['$compileProvider', function ($compileProvider) {
+    // when not in debug mode remove all angularjs debug css classes and  HTML comments from the dom
+    $compileProvider.debugInfoEnabled(Umbraco.Sys.ServerVariables.isDebuggingEnabled);
+    // don't execute directives inside comments
+    $compileProvider.commentDirectivesEnabled(false);
+    // don't execute directives inside css classes
+    $compileProvider.cssClassDirectivesEnabled(false);
+}]);
+
+// I configure the $animate service during bootstrap.
+angular.module("umbraco").config(
+    function configureAnimate( $animateProvider ) {
+        // By default, the $animate service will check for animation styling
+        // on every structural change. This requires a lot of animateFrame-based
+        // DOM-inspection. However, we can tell $animate to only check for
+        // animations on elements that have a specific class name RegExp pattern
+        // present. In this case, we are requiring the "umb-animated" class.
+        $animateProvider.classNameFilter( /\bumb-animated\b/ );
+    }
+);
 
 var packages = angular.module("umbraco.packages", []);
 
@@ -22,11 +46,20 @@ var packages = angular.module("umbraco.packages", []);
 //module is initilized.
 angular.module("umbraco.views", ["umbraco.viewcache"]);
 angular.module("umbraco.viewcache", [])
-    .run(function($rootScope, $templateCache) {
+    .run(function ($rootScope, $templateCache, localStorageService) {
         /** For debug mode, always clear template cache to cut down on
             dev frustration and chrome cache on templates */
         if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
             $templateCache.removeAll();
+        }
+        else {
+            var storedVersion = localStorageService.get("umbVersion");
+            if (!storedVersion || storedVersion !== Umbraco.Sys.ServerVariables.application.cacheBuster) {
+                //if the stored version doesn't match our cache bust version, clear the template cache
+                $templateCache.removeAll();
+                //store the current version
+                localStorageService.set("umbVersion", Umbraco.Sys.ServerVariables.application.cacheBuster);
+            }
         }
     })
     .config([

@@ -125,6 +125,20 @@ Use this directive to generate a thumbnail grid of media items.
                         i--;
                     }
 
+
+                    // If subfolder search is not enabled remove the media items that's not needed
+                    // Make sure that includeSubFolder is not undefined since the directive is used
+                    // in contexts where it should not be used. Currently only used when we trigger
+                    // a media picker
+                    if(scope.includeSubFolders !== undefined){
+                        if (scope.includeSubFolders !== 'true') {
+                            if (item.parentId !== parseInt(scope.currentFolderId)) {
+                                scope.items.splice(i, 1);
+                                i--;
+                            }
+                        }
+                    }
+
                 }
 
                 if (scope.items.length > 0) {
@@ -144,7 +158,7 @@ Use this directive to generate a thumbnail grid of media items.
                 }
 
                 if (!item.isFolder) {
-                    
+
                     // handle entity
                     if(item.image) {
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
@@ -153,7 +167,7 @@ Use this directive to generate a thumbnail grid of media items.
                     } else {
                         item.thumbnail = mediaHelper.resolveFile(item, true);
                         item.image = mediaHelper.resolveFile(item, false);
-                        
+
                         var fileProp = _.find(item.properties, function (v) {
                             return (v.alias === "umbracoFile");
                         });
@@ -281,6 +295,13 @@ Use this directive to generate a thumbnail grid of media items.
                 }
             };
 
+            scope.clickEdit = function(item, $event) {
+                if (scope.onClickEdit) {
+                    scope.onClickEdit({"item": item})
+                    $event.stopPropagation();
+                }
+            };
+
             var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue) {
                 if (angular.isArray(newValue)) {
                     activate();
@@ -302,12 +323,16 @@ Use this directive to generate a thumbnail grid of media items.
                 onDetailsHover: "=",
                 onClick: '=',
                 onClickName: "=",
+                onClickEdit: "&?",
+                allowOnClickEdit: "@?",
                 filterBy: "=",
                 itemMaxWidth: "@",
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
                 itemMinHeight: "@",
-                onlyImages: "@"
+                onlyImages: "@",
+                includeSubFolders: "@",
+                currentFolderId: "@"
             },
             link: link
         };

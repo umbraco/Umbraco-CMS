@@ -1,37 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using AutoMapper;
-using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    public class UserModelMapperTests : BaseDatabaseFactoryTest
+    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class UserModelMapperTests : TestWithDatabaseBase
     {
         [Test]
         public void Map_UserGroupSave_To_IUserGroup()
         {
-            var userModelMapper = new UserModelMapper();
-            Mapper.Initialize(configuration => userModelMapper.ConfigureMappings(configuration, ApplicationContext.Current));
-
-            var userService = ApplicationContext.Services.UserService;
             IUserGroup userGroup = new UserGroup(0, "alias", "name", new List<string> { "c" }, "icon");
-            userService.Save(userGroup);
+            userGroup.Id = 42;
 
             // userGroup.permissions is System.Collections.Generic.List`1[System.String]
-
-            userGroup = userService.GetUserGroupById(userGroup.Id);
 
             // userGroup.permissions is System.Linq.Enumerable+WhereSelectArrayIterator`2[System.Char, System.String]
             // fixed: now System.Collections.Generic.List`1[System.String]

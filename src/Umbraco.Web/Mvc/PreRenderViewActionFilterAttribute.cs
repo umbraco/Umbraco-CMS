@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
@@ -15,13 +15,13 @@ namespace Umbraco.Web.Mvc
 
             var result = filterContext.Result as ViewResultBase;
             if (result == null)
-            {             
+            {
                 return;
             }
 
             var model = result.Model;
             if (model == null)
-            {                
+            {
                 return;
             }
 

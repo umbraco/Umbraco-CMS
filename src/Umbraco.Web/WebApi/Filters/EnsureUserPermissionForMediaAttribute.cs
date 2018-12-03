@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
-using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -16,7 +14,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// Auth filter to check if the current user has access to the content item
     /// </summary>
     /// <remarks>
-    /// Since media doesn't have permissions, this simply checks start node access    
+    /// Since media doesn't have permissions, this simply checks start node access
     /// </remarks>
     internal sealed class EnsureUserPermissionForMediaAttribute : ActionFilterAttribute
     {
@@ -40,20 +38,18 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForMediaAttribute(string paramName)
         {
-            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
         }
 
+        // fixme v8 guess this is not used anymore, source is ignored?!
         public EnsureUserPermissionForMediaAttribute(string paramName, DictionarySource source)
         {
-            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
         }
-       
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+
+        public override bool AllowMultiple => true;
 
         private int GetNodeIdFromParameter(object parameterValue)
         {
@@ -74,7 +70,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (guidId != Guid.Empty)
             {
-                var found =  ApplicationContext.Current.Services.EntityService.GetIdForKey(guidId, UmbracoObjectTypes.Media);
+                var found =  Current.Services.EntityService.GetId(guidId, UmbracoObjectTypes.Media);
                 if (found)
                     return found.Result;
             }
@@ -122,9 +118,9 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (MediaController.CheckPermissions(
                 actionContext.Request.Properties,
-                UmbracoContext.Current.Security.CurrentUser, 
-                ApplicationContext.Current.Services.MediaService, 
-                ApplicationContext.Current.Services.EntityService, 
+                UmbracoContext.Current.Security.CurrentUser,
+                Current.Services.MediaService,
+                Current.Services.EntityService,
                 nodeId))
             {
                 base.OnActionExecuting(actionContext);
@@ -133,10 +129,6 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-            
         }
-        
-        
-
     }
 }

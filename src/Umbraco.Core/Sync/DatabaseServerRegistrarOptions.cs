@@ -14,14 +14,9 @@ namespace Umbraco.Core.Sync
         public DatabaseServerRegistrarOptions()
         {
             StaleServerTimeout = TimeSpan.FromMinutes(2); // 2 minutes
-            ThrottleSeconds = 30; // 30 seconds
             RecurringSeconds = 60; // do it every minute
         }
-
-        [Obsolete("This is no longer used")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public int ThrottleSeconds { get; set; }
-
+        
         /// <summary>
         /// The amount of seconds to wait between calls to the database on the background thread
         /// </summary>

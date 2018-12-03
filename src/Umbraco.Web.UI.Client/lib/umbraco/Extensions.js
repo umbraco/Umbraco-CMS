@@ -84,27 +84,21 @@
         };
     }
     
-    if (!String.prototype.trimStart) {
-        
-        /** trims the start of the string*/
-        String.prototype.trimStart = function (str) {
-            if (this.startsWith(str)) {
-                return this.substring(str.length);
-            }
-            return this;
-        };
-    }
-    
-    if (!String.prototype.trimEnd) {
+    /** trims the start of the string*/
+    String.prototype.trimStart = function (str) {
+        if (this.startsWith(str)) {
+            return this.substring(str.length);
+        }
+        return this;
+    };
 
-        /** trims the end of the string*/
-        String.prototype.trimEnd = function (str) {
-            if (this.endsWith(str)) {
-                return this.substring(0, this.length - str.length);
-            }
-            return this;
-        };
-    }
+    /** trims the end of the string*/
+    String.prototype.trimEnd = function (str) {
+        if (this.endsWith(str)) {
+            return this.substring(0, this.length - str.length);
+        }
+        return this;
+    };
 
     if (!String.prototype.utf8Encode) {
 
@@ -331,5 +325,23 @@
         };
     }
 
+    if (!Object.toBoolean) {
+
+        /** Converts a string/integer/bool to true/false */
+        Object.toBoolean = function (obj) {
+            if (obj === undefined || obj === null) {
+                return false;
+            }
+
+            if ((typeof obj) === "boolean") {
+                return obj;
+            }
+
+            if (obj === "1" || obj === 1 || obj.toString().toLowerCase() === "true") {
+                return true;
+            }
+            return false;
+        };
+    }
 
 })();

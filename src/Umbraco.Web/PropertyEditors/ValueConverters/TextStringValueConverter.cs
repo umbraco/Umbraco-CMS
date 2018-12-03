@@ -1,53 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(string))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
         private static readonly string[] PropertyTypeAliases =
         {
-            Constants.PropertyEditors.TextboxAlias,
-            Constants.PropertyEditors.TextboxMultipleAlias
+            Constants.PropertyEditors.Aliases.TextBox,
+            Constants.PropertyEditors.Aliases.TextArea
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return PropertyTypeAliases.Contains(propertyType.PropertyEditorAlias);
-        }
+            => PropertyTypeAliases.Contains(propertyType.EditorAlias);
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+            => typeof (string);
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            => PropertyCacheLevel.Snapshot;
+
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, UmbracoContext.Current);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             return sourceString;
         }
 
-        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return source ?? string.Empty;
+            return inter ?? string.Empty;
         }
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return source;
+            return inter;
         }
     }
 }

@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -19,11 +13,12 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
-        private readonly ApplicationContext _applicationContext;
+        private readonly DatabaseBuilder _databaseBuilder;
+        private readonly ILogger _logger;
 
-        public DatabaseConfigureStep(ApplicationContext applicationContext)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder)
         {
-            _applicationContext = applicationContext;
+            _databaseBuilder = databaseBuilder;
         }
 
         public override InstallSetupResult Execute(DatabaseModel database)
@@ -34,9 +29,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 database = new DatabaseModel();
             }
 
-            var dbHelper = new DatabaseHelper();
-
-            if (dbHelper.CheckConnection(database, _applicationContext) == false)
+            if (_databaseBuilder.CheckConnection(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
             {
                 throw new InstallException("Could not connect to the database");
             }
@@ -46,35 +39,30 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private void ConfigureConnection(DatabaseModel database)
         {
-            var dbContext = _applicationContext.DatabaseContext;
             if (database.ConnectionString.IsNullOrWhiteSpace() == false)
             {
-                dbContext.ConfigureDatabaseConnection(database.ConnectionString);
+                _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString);
             }
             else if (database.DatabaseType == DatabaseType.SqlCe)
             {
-                dbContext.ConfigureEmbeddedDatabaseConnection();
+                _databaseBuilder.ConfigureEmbeddedDatabaseConnection();
             }
             else if (database.IntegratedAuth)
             {
-                dbContext.ConfigureIntegratedSecurityDatabaseConnection(
-                    database.Server, database.DatabaseName);
+                _databaseBuilder.ConfigureIntegratedSecurityDatabaseConnection(database.Server, database.DatabaseName);
             }
             else
             {
                 var password = database.Password.Replace("&", "&amp;").Replace(">", "&gt;").Replace("<", "&lt;").Replace("\"", "&quot;").Replace("'", "''");
                 password = string.Format("'{0}'", password);
 
-                dbContext.ConfigureDatabaseConnection(
+                _databaseBuilder.ConfigureDatabaseConnection(
                     database.Server, database.DatabaseName, database.Login, password,
                     database.DatabaseType.ToString());
             }
         }
 
-        public override string View
-        {
-            get { return ShouldDisplayView() ? base.View : ""; }
-        }
+        public override string View => ShouldDisplayView() ? base.View : "";
 
         public override bool RequiresExecution(DatabaseModel model)
         {
@@ -86,18 +74,18 @@ namespace Umbraco.Web.Install.InstallSteps
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
             var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
-            if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings))
+            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))
             {
                 try
                 {
                     //Since a connection string was present we verify the db can connect and query
-                    var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
+                    var result = _databaseBuilder.ValidateDatabaseSchema();
                     result.DetermineInstalledVersion();
                     return false;
                 }
                 catch (Exception ex)
                 {
-                    _applicationContext.ProfilingLogger.Logger.Error<DatabaseConfigureStep>("An error occurred, reconfiguring...", ex);
+                    _logger.Error<DatabaseConfigureStep>(ex, "An error occurred, reconfiguring...");
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }

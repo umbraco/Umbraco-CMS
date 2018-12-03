@@ -2,14 +2,23 @@
   list-style: none;
   display: flex;
   margin: 0;
+  border-left: 1px solid @gray-9;
 }
 
 .umb-sub-views-nav-item {
   text-align: center;
-  //margin-left: 20px;
   cursor: pointer;
   display: block;
-  padding: 5px 10px;
+  padding: 4px 10px 0 10px;
+  border-bottom: 2px solid transparent;
+  min-width: 70px;
+  border-right: 1px solid @gray-9;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: @editorHeaderHeight;
 }
 
 .umb-sub-views-nav-item:focus {
@@ -23,6 +32,7 @@
 
 .umb-sub-views-nav-item.is-active {
   color: @turquoise-d1;
+  border-bottom-color: @turquoise-d1;
 }
 
 .show-validation .umb-sub-views-nav-item.-has-error {
@@ -33,8 +43,41 @@
   font-size: 24px;
   display: block;
   text-align: center;
+  margin-bottom: 7px;
 }
 
 .umb-sub-views-nav-item-text {
   font-size: 12px;
+  line-height: 1em;
+}
+
+.umb-sub-views-nav-item__more {
+  margin-bottom: 10px;
+}
+
+.umb-sub-views-nav-item__more i {
+	height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: @gray-3;
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+
+.umb-sub-views-nav-item__more i:last-of-type {
+  margin-right: 0;
+}
+
+// make dots green the an item is active
+.umb-sub-views-nav-item.is-active .umb-sub-views-nav-item__more i {
+  background-color: @turquoise-d1;
+}
+
+.umb-sub-views-nav__dropdown.umb-sub-views-nav__dropdown {
+  left: auto;
+  right: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  min-width: auto;
+  margin-top: 10px;
 }

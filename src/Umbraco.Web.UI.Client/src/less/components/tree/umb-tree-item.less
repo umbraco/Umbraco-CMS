@@ -1,0 +1,72 @@
+.umb-tree-item {
+    display: block;
+    min-width: 100%;
+    width: auto;
+
+    &:hover ins {
+        visibility: visible;
+        cursor: pointer
+    }
+}
+
+.umb-tree-item > .umb-tree-item__inner {
+
+    &:hover .umb-tree-item__label {
+        overflow: hidden;
+        margin-right: 6px;
+    }    
+    
+    // Loading Animation
+    // ------------------------
+    .l {
+        width: 100%;
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+
+        div { 
+            .umb-loader;
+        }
+    }
+
+    .umb-tree-item__label {
+        padding: 7px 0 5px; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1 0 auto;
+    }
+}
+
+.umb-tree-item.current > .umb-tree-item__inner {
+
+    background: @turquoise-d1; 
+    
+    // override small icon color. TODO => check usage 
+//    &:before {
+//        color: @turquoise-l2;
+//    }
+
+    .umb-options {
+
+        &:hover i {
+            opacity: .7;
+        }
+
+        i {
+            background: @white;
+            border-color: @turquoise-d1;
+            transition: opacity 120ms ease;
+        }
+    }
+
+    a,
+    .umb-tree-icon,
+    ins {
+        color: @white !important;
+        background-color: @turquoise-d1;
+        border-color: @turquoise-d1;
+    }
+}

@@ -1,130 +1,74 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Represents an <see cref="IPublishedProperty"/> type.
+    /// Represents a published property type.
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedPropertyType"/> class are immutable, ie
     /// if the property type changes, then a new class needs to be created.</remarks>
     public class PublishedPropertyType
     {
+        //fixme - API design review, should this be an interface?
+
+        private readonly IPublishedModelFactory _publishedModelFactory;
+        private readonly PropertyValueConverterCollection _propertyValueConverters;
+        private readonly object _locker = new object();
+        private volatile bool _initialized;
+        private IPropertyValueConverter _converter;
+        private PropertyCacheLevel _cacheLevel;
+
+        private Type _modelClrType;
+        private Type _clrType;
+
         #region Constructors
 
-        // clone
-        private PublishedPropertyType(PublishedPropertyType orig)
+        /// <summary>
+        /// Initialize a new instance of the <see cref="PublishedPropertyType"/> class with a property type.
+        /// </summary>
+        /// <remarks>
+        /// <para>The new published property type belongs to the published content type.</para>
+        /// </remarks>
+        public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+            : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
-            ContentType = orig.ContentType;
-            PropertyTypeAlias = orig.PropertyTypeAlias;
-            DataTypeId = orig.DataTypeId;
-            PropertyEditorAlias = orig.PropertyEditorAlias;
-            _converter = orig._converter;
-            _sourceCacheLevel = orig._sourceCacheLevel;
-            _objectCacheLevel = orig._objectCacheLevel;
-            _xpathCacheLevel = orig._xpathCacheLevel;
-            _clrType = orig._clrType;
-
-            // do NOT copy the reduced cache levels
-            // as we should NOT clone a nested / detached type
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
         /// <summary>
-        /// Initialize a new instance of the <see cref="PublishedPropertyType"/> class within a <see cref="PublishedContentType"/>,
-        /// with a <see cref="PropertyType"/>.
+        /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
-        /// <param name="contentType">The published content type.</param>
-        /// <param name="propertyType">The property type.</param>
-        /// <remarks>The new published property type belongs to the published content type and corresponds to the property type.</remarks>
-        public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType)
+        /// <remarks>
+        /// <para>Values are assumed to be consisted and are not checked.</para>
+        /// <para>The new published property type belongs to the published content type.</para>
+        /// </remarks>
+        public PublishedPropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+            : this(propertyTypeAlias, dataTypeId, isUserProperty, variations, propertyValueConverters, publishedModelFactory, factory)
         {
-            // PropertyEditor [1:n] DataTypeDefinition [1:n] PropertyType
-
-            ContentType = contentType;
-            PropertyTypeAlias = propertyType.Alias;
-
-            DataTypeId = propertyType.DataTypeDefinitionId;
-            PropertyEditorAlias = propertyType.PropertyEditorAlias;
-
-            InitializeConverters();
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with an existing <see cref="PublishedPropertyType"/>
-        /// and a new property type alias.
+        /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
-        /// <param name="propertyTypeAlias">The new property type alias.</param>
-        /// <param name="propertyType">The existing published property type.</param>
         /// <remarks>
-        /// <para>The new published property type does not belong to a published content type.</para>
-        /// <para>It is a copy of the initial published property type, with a different alias.</para>
-        /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, PublishedPropertyType propertyType)
-            : this(propertyTypeAlias, propertyType.DataTypeId, propertyType.PropertyEditorAlias)
-        { }
-
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias and a property editor alias.
-        /// </summary>
-        /// <param name="propertyTypeAlias">The property type alias.</param>
-        /// <param name="propertyEditorAlias">The property editor alias.</param>
-        /// <remarks>
-        /// <para>The new published property type does not belong to a published content type.</para>
-        /// <para>It is based upon the property editor, but has no datatype definition. This will work as long
-        /// as the datatype definition is not required to process (eg to convert) the property values. For
-        /// example, this may not work if the related IPropertyValueConverter requires the datatype definition
-        /// to make decisions, fetch prevalues, etc.</para>
-        /// <para>The value of <paramref name="propertyEditorAlias"/> is assumed to be valid.</para>
-        /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, string propertyEditorAlias)
-            : this(propertyTypeAlias, 0, propertyEditorAlias)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias and a datatype definition.
-        /// </summary>
-        /// <param name="propertyTypeAlias">The property type alias.</param>
-        /// <param name="dataTypeDefinition">The datatype definition.</param>
-        /// <remarks>
+        /// <para>Values are assumed to be consistent and are not checked.</para>
         /// <para>The new published property type does not belong to a published content type.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, IDataTypeDefinition dataTypeDefinition)
-            : this(propertyTypeAlias, dataTypeDefinition.Id, dataTypeDefinition.PropertyEditorAlias)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias,
-        /// a datatype definition identifier, and a property editor alias.
-        /// </summary>
-        /// <param name="propertyTypeAlias">The property type alias.</param>
-        /// <param name="dataTypeDefinitionId">The datatype definition identifier.</param>
-        /// <param name="propertyEditorAlias">The property editor alias.</param>
-        /// <param name="initConverters">Generally used only for testing, in production this will always be true</param>
-        /// <remarks>
-        /// <para>The new published property type does not belong to a published content type.</para>
-        /// <para>The values of <paramref name="dataTypeDefinitionId"/> and <paramref name="propertyEditorAlias"/> are
-        /// assumed to be valid and consistent.</para>
-        /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias, bool initConverters = true)
+        public PublishedPropertyType(string propertyTypeAlias, int dataTypeId, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
         {
-            // ContentType 
-            // - in unit tests, to be set by PublishedContentType when creating it
-            // - in detached types, remains null
+            _publishedModelFactory = publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));
+            _propertyValueConverters = propertyValueConverters ?? throw new ArgumentNullException(nameof(propertyValueConverters));
 
-            PropertyTypeAlias = propertyTypeAlias;
+            Alias = propertyTypeAlias;
 
-            DataTypeId = dataTypeDefinitionId;
-            PropertyEditorAlias = propertyEditorAlias;
+            IsUserProperty = isUserProperty;
+            Variations = variations;
 
-            if (initConverters)
-                InitializeConverters();
+            DataType = factory.GetDataType(dataTypeId);
         }
 
         #endregion
@@ -132,396 +76,242 @@ namespace Umbraco.Core.Models.PublishedContent
         #region Property type
 
         /// <summary>
-        /// Gets or sets the published content type containing the property type.
+        /// Gets the published content type containing the property type.
         /// </summary>
-        // internally set by PublishedContentType constructor
-        public PublishedContentType ContentType { get; internal set; }
+        public PublishedContentType ContentType { get; internal set; } // internally set by PublishedContentType constructor
 
         /// <summary>
-        /// Gets or sets the alias uniquely identifying the property type.
+        /// Gets the data type.
         /// </summary>
-        public string PropertyTypeAlias { get; private set; }
+        public PublishedDataType DataType { get; }
 
         /// <summary>
-        /// Gets or sets the identifier uniquely identifying the data type supporting the property type.
+        /// Gets property type alias.
         /// </summary>
-        public int DataTypeId { get; private set; }
+        public string Alias { get; }
 
         /// <summary>
-        /// Gets or sets the alias uniquely identifying the property editor for the property type.
+        /// Gets the property editor alias.
         /// </summary>
-        public string PropertyEditorAlias { get; private set; }
+        public string EditorAlias => DataType.EditorAlias;
+
+        /// <summary>
+        /// Gets a value indicating whether the property is a user content property.
+        /// </summary>
+        /// <remarks>A non-user content property is a property that has been added to a
+        /// published content type by Umbraco but does not corresponds to a user-defined
+        /// published property.</remarks>
+        public bool IsUserProperty { get; }
+
+        /// <summary>
+        /// Gets the content variations of the property type.
+        /// </summary>
+        public ContentVariation Variations { get; }
 
         #endregion
 
         #region Converters
 
-        private IPropertyValueConverter _converter;
-
-        private PropertyCacheLevel _sourceCacheLevel;
-        private PropertyCacheLevel _objectCacheLevel;
-        private PropertyCacheLevel _xpathCacheLevel;
-
-        private Type _clrType = typeof (object);
-
-        private void InitializeConverters()
+        private void Initialize()
         {
-            //TODO: Look at optimizing this method, it gets run for every property type for the document being rendered at startup,
-            // every precious second counts!
+            if (_initialized) return;
+            lock (_locker)
+            {
+                if (_initialized) return;
+                InitializeLocked();
+                _initialized = true;
+            }
+        }
 
-            var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();            
-            var defaultConvertersWithAttributes = PropertyValueConvertersResolver.Current.DefaultConverters;
-
+        private void InitializeLocked()
+        {
             _converter = null;
-            
-            //get all converters for this property type
-            // todo: remove Union() once we drop IPropertyEditorValueConverter support.
-            var foundConverters = converters.Union(GetCompatConverters()).Where(x => x.IsConverter(this)).ToArray();
-            if (foundConverters.Length == 1)
-            {
-                _converter = foundConverters[0];
-            }
-            else if (foundConverters.Length > 1)
-            {
-                //more than one was found, we need to first figure out if one of these is an Umbraco default value type converter
-                //get the non-default and see if we have one
-                var nonDefault = foundConverters.Except(defaultConvertersWithAttributes.Select(x => x.Item1)).ToArray();
-                if (nonDefault.Length == 1)
-                {
-                    //there's only 1 custom converter registered that so use it
-                    _converter = nonDefault[0];
-                }
-                else if (nonDefault.Length > 1)
-                {
-                    //this is not allowed, there cannot be more than 1 custom converter
-                    throw new InvalidOperationException(
-                        string.Format("Type '{2}' cannot be an IPropertyValueConverter"
-                                      + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
-                                      + " for that property, and only one converter can exist for a property.",
-                                      ContentType.Alias, PropertyTypeAlias,
-                                      nonDefault[1].GetType().FullName, nonDefault[0].GetType().FullName));
-                }
-                else 
-                {
-                    //we need to remove any converters that have been shadowed by another converter
-                    var foundDefaultConvertersWithAttributes = defaultConvertersWithAttributes.Where(x => foundConverters.Contains(x.Item1));
-                    var shadowedTypes = foundDefaultConvertersWithAttributes.SelectMany(x => x.Item2.DefaultConvertersToShadow);
-                    var shadowedDefaultConverters = foundConverters.Where(x => shadowedTypes.Contains(x.GetType()));
-                    var nonShadowedDefaultConverters = foundConverters.Except(shadowedDefaultConverters).ToArray();
+            var isdefault = false;
 
-                    if (nonShadowedDefaultConverters.Length == 1)
+            foreach (var converter in _propertyValueConverters)
+            {
+                if (!converter.IsConverter(this))
+                    continue;
+
+                if (_converter == null)
+                {
+                    _converter = converter;
+                    isdefault = _propertyValueConverters.IsDefault(converter);
+                    continue;
+                }
+
+                if (isdefault)
+                {
+                    if (_propertyValueConverters.IsDefault(converter))
                     {
-                        //assign to the single default converter
-                        _converter = nonShadowedDefaultConverters[0];    
+                        // previous was default, and got another default
+                        if (_propertyValueConverters.Shadows(_converter, converter))
+                        {
+                            // previous shadows, ignore
+                        }
+                        else if (_propertyValueConverters.Shadows(converter, _converter))
+                        {
+                            // shadows previous, replace
+                            _converter = converter;
+                        }
+                        else
+                        {
+                            // no shadow - bad
+                            throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
+                                                                              + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                                                                              + " for that property, and only one converter can exist for a property.",
+                                ContentType.Alias, Alias,
+                                converter.GetType().FullName, _converter.GetType().FullName));
+                        }
                     }
-                    else if (nonShadowedDefaultConverters.Length > 1)
+                    else
                     {
-                        //this is not allowed, there cannot be more than 1 custom converter
-                        throw new InvalidOperationException(
-                            string.Format("Type '{2}' cannot be an IPropertyValueConverter"
-                                          + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
-                                          + " for that property, and only one converter can exist for a property.",
-                                          ContentType.Alias, PropertyTypeAlias,
-                                          nonShadowedDefaultConverters[1].GetType().FullName, nonShadowedDefaultConverters[0].GetType().FullName));
+                        // previous was default, replaced by non-default
+                        _converter = converter;
+                        isdefault = false;
                     }
-                }
-                
-            }
-
-            var converterMeta = _converter as IPropertyValueConverterMeta;
-
-            // get the cache levels, quietely fixing the inconsistencies (no need to throw, really)
-            if (converterMeta != null)
-            {
-                _sourceCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Source);
-                _objectCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.Object);
-                _xpathCacheLevel = converterMeta.GetPropertyCacheLevel(this, PropertyCacheValue.XPath);
-            }
-            else
-            {
-                _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
-                _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
-                _xpathCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
-            }
-            if (_objectCacheLevel < _sourceCacheLevel) _objectCacheLevel = _sourceCacheLevel;
-            if (_xpathCacheLevel < _sourceCacheLevel) _xpathCacheLevel = _sourceCacheLevel;
-
-            // get the CLR type of the converted value
-            if (_converter != null)
-            {
-                if (converterMeta != null)
-                {
-                    _clrType = converterMeta.GetPropertyValueType(this);
                 }
                 else
                 {
-                    var attr = _converter.GetType().GetCustomAttribute<PropertyValueTypeAttribute>(false);
-                    if (attr != null)
-                        _clrType = attr.Type;
+                    if (_propertyValueConverters.IsDefault(converter))
+                    {
+                        // previous was non-default, ignore default
+                    }
+                    else
+                    {
+                        // previous was non-default, and got another non-default - bad
+                        throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
+                                                                          + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                                                                          + " for that property, and only one converter can exist for a property.",
+                            ContentType.Alias, Alias,
+                            converter.GetType().FullName, _converter.GetType().FullName));
+                    }
                 }
+            }
+
+            _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
+            _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
+        }
+
+        /// <summary>
+        /// Determines whether a value is an actual value, or not a value.
+        /// </summary>
+        /// <remarks>Used by property.HasValue and, for instance, in fallback scenarios.</remarks>
+        public bool? IsValue(object value, PropertyValueLevel level)
+        {
+            if (!_initialized) Initialize();
+
+            // if we have a converter, use the converter
+            if (_converter != null)
+                return _converter.IsValue(value, level);
+
+            // otherwise use the old magic null & string comparisons
+            return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
+        }
+
+        /// <summary>
+        /// Gets the property cache level.
+        /// </summary>
+        public PropertyCacheLevel CacheLevel
+        {
+            get
+            {
+                if (!_initialized) Initialize();
+                return _cacheLevel;
             }
         }
 
-        static PropertyCacheLevel GetCacheLevel(IPropertyValueConverter converter, PropertyCacheValue value)
+        /// <summary>
+        /// Converts the source value into the intermediate value.
+        /// </summary>
+        /// <param name="owner">The published element owning the property.</param>
+        /// <param name="source">The source value.</param>
+        /// <param name="preview">A value indicating whether content should be considered draft.</param>
+        /// <returns>The intermediate value.</returns>
+        public object ConvertSourceToInter(IPublishedElement owner, object source, bool preview)
         {
-            if (converter == null)
-                return PropertyCacheLevel.Request;
+            if (!_initialized) Initialize();
 
-            var attr = converter.GetType().GetCustomAttributes<PropertyValueCacheAttribute>(false)
-                .FirstOrDefault(x => x.Value == value || x.Value == PropertyCacheValue.All);
-
-            return attr == null ? PropertyCacheLevel.Request : attr.Level;
-        }
-        
-        // converts the raw value into the source value
-        // uses converters, else falls back to dark (& performance-wise expensive) magic
-        // source: the property raw value
-        // preview: whether we are previewing or not
-        public object ConvertDataToSource(object source, bool preview)
-        {
-            // use the converter else use dark (& performance-wise expensive) magic
-            return _converter != null 
-                ? _converter.ConvertDataToSource(this, source, preview) 
-                : ConvertUsingDarkMagic(source);
-        }
-
-        // gets the source cache level
-        public PropertyCacheLevel SourceCacheLevel { get { return _sourceCacheLevel; } }
-
-        // converts the source value into the clr value
-        // uses converters, else returns the source value
-        // source: the property source value
-        // preview: whether we are previewing or not
-        public object ConvertSourceToObject(object source, bool preview)
-        {
-            // use the converter if any
-            // else just return the source value
+            // use the converter if any, else just return the source value
             return _converter != null
-                ? _converter.ConvertSourceToObject(this, source, preview) 
+                ? _converter.ConvertSourceToIntermediate(owner, this, source, preview)
                 : source;
         }
 
-        // gets the value cache level
-        public PropertyCacheLevel ObjectCacheLevel { get { return _objectCacheLevel; } }
-
-        // converts the source value into the xpath value
-        // uses the converter else returns the source value as a string
-        // if successful, returns either a string or an XPathNavigator
-        // source: the property source value
-        // preview: whether we are previewing or not
-        public object ConvertSourceToXPath(object source, bool preview)
+        /// <summary>
+        /// Converts the intermediate value into the object value.
+        /// </summary>
+        /// <param name="owner">The published element owning the property.</param>
+        /// <param name="referenceCacheLevel">The reference cache level.</param>
+        /// <param name="inter">The intermediate value.</param>
+        /// <param name="preview">A value indicating whether content should be considered draft.</param>
+        /// <returns>The object value.</returns>
+        public object ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
+            if (!_initialized) Initialize();
+
+            // use the converter if any, else just return the inter value
+            return _converter != null
+                ? _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
+                : inter;
+        }
+
+        /// <summary>
+        /// Converts the intermediate value into the XPath value.
+        /// </summary>
+        /// <param name="owner">The published element owning the property.</param>
+        /// <param name="referenceCacheLevel">The reference cache level.</param>
+        /// <param name="inter">The intermediate value.</param>
+        /// <param name="preview">A value indicating whether content should be considered draft.</param>
+        /// <returns>The XPath value.</returns>
+        /// <remarks>
+        /// <para>The XPath value can be either a string or an XPathNavigator.</para>
+        /// </remarks>
+        public object ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        {
+            if (!_initialized) Initialize();
+
             // use the converter if any
             if (_converter != null)
-                return _converter.ConvertSourceToXPath(this, source, preview);
+                return _converter.ConvertIntermediateToXPath(owner, this, referenceCacheLevel, inter, preview);
 
-            // else just return the source value as a string or an XPathNavigator
-            if (source == null) return null;
-            var xElement = source as XElement;
-            if (xElement != null)
+            // else just return the inter value as a string or an XPathNavigator
+            if (inter == null) return null;
+            if (inter is XElement xElement)
                 return xElement.CreateNavigator();
-            return source.ToString().Trim();
-        }
-
-        // gets the xpath cache level
-        public PropertyCacheLevel XPathCacheLevel { get { return _xpathCacheLevel; } }
-
-        internal static object ConvertUsingDarkMagic(object source)
-        {
-            // convert to string
-            var stringSource = source as string;
-            if (stringSource == null) return source; // not a string => return the object
-            stringSource = stringSource.Trim();
-            if (stringSource.Length == 0) return null; // empty string => return null
-
-            // try numbers and booleans
-            // make sure we use the invariant culture ie a dot decimal point, comma is for csv
-            // NOTE far from perfect: "01a" is returned as a string but "012" is returned as an integer...
-            int i;
-            if (int.TryParse(stringSource, NumberStyles.Integer, CultureInfo.InvariantCulture, out i))
-                return i;
-            float f;
-            if (float.TryParse(stringSource, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
-                return f;
-            bool b;
-            if (bool.TryParse(stringSource, out b))
-                return b;
-
-            //TODO: We can change this just like we do for the JSON converter - but to maintain compatibility might mean this still has to remain here
-
-            // try xml - that is expensive, performance-wise
-            XElement elt;
-            if (XmlHelper.TryCreateXElementFromPropertyValue(stringSource, out elt))
-                return new DynamicXml(elt); // xml => return DynamicXml for compatiblity's sake
-
-            return source;
-        }
-
-        // gets the property CLR type
-        public Type ClrType { get { return _clrType; } }
-
-        #endregion
-
-        #region Compat
-
-        // backward-compatibility: support IPropertyEditorValueConverter while we have to
-        // todo: remove once we drop IPropertyEditorValueConverter support.
-
-        IEnumerable<IPropertyValueConverter> GetCompatConverters()
-        {
-            var propertyEditorGuid = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
-            return PropertyEditorValueConvertersResolver.HasCurrent && propertyEditorGuid.HasValue
-                ? PropertyEditorValueConvertersResolver.Current.Converters
-                    .Where(x => x.IsConverterFor(propertyEditorGuid.Value, ContentType.Alias, PropertyTypeAlias))
-                    .Select(x => new CompatConverter(x))
-                : Enumerable.Empty<IPropertyValueConverter>();
-        }
-
-        private class CompatConverter : PropertyValueConverterBase
-        {
-            private readonly IPropertyEditorValueConverter _converter;
-
-            public CompatConverter(IPropertyEditorValueConverter converter)
-            {
-                _converter = converter;
-            }
-
-            public override bool IsConverter(PublishedPropertyType propertyType)
-            {
-                return true;
-            }
-
-            public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
-            {
-                // NOTE: ignore preview, because IPropertyEditorValueConverter does not support it
-                return _converter.ConvertPropertyValue(source).Result;
-            }
-        }
-
-        #endregion
-
-        #region Detached
-
-        private PropertyCacheLevel _sourceCacheLevelReduced = 0;
-        private PropertyCacheLevel _objectCacheLevelReduced = 0;
-        private PropertyCacheLevel _xpathCacheLevelReduced = 0;
-
-        internal bool IsDetachedOrNested
-        {
-            // enough to test source
-            get { return _sourceCacheLevelReduced != 0; }
+            return inter.ToString().Trim();
         }
 
         /// <summary>
-        /// Creates a detached clone of this published property type.
+        /// Gets the property model Clr type.
         /// </summary>
-        /// <returns>A detached clone of this published property type.</returns>
         /// <remarks>
-        /// <para>Only a published property type that has not already been detached or nested, can be detached.</para>
-        /// <para>Use detached published property type when creating detached properties outside of a published content.</para>
+        /// <para>The model Clr type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
+        /// <para>For the actual Clr type, see <see cref="ClrType"/>.</para>
         /// </remarks>
-        internal PublishedPropertyType Detached()
+        public Type ModelClrType
         {
-            // verify
-            if (IsDetachedOrNested)
-                throw new Exception("PublishedPropertyType is already detached/nested.");
-
-            var detached = new PublishedPropertyType(this);
-            detached._sourceCacheLevel 
-                = detached._objectCacheLevel 
-                = detached._xpathCacheLevel 
-                = PropertyCacheLevel.Content;
-            // set to none to a) indicate it's detached / nested and b) make sure any nested
-            // types switch all their cache to .Content
-            detached._sourceCacheLevelReduced 
-                = detached._objectCacheLevelReduced
-                = detached._xpathCacheLevelReduced
-                = PropertyCacheLevel.None;
-
-            return detached;
+            get
+            {
+                if (!_initialized) Initialize();
+                return _modelClrType;
+            }
         }
 
         /// <summary>
-        /// Creates a nested clone of this published property type within a specified container published property type.
+        /// Gets the property Clr type.
         /// </summary>
-        /// <param name="containerType">The container published property type.</param>
-        /// <returns>A nested clone of this published property type</returns>
         /// <remarks>
-        /// <para>Only a published property type that has not already been detached or nested, can be nested.</para>
-        /// <para>Use nested published property type when creating detached properties within a published content.</para>
+        /// <para>Returns the actual Clr type which does not contain <see cref="ModelType"/> types.</para>
+        /// <para>Mapping from <see cref="ModelClrType"/> may throw if some <see cref="ModelType"/> instances
+        /// could not be mapped to actual Clr types.</para>
         /// </remarks>
-        internal PublishedPropertyType Nested(PublishedPropertyType containerType)
+        public Type ClrType
         {
-            // verify
-            if (IsDetachedOrNested)
-                throw new Exception("PublishedPropertyType is already detached/nested.");
-
-            var nested = new PublishedPropertyType(this);
-
-            // before we reduce, both xpath and object are >= source, and
-            // the way reduce works, the relative order of resulting xpath, object and source are preserved
-
-            // Reduce() will set _xxxCacheLevelReduced thus indicating that the type is detached / nested
-
-            Reduce(_sourceCacheLevel, _sourceCacheLevelReduced, ref nested._sourceCacheLevel, ref nested._sourceCacheLevelReduced);
-            Reduce(_objectCacheLevel, _objectCacheLevelReduced, ref nested._objectCacheLevel, ref nested._objectCacheLevelReduced);
-            Reduce(_xpathCacheLevel, _xpathCacheLevelReduced, ref nested._xpathCacheLevel, ref nested._xpathCacheLevelReduced);
-
-            return nested;
-        }
-
-        private static void Reduce(
-            PropertyCacheLevel containerCacheLevel, PropertyCacheLevel containerCacheLevelReduced,
-            ref PropertyCacheLevel nestedCacheLevel, ref PropertyCacheLevel nestedCacheLevelReduced)
-        {
-            // initialize if required
-            if (containerCacheLevelReduced == 0)
-                containerCacheLevelReduced = containerCacheLevel;
-
-            switch (containerCacheLevelReduced)
+            get
             {
-                case PropertyCacheLevel.None:
-                    // once .None, force .Content for everything
-                    nestedCacheLevel = PropertyCacheLevel.Content;
-                    nestedCacheLevelReduced = PropertyCacheLevel.None; // and propagate
-                    break;
-
-                case PropertyCacheLevel.Request:
-                    // once .Request, force .Content for everything
-                    nestedCacheLevel = PropertyCacheLevel.Content;
-                    nestedCacheLevelReduced = PropertyCacheLevel.Request; // and propagate
-                    break;
-
-                case PropertyCacheLevel.Content:
-                    // as long as .Content, accept anything
-                    nestedCacheLevelReduced = nestedCacheLevel; // and it becomes the nested reduced
-                    break;
-
-                case PropertyCacheLevel.ContentCache:
-                    // once .ContentCache, accept .Request and .Content but not .ContentCache
-                    switch (nestedCacheLevel)
-                    {
-                        case PropertyCacheLevel.Request:
-                        case PropertyCacheLevel.None:
-                            // accept
-                            nestedCacheLevelReduced = nestedCacheLevel; // and it becomes the nested reduced
-                            break;
-                        case PropertyCacheLevel.Content:
-                            // accept
-                            nestedCacheLevelReduced = PropertyCacheLevel.ContentCache; // and propagate
-                            break;
-                        case PropertyCacheLevel.ContentCache:
-                            // force .Content
-                            nestedCacheLevel = PropertyCacheLevel.Content;
-                            nestedCacheLevelReduced = PropertyCacheLevel.ContentCache; // and propagate
-                            break;
-                        default:
-                            throw new Exception("Unsupported PropertyCacheLevel value.");
-                    }
-                    break;
-
-                default:
-                    throw new Exception("Unsupported PropertyCacheLevel value.");
+                if (!_initialized) Initialize();
+                return _clrType ?? (_clrType = _publishedModelFactory.MapModelType(_modelClrType));
             }
         }
 

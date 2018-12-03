@@ -1,32 +1,31 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Handles Application tree cache invalidation/refreshing
-    /// </summary>
     public sealed class ApplicationTreeCacheRefresher : CacheRefresherBase<ApplicationTreeCacheRefresher>
     {
-        protected override ApplicationTreeCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        public ApplicationTreeCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.ApplicationTreeCacheRefresherId); }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "Applications tree cache refresher"; }
-        }
+        protected override ApplicationTreeCacheRefresher This => this;
+
+        public static readonly Guid UniqueId = Guid.Parse("0AC6C028-9860-4EA4-958D-14D39F45886E");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Application Tree Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
             base.RefreshAll();
         }
 
@@ -38,9 +37,10 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
             base.Remove(id);
         }
 
+        #endregion
     }
 }

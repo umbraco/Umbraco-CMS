@@ -1,0 +1,61 @@
+﻿@using Umbraco.Core
+@using ClientDependency.Core
+@using ClientDependency.Core.Mvc
+@using Umbraco.Core.IO
+@using Umbraco.Web
+@using Umbraco.Core.Configuration
+
+@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
+@{
+    var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
+
+    Html
+        .RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Umbraco Preview</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="pinterest" content="nopin" />
+
+    @Html.RenderCssHere(
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+
+</head>
+<body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController">
+    <div class="wait" ng-show="!frameLoaded"></div>
+
+    @if (string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView) == false)
+    {
+        @Html.Partial(Model.PreviewExtendedHeaderView)
+    }
+
+    <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
+        <preview-i-frame src="pageUrl" on-loaded="onFrameLoaded(iframe)"></preview-i-frame>
+    </div>
+    <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">
+        <div class="fix-left-menu selected">
+            <div class="avatar">
+                <img ng-src="../assets/img/application/logo.png"
+                     ng-srcset="../assets/img/application/logo@2x.png 2x,
+                    ../assets/img/application/logo@3x.png 3x" />
+            </div>
+            <ul class="sections" ng-class="{selected: showDevicesPreview && showDevices}">
+                <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }">
+                    <a href="" ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
+                </li>
+                <li>
+                    <a href="" ng-click="exitPreview()" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script src="../lib/lazyload-js/lazyload.min.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "Preview")"></script>
+
+</body>
+</html>

@@ -10,7 +10,6 @@
       <umb-editor-view ng-if="!page.loading">
 
          <umb-editor-header
-            menu="page.menu"
             name="content.name"
             name-locked="page.nameLocked"
             hide-icon="true"
@@ -20,32 +19,43 @@
 
 
          <umb-editor-container class="form-horizontal">
+             
+            <umb-box>
 
-            <umb-property property="properties.selectedEditor">
-                <div>
-                    <select name="selectedEditor"
-                           ng-model="content.selectedEditor"
-                           required
-                           ng-options="e.alias as e.name for e in content.availableEditors"></select>
-                    <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                </div>
+                <umb-box-content>
 
-            </umb-property>
+                    <umb-control-group label="Id" ng-if="showIdentifier">
+                        <div>{{content.id}}</div>
+                        <small>{{content.key}}</small>
+                    </umb-control-group>
 
-            <umb-property property="properties.selectedEditorId">
-                <div>{{content.selectedEditor}}</div>
-            </umb-property>
+                    <umb-property property="properties.selectedEditor">
+                        <div>
+                            <select name="selectedEditor"
+                                    ng-model="content.selectedEditor"
+                                    required
+                                    ng-options="e.alias as e.name for e in content.availableEditors"></select>
+                            <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                            </span>
+                        </div>
 
+                    </umb-property>
 
-            <umb-property
-                property="preValue"
-                ng-repeat="preValue in preValues">
+                    <umb-property property="properties.selectedEditorId">
+                        <div>{{content.selectedEditor}}</div>
+                    </umb-property>
 
-                <umb-editor model="preValue" is-pre-value="true"></umb-editor>
-            </umb-property>
+                    <umb-property property="preValue"
+                                  ng-repeat="preValue in preValues">
+                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                    </umb-property>
+
+                </umb-box-content>
+
+            </umb-box>
 
          </umb-editor-container>
-
 
          <umb-editor-footer>
 

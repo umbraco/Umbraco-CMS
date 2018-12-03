@@ -1,3 +1,5 @@
+﻿using System;
+
 namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
     /// <summary>
@@ -5,9 +7,17 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
     /// </summary>
     internal class DbIndexDefinition
     {
-        public virtual string IndexName { get; set; }
-        public virtual string TableName { get; set; }
-        public virtual string ColumnName { get; set; }
-        public virtual bool IsUnique { get; set; }
+        public DbIndexDefinition(Tuple<string, string, string, bool> data)
+        {
+            TableName = data.Item1;
+            IndexName = data.Item2;
+            ColumnName = data.Item3;
+            IsUnique = data.Item4;
+        }
+
+        public string IndexName { get; }
+        public string TableName { get; }
+        public string ColumnName { get; }
+        public bool IsUnique { get; }
     }
 }

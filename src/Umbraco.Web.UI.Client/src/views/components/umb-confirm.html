@@ -3,8 +3,8 @@
     
     <div class="umb-pane btn-toolbar umb-btn-toolbar">
     	<div class="control-group umb-control-group">	
-    		<a href class="btn btn-link" ng-click="onCancel()"><localize key="general_cancel">Cancel</localize></a>
-    		<a href class="btn btn-primary" ng-click="onConfirm()"><localize key="general_ok">Ok</localize></a>
+    		<a ng-if="showCancel" href class="btn btn-link" ng-click="onCancel()"><localize key="general_cancel">Cancel</localize></a>
+    		<a ng-if="showConfirm" href class="btn btn-primary" ng-click="onConfirm()"><localize key="general_ok">Ok</localize></a>
     	</div>	
 	</div>
 </div>

@@ -1,11 +1,12 @@
-﻿<div class="umb-editor umb-checkboxlist" ng-controller="Umbraco.PropertyEditors.CheckboxListController">
+﻿<div class="umb-property-editor umb-checkboxlist" ng-controller="Umbraco.PropertyEditors.CheckboxListController">
 
     <ul class="unstyled">
-        <li ng-repeat="item in selectedItems">
+        <li ng-repeat="item in selectedItems track by item.key">
             <label class="checkbox">
                 <input type="checkbox" name="checkboxlist"
                        value="{{item.key}}"
-                       ng-model="item.checked" />
+                       ng-model="item.checked"
+                       ng-change="changed(item)" />
                 {{item.val}}
             </label>
         </li>

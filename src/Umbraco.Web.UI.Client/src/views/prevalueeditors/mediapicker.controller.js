@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function mediaPickerController($scope, dialogService, entityResource, $log, iconHelper) {
+function mediaPickerController($scope, entityResource, iconHelper, editorService) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -26,31 +26,26 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
         angular.extend(dialogOptions, $scope.model.config);
     }
 
-    $scope.openContentPicker = function() {
-      $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.view = "treePicker";
-      $scope.contentPickerOverlay.show = true;
+    $scope.openTreePicker = function () {
+        var treePicker = dialogOptions;
 
-      $scope.contentPickerOverlay.submit = function(model) {
+        treePicker.submit = function (model) {
+            if (treePicker.multiPicker) {
+                _.each(model.selection, function (item, i) {
+                    $scope.add(item);
+                });
+            } else {
+                $scope.clear();
+                $scope.add(model.selection[0]);
+            }
+            editorService.close();
+        };
 
-         if ($scope.contentPickerOverlay.multiPicker) {
-             _.each(model.selection, function (item, i) {
-                 $scope.add(item);
-             });
-         }
-         else {
-             $scope.clear();
-             $scope.add(model.selection[0]);
-         }
+        treePicker.close = function () {
+            editorService.close();
+        };
 
-         $scope.contentPickerOverlay.show = false;
-         $scope.contentPickerOverlay = null;
-      };
-
-      $scope.contentPickerOverlay.close = function(oldModel) {
-         $scope.contentPickerOverlay.show = false;
-         $scope.contentPickerOverlay = null;
-      };
+        editorService.treePicker(treePicker);
     }
 
     $scope.remove =function(index){

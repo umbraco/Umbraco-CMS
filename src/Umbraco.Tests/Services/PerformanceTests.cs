@@ -1,41 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Xml.Linq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-	/// <summary>
+    /// <summary>
     /// Tests covering all methods in the ContentService class.
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
-    public class PerformanceTests : BaseDatabaseFactoryTest
+    public class PerformanceTests : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-	        base.Initialize();
-        }
+        // fixme probably making little sense in places due to scope creating a transaction?!
 
         protected override string GetDbConnectionString()
         {
@@ -44,7 +40,7 @@ namespace Umbraco.Tests.Services
 
         protected override string GetDbProviderName()
         {
-            return Constants.DatabaseProviders.SqlServer;
+            return Constants.DbProviderNames.SqlServer;
         }
 
 
@@ -55,11 +51,18 @@ namespace Umbraco.Tests.Services
         {
         }
 
-		[TearDown]
-		public override void TearDown()
-		{   
-      		base.TearDown();
-		}
+        [TearDown]
+        public override void TearDown()
+        {
+              base.TearDown();
+        }
+
+        private static ProfilingLogger GetTestProfilingLogger()
+        {
+            var logger = new DebugDiagnosticsLogger();
+            var profiler = new TestProfiler();
+            return new ProfilingLogger(logger, profiler);
+        }
 
         [Test]
         public void Get_All_Published_Content()
@@ -70,7 +73,8 @@ namespace Umbraco.Tests.Services
             var countOfPublished = result.Count(x => x.Published);
             var contentTypeId = result.First().ContentTypeId;
 
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content normally"))
+            var proflog = GetTestProfilingLogger();
+            using (proflog.DebugDuration<PerformanceTests>("Getting published content normally"))
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -86,10 +90,10 @@ namespace Umbraco.Tests.Services
                     }
                     Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
                 }
-                
+
             }
 
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content optimized"))
+            using (proflog.DebugDuration<PerformanceTests>("Getting published content optimized"))
             {
 
                 //do this 10x!
@@ -104,39 +108,6 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [Test]
-        public void Get_All_Published_Content_Of_Type()
-        {
-            var result = PrimeDbWithLotsOfContent();
-            var contentSvc = (ContentService)ServiceContext.ContentService;
-
-            var countOfPublished = result.Count(x => x.Published);
-            var contentTypeId = result.First().ContentTypeId;
-
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content of type normally"))
-            {
-                //do this 10x!
-                for (var i = 0; i < 10; i++)
-                {
-                    
-                    //get all content items that are published of this type
-                    var published = contentSvc.GetContentOfContentType(contentTypeId).Where(content => content.Published);
-                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
-                }
-            }
-
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content of type optimized"))
-            {
-
-                //do this 10x!
-                for (var i = 0; i < 10; i++)
-                {
-                    //get all content items that are published of this type
-                    var published = contentSvc.GetPublishedContentOfContentType(contentTypeId);
-                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
-                }
-            }
-        }
 
         [Test]
         public void Truncate_Insert_Vs_Update_Insert()
@@ -144,31 +115,36 @@ namespace Umbraco.Tests.Services
             var customObjectType = Guid.NewGuid();
             //chuck lots of data in the db
             var nodes = PrimeDbWithLotsOfContentXmlRecords(customObjectType);
+            var proflog = GetTestProfilingLogger();
 
-            //now we need to test the difference between truncating all records and re-inserting them as we do now, 
+            //now we need to test the difference between truncating all records and re-inserting them as we do now,
             //vs updating them (which might result in checking if they exist for or listening on an exception).
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + normal insert test"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + normal insert test"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
                     //clear all the xml entries
-                    DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+                    scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
+                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
                     foreach (var xml in xmlItems)
                     {
-                        var result = DatabaseContext.Database.Insert(xml);
+                        var result = scope.Database.Insert(xml);
                     }
                 }
+
+                scope.Complete();
             }
 
             //now, isntead of truncating, we'll attempt to update and if it doesn't work then we insert
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting update test"))
-            {           
+            using (proflog.DebugDuration<PerformanceTests>("Starting update test"))
+            using (var scope = ScopeProvider.CreateScope())
+            {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
@@ -176,30 +152,34 @@ namespace Umbraco.Tests.Services
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
                     foreach (var xml in xmlItems)
                     {
-                        var result = DatabaseContext.Database.Update(xml);
+                        var result = scope.Database.Update(xml);
                     }
                 }
+
+                scope.Complete();
             }
 
             //now, test truncating but then do bulk insertion of records
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
                 {
                     //clear all the xml entries
-                    DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+                    scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
+                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
-                    DatabaseContext.Database.BulkInsertRecords(xmlItems);
+                    scope.Database.BulkInsertRecordsWithTransaction(xmlItems);
                 }
             }
 
             //now, test truncating but then do bulk insertion of records
-            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
+            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
+            using (var scope = ScopeProvider.CreateScope())
             {
                 //do this 10x!
                 for (var i = 0; i < 10; i++)
@@ -207,36 +187,35 @@ namespace Umbraco.Tests.Services
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
 
-                    using (var tr = DatabaseContext.Database.GetTransaction())
+                    using (var tr = scope.Database.GetTransaction())
                     {
                         //clear all the xml entries
-                        DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+                        scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
+                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        DatabaseContext.Database.BulkInsertRecords(xmlItems, tr);
+                        scope.Database.BulkInsertRecords(xmlItems);
 
                         tr.Complete();
                     }
                 }
             }
-            
-
         }
 
         private IEnumerable<IContent> PrimeDbWithLotsOfContent()
         {
             var contentType1 = MockedContentTypes.CreateSimpleContentType();
-            contentType1.AllowedAsRoot = true;            
+            contentType1.AllowedAsRoot = true;
             ServiceContext.ContentTypeService.Save(contentType1);
             contentType1.AllowedContentTypes = new List<ContentTypeSort>
                 {
                     new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias)
                 };
             var result = new List<IContent>();
-            ServiceContext.ContentTypeService.Save(contentType1);            
+            ServiceContext.ContentTypeService.Save(contentType1);
             IContent lastParent = MockedContent.CreateSimpleContent(contentType1);
+            lastParent.PublishCulture();
             ServiceContext.ContentService.SaveAndPublish(lastParent);
             result.Add(lastParent);
             //create 20 deep
@@ -250,7 +229,8 @@ namespace Umbraco.Tests.Services
                     //only publish evens
                     if (j % 2 == 0)
                     {
-                        ServiceContext.ContentService.SaveAndPublish(content);        
+                        content.PublishCulture();
+                        ServiceContext.ContentService.SaveAndPublish(content);
                     }
                     else
                     {
@@ -258,12 +238,12 @@ namespace Umbraco.Tests.Services
                     }
                     result.Add(content);
                 }
-                
+
                 //assign the last one as the next parent
                 lastParent = content;
             }
             return result;
-        } 
+        }
 
         private IEnumerable<NodeDto> PrimeDbWithLotsOfContentXmlRecords(Guid customObjectType)
         {
@@ -276,28 +256,34 @@ namespace Umbraco.Tests.Services
                     ParentId = -1,
                     NodeObjectType = customObjectType,
                     Text = i.ToString(CultureInfo.InvariantCulture),
-                    UserId = 0,
+                    UserId = -1,
                     CreateDate = DateTime.Now,
                     Trashed = false,
                     SortOrder = 0,
                     Path = ""
                 });
             }
-            DatabaseContext.Database.BulkInsertRecords(nodes);
 
-            //re-get the nodes with ids
-            var sql = new Sql();
-            sql.Select("*").From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
-            nodes = DatabaseContext.Database.Fetch<NodeDto>(sql);
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.Database.BulkInsertRecordsWithTransaction(nodes);
 
-            //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
-            var contentTypeId = 0;
-            var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
-            DatabaseContext.Database.BulkInsertRecords(cmsContentItems);
+                //re-get the nodes with ids
+                var sql = Current.SqlContext.Sql();
+                sql.SelectAll().From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == customObjectType);
+                nodes = scope.Database.Fetch<NodeDto>(sql);
 
-            //create the xml data
-            var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
-            DatabaseContext.Database.BulkInsertRecords(xmlItems);
+                //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
+                var contentTypeId = 0;
+                var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
+                scope.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
+
+                //create the xml data
+                var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
+                scope.Database.BulkInsertRecordsWithTransaction(xmlItems);
+
+                scope.Complete();
+            }
 
             return nodes;
         }
@@ -314,7 +300,7 @@ namespace Umbraco.Tests.Services
   <panelContent2><![CDATA[<h2>Umbraco Development</h2>
 <p><img src='/images/umbraco_square.jpg' alt='Umbraco' class='fr'/>Umbraco the the leading ASP.NET open source CMS, under pinning over 150,000 websites. Our Certified Developers are experts in developing high performance and feature rich websites.</p>]]></panelContent2>
   <panelContent3><![CDATA[<h2>Contact Us</h2>
-<p><a href='http://www.twitter.com/chriskoiak' target='_blank'><img src='/images/twitter_square.png' alt='Contact Us on Twitter' class='fr'/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href='http://our.umbraco.org/projects/starter-kits/standard-website-mvc' target='_blank'>project website</a> or via <a href='http://www.twitter.com/chriskoiak' target='_blank'>twitter</a></p>]]></panelContent3>
+<p><a href='http://www.twitter.com/chriskoiak' target='_blank'><img src='/images/twitter_square.png' alt='Contact Us on Twitter' class='fr'/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href='https://our.umbraco.com/projects/starter-kits/standard-website-mvc' target='_blank'>project website</a> or via <a href='http://www.twitter.com/chriskoiak' target='_blank'>twitter</a></p>]]></panelContent3>
   <primaryNavigation><![CDATA[1231,1232,1236,1238,1239]]></primaryNavigation>
   <address>Standard Website MVC, Company Address, Glasgow, Postcode</address>
   <copyright>Copyright &amp;copy; 2012 Your Company</copyright>

@@ -17,6 +17,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.nameLocked = false;
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
+    $scope.page.exportButton = "init";
     $scope.busy = false;
 
     $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
@@ -44,6 +45,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     editorState.set($scope.content);
 
+                    // set all groups to open
+                    angular.forEach($scope.content.tabs, function(group){
+                        group.open = true;
+                    });
+
                     $scope.page.loading = false;
 
                 });
@@ -58,6 +64,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     editorState.set($scope.content);
 
+                    // set all groups to open
+                    angular.forEach($scope.content.tabs, function(group){
+                        group.open = true;
+                    });
+
                     $scope.page.loading = false;
 
                 });
@@ -66,10 +77,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     }
     else {
         //so, we usually refernce all editors with the Int ID, but with members we have
-        //a different pattern, adding a route-redirect here to handle this:
-        //isNumber doesnt work here since its seen as a string
-
-        //TODO: Why is this here - I don't understand why this would ever be an integer? This will not work when we support non-umbraco membership providers.
+        //a different pattern, adding a route-redirect here to handle this just in case.
+        //(isNumber doesnt work here since its seen as a string)
+        //The reason this might be an INT is due to the routing used for the member list view
+        //but this is now configured to use the key, so this is just a fail safe
 
         if ($routeParams.id && $routeParams.id.length < 9) {
 
@@ -106,7 +117,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     // route but there might be server validation errors in the collection which we need to display
                     // after the redirect, so we will bind all subscriptions which will show the server validation errors
                     // if there are any and then clear them so the collection no longer persists them.
-                    serverValidationManager.executeAndClearAllSubscriptions();
+                    serverValidationManager.notifyAndClearAllSubscriptions();
 
                     $scope.page.loading = false;
 
@@ -125,7 +136,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
     $scope.save = function() {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (!$scope.busy && formHelper.submitForm({ scope: $scope })) {
 
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";
@@ -133,7 +144,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
@@ -170,6 +181,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         }
 
     };
+
+    $scope.export = function() {
+        var memberKey = $scope.content.key;
+        memberResource.exportMemberData(memberKey);
+    }
 
 }
 

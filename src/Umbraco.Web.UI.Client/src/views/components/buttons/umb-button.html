@@ -1,35 +1,34 @@
-<div class="umb-button" ng-class="{'umb-button--block': blockElement}" data-element="{{ alias ? 'button-' + alias : '' }}">
+<div class="umb-button" ng-class="{'umb-button--block': vm.blockElement}" data-element="{{ vm.alias ? 'button-' + vm.alias : '' }}">
 
-   <div class="icon-check umb-button__success" ng-class="{'-hidden': state !== 'success', '-white': style}"></div>
+    <div ng-if="vm.innerState">
+        <div class="icon-check umb-button__success" ng-class="{'-hidden': vm.innerState !== 'success', '-white': vm.style}"></div>
+        <div class="icon-delete umb-button__error" ng-class="{'-hidden': vm.innerState !== 'error', '-white': vm.style}"></div>
+        <div class="umb-button__progress" ng-class="{'-hidden': vm.innerState !== 'busy', '-white': vm.style}"></div>
+        <div ng-if="vm.innerState !== 'init'" class="umb-button__overlay"></div>
+    </div>
 
-   <div class="icon-delete umb-button__error" ng-class="{'-hidden': state !== 'error', '-white': style}"></div>
+    <a ng-if="vm.type === 'link'" ng-href="{{vm.href}}" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" ng-click="vm.clickButton($event)" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}">
+        <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
+            <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
+            {{vm.buttonLabel}}
+            <span ng-if="vm.showCaret" class="umb-button__caret caret"></span>
+        </span>
+    </a>
 
-   <div class="umb-button__progress" ng-class="{'-hidden': state !== 'busy', '-white': style}"></div>
+    <button ng-if="vm.type === 'button'" type="button" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" ng-click="vm.clickButton($event)" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled">
+        <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
+            <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
+            {{vm.buttonLabel}}
+            <span ng-if="vm.showCaret" class="umb-button__caret caret"></span>
+        </span>
+    </button>
 
-   <div ng-if="state !== 'init'" class="umb-button__overlay"></div>
-
-   <a ng-if="type === 'link'" href="{{href}}" class="btn umb-button__button {{style}} umb-button--{{size}}" ng-click="action(model)" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}">
-      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
-         <i ng-if="icon" class="{{icon}} umb-button__icon"></i>
-         <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
-         <span ng-if="!labelKey">{{label}}</span>
-      </span>
-   </a>
-
-   <button ng-if="type === 'button'" type="button" class="btn umb-button__button {{style}} umb-button--{{size}}" ng-click="action(model)" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}" ng-disabled="disabled">
-      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
-         <i ng-if="icon" class="{{icon}} umb-button__icon"></i>
-         <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
-         <span ng-if="!labelKey">{{label}}</span>
-      </span>
-   </button>
-
-   <button ng-if="type === 'submit'" type="submit" class="btn umb-button__button {{style}} umb-button--{{size}}" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}" ng-disabled="disabled">
-      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
-         <i ng-if="icon" class="{{icon}} umb-button__icon"></i>
-         <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
-         <span ng-if="!labelKey">{{label}}</span>
-      </span>
-   </button>
+    <button ng-if="vm.type === 'submit'" type="submit" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled">
+        <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
+            <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
+            {{vm.buttonLabel}}
+            <span ng-if="vm.showCaret" class="umb-button__caret caret"></span>
+        </span>
+    </button>
 
 </div>

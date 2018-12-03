@@ -1,6 +1,6 @@
 ﻿angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RelatedLinksController",
-        function ($rootScope, $scope, dialogService, iconHelper) {
+        function ($scope, iconHelper, editorService) {
 
             if (!$scope.model.value) {
                 $scope.model.value = [];
@@ -18,55 +18,47 @@
             $scope.currentEditLink = null;
             $scope.hasError = false;
 
-            $scope.internal = function($event) {
-               $scope.currentEditLink = null;
+            $scope.internal = function ($event) {
+                $scope.currentEditLink = null;
 
-               $scope.contentPickerOverlay = {};
-               $scope.contentPickerOverlay.view = "contentpicker";
-               $scope.contentPickerOverlay.multiPicker = false;
-               $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
+                var contentPicker = {
+                    section: "content",
+                    treeAlias: "content",
+                    multiPicker: false,
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
+                    submit: function (model) {
+                        select(model.selection[0]);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
 
-               $scope.contentPickerOverlay.submit = function(model) {
+                editorService.treePicker(contentPicker);
 
-                  select(model.selection[0]);
-
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $scope.contentPickerOverlay.close = function(oldModel) {
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $event.preventDefault();
+                $event.preventDefault();
             };
 
             $scope.selectInternal = function ($event, link) {
-               $scope.currentEditLink = link;
+                $scope.currentEditLink = link;
 
-               $scope.contentPickerOverlay = {};
-               $scope.contentPickerOverlay.view = "contentpicker";
-               $scope.contentPickerOverlay.multiPicker = false;
-               $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
+                var contentPicker = {
+                    section: "content",
+                    treeAlias: "content",
+                    multiPicker: false,
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
+                    submit: function (model) {
+                        select(model.selection[0]);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.treePicker(contentPicker);
 
-               $scope.contentPickerOverlay.submit = function(model) {
-
-                  select(model.selection[0]);
-
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $scope.contentPickerOverlay.close = function(oldModel) {
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $event.preventDefault();
-
+                $event.preventDefault();
             };
 
             $scope.edit = function (idx) {
@@ -167,7 +159,7 @@
                 placeholder: 'sortable-placeholder',
                 forcePlaceholderSize: true,
                 helper: function (e, ui) {
-                    // When sorting table rows, the cells collapse. This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                    // When sorting table rows, the cells collapse. This helper fixes that: https://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
                     ui.children().each(function () {
                         $(this).width($(this).width());
                     });
@@ -189,7 +181,7 @@
                 start: function (e, ui) {
                     //ui.placeholder.html("<td colspan='5'></td>");
 
-                    // Build a placeholder cell that spans all the cells in the row: http://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
+                    // Build a placeholder cell that spans all the cells in the row: https://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
                     var cellCount = 0;
                     $('td, th', ui.helper).each(function () {
                         // For each td or th try and get it's colspan attribute, and add that or 1 to the total

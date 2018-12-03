@@ -1,47 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.WebPages;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.macro;
-using Umbraco.Core.Models;
-using umbraco.interfaces;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
-using System.Web.Mvc.Html;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {
     /// <summary>
-    /// A macro engine using MVC Partial Views to execute
+    /// A macro engine using MVC Partial Views to execute.
     /// </summary>
-    public class PartialViewMacroEngine : IMacroEngine
+    public class PartialViewMacroEngine
     {
         private readonly Func<HttpContextBase> _getHttpContext;
         private readonly Func<UmbracoContext> _getUmbracoContext;
-
-        public const string EngineName = "Partial View Macro Engine";
 
         public PartialViewMacroEngine()
         {
             _getHttpContext = () =>
             {
                 if (HttpContext.Current == null)
-                    throw new InvalidOperationException("The " + this.GetType() + " cannot execute with a null HttpContext.Current reference");
+                    throw new InvalidOperationException($"The {GetType()} cannot execute with a null HttpContext.Current reference.");
                 return new HttpContextWrapper(HttpContext.Current);
             };
 
             _getUmbracoContext = () =>
             {
                 if (UmbracoContext.Current == null)
-                    throw new InvalidOperationException("The " + this.GetType() + " cannot execute with a null UmbracoContext.Current reference");
+                    throw new InvalidOperationException($"The {GetType()} cannot execute with a null UmbracoContext.Current reference.");
                 return UmbracoContext.Current;
             };
         }
@@ -57,34 +45,7 @@ namespace Umbraco.Web.Macros
             _getUmbracoContext = () => umbracoContext;
         }
 
-        public string Name
-        {
-            get { return EngineName; }
-        }
-
-		//NOTE: We do not return any supported extensions because we don't want the MacroEngineFactory to return this
-		// macro engine when searching for engines via extension. Those types of engines are reserved for files that are
-		// stored in the ~/macroScripts folder and each engine must support unique extensions. This is a total Hack until 
-		// we rewrite how macro engines work.
-		public IEnumerable<string> SupportedExtensions
-		{
-			get { return Enumerable.Empty<string>(); }		
-		}
-
-		//NOTE: We do not return any supported extensions because we don't want the MacroEngineFactory to return this
-		// macro engine when searching for engines via extension. Those types of engines are reserved for files that are
-		// stored in the ~/macroScripts folder and each engine must support unique extensions. This is a total Hack until 
-		// we rewrite how macro engines work.
-		public IEnumerable<string> SupportedUIExtensions
-		{
-			get { return Enumerable.Empty<string>(); }
-		}
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties
-        {
-            get { throw new NotSupportedException(); }
-        }
-
-        public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage)
+        public bool Validate(string code, string tempFileName, IPublishedContent currentPage, out string errorMessage)
         {
             var temp = GetVirtualPathFromPhysicalPath(tempFileName);
             try
@@ -100,35 +61,22 @@ namespace Umbraco.Web.Macros
             return true;
         }
 
-        public string Execute(MacroModel macro, INode node)
+        public MacroContent Execute(MacroModel macro, IPublishedContent content)
         {
-            if (node == null) return string.Empty;
+            if (macro == null) throw new ArgumentNullException(nameof(macro));
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (macro.MacroSource.IsNullOrWhiteSpace()) throw new ArgumentException("The MacroSource property of the macro object cannot be null or empty");
 
-            var umbCtx = _getUmbracoContext();
-            //NOTE: This is a bit of a nasty hack to check if the INode is actually already based on an IPublishedContent 
-            // (will be the case when using LegacyConvertedNode )
-            return Execute(macro,
-                (node is IPublishedContent)
-                    ? (IPublishedContent)node
-                    : umbCtx.ContentCache.GetById(node.Id));
-        }
-
-        public string Execute(MacroModel macro, IPublishedContent content)
-        {
-            if (macro == null) throw new ArgumentNullException("macro");
-            if (content == null) throw new ArgumentNullException("content");
-			if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
-		
             var http = _getHttpContext();
             var umbCtx = _getUmbracoContext();
             var routeVals = new RouteData();
             routeVals.Values.Add("controller", "PartialViewMacro");
             routeVals.Values.Add("action", "Index");
-            routeVals.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
+            routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
 
-			//lets render this controller as a child action
-			var viewContext = new ViewContext {ViewData = new ViewDataDictionary()};;
-            //try and extract the current view context from the route values, this would be set in the UmbracoViewPage or in 
+            //lets render this controller as a child action
+            var viewContext = new ViewContext { ViewData = new ViewDataDictionary() };
+            //try and extract the current view context from the route values, this would be set in the UmbracoViewPage or in
             // the UmbracoPageResult if POSTing to an MVC controller but rendering in Webforms
             if (http.Request.RequestContext.RouteData.DataTokens.ContainsKey(Mvc.Constants.DataTokenCurrentViewContext))
             {
@@ -141,20 +89,20 @@ namespace Umbraco.Web.Macros
             using (var controller = new PartialViewMacroController(macro, content))
             {
                 controller.ViewData = viewContext.ViewData;
-                
-				controller.ControllerContext = new ControllerContext(request, controller);
+
+                controller.ControllerContext = new ControllerContext(request, controller);
 
                 //call the action to render
                 var result = controller.Index();
-				output = controller.RenderViewResultAsString(result);
+                output = controller.RenderViewResultAsString(result);
             }
 
-            return output;
+            return new MacroContent { Text = output };
         }
 
         private string GetVirtualPathFromPhysicalPath(string physicalPath)
         {
-            string rootpath = _getHttpContext().Server.MapPath("~/");
+            var rootpath = _getHttpContext().Server.MapPath("~/");
             physicalPath = physicalPath.Replace(rootpath, "");
             physicalPath = physicalPath.Replace("\\", "/");
             return "~/" + physicalPath;

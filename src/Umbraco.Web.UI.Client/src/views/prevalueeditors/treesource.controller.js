@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper){
+	function($scope, entityResource, iconHelper, editorService){
 
 	    if (!$scope.model) {
 	        $scope.model = {};
@@ -33,20 +33,21 @@ angular.module('umbraco')
 
 
 		$scope.openContentPicker =function(){
-			$scope.treePickerOverlay = {
-                view: "treepicker",
+			var treePicker = {
                 idType: $scope.model.config.idType,
 				section: $scope.model.value.type,
 				treeAlias: $scope.model.value.type,
 				multiPicker: false,
-				show: true,
 				submit: function(model) {
 					var item = model.selection[0];
 					populate(item);
-					$scope.treePickerOverlay.show = false;
-					$scope.treePickerOverlay = null;
+					editorService.close();
+				},
+				close: function() {
+					editorService.close();
 				}
 			};
+			editorService.treePicker(treePicker);
 		};
 
 		$scope.clear = function() {

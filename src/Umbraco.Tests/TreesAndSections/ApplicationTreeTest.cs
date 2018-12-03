@@ -4,24 +4,27 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
-using ApplicationTree = umbraco.BusinessLogic.ApplicationTree;
+using System.Threading;
+using Umbraco.Tests.Testing;
+using Umbraco.Web.Services;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TreesAndSections
 {
-    
-    
+
+
     /// <summary>
     ///This is a test class for ApplicationTreeTest and is intended
     ///to contain all ApplicationTreeTest Unit Tests
     ///</summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
-    [TestFixture, RequiresSTA]
-    public class ApplicationTreeTest : BaseDatabaseFactoryTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ApplicationTreeTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             var treesConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/trees.config");
             var appConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/applications.config");
@@ -39,13 +42,13 @@ namespace Umbraco.Tests.TreesAndSections
             SectionService.AppConfigFilePath = appConfig;
         }
 
-        [TearDown]
         public override void TearDown()
         {
             base.TearDown();
+
             if (Directory.Exists(TestHelper.MapPathForTest("~/TEMP/TreesAndSections")))
             {
-                Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);    
+                Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);
             }
             ApplicationTreeService.TreeConfigFilePath = null;
             SectionService.AppConfigFilePath = null;
@@ -60,22 +63,22 @@ namespace Umbraco.Tests.TreesAndSections
             //create new app
             var appName = Guid.NewGuid().ToString("N");
             var treeName = Guid.NewGuid().ToString("N");
-            ApplicationContext.Services.SectionService.MakeNew(appName, appName, "icon.jpg");
+            Current.Services.SectionService.MakeNew(appName, appName, "icon.jpg");
 
             //check if it exists
-            var app = ApplicationContext.Services.SectionService.GetByAlias(appName);
+            var app = Current.Services.SectionService.GetByAlias(appName);
             Assert.IsNotNull(app);
 
             //create the new app tree assigned to the new app
-            ApplicationContext.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, treeName, treeName, "icon.jpg", "icon.jpg", "Umbraco.Web.Trees.ContentTreeController, umbraco");
-            var tree = ApplicationContext.Services.ApplicationTreeService.GetByAlias(treeName);
+            Current.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, treeName, treeName, "icon.jpg", "icon.jpg", "Umbraco.Web.Trees.ContentTreeController, Umbraco.Web");
+            var tree = Current.Services.ApplicationTreeService.GetByAlias(treeName);
             Assert.IsNotNull(tree);
 
             //now delete the app
-            ApplicationContext.Services.SectionService.DeleteSection(app);
+            Current.Services.SectionService.DeleteSection(app);
 
             //check that the tree is gone
-            Assert.AreEqual(0, ApplicationContext.Services.ApplicationTreeService.GetApplicationTrees(treeName).Count());
+            Assert.AreEqual(0, Current.Services.ApplicationTreeService.GetApplicationTrees(treeName).Count());
         }
 
 
@@ -358,11 +361,11 @@ namespace Umbraco.Tests.TreesAndSections
         //    actual = target.Type;
         //    Assert.AreEqual(expected, actual);
         //    Assert.Inconclusive("Verify the correctness of this test method.");
-        //} 
+        //}
         #endregion
 
         #region Additional test attributes
-        // 
+        //
         //You can use the following additional attributes as you write your tests:
         //
         //Use ClassInitialize to run code before running the first test in the class

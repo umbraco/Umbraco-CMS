@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="Umbraco_Web_UI_org_umbraco_our_Repository" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://our.umbraco.org/umbraco/webservices/api/repository.asmx</Value>
+      <Value Profile="(Default)">https://our.umbraco.com/umbraco/webservices/api/repository.asmx</Value>
     </Setting>
   </Settings>
 </SettingsFile>

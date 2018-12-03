@@ -1,23 +1,42 @@
 //
 // Container styles
 // --------------------------------------------------
-.umb-editor {
-  min-width:66.6%;
+.umb-property-editor {
+    @media (max-width: 800px) {
+        width: 100%;
+    }
+    @media (min-width: 800px) {
+      min-width:66.6%;
+    }
+
+	&-pull {
+		float:left;
+		width:66.6%;
+	}
+
+	&-push {
+		float:right;
+	}
 }
 
-.umb-editor-tiny {
+.umb-property-editor-tiny {
   width: 60px;
+
+	&.umb-editor-push {
+		width:30%;
+		min-width:0;
+	}
 }
 
-.umb-editor-small {
+.umb-property-editor-small {
   width: 90px;
 }
 
-.umb-modal .umb-editor {
+.umb-modal .umb-property-editor {
   width: 95%;
 }
 
-.umb-dialog .umb-editor {
+.umb-dialog .umb-property-editor {
   width: 95%;
 }
 .umb-dialog .umb-control-group .help-block {
@@ -25,8 +44,29 @@
 }
 
 .umb-codeeditor{
-  width: 99%;
+  width: 99%; 
 }
+
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
 
 //
 // Content picker
@@ -38,6 +78,16 @@
 
 .umb-contentpicker-popover .search-holder {
   padding: 10px;
+}
+
+.umb-contentpicker__min-max-help {
+    font-size: 13px;
+    margin-top: 5px;
+    color: @gray-4;
+}
+
+.show-validation .umb-contentpicker__min-max-help {
+    display: none;
 }
 
 .umb-contentpicker small {
@@ -52,105 +102,126 @@
   }
 }
 
-/* CODEMIRROR DATATYPE */
-div.umb-codeeditor {
-  border: 1px solid @gray-8;
-}
-div.umb-codeeditor .umb-el-wrap {
-  padding: 0px;
-}
-div.umb-codeeditor .umb-btn-toolbar {
-  padding: 0px;
-  margin: 0px;
-  border-bottom: @gray-8 1px solid;
-  background: @gray-10;
-}
-
-
-//
-// RTE
-// --------------------------------------------------
-.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0px !important;}
-.mce-panel{background: @gray-10 !important; border-color: @gray-8 !important;}
-.mce-btn-group, .mce-btn{border: none !important; background: none !important;}
-.mce-ico{font-size: 12px !important; color: @gray-1 !important;}
-/* Special case to support helviticons for the tiny mce button controls */
-.mce-ico.mce-i-custom[class^="icon-"],
-.mce-ico.mce-i-custom[class*=" icon-"] {
-  font-family: icomoon;
-  font-size:16px !important;
-}
-
-/* pre-value editor */
-.rte-editor-preval .control-group .controls > div > label .mce-ico { line-height: 20px; }
 
 
 //
 // Color picker
 // --------------------------------------------------
-ul.color-picker li {
-  padding: 2px;
-  margin: 3px;
-  border: 2px solid transparent;
-  width: 60px;
-}
-ul.color-picker li.active {
-  border: 2px dashed @gray-8;
-}
-ul.color-picker li a  {
-  height: 50px;
-  display:block;
-  cursor:pointer;
-}
-
-.control-group.color-picker-preval .thumbnail {
-  width:30px;
-  border:none;
-}
 
 /* pre-value editor */
-/*.control-group.color-picker-preval:before {
-    content: "";
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-}*/
+.control-group.color-picker-preval {
+    .thumbnail {
+        width: 34px;
+        height: 34px;
+        min-width: auto;
+        border: none;
+        cursor: move;
+        border-radius: 3px;
+        margin-top: auto;
+        margin-bottom: auto;
+        flex: 0 0 auto;
+    }
 
-/*.control-group.color-picker-preval div.thumbnail {
-    display: inline-block;
-    vertical-align: middle;
-}*/
-.control-group.color-picker-preval div.color-picker-prediv {
-    display: inline-block;
-    width: 60%;
+    .handle {
+        float: left;
+        display: inline-flex;
+        margin: 5px 3px 5px 0;
+    }
+
+    div.color-picker-prediv {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        flex: 1;
+
+        pre {
+            display: inline-flex;
+            font-family: monospace;
+            margin-left: 15px;
+            margin-right: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 0;
+            vertical-align: middle;
+            padding: 6px 10px;
+            background: #f7f7f7;
+            flex: 0 0 auto;
+        }
+
+        span {
+            margin-left: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    input[type="text"] {
+        display: flex;
+        flex: 1 1 100px;
+        margin-top: 1px;
+        margin-right: 15px;
+        min-width: auto;
+        width: auto;
+    }
+
+    .sp-replacer {
+        display: inline-flex;
+        margin-right: 18px;
+    }
+
+    label {
+        border: 1px solid @white;
+        padding: 6px 10px;
+        font-family: monospace;
+        border: 1px solid #dfdfe1;
+        background: #f7f7f7;
+        margin: 0 15px 0 3px;
+        border-radius: 3px;
+    }
 }
 
-.control-group.color-picker-preval pre {
-    display: inline;
-    margin-right: 20px;
-    margin-left: 10px;
-    width: 50%;
-    white-space: nowrap;
-    overflow: hidden;
-    margin-bottom: 0;
-    vertical-align: middle;
+//
+// Image Cropper
+// --------------------------------------------------
+
+.umb-prevalues-multivalues.umb-cropsizes{
+
+    max-width: 500px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
 }
 
-.control-group.color-picker-preval btn {
-    //vertical-align: middle;
-}
+.umb-cropsizes {
 
-.control-group.color-picker-preval input[type="text"] {
-    min-width: 40%;
-    width: 40%;
-    display: inline-block;
-    margin-right: 20px;
-    margin-top: 1px;
-}
+    &__add {
+        display: inline-flex;
+        align-items: center;
+    }
 
-.control-group.color-picker-preval label {
-    border: solid @white 1px;
-    padding: 6px;
+    &__controls {
+        margin: 24px 0 0;
+        display: flex;
+    }
+    
+    &__input {
+        width: 100%;
+        &-wrap{
+            flex: 1 1 auto;
+            margin-right: 10px;
+            &--narrow {
+                flex: 0 1 100px;
+            }
+        }
+   }
 }
 
 
@@ -172,6 +243,18 @@ ul.color-picker li a  {
     &:hover {
         color: @turquoise-d1;
         border-color: @turquoise;
+    }
+}
+
+.umb-mediapicker .label{
+    &__trashed{
+        background-color: @red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        transform: translate3d(-50%,-50%,0);
+        margin: 0;
     }
 }
 
@@ -203,10 +286,22 @@ ul.color-picker li a  {
 
 
 
-.umb-thumbnails{
-  position: relative;
+.umb-thumbnails {
+    position: relative;
+    display: flex;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
+.umb-thumbnails > li.icon {
+    width: 14%;
+    text-align: center;
+}
 
 .umb-thumbnails i{margin: auto;}
 .umb-thumbnails a{
@@ -243,7 +338,7 @@ ul.color-picker li a  {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 5px 0 0;
+    margin: 0 0 5px 5px;
     padding: 5px;
 }
 
@@ -261,7 +356,7 @@ ul.color-picker li a  {
     background-image: url(../img/checkered-background.png);
 }
 
-.umb-sortable-thumbnails li img.trashed {
+.umb-sortable-thumbnails li .trashed {
     opacity:0.3;
 }
 
@@ -274,17 +369,44 @@ ul.color-picker li a  {
     text-align: center;
 }
 
-.umb-sortable-thumbnails .umb-icon-holder .icon{
+.umb-sortable-thumbnails .umb-icon-holder .icon {
     font-size: 40px;
     line-height: 50px;
     color: @gray-3;
     display: block;
 }
 
+.umb-sortable-thumbnails .umb-icon-holder .file-icon > span {
+    color: @white;
+    background: @gray-4;
+    padding: 1px 3px;
+    font-size: 10px;
+    line-height: 130%;
+    display: block;
+    margin-top: -30px;
+    width: 2em;
+}
+
+.umb-sortable-thumbnails .umb-icon-holder .file-icon + small {
+    display: block;
+    margin-top: 1em;
+}
+
+
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
-    width: 120px;
-    height: 114px;
+    width: 124px;
+    height: 124px;
     overflow: hidden;
+    position: relative;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__loading {
+    position: absolute;
+    background-color: rgba(255,255,255,0.8);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__actions {
@@ -296,6 +418,12 @@ ul.color-picker li a  {
     flex-direction: row;
     opacity: 0;
     visibility: hidden;
+}
+
+.umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
+    > li:not(.unsortable) {
+        cursor: move;
+    }
 }
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
@@ -471,11 +599,21 @@ ul.color-picker li a  {
     .imagecropper .umb-cropper__container {
         position: relative;
         margin-bottom: 10px;
-        max-width: 100%;
+        max-width: 100%; 
         border: 1px solid @gray-10;
 
         @media (min-width: 769px) {
             width: 600px;
+        }
+    }
+
+    .imagecropper .umb-cropper__container .button-drawer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px;
+
+        button {
+            margin-left: 4px;
         }
     }
 
@@ -484,7 +622,7 @@ ul.color-picker li a  {
         top: 3px;
         right: 3px;
         cursor: pointer;
-        z-index: 1;
+        z-index: @zindexCropperOverlay + 1;
     }
 
     .umb-close-cropper:hover {
@@ -558,27 +696,7 @@ ul.color-picker li a  {
   line-height: 120px
 }
 
-.umb-upload-drop-zone{
-    margin-bottom:5px;
-}
-
-.umb-upload-drop-zone .info, .umb-upload-button-big{
-  display: block;
-  padding: 20px;
-  opacity: 1;
-  border: 1px dashed @gray-8;
-  background: none;
-  text-align: center;
-  font-size: 14px;
-  color: @gray-8;
-}
-
 .umb-upload-button-big:hover{color: @gray-8;}
-
-.umb-upload-drop-zone .info i.icon, .umb-upload-button-big i.icon{
-  font-size: 55px;
-  line-height: 70px
-}
 
 .umb-upload-button-big {display: block}
 .umb-upload-button-big input {
@@ -586,123 +704,6 @@ ul.color-picker li a  {
   bottom: 0;
   height: 100%;
   width: 100%;
-}
-
-
-
-//
-// Photo folder styling
-// --------------------------------------------------
-
-.umb-photo-folder .picrow{
-  overflow-y: hidden;
-  position: relative;
-}
-
-
-
-.umb-photo-folder .picrow div, .umb-photo-preview{
-  margin: 0px;
-  padding: 0px;
-  border: none;
-  display: inline-block;
-  vertical-align: top;
-  position: relative;
-}
-
-
-
-.umb-photo-folder .picrow div a:first-child {
-     width:100%;
-    height:100%;
-}
-
-.umb-photo-folder .picrow div.umb-photo {
-    width:100%;
-    height:100%;
-    background-color: @gray-10;
-}
-
-.umb-photo-folder a:hover{text-decoration: none}
-.umb-photo-folder .umb-non-thumbnail{
-  text-align: center;
-  vertical-align: middle;
-  font-size: 12px;
-  background: @gray-10;
-  color: @black;
-  text-decoration: none;
-}
-
-.umb-photo-folder .selector-overlay{
-  display: none;
-}
-
-//this is a temp hack, to provide selectors in the dialog:
-.umb-photo-folder .pic:hover .selector-overlay {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  padding: 5px;
-  background: @black;
-  z-index: 100;
-  display: block;
-  text-align: center;
-  color: @white;
-  opacity: 0.4;
-  text-decoration:none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.umb-photo-folder .umb-non-thumbnail i{
-  color: @gray-8;
-  font-size: 50px;
-  line-height: 60px;
-  display: block;
-  margin: auto;
-  /*vertically aligns */
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.umb-photo-folder .umb-non-thumbnail span{
-  position: absolute;
-  display: block;
-  margin: auto;
-  width: 100%;
-  top: 20px;
-}
-
-.umb-photo-folder .selected{
-  position: relative;
-}
-
-.umb-photo-folder .selected:before{
-  content: "\e165";
-  font-family: Icomoon;
-
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-
-  font-size: 24px;
-  color: @black;
-  opacity: 0.5;
-  background: @white;
-
-  line-height: 36px;
-  text-align: center;
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-
-  height: 32px;
-  width: 32px;
-  overflow: hidden;
-  display: block;
-  z-index: 100;
 }
 
 
@@ -722,7 +723,7 @@ ul.color-picker li a  {
 .umb-fileupload ul {
   list-style: none;
   vertical-align: middle;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .umb-fileupload label {
@@ -826,10 +827,39 @@ ul.color-picker li a  {
 //
 // Tags
 // --------------------------------------------------
-.umb-tags{border: @gray-10 solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
-.umb-tags .tag{cursor: pointer;  margin: 7px; padding: 7px; background: @turquoise}
-.umb-tags .tag i{padding: 2px;}
-.umb-tags input{border: none; background: @white}
+.umb-tags{
+    border: @gray-10 solid 1px;
+    padding: 10px;
+    font-size: 13px;
+    text-shadow: none;
+
+    .tag{
+        cursor: default;
+        margin: 7px;
+        padding: 10px;
+        background: @turquoise;
+        position: relative;
+
+        .icon-trash{
+            cursor: pointer;
+            padding: 2px;
+            font-size: 12px;
+            position: relative;
+            right: -6px;
+        }
+
+        .umb_confirm-action__overlay.-left{
+            top: 6px;
+            left: auto;
+            right: 15px;
+        }
+    }
+
+    input{
+        border: none;
+        background: @white;
+    }
+}
 
 //
 // Date/time picker
@@ -851,7 +881,20 @@ ul.color-picker li a  {
 
 //
 // Nested boolean (e.g. list view bulk action permissions)
-// ---------------------=====-----------------------------
+// -------------------------------------------------------
 .umb-nested-boolean label {margin-bottom: 8px; float: left; width: 320px;}
 .umb-nested-boolean label span {float: left; width: 80%;}
 .umb-nested-boolean label input[type='checkbox'] {margin-right: 10px; float: left;}
+
+//
+// Custom styles of property editors in property preview in document type editor
+// -----------------------------------------------------------------------------
+.umb-group-builder__property-preview {
+    .umb-property-editor {
+        .slider {
+            .tooltip {
+                display: none;
+            }
+        }
+    }
+}

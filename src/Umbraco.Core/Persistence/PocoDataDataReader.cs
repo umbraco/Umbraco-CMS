@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -14,56 +15,48 @@ namespace Umbraco.Core.Persistence
     /// <remarks>
     /// We are using a custom data reader so that tons of memory is not consumed when rebuilding this table, previously
     /// we'd generate SQL insert statements, but we'd have to put all of the XML structures into memory first. Alternatively
-    /// we can use .net's DataTable, but this also requires putting everything into memory. By using a DataReader we don't have to 
-    /// store every content item and it's XML structure in memory to get it into the DB, we can stream it into the db with this 
+    /// we can use .net's DataTable, but this also requires putting everything into memory. By using a DataReader we don't have to
+    /// store every content item and it's XML structure in memory to get it into the DB, we can stream it into the db with this
     /// reader.
     /// </remarks>
-    internal class PocoDataDataReader<T, TSyntax> : BulkDataReader 
+    internal class PocoDataDataReader<T, TSyntax> : BulkDataReader
         where TSyntax : ISqlSyntaxProvider
-    {        
+    {
         private readonly MicrosoftSqlSyntaxProviderBase<TSyntax> _sqlSyntaxProvider;
         private readonly TableDefinition _tableDefinition;
-        private readonly Database.PocoColumn[] _readerColumns;
+        private readonly PocoColumn[] _readerColumns;
         private readonly IEnumerator<T> _enumerator;
         private readonly ColumnDefinition[] _columnDefinitions;
         private int _recordsAffected = -1;
 
         public PocoDataDataReader(
-            IEnumerable<T> dataSource,             
-            Database.PocoData pd,
+            IEnumerable<T> dataSource,
+            PocoData pd,
             MicrosoftSqlSyntaxProviderBase<TSyntax> sqlSyntaxProvider)
         {
-            if (dataSource == null) throw new ArgumentNullException("dataSource");            
-            if (sqlSyntaxProvider == null) throw new ArgumentNullException("sqlSyntaxProvider");
+            if (dataSource == null) throw new ArgumentNullException(nameof(dataSource));
+            if (sqlSyntaxProvider == null) throw new ArgumentNullException(nameof(sqlSyntaxProvider));
 
-            _tableDefinition = DefinitionFactory.GetTableDefinition(sqlSyntaxProvider, pd.type);
-            if (_tableDefinition == null) throw new InvalidOperationException("No table definition found for type " + pd.type);
+            _tableDefinition = DefinitionFactory.GetTableDefinition(pd.Type, sqlSyntaxProvider);
+            if (_tableDefinition == null) throw new InvalidOperationException("No table definition found for type " + pd.Type);
 
-            //Only return real columns, do not include columns that are result columns
+            // only real columns, exclude result columns
             _readerColumns = pd.Columns
                 .Where(x => x.Value.ResultColumn == false)
                 .Select(x => x.Value)
                 .ToArray();
+
             _sqlSyntaxProvider = sqlSyntaxProvider;
             _enumerator = dataSource.GetEnumerator();
             _columnDefinitions = _tableDefinition.Columns.ToArray();
-            
+
         }
 
-        protected override string SchemaName
-        {
-            get { return _tableDefinition.SchemaName; }
-        }
+        protected override string SchemaName => _tableDefinition.SchemaName;
 
-        protected override string TableName
-        {
-            get { return _tableDefinition.Name; }
-        }
+        protected override string TableName => _tableDefinition.Name;
 
-        public override int RecordsAffected
-        {
-            get { return _recordsAffected <= 0 ? -1 : _recordsAffected; }
-        }
+        public override int RecordsAffected => _recordsAffected <= 0 ? -1 : _recordsAffected;
 
         /// <summary>
         /// This will automatically add the schema rows based on the Poco table definition and the columns passed in
@@ -74,7 +67,7 @@ namespace Umbraco.Core.Persistence
             //foreach (var col in _columnDefinitions.Where(x => colNames.Contains(x.Name, StringComparer.OrdinalIgnoreCase)))
             foreach (var col in _columnDefinitions)
             {
-                var sqlDbType = SqlDbType.NVarChar;
+                SqlDbType sqlDbType;
                 if (col.HasSpecialDbType)
                 {
                     //get the SqlDbType from the 'special type'
@@ -100,15 +93,14 @@ namespace Umbraco.Core.Persistence
                     //get the SqlDbType from the clr type
                     sqlDbType = _sqlSyntaxProvider.GetSqlDbType(col.PropertyType);
                 }
-                
-                AddSchemaTableRow(
-                    col.Name, 
-                    col.Size > 0 ? (int?)col.Size : null,
-                    col.Precision > 0  ? (short?)col.Precision : null, 
-                    null, col.IsUnique, col.IsIdentity, col.IsNullable, sqlDbType, 
-                    null, null, null, null, null);                
-            }
 
+                AddSchemaTableRow(
+                    col.Name,
+                    col.Size > 0 ? (int?)col.Size : null,
+                    col.Precision > 0  ? (short?)col.Precision : null,
+                    null, col.IsUnique, col.IsIdentity, col.IsNullable, sqlDbType,
+                    null, null, null, null, null);
+            }
         }
 
         /// <summary>
@@ -118,14 +110,7 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public override object GetValue(int i)
         {
-            if (_enumerator.Current != null)
-            {
-                return _readerColumns[i].GetValue(_enumerator.Current);
-                //return _columnDefinitions[i]. .GetValue(_enumerator.Current);
-            }
-
-            return null;
-            //TODO: Or throw ?
+            return _enumerator.Current == null ? null : _readerColumns[i].GetValue(_enumerator.Current);
         }
 
         /// <summary>
@@ -138,9 +123,7 @@ namespace Umbraco.Core.Persistence
             if (result)
             {
                 if (_recordsAffected == -1)
-                {
                     _recordsAffected = 0;
-                }
                 _recordsAffected++;
             }
             return result;
@@ -155,9 +138,7 @@ namespace Umbraco.Core.Persistence
             base.Dispose(disposing);
 
             if (disposing)
-            {
                 _enumerator.Dispose();
-            }
         }
     }
 }

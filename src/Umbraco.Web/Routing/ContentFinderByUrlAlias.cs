@@ -1,136 +1,117 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
-	/// <summary>
-	/// Provides an implementation of <see cref="IContentFinder"/> that handles page aliases.
-	/// </summary>
-	/// <remarks>
-	/// <para>Handles <c>/just/about/anything</c> where <c>/just/about/anything</c> is contained in the <c>umbracoUrlAlias</c> property of a document.</para>
-	/// <para>The alias is the full path to the document. There can be more than one alias, separated by commas.</para>
-	/// </remarks>
+    /// <summary>
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page aliases.
+    /// </summary>
+    /// <remarks>
+    /// <para>Handles <c>/just/about/anything</c> where <c>/just/about/anything</c> is contained in the <c>umbracoUrlAlias</c> property of a document.</para>
+    /// <para>The alias is the full path to the document. There can be more than one alias, separated by commas.</para>
+    /// </remarks>
     public class ContentFinderByUrlAlias : IContentFinder
     {
-		/// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
-		/// </summary>
-		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
-		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindContent(PublishedContentRequest docRequest)
-		{
-			IPublishedContent node = null;
+        protected ILogger Logger { get; }
 
-			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"
-			{
-				node = FindContentByAlias(docRequest.RoutingContext.UmbracoContext.ContentCache,
-					docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, 
-					docRequest.Uri.GetAbsolutePathDecoded());
-
-				if (node != null)
-				{					
-					docRequest.PublishedContent = node;
-					LogHelper.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContent.Id);
-				}
-			}
-
-			return node != null;
-		}
-
-        private static IPublishedContent FindContentByAlias(ContextualPublishedContentCache cache, int rootNodeId, string alias)
+        public ContentFinderByUrlAlias(ILogger logger)
         {
-            if (alias == null) throw new ArgumentNullException("alias");
+            Logger = logger;
+        }
+
+        /// <summary>
+        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// </summary>
+        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+        public bool TryFindContent(PublishedRequest frequest)
+        {
+            IPublishedContent node = null;
+
+            if (frequest.Uri.AbsolutePath != "/") // no alias if "/"
+            {
+                node = FindContentByAlias(frequest.UmbracoContext.ContentCache,
+                    frequest.HasDomain ? frequest.Domain.ContentId : 0,
+                    frequest.Culture.Name,
+                    frequest.Uri.GetAbsolutePathDecoded());
+
+                if (node != null)
+                {
+                    frequest.PublishedContent = node;
+                    Logger.Debug<ContentFinderByUrlAlias>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
+                }
+            }
+
+            return node != null;
+        }
+
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        {
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
 
             // the alias may be "foo/bar" or "/foo/bar"
             // there may be spaces as in "/foo/bar,  /foo/nil"
             // these should probably be taken care of earlier on
 
-            alias = alias.TrimStart('/');
-            var xpathBuilder = new StringBuilder();
-            xpathBuilder.Append(XPathStringsDefinition.Root);
+            // TODO
+            // can we normalize the values so that they contain no whitespaces, and no leading slashes?
+            // and then the comparisons in IsMatch can be way faster - and allocate way less strings
+
+            const string propertyAlias = Constants.Conventions.Content.UrlAlias;
+
+            var test1 = alias.TrimStart('/') + ",";
+            var test2 = ",/" + test1; // test2 is ",/alias,"
+            test1 = "," + test1; // test1 is ",alias,"
+
+            bool IsMatch(IPublishedContent c, string a1, string a2)
+            {
+                // this basically implements the original XPath query ;-(
+                //
+                // "//* [@isDoc and (" +
+                // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
+                // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
+                // ")]"
+
+                if (!c.HasProperty(propertyAlias)) return false;
+                var p = c.GetProperty(propertyAlias);
+                var varies = p.PropertyType.VariesByCulture();
+                string v;
+                if (varies)
+                {
+                    if (!c.HasCulture(culture)) return false;
+                    v = c.Value<string>(propertyAlias, culture);
+                }
+                else
+                {
+                    v = c.Value<string>(propertyAlias);
+                }
+                if (string.IsNullOrWhiteSpace(v)) return false;
+                v = "," + v.Replace(" ", "") + ",";
+                return v.InvariantContains(a1) || v.InvariantContains(a2);
+            }
+
+            // fixme - even with Linq, what happens below has to be horribly slow
+            // but the only solution is to entirely refactor url providers to stop being dynamic
 
             if (rootNodeId > 0)
-                xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
-
-            XPathVariable var = null;
-            if (alias.Contains('\'') || alias.Contains('"'))
             {
-                // use a var, as escaping gets ugly pretty quickly
-                var = new XPathVariable("alias", alias);
-                alias = "$alias";
+                var rootNode = cache.GetById(rootNodeId);
+                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
             }
-            xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentByAlias, alias);
 
-            var xpath = xpathBuilder.ToString();
+            foreach (var rootContent in cache.GetAtRoot())
+            {
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                if (c != null) return c;
+            }
 
-            // note: it's OK if var is null, will be ignored
-            return cache.GetSingleByXPath(xpath, var);
+            return null;
         }
-
-        #region XPath Strings
-
-        class XPathStringsDefinition
-		{
-			public int Version { get; private set; }
-
-			public static string Root { get { return "/root"; } }
-			public string DescendantDocumentById { get; private set; }
-			public string DescendantDocumentByAlias { get; private set; }
-
-			public XPathStringsDefinition(int version)
-			{
-				Version = version;
-
-				switch (version)
-				{
-					// legacy XML schema
-					case 0:
-						DescendantDocumentById = "//node [@id={0}]";
-						DescendantDocumentByAlias = "//node[("
-							+ "contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},')"
-							+ ")]";
-						break;
-
-					// default XML schema as of 4.10
-					case 1:
-						DescendantDocumentById = "//* [@isDoc and @id={0}]";
-						DescendantDocumentByAlias = "//* [@isDoc and ("
-							+ "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
-							+ ")]";
-						break;
-
-					default:
-						throw new Exception(string.Format("Unsupported Xml schema version '{0}').", version));
-				}
-			}
-		}
-
-		static XPathStringsDefinition _xPathStringsValue;
-		static XPathStringsDefinition XPathStrings
-		{
-			get
-			{
-				// in theory XPathStrings should be a static variable that
-				// we should initialize in a static ctor - but then test cases
-				// that switch schemas fail - so cache and refresh when needed,
-				// ie never when running the actual site
-
-				var version = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? 0 : 1;
-				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
-					_xPathStringsValue = new XPathStringsDefinition(version);
-				return _xPathStringsValue;
-			}
-		}
-
-		#endregion
     }
 }

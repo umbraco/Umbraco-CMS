@@ -1,0 +1,81 @@
+<div data-element="editor-header" class="umb-editor-header">
+
+    <div class="flex items-center" style="height: 100%;">
+
+        <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
+            <a class="umb-editor-header__back" href="#" ng-click="goBack()" prevent-default>
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="flex items-center" style="flex: 1;">
+
+            <div id="nameField" style="flex: 1 1 auto;">
+                <div class="umb-editor-header__name-wrapper">
+                    <ng-form name="headerNameForm">
+                        <input 
+                            data-element="editor-name-field"
+                            type="text"
+                            class="umb-editor-header__name-input"
+                            localize="placeholder"
+                            placeholder="@placeholders_entername"
+                            name="headerName"
+                            ng-model="name"
+                            ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                            ng-disabled="nameDisabled"
+                            umb-auto-focus
+                            val-server-field="{{serverValidationNameField}}"
+                            required
+                            autocomplete="off" />
+                    </ng-form>
+
+                    <a ng-if="variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                        <span>{{vm.currentVariant.language.name}}</span>
+                        <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                    </a>
+
+                    <span ng-if="hideChangeVariant" class="umb-variant-switcher__toggle">
+                        <span>{{vm.currentVariant.language.name}}</span>
+                    </span>
+
+                    <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active, 'umb-variant-switcher_item--not-allowed': variantIsOpen(variant.language.culture)}" ng-repeat="variant in variants">
+                            <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
+                                <span class="umb-variant-switcher__name" ng-class="{'bold': variant.language.isDefault}">{{variant.language.name}}</span>
+                                <umb-variant-state variant="variant" class="umb-variant-switcher__state"></umb-variant-state>
+                            </a>
+                            <div ng-if="splitViewOpen !== true && !variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
+                        </umb-dropdown-item>
+                    </umb-dropdown>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div ng-if="splitViewOpen" style="margin-left: 20px;">
+            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
+                <i class="icon-delete"></i>
+            </a>
+        </div>
+
+        <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
+            <umb-editor-navigation 
+                data-element="editor-sub-views"
+                navigation="navigation"
+                on-select="selectNavigationItem(item)">
+            </umb-editor-navigation>
+        </div>
+
+        <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true" style="margin-left: 20px;">
+            <umb-editor-menu 
+                data-element="editor-actions"
+                current-node="menu.currentNode"
+                current-section="{{menu.currentSection}}">
+            </umb-editor-menu>
+        </div>
+
+    </div>
+
+</div>

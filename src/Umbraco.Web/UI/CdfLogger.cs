@@ -1,41 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ClientDependency.Core.Logging;
 using Umbraco.Core.Logging;
-using ILogger = ClientDependency.Core.Logging.ILogger;
+using Umbraco.Web.Composing;
+using ICdfLogger = ClientDependency.Core.Logging.ILogger;
+using ICoreLogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.UI
 {
     /// <summary>
     /// A logger for ClientDependency
     /// </summary>
-    public class CdfLogger : ILogger
+    public class CdfLogger : ICdfLogger
     {
+        private readonly ICoreLogger _logger;
+
+        // Client Dependency doesn't know how to inject
+        public CdfLogger(/*ICoreLogger logger*/)
+        {
+            _logger = Current.Logger;
+        }
+
         public void Debug(string msg)
         {
-            LogHelper.Debug<CdfLogger>(msg);
+            _logger.Debug<CdfLogger>(msg);
         }
 
         public void Info(string msg)
         {
-            LogHelper.Info<CdfLogger>(msg);
+            _logger.Info<CdfLogger>(msg);
         }
 
         public void Warn(string msg)
         {
-            LogHelper.Warn<CdfLogger>(msg);
+            _logger.Warn<CdfLogger>(msg);
         }
 
         public void Error(string msg, Exception ex)
         {
-            LogHelper.Error<CdfLogger>(msg, ex);
+            _logger.Error<CdfLogger>(ex, msg);
         }
 
         public void Fatal(string msg, Exception ex)
         {
-            LogHelper.Error<CdfLogger>(msg, ex);
+            _logger.Error<CdfLogger>(ex, msg);
         }
     }
 }

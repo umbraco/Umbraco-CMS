@@ -17,7 +17,7 @@
             restrict: 'E',
             replace: true,
             transclude: true,
-            templateUrl: 'views/components/umb-dropdown-item.html',
+            templateUrl: 'views/components/umb-dropdown-item.html'
         };
 
         return directive;

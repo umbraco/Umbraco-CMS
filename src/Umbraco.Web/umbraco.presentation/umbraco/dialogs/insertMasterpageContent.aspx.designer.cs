@@ -19,7 +19,7 @@ namespace umbraco.presentation.umbraco.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_insert;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_insert;
         
         /// <summary>
         /// pp_placeholder control.
@@ -28,7 +28,7 @@ namespace umbraco.presentation.umbraco.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_placeholder;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_placeholder;
         
         /// <summary>
         /// dd_detectedAlias control.

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NPoco;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -6,16 +7,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 {
     internal static class SqlSyntaxProviderExtensions
     {
-        public static IEnumerable<DbIndexDefinition> GetDefinedIndexesDefinitions(this ISqlSyntaxProvider sql, Database db)
+        public static IEnumerable<DbIndexDefinition> GetDefinedIndexesDefinitions(this ISqlSyntaxProvider sql, IDatabase db)
         {
             return sql.GetDefinedIndexes(db)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
         }
 
         /// <summary>
@@ -41,7 +36,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public static Sql GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery, WhereInType whereInType = WhereInType.In)
         {
 
-            return 
+            return
                 new Sql(string.Format(
                     whereInType == WhereInType.In
                         ? @"DELETE FROM {0} WHERE {1} IN (SELECT {1} FROM ({2}) x)"

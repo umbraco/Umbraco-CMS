@@ -1,20 +1,26 @@
 .umb-editor-sub-header {
-   padding: 15px 0;
-   margin-bottom: 30px;
-   background: @white;
+   padding: 10px 0;
+   margin-bottom: 10px;
+   background: @gray-10;
    display: flex;
    justify-content: space-between;
-   margin-top: -30px;
+   margin-top: -10px;
    position: relative;
    top: 0;
+
+    &.nested {
+        margin-top: 0;
+        margin-bottom: 0;
+        background: @gray-10;
+    }
 }
 
 .umb-editor-sub-header.-umb-sticky-bar {
-   box-shadow: 0 5px 0 rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.16);
-   transition: box-shadow 1s;
-   top: 100px; /* height of header */
-   margin-top: 0;
-   margin-bottom: 0;
+    box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
+    transition: box-shadow 1s;
+    top: calc(@appHeaderHeight + @editorHeaderHeight);
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .umb-group-builder__property-preview .umb-editor-sub-header {
@@ -36,24 +42,16 @@
 }
 
 .umb-editor-sub-header__section {
-   border-left: 1px solid @gray-8;
    display: flex;
    align-items: center;
-   padding-left: 20px;
-   padding-right: 20px;
+   padding-left: 10px;
+   padding-right: 10px;
 }
 
 .umb-editor-sub-header__content-left .umb-editor-sub-header__section:first-child {
-   border-left: none;
    padding-left: 0;
 }
 
-.umb-editor-sub-header__content-right .umb-editor-sub-header__section {
-   border-left: none;
-   border-right: 1px solid @gray-8;
-}
-
 .umb-editor-sub-header__content-right .umb-editor-sub-header__section:last-child {
-   border-right: none;
    padding-right: 0;
 }

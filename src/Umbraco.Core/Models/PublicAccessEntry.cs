@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PublicAccessEntry : Entity, IAggregateRoot
+    public class PublicAccessEntry : EntityBase
     {
         private readonly ObservableCollection<PublicAccessRule> _ruleCollection;
         private int _protectedNodeId;
@@ -27,6 +27,9 @@ namespace Umbraco.Core.Models
 
             _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
+
+            foreach (var rule in _ruleCollection)
+                rule.AccessEntryId = Key;
         }
 
         public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
@@ -40,6 +43,9 @@ namespace Umbraco.Core.Models
 
             _ruleCollection = new ObservableCollection<PublicAccessRule>(ruleCollection);
             _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
+
+            foreach (var rule in _ruleCollection)
+                rule.AccessEntryId = Key;
         }
 
         void _ruleCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -137,13 +143,26 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, Ps.Value.ProtectedNodeIdSelector); }
         }
 
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
             _removedRules.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
             foreach (var publicAccessRule in _ruleCollection)
             {
-                publicAccessRule.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                publicAccessRule.ResetDirtyProperties(rememberDirty);
+            }
+        }
+
+        protected override void PerformDeepClone(object clone)
+        {
+            base.PerformDeepClone(clone);
+
+            var cloneEntity = (PublicAccessEntry)clone;
+
+            if (cloneEntity._ruleCollection != null)
+            {
+                cloneEntity._ruleCollection.CollectionChanged -= _ruleCollection_CollectionChanged;       //clear this event handler if any
+                cloneEntity._ruleCollection.CollectionChanged += cloneEntity._ruleCollection_CollectionChanged; //re-assign correct event handler
             }
         }
     }

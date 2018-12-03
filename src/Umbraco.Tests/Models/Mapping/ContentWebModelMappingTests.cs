@@ -1,59 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Web.Dictionary;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using umbraco;
+using Umbraco.Core.Composing;
+using Umbraco.Tests.Testing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models.Mapping
 {
-    [RequiresAutoMapperMappings]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class ContentWebModelMappingTests : BaseDatabaseFactoryTest
+    [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
-        protected override void FreezeResolution()
+        protected override void Compose()
         {
-            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
-                Mock.Of<ICultureDictionaryFactory>());
+            base.Compose();
 
-            base.FreezeResolution();
+            Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
         }
 
-        [PropertyEditor("Test.Test", "Test", "~/Test.html")]
-        public class TestPropertyEditor : PropertyEditor
+        [DataEditor("Test.Test", "Test", "~/Test.html")]
+        public class TestPropertyEditor : DataEditor
         {
-            
+            /// <summary>
+            /// The constructor will setup the property editor based on the attribute if one is found
+            /// </summary>
+            public TestPropertyEditor(ILogger logger) : base(logger)
+            { }
         }
 
-        //protected override void FreezeResolution()
-        //{
-        //    PropertyEditorResolver.Current = new PropertyEditorResolver(
-        //        () => PluginManager.Current.ResolvePropertyEditors());
-
-        //    base.FreezeResolution();
-        //}
+        private void FixUsers(IContentBase content)
+        {
+            // CreateSimpleContentType leaves CreatorId == 0
+            // which used to be both the "super" user and the "default" user
+            // v8 is changing this, so the test would report a <null> creator
+            // temp. fixing by assigning super here
+            //
+            content.CreatorId = Constants.Security.SuperUserId;
+        }
 
         [Test]
         public void To_Media_Item_Simple()
         {
             var contentType = MockedContentTypes.CreateImageMediaType();
             var content = MockedMedia.CreateMediaImage(contentType, -1);
+            FixUsers(content);
 
-            var result = Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>(content);
+            var result = Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>(content);
 
             AssertBasics(result, content);
 
@@ -68,8 +71,9 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
 
-            var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content);
+            var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content);
 
             AssertBasics(result, content);
 
@@ -84,10 +88,14 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
 
-            var result = Mapper.Map<IContent, ContentItemDto<IContent>>(content);
+            var result = Mapper.Map<IContent, ContentPropertyCollectionDto>(content);
 
-            AssertContentItem(result, content);    
+            foreach (var p in content.Properties)
+            {
+                AssertProperty(result, p);
+            }
         }
 
         [Test]
@@ -95,10 +103,14 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateImageMediaType();
             var content = MockedMedia.CreateMediaImage(contentType, -1);
+            FixUsers(content);
 
-            var result = Mapper.Map<IMedia, ContentItemDto<IMedia>>(content);
+            var result = Mapper.Map<IMedia, ContentPropertyCollectionDto>(content);
 
-            AssertContentItem(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertProperty(result, p);
+            }
         }
 
         [Test]
@@ -106,34 +118,58 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
-            //need ids for tabs
+            FixUsers(content);
+
+            // need ids for tabs
             var id = 1;
             foreach (var g in content.PropertyGroups)
-            {
-                g.Id = id;
-                id++;
-            }
+                g.Id = id++;
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
             AssertBasics(result, content);
+
+            var invariantContent = result.Variants.First();
             foreach (var p in content.Properties)
             {
-                AssertDisplayProperty(result, p, ApplicationContext);
-            }            
-            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count());
-            Assert.IsTrue(result.Tabs.First().IsActive);
-            Assert.IsTrue(result.Tabs.Except(new[] {result.Tabs.First()}).All(x => x.IsActive == false));
+                AssertBasicProperty(invariantContent, p);
+                AssertDisplayProperty(invariantContent, p);
+            }
+
+            Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count());
+            Assert.IsTrue(invariantContent.Tabs.First().IsActive);
+            Assert.IsTrue(invariantContent.Tabs.Except(new[] { invariantContent.Tabs.First() }).All(x => x.IsActive == false));
+        }
+
+        [Test]
+        public void To_Display_Model_No_Tabs()
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            contentType.PropertyGroups.Clear();
+            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+
+            var result = Mapper.Map<IContent, ContentItemDisplay>(content);
+
+            AssertBasics(result, content);
+
+            var invariantContent = result.Variants.First();
+            foreach (var p in content.Properties)
+            {
+                AssertBasicProperty(invariantContent, p);
+                AssertDisplayProperty(invariantContent, p);
+            }
+            
+            Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count());
         }
 
         [Test]
         public void To_Display_Model_With_Non_Grouped_Properties()
         {
             var idSeed = 1;
-            var contentType = MockedContentTypes.CreateSimpleContentType();            
+            var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
             //set ids or it wont work
             contentType.Id = idSeed;
             foreach (var p in contentType.PropertyTypes)
@@ -142,6 +178,8 @@ namespace Umbraco.Tests.Models.Mapping
                 idSeed++;
             }
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
+
             foreach (var p in content.Properties)
             {
                 p.Id = idSeed;
@@ -162,26 +200,27 @@ namespace Umbraco.Tests.Models.Mapping
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
             AssertBasics(result, content);
+
+            var invariantContent = result.Variants.First();
             foreach (var p in content.Properties)
             {
-                AssertDisplayProperty(result, p, ApplicationContext);
+                AssertBasicProperty(invariantContent, p);
+                AssertDisplayProperty(invariantContent, p);
             }
-            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
-            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == ui.Text("general", "properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
+
+            Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count() - 1);
+            Assert.IsTrue(invariantContent.Tabs.Any(x => x.Label == Current.Services.TextService.Localize("general/properties")));
+            Assert.AreEqual(2, invariantContent.Tabs.Where(x => x.Label == Current.Services.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         #region Assertions
 
-        private void AssertDisplayProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p, ApplicationContext applicationContext)
-            where T : ContentPropertyDisplay
-            where TPersisted : IContentBase
+        private void AssertDisplayProperty<T>(IContentProperties<T> result, Property p)
+            where T : ContentPropertyBasic
         {
-            AssertBasicProperty(result, p);
-            
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
-            
+
             //pDto.Alias = p.Alias;
             //pDto.Description = p.PropertyType.Description;
             //pDto.Label = p.PropertyType.Name;
@@ -189,13 +228,50 @@ namespace Umbraco.Tests.Models.Mapping
 
         }
 
-        private void AssertBasics<T, TPersisted>(ContentItemBasic<T, TPersisted> result, TPersisted content)
+        private void AssertBasics(ContentItemDisplay result, IContent content)
+        {
+            Assert.AreEqual(content.Id, result.Id);
+
+            var ownerId = content.CreatorId;
+            if (ownerId != 0)
+            {
+                Assert.IsNotNull(result.Owner);
+                Assert.AreEqual(Constants.Security.SuperUserId, result.Owner.UserId);
+                Assert.AreEqual("Administrator", result.Owner.Name);
+            }
+            else
+            {
+                Assert.IsNull(result.Owner); // because, 0 is no user
+            }
+
+            var invariantContent = result.Variants.First();
+
+            Assert.AreEqual(content.ParentId, result.ParentId);
+            Assert.AreEqual(content.UpdateDate, invariantContent.UpdateDate);
+            Assert.AreEqual(content.CreateDate, invariantContent.CreateDate);
+            Assert.AreEqual(content.Name, invariantContent.Name);
+            Assert.AreEqual(content.Properties.Count(),
+                ((IContentProperties<ContentPropertyDisplay>)invariantContent).Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
+        }
+
+        private void AssertBasics<T, TPersisted>(ContentItemBasic<T> result, TPersisted content)
             where T : ContentPropertyBasic
             where TPersisted : IContentBase
         {
             Assert.AreEqual(content.Id, result.Id);
-            Assert.AreEqual(0, result.Owner.UserId);
-            Assert.AreEqual("Administrator", result.Owner.Name);
+
+            var ownerId = content.CreatorId;
+            if (ownerId != 0)
+            {
+                Assert.IsNotNull(result.Owner);
+                Assert.AreEqual(Constants.Security.SuperUserId, result.Owner.UserId);
+                Assert.AreEqual("Administrator", result.Owner.Name);
+            }
+            else
+            {
+                Assert.IsNull(result.Owner); // because, 0 is no user
+            }
+
             Assert.AreEqual(content.ParentId, result.ParentId);
             Assert.AreEqual(content.UpdateDate, result.UpdateDate);
             Assert.AreEqual(content.CreateDate, result.CreateDate);
@@ -203,25 +279,23 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(content.Properties.Count(), result.Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
-        private void AssertBasicProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p)
+        private void AssertBasicProperty<T>(IContentProperties<T> result, Property p)
             where T : ContentPropertyBasic
-            where TPersisted : IContentBase
         {
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
             Assert.AreEqual(p.Alias, pDto.Alias);
             Assert.AreEqual(p.Id, pDto.Id);
 
-            if (p.Value == null)
+            if (p.GetValue() == null)
                 Assert.AreEqual(pDto.Value, string.Empty);
-            else if (p.Value is decimal)
-                Assert.AreEqual(pDto.Value, ((decimal) p.Value).ToString(NumberFormatInfo.InvariantInfo));
+            else if (p.GetValue() is decimal)
+                Assert.AreEqual(pDto.Value, ((decimal) p.GetValue()).ToString(NumberFormatInfo.InvariantInfo));
             else
-                Assert.AreEqual(pDto.Value, p.Value.ToString());
+                Assert.AreEqual(pDto.Value, p.GetValue().ToString());
         }
 
-        private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)
-            where TPersisted : IContentBase
+        private void AssertProperty(IContentProperties<ContentPropertyDto> result, Property p)
         {
             AssertBasicProperty(result, p);
 
@@ -231,11 +305,11 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
             Assert.AreEqual(p.PropertyType.Description, pDto.Description);
             Assert.AreEqual(p.PropertyType.Name, pDto.Label);
-            Assert.AreEqual(ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
-            Assert.AreEqual(PropertyEditorResolver.Current.GetByAlias(p.PropertyType.PropertyEditorAlias), pDto.PropertyEditor);
+            Assert.AreEqual(Current.Services.DataTypeService.GetDataType(p.PropertyType.DataTypeId), pDto.DataType);
+            Assert.AreEqual(Current.PropertyEditors[p.PropertyType.PropertyEditorAlias], pDto.PropertyEditor);
         }
 
-        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto, T> result, T content)
+        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto> result, T content)
             where T : IContentBase
         {
             AssertBasics(result, content);

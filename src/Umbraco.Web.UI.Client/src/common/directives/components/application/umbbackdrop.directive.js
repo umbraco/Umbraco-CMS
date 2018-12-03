@@ -103,7 +103,7 @@
                 backdropOpacity: "=?",
                 highlightElement: "=?",
                 highlightPreventClick: "=?",
-                disableEventsOnClick: "=?",
+                disableEventsOnClick: "=?"
             }
         };
 

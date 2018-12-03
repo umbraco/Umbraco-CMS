@@ -1,23 +1,28 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
-using umbraco.cms.businesslogic;
-using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    public class ScopeEventDispatcherTests : BaseUmbracoConfigurationTest
+    public class ScopeEventDispatcherTests //: BaseUmbracoConfigurationTest
     {
+        private TestObjects _testObjects;
+
         [SetUp]
         public void Setup()
         {
@@ -25,6 +30,23 @@ namespace Umbraco.Tests.Scoping
             DoThing1 = null;
             DoThing2 = null;
             DoThing3 = null;
+
+            Current.Container = new ServiceContainer();
+
+            _testObjects = new TestObjects(Current.Container);
+            Current.Container.RegisterSingleton(f => Current.Container);
+            Current.Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
+            Current.Container.RegisterCollectionBuilder<MapperCollectionBuilder>();
+
+            SettingsForTests.Reset(); // ensure we have configuration
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Current.Reset();
+
+            SettingsForTests.Reset();
         }
 
         [TestCase(false, true, true)]
@@ -43,7 +65,7 @@ namespace Umbraco.Tests.Scoping
             DoThing1 += (sender, args) => { counter1++; if (cancel) args.Cancel = true; };
             DoThing2 += (sender, args) => { counter2++; };
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: passive ? new PassiveEventDispatcher() : null))
             {
                 var cancelled = scope.Events.DispatchCancelable(DoThing1, this, new SaveEventArgs<string>("test"));
@@ -72,7 +94,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 += OnDoThingFail;
             DoThing3 += OnDoThingFail;
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
@@ -114,7 +136,7 @@ namespace Umbraco.Tests.Scoping
             var content3 = MockedContent.CreateBasicContent(contentType);
             content3.Id = 789;
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
 
@@ -147,22 +169,22 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SupersededEvents2()
         {
+            Test_Unpublished += OnDoThingFail;
+            Test_Deleted += OnDoThingFail;
+
             var contentService = Mock.Of<IContentService>();
             var content = Mock.Of<IContent>();
-            var l1 = new List<IEventDefinition>
+
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
-                new EventDefinition<IContentService, PublishEventArgs<IContent>>(Test_UnPublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "UnPublished"),
-                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(Test_Deleted, contentService, new DeleteEventArgs<IContent>(new [] { content }), "Deleted")
-            };
+                scope.Events.Dispatch(Test_Unpublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "Unpublished");
+                scope.Events.Dispatch(Test_Deleted, contentService, new DeleteEventArgs<IContent>(new [] { content }), "Deleted");
 
-            var l2 = new OrderedHashSet<IEventDefinition>(keepOldest: false);
-            foreach (var e in l1)
-                l2.Add(e);
-
-            var l3 = ScopeEventDispatcherBase.FilterSupersededAndUpdateToLatestEntity(l2);
-
-            // see U4-10764
-            Assert.AreEqual(2, l3.Count());
+                // see U4-10764
+                var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
+                Assert.AreEqual(2, events.Length);
+            }
         }
 
         /// <summary>
@@ -187,7 +209,7 @@ namespace Umbraco.Tests.Scoping
             content3.Id = 123;
             content3.UpdateDate = now.AddMinutes(3);
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
@@ -227,7 +249,7 @@ namespace Umbraco.Tests.Scoping
             content3.Id = 123;
             content1.UpdateDate = now.AddMinutes(3);
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
@@ -260,7 +282,7 @@ namespace Umbraco.Tests.Scoping
             content3.Id = 123;
             content3.UpdateDate = now.AddMinutes(3);
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
@@ -284,7 +306,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 += OnDoThingFail;
             DoThing3 += OnDoThingFail;
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
@@ -310,7 +332,7 @@ namespace Umbraco.Tests.Scoping
             ScopeContext ambientContext = null;
             Guid value = Guid.Empty;
 
-            var scopeProvider = new ScopeProvider(Mock.Of<IDatabaseFactory2>());
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>()) as ScopeProvider;
 
             DoThing1 += (sender, args) => { counter++; };
             DoThing2 += (sender, args) => { counter++; };
@@ -369,12 +391,11 @@ namespace Umbraco.Tests.Scoping
         public static event EventHandler<TestEventArgs> DoForTestArgs;
         public static event EventHandler<TestEventArgs2> DoForTestArgs2;
         public static event EventHandler<SaveEventArgs<string>> DoThing1;
-
         public static event EventHandler<SaveEventArgs<int>> DoThing2;
 
         public static event TypedEventHandler<ScopeEventDispatcherTests, SaveEventArgs<decimal>> DoThing3;
 
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Test_UnPublished;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Test_Unpublished;
         public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Test_Deleted;
 
         public class TestEventArgs : CancellableObjectEventArgs
@@ -402,7 +423,7 @@ namespace Umbraco.Tests.Scoping
             }
         }
 
-        public class PassiveEventDispatcher : ScopeEventDispatcherBase
+        public class PassiveEventDispatcher : QueuingEventDispatcherBase
         {
             public PassiveEventDispatcher()
                 : base(false)

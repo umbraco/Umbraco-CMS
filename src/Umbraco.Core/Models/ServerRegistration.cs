@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a registered server in a multiple-servers environment.
     /// </summary>
-    public class ServerRegistration : Entity, IServerRegistration
+    public class ServerRegistration : EntityBase, IServerRegistration
     {
         private string _serverAddress;
         private string _serverIdentity;

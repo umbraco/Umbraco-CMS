@@ -5,4 +5,6 @@
   </content>
   
   <webservices xdt:Transform="Remove" />
+  
+  <repositories xdt:Transform="Remove" />
 </settings>

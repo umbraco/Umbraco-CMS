@@ -3,27 +3,26 @@ using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using LightInject;
 using Moq;
 using NUnit.Framework;
-using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Profiling;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -31,15 +30,26 @@ using Umbraco.Web.Security;
 namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
-    public class UmbracoViewPageTests
+    [UmbracoTest(WithApplication = true)]
+    public class UmbracoViewPageTests : UmbracoTestBase
     {
+        private PublishedSnapshotService _service;
+
+        [TearDown]
+        public override void TearDown()
+        {
+            if (_service == null) return;
+            _service.Dispose();
+            _service = null;
+        }
+
         #region RenderModel To ...
 
         [Test]
         public void RenderModel_To_RenderModel()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelTestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -53,7 +63,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -67,7 +77,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType2_To_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -81,7 +91,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new ContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -94,14 +104,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -109,14 +119,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType2_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType2>(view.Model.Content);
         }
 
@@ -124,7 +134,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModel_ContentType1_To_RenderModelOf_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel(content);
             var view = new RenderModelOfContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -141,7 +151,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_RenderModel()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelTestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -155,7 +165,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -169,7 +179,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType2_To_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel<ContentType2>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType2>(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -183,7 +193,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new ContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -195,14 +205,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -210,14 +220,14 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType2_To_RenderModelOf_ContentType1()
         {
             var content = new ContentType2(null);
-            var model = new RenderModel<ContentType2>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType2>(content);
             var view = new RenderModelOfContentType1TestPage();
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType2>(view.Model.Content);
         }
 
@@ -225,7 +235,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void RenderModelOf_ContentType1_To_RenderModelOf_ContentType2()
         {
             var content = new ContentType1(null);
-            var model = new RenderModel<ContentType1>(content, CultureInfo.InvariantCulture);
+            var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType2TestPage();
             var viewData = new ViewDataDictionary(model);
 
@@ -247,7 +257,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel>(view.Model);
+            Assert.IsInstanceOf<ContentModel>(view.Model);
         }
 
         [Test]
@@ -260,7 +270,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -274,7 +284,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             view.SetViewDataX(viewData);
 
-            Assert.IsInstanceOf<RenderModel<ContentType1>>(view.Model);
+            Assert.IsInstanceOf<ContentModel<ContentType1>>(view.Model);
             Assert.IsInstanceOf<ContentType1>(view.Model.Content);
         }
 
@@ -288,7 +298,7 @@ namespace Umbraco.Tests.Web.Mvc
             view.ViewContext = GetViewContext();
             Assert.Throws<ModelBindingException>(() =>view.SetViewDataX(viewData));
         }
-        
+
         [Test]
         public void ContentType1_To_ContentType1()
         {
@@ -325,7 +335,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             Assert.IsInstanceOf<ContentType1>(view.Model);
         }
-        
+
         #endregion
 
         #region Test elements
@@ -343,13 +353,13 @@ namespace Umbraco.Tests.Web.Mvc
             }
         }
 
-        public class RenderModelTestPage : TestPage<RenderModel>
+        public class RenderModelTestPage : TestPage<ContentModel>
         { }
 
-        public class RenderModelOfContentType1TestPage : TestPage<RenderModel<ContentType1>>
+        public class RenderModelOfContentType1TestPage : TestPage<ContentModel<ContentType1>>
         { }
 
-        public class RenderModelOfContentType2TestPage : TestPage<RenderModel<ContentType2>>
+        public class RenderModelOfContentType2TestPage : TestPage<ContentModel<ContentType2>>
         { }
 
         public class ContentType1TestPage : TestPage<ContentType1>
@@ -372,109 +382,66 @@ namespace Umbraco.Tests.Web.Mvc
 
         #region Test helpers
 
-        ServiceContext GetServiceContext(IUmbracoSettingsSection umbracoSettings, ILogger logger)
+        ServiceContext GetServiceContext()
         {
-            var svcCtx = new ServiceContext(
-                new Mock<IContentService>().Object,
-                new Mock<IMediaService>().Object,
-                new Mock<IContentTypeService>().Object,
-                new Mock<IDataTypeService>().Object,
-                new Mock<IFileService>().Object,
-                new Mock<ILocalizationService>().Object,
-                new PackagingService(
-                    new Mock<ILogger>().Object,
-                    new Mock<IContentService>().Object,
-                    new Mock<IContentTypeService>().Object,
-                    new Mock<IMediaService>().Object,
-                    new Mock<IMacroService>().Object,
-                    new Mock<IDataTypeService>().Object,
-                    new Mock<IFileService>().Object,
-                    new Mock<ILocalizationService>().Object,
-                    new Mock<IEntityService>().Object,
-                    new Mock<IUserService>().Object,
-                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
-                    new Mock<IScopeUnitOfWorkProvider>().Object),
-                new Mock<IEntityService>().Object,
-                new RelationService(
-                    new Mock<IScopeUnitOfWorkProvider>().Object,
-                    new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
-                    logger,
-                    new TransientMessagesFactory(),
-                    new Mock<IEntityService>().Object),
-                new Mock<IMemberGroupService>().Object,
-                new Mock<IMemberTypeService>().Object,
-                new Mock<IMemberService>().Object,
-                new Mock<IUserService>().Object,
-                new Mock<ISectionService>().Object,
-                new Mock<IApplicationTreeService>().Object,
-                new Mock<ITagService>().Object,
-                new Mock<INotificationService>().Object,
-                Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IAuditService>(),
-                Mock.Of<IDomainService>());
-            return svcCtx;
+            return TestObjects.GetServiceContextMock();
         }
 
         ViewContext GetViewContext()
         {
-            var settings = SettingsForTests.GetDefault();
+            var settings = SettingsForTests.GetDefaultUmbracoSettings();
             var logger = Mock.Of<ILogger>();
             var umbracoContext = GetUmbracoContext(
                 logger, settings,
                 "/dang", 0);
 
-            var urlProvider = new UrlProvider(umbracoContext, settings.WebRouting, new IUrlProvider[] { new DefaultUrlProvider(settings.RequestHandler) });
-            var routingContext = new RoutingContext(
-                umbracoContext,
-                Enumerable.Empty<IContentFinder>(),
-                new FakeLastChanceFinder(),
-                urlProvider);
-            umbracoContext.RoutingContext = routingContext;
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
+            var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
-            var request = new PublishedContentRequest(
-                new Uri("http://localhost/dang"), 
-                routingContext,
-               settings.WebRouting,
-                s => Enumerable.Empty<string>());
-
-            request.Culture = CultureInfo.InvariantCulture;
-            umbracoContext.PublishedContentRequest = request;
+            frequest.Culture = CultureInfo.InvariantCulture;
+            umbracoContext.PublishedRequest = frequest;
 
             var context = new ViewContext();
             context.RouteData = new RouteData();
-            context.RouteData.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
+            context.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
 
             return context;
         }
 
         protected UmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
-            var cache = new PublishedContentCache();
+            var svcCtx = GetServiceContext();
 
-            //cache.GetXmlDelegate = (context, preview) =>
-            //{
-            //    var doc = new XmlDocument();
-            //    doc.LoadXml(GetXmlContent(templateId));
-            //    return doc;
-            //};
+            var databaseFactory = TestObjects.GetDatabaseFactoryMock();
 
-            //PublishedContentCache.UnitTesting = true;
+            //var appCtx = new ApplicationContext(
+            //    new DatabaseContext(databaseFactory, logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
+            //    svcCtx,
+            //    CacheHelper.CreateDisabledCacheHelper(),
+            //    new ProfilingLogger(logger, Mock.Of<IProfiler>())) { /*IsReady = true*/ };
 
-            // ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
-            var svcCtx = GetServiceContext(umbracoSettings, logger);
-
-            var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IScopeProviderInternal>(), logger, Mock.Of<ISqlSyntaxProvider>(), "test"),
-                svcCtx,
-                CacheHelper.CreateDisabledCacheHelper(),
-                new ProfilingLogger(logger, Mock.Of<IProfiler>())) { IsReady = true };
+            var cache = NullCacheProvider.Instance;
+            //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
+            var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var factory = Mock.Of<IPublishedContentTypeFactory>();
+            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(),
+                null, null,
+                null, null, null,
+                new TestDefaultCultureAccessor(),
+                Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
+
+            var globalSettings = TestObjects.GetGlobalSettings();
+
             var ctx = new UmbracoContext(
-                GetHttpContextFactory(url, routeData).HttpContext,
-                appCtx,
-                new PublishedCaches(cache, new PublishedMediaCache(appCtx)),
-                new WebSecurity(http, appCtx));
+                http,
+                _service,
+                new WebSecurity(http, Current.Services.UserService, globalSettings),
+                TestObjects.GetUmbracoSettings(),
+                Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
+                new TestVariationContextAccessor());
 
             //if (setSingleton)
             //{
@@ -489,10 +456,6 @@ namespace Umbraco.Tests.Web.Mvc
             var factory = routeData != null
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
-
-
-            //set the state helper
-            StateHelper.HttpContext = factory.HttpContext;
 
             return factory;
         }

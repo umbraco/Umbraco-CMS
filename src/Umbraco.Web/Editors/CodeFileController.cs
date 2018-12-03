@@ -11,11 +11,15 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings.Css;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
+using Stylesheet = Umbraco.Core.Models.Stylesheet;
+using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 
 namespace Umbraco.Web.Editors
 {
@@ -120,7 +124,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Used to get a specific file from disk via the FileService
         /// </summary>
-        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="virtualPath">The filename or urlencoded path of the file to open</param>
         /// <returns>The file and its contents from the virtualPath</returns>
         public CodeFileDisplay GetByPath(string type, string virtualPath)
@@ -167,6 +171,18 @@ namespace Umbraco.Web.Editors
                         return display;
                     }
                     throw new HttpResponseException(HttpStatusCode.NotFound);
+
+                case Core.Constants.Trees.Stylesheets:
+                    var stylesheet = Services.FileService.GetStylesheetByName(virtualPath);
+                    if (stylesheet != null)
+                    {
+                        var display = Mapper.Map<Stylesheet, CodeFileDisplay>(stylesheet);
+                        display.FileType = Core.Constants.Trees.Stylesheets;
+                        display.Path = Url.GetTreePathFromFilePath(stylesheet.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(stylesheet.Path);
+                        return display;
+                    }
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -203,9 +219,9 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to scaffold the json object for the editors for 'scripts', 'partialViews', 'partialViewMacros'
+        /// Used to scaffold the json object for the editors for 'scripts', 'partialViews', 'partialViewMacros' and 'stylesheets'
         /// </summary>
-        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="id"></param>
         /// <param name="snippetName"></param>
         /// <returns></returns>
@@ -234,6 +250,10 @@ namespace Umbraco.Web.Editors
                     codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.Scripts;
                     break;
+                case Core.Constants.Trees.Stylesheets:
+                    codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
+                    codeFileDisplay.VirtualPath = SystemDirectories.Css;
+                    break;
                 default:
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
             }
@@ -248,7 +268,7 @@ namespace Umbraco.Web.Editors
                 codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             }
 
-            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");            
+            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");
             codeFileDisplay.FileType = type;
             return codeFileDisplay;
         }
@@ -256,7 +276,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Used to delete a specific file from disk via the FileService
         /// </summary>
-        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="virtualPath">The filename or urlencoded path of the file to delete</param>
         /// <returns>Will return a simple 200 if file deletion succeeds</returns>
         [HttpDelete]
@@ -265,7 +285,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
             if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
-            
+
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
 
             switch (type)
@@ -307,6 +327,14 @@ namespace Umbraco.Web.Editors
                     }
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
+                case Core.Constants.Trees.Stylesheets:
+                    if (Services.FileService.GetStylesheetByName(virtualPath) != null)
+                    {
+                        Services.FileService.DeleteStylesheet(virtualPath, Security.CurrentUser.Id);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Stylesheet found with the specified path");
+
                 default:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
             }
@@ -315,7 +343,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to create or update a 'partialview', 'partialviewmacro' or 'script' file
+        /// Used to create or update a 'partialview', 'partialviewmacro', 'script' or 'stylesheets' file
         /// </summary>
         /// <param name="display"></param>
         /// <returns>The updated CodeFileDisplay model</returns>
@@ -368,20 +396,83 @@ namespace Umbraco.Web.Editors
                     display.Id = System.Web.HttpUtility.UrlEncode(scriptResult.Path);
                     return display;
 
-                    //display.AddErrorNotification(
-                    //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                    //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
+                //display.AddErrorNotification(
+                //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
 
-                    break;
+                case Core.Constants.Trees.Stylesheets:
 
-
-                    
+                    var stylesheetResult = CreateOrUpdateStylesheet(display);
+                    display = Mapper.Map(stylesheetResult, display);
+                    display.Path = Url.GetTreePathFromFilePath(stylesheetResult.Path);
+                    display.Id = System.Web.HttpUtility.UrlEncode(stylesheetResult.Path);
+                    return display;
 
                 default:
                     throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             return display;
+        }
+
+        /// <summary>
+        /// Extracts "umbraco style rules" from a style sheet
+        /// </summary>
+        /// <param name="data">The style sheet data</param>
+        /// <returns>The style rules</returns>
+        public StylesheetRule[] PostExtractStylesheetRules(StylesheetData data)
+        {
+            if (data.Content.IsNullOrWhiteSpace())
+            {
+                return new StylesheetRule[0];
+            }
+
+            return StylesheetHelper.ParseRules(data.Content)?.Select(rule => new StylesheetRule
+            {
+                Name = rule.Name,
+                Selector = rule.Selector,
+                Styles = rule.Styles
+            }).ToArray();
+        }
+
+        /// <summary>
+        /// Creates a style sheet from CSS and style rules
+        /// </summary>
+        /// <param name="data">The style sheet data</param>
+        /// <returns>The style sheet combined from the CSS and the rules</returns>
+        /// <remarks>
+        /// Any "umbraco style rules" in the CSS will be removed and replaced with the rules passed in <see cref="data"/>
+        /// </remarks>
+        public string PostInterpolateStylesheetRules(StylesheetData data)
+        {
+            // first remove all existing rules
+            var existingRules = data.Content.IsNullOrWhiteSpace()
+                ? new Core.Strings.Css.StylesheetRule[0]
+                : StylesheetHelper.ParseRules(data.Content).ToArray();
+            foreach (var rule in existingRules)
+            {
+                data.Content = StylesheetHelper.ReplaceRule(data.Content, rule.Name, null);
+            }
+
+            data.Content = data.Content.TrimEnd('\n', '\r');
+
+            // now add all the posted rules
+            if (data.Rules != null && data.Rules.Any())
+            {
+                foreach (var rule in data.Rules)
+                {
+                    data.Content = StylesheetHelper.AppendRule(data.Content, new Core.Strings.Css.StylesheetRule
+                    {
+                        Name = rule.Name,
+                        Selector = rule.Selector,
+                        Styles = rule.Styles
+                    });
+                }
+
+                data.Content += Environment.NewLine;
+            }
+
+            return data.Content;
         }
 
         /// <summary>
@@ -395,52 +486,70 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private Script CreateOrUpdateScript(CodeFileDisplay display)
         {
+            return CreateOrUpdateFile(display, ".js", Current.FileSystems.ScriptsFileSystem,
+                name => Services.FileService.GetScriptByName(name),
+                (script, userId) => Services.FileService.SaveScript(script, userId),
+                name => new Script(name));
+        }
+
+        private Stylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
+        {
+            return CreateOrUpdateFile(display, ".css", Current.FileSystems.StylesheetsFileSystem,
+                name => Services.FileService.GetStylesheetByName(name), 
+                (stylesheet, userId) => Services.FileService.SaveStylesheet(stylesheet, userId),
+                name => new Stylesheet(name)
+            );
+        }
+
+        private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem fileSystem,
+            Func<string, T> getFileByName, Action<T, int> saveFile, Func<string, T> createFile) where T : Core.Models.File
+        {
             //must always end with the correct extension
-            display.Name = EnsureCorrectFileExtension(display.Name, ".js");
+            display.Name = EnsureCorrectFileExtension(display.Name, extension);
 
             var virtualPath = display.VirtualPath ?? string.Empty;
             // this is all weird, should be using relative paths everywhere!
-            var relPath = FileSystemProviderManager.Current.ScriptsFileSystem.GetRelativePath(virtualPath);
+            var relPath = fileSystem.GetRelativePath(virtualPath);
 
-            if (relPath.EndsWith(".js") == false)
+            if (relPath.EndsWith(extension) == false)
             {
                 //this would typically mean it's new
                 relPath = relPath.IsNullOrWhiteSpace()
                     ? relPath + display.Name
                     : relPath.EnsureEndsWith('/') + display.Name;
-            }            
+            }
 
-            var script = Services.FileService.GetScriptByName(relPath);
-            if (script != null)
+            var file = getFileByName(relPath);
+            if (file != null)
             {
                 // might need to find the path
-                var orgPath = script.OriginalPath.Substring(0, script.OriginalPath.IndexOf(script.Name));
-                script.Path = orgPath + display.Name;
+                var orgPath = file.OriginalPath.Substring(0, file.OriginalPath.IndexOf(file.Name));
+                file.Path = orgPath + display.Name;
 
-                script.Content = display.Content;
+                file.Content = display.Content;
                 //try/catch? since this doesn't return an Attempt?
-                Services.FileService.SaveScript(script, Security.CurrentUser.Id);
+                saveFile(file, Security.CurrentUser.Id);
             }
             else
             {
-                script = new Script(relPath);
-                script.Content = display.Content;
-                Services.FileService.SaveScript(script, Security.CurrentUser.Id);
+                file = createFile(relPath);
+                file.Content = display.Content;
+                saveFile(file, Security.CurrentUser.Id);
             }
 
-            return script;
+            return file;
         }
 
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
             return CreateOrUpdatePartialView(display, SystemDirectories.PartialViews,
-                Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);            
+                Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);
         }
-        
+
         private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
         {
             return CreateOrUpdatePartialView(display, SystemDirectories.MacroPartials,
-                Services.FileService.GetPartialViewMacro, Services.FileService.SavePartialViewMacro, Services.FileService.CreatePartialViewMacro);           
+                Services.FileService.GetPartialViewMacro, Services.FileService.SavePartialViewMacro, Services.FileService.CreatePartialViewMacro);
         }
 
         /// <summary>
@@ -510,6 +619,14 @@ namespace Umbraco.Web.Editors
             var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
+        }
+
+        // this is an internal class for passing stylesheet data from the client to the controller while editing
+        public class StylesheetData
+        {
+            public string Content { get; set; }
+
+            public StylesheetRule[] Rules { get; set; }
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Cache
 {
@@ -10,21 +8,24 @@ namespace Umbraco.Web.Cache
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class UserGroupPermissionsCacheRefresher : CacheRefresherBase<UserGroupPermissionsCacheRefresher>
     {
-        protected override UserGroupPermissionsCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        public UserGroupPermissionsCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.UserGroupPermissionsCacheRefresherId); }
-        }
+        #region Define
 
+        protected override UserGroupPermissionsCacheRefresher This => this;
 
-        public override string Name
-        {
-            get { return "User group permissions cache refresher"; }
-        }
-        
+        public static readonly Guid UniqueId = Guid.Parse("840AB9C5-5C0B-48DB-A77E-29FE4B80CD3A");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "User Group Permissions Cache Refresher";
+
+        #endregion
+
+        #region Refresher
+
+        #endregion
     }
 }

@@ -2,11 +2,12 @@
     position: fixed;
     top: 0;
     bottom: 0;
-    left: 0;
+    left: auto;
+    right: 0;
     z-index: 10;
     width: @drawerWidth;
-    box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
     background: @gray-9;
+    box-shadow: inset 5px 0 20px rgba(0,0,0,.3);
 }
 
 .umb-drawer-view {
@@ -55,12 +56,14 @@
 /* Our badge - should be moved */
 
 .umb-help-badge {
-    padding: 10px 20px 10px 35px;
+    padding: 10px 20px 10px 55px;
     background: @white;
     position: relative;
     overflow: hidden;
     border-radius: 3px;
     display: block;
+    margin-bottom:5px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 }
 
 .umb-help-badge:hover,
@@ -74,10 +77,10 @@
 }
 
 .umb-help-badge__icon {
-    font-size: 40px;
+    font-size: 36px;
     transform: translate(0,-50%);
     position: absolute;
-    left: -15px;
+    left: 10px;
     top: 50%;
     color: @red-l3;
 }
@@ -128,6 +131,14 @@
     align-items: center;
 }
 
+/* the outer container for each help type - tours, video etc */
+.umb-help-section + .umb-help-section {
+    margin-top:20px;
+}
+
+.umb-help-section__title {
+    margin:0 0 10px;    
+}
 
 /* Help list */
 
@@ -135,40 +146,55 @@
     list-style: none;
     margin-left: 0;
     margin-bottom: 0;
-    background: @white;
+    background: @white; 
     border-radius: 3px;
-}
-
-.umb-help-list:last-child {
-    border-bottom: none;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+    
+    [data-element*="help-tours"] & {
+        margin-bottom:5px;
+    }
 }
 
 .umb-help-list-item {
     margin-bottom: 1px;
     border-radius: 0;
     border-bottom: 1px solid @gray-9;
+    padding: 10px;
 }
 
-.umb-help-list-item > a,
+.umb-help-list-item:last-child {
+    border-bottom: none;
+}
+
+.umb-help-list-item__group-title i {
+    margin-right:2px;
+    text-decoration: none;
+}
+
 .umb-help-list-item__content {
     display: flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 20px 10px 10px;
+    text-decoration: none;
 }
 
+.umb-help-list-item:hover,
+.umb-help-list-item:focus,
+.umb-help-list-item:active,
 .umb-help-list-item > a:hover, 
 .umb-help-list-item > a:focus,
 .umb-help-list-item > a:active {
     text-decoration: none;
 
     .umb-help-list-item__title {
-        text-decoration: underline !important;
+        text-decoration: underline;
     }
 }
 
 .umb-help-list-item__title {
     font-size: 14px;
     display: block;
+    margin-left: 26px;
 }
 
 .umb-help-list-item__description {
@@ -181,6 +207,7 @@
     margin-right: 8px;
     color: @gray-4;
     font-size: 18px;
+    float: left;
 }
 
 .umb-help-list-item__open-icon {
@@ -191,4 +218,8 @@
 
 .umb-help-list-item:hover .umb-help-list-item__group-title {
     text-decoration: underline;
+}
+
+[data-element*="tour-"].umb-help-list-item:hover .umb-help-list-item__title {
+    text-decoration:none;
 }

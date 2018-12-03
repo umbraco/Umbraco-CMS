@@ -4,6 +4,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
@@ -12,60 +13,75 @@ namespace Umbraco.Core.Scoping
     /// Implements <see cref="IScope"/>.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IScopeInternal
+    internal class Scope : IScope
     {
+        // fixme
+        // considering that a great amount of things here are only useful for the top-level
+        // scope would it make sense to have a ChildScope class that would have a smaller
+        // memory footprint?
+
         private readonly ScopeProvider _scopeProvider;
+        private readonly ILogger _logger;
+
         private readonly IsolationLevel _isolationLevel;
         private readonly RepositoryCacheMode _repositoryCacheMode;
         private readonly bool? _scopeFileSystem;
         private readonly ScopeContext _scopeContext;
+        private readonly bool _autoComplete;
         private bool _callContext;
+
         private bool _disposed;
         private bool? _completed;
 
         private IsolatedRuntimeCache _isolatedRuntimeCache;
-        private UmbracoDatabase _database;
+        private IUmbracoDatabase _database;
         private EventMessages _messages;
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
 
-        // this is v7, in v8 this has to change to RepeatableRead
-        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
+        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
-            Scope parent, ScopeContext scopeContext, bool detachable,
+            ILogger logger, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
+            bool callContext = false,
+            bool autoComplete = false)
         {
             _scopeProvider = scopeProvider;
+            _logger = logger;
+
             _scopeContext = scopeContext;
+
             _isolationLevel = isolationLevel;
             _repositoryCacheMode = repositoryCacheMode;
             _eventDispatcher = eventDispatcher;
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
+            _autoComplete = autoComplete;
+
             Detachable = detachable;
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
-            Console.WriteLine("create " + _instanceId.ToString("N").Substring(0, 8));
+            Console.WriteLine("create " + InstanceId.ToString("N").Substring(0, 8));
 #endif
 
             if (detachable)
             {
-                if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", "parent");
-                if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", "scopeContext");
+                if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
+                if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+                if (autoComplete) throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
 
                 // detachable creates its own scope context
                 _scopeContext = new ScopeContext();
 
                 // see note below
                 if (scopeFileSystems == true)
-                    _fscope = FileSystemProviderManager.Current.Shadow(Guid.NewGuid());
+                    _fscope = fileSystems.Shadow(Guid.NewGuid());
 
                 return;
             }
@@ -75,16 +91,19 @@ namespace Umbraco.Core.Scoping
                 ParentScope = parent;
 
                 // cannot specify a different mode!
-                if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode != repositoryCacheMode)
-                    throw new ArgumentException("Cannot be different from parent.", "repositoryCacheMode");
+                // fixme - means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
+                // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
+                if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode > repositoryCacheMode)
+                    throw new ArgumentException($"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
 
                 // cannot specify a dispatcher!
                 if (_eventDispatcher != null)
-                    throw new ArgumentException("Cannot be specified on nested scope.", "eventDispatcher");
+                    throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
 
                 // cannot specify a different fs scope!
+                // can be 'true' only on outer scope (and false does not make much sense)
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
-                    throw new ArgumentException("Cannot be different from parent.", "scopeFileSystems");
+                    throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
             }
             else
             {
@@ -92,52 +111,37 @@ namespace Umbraco.Core.Scoping
                 // every scoped FS to trigger the creation of shadow FS "on demand", and that would be
                 // pretty pointless since if scopeFileSystems is true, we *know* we want to shadow
                 if (scopeFileSystems == true)
-                    _fscope = FileSystemProviderManager.Current.Shadow(Guid.NewGuid());
+                    _fscope = fileSystems.Shadow(Guid.NewGuid());
             }
         }
 
         // initializes a new scope
-        public Scope(ScopeProvider scopeProvider, bool detachable,
-            ScopeContext scopeContext,
+        public Scope(ScopeProvider scopeProvider,
+            ILogger logger, FileSystems fileSystems, bool detachable, ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
-            : this(scopeProvider, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
+            bool callContext = false,
+            bool autoComplete = false)
+            : this(scopeProvider, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
-        public Scope(ScopeProvider scopeProvider, Scope parent,
+        public Scope(ScopeProvider scopeProvider,
+            ILogger logger, FileSystems fileSystems, Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
-            : this(scopeProvider, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
+            bool callContext = false,
+            bool autoComplete = false)
+            : this(scopeProvider, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
-        // initializes a new scope, replacing a NoScope instance
-        public Scope(ScopeProvider scopeProvider, NoScope noScope,
-            ScopeContext scopeContext,
-            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
-            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
-            IEventDispatcher eventDispatcher = null,
-            bool? scopeFileSystems = null,
-            bool callContext = false)
-            : this(scopeProvider, null, scopeContext, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
-        {
-            // steal everything from NoScope
-            _database = noScope.DatabaseOrNull;
-            _messages = noScope.MessagesOrNull;
+        public Guid InstanceId { get; } = Guid.NewGuid();
 
-            // make sure the NoScope can be replaced ie not in a transaction
-            if (_database != null && _database.InTransaction)
-                throw new Exception("NoScope instance is not free.");
-        }
-
-        private readonly Guid _instanceId = Guid.NewGuid();
-        public Guid InstanceId { get { return _instanceId; } }
+        public ISqlContext SqlContext => _scopeProvider.SqlContext;
 
         // a value indicating whether to force call-context
         public bool CallContext
@@ -148,7 +152,7 @@ namespace Umbraco.Core.Scoping
                 if (ParentScope != null) return ParentScope.CallContext;
                 return false;
             }
-            set { _callContext = value; }
+            set => _callContext = value;
         }
 
         public bool ScopedFileSystems
@@ -185,24 +189,21 @@ namespace Umbraco.Core.Scoping
 
         // a value indicating whether the scope is detachable
         // ie whether it was created by CreateDetachedScope
-        public bool Detachable { get; private set; }
+        public bool Detachable { get; }
 
         // the parent scope (in a nested scopes chain)
-        public IScopeInternal ParentScope { get; set; }
+        public Scope ParentScope { get; set; }
 
         public bool Attached { get; set; }
 
         // the original scope (when attaching a detachable scope)
-        public IScopeInternal OrigScope { get; set; }
+        public Scope OrigScope { get; set; }
 
         // the original context (when attaching a detachable scope)
         public ScopeContext OrigContext { get; set; }
 
         // the context (for attaching & detaching only)
-        public ScopeContext Context
-        {
-            get { return _scopeContext; }
-        }
+        public ScopeContext Context => _scopeContext;
 
         public IsolationLevel IsolationLevel
         {
@@ -215,33 +216,26 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public UmbracoDatabase Database
+        public IUmbracoDatabase Database
         {
             get
             {
                 EnsureNotDisposed();
+
+                if (_database != null)
+                    return _database;
+
                 if (ParentScope != null)
                 {
                     var database = ParentScope.Database;
-                    if (_isolationLevel > IsolationLevel.Unspecified && database.CurrentTransactionIsolationLevel < _isolationLevel)
-                        throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + database.CurrentTransactionIsolationLevel + " from parent.");
-                    _database = database;
+                    var currentLevel = database.GetCurrentTransactionIsolationLevel();
+                    if (_isolationLevel > IsolationLevel.Unspecified && currentLevel < _isolationLevel)
+                        throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + currentLevel + " from parent.");
+                    return _database = database;
                 }
 
-                if (_database != null)
-                {
-                    // if the database has been created by a Scope instance it has to be
-                    // in a transaction, however it can be a database that was stolen from
-                    // a NoScope instance, in which case we need to enter a transaction, as
-                    // a scope implies a transaction, always
-                    if (_database.InTransaction)
-                        return _database;
-                }
-                else
-                {
-                    // create a new database
-                    _database = _scopeProvider.DatabaseFactory.CreateNewDatabase();
-                }
+                // create a new database
+                _database = _scopeProvider.DatabaseFactory.CreateDatabase();
 
                 // enter a transaction, as a scope implies a transaction, always
                 try
@@ -258,7 +252,7 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        public UmbracoDatabase DatabaseOrNull
+        public IUmbracoDatabase DatabaseOrNull
         {
             get
             {
@@ -274,27 +268,14 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Messages;
+                return _messages ?? (_messages = new EventMessages());
 
-                if (_messages != null) return _messages;
-
-                // this is ugly - in v7 for backward compatibility reasons, EventMessages need
-                // to survive way longer that the scopes, and kinda resides on its own in http
-                // context, but must also be in scopes for when we do async and lose http context
-                // TODO refactor in v8
-
-                var factory = ScopeLifespanMessagesFactory.Current;
-                if (factory == null)
-                {
-                    _messages = new EventMessages();
-                }
-                else
-                {
-                    _messages = factory.GetFromHttpContext();
-                    if (_messages == null)
-                        factory.Set(_messages = new EventMessages());
-                }
-
-                return _messages;
+                // fixme - event messages?
+                // this may be a problem: the messages collection will be cleared at the end of the scope
+                // how shall we process it in controllers etc? if we don't want the global factory from v7?
+                // it'd need to be captured by the controller
+                //
+                // + rename // EventMessages = ServiceMessages or something
             }
         }
 
@@ -303,14 +284,7 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.MessagesOrNull;
-
-                // see comments in Messages
-
-                if (_messages != null) return _messages;
-
-                var factory = ScopeLifespanMessagesFactory.Current;
-                return factory == null ? null : factory.GetFromHttpContext();
+                return ParentScope == null ? _messages : ParentScope.MessagesOrNull;
             }
         }
 
@@ -321,7 +295,7 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new ScopeEventDispatcher());
+                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher());
             }
         }
 
@@ -344,7 +318,8 @@ namespace Umbraco.Core.Scoping
             if (completed.HasValue == false || completed.Value == false)
             {
                 if (LogUncompletedScopes)
-                    Logging.LogHelper.Debug<Scope>("Uncompleted Child Scope at\r\n" + Environment.StackTrace);
+                    _logger.Debug<Scope>("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+
                 _completed = false;
             }
         }
@@ -352,7 +327,11 @@ namespace Umbraco.Core.Scoping
         private void EnsureNotDisposed()
         {
             if (_disposed)
-                throw new ObjectDisposedException("this");
+                throw new ObjectDisposedException(GetType().FullName);
+
+            // fixme - safer?
+            //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
+            //    throw new ObjectDisposedException(GetType().FullName);
         }
 
         public void Dispose()
@@ -363,22 +342,28 @@ namespace Umbraco.Core.Scoping
             {
 #if DEBUG_SCOPES
                 var ambient = _scopeProvider.AmbientScope;
-                Logging.LogHelper.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
+                _logger.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
                     throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
-                var infos = _scopeProvider.GetScopeInfo(ambient);
-                throw new InvalidOperationException("Not the ambient scope (see current ambient ctor stack trace).\r\n" + infos.CtorStack);
+                var ambientInfos = _scopeProvider.GetScopeInfo(ambient);
+                var disposeInfos = _scopeProvider.GetScopeInfo(this);
+                throw new InvalidOperationException("Not the ambient scope (see ctor stack traces).\r\n"
+                    + "- ambient ctor ->\r\n" + ambientInfos.CtorStack + "\r\n"
+                    + "- dispose ctor ->\r\n" + disposeInfos.CtorStack + "\r\n");
 #else
                 throw new InvalidOperationException("Not the ambient scope.");
 #endif
             }
 
             var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent;
+            _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
 #endif
+
+            if (_autoComplete && _completed == null)
+                _completed = true;
 
             if (parent != null)
                 parent.ChildCompleted(_completed);
@@ -438,7 +423,7 @@ namespace Umbraco.Core.Scoping
         //    to ensure we don't leave a scope around, etc
         private void RobustExit(bool completed, bool onException)
         {
-            if (onException) completed = false;
+             if (onException) completed = false;
 
             TryFinally(() =>
             {
@@ -452,8 +437,8 @@ namespace Umbraco.Core.Scoping
             }, () =>
             {
                 // deal with events
-                if (onException == false && _eventDispatcher != null)
-                    _eventDispatcher.ScopeExit(completed);
+                if (onException == false)
+                    _eventDispatcher?.ScopeExit(completed);
             }, () =>
             {
                 // if *we* created it, then get rid of it
@@ -505,9 +490,41 @@ namespace Umbraco.Core.Scoping
 
         // caching config
         // true if Umbraco.CoreDebug.LogUncompletedScope appSetting is set to "true"
-        private static bool LogUncompletedScopes
+        private static bool LogUncompletedScopes => (_logUncompletedScopes
+            ?? (_logUncompletedScopes = UmbracoConfig.For.CoreDebug().LogUncompletedScopes)).Value;
+
+        /// <inheritdoc />
+        public void ReadLock(params int[] lockIds)
         {
-            get { return (_logUncompletedScopes ?? (_logUncompletedScopes = UmbracoConfig.For.CoreDebug().LogUncompletedScopes)).Value; }
+            // soon as we get Database, a transaction is started
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = Database.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void WriteLock(params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (Database.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = Database.Execute("UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new Exception($"LockObject with id={lockId} does not exist.");
+            }
         }
     }
 }

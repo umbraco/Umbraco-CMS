@@ -1,53 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using System.Web.Security;
 using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using System.Web.Http;
-using System.Net;
-using Umbraco.Core.PropertyEditors;
-using System;
-using System.Net.Http;
-using ContentType = System.Net.Mime.ContentType;
 
 namespace Umbraco.Web.Editors
 {
-    
+
     /// <summary>
-    /// An API controller used for dealing with content types
+    /// An API controller used for dealing with member types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]    
-    public class MemberTypeController : ContentTypeControllerBase
+    [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]    
+    public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MemberTypeController()
-            : this(UmbracoContext.Current)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
+        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public MemberTypeController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
-
-        private readonly MembershipProvider _provider;
-
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
@@ -67,6 +46,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public HttpResponseMessage DeleteById(int id)
         {
             var foundType = Services.MemberTypeService.Get(id);
@@ -93,6 +73,8 @@ namespace Umbraco.Web.Editors
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <returns></returns>
+
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public HttpResponseMessage GetAvailableCompositeMemberTypes(int contentTypeId,
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
@@ -106,6 +88,7 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
@@ -115,7 +98,7 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
-       
+
         /// <summary>
         /// Returns all member types
         /// </summary>
@@ -124,16 +107,55 @@ namespace Umbraco.Web.Editors
             if (_provider.IsUmbracoMembershipProvider())
             {
                 return Services.MemberTypeService.GetAll()
-                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);    
+                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);
             }
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+            //get the persisted member type
+            var ctId = Convert.ToInt32(contentTypeSave.Id);
+            var ct = ctId > 0 ? Services.MemberTypeService.Get(ctId) : null;
+
+            if (UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+            {
+                //We need to validate if any properties on the contentTypeSave have had their IsSensitiveValue changed,
+                //and if so, we need to check if the current user has access to sensitive values. If not, we have to return an error
+                var props = contentTypeSave.Groups.SelectMany(x => x.Properties);
+                if (ct != null)
+                {
+                    foreach (var prop in props)
+                    {
+                        // Id 0 means the property was just added, no need to look it up
+                        if (prop.Id == 0)
+                            continue;
+                        
+                        var foundOnContentType = ct.PropertyTypes.FirstOrDefault(x => x.Id == prop.Id);
+                        if (foundOnContentType == null)
+                            throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "No property type with id " + prop.Id + " found on the content type"));
+                        if (ct.IsSensitiveProperty(foundOnContentType.Alias) && prop.IsSensitiveData == false)
+                        {
+                            //if these don't match, then we cannot continue, this user is not allowed to change this value
+                            throw new HttpResponseException(HttpStatusCode.Forbidden);
+                        }
+                    }
+                }
+                else
+                {
+                    //if it is new, then we can just verify if any property has sensitive data turned on which is not allowed
+                    if (props.Any(prop => prop.IsSensitiveData))
+                    {
+                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                    }
+                }
+            }
+           
+
+            var savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
-                getContentType:             i => Services.MemberTypeService.Get(i),
+                getContentType:             i => ct,
                 saveContentType:            type => Services.MemberTypeService.Save(type));
 
             var display = Mapper.Map<MemberTypeDisplay>(savedCt);

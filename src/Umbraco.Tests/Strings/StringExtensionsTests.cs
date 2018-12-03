@@ -1,30 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringExtensionsTests
+    public class StringExtensionsTests : UmbracoTestBase
     {
-	    [SetUp]
-	    public void Setup()
-	    {
-            ShortStringHelperResolver.Reset();
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new MockShortStringHelper());
-	        Resolution.Freeze();
-	    }
-
-        [TearDown]
-        public void TearDown()
+        public override void SetUp()
         {
-            ShortStringHelperResolver.Reset();
+            base.SetUp();
+
+            // fixme - in "compose"?
+            Container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
         }
-        
+
+        [Test]
+        public void CurrentHelper()
+        {
+            var helper = Current.ShortStringHelper;
+            Assert.IsInstanceOf<MockShortStringHelper>(helper);
+        }
+
+        [TestCase("hello-world.png", "Hello World")]
+        [TestCase("hello-world .png", "Hello World")]
+        [TestCase("_hello-world __1.png", "Hello World 1")]
+        public void To_Friendly_Name(string first, string second)
+        {
+            Assert.AreEqual(first.ToFriendlyName(), second);
+        }
+
         [TestCase("hello", "world", false)]
         [TestCase("hello", "hello", true)]
         [TestCase("hellohellohellohellohellohellohello", "hellohellohellohellohellohellohelloo", false)]
@@ -53,43 +68,43 @@ namespace Umbraco.Tests.Strings
         [TestCase("hello.txt", "hello")]
         [TestCase("this.is.a.Txt", "this.is.a")]
         [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]
-        [TestCase("not a file","not a file")]
+        [TestCase("not a file", "not a file")]
         public void Strip_File_Extension(string input, string result)
         {
             var stripped = input.StripFileExtension();
             Assert.AreEqual(stripped, result);
         }
 
-	    [TestCase("This is a string to encrypt")]
-		[TestCase("This is a string to encrypt\nThis is a second line")]
-		[TestCase("    White space is preserved    ")]
-		[TestCase("\nWhite space is preserved\n")]
-		public void Encrypt_And_Decrypt(string input)
-		{
-			var encrypted = input.EncryptWithMachineKey();
-			var decrypted = encrypted.DecryptWithMachineKey();
-			Assert.AreNotEqual(input, encrypted);
-			Assert.AreEqual(input, decrypted);
-		}
+        [TestCase("This is a string to encrypt")]
+        [TestCase("This is a string to encrypt\nThis is a second line")]
+        [TestCase("    White space is preserved    ")]
+        [TestCase("\nWhite space is preserved\n")]
+        public void Encrypt_And_Decrypt(string input)
+        {
+            var encrypted = input.EncryptWithMachineKey();
+            var decrypted = encrypted.DecryptWithMachineKey();
+            Assert.AreNotEqual(input, encrypted);
+            Assert.AreEqual(input, decrypted);
+        }
 
-		[Test()]
-		public void Encrypt_And_Decrypt_Long_Value()
-		{
-			// Generate a really long string
-			char[] chars = { 'a', 'b', 'c', '1', '2', '3', '\n' };
+        [Test()]
+        public void Encrypt_And_Decrypt_Long_Value()
+        {
+            // Generate a really long string
+            char[] chars = { 'a', 'b', 'c', '1', '2', '3', '\n' };
 
-			string valueToTest = string.Empty;
+            string valueToTest = string.Empty;
 
-			// Create a string 7035 chars long
-			for (int i = 0; i < 1005; i++)
-				for (int j = 0; j < chars.Length; j++)
-					valueToTest += chars[j].ToString();
+            // Create a string 7035 chars long
+            for (int i = 0; i < 1005; i++)
+                for (int j = 0; j < chars.Length; j++)
+                    valueToTest += chars[j].ToString();
 
-			var encrypted = valueToTest.EncryptWithMachineKey();
-			var decrypted = encrypted.DecryptWithMachineKey();
-			Assert.AreNotEqual(valueToTest, encrypted);
-			Assert.AreEqual(valueToTest, decrypted);
-		}
+            var encrypted = valueToTest.EncryptWithMachineKey();
+            var decrypted = encrypted.DecryptWithMachineKey();
+            Assert.AreNotEqual(valueToTest, encrypted);
+            Assert.AreEqual(valueToTest, decrypted);
+        }
 
         [TestCase("Hello this is my string", " string", "Hello this is my")]
         [TestCase("Hello this is my string strung", " string", "Hello this is my string strung")]
@@ -147,6 +162,42 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(expected, output);
         }
 
+        [TestCase("pineapple", new string[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, true)]
+        [TestCase("PINEAPPLE", new string[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
+        [TestCase("pineapple", new string[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
+        [TestCase("pineapple", new string[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("pineapple", new string[] { "banana", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, false)]
+        [TestCase("Strawberry unicorn pie", new string[] { "Berry" }, StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("empty pie", new string[0], StringComparison.OrdinalIgnoreCase, false)]
+        public void ContainsAny(string haystack, IEnumerable<string> needles, StringComparison comparison, bool expected)
+        {
+            bool output = haystack.ContainsAny(needles, comparison);
+            Assert.AreEqual(expected, output);
+        }
+
+        [TestCase("", true)]
+        [TestCase(" ", true)]
+        [TestCase("\r\n\r\n", true)]
+        [TestCase("\r\n", true)]
+        [TestCase(@"
+        Hello
+        ", false)]
+        [TestCase(null, true)]
+        [TestCase("a", false)]
+        [TestCase("abc", false)]
+        [TestCase("abc   ", false)]
+        [TestCase("   abc", false)]
+        [TestCase("   abc   ", false)]
+        public void IsNullOrWhiteSpace(string value, bool expected)
+        {
+            // Act
+            bool result = value.IsNullOrWhiteSpace();
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+
         // FORMAT STRINGS
 
         // note: here we just ensure that the proper helper gets called properly
@@ -183,7 +234,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeAliasWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias(CultureInfo.InvariantCulture);
+            var output = "JUST-ANYTHING".ToSafeAlias(null);
             Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -197,7 +248,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToUrlSegmentWithCulture()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment(CultureInfo.InvariantCulture);
+            var output = "JUST-ANYTHING".ToUrlSegment(null);
             Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -211,7 +262,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeFileNameWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeFileName(CultureInfo.InvariantCulture);
+            var output = "JUST-ANYTHING".ToSafeFileName(null);
             Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -229,18 +280,31 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("SPLIT-PASCAL-CASING::JUST-ANYTHING", output);
         }
 
-        [Test]
+        [Test] // can't do cases with an IDictionary
         public void ReplaceManyWithCharMap()
         {
-            var output = "JUST-ANYTHING".ReplaceMany(null);
-            Assert.AreEqual("REPLACE-MANY-A::JUST-ANYTHING", output);
+            const string input = "télévisiön tzvâr ßup &nbsp; pof";
+            const string expected = "television tzvar ssup   pof";
+            IDictionary<string, string> replacements = new Dictionary<string, string>
+                {
+                    { "é", "e" },
+                    { "ö", "o" },
+                    { "â", "a" },
+                    { "ß", "ss" },
+                    { "&nbsp;", " " },
+                };
+            var output = input.ReplaceMany(replacements);
+            Assert.AreEqual(expected, output);
         }
 
-        [Test]
-        public void ReplaceManyByOneChar()
+        #region Cases
+        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
+        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
+        #endregion
+        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
         {
-            var output = "JUST-ANYTHING".ReplaceMany(new char[] {}, '*');
-            Assert.AreEqual("REPLACE-MANY-B::JUST-ANYTHING", output);
+            var output = input.ReplaceMany(toReplace.ToArray(), replacement);
+            Assert.AreEqual(expected, output);
         }
     }
 }

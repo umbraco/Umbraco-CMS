@@ -1,5 +1,5 @@
-namespace Umbraco.Core.Services
-{    
+﻿namespace Umbraco.Core.Services
+{
 
     /// <summary>
     /// A status type of the result of moving an item
@@ -7,7 +7,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// Anything less than 10 = Success!
     /// </remarks>
-    public enum MoveOperationStatusType
+    public enum MoveOperationStatusType : byte
     {
         /// <summary>
         /// The move was successful.
