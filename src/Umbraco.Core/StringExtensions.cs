@@ -190,7 +190,7 @@ namespace Umbraco.Core
             return new string(outputArray);
         }
 
-        private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
+        private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'+\"".ToCharArray();
 
         /// <summary>
         /// Cleans string to aid in preventing xss attacks.
@@ -541,7 +541,7 @@ namespace Umbraco.Core
         /// <returns>Returns the string without any html tags.</returns>
         public static string StripHtml(this string text)
         {
-            const string pattern = @"<(.|\n)*?>";
+            string pattern = "[*{}\\/:<>?|\"-+()\\n]";
             return Regex.Replace(text, pattern, String.Empty);
         }
 
