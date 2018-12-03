@@ -696,7 +696,11 @@ namespace Umbraco.Web.Editors
                     {
                         display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                            contentItem.ReleaseDate.HasValue
+                                ? string.Format(Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText"),
+                                    $"{contentItem.ReleaseDate.Value.ToLongDateString()} {contentItem.ReleaseDate.Value.ToString("HH:mm")}")
+                                : Services.TextService.Localize("speechBubbles/editContentSavedText")
+                        );
                     }
                     else
                     {
@@ -718,7 +722,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    ShowMessageForPublishStatus(publishStatus.Result, display);
+                    ShowMessageForPublishStatus(publishStatus.Result, display, contentItem.ExpireDate);
                     break;
             }
 
@@ -759,7 +763,7 @@ namespace Umbraco.Web.Editors
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
-                ShowMessageForPublishStatus(publishResult.Result, notificationModel);
+                ShowMessageForPublishStatus(publishResult.Result, notificationModel, foundContent.ExpireDate);
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
@@ -1040,15 +1044,19 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display)
+        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display, DateTime? expireDate)
         {
             switch (status.StatusType)
             {
                 case PublishStatusType.Success:
-                case PublishStatusType.SuccessAlreadyPublished:
+                case PublishStatusType.SuccessAlreadyPublished:                    
                     display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                            expireDate.HasValue
+                                ? string.Format(Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText"),
+                                    $"{expireDate.Value.ToLongDateString()} {expireDate.Value.ToString("HH:mm")}")
+                                : Services.TextService.Localize("speechBubbles/editContentPublishedText")
+                    );
                     break;
                 case PublishStatusType.FailedPathNotPublished:
                     display.AddWarningNotification(
