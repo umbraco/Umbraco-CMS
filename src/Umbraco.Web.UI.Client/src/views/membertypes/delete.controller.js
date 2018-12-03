@@ -8,6 +8,10 @@
  */
 function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
 
+    $scope.vm = {
+        confirmed: false
+    };
+
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
