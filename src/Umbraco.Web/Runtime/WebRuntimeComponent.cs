@@ -122,6 +122,8 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 
+            composition.Container.RegisterSingleton<DashboardHelper>();
+
             composition.Container.RegisterUmbracoControllers(typeLoader, GetType().Assembly);
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
 
