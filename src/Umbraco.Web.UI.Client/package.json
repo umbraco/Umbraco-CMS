@@ -32,6 +32,6 @@
     "merge-stream": "^1.0.1",
     "run-sequence": "^2.2.1",
     "marked": "^0.5.2",
-    "event-stream": "^4.0.1"
+    "event-stream": "3.3.4"
   }
 }
