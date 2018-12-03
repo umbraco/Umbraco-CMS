@@ -151,7 +151,7 @@ namespace Umbraco.Tests.UmbracoExamine
             Directory luceneDir,
             Analyzer analyzer = null,
             ILocalizationService languageService = null,
-            IValueSetValidator validator = null)
+            IContentValueSetValidator validator = null)
         {
             if (languageService == null)
                 languageService = GetMockLocalizationService();

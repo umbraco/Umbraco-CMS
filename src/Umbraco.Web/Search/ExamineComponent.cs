@@ -125,13 +125,11 @@ namespace Umbraco.Web.Search
 
             //create the indexes and register them with the manager
             foreach(var index in indexCreator.Create())
-            {
                 _examineManager.AddIndex(index);
-            }
 
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
-            var registeredIndexers = examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
+            var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
             profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
@@ -205,7 +203,7 @@ namespace Umbraco.Web.Search
 
                 _isConfigured = true;
 
-                foreach (var luceneIndexer in examineManager.IndexProviders.Values.OfType<LuceneIndex>())
+                foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
                 {
                     //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
                     //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
@@ -377,7 +375,7 @@ namespace Umbraco.Web.Search
                 //Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
                 foreach (var id in ci.Value.removedIds)
                 {
-                    foreach (var index in _examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>())
+                    foreach (var index in _examineManager.Indexes.OfType<IUmbracoIndexer>())
                     {
                         var searcher = index.GetSearcher();
 
@@ -707,7 +705,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = examineComponent._contentValueSetBuilder.GetValueSets(content).ToList();
 
-                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
                     // only for the specified indexers
                     .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportSoftDelete)
                     .Where(x => x.EnableDefaultEventHandler))
@@ -739,7 +737,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
                     // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
                     // then only index this for indexers supporting unpublished media
                     .Where(x => isPublished || (x.SupportSoftDelete))
@@ -769,7 +767,7 @@ namespace Umbraco.Web.Search
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
                 var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
                     //ensure that only the providers are flagged to listen execute
                     .Where(x => x.EnableDefaultEventHandler))
                 {
@@ -799,7 +797,7 @@ namespace Umbraco.Web.Search
             public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
-                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
                     // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
                     // otherwise if keepIfUnpublished == false then remove from all indexes
                     .Where(x => keepIfUnpublished == false || x.SupportSoftDelete == false)

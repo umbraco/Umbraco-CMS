@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<ExamineIndexModel> GetIndexerDetails()
         {
-            return _examineManager.IndexProviders.Select(CreateModel).OrderBy(x => x.Name.TrimEnd("Indexer"));
+            return _examineManager.Indexes.Select(CreateModel).OrderBy(x => x.Name.TrimEnd("Indexer"));
         }
 
         /// <summary>
@@ -53,32 +53,8 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
         {
             var model = new List<ExamineSearcherModel>(
-               _examineManager.IndexProviders.Select(indexer =>
-               {
-                   var searcher = indexer.Value.GetSearcher();
-                   var searcherName = (searcher as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
-
-                   var indexerModel = new ExamineSearcherModel
-                   {
-                       Name = searcherName
-                   };
-                   var props = TypeHelper.CachedDiscoverableProperties(searcher.GetType(), mustWrite: false)
-                               //ignore these properties
-                               .Where(x => new[] { "Description" }.InvariantContains(x.Name) == false)
-                               .Where(x => x.GetCustomAttribute<EditorBrowsableAttribute>()
-                                           ?.State != EditorBrowsableState.Never)
-                               .OrderBy(x => x.Name);
-                   foreach (var p in props)
-                   {
-                       indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null)?.ToString());
-                   }
-
-                   return indexerModel;
-               }).OrderBy(x =>
-               {
-                   //order by name , but strip the "Searcher" from the end if it exists
-                   return x.Name.TrimEnd("Searcher");
-               }));
+                _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel{Name = searcher.Name})
+                    .OrderBy(x => x.Name.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
             return model;
         }
 
@@ -138,7 +114,7 @@ namespace Umbraco.Web.Editors
             //if its still there then it's not done
             return found != null
                 ? null
-                : CreateModel(new KeyValuePair<string, IIndex>(indexName, index));
+                : CreateModel(index);
 
         }
 
@@ -197,13 +173,12 @@ namespace Umbraco.Web.Editors
 
         
 
-        private ExamineIndexModel CreateModel(KeyValuePair<string, IIndex> indexerKeyVal)
+        private ExamineIndexModel CreateModel(IIndex index)
         {
-            var indexer = indexerKeyVal.Value;
-            var indexName = indexerKeyVal.Key;
+            var indexName = index.Name;
 
-            if (!(indexer is IIndexDiagnostics indexDiag))
-                indexDiag = new GenericIndexDiagnostics(indexer);
+            if (!(index is IIndexDiagnostics indexDiag))
+                indexDiag = new GenericIndexDiagnostics(index);
 
 
             var isHealth = indexDiag.IsHealthy();
@@ -229,10 +204,10 @@ namespace Umbraco.Web.Editors
 
         private HttpResponseMessage ValidateLuceneSearcher(string searcherName, out LuceneSearcher searcher)
         {
-            foreach (var indexer in _examineManager.IndexProviders)
+            foreach (var indexer in _examineManager.Indexes)
             {
-                var s = indexer.Value.GetSearcher();
-                var sName = (s as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
+                var s = indexer.GetSearcher();
+                var sName = (s as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Name, "Searcher");
                 if (sName != searcherName)
                 {
                     continue;
@@ -277,10 +252,9 @@ namespace Umbraco.Web.Editors
         {
             index = null;
 
-            if (_examineManager.IndexProviders.ContainsKey(indexName))
+            if (_examineManager.TryGetIndex(indexName, out index))
             {
                 //return Ok!
-                index = _examineManager.GetIndex(indexName);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 

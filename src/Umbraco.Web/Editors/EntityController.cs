@@ -15,6 +15,7 @@ using Umbraco.Core.Models;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
+using Examine;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models.Mapping;
@@ -53,12 +54,13 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly SearchableTreeCollection _searchableTreeCollection;
 
-        public EntityController(SearchableTreeCollection searchableTreeCollection)
+        public EntityController(SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
         {
             _searchableTreeCollection = searchableTreeCollection;
+            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -410,22 +412,18 @@ namespace Umbraco.Web.Editors
             Direction orderDirection = Direction.Ascending,
             string filter = "")
         {
-            int intId;
-
-            if (int.TryParse(id, out intId))
+            if (int.TryParse(id, out var intId))
             {
                 return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
             }
 
-            Guid guidId;
-            if (Guid.TryParse(id, out guidId))
+            if (Guid.TryParse(id, out _))
             {
                 //Not supported currently
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            Udi udiId;
-            if (Udi.TryParse(id, out udiId))
+            if (Udi.TryParse(id, out _))
             {
                 //Not supported currently
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -443,8 +441,7 @@ namespace Umbraco.Web.Editors
             //the EntityService cannot search members of a certain type, this is currently not supported and would require
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
-            long total;
-            var searchResult = _treeSearcher.ExamineSearch(Umbraco, filter ?? "", type, pageSize, pageNumber - 1, out total, id);
+            var searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out long total, id);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
             {
@@ -480,8 +477,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
-                long totalRecords;
-                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords, orderBy, orderDirection, filter);
 
                 if (totalRecords == 0)
                 {
@@ -596,12 +592,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
+            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom);
         }
-
-
-
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {

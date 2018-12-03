@@ -129,6 +129,8 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
 
+            composition.Container.Register<UmbracoTreeSearcher>(new PerRequestLifeTime());
+
             composition.Container.RegisterCollectionBuilder<EditorValidatorCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<IEditorValidator>());
 

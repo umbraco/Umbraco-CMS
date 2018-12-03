@@ -49,6 +49,6 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searcher = null);
     }
 }

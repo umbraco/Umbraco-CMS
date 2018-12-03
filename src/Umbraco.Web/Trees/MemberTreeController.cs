@@ -33,13 +33,14 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
     public class MemberTreeController : TreeController, ISearchableTree
     {
-        public MemberTreeController()
+        public MemberTreeController(UmbracoTreeSearcher treeSearcher)
         {
+            _treeSearcher = treeSearcher;
             _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             _isUmbracoProvider = _provider.IsUmbracoMembershipProvider();
         }
 
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly MembershipProvider _provider;
         private readonly bool _isUmbracoProvider;
 
@@ -193,7 +194,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Member, pageSize, pageIndex, out totalFound, searchFrom);
+            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Member, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

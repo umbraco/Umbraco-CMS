@@ -110,12 +110,12 @@ namespace Umbraco.Web.Search
             return luceneDir;
         }
 
-        public virtual IValueSetValidator GetContentValueSetValidator()
+        public virtual IContentValueSetValidator GetContentValueSetValidator()
         {
             return new ContentValueSetValidator(true, true, PublicAccessService);
         }
 
-        public virtual IValueSetValidator GetPublishedContentValueSetValidator()
+        public virtual IContentValueSetValidator GetPublishedContentValueSetValidator()
         {
             return new ContentValueSetValidator(false, false, PublicAccessService);
         }

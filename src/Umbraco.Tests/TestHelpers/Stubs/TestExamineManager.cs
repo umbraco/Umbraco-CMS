@@ -24,15 +24,19 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             //noop
         }
 
-        public IIndex GetIndex(string indexerName)
+        public bool TryGetIndex(string indexName, out IIndex index)
         {
-            return _indexers.TryGetValue(indexerName, out var indexer) ? indexer : null;
+            return _indexers.TryGetValue(indexName, out index);
         }
 
-        public ISearcher GetSearcher(string searcherName)
+        public bool TryGetSearcher(string searcherName, out ISearcher searcher)
         {
-            return _searchers.TryGetValue(searcherName, out var indexer) ? indexer : null;
+            return _searchers.TryGetValue(searcherName, out searcher);
         }
+
+        public IEnumerable<IIndex> Indexes => _indexers.Values;
+
+        public IEnumerable<ISearcher> RegisteredSearchers => _searchers.Values;
 
         public IReadOnlyDictionary<string, IIndex> IndexProviders => _indexers;
     }

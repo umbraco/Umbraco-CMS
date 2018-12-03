@@ -57,7 +57,7 @@ namespace Umbraco.Examine
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
             ILocalizationService languageService,
-            IValueSetValidator validator,
+            IContentValueSetValidator validator,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
@@ -121,14 +121,50 @@ namespace Umbraco.Examine
                 //Using a singleton here, we can't inject this when using config based providers and we don't use this
                 //anywhere else in this class
                 Current.Services.PublicAccessService,
-                parentId, ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
+                parentId,
+                ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
 
             SupportSoftDelete = supportUnpublished;
         }
 
         #endregion
 
-        #region Public methods
+        /// <summary>
+        /// Special check for invalid paths
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="onComplete"></param>
+        protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+        {
+            var valid = true;
+
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (var v in values)
+            {
+                if (v.Values.TryGetValue("path", out var paths) && paths.Count > 0 && paths[0] != null)
+                {
+                    //we know this is an IContentValueSetValidator
+                    var validator = (IContentValueSetValidator) ValueSetValidator;
+                    var path = paths[0].ToString();
+                    
+                    if (!validator.ValidatePath(path, v.Category)
+                        || !validator.ValidateRecycleBin(path, v.Category)
+                        || !validator.ValidateProtectedContent(path, v.Category))
+                    {
+                        //since the path is not valid we need to delete this item in case it exists in the index already and has now
+                        //been moved to an invalid parent.
+                        PerformDeleteFromIndex(v.Id, x => { /*noop*/ });
+                        valid = false;
+                    }
+                }
+            }
+
+            if (valid)
+            {
+                // ReSharper disable once PossibleMultipleEnumeration
+                base.PerformIndexItems(values, onComplete);
+            }
+        }
 
         /// <inheritdoc />
         /// <summary>
@@ -155,14 +191,11 @@ namespace Umbraco.Examine
             //need to queue a delete item for each one found
             foreach (var r in results)
             {
-                QueueIndexOperation(new IndexOperation(new ValueSet(r.Id, null), IndexOperationType.Delete));
+                QueueIndexOperation(new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete));
             }
 
             base.PerformDeleteFromIndex(nodeId, onComplete);
         }
-        #endregion
-
-        #region Protected
 
         /// <summary>
         /// Overridden to ensure that the variant system fields have the right value types
@@ -184,8 +217,6 @@ namespace Umbraco.Examine
 
             return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
-
-
-        #endregion
+        
     }
 }

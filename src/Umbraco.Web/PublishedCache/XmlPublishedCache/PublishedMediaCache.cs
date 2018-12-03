@@ -240,8 +240,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                //by default use the internal index
-                return eMgr.GetSearcher(Constants.Examine.InternalIndexer);
+                if (eMgr.TryGetIndex(Constants.Examine.InternalIndexer, out var index))
+                    return index.GetSearcher();
+                throw new InvalidOperationException($"No index found by name {Constants.Examine.InternalIndexer}");
             }
             catch (FileNotFoundException)
             {

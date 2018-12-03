@@ -59,18 +59,20 @@ namespace Umbraco.Examine
         /// </remarks>
         public IEnumerable<string> ExcludeFields { get; }
 
-        public virtual bool Validate(ValueSet valueSet)
+        public virtual ValueSetValidationResult Validate(ValueSet valueSet)
         {
             if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category))
-                return false;
+                return ValueSetValidationResult.Failed;
 
             //check if this document is of a correct type of node type alias
             if (IncludeItemTypes != null && !IncludeItemTypes.InvariantContains(valueSet.ItemType))
-                return false;
+                return ValueSetValidationResult.Failed;
 
             //if this node type is part of our exclusion list
             if (ExcludeItemTypes != null && ExcludeItemTypes.InvariantContains(valueSet.ItemType))
-                return false;
+                return ValueSetValidationResult.Failed;
+
+            var isFiltered = false;
 
             //filter based on the fields provided (if any)
             if (IncludeFields != null || ExcludeFields != null)
@@ -78,15 +80,21 @@ namespace Umbraco.Examine
                 foreach (var key in valueSet.Values.Keys.ToList())
                 {
                     if (IncludeFields != null && !IncludeFields.InvariantContains(key))
+                    {
                         valueSet.Values.Remove(key); //remove any value with a key that doesn't match the inclusion list
+                        isFiltered = true;
+                    }
 
                     if (ExcludeFields != null && ExcludeFields.InvariantContains(key))
+                    {
                         valueSet.Values.Remove(key); //remove any value with a key that matches the exclusion list
+                        isFiltered = true;
+                    }
+
                 }
             }
-            
 
-            return true;
+            return isFiltered ? ValueSetValidationResult.Filtered : ValueSetValidationResult.Valid;
         }
     }
 }
