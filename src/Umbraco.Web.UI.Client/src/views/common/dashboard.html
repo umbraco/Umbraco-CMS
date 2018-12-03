@@ -18,18 +18,13 @@
 
                 <umb-tab-content ng-repeat="tab in dashboard.tabs" ng-if="tab.active" tab="tab" class="row-fluid">
     
-                    <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
+                    <div ng-repeat="property in tab.properties">
     
-                        <div class="clearfix" ng-switch-when="false">
+                        <div class="clearfix">
                             <h3 ng-show="property.caption">{{property.caption}}</h3>
                             <div ng-include="property.path"></div>
                         </div>
     
-                        <div class="umb-dashboard-control clearfix" ng-switch-when="true">
-                            <h3 ng-show="property.caption">{{property.caption}}</h3>
-                            <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
-                        </div>
-
                     </div>
                     
                 </umb-tab-content>

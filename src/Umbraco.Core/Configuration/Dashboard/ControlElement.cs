@@ -8,25 +8,6 @@ namespace Umbraco.Core.Configuration.Dashboard
 
     internal class ControlElement : RawXmlConfigurationElement, IDashboardControl
     {
-        public bool ShowOnce
-        {
-            get
-            {
-                return RawXml.Attribute("showOnce") == null
-                           ? false
-                           : bool.Parse(RawXml.Attribute("showOnce").Value);
-            }
-        }
-
-        public bool AddPanel
-        {
-            get
-            {
-                return RawXml.Attribute("addPanel") == null
-                           ? true
-                           : bool.Parse(RawXml.Attribute("addPanel").Value);
-            }
-        }
 
         public string PanelCaption
         {
@@ -37,7 +18,6 @@ namespace Umbraco.Core.Configuration.Dashboard
                            : RawXml.Attribute("panelCaption").Value;
             }
         }
-
         public AccessElement Access
         {
             get
@@ -66,9 +46,6 @@ namespace Umbraco.Core.Configuration.Dashboard
         }
 
 
-        IAccess IDashboardControl.AccessRights
-        {
-            get { return Access; }
-        }
+        IAccess IDashboardControl.AccessRights => Access;
     }
 }

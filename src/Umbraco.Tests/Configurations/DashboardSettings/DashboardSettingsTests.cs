@@ -101,14 +101,10 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         [Test]
         public void Test_Control()
         {
-            Assert.AreEqual(true, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).ShowOnce);
-            Assert.AreEqual(true, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).AddPanel);
             Assert.AreEqual("hello", SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).PanelCaption);
             Assert.AreEqual("views/dashboard/settings/settingsdashboardintro.html",
                 SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).ControlPath);
 
-            Assert.AreEqual(false, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(1).ShowOnce);
-            Assert.AreEqual(false, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(1).AddPanel);
             Assert.AreEqual("", SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(1).PanelCaption);
             Assert.AreEqual("views/dashboard/settings/settingsdashboardvideos.html",
                 SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(1).ControlPath);
