@@ -3,8 +3,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using System.Linq;
-using Umbraco.Core.IO;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -27,16 +25,19 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
+        private readonly DashboardHelper _dashboardHelper;
+
+        public DashboardController(DashboardHelper dashboardHelper)
+        {
+            _dashboardHelper = dashboardHelper;
+        }
+
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
-            var context = UmbracoContext.Current;
-            if (context == null)
-                throw new HttpResponseException(HttpStatusCode.InternalServerError);
-
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
@@ -119,8 +120,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
-            var dashboardHelper = new DashboardHelper(Services.SectionService);
-            return dashboardHelper.GetDashboard(section, Security.CurrentUser);
+            return _dashboardHelper.GetDashboard(section, Security.CurrentUser);
         }
     }
 }

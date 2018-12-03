@@ -531,26 +531,24 @@
 
         // copy to clip board success
         function copySuccess() {
-
-            if (vm.page.copyPasswordButtonState != "success") {
-
-                vm.page.copyPasswordButtonState = "success";
-
+            if (vm.page.copyPasswordButtonState !== "success") {
+                $timeout(function(){
+                    vm.page.copyPasswordButtonState = "success";
+                });
                 $timeout(function () {
-                    resetClipboardButtonState()
+                    resetClipboardButtonState();
                 }, 1000);
             }
-
         }
 
         // copy to clip board error
         function copyError() {
-            if (vm.page.copyPasswordButtonState != "error") {
-
-                vm.page.copyPasswordButtonState = "error";
-
+            if (vm.page.copyPasswordButtonState !== "error") {
+                $timeout(function() {
+                    vm.page.copyPasswordButtonState = "error";
+                });
                 $timeout(function () {
-                    resetClipboardButtonState()
+                    resetClipboardButtonState();
                 }, 1000);
             }
         }

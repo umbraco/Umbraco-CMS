@@ -96,7 +96,7 @@ angular.module('umbraco.services')
         function loadLocales(locales, supportedLocales) {
             var localeUrls = getMomentLocales(locales, supportedLocales);
             if (localeUrls.length >= 1) {
-                return assetsService.load(localeUrls, $rootScope);
+                return service.load(localeUrls, $rootScope);
             }
             else {
                 $q.when(true);

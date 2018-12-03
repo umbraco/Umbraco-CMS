@@ -1,5 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
 
@@ -21,11 +23,19 @@ namespace Umbraco.Core.Manifest
 
         [JsonProperty("parameterEditors")]
         public IDataEditor[] ParameterEditors { get; set; } = Array.Empty<IDataEditor>();
-
+        
         [JsonProperty("gridEditors")]
         public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();
 
         [JsonProperty("contentApps")]
         public IContentAppDefinition[] ContentApps { get; set; } = Array.Empty<IContentAppDefinition>();
+
+        /// <summary>
+        /// The dictionary of dashboards
+        /// </summary>
+        [JsonProperty("dashboards")]
+        public IReadOnlyDictionary<string, ManifestDashboardSection> Dashboards { get; set; } = new Dictionary<string, ManifestDashboardSection>();
+
+       
     }
 }

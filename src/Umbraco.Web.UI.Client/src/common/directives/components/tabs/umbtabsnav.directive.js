@@ -128,12 +128,12 @@ Use this directive to render a tabs navigation.
 				});
             }
 
-            $(window).bind('resize.tabsNav', function () {
+            $(window).on('resize.tabsNav', function () {
                 calculateWidth();
             });
 
             scope.$on('$destroy', function() {
-                $(window).unbind('resize.tabsNav');
+                $(window).off('resize.tabsNav');
             });
 
         }

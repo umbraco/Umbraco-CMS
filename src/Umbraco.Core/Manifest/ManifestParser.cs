@@ -100,6 +100,7 @@ namespace Umbraco.Core.Manifest
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<IContentAppDefinition>();
+            var dashboards = new Dictionary<string, ManifestDashboardSection>();
 
             foreach (var manifest in manifests)
             {
@@ -109,6 +110,35 @@ namespace Umbraco.Core.Manifest
                 if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
+                if (manifest.Dashboards != null)
+                {
+                    foreach (var item in manifest.Dashboards)
+                    {
+                        if (dashboards.TryGetValue(item.Key, out var existing))
+                        {
+                            foreach (var area in item.Value.Areas)
+                                if (existing.Areas.Contains(area, StringComparer.InvariantCultureIgnoreCase) == false)
+                                    existing.Areas.Add(area);
+
+                            //merge
+                            foreach (var tab in item.Value.Tabs)
+                            {
+                                if (existing.Tabs.TryGetValue(tab.Key, out var existingTab))
+                                {
+                                    //merge
+                                    foreach (var control in tab.Value.Controls)
+                                    {
+                                        existingTab.Controls.Add(control);
+                                    }
+                                }
+                                else
+                                    existing.Tabs[tab.Key] = tab.Value;
+                            }
+                        }
+                        else
+                            dashboards[item.Key] = item.Value;
+                    }
+                }
             }
 
             return new PackageManifest
@@ -118,7 +148,8 @@ namespace Umbraco.Core.Manifest
                 PropertyEditors = propertyEditors.ToArray(),
                 ParameterEditors = parameterEditors.ToArray(),
                 GridEditors = gridEditors.ToArray(),
-                ContentApps = contentApps.ToArray()
+                ContentApps = contentApps.ToArray(),
+                Dashboards = dashboards
             };
         }
 
@@ -151,6 +182,7 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
+                //TODO: DO i need a dashboard one?
                 new ContentAppDefinitionConverter());
 
             // scripts and stylesheets are raw string, must process here
@@ -165,6 +197,8 @@ namespace Umbraco.Core.Manifest
             if (ppEditors.Count > 0)
                 manifest.ParameterEditors = manifest.ParameterEditors.Union(ppEditors).ToArray();
 
+            //TODO: Do we need to deal with dashboards or are they auto parsed?
+
             return manifest;
         }
 
@@ -173,5 +207,6 @@ namespace Umbraco.Core.Manifest
         {
             return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(text);
         }
+
     }
 }

@@ -45,8 +45,6 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
             appState.setMenuState("showMenuDialog", false);
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
-
-            //$("#search-form input").focus();
             break;
         case 'menu':
             appState.setGlobalState("navMode", "menu");
@@ -70,12 +68,6 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
             appState.setMenuState("showMenu", false);
             appState.setSectionState("showSearchResults", true);
             appState.setMenuState("showMenuDialog", false);
-
-            //TODO: This would be much better off in the search field controller listening to appState changes
-            $timeout(function() {
-                $("#search-field").focus();
-            });
-
             break;
         default:
             appState.setGlobalState("navMode", "default");
