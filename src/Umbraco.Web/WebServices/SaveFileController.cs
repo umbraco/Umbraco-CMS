@@ -243,7 +243,7 @@ namespace Umbraco.Web.WebServices
             // sanitize input - stylesheet names have no extension
             var svce = (FileService)Services.FileService;
 
-            filename = CleanFilename(filename.CleanForXss());
+            filename = CleanFilename(filename);
             oldName = CleanFilename(oldName);
 
             if (filename != oldName)
