@@ -3,6 +3,8 @@ using Examine;
 
 namespace Umbraco.Examine
 {
+    
+
     public interface IIndexPopulator
     {
         bool IsRegistered(string indexName);

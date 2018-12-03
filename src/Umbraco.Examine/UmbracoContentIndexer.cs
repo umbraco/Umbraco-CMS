@@ -136,33 +136,43 @@ namespace Umbraco.Examine
         /// <param name="onComplete"></param>
         protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
         {
-            var valid = true;
-
-            // ReSharper disable once PossibleMultipleEnumeration
-            foreach (var v in values)
+            //We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
+            // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
+            // Then we'll index the Value group all together.
+            // We return 0 or 1 here so we can order the results and do the invalid first and then the valid.
+            var invalidOrValid = values.GroupBy(v =>
             {
-                if (v.Values.TryGetValue("path", out var paths) && paths.Count > 0 && paths[0] != null)
-                {
-                    //we know this is an IContentValueSetValidator
-                    var validator = (IContentValueSetValidator) ValueSetValidator;
-                    var path = paths[0].ToString();
-                    
-                    if (!validator.ValidatePath(path, v.Category)
+                if (!v.Values.TryGetValue("path", out var paths) || paths.Count <= 0 || paths[0] == null)
+                    return 0;
+
+                //we know this is an IContentValueSetValidator
+                var validator = (IContentValueSetValidator)ValueSetValidator;
+                var path = paths[0].ToString();
+
+                return (!validator.ValidatePath(path, v.Category)
                         || !validator.ValidateRecycleBin(path, v.Category)
                         || !validator.ValidateProtectedContent(path, v.Category))
+                    ? 0
+                    : 1;
+            });
+
+            foreach (var group in invalidOrValid.OrderBy(x => x.Key))
+            {
+                if (group.Key == 0)
+                {
+                    //these are the invalid items so we'll delete them
+                    //since the path is not valid we need to delete this item in case it exists in the index already and has now
+                    //been moved to an invalid parent.
+                    foreach (var i in group)
                     {
-                        //since the path is not valid we need to delete this item in case it exists in the index already and has now
-                        //been moved to an invalid parent.
-                        PerformDeleteFromIndex(v.Id, x => { /*noop*/ });
-                        valid = false;
+                        PerformDeleteFromIndex(i.Id, x => { /*noop*/ });
                     }
                 }
-            }
-
-            if (valid)
-            {
-                // ReSharper disable once PossibleMultipleEnumeration
-                base.PerformIndexItems(values, onComplete);
+                else
+                {
+                    //these are the valid ones, so just index them all at once
+                    base.PerformIndexItems(group, onComplete);
+                }
             }
         }
 

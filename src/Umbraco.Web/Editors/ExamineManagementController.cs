@@ -25,16 +25,17 @@ namespace Umbraco.Web.Editors
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCacheProvider;
-        private readonly IEnumerable<IIndexPopulator> _populators;
+        private readonly IndexRebuilder _indexRebuilder;
+
 
         public ExamineManagementController(IExamineManager examineManager, ILogger logger,
             IRuntimeCacheProvider runtimeCacheProvider,
-            IEnumerable<IIndexPopulator> populators)
+            IndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;
             _runtimeCacheProvider = runtimeCacheProvider;
-            _populators = populators;
+            _indexRebuilder = indexRebuilder;
         }
 
         /// <summary>
@@ -151,9 +152,11 @@ namespace Umbraco.Web.Editors
                 //clear and replace
                 index.CreateIndex();
 
-                //populate it
-                foreach (var populator in _populators.Where(x => x.IsRegistered(indexName)))
-                    populator.Populate(index);
+                _indexRebuilder.RebuildIndex(indexName);
+
+                ////populate it
+                //foreach (var populator in _populators.Where(x => x.IsRegistered(indexName)))
+                //    populator.Populate(index);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -195,7 +198,7 @@ namespace Umbraco.Web.Editors
                 Name = indexName,
                 HealthStatus = isHealth.Success ? (isHealth.Result ?? "Healthy") : (isHealth.Result ?? "Unhealthy"),
                 ProviderProperties = properties,
-                CanRebuild = _populators.Any(x => x.IsRegistered(indexName))
+                CanRebuild = _indexRebuilder.CanRebuild(indexName)
             };
             
 
@@ -239,7 +242,7 @@ namespace Umbraco.Web.Editors
 
         private HttpResponseMessage ValidatePopulator(string indexName)
         {
-            if (_populators.Any(x => x.IsRegistered(indexName)))
+            if (_indexRebuilder.CanRebuild(indexName))
                 return Request.CreateResponse(HttpStatusCode.OK);
 
             var response = Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -264,7 +267,6 @@ namespace Umbraco.Web.Editors
             return response;
         }
 
-        //static listener so it's not GC'd
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)
         {
             var indexer = (LuceneIndex) sender;
