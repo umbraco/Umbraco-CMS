@@ -10,6 +10,7 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
     vm.selectedSearcher = null;
     vm.searchResults = null;
 
+    vm.showSearchResultDialog = showSearchResultDialog;
     vm.showIndexInfo = showIndexInfo;
     vm.showSearcherInfo = showSearcherInfo;
     vm.search = search;
@@ -21,6 +22,19 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
     vm.goToPageSearchResultPage = goToPageSearchResultPage;
 
     vm.infoOverlay = null;
+
+    function showSearchResultDialog(values) {
+        if (vm.searchResults) {
+            vm.searchResults.overlay = {
+                title: "Field values",
+                searchResultValues: values,
+                view: "views/dashboard/settings/examinemanagementresults.html",
+                close: function () {
+                    vm.searchResults.overlay = null;
+                }
+            };
+        }
+    }
 
     function nextSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
