@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -8,26 +7,21 @@ namespace Umbraco.Core.Configuration.Dashboard
 
     internal class ControlElement : RawXmlConfigurationElement, IDashboardControl
     {
-
         public string PanelCaption
         {
             get
             {
-                return RawXml.Attribute("panelCaption") == null
-                           ? ""
-                           : RawXml.Attribute("panelCaption").Value;
+                var panelCaption = RawXml.Attribute("panelCaption");
+                return panelCaption == null ? "" : panelCaption.Value;
             }
         }
+
         public AccessElement Access
         {
             get
             {
                 var access = RawXml.Element("access");
-                if (access == null)
-                {
-                    return new AccessElement();
-                }
-                return new AccessElement(access);
+                return access == null ? new AccessElement() : new AccessElement(access);
             }
         }
 
@@ -44,7 +38,6 @@ namespace Umbraco.Core.Configuration.Dashboard
                 return txt.Value.Trim();
             }
         }
-
 
         IAccess IDashboardControl.AccessRights => Access;
     }

@@ -100,7 +100,7 @@ namespace Umbraco.Core.Manifest
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<IContentAppDefinition>();
-            var dashboards = new List<ManifestDashboard>();
+            var dashboards = new List<ManifestDashboardDefinition>();
 
             foreach (var manifest in manifests)
             {
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
-                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);               
+                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
             }
 
             return new PackageManifest
@@ -132,7 +132,6 @@ namespace Umbraco.Core.Manifest
                 return new string[0];
             return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
         }
-            
 
         private static string TrimPreamble(string text)
         {
@@ -154,8 +153,8 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
-                //TODO: DO i need a dashboard one?
-                new ContentAppDefinitionConverter());
+                new ContentAppDefinitionConverter(),
+                new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)
@@ -169,8 +168,6 @@ namespace Umbraco.Core.Manifest
             if (ppEditors.Count > 0)
                 manifest.ParameterEditors = manifest.ParameterEditors.Union(ppEditors).ToArray();
 
-            //TODO: Do we need to deal with dashboards or are they auto parsed?
-
             return manifest;
         }
 
@@ -179,6 +176,5 @@ namespace Umbraco.Core.Manifest
         {
             return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(text);
         }
-
     }
 }

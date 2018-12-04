@@ -194,8 +194,8 @@
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
-    <Compile Include="Configuration\Dashboard\AccessItem.cs" />
-    <Compile Include="Configuration\Dashboard\AccessType.cs" />
+    <Compile Include="Configuration\Dashboard\AccessRule.cs" />
+    <Compile Include="Configuration\Dashboard\AccessRuleType.cs" />
     <Compile Include="Configuration\Dashboard\AreaCollection.cs" />
     <Compile Include="Configuration\Dashboard\AreaElement.cs" />
     <Compile Include="Configuration\Dashboard\AreasElement.cs" />
@@ -203,7 +203,7 @@
     <Compile Include="Configuration\Dashboard\ControlElement.cs" />
     <Compile Include="Configuration\Dashboard\DashboardSection.cs" />
     <Compile Include="Configuration\Dashboard\IAccess.cs" />
-    <Compile Include="Configuration\Dashboard\IAccessItem.cs" />
+    <Compile Include="Configuration\Dashboard\IAccessRule.cs" />
     <Compile Include="Configuration\Dashboard\IArea.cs" />
     <Compile Include="Configuration\Dashboard\IDashboardControl.cs" />
     <Compile Include="Configuration\Dashboard\IDashboardSection.cs" />
@@ -334,8 +334,9 @@
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
     <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
+    <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
-    <Compile Include="Manifest\ManifestDashboardSection.cs" />
+    <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
