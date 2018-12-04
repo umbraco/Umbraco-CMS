@@ -27,7 +27,7 @@
 
             <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
                 <h4><strong><localize key="packager_packagesPopular">Popular</localize></strong></h4>
-                <div class="umb-packages clearfix">
+                <div class="umb-packages">
 
                     <div class="umb-package" ng-repeat="package in vm.popular">
                         <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
@@ -61,7 +61,7 @@
                 <h4 ng-if="vm.searchQuery === ''"><strong><localize key="packager_packagesNew">New Releases</localize></strong></h4>
                 <h4 ng-if="vm.searchQuery !== ''"><strong><localize key="packager_packageSearchResults">Results for</localize> '{{ vm.searchQuery }}'</strong></h4>
 
-                <div class="umb-packages clearfix">
+                <div class="umb-packages">
 
                     <div class="umb-package" ng-repeat="package in vm.packages">
                         <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
@@ -129,147 +129,153 @@
 
                 <div class="umb-package-details__main-content">
 
-                    <div class="umb-packages-view-title">{{ vm.package.name }}</div>
+                    <umb-box>
+                        <umb-box-content>
+                            <div class="umb-packages-view-title">{{ vm.package.name }}</div>
+                            <div class="umb-package-details__description" ng-bind-html="vm.package.description"></div>
+                            <div class="umb-gallery">
+                                <div class="umb-gallery__thumbnails">
+                                <a class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
+                                        <img ng-src="{{ image.thumbnail }}" />
+                                    </a>
+                                </div>
+                            </div>
+                        </umb-box-content>
+                    </umb-box>
 
-                    <div class="umb-package-details__description" ng-bind-html="vm.package.description"></div>
-
-                    <div class="umb-gallery">
-                        <div class="umb-gallery__thumbnails">
-                        <a class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
-                                <img ng-src="{{ image.thumbnail }}" />
-                            </a>
-                        </div>
-                    </div>
-
-                <umb-lightbox
-                    ng-if="vm.lightbox.show"
-                    items="vm.lightbox.items"
-                    active-item-index="vm.lightbox.activeIndex"
-                    on-close="vm.closeLightbox">
-                </umb-lightbox>
+                    <umb-lightbox
+                        ng-if="vm.lightbox.show"
+                        items="vm.lightbox.items"
+                        active-item-index="vm.lightbox.activeIndex"
+                        on-close="vm.closeLightbox">
+                    </umb-lightbox>
 
                 </div>
 
                 <div class="umb-package-details__sidebar">
 
-                    <div class="umb-package-details__section">
-
-                        <umb-button
-                            ng-if="vm.package.isValid === true"
-                            type="button"
-                            button-style="[success,block]"
-                            size="m"
-                            action="vm.downloadPackage(vm.package)"
-                            label-key="packager_packageInstall">
-                        </umb-button>
-
-                        <umb-button
-                            ng-if="vm.package.isValid === false"
-                            type="button"
-                            button-style="[block]"
-                            size="m"
-                            disabled="vm.package.isValid === false"
-                            label-key="packager_packageAlreadyInstalled">
-                        </umb-button>
-
-                    </div>
-
-                    <div class="umb-package-details__section">
-                        <div class="umb-package-details__owner-profile">
-
-                            <div class="umb-package-details__owner-profile-avatar">
-                            <umb-avatar
+                    <umb-box>
+                        <umb-box-content>
+                            <umb-button
+                                ng-if="vm.package.isValid === true"
+                                type="button"
+                                button-style="[success,block]"
                                 size="m"
-                                img-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
-                            </umb-avatar>
-                            </div>
+                                action="vm.downloadPackage(vm.package)"
+                                label-key="packager_packageInstall">
+                            </umb-button>
+                            <umb-button
+                                ng-if="vm.package.isValid === false"
+                                type="button"
+                                button-style="[block]"
+                                size="m"
+                                disabled="vm.package.isValid === false"
+                                label-key="packager_packageAlreadyInstalled">
+                            </umb-button>
+                        </umb-box-content>
+                    </umb-box>
 
+                    <umb-box>
+                        <umb-box-content>
+                            <div class="umb-package-details__owner-profile">
+
+                                <div class="umb-package-details__owner-profile-avatar">
+                                <umb-avatar
+                                    size="m"
+                                    img-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
+                                </umb-avatar>
+                                </div>
+    
+                                <div>
+                                    <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
+                                    <div class="umb-package-details__owner-profile-karma">
+                                        {{ vm.package.ownerInfo.owner }} <localize key="packager_packageHas">has</localize> <strong>{{ vm.package.ownerInfo.karma }}</strong> <localize key="packager_packageKarmaPoints">karma points</localize>
+                                    </div>
+                                </div>
+                            </div>
+                        </umb-box-content>
+                    </umb-box>
+
+                    <umb-box>
+                        <umb-box-content>
+                            <div class="umb-package-details__section-title"><localize key="packager_packageInfo">Information</localize></div>
                             <div>
-                                <div class="umb-package-details__owner-profile-name">{{ vm.package.ownerInfo.owner }}</div>
-                                <div class="umb-package-details__owner-profile-karma">
-                                    {{ vm.package.ownerInfo.owner }} <localize key="packager_packageHas">has</localize> <strong>{{ vm.package.ownerInfo.karma }}</strong> <localize key="packager_packageKarmaPoints">karma points</localize>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.owner">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageOwner">Owner</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.ownerInfo.owner}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.contributors">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageContrib">Contributors</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">
+                                        <span ng-repeat="contributor in vm.package.ownerInfo.contributors">{{ contributor }}<span ng-if="!$last">,&nbsp;</span></span>
+                                    </div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.created">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageCreated">Created</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.created | date:'yyyy-MM-dd HH:mm:ss'}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageCurrentVersion">Current version</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.latestVersion}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.information.netVersion">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageNetVersion">.NET Version</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.information.netVersion}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.licenseName">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageLicense">License</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.licenseName}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.downloads">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageDownloads">Downloads</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.downloads}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.karma">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_packageLikes">Likes</localize>:</div>
+                                    <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
+                                </div>
+
+                            </div>
+                        </umb-box-content>
+                    </umb-box>
+
+                    <umb-box>
+                        <umb-box-content>
+                            <div class="umb-package-details__section-title"><localize key="packager_packageCompatibility">Compatibility</localize></div>
+                            <div class="umb-package-details__section-description"><localize key="packager_packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</localize></div>
+                            <div class="umb-package-details__compatability" ng-repeat="compatibility in vm.package.compatibility | filter:percentage > 0">
+                                <div class="umb-package-details__compatability-label">
+                                    <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>
+                                    <span class="umb-package-details__information-item-label-2">({{compatibility.percentage}}%)</span>
+                                </div>
+                                <umb-progress-bar
+                                    percentage="{{compatibility.percentage}}">
+                                </umb-progress-bar>
+                            </div>
+                        </umb-box-content>
+                    </umb-box>
+
+                    <umb-box ng-if="vm.package.externalSources">
+                        <umb-box-content>
+                            <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
+                            <div>
+                                <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
+                                    <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
+                                        <i class="icon-out"></i>
+                                        {{ externalSource.name }}
+                                    </a>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="umb-package-details__section">
-                        <div class="umb-package-details__section-title"><localize key="packager_packageInfo">Information</localize></div>
-                        <div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.owner">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageOwner">Owner</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.ownerInfo.owner}}</div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.contributors">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageContrib">Contributors</localize>:</div>
-                                <div class="umb-package-details__information-item-content">
-                                    <span ng-repeat="contributor in vm.package.ownerInfo.contributors">{{ contributor }}<span ng-if="!$last">,&nbsp;</span></span>
-                                </div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.created">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageCreated">Created</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.created | date:'yyyy-MM-dd HH:mm:ss'}}</div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.latestVersion">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageCurrentVersion">Current version</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.latestVersion}}</div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.information.netVersion">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageNetVersion">.NET Version</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.information.netVersion}}</div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.licenseName">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageLicense">License</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.licenseName}}</div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.downloads">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageDownloads">Downloads</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.downloads}}</div>
-                            </div>
-
-                            <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.karma">
-                                <div class="umb-package-details__information-item-label"><localize key="packager_packageLikes">Likes</localize>:</div>
-                                <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="umb-package-details__section">
-                        <div class="umb-package-details__section-title"><localize key="packager_packageCompatibility">Compatibility</localize></div>
-                        <div class="umb-package-details__section-description"><localize key="packager_packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</localize></div>
-                        <div class="umb-package-details__compatability" ng-repeat="compatibility in vm.package.compatibility | filter:percentage > 0">
-                            <div class="umb-package-details__compatability-label">
-                                <span class="umb-package-details__information-item-label">{{compatibility.version}}</span>
-                                <span class="umb-package-details__information-item-label-2">({{compatibility.percentage}}%)</span>
-                            </div>
-
-                        <umb-progress-bar
-                            percentage="{{compatibility.percentage}}">
-                        </umb-progress-bar>
-
-                        </div>
-                    </div>
-
-                    <div class="umb-package-details__section" ng-if="vm.package.externalSources">
-                        <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
-                        <div>
-                            <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
-                                <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
-                                    <i class="icon-out"></i>
-                                    {{ externalSource.name }}
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
+                        </umb-box-content>
+                    </umb-box>
 
                 </div>
 
