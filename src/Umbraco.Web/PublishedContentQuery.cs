@@ -227,7 +227,7 @@ namespace Umbraco.Web
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
         {
             //fixme: inject IExamineManager
 
@@ -260,7 +260,7 @@ namespace Umbraco.Web
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
         {
             if (_query != null) return _query.Search(skip, take, out totalRecords, criteria, searcher);
 

@@ -590,7 +590,7 @@ namespace Umbraco.Web.Editors
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
             return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom);
         }

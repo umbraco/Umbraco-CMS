@@ -9,13 +9,18 @@ using System.Web.Http;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
+using Lucene.Net.Analysis;
+using Lucene.Net.QueryParsers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Examine;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Search;
+using SearchResult = Umbraco.Web.Models.ContentEditing.SearchResult;
+using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Web.Editors
 {
@@ -54,40 +59,59 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
         {
             var model = new List<ExamineSearcherModel>(
-                _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel{Name = searcher.Name})
+                _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel { Name = searcher.Name })
                     .OrderBy(x => x.Name.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
             return model;
         }
 
-        public ISearchResults GetSearchResults(string searcherName, string query, string queryType)
+        public SearchResults GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
         {
-            if (queryType == null)
-            {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
-
             if (query.IsNullOrWhiteSpace())
+                return SearchResults.Empty();
+
+            var msg = ValidateSearcher(searcherName, out var searcher);
+            if (!msg.IsSuccessStatusCode)
+                throw new HttpResponseException(msg);
+
+            var results = TryParseLuceneQuery(query)
+                ? searcher.Search(searcher.CreateCriteria().RawQuery(query), maxResults: pageSize * (pageIndex + 1))
+                : searcher.Search(query, true, maxResults: pageSize * (pageIndex + 1));
+
+            var pagedResults = results.Skip(pageIndex * pageSize);
+
+            return new SearchResults
             {
-                return LuceneSearchResults.Empty();
-            }
+                TotalRecords = results.TotalItemCount,
+                Results = pagedResults.Select(x => new SearchResult
+                {
+                    Id = x.Id,
+                    Score = x.Score,
+                    Values = x.Values
+                })
+            };
+        }
 
-            var msg = ValidateLuceneSearcher(searcherName, out var searcher);
-            if (msg.IsSuccessStatusCode)
+        private bool TryParseLuceneQuery(string query)
+        {
+            //TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll
+            // also do this rudimentary check
+            if (!query.Contains(":"))
+                return false;
+
+            try
             {
-                if (queryType.InvariantEquals("text"))
-                {
-                    return searcher.Search(query, false);
-                }
-
-                if (queryType.InvariantEquals("lucene"))
-                {
-                    return searcher.Search(searcher.CreateCriteria().RawQuery(query));
-                }
-
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                //This will pass with a plain old string without any fields, need to figure out a way to have it properly parse
+                var parsed = new QueryParser(Version.LUCENE_30, "nodeName", new KeywordAnalyzer()).Parse(query);
+                return true;
             }
-
-            throw new HttpResponseException(msg);
+            catch (ParseException)
+            {
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -174,7 +198,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        
+
 
         private ExamineIndexModel CreateModel(IIndex index)
         {
@@ -200,39 +224,24 @@ namespace Umbraco.Web.Editors
                 ProviderProperties = properties,
                 CanRebuild = _indexRebuilder.CanRebuild(indexName)
             };
-            
+
 
             return indexerModel;
         }
 
-        private HttpResponseMessage ValidateLuceneSearcher(string searcherName, out LuceneSearcher searcher)
+        private HttpResponseMessage ValidateSearcher(string searcherName, out ISearcher searcher)
         {
-            foreach (var indexer in _examineManager.Indexes)
+            //try to get the searcher from the indexes
+            if (_examineManager.TryGetIndex(searcherName, out var index))
             {
-                var s = indexer.GetSearcher();
-                var sName = (s as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Name, "Searcher");
-                if (sName != searcherName)
-                {
-                    continue;
-                }
-
-                searcher = s as LuceneSearcher;
-
-                //Found it, return OK
-                if (searcher != null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                }
-
-                //Return an error since it's not the right type
-                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-                response.Content =
-                    new StringContent($"The searcher {searcherName} is not of type {typeof(LuceneSearcher)}");
-                response.ReasonPhrase = "Wrong Searcher Type";
-                return response;
+                searcher = index.GetSearcher();
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            searcher = null;
+
+            //if we didn't find anything try to find it by an explicitly declared searcher
+            if (_examineManager.TryGetSearcher(searcherName, out searcher))
+                return Request.CreateResponse(HttpStatusCode.OK);
 
             var response1 = Request.CreateResponse(HttpStatusCode.BadRequest);
             response1.Content = new StringContent($"No searcher found with name = {searcherName}");
@@ -269,7 +278,7 @@ namespace Umbraco.Web.Editors
 
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)
         {
-            var indexer = (LuceneIndex) sender;
+            var indexer = (LuceneIndex)sender;
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

@@ -62,7 +62,7 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.0-beta042" />
+    <PackageReference Include="Examine" Version="1.0.0-beta043" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
     <PackageReference Include="ImageProcessor">
       <Version>2.6.2.25</Version>
@@ -151,6 +151,8 @@
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\ContentEditing\RollbackVersion.cs" />
+    <Compile Include="Models\ContentEditing\SearchResult.cs" />
+    <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
@@ -944,7 +946,7 @@
     <Compile Include="Models\Trees\MenuItem.cs" />
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
-    <Compile Include="Models\ContentEditing\SearchResultItem.cs" />
+    <Compile Include="Models\ContentEditing\SearchResultEntity.cs" />
     <Compile Include="Models\Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />

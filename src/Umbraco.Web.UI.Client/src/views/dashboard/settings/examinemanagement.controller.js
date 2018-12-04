@@ -7,19 +7,33 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
     vm.loading = true;
     vm.viewState = "list";
     vm.selectedIndex = null;
+    vm.selectedSearcher = null;
+    vm.searchResults = null;
 
     vm.showIndexInfo = showIndexInfo;
     vm.showSearcherInfo = showSearcherInfo;
     vm.search = search;
     vm.toggle = toggle;
     vm.rebuildIndex = rebuildIndex;
-    vm.closeSearch = closeSearch;
     vm.setViewState = setViewState;
-    
+    vm.nextSearchResultPage = nextSearchResultPage;
+    vm.prevSearchResultPage = prevSearchResultPage;
+    vm.goToPageSearchResultPage = goToPageSearchResultPage;
 
     vm.infoOverlay = null;
 
+    function nextSearchResultPage(pageNumber) {
+        search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
+    }
+    function prevSearchResultPage(pageNumber) {
+        search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
+    }
+    function goToPageSearchResultPage(pageNumber) {
+        search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
+    }
+
     function setViewState(state) {
+        vm.searchResults = null;
         vm.viewState = state;
     }
 
@@ -49,7 +63,7 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
                     }
                     index.isProcessing = false;
                 } else {
-                    $timeout(function() {
+                    $timeout(() => {
                             //don't continue if we've tried 100 times
                             if (index.processingAttempts < 100) {
                                 checkProcessing(index, checkActionName);
@@ -65,23 +79,34 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
             });
     }
 
-    function search(searcher, e) {
+    function search(searcher, e, pageNumber) {
+
+        //deal with accepting pressing the enter key
         if (e && e.keyCode !== 13) {
             return;
         }
+
+        if (!searcher) {
+            throw "searcher parameter is required";
+        }
+
+        searcher.isProcessing = true;
 
         umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
                     "GetSearchResults",
                     {
                         searcherName: searcher.name,
-                        query: encodeURIComponent(searcher.searchText),
-                        queryType: searcher.searchType
+                        query: encodeURIComponent(vm.searchText),
+                        pageIndex: pageNumber ? (pageNumber - 1) : 0
                     })),
                 'Failed to search')
-            .then(function(searchResults) {
-                searcher.isSearching = true;
-                searcher.searchResults = searchResults;
+            .then(searchResults => {
+                searcher.isProcessing = false;
+                vm.searchResults = searchResults
+                vm.searchResults.pageNumber = pageNumber ? pageNumber : 1;
+                //20 is page size
+                vm.searchResults.totalPages = Math.ceil(vm.searchResults.totalRecords / 20);
             });
     }
 
@@ -111,17 +136,10 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
 
                     //rebuilding has started, nothing is returned accept a 200 status code.
                     //lets poll to see if it is done.
-                    $timeout(function() {
-                            checkProcessing(index, "PostCheckRebuildIndex");
-                        },
-                        1000);
+                    $timeout(() => { checkProcessing(index, "PostCheckRebuildIndex"), 1000 });
 
                 });
         }
-    }
-
-    function closeSearch(searcher) {
-        searcher.isSearching = true;
     }
 
     function init() {
@@ -142,17 +160,14 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
                 umbRequestHelper.resourcePromise(
                     $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetSearcherDetails")),
                     'Failed to retrieve searcher details')
-                .then(function (data) {
+                .then(data => {
                     vm.searcherDetails = data;
                     for (var s in vm.searcherDetails) {
                         vm.searcherDetails[s].searchType = "text";
                     }
                 })
             ])
-            .then(function () {
-                //all init loading is complete
-                vm.loading = false;
-            });
+            .then(() => { vm.loading = false });
     }
 
     init();

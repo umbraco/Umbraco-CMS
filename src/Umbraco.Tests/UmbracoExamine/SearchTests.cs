@@ -86,7 +86,7 @@ namespace Umbraco.Tests.UmbracoExamine
             }
         }
 
-        private bool IsSortedByNumber(IEnumerable<SearchResult> results)
+        private bool IsSortedByNumber(IEnumerable<ISearchResult> results)
         {
             var currentSort = 0;
             foreach (var searchResult in results)

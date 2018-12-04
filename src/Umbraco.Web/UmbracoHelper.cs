@@ -836,7 +836,7 @@ namespace Umbraco.Web
         /// <param name="useWildCards"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string searchProvider = null)
         {
             return ContentQuery.Search(skip, take, out totalRecords, term, useWildCards, searchProvider);
         }
@@ -850,7 +850,7 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out long totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
             return ContentQuery.Search(skip, take, out totalRecords, criteria, searchProvider);
         }

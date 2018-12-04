@@ -354,7 +354,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return null;
         }
 
-        internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
+        internal CacheValues ConvertFromSearchResult(ISearchResult searchResult)
         {
             // note: fixing fields in 7.x, removed by Shan for 8.0
 

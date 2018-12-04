@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            CreateMap<EntitySlim, SearchResultItem>()
+            CreateMap<EntitySlim, SearchResultEntity>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src=> GetContentTypeIcon(src)))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            CreateMap<SearchResult, SearchResultItem>()
+            CreateMap<ISearchResult, SearchResultEntity>()
                 //default to document icon
                   .ForMember(dest => dest.Score, opt => opt.MapFrom(result => result.Score))
                   .ForMember(dest => dest.Udi, opt => opt.Ignore())
@@ -174,11 +174,11 @@ namespace Umbraco.Web.Models.Mapping
                           }
                       });
 
-            CreateMap<ISearchResults, IEnumerable<SearchResultItem>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
+            CreateMap<ISearchResults, IEnumerable<SearchResultEntity>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultEntity>).ToList());
 
-            CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
+            CreateMap<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultEntity>).ToList());
         }
 
         /// <summary>

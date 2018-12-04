@@ -12,6 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
+using SearchResult = Examine.SearchResult;
 
 namespace Umbraco.Web.Search
 {
@@ -41,7 +42,7 @@ namespace Umbraco.Web.Search
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        public IEnumerable<SearchResultItem> ExamineSearch(
+        public IEnumerable<SearchResultEntity> ExamineSearch(
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Search
                 if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
                 {
                     totalFound = 0;
-                    return new List<SearchResultItem>();
+                    return new List<SearchResultEntity>();
                 }
 
                 //update the query with the query term
@@ -143,7 +144,7 @@ namespace Umbraco.Web.Search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
                 {
                     totalFound = 0;
-                    return new List<SearchResultItem>();
+                    return new List<SearchResultEntity>();
                 }
 
                 //update the query with the query term
@@ -277,9 +278,9 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> MemberFromSearchResults(SearchResult[] results)
+        private IEnumerable<SearchResultEntity> MemberFromSearchResults(ISearchResult[] results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultItem>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
@@ -310,9 +311,9 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> MediaFromSearchResults(IEnumerable<SearchResult> results)
+        private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultItem>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
@@ -330,9 +331,9 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ContentFromSearchResults(IEnumerable<SearchResult> results)
+        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultItem>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
