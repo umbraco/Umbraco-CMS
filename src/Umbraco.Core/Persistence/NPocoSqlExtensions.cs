@@ -1136,7 +1136,7 @@ namespace Umbraco.Core.Persistence
         {
             text.AppendLine(sql);
 
-            if (arguments.Length == 0)
+            if (arguments == null || arguments.Length == 0)
                 return;
 
             text.Append(" --");
