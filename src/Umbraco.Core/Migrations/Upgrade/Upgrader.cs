@@ -1,47 +1,76 @@
 ﻿using System;
-using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
+    /// <summary>
+    /// Provides a base class for upgraders.
+    /// </summary>
     public abstract class Upgrader
     {
         private readonly IKeyValueService _keyValueService;
-        private readonly PostMigrationCollection _postMigrations;
         private MigrationPlan _plan;
 
-        protected Upgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Upgrader"/> class.
+        /// </summary>
+        protected Upgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             MigrationBuilder = migrationBuilder ?? throw new ArgumentNullException(nameof(migrationBuilder));
             _keyValueService = keyValueService ?? throw new ArgumentNullException(nameof(keyValueService));
-            _postMigrations = postMigrations ?? throw new ArgumentNullException(nameof(postMigrations));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Gets the name of the migration plan.
+        /// </summary>
         public string Name => Plan.Name;
 
+        /// <summary>
+        /// Gets the state value key corresponding to the migration plan.
+        /// </summary>
         public string StateValueKey => GetStateValueKey(Plan);
 
+        /// <summary>
+        /// Gets the scope provider.
+        /// </summary>
         protected IScopeProvider ScopeProvider { get; }
 
+        /// <summary>
+        /// Gets the migration builder.
+        /// </summary>
         protected IMigrationBuilder MigrationBuilder { get; }
 
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
         protected ILogger Logger { get; }
 
-        protected MigrationPlan Plan => _plan ?? (_plan = GetPlan());
+        /// <summary>
+        /// Gets the migration plan.
+        /// </summary>
+        protected MigrationPlan Plan => _plan ?? (_plan = CreatePlan());
 
-        protected abstract MigrationPlan GetPlan();
-        protected abstract (SemVersion, SemVersion) GetVersions();
+        /// <summary>
+        /// Creates the migration plan.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract MigrationPlan CreatePlan();
 
+        /// <summary>
+        /// Executes.
+        /// </summary>
         public void Execute()
         {
             var plan = Plan;
 
             using (var scope = ScopeProvider.CreateScope())
             {
+                BeforeMigrations(scope);
+
                 // read current state
                 var currentState = _keyValueService.GetValue(StateValueKey);
                 var forceState = false;
@@ -63,15 +92,27 @@ namespace Umbraco.Core.Migrations.Upgrade
                 else if (currentState != state)
                     _keyValueService.SetValue(StateValueKey, currentState, state);
 
-                // run post-migrations
-                (var originVersion, var targetVersion) = GetVersions();
-                foreach (var postMigration in _postMigrations)
-                    postMigration.Execute(Name, scope, originVersion, targetVersion, Logger);
+                AfterMigrations(scope);
 
                 scope.Complete();
             }
         }
 
+        /// <summary>
+        /// Executes as part of the upgrade scope and before all migrations have executed.
+        /// </summary>
+        public virtual void BeforeMigrations(IScope scope)
+        { }
+
+        /// <summary>
+        /// Executes as part of the upgrade scope and after all migrations have executed.
+        /// </summary>
+        public virtual void AfterMigrations(IScope scope)
+        { }
+
+        /// <summary>
+        /// Gets the state value key for a migration plan.
+        /// </summary>
         public static string GetStateValueKey(MigrationPlan plan) => "Umbraco.Core.Upgrader.State+" + plan.Name;
     }
 }

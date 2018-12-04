@@ -51,8 +51,8 @@ namespace Umbraco.Tests.Migrations
 
             var plan = new MigrationPlan("default", migrationBuilder, logger)
                 .From(string.Empty)
-                .Chain<DeleteRedirectUrlTable>("{4A9A1A8F-0DA1-4BCF-AD06-C19D79152E35}")
-                .Chain<NoopMigration>("VERSION.33");
+                .To<DeleteRedirectUrlTable>("{4A9A1A8F-0DA1-4BCF-AD06-C19D79152E35}")
+                .To<NoopMigration>("VERSION.33");
 
             var kvs = Mock.Of<IKeyValueService>();
             Mock.Get(kvs).Setup(x => x.GetValue(It.IsAny<string>())).Returns<string>(k => k == "Umbraco.Tests.MigrationPlan" ? string.Empty : null);
@@ -82,9 +82,11 @@ namespace Umbraco.Tests.Migrations
         public void CanAddMigrations()
         {
             var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add(string.Empty, "aaa");
-            plan.Add("aaa", "bbb");
-            plan.Add("bbb", "ccc");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .To("bbb")
+                .To("ccc");
         }
 
         [Test]
@@ -93,7 +95,7 @@ namespace Umbraco.Tests.Migrations
             var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
             Assert.Throws<ArgumentException>(() =>
             {
-                plan.Add("aaa", "aaa");
+                plan.From("aaa").To("aaa");
             });
         }
 
@@ -101,10 +103,10 @@ namespace Umbraco.Tests.Migrations
         public void OnlyOneTransitionPerState()
         {
             var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add("aaa", "bbb");
+            plan.From("aaa").To("bbb");
             Assert.Throws<InvalidOperationException>(() =>
             {
-                plan.Add("aaa", "ccc");
+                plan.From("aaa").To("ccc");
             });
         }
 
@@ -112,9 +114,12 @@ namespace Umbraco.Tests.Migrations
         public void CannotContainTwoMoreHeads()
         {
             var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add(string.Empty, "aaa");
-            plan.Add("aaa", "bbb");
-            plan.Add("ccc", "ddd");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .To("bbb")
+                .From("ccc")
+                .To("ddd");
             Assert.Throws<Exception>(() => plan.Validate());
         }
 
@@ -122,10 +127,11 @@ namespace Umbraco.Tests.Migrations
         public void CannotContainLoops()
         {
             var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add(string.Empty, "aaa");
-            plan.Add("aaa", "bbb");
-            plan.Add("bbb", "ccc");
-            plan.Add("ccc", "aaa");
+            plan
+                .From("aaa")
+                .To("bbb")
+                .To("ccc")
+                .To("aaa");
             Assert.Throws<Exception>(() => plan.Validate());
         }
 

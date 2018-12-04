@@ -34,9 +34,10 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
                     new MigrationPlan("test",  builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "done"));
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("done"));
 
                 upgrader.Execute();
 
@@ -71,10 +72,11 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
                     new MigrationPlan("test", builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<DeleteKeysAndIndexesMigration>("a", "done"));
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<DeleteKeysAndIndexesMigration>("done"));
 
                 upgrader.Execute();
                 scope.Complete();
@@ -106,11 +108,12 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
                     new MigrationPlan("test",  builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<DeleteKeysAndIndexesMigration>("a", "b")
-                        .Add<CreateKeysAndIndexesOfTDtoMigration>("b", "done"));
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<DeleteKeysAndIndexesMigration>("b")
+                        .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
                 upgrader.Execute();
                 scope.Complete();
@@ -142,11 +145,12 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
                     new MigrationPlan("test",  builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<DeleteKeysAndIndexesMigration>("a", "b")
-                        .Add<CreateKeysAndIndexesMigration>("b", "done"));
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<DeleteKeysAndIndexesMigration>("b")
+                        .To<CreateKeysAndIndexesMigration>("done"));
 
                 upgrader.Execute();
                 scope.Complete();
@@ -176,10 +180,11 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
                     new MigrationPlan("test", builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<CreateColumnMigration>("a", "done"));
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<CreateColumnMigration>("done"));
 
                 upgrader.Execute();
                 scope.Complete();

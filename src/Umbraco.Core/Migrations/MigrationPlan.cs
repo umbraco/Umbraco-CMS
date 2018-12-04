@@ -64,23 +64,8 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         public string Name { get; }
 
-        /// <summary>
-        /// Adds an empty migration from source to target state.
-        /// </summary>
-        public MigrationPlan Add(string sourceState, string targetState)
-            => Add<NoopMigration>(sourceState, targetState);
-
-        /// <summary>
-        /// Adds a migration from source to target state.
-        /// </summary>
-        public MigrationPlan Add<TMigration>(string sourceState, string targetState)
-            where TMigration : IMigration
-            => Add(sourceState, targetState, typeof(TMigration));
-
-        /// <summary>
-        /// Adds a migration from source to target state.
-        /// </summary>
-        public MigrationPlan Add(string sourceState, string targetState, Type migration)
+        // adds a transition
+        private MigrationPlan Add(string sourceState, string targetState, Type migration)
         {
             if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
             if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentNullOrEmptyException(nameof(targetState));
@@ -113,26 +98,26 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-        /// Chains an empty migration from chain to target state.
-        /// </summary>
-        public MigrationPlan Chain(string targetState)
-            => Chain<NoopMigration>(targetState);
+    /// Adds a transition to a target state through an empty migration.
+    /// </summary>
+        public MigrationPlan To(string targetState)
+            => To<NoopMigration>(targetState);
 
         /// <summary>
-        /// Chains a migration from chain to target state.
+        /// Adds a transition to a target state through a migration.
         /// </summary>
-        public MigrationPlan Chain<TMigration>(string targetState)
+        public MigrationPlan To<TMigration>(string targetState)
             where TMigration : IMigration
-            => Chain(targetState, typeof(TMigration));
+            => To(targetState, typeof(TMigration));
 
         /// <summary>
-        /// Chains a migration from chain to target state.
+        /// Adds a transition to a target state through a migration.
         /// </summary>
-        public MigrationPlan Chain(string targetState, Type migration)
+        public MigrationPlan To(string targetState, Type migration)
             => Add(_prevState, targetState, migration);
 
         /// <summary>
-        /// Sets the chain state.
+        /// Sets the starting state.
         /// </summary>
         public MigrationPlan From(string sourceState)
         {
@@ -141,19 +126,16 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-        /// Copies a chain.
+        /// Adds transitions to a target state by copying transitions from a start state to an end state.
         /// </summary>
-        /// <remarks>Copies the chain going from startState to endState, with new states going from sourceState to targetState.</remarks>
-        public MigrationPlan CopyChain(string sourceState, string startState, string endState, string targetState)
+        public MigrationPlan To(string targetState, string startState, string endState)
         {
-            if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
             if (string.IsNullOrWhiteSpace(startState)) throw new ArgumentNullOrEmptyException(nameof(startState));
             if (string.IsNullOrWhiteSpace(endState)) throw new ArgumentNullOrEmptyException(nameof(endState));
             if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentNullOrEmptyException(nameof(targetState));
-            if (sourceState == targetState) throw new ArgumentException("Source and target states cannot be identical.");
+
             if (startState == endState) throw new ArgumentException("Start and end states cannot be identical.");
 
-            sourceState = sourceState.Trim();
             startState = startState.Trim();
             endState = endState.Trim();
             targetState = targetState.Trim();
@@ -168,13 +150,12 @@ namespace Umbraco.Core.Migrations
                 visited.Add(state);
 
                 if (!_transitions.TryGetValue(state, out var transition))
-                    throw new InvalidOperationException($"There is no transition from state \"{sourceState}\".");
+                    throw new InvalidOperationException($"There is no transition from state \"{state}\".");
 
                 var newTargetState = transition.TargetState == endState
                     ? targetState
                     : Guid.NewGuid().ToString("B").ToUpper();
-                Add(sourceState, newTargetState, transition.MigrationType);
-                sourceState = newTargetState;
+                To(newTargetState, transition.MigrationType);
                 state = transition.TargetState;
             }
 
@@ -184,9 +165,21 @@ namespace Umbraco.Core.Migrations
         /// <summary>
         /// Copies a chain.
         /// </summary>
+        /// <remarks>Copies the chain going from startState to endState, with new states going from sourceState to targetState.</remarks>
+        [Obsolete("die", true)]
+        public MigrationPlan CopyChain(string sourceState, string startState, string endState, string targetState)
+        {
+            From(sourceState).To(targetState, startState, endState);
+            return this;
+        }
+
+        /// <summary>
+        /// Copies a chain.
+        /// </summary>
         /// <remarks>Copies the chain going from startState to endState, with new states going from chain to targetState.</remarks>
+        [Obsolete("die", true)]
         public MigrationPlan CopyChain(string startState, string endState, string targetState)
-            => CopyChain(_prevState, startState, endState, targetState);
+            => To(targetState, startState, endState);
 
         /// <summary>
         /// Gets the initial state.

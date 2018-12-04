@@ -20,23 +20,38 @@ namespace Umbraco.Tests.Migrations
         {
             private readonly MigrationPlan _plan;
 
-            public TestUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger, MigrationPlan plan)
-                : base(scopeProvider, migrationBuilder, keyValueService, postMigrations, logger)
+            public TestUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, MigrationPlan plan)
+                : base(scopeProvider, migrationBuilder, keyValueService, logger)
             {
                 _plan = plan;
             }
 
-            protected override MigrationPlan GetPlan()
+            protected override MigrationPlan CreatePlan()
             {
                 return _plan;
             }
-
-            protected override (SemVersion, SemVersion) GetVersions()
-            {
-                return (new SemVersion(0), new SemVersion(0));
-            }
         }
 
+        public class TestUpgraderWithPostMigrations : TestUpgrader
+        {
+            private readonly PostMigrationCollection _postMigrations;
+
+            public TestUpgraderWithPostMigrations(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, PostMigrationCollection postMigrations, MigrationPlan plan)
+                : base(scopeProvider, migrationBuilder, keyValueService, logger, plan)
+            {
+                _postMigrations = postMigrations;
+            }
+
+            public override void AfterMigrations(IScope scope)
+            {
+                // run post-migrations
+                var originVersion = new SemVersion(0);
+                var targetVersion = new SemVersion(0);
+
+                foreach (var postMigration in _postMigrations)
+                    postMigration.Execute(Name, scope, originVersion, targetVersion, Logger);
+            }
+        }
 
         public class TestScopeProvider : IScopeProvider
         {

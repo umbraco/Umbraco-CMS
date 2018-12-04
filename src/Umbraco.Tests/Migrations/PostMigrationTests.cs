@@ -50,9 +50,8 @@ namespace Umbraco.Tests.Migrations
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var u1 = new MigrationTests.TestUpgrader(scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
-                new MigrationPlan("Test",  builder, logger)
-                    .Add<NoopMigration>(string.Empty, "done"));
+            var u1 = new MigrationTests.TestUpgraderWithPostMigrations(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger, posts,
+                new MigrationPlan("Test",  builder, logger).From(string.Empty).To("done"));
             u1.Execute();
 
             Assert.AreEqual(1, changed1.CountExecuted);
@@ -94,17 +93,15 @@ namespace Umbraco.Tests.Migrations
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var u1 = new MigrationTests.TestUpgrader(scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
-                new MigrationPlan("Test1", builder, logger)
-                    .Add<NoopMigration>(string.Empty, "done"));
+            var u1 = new MigrationTests.TestUpgraderWithPostMigrations(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger, posts,
+                new MigrationPlan("Test1", builder, logger).From(string.Empty).To("done"));
             u1.Execute();
 
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(0, changed2.CountExecuted);
 
-            var u2 = new MigrationTests.TestUpgrader(scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
-                new MigrationPlan("Test2", builder, logger)
-                    .Add<NoopMigration>(string.Empty, "done"));
+            var u2 = new MigrationTests.TestUpgraderWithPostMigrations(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger, posts,
+                new MigrationPlan("Test2", builder, logger).From(string.Empty).To("done"));
             u2.Execute();
 
             Assert.AreEqual(1, changed1.CountExecuted);
