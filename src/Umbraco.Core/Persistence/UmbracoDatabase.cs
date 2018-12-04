@@ -67,6 +67,24 @@ namespace Umbraco.Core.Persistence
         /// <inheritdoc />
         public ISqlContext SqlContext { get; }
 
+        #region Temp
+
+        // work around NPoco issue https://github.com/schotime/NPoco/issues/517 while we wait for the fix
+        public override DbCommand CreateCommand(DbConnection connection, CommandType commandType, string sql, params object[] args)
+        {
+            var command = base.CreateCommand(connection, commandType, sql, args);
+
+            if (!DatabaseType.IsSqlCe()) return command;
+
+            foreach (DbParameter parameter in command.Parameters)
+                if (parameter.Value == DBNull.Value)
+                    parameter.DbType = DbType.String;
+
+            return command;
+        }
+
+        #endregion
+
         #region Testing, Debugging and Troubleshooting
 
         private bool _enableCount;
@@ -242,7 +260,9 @@ namespace Umbraco.Core.Persistence
                 sb.Append(" @");
                 sb.Append(i++);
                 sb.Append(":");
-                sb.Append(arg);
+                if (arg == DBNull.Value) sb.Append("<dbNull>");
+                else if (arg == null) sb.Append("<null>");
+                else sb.Append(arg);
             }
 
             return sb.ToString();

@@ -595,7 +595,6 @@ namespace Umbraco.Core
             return null;
         }
 
-
         /// <summary>
         /// Attempts to serialize the value to an XmlString using ToXmlString
         /// </summary>
@@ -787,6 +786,21 @@ namespace Umbraco.Core
             }
 
             return BoolConvertCache[type] = false;
+        }
+
+        /// <summary>
+        /// Indicates whether two nullable values are equal, substituting a fallback value for nulls.
+        /// </summary>
+        /// <typeparam name="T">The nullable type.</typeparam>
+        /// <param name="value">The value to compare.</param>
+        /// <param name="other">The value to compare to.</param>
+        /// <param name="fallbackValue">The value to use when any value is null.</param>
+        /// <remarks>Do not use outside of Sql expressions.</remarks>
+        // see usage in ExpressionVisitorBase
+        public static bool NEquals<T>(this T? value, T? other, T fallbackValue)
+            where T : struct
+        {
+            return (value ?? fallbackValue).Equals(other ?? fallbackValue);
         }
     }
 }

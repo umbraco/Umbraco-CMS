@@ -130,6 +130,133 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void TagsCanBecomeVariant()
+        {
+            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            PropertyType propertyType;
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                {
+                    DataTypeId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.AssignTags("tags", new[] { "hello", "world", "another", "one" });
+            contentService.SaveAndPublish(content1);
+
+            contentType.Variations = ContentVariation.Culture;
+            contentTypeService.Save(contentType);
+
+            // no changes
+            content1 = contentService.GetById(content1.Id);
+
+            var tags = content1.Properties["tags"].GetTagsValue().ToArray();
+            Assert.AreEqual(4, tags.Length);
+            Assert.Contains("one", tags);
+            Assert.AreEqual(-1, tags.IndexOf("plus"));
+
+            var tagGroups = tagService.GetAllTags().GroupBy(x => x.LanguageId);
+            foreach (var tag in tagService.GetAllTags())
+                Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
+            Assert.AreEqual(1, tagGroups.Count());
+            var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
+            Assert.IsNotNull(enTagGroup);
+            Assert.AreEqual(4, enTagGroup.Count());
+            Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
+            Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+
+            propertyType.Variations = ContentVariation.Culture;
+            contentTypeService.Save(contentType);
+
+            // changes
+            content1 = contentService.GetById(content1.Id);
+
+            // property value has been moved from invariant to en-US
+            tags = content1.Properties["tags"].GetTagsValue().ToArray();
+            Assert.IsEmpty(tags);
+
+            tags = content1.Properties["tags"].GetTagsValue("en-US").ToArray();
+            Assert.AreEqual(4, tags.Length);
+            Assert.Contains("one", tags);
+            Assert.AreEqual(-1, tags.IndexOf("plus"));
+
+            // tags have been copied from invariant to en-US
+            tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in tagService.GetAllTags("*"))
+                Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
+            Assert.AreEqual(1, tagGroups.Count());
+
+            enTagGroup = tagGroups.FirstOrDefault(x => x.Key == enId);
+            Assert.IsNotNull(enTagGroup);
+            Assert.AreEqual(4, enTagGroup.Count());
+            Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
+            Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        }
+
+        [Test]
+        public void TagsCanBecomeInvariant()
+        {
+            var languageService = ServiceContext.LocalizationService;
+            languageService.Save(new Language("fr-FR")); // en-US is already there
+
+            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            PropertyType propertyType;
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                {
+                    DataTypeId = 1041,
+                    Variations = ContentVariation.Culture
+                });
+            contentType.Variations = ContentVariation.Culture;
+            contentTypeService.Save(contentType);
+
+            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetCultureName("name-fr", "fr-FR");
+            content1.SetCultureName("name-en", "en-US");
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
+            content1.AssignTags("tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
+            contentService.SaveAndPublish(content1);
+
+            contentType.Variations = ContentVariation.Nothing;
+            contentTypeService.Save(contentType);
+
+            // changes
+            content1 = contentService.GetById(content1.Id);
+
+            // property value has been moved from en-US to invariant, fr-FR tags are gone
+            Assert.IsEmpty(content1.Properties["tags"].GetTagsValue("fr-FR"));
+            Assert.IsEmpty(content1.Properties["tags"].GetTagsValue("en-US"));
+
+            var tags = content1.Properties["tags"].GetTagsValue().ToArray();
+            Assert.AreEqual(4, tags.Length);
+            Assert.Contains("one", tags);
+            Assert.AreEqual(-1, tags.IndexOf("plus"));
+
+            // tags have been copied from en-US to invariant, fr-FR tags are gone
+            var tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in tagService.GetAllTags("*"))
+                Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
+            Assert.AreEqual(1, tagGroups.Count());
+
+            var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
+            Assert.IsNotNull(enTagGroup);
+            Assert.AreEqual(4, enTagGroup.Count());
+            Assert.IsTrue(enTagGroup.Any(x => x.Text == "one"));
+            Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
+        }
+
+        [Test]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_One()
         {
             var contentService = ServiceContext.ContentService;
@@ -193,7 +320,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        [Ignore("U4-8442, will need to be fixed eventually.")]
+        //[Ignore("U4-8442, will need to be fixed eventually.")]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_Tree()
         {
             var contentService = ServiceContext.ContentService;
@@ -209,12 +336,10 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
-            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishCulture();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -298,7 +423,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        [Ignore("U4-8442, will need to be fixed eventually.")]
+        //[Ignore("U4-8442, will need to be fixed eventually.")]
         public void TagsAreUpdatedWhenContentIsUnpublishedAndRePublished_Tree()
         {
             var contentService = ServiceContext.ContentService;
@@ -314,12 +439,10 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishCulture();
             contentService.SaveAndPublish(content2);
 
             contentService.Unpublish(content1);
