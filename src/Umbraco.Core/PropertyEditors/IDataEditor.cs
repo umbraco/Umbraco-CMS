@@ -67,7 +67,7 @@ namespace Umbraco.Core.PropertyEditors
         IConfigurationEditor GetConfigurationEditor();
 
         /// <summary>
-        /// Gets the value indexer for the editor.
+        /// Gets the index value factory for the editor.
         /// </summary>
         IPropertyIndexValueFactory PropertyIndexValueFactory { get; }
     }

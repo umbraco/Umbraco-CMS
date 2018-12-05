@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Represents a property value indexer.
+    /// Represents a property index value factory.
     /// </summary>
     public interface IPropertyIndexValueFactory
     {
