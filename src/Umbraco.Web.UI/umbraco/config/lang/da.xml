@@ -1622,5 +1622,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="mediaTrashed">Slettet medie med Id: {0} relateret til original "parent" / mappe med id: {1}</key>
     <key alias="itemCannotBeRestored">Kan ikke automatisk genoprette dette element</key>
     <key alias="itemCannotBeRestoredHelpText">Der er ikke nogen placering hvor dette element automatisk kan genoprettes. Du kan flytte elementet manuelt i træet nedenfor.</key>
+    <key alias="wasRestored">blev genoprettet under</key>
   </area>
 </language>

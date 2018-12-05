@@ -13,9 +13,12 @@
 		    </div>
 
 		    <div ng-show="success">
-		        <div class="alert alert-success">
-                    <strong>{{source.name}}</strong> <localize key="editdatatype_wasMoved">was moved underneath</localize> <strong>{{target.name}}</strong>
-		        </div>
+                <div class="alert alert-success">
+                    <strong>{{source.name}}</strong>
+                    <span ng-hide="moving"><localize key="recycleBin_wasRestored">was restored under</localize></span>
+                    <span ng-show="moving"><localize key="editdatatype_wasMoved">was moved underneath</localize></span>
+                    <strong>{{target.name}}</strong>
+                </div>
 		        <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
 		    </div>
 
