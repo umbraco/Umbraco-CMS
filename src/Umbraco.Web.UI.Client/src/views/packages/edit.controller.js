@@ -98,6 +98,7 @@
 
         function openFilePicker() {
             const filePicker = {
+                title: "Select files",
                 section: "settings",
                 treeAlias: "files",
                 entityType: "file",
@@ -128,6 +129,7 @@
 
         function openControlPicker() {
             const controlPicker = {
+                title: "Select control",
                 treeAlias: "files",
                 section:"settings",
                 entityType: "file",
