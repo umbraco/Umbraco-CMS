@@ -44,6 +44,12 @@
                     "view": "views/packages/views/install-local.html",
                     "active": installPackageUri === "local",
                     "alias": "umbInstallLocal"
+                },
+                {
+                    "name": "Created",
+                    "icon": "icon-add",
+                    "view": "views/packages/views/created.html",
+                    "alias": "umbCreatedPackages"
                 }
             ];
 

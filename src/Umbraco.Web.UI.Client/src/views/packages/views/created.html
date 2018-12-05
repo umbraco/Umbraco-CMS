@@ -1,0 +1,45 @@
+<div ng-controller="Umbraco.Editors.Packages.CreatedController as vm">
+
+    <umb-editor-sub-header>
+
+        <umb-editor-sub-header-content-left>
+            <umb-button
+                button-style="success"
+                type="button" 
+                action="vm.createPackage()"
+                label="Create package">
+            </umb-button>
+        </umb-editor-sub-header-content-left>
+
+    </umb-editor-sub-header>
+
+    <table class="table table-hover">
+        <tbody>
+            <tr ng-repeat="createdPackage in vm.createdPackages" style="cursor: pointer;" ng-click="vm.goToPackage(createdPackage)">
+                <td class="flex items-center">
+                    <div class="umb-package-list__item-icon">
+                        <i ng-if="!createdPackage.iconUrl" class="icon-box"></i>
+                        <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" />
+                    </div>
+                    <div class="umb-package-list__item-content">
+                        <div class="umb-package-list__item-name">{{ createdPackage.name }}</div>
+                        <div class="umb-package-list__item-description">
+                            {{ createdPackage.version }} | <a href="{{ createdPackage.url }}" target="_blank">{{ createdPackage.url }}</a>| {{ createdPackage.author }}
+                        </div>
+                    </div>
+                </td>
+                <td style="text-align: right;">
+                    <umb-button
+                        type="button"
+                        button-style="danger"
+                        size="xxs"
+                        label-key="general_delete"
+                        add-ellipsis="true"
+                        action="vm.deleteCreatedPackage(createdPackage)">
+                    </umb-button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
