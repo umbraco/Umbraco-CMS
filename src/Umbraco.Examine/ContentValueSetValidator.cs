@@ -43,7 +43,7 @@ namespace Umbraco.Examine
             var recycleBinId = category == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
 
             //check for recycle bin
-            if (!PublishedValuesOnly)
+            if (PublishedValuesOnly)
             {
                 if (path.Contains(string.Concat(",", recycleBinId, ",")))
                     return false;
@@ -90,7 +90,7 @@ namespace Umbraco.Examine
             var isFiltered = baseValidate == ValueSetValidationResult.Filtered;
 
             //check for published content
-            if (valueSet.Category == IndexTypes.Content && !PublishedValuesOnly)
+            if (valueSet.Category == IndexTypes.Content && PublishedValuesOnly)
             {
                 if (!valueSet.Values.TryGetValue(UmbracoExamineIndexer.PublishedFieldName, out var published))
                     return ValueSetValidationResult.Failed;

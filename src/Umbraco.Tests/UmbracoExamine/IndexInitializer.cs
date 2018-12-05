@@ -29,15 +29,15 @@ namespace Umbraco.Tests.UmbracoExamine
     /// </summary>
     internal static class IndexInitializer
     {
-        public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors)
+        public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, GetMockUserService(), true);
+            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, GetMockUserService(), publishedValuesOnly);
             return contentValueSetBuilder;
         }
 
-        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, ISqlContext sqlContext)
+        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, ISqlContext sqlContext, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors);
+            var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, publishedValuesOnly);
             var contentIndexDataSource = new ContentIndexPopulator(true, null, contentService, sqlContext, contentValueSetBuilder);
             return contentIndexDataSource;
         }
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer = new StandardAnalyzer(Version.LUCENE_30);
 
             if (validator == null)
-                validator = new ContentValueSetValidator(false);
+                validator = new ContentValueSetValidator(true);
             
             var i = new UmbracoContentIndexer(
                 "testIndexer",
