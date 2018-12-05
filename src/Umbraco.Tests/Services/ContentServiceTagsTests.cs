@@ -320,7 +320,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        //[Ignore("U4-8442, will need to be fixed eventually.")]
+        [Ignore("https://github.com/umbraco/Umbraco-CMS/issues/3821 (U4-8442), will need to be fixed.")]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_Tree()
         {
             var contentService = ServiceContext.ContentService;
@@ -423,7 +423,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        //[Ignore("U4-8442, will need to be fixed eventually.")]
+        [Ignore("https://github.com/umbraco/Umbraco-CMS/issues/3821 (U4-8442), will need to be fixed.")]
         public void TagsAreUpdatedWhenContentIsUnpublishedAndRePublished_Tree()
         {
             var contentService = ServiceContext.ContentService;
