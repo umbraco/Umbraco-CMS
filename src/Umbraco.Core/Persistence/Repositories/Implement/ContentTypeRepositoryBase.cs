@@ -762,7 +762,7 @@ AND umbracoNode.id <> @id",
         ///
         private void CopyTagData(int? sourceLanguageId, int? targetLanguageId, IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
         {
-            // note: important to use NEquals for nullable types, cannot directly compare language identifiers
+            // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
             // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
@@ -784,7 +784,7 @@ AND umbracoNode.id <> @id",
 
             sqlTagToDelete
                 .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
-                .Where<TagDto>(x => x.LanguageId.NEquals(targetLanguageId, -1));
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
 
             var sqlDeleteRel = Sql()
                 .Delete<TagRelationshipDto>()
@@ -811,7 +811,7 @@ AND umbracoNode.id <> @id",
 
             sqlSelect
                 .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
-                .LeftJoin<TagDto>("xtags").On<TagDto, TagDto>((tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group && tag.LanguageId.NEquals(targetLanguageId, -1), aliasRight: "xtags");
+                .LeftJoin<TagDto>("xtags").On<TagDto, TagDto>((tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group && tag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
 
             if (contentTypeIds != null)
                 sqlSelect
@@ -825,7 +825,7 @@ AND umbracoNode.id <> @id",
                 sqlSelect
                     .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
-            sqlSelect.Where<TagDto>(x => x.LanguageId.NEquals(sourceLanguageId, -1));
+            sqlSelect.Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
 
             var cols = Sql().Columns<TagDto>(x => x.Text, x => x.Group, x => x.LanguageId);
             var sqlInsertTag = Sql($"INSERT INTO {TagDto.TableName} ({cols})").Append(sqlSelect);
@@ -840,8 +840,8 @@ AND umbracoNode.id <> @id",
                 .AndSelect<TagDto>("otag", x => x.Id)
                 .From<TagRelationshipDto>()
                 .InnerJoin<TagDto>().On<TagRelationshipDto, TagDto>((rel, tag) => rel.TagId == tag.Id)
-                .InnerJoin<TagDto>("otag").On<TagDto, TagDto>((tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group && otag.LanguageId.NEquals(targetLanguageId, -1), aliasRight: "otag")
-                .Where<TagDto>(x => x.LanguageId.NEquals(sourceLanguageId, -1));
+                .InnerJoin<TagDto>("otag").On<TagDto, TagDto>((tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group && otag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "otag")
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
 
             var cols2 = Sql().Columns<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
             var sqlInsertRel = Sql($"INSERT INTO {TagRelationshipDto.TableName} ({cols2})").Append(sqlFoo);
@@ -864,7 +864,7 @@ AND umbracoNode.id <> @id",
 
             sqlTagToDelete
                 .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
-                .Where<TagDto>(x => !x.LanguageId.NEquals(targetLanguageId, -1));
+                .Where<TagDto>(x => !x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
 
             sqlDeleteRel = Sql()
                 .Delete<TagRelationshipDto>()
@@ -891,7 +891,7 @@ AND umbracoNode.id <> @id",
         /// <param name="contentTypeIds">The content type identifiers.</param>
         private void CopyPropertyData(int? sourceLanguageId, int? targetLanguageId, IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
         {
-            // note: important to use NEquals for nullable types, cannot directly compare language identifiers
+            // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
             // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
@@ -920,7 +920,7 @@ AND umbracoNode.id <> @id",
                 sqlDelete.WhereIn<PropertyDataDto>(x => x.VersionId, inSql);
             }
 
-            sqlDelete.Where<PropertyDataDto>(x => x.LanguageId.NEquals(targetLanguageId, -1));
+            sqlDelete.Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
 
             sqlDelete
                 .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
@@ -944,7 +944,7 @@ AND umbracoNode.id <> @id",
                     .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pdata, cversion) => pdata.VersionId == cversion.Id)
                     .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>((cversion, c) => cversion.NodeId == c.NodeId);
 
-            sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId.NEquals(sourceLanguageId, -1));
+            sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
 
             sqlSelectData
                 .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);

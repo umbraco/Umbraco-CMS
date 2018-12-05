@@ -797,7 +797,7 @@ namespace Umbraco.Core
         /// <param name="fallbackValue">The value to use when any value is null.</param>
         /// <remarks>Do not use outside of Sql expressions.</remarks>
         // see usage in ExpressionVisitorBase
-        public static bool NEquals<T>(this T? value, T? other, T fallbackValue)
+        public static bool SqlNullableEquals<T>(this T? value, T? other, T fallbackValue)
             where T : struct
         {
             return (value ?? fallbackValue).Equals(other ?? fallbackValue);
