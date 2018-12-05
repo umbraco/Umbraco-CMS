@@ -7,7 +7,7 @@
     /// <remarks>
     /// Anything less than 10 = Success!
     /// </remarks>
-    public enum MoveOperationStatusType
+    public enum MoveOperationStatusType : byte
     {
         /// <summary>
         /// The move was successful.

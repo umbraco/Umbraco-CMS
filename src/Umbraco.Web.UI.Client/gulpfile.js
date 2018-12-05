@@ -283,47 +283,28 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/jquery/dist"
         },
         {
-            "name": "jquery-migrate",
-            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.min.js"],
-            "base": "./node_modules/jquery-migrate/dist"
-        },
-        {
             "name": "jquery-ui",
             "src":  ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
             "base": "./node_modules/jquery-ui-dist"
         },
         {
-            "name": "jquery-validate",
-            "src":  ["./node_modules/jquery-validation/dist/jquery.validate.min.js"],
-            "base": "./node_modules/jquery-validation/dist"
-        },
-        {
-            "name": "jquery-validation-unobtrusive",
-            "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
-            "base": "./node_modules/jquery-validation-unobtrusive/dist"
+            "name": "jquery-ui-touch-punch",
+            "src":  ["./node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"],
+            "base": "./node_modules/jquery-ui-touch-punch"
         },
         {
             "name": "lazyload-js",
             "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
             "base": "./node_modules/lazyload-js"
         },
-        // TODO: We can optimize here:
-        // we don't have to ship with the moment-with-locales libraries
-        // we lazyload the user locale
         {
             "name": "moment",
-            "src":  [
-                "./node_modules/moment/min/moment.min.js",
-                "./node_modules/moment/min/moment-with-locales.js",
-                "./node_modules/moment/min/moment-with-locales.min.js"
-            ],
+            "src":  ["./node_modules/moment/min/moment.min.js"],
             "base": "./node_modules/moment/min"
         },
         {
             "name": "moment",
-            "src":  [
-                "./node_modules/moment/locale/*.js"
-            ],
+            "src":  ["./node_modules/moment/locale/*.js"],
             "base": "./node_modules/moment/locale"
         },
         {
@@ -332,9 +313,25 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/ng-file-upload/dist"
         },
         {
+            "name": "nouislider",
+            "src":  [
+                "./node_modules/nouislider/distribute/nouislider.min.js",
+                "./node_modules/nouislider/distribute/nouislider.min.css"
+            ],
+            "base": "./node_modules/nouislider/distribute"
+        },
+        {
             "name": "signalr",
             "src":  ["./node_modules/signalr/jquery.signalR.js"],
             "base": "./node_modules/signalr"
+        },
+        {
+            "name": "spectrum",
+            "src":  [
+                "./node_modules/spectrum-colorpicker/spectrum.js",
+                "./node_modules/spectrum-colorpicker/spectrum.css"
+            ],
+            "base": "./node_modules/spectrum-colorpicker"
         },
         {
             "name": "tinymce",

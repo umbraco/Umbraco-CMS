@@ -4,6 +4,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.ContentEditing
 {
+
     /// <summary>
     /// Represents a content app definition.
     /// </summary>

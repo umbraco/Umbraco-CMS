@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -105,6 +105,7 @@ namespace Umbraco.Core.Manifest
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<IContentAppDefinition>();
+            var dashboards = new List<ManifestDashboardDefinition>();
 
             foreach (var manifest in manifests)
             {
@@ -114,6 +115,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
+                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
             }
 
             return new PackageManifest
@@ -123,7 +125,8 @@ namespace Umbraco.Core.Manifest
                 PropertyEditors = propertyEditors.ToArray(),
                 ParameterEditors = parameterEditors.ToArray(),
                 GridEditors = gridEditors.ToArray(),
-                ContentApps = contentApps.ToArray()
+                ContentApps = contentApps.ToArray(),
+                Dashboards = dashboards.ToArray()
             };
         }
 
@@ -134,7 +137,6 @@ namespace Umbraco.Core.Manifest
                 return new string[0];
             return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
         }
-
 
         private static string TrimPreamble(string text)
         {
@@ -156,7 +158,9 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
-                new ContentAppDefinitionConverter(_contentTypeService));
+                new ContentAppDefinitionConverter(_contentTypeService),
+                new ContentAppDefinitionConverter(_contentTypeService),
+                new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)
