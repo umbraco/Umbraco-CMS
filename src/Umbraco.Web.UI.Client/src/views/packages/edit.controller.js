@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($location) {
+    function EditController($location, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
 
         const vm = this;
 
@@ -16,6 +16,8 @@
         vm.back = back;
         vm.createPackage = createPackage;
         vm.save = save;
+        vm.removeContentItem = removeContentItem;
+        vm.openContentPicker = openContentPicker;
 
         function onInit() {
             // load package
@@ -24,113 +26,39 @@
                 "name": "My package"
             };
 
-            vm.documentTypes = [
-                {
-                    "name": "Home"
-                },
-                {
-                    "name": "Blog"
-                },
-                {
-                    "name": "Blog Post"
-                },
-                {
-                    "name": "News"
-                },
-                {
-                    "name": "News Item"
-                },
-                {
-                    "name": "Contact"
-                },
-                {
-                    "name": "About"
-                }
-            ];
+            // get all doc types
+            contentTypeResource.getAll().then(documentTypes => {
+                vm.documentTypes = documentTypes;
+            });
 
-            vm.templates = [
-                {
-                    "name": "Home"
-                },
-                {
-                    "name": "Blog"
-                },
-                {
-                    "name": "Blog Post"
-                },
-                {
-                    "name": "News"
-                },
-                {
-                    "name": "News Item"
-                },
-                {
-                    "name": "Contact"
-                },
-                {
-                    "name": "About"
-                }
-            ];
+            // get all templates
+            templateResource.getAll().then(templates => {
+                vm.templates = templates;
+            });
 
-            vm.stylesheets = [
-                {
-                    "name": "styles.css"
-                },
-                {
-                    "name": "carousel.css"
-                },
-                {
-                    "name": "fonts.css"
-                }
-            ];
+            // get all stylesheets
+            stylesheetResource.getAll().then(stylesheets => {
+                vm.stylesheets = stylesheets;
+            });
 
-            vm.macros = [
-                {
-                    "name": "Macro 1"
-                },
-                {
-                    "name": "Macro 2"
-                },
-                {
-                    "name": "Macro 3"
-                }
-            ];
+            // TODO: implement macros
+            vm.macros = [];
+            
+            // get all languages
+            languageResource.getAll().then(languages => {
+                vm.languages = languages;
+            });
 
-            vm.languages = [
-                {
-                    "name": "English (United States)"
-                },
-                {
-                    "name": "Danish"
-                },
-                {
-                    "name": "Spanish"
-                }
-            ];
+            // get all dictionary items
+            dictionaryResource.getList().then(dictionaryItems => {
+                vm.dictionaryItems = dictionaryItems;
+            });
 
-            vm.dictionaryItems = [
-                {
-                    "name": "Item 1"
-                },
-                {
-                    "name": "Item 2"
-                },
-                {
-                    "name": "Item 3"
-                }
-            ];
+            // get all data types items
+            dataTypeResource.getAll().then(dataTypes => {
+                vm.dataTypes = dataTypes;
+            });
 
-            vm.dataTypes = [
-                {
-                    "name": "Datatype 1"
-                },
-                {
-                    "name": "Datatype 2"
-                },
-                {
-                    "name": "Datatype 3"
-                }
-            ];
         }
 
         function back() {
@@ -143,6 +71,25 @@
 
         function save() {
             console.log("save package");
+        }
+
+        function removeContentItem() {
+            vm.package.contentItem = null;
+        }
+
+        function openContentPicker() {
+            const contentPicker = {
+                submit: function(model) {
+                    if(model.selection && model.selection.length > 0) {
+                        vm.package.contentItem = model.selection[0];
+                    }
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
+            editorService.contentPicker(contentPicker);
         }
 
         onInit();

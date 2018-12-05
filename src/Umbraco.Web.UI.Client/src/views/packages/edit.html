@@ -78,13 +78,43 @@
                     </div>
             
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
-                            <input type="checkbox" ng-model="package.test" />
+
+                        <umb-control-group label="Content">
+
+                            <umb-node-preview
+                                ng-if="vm.package.contentItem.id"
+                                icon="vm.package.contentItem.icon"
+                                name="vm.package.contentItem.name"
+                                allow-edit="true"
+                                allow-remove="true"
+                                on-edit="vm.openContentPicker()"
+                                on-remove="vm.removeContentItem()">
+                            </umb-node-preview>
+
+                            <a href=""
+                                ng-if="!vm.package.contentItem"
+                                style="margin-bottom: 10px;"
+                                class="umb-node-preview-add"
+                                ng-click="vm.openContentPicker()"
+                                prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
+
+                            <label style="padding-left: 0;">
+                                <input type="checkbox" ng-model="vm.package.includeContentChildren" ng-disabled="!vm.package.contentItem.id" />
+                                Include all child nodes
+                            </label>
+
                         </umb-control-group>
 
                         <umb-control-group label="Document Types">
                             <div ng-repeat="doctype in vm.documentTypes">
                                 <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
+                                    <input 
+                                        type="checkbox" 
+                                        ng-model="doctype.selected" 
+                                        checklist-model="vm.package.contentTypes"
+                                        checklist-value="doctype.alias" />
                                     {{doctype.name}}
                                 </label>
                             </div>
@@ -93,7 +123,10 @@
                         <umb-control-group label="Templates">
                             <div ng-repeat="template in vm.templates">
                                 <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
+                                    <input 
+                                        type="checkbox" 
+                                        checklist-model="vm.package.templates"
+                                        checklist-value="template.alias" />
                                     {{template.name}}
                                 </label>
                             </div>
@@ -102,25 +135,26 @@
                         <umb-control-group label="Stylesheets">
                             <div ng-repeat="stylesheet in vm.stylesheets">
                                 <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
+                                    <input 
+                                        type="checkbox" 
+                                        checklist-model="vm.package.stylesheets"
+                                        checklist-value="stylesheet.path" />
                                     {{stylesheet.name}}
                                 </label>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="Macros">
-                            <div ng-repeat="macro in vm.macros">
-                                <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
-                                    {{macro.name}}
-                                </label>
-                            </div>
+                            NOT IMPLEMENTED
                         </umb-control-group>
 
                         <umb-control-group label="Languages">
                             <div ng-repeat="language in vm.languages">
                                 <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
+                                    <input 
+                                        type="checkbox" 
+                                        checklist-model="vm.package.languages"
+                                        checklist-value="stylesheet.id" />
                                     {{language.name}}
                                 </label>
                             </div>
@@ -129,7 +163,10 @@
                         <umb-control-group label="Dictionary Items">
                             <div ng-repeat="dictionaryItem in vm.dictionaryItems">
                                 <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
+                                    <input 
+                                        type="checkbox" 
+                                        checklist-model="vm.package.dictionaryItems"
+                                        checklist-value="dictionaryItem.id" />
                                     {{dictionaryItem.name}}
                                 </label>
                             </div>
@@ -138,7 +175,10 @@
                         <umb-control-group label="Data Types">
                             <div ng-repeat="dataType in vm.dataTypes">
                                 <label>
-                                    <input type="checkbox" ng-model="doctype.selected" />
+                                    <input 
+                                        type="checkbox" 
+                                        checklist-model="vm.package.dataTypes"
+                                        checklist-value="dataType.id" />
                                     {{dataType.name}}
                                 </label>
                             </div>
