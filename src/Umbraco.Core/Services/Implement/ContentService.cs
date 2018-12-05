@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Implements the content service.
     /// </summary>
-    internal class ContentService : RepositoryService, IContentService
+    public class ContentService : RepositoryService, IContentService
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IEntityRepository _entityRepository;

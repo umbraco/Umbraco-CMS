@@ -161,7 +161,7 @@
 
                         <div class="control-group" ng-class="{error: vm.loginForm.username.$invalid}">
                             <label><localize key="general_username">Username</localize></label>
-                            <input type="text" ng-model="vm.login" name="username" class="-full-width-input" localize="placeholder" placeholder="@placeholders_usernameHint" />
+                            <input type="text" ng-model="vm.login" name="username" class="-full-width-input" localize="placeholder" placeholder="@placeholders_usernameHint" focus-when="{{vm.view === 'login'}}" />
                         </div>
 
                         <div class="control-group" ng-class="{error: vm.loginForm.password.$invalid}">
@@ -199,7 +199,7 @@
                     <form method="POST" name="vm.requestPasswordResetForm" ng-submit="vm.requestPasswordResetSubmit(email)">
                         <div class="control-group" ng-class="{error: requestPasswordResetForm.email.$invalid}">
                             <label><localize key="general_email">Email</localize></label>
-                            <input type="email" val-email ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" />
+                            <input type="email" val-email ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" focus-when="{{vm.view === 'request-password-reset'}}" />
                         </div>
 
                         <div class="control-group" ng-show="requestPasswordResetForm.$invalid">
@@ -230,7 +230,7 @@
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
                             <label><localize key="user_newPassword">New password</localize></label>
-                            <input type="password" ng-model="vm.password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
+                            <input type="password" ng-model="vm.password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" focus-when="{{vm.view === 'set-password'}}" />
                         </div>
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">

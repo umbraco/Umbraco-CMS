@@ -161,7 +161,6 @@
             vm.errorMsg = "";
             resetInputValidation();
             vm.view = "login";
-            setFieldFocus("loginForm", "username");
         }
 
         function showRequestPasswordReset() {
@@ -169,14 +168,12 @@
             resetInputValidation();
             vm.view = "request-password-reset";
             vm.showEmailResetConfirmation = false;
-            setFieldFocus("requestPasswordResetForm", "email");
         }
 
         function showSetPassword() {
             vm.errorMsg = "";
             resetInputValidation();
             vm.view = "set-password";
-            setFieldFocus("setPasswordForm", "password");
         }
 
         function loginSubmit(login, password) {
@@ -392,12 +389,6 @@
                         vm.avatarFile.serverErrorMessage = evt.Message;
                     }
                 }
-            });
-        }
-
-        function setFieldFocus(form, field) {
-            $timeout(function () {
-                $("form[name='" + form + "'] input[name='" + field + "']").focus();
             });
         }
 
