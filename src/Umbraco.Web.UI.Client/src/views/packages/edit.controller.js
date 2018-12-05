@@ -18,6 +18,7 @@
         vm.save = save;
         vm.removeContentItem = removeContentItem;
         vm.openContentPicker = openContentPicker;
+        vm.openFilePicker = openFilePicker;
 
         function onInit() {
             // load package
@@ -90,6 +91,22 @@
                 }
             };
             editorService.contentPicker(contentPicker);
+        }
+
+        function openFilePicker() {
+            const filePicker = {
+                treeAlias: "files",
+                section:"settings",
+                entityType: "file",
+                submit: function(model) {
+                    console.log(model.selection);
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
+            editorService.contentPicker(filePicker);
         }
 
         onInit();

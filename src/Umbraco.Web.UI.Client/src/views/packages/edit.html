@@ -202,12 +202,25 @@
                         <umb-control-group 
                             label="Path to file"
                             description="Absolute path to file (ie: /bin/umbraco.bin)">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.pathToFile" />
+                            <a href=""
+                                class="umb-node-preview-add"
+                                ng-click="vm.openFilePicker()"
+                                prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
                         </umb-control-group>
+
                         <umb-control-group 
                             label="Control after installation"
                             description="Load control after installation (ex: /usercontrols/installer.ascx)">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.controlAfterInstallation" />
+
+
+                            <a href=""
+                                class="umb-node-preview-add"
+                                ng-click="vm.openFilePicker()"
+                                prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
                         </umb-control-group>
                     </div>
             
