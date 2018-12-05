@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors
                 : Current.Services.ContentTypeService.Get(contentTypeAlias);
         }
 
-        //fixme: Need to add a custom IValueIndexer for this editor
+        //fixme: Need to add a custom IPropertyIndexValueFactory for this editor
 
         #region Pre Value Editor
 

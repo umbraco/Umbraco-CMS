@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalRecords">Total number of documents.</param>
         /// <param name="filter">Query filter.</param>
-        /// <param name="ordering"></param>
+        /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IContent> filter = null, Ordering ordering = null);
 

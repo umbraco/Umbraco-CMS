@@ -4,10 +4,13 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Returns indexable data for the property
+    /// Represents a property value indexer.
     /// </summary>
-    public interface IPropertyIndexValues
+    public interface IPropertyIndexValueFactory
     {
+        /// <summary>
+        /// Gets the index values for a property.
+        /// </summary>
         IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published);
     }
 }

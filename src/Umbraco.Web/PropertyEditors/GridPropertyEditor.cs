@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
             : base(logger)
         { }
 
-        public override IPropertyIndexValues PropertyIndexValues => new GridPropertyIndexValues();
+        public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
 
         /// <summary>
         /// Overridden to ensure that the value is validated

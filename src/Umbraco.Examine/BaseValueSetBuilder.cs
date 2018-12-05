@@ -29,7 +29,7 @@ namespace Umbraco.Examine
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null) return;
 
-            var indexVals = editor.PropertyIndexValues.GetIndexValues(property, culture, segment, PublishedValuesOnly);
+            var indexVals = editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly);
             foreach (var keyVal in indexVals)
             {
                 if (keyVal.Key.IsNullOrWhiteSpace()) continue;

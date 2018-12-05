@@ -5,7 +5,6 @@ namespace Umbraco.Core
 {
     public static partial class Constants
     {
-        
         public static class UmbracoIndexes
         {
             public const string InternalIndexName = InternalIndexPath + "Index";
@@ -15,7 +14,6 @@ namespace Umbraco.Core
             public const string InternalIndexPath = "Internal";
             public const string ExternalIndexPath = "External";
             public const string MembersIndexPath = "Members";
-
         }
     }
 }

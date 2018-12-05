@@ -63,6 +63,7 @@ namespace Umbraco.Web.Search
             //composition.Container.RegisterSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
             //composition.Container.RegisterSingleton<IIndexPopulator, MediaIndexPopulator>();
 
+            // fixme -- CHANGE THIS WHEN THE DI PR IS MERGED
             //fixme: Instead i have to do this, but this means that developers adding their own will also need to do this which isn't ideal
             composition.Container.RegisterMany<IIndexPopulator, PerContainerLifetime>(new[]
             {

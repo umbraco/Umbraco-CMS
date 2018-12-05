@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
-        public override IPropertyIndexValues PropertyIndexValues => new RichTextPropertyIndexValues();
+        public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
@@ -93,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        internal class RichTextPropertyIndexValues : IPropertyIndexValues
+        internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
         {
             public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
             {

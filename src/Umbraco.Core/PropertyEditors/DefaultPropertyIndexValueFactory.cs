@@ -4,10 +4,11 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Returns a single field to index containing the property value
+    /// Provides a default implementation for <see ref="IPropertyIndexValue">, returning a single field to index containing the property value.
     /// </summary>
-    public class DefaultPropertyIndexValues : IPropertyIndexValues
+    public class DefaultPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
+        /// <inheritdoc />
         public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
         {
             yield return new KeyValuePair<string, IEnumerable<object>>(

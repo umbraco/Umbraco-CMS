@@ -17,6 +17,7 @@ namespace Umbraco.Core
         /// <returns> An IEnumerable{T} consisting of a single item. </returns>
         public static IEnumerable<T> Yield<T>(this T item)
         {
+            // see EnumeratorBenchmarks - this is faster, and allocates less, than returning an array
             yield return item;
         }
 
