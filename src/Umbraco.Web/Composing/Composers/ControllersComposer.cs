@@ -22,7 +22,7 @@ namespace Umbraco.Web.Composing.Composers
             //
             // We scan and auto-registers:
             // - every IController and IHttpController that *we* have in Umbraco.Web
-            // - PluginController and UmbracoApiController in every assembly
+            // - PluginController, RenderMvcController and UmbracoApiController in every assembly
             //
             // We do NOT scan:
             // - any IController or IHttpController (anything not PluginController nor UmbracoApiController), outside of Umbraco.Web
