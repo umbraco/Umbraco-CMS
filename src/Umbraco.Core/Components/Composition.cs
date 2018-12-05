@@ -85,11 +85,19 @@ namespace Umbraco.Core.Components
         /// <inheritdoc />
         public IFactory CreateFactory()
         {
+            foreach (var onCreating in OnCreatingFactory.Values)
+                onCreating();
+
             foreach (var unique in _uniques.Values)
                 unique.RegisterTo(_register);
 
             return _register.CreateFactory();
         }
+
+        /// <summary>
+        /// Gets a dictionary of action to execute when creating the factory.
+        /// </summary>
+        public Dictionary<string, Action> OnCreatingFactory { get; } = new Dictionary<string, Action>();
 
         #endregion
 

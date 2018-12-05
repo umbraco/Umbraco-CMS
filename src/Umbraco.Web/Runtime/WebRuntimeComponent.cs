@@ -120,8 +120,12 @@ namespace Umbraco.Web.Runtime
             // configure the container for web
             composition.ConfigureForWeb();
 
+
+            composition.RegisterUnique<Dashboards>();
+
             composition
-                .ComposeUmbracoControllers(GetType().Assembly);
+                .ComposeUmbracoControllers(GetType().Assembly)
+                .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
 
             composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
@@ -132,9 +136,6 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
             composition.RegisterUnique<UmbracoFeatures>();
-
-            // set the default RenderMvcController
-            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             composition.WithCollectionBuilder<ActionCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());

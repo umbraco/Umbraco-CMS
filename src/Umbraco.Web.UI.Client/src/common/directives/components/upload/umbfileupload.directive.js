@@ -12,7 +12,7 @@ function umbFileUpload() {
         restrict: "A",
         scope: true,        //create a new scope
         link: function (scope, el, attrs) {
-            el.bind('change', function (event) {
+            el.on('change', function (event) {
                 var files = event.target.files;
                 //emit event upward
                 scope.$emit("filesSelected", { files: files });                           

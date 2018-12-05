@@ -27,6 +27,8 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
+        private readonly Dashboards _dashboards;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
         /// </summary>
@@ -36,9 +38,11 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
-        { }
+        {
+            _dashboards = dashboards;
+        }
 
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
@@ -47,10 +51,6 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
-            var context = UmbracoContext.Current;
-            if (context == null)
-                throw new HttpResponseException(HttpStatusCode.InternalServerError);
-
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
@@ -133,8 +133,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
-            var dashboardHelper = new DashboardHelper(Services.SectionService);
-            return dashboardHelper.GetDashboard(section, Security.CurrentUser);
+            return _dashboards.GetDashboards(section, Security.CurrentUser);
         }
     }
 }

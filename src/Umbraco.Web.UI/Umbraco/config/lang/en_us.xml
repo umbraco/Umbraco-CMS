@@ -340,6 +340,7 @@
     <key alias="confirmListViewPublish">Publishing will make the selected items visible on the site.</key>
     <key alias="confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</key>
     <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
+    <key alias="doctypeChangeWarning">You have unsaved changes. Making changes to the Document Type will discard the changes.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>

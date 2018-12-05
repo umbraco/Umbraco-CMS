@@ -104,8 +104,8 @@ Use this directive to render a tooltip.
             };
 
             // element size
-            elementHeight = el.context.clientHeight;
-            elementWidth = el.context.clientWidth;
+            elementHeight = el[0].clientHeight;
+            elementWidth = el[0].clientWidth;
 
             position.left = event.pageX - (elementWidth / 2);
             position.top = event.pageY;
