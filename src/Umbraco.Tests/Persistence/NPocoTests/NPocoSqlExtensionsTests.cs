@@ -52,14 +52,14 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 .Where<PropertyDataDto>(x => (nid == null && x.LanguageId == null) || (nid != null && x.LanguageId == nid));
             Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE ((((@0 is null) AND ([umbracoPropertyData].[languageId] is null)) OR ((@1 is not null) AND ([umbracoPropertyData].[languageId] = @2))))", sql.SQL, sql.SQL);
 
-            // new NEquals method does it automatically
+            // new SqlNullableEquals method does it automatically
             // 'course it would be nicer if '==' could do it
-            // see note in ExpressionVisitorBase for NEquals
+            // see note in ExpressionVisitorBase for SqlNullableEquals
 
             //sql = new Sql<ISqlContext>(SqlContext)
             //    .Select("*")
             //    .From<PropertyDataDto>()
-            //    .Where<PropertyDataDto>(x => x.LanguageId.NEquals(nid));
+            //    .Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(nid));
             //Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE ((((@0 is null) AND ([umbracoPropertyData].[languageId] is null)) OR ((@0 is not null) AND ([umbracoPropertyData].[languageId] = @0))))", sql.SQL, sql.SQL);
 
             // but, the expression above fails with SQL CE, 'specified argument for the function is not valid' in 'isnull' function
@@ -68,22 +68,22 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             sql = new Sql<ISqlContext>(SqlContext)
                 .Select("*")
                 .From<PropertyDataDto>()
-                .Where<PropertyDataDto>(x => x.LanguageId.NEquals(nid, -1));
+                .Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(nid, -1));
             Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE ((COALESCE([umbracoPropertyData].[languageId],@0) = COALESCE(@1,@0)))", sql.SQL, sql.SQL);
         }
 
         [Test]
-        public void NEqualsTest()
+        public void SqlNullableEqualsTest()
         {
             int? a, b;
             a = b = null;
-            Assert.IsTrue(a.NEquals(b, -1));
+            Assert.IsTrue(a.SqlNullableEquals(b, -1));
             b = 2;
-            Assert.IsFalse(a.NEquals(b, -1));
+            Assert.IsFalse(a.SqlNullableEquals(b, -1));
             a = 2;
-            Assert.IsTrue(a.NEquals(b, -1));
+            Assert.IsTrue(a.SqlNullableEquals(b, -1));
             b = null;
-            Assert.IsFalse(a.NEquals(b, -1));
+            Assert.IsFalse(a.SqlNullableEquals(b, -1));
         }
 
         [Test]
