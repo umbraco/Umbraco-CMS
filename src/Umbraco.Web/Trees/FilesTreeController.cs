@@ -10,9 +10,11 @@ namespace Umbraco.Web.Trees
     {
         protected override IFileSystem FileSystem => new PhysicalFileSystem("~/"); // fixme inject
 
-        protected override string[] Extensions => new string[] { };
+        private static readonly string[] ExtensionsStatic = { "*" };
 
-        protected override string FileIcon => "icon-script";
+        protected override string[] Extensions => ExtensionsStatic;
+
+        protected override string FileIcon => "icon-document";
 
         protected override void OnRenderFolderNode(ref TreeNode treeNode)
         {
