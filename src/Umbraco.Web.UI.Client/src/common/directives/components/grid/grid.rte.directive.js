@@ -67,7 +67,7 @@ angular.module("umbraco.directives")
 
                             $timeout(function () {
                                 if (scope.value === null) {
-                                    editor.focus();
+                                    editor.trigger("focus");
                                 }
                             }, 400);
 

@@ -5,7 +5,7 @@ angular.module("umbraco.directives").directive('focusWhen', function ($timeout) 
             attrs.$observe("focusWhen", function (newValue) {
                 if (newValue === "true") {
                    $timeout(function () {
-                      elm.focus();
+                      elm.trigger("focus");
                    });
                 }
             });

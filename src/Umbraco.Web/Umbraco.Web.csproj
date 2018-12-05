@@ -193,7 +193,7 @@
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
-    <Compile Include="Editors\DashboardHelper.cs" />
+    <Compile Include="Editors\Dashboards.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />

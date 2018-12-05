@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
@@ -379,6 +380,54 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("My App2", app1.Name);
             Assert.AreEqual("icon-bar", app1.Icon);
             Assert.AreEqual("/App_Plugins/MyPackage/ContentApps/MyApp2.html", app1.View);
+        }
+
+        [Test]
+        public void CanParseManifest_Dashboards()
+        {
+            const string json = @"{'dashboards': [
+    {
+        'name': 'First One',
+        'alias': 'something',
+        'view': '~/App_Plugins/MyPackage/Dashboards/one.html',
+        'sections': [ 'content' ],
+        'access': [ {'grant':'user'}, {'deny':'foo'} ]
+
+    },
+    {
+        'name': 'Second-One',
+        'alias': 'something.else',
+        'weight': -1,
+        'view': '~/App_Plugins/MyPackage/Dashboards/two.html',
+        'sections': [ 'forms' ],
+    }
+]}";
+
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Dashboards.Length);
+
+            Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[0]);
+            var db0 = manifest.Dashboards[0];
+            Assert.AreEqual("something", db0.Alias);
+            Assert.AreEqual("First One", db0.Name);
+            Assert.AreEqual(100, db0.Weight);
+            Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/one.html", db0.View);
+            Assert.AreEqual(1, db0.Sections.Length);
+            Assert.AreEqual("content", db0.Sections[0]);
+            Assert.AreEqual(2, db0.AccessRules.Length);
+            Assert.AreEqual(AccessRuleType.Grant, db0.AccessRules[0].Type);
+            Assert.AreEqual("user", db0.AccessRules[0].Value);
+            Assert.AreEqual(AccessRuleType.Deny, db0.AccessRules[1].Type);
+            Assert.AreEqual("foo", db0.AccessRules[1].Value);
+
+            Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[1]);
+            var db1 = manifest.Dashboards[1];
+            Assert.AreEqual("something.else", db1.Alias);
+            Assert.AreEqual("Second-One", db1.Name);
+            Assert.AreEqual(-1, db1.Weight);
+            Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/two.html", db1.View);
+            Assert.AreEqual(1, db1.Sections.Length);
+            Assert.AreEqual("forms", db1.Sections[0]);
         }
     }
 }

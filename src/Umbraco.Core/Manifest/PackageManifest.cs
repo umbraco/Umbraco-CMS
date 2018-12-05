@@ -27,5 +27,8 @@ namespace Umbraco.Core.Manifest
 
         [JsonProperty("contentApps")]
         public IContentAppDefinition[] ContentApps { get; set; } = Array.Empty<IContentAppDefinition>();
+
+        [JsonProperty("dashboards")]
+        public ManifestDashboardDefinition[] Dashboards { get; set; } = Array.Empty<ManifestDashboardDefinition>();
     }
 }

@@ -120,6 +120,9 @@ namespace Umbraco.Web.Runtime
             // configure the container for web
             composition.ConfigureForWeb();
 
+
+            composition.RegisterUnique<Dashboards>();
+
             composition
                 .ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
