@@ -44,7 +44,7 @@
 
             // TODO: implement macros
             vm.macros = [];
-            
+
             // get all languages
             languageResource.getAll().then(languages => {
                 vm.languages = languages;
@@ -95,9 +95,10 @@
 
         function openFilePicker() {
             const filePicker = {
+                section: "settings",
                 treeAlias: "files",
-                section:"settings",
                 entityType: "file",
+                onlyInitialized: false,
                 submit: function(model) {
                     console.log(model.selection);
                     editorService.close();
@@ -106,7 +107,7 @@
                     editorService.close();
                 }
             };
-            editorService.contentPicker(filePicker);
+            editorService.treePicker(filePicker);
         }
 
         onInit();

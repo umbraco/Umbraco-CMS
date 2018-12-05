@@ -183,6 +183,7 @@
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
+    <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
