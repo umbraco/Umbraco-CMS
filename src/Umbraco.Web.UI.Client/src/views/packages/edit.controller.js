@@ -19,6 +19,9 @@
         vm.removeContentItem = removeContentItem;
         vm.openContentPicker = openContentPicker;
         vm.openFilePicker = openFilePicker;
+        vm.removeFile = removeFile;
+        vm.openControlPicker = openControlPicker;
+        vm.removeControl = removeControl;
 
         function onInit() {
             // load package
@@ -98,8 +101,17 @@
                 treeAlias: "files",
                 section:"settings",
                 entityType: "file",
+                multiPicker: true,
                 submit: function(model) {
                     console.log(model.selection);
+
+                    if(model && model.selection) {
+                        vm.package.files = vm.package.files ? vm.package.files : [];
+                        model.selection.forEach(selected => {
+                            vm.package.files.push(selected);
+                        });
+                    }
+                    
                     editorService.close();
                 },
                 close: function() {
@@ -107,6 +119,32 @@
                 }
             };
             editorService.contentPicker(filePicker);
+        }
+
+        function removeFile(index) {
+            vm.package.files.splice(index, 1);
+        }
+
+        function openControlPicker() {
+            const controlPicker = {
+                treeAlias: "files",
+                section:"settings",
+                entityType: "file",
+                submit: function(model) {
+                    if(model.selection && model.selection.length > 0) {
+                        vm.package.control = model.selection[0];
+                    }
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
+            editorService.contentPicker(controlPicker);
+        }
+
+        function removeControl() {
+            vm.package.control = null;
         }
 
         onInit();
