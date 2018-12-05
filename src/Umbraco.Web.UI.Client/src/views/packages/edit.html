@@ -202,25 +202,47 @@
                         <umb-control-group 
                             label="Path to file"
                             description="Absolute path to file (ie: /bin/umbraco.bin)">
+
+                            <umb-node-preview
+                                ng-if="vm.package.files"
+                                ng-repeat="file in vm.package.files"
+                                icon="file.icon"
+                                name="file.name"
+                                allow-remove="true"
+                                on-remove="vm.removeFile($index)">
+                            </umb-node-preview>
+
                             <a href=""
                                 class="umb-node-preview-add"
                                 ng-click="vm.openFilePicker()"
                                 prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>
+
                         </umb-control-group>
 
                         <umb-control-group 
                             label="Control after installation"
                             description="Load control after installation (ex: /usercontrols/installer.ascx)">
 
+                            <umb-node-preview
+                                ng-if="vm.package.control.id"
+                                icon="vm.package.control.icon"
+                                name="vm.package.control.name"
+                                allow-edit="true"
+                                allow-remove="true"
+                                on-edit="vm.openControlPicker()"
+                                on-remove="vm.removeControl()">
+                            </umb-node-preview>
 
                             <a href=""
+                                ng-if="!vm.package.control.id"
                                 class="umb-node-preview-add"
-                                ng-click="vm.openFilePicker()"
+                                ng-click="vm.openControlPicker()"
                                 prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>
+
                         </umb-control-group>
                     </div>
             
