@@ -13,8 +13,13 @@ namespace Umbraco.Examine
         bool EnableDefaultEventHandler { get; }
 
         /// <summary>
-        /// When set to true data will not be deleted from the index if the data is being soft deleted (unpublished or trashed)
+        /// When set to true the index will only retain published values
         /// </summary>
-        bool SupportSoftDelete { get; }
+        /// <remarks>
+        /// Any non-published values will not be put or kept in the index:
+        /// * Deleted, Trashed, non-published Content items
+        /// * non-published Variants
+        /// </remarks>
+        bool PublishedValuesOnly { get; }
     }
 }

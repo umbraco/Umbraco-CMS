@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
@@ -14,7 +13,6 @@ using Examine.LuceneEngine.Indexing;
 using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Xml;
 using Umbraco.Examine.Config;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -147,7 +145,7 @@ namespace Umbraco.Examine
         /// </summary>
         public bool EnableDefaultEventHandler { get; set; } = true;
 
-        public bool SupportSoftDelete { get; protected set; } = false;
+        public bool PublishedValuesOnly { get; protected set; } = false;
 
         protected ConfigIndexCriteria ConfigIndexCriteria { get; private set; }
 
@@ -177,38 +175,35 @@ namespace Umbraco.Examine
             }
 
             //Need to check if the index set or IndexerData is specified...
-            if (config["indexSet"] == null && (FieldDefinitionCollection.Count == 0))
+            if (config["indexSet"] == null && FieldDefinitionCollection.Count == 0)
             {
                 //if we don't have either, then we'll try to set the index set by naming conventions
                 var found = false;
-                if (name.EndsWith("Indexer"))
+
+                var possibleSuffixes = new[] {"Index", "Indexer"};
+                foreach (var suffix in possibleSuffixes)
                 {
-                    var setNameByConvension = name.Remove(name.LastIndexOf("Indexer")) + "IndexSet";
+                    if (!name.EndsWith(suffix)) continue;
+
+                    var setNameByConvension = name.Remove(name.LastIndexOf(suffix, StringComparison.Ordinal)) + "IndexSet";
                     //check if we can assign the index set by naming convention
                     var set = IndexSets.Instance.Sets.Cast<IndexSet>().SingleOrDefault(x => x.SetName == setNameByConvension);
 
-                    if (set != null)
+                    if (set == null) continue;
+
+                    //we've found an index set by naming conventions :)
+                    IndexSetName = set.SetName;
+
+                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
+
+                    //get the index criteria and ensure folder
+                    ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
+                    foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
-                        //we've found an index set by naming conventions :)
-                        IndexSetName = set.SetName;
-
-                        var indexSet = IndexSets.Instance.Sets[IndexSetName];
-
-                        //if tokens are declared in the path, then use them (i.e. {machinename} )
-                        indexSet.ReplaceTokensInIndexPath();
-
-                        //get the index criteria and ensure folder
-                        ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
-                        foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
-                        {
-                            FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
-                        }
-
-                        //now set the index folder
-                        LuceneIndexFolder = new DirectoryInfo(Path.Combine(IndexSets.Instance.Sets[IndexSetName].IndexDirectory.FullName, "Index"));
-
-                        found = true;
+                        FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
                     }
+                    found = true;
+                    break;
                 }
 
                 if (!found)
@@ -229,24 +224,18 @@ namespace Umbraco.Examine
 
                     var indexSet = IndexSets.Instance.Sets[IndexSetName];
 
-                    //if tokens are declared in the path, then use them (i.e. {machinename} )
-                    indexSet.ReplaceTokensInIndexPath();
-
                     //get the index criteria and ensure folder
                     ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
                     foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
                         FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
                     }
-
-                    //now set the index folder
-                    LuceneIndexFolder = new DirectoryInfo(Path.Combine(IndexSets.Instance.Sets[IndexSetName].IndexDirectory.FullName, "Index"));
                 }
             }
 
             base.Initialize(name, config);
         }
-
+        
         #endregion
 
         /// <summary>

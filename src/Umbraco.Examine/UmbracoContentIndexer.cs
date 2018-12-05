@@ -64,8 +64,8 @@ namespace Umbraco.Examine
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
 
-            if (validator is ContentValueSetValidator contentValueSetValidator)
-                SupportSoftDelete = contentValueSetValidator.SupportUnpublishedContent;
+            if (validator is IContentValueSetValidator contentValueSetValidator)
+                PublishedValuesOnly = contentValueSetValidator.PublishedValuesOnly;
         }
 
         #endregion
@@ -124,7 +124,7 @@ namespace Umbraco.Examine
                 parentId,
                 ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
 
-            SupportSoftDelete = supportUnpublished;
+            PublishedValuesOnly = supportUnpublished;
         }
 
         #endregion

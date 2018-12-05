@@ -25,7 +25,7 @@ namespace Umbraco.Examine
         /// </summary>
         private static IQuery<IContent> _publishedQuery;
 
-        private readonly bool _supportUnpublishedContent;
+        private readonly bool _publishedValuesOnly;
         private readonly int? _parentId;
 
         /// <summary>
@@ -34,27 +34,27 @@ namespace Umbraco.Examine
         /// <param name="contentService"></param>
         /// <param name="sqlContext"></param>
         /// <param name="contentValueSetBuilder"></param>
-        public ContentIndexPopulator(IContentService contentService, ISqlContext sqlContext, IValueSetBuilder<IContent> contentValueSetBuilder)
-            : this(true, null, contentService, sqlContext, contentValueSetBuilder)
+        public ContentIndexPopulator(IContentService contentService, ISqlContext sqlContext, IContentValueSetBuilder contentValueSetBuilder)
+            : this(false, null, contentService, sqlContext, contentValueSetBuilder)
         {   
         }
 
         /// <summary>
         /// Optional constructor allowing specifying custom query parameters
         /// </summary>
-        /// <param name="supportUnpublishedContent"></param>
+        /// <param name="publishedValuesOnly"></param>
         /// <param name="parentId"></param>
         /// <param name="contentService"></param>
         /// <param name="sqlContext"></param>
         /// <param name="contentValueSetBuilder"></param>
-        public ContentIndexPopulator(bool supportUnpublishedContent, int? parentId, IContentService contentService, ISqlContext sqlContext, IValueSetBuilder<IContent> contentValueSetBuilder)
+        public ContentIndexPopulator(bool publishedValuesOnly, int? parentId, IContentService contentService, ISqlContext sqlContext, IValueSetBuilder<IContent> contentValueSetBuilder)
         {
             if (sqlContext == null) throw new ArgumentNullException(nameof(sqlContext));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
             if (_publishedQuery != null)
                 _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
-            _supportUnpublishedContent = supportUnpublishedContent;
+            _publishedValuesOnly = publishedValuesOnly;
             _parentId = parentId;
 
             RegisterIndex(Constants.UmbracoIndexes.InternalIndexName);
@@ -75,7 +75,7 @@ namespace Umbraco.Examine
 
             do
             {
-                if (_supportUnpublishedContent)
+                if (!_publishedValuesOnly)
                 {
                     content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
                 }

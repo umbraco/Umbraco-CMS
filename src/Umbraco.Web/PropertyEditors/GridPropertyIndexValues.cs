@@ -18,11 +18,11 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class GridPropertyIndexValues : IPropertyIndexValues
     {
-        public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
         {
-            var result = new List<KeyValuePair<string, object[]>>();
+            var result = new List<KeyValuePair<string, IEnumerable<object>>>();
 
-            var val = property.GetValue(culture, segment);
+            var val = property.GetValue(culture, segment, published);
 
             //if there is a value, it's a string and it's detected as json
             if (val is string rawVal && rawVal.DetectIsJson())
@@ -51,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors
                                 sb.Append(" ");
 
                                 //add the row name as an individual field
-                                result.Add(new KeyValuePair<string, object[]>($"{property.Alias}.{rowName}", new[] { str }));
+                                result.Add(new KeyValuePair<string, IEnumerable<object>>($"{property.Alias}.{rowName}", new[] { str }));
                             }
                         }
                     }
@@ -59,10 +59,10 @@ namespace Umbraco.Web.PropertyEditors
                     if (sb.Length > 0)
                     {
                         //First save the raw value to a raw field
-                        result.Add(new KeyValuePair<string, object[]>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+                        result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
 
                         //index the property with the combined/cleaned value
-                        result.Add(new KeyValuePair<string, object[]>(property.Alias, new[] { sb.ToString() }));
+                        result.Add(new KeyValuePair<string, IEnumerable<object>>(property.Alias, new[] { sb.ToString() }));
                     }
                 }
                 catch (InvalidCastException)

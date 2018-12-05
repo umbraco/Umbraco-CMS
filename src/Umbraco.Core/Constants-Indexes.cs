@@ -8,9 +8,9 @@ namespace Umbraco.Core
         
         public static class UmbracoIndexes
         {
-            public const string InternalIndexName = InternalIndexPath + "Indexer";
-            public const string ExternalIndexName = ExternalIndexPath + "Indexer";
-            public const string MembersIndexName = MembersIndexPath + "Indexer";
+            public const string InternalIndexName = InternalIndexPath + "Index";
+            public const string ExternalIndexName = ExternalIndexPath + "Index";
+            public const string MembersIndexName = MembersIndexPath + "Index";
 
             public const string InternalIndexPath = "Internal";
             public const string ExternalIndexPath = "External";

@@ -176,9 +176,6 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
                     'Failed to retrieve searcher details')
                 .then(data => {
                     vm.searcherDetails = data;
-                    for (var s in vm.searcherDetails) {
-                        vm.searcherDetails[s].searchType = "text";
-                    }
                 })
             ])
             .then(() => { vm.loading = false });

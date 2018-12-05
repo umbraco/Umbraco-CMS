@@ -8,15 +8,19 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Examine
 {
-    public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>
+    /// <summary>
+    /// Builds <see cref="ValueSet"/>s for <see cref="IContent"/> items
+    /// </summary>
+    public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder, IPublishedContentValueSetBuilder
     {
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private readonly IUserService _userService;
 
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IUserService userService)
-            : base(propertyEditors)
+            IUserService userService,
+            bool publishedValuesOnly)
+            : base(propertyEditors, publishedValuesOnly)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
@@ -47,8 +51,10 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {c.SortOrder}},
                     {"createDate", new object[] {c.CreateDate}},    //Always add invariant createDate
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
-                    {"nodeName", c.Name.Yield()},            //Always add invariant nodeName
-                    {"urlName", urlValue.Yield()},           //Always add invariant urlName
+                    {"nodeName", PublishedValuesOnly               //Always add invariant nodeName
+                        ? c.PublishName.Yield()
+                        : c.Name.Yield()},            
+                    {"urlName", urlValue.Yield()},                  //Always add invariant urlName
                     {"path", c.Path.Yield()},
                     {"nodeType", new object[] {c.ContentType.Id}},
                     {"creatorName", (c.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
@@ -67,9 +73,13 @@ namespace Umbraco.Examine
                         var variantUrl = c.GetUrlSegment(_urlSegmentProviders, culture);
                         var lowerCulture = culture.ToLowerInvariant();
                         values[$"urlName_{lowerCulture}"] = variantUrl.Yield();
-                        values[$"nodeName_{lowerCulture}"] = c.GetCultureName(culture).Yield();
-                        values[$"{UmbracoExamineIndexer.PublishedFieldName}_{lowerCulture}"] = new object[] { c.IsCulturePublished(culture) ? 1 : 0 };
-                        values[$"updateDate_{lowerCulture}"] = new object[] { c.GetUpdateDate(culture) };
+                        values[$"nodeName_{lowerCulture}"] = PublishedValuesOnly
+                            ? c.GetPublishName(culture).Yield()
+                            : c.GetCultureName(culture).Yield();
+                        values[$"{UmbracoExamineIndexer.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? 1 : 0).Yield<object>();
+                        values[$"updateDate_{lowerCulture}"] = PublishedValuesOnly
+                            ? c.GetPublishDate(culture).Yield<object>()
+                            : c.GetUpdateDate(culture).Yield<object>();
                     }
                 }
 

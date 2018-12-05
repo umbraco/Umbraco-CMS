@@ -8,9 +8,11 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class DefaultPropertyIndexValues : IPropertyIndexValues
     {
-        public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
         {
-            yield return new KeyValuePair<string, object[]>(property.Alias, new[] { property.GetValue(culture, segment) });
+            yield return new KeyValuePair<string, IEnumerable<object>>(
+                property.Alias,
+                property.GetValue(culture, segment, published).Yield());
         }
     }
 }

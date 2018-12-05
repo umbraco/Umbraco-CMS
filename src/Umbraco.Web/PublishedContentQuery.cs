@@ -242,15 +242,12 @@ namespace Umbraco.Web
 
             var searcher = index.GetSearcher();
 
-            if (skip == 0 && take == 0)
-            {
-                var results = searcher.Search(term, useWildCards);
-                totalRecords = results.TotalItemCount;
-                return results.ToPublishedSearchResults(_contentCache);
-            }
+            var results = skip == 0 && take == 0
+                ? searcher.Search(term, true)
+                : searcher.Search(term, true, maxResults: skip + take);
 
-            var criteria = SearchAllFields(term, useWildCards, searcher, index);
-            return Search(skip, take, out totalRecords, criteria, searcher);
+            totalRecords = results.TotalItemCount;
+            return results.ToPublishedSearchResults(_contentCache);
         }
 
         /// <inheritdoc />
@@ -279,28 +276,6 @@ namespace Umbraco.Web
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
-
-        /// <summary>
-        /// Creates an ISearchCriteria for searching all fields in a <see cref="BaseLuceneSearcher"/>.
-        /// </summary>
-        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, ISearcher searcher, IIndex indexer)
-        {
-            var sc = searcher.CreateCriteria();
-
-            //if we're dealing with a lucene searcher, we can get all of it's indexed fields,
-            //else we can get the defined fields for the index. 
-            var searchFields = (searcher is BaseLuceneSearcher luceneSearcher)
-                ? luceneSearcher.GetAllIndexedFields()
-                : indexer.FieldDefinitionCollection.Keys;
-
-            //this is what Examine does internally to create ISearchCriteria for searching all fields
-            var strArray = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            sc = useWildcards == false
-                ? sc.GroupedOr(searchFields, strArray).Compile()
-                : sc.GroupedOr(searchFields, strArray.Select(x => (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray()).Compile();
-            return sc;
-        }        
 
 
         #endregion

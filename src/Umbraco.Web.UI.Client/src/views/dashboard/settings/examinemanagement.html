@@ -86,8 +86,107 @@
         </div>
 
         <div ng-if="vm.viewState === 'searcher-details'">
-            <!-- TODO: Add searcher properties -->
-            <!-- TODO: Add search tools -->
+
+            <umb-editor-sub-header>
+                <umb-editor-sub-header-content-left>
+                    <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                </umb-editor-sub-header-content-left>
+            </umb-editor-sub-header>
+
+            <div class="umb-healthcheck-group__details">
+
+                <div class="umb-healthcheck-group__details-group">
+
+                    <div class="umb-healthcheck-group__details-group-title">
+                        <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedSearcher.name }}</div>
+                    </div>
+
+                    <div class="umb-healthcheck-group__details-checks">
+
+                        <!-- Search Tool -->
+
+                        <div class="umb-healthcheck-group__details-check">
+
+                            <div class="umb-healthcheck-group__details-check-title">
+                                <div class="umb-healthcheck-group__details-check-name">Search</div>
+                                <div class="umb-healthcheck-group__details-check-description">Search the index and view the results</div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status">
+
+                                <div class="umb-healthcheck-group__details-status-content">
+
+                                    <div class="umb-healthcheck-group__details-status-actions">
+                                        <div class="umb-healthcheck-group__details-status-action">
+                                            <ng-form name="searchTools">
+
+                                                <div class="row form-search">
+                                                    <div>
+                                                        <input type="text" class="search-query"
+                                                               ng-model="vm.searchText" no-dirty-check
+                                                               ng-keypress="vm.search(vm.selectedSearcher, $event)" />
+
+                                                        <umb-button disabled="vm.selectedSearcher.isProcessing"
+                                                                    type="button"
+                                                                    button-style="success"
+                                                                    action="vm.search(vm.selectedSearcher)"
+                                                                    label="Search">
+                                                        </umb-button>
+
+                                                    </div>
+                                                </div>
+
+                                                <div ng-if="!vm.selectedSearcher.isProcessing && vm.searchResults">
+                                                    <br />
+
+                                                    <table class="table table-bordered table-condensed">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="score">Score</th>
+                                                                <th class="id">Id</th>
+                                                                <th>Name</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="result in vm.searchResults.results track by $index">
+                                                                <td>{{result.score}}</td>
+                                                                <td>{{result.id}}</td>
+                                                                <td>
+                                                                    <span>{{result.values['nodeName']}}</span>&nbsp;
+                                                                    <a class="color-green" href="" ng-click="vm.showSearchResultDialog(result.values)">
+                                                                        <em>({{result.fieldCount}} fields)</em>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="flex justify-center">
+                                                        <umb-pagination page-number="vm.searchResults.pageNumber"
+                                                                        total-pages="vm.searchResults.totalPages"
+                                                                        on-next="vm.nextSearchResultPage"
+                                                                        on-prev="vm.prevSearchResultPage"
+                                                                        on-go-to-page="vm.goToPageSearchResultPage">
+                                                        </umb-pagination>
+                                                    </div>
+
+                                                </div>
+
+                                            </ng-form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
         </div>
 
         <div ng-if="vm.viewState === 'index-details'">
@@ -140,33 +239,6 @@
 
                         </div>
 
-                        <!-- Index Stats -->
-
-                        <div class="umb-healthcheck-group__details-check">
-
-                            <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Index info</div>
-                                <div class="umb-healthcheck-group__details-check-description">Lists the properties of the index</div>
-                            </div>
-
-                            <div class="umb-healthcheck-group__details-status">
-
-                                <div class="umb-healthcheck-group__details-status-content">
-
-                                    <table class="table table-bordered table-condensed">
-                                        <caption>&nbsp;</caption>
-                                        <tr ng-repeat="(key, val) in vm.selectedIndex.providerProperties track by $index">
-                                            <th>{{key}}</th>
-                                            <td>{{val}}</td>
-                                        </tr>
-                                    </table>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
                         <!-- Search Tool -->
 
                         <div class="umb-healthcheck-group__details-check">
@@ -200,7 +272,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div ng-hide="vm.selectedIndex.isProcessing || !vm.searchResults">
+                                                <div ng-if="!vm.selectedIndex.isProcessing && vm.searchResults">
                                                     <br />
 
                                                     <table class="table table-bordered table-condensed">
@@ -212,7 +284,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr ng-repeat="result in vm.searchResults.results track by result.id">
+                                                            <tr ng-repeat="result in vm.searchResults.results track by $index">
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
@@ -245,6 +317,35 @@
                             </div>
 
                         </div>
+
+                        <!-- Index Stats -->
+
+                        <div class="umb-healthcheck-group__details-check">
+
+                            <div class="umb-healthcheck-group__details-check-title">
+                                <div class="umb-healthcheck-group__details-check-name">Index info</div>
+                                <div class="umb-healthcheck-group__details-check-description">Lists the properties of the index</div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status">
+
+                                <div class="umb-healthcheck-group__details-status-content">
+
+                                    <table class="table table-bordered table-condensed">
+                                        <caption>&nbsp;</caption>
+                                        <tr ng-repeat="(key, val) in vm.selectedIndex.providerProperties track by $index">
+                                            <th>{{key}}</th>
+                                            <td>{{val}}</td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Rebuild -->
 
                         <div class="umb-healthcheck-group__details-check">
 
@@ -291,8 +392,6 @@
                             </div>
 
                         </div>
-
-
 
                     </div>
 

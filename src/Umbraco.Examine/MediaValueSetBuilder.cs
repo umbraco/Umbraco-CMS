@@ -16,7 +16,7 @@ namespace Umbraco.Examine
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IUserService userService)
-            : base(propertyEditors)
+            : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;

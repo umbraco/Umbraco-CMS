@@ -8,6 +8,6 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public interface IPropertyIndexValues
     {
-        IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment);
+        IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published);
     }
 }

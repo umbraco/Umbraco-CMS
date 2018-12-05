@@ -10,7 +10,7 @@ namespace Umbraco.Examine
     public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
     {
         public MemberValueSetBuilder(PropertyEditorCollection propertyEditors)
-            : base(propertyEditors)
+            : base(propertyEditors, false)
         {
         }
 

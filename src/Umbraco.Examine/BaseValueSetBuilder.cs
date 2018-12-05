@@ -12,10 +12,12 @@ namespace Umbraco.Examine
     public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
         where TContent : IContentBase
     {
+        protected bool PublishedValuesOnly { get; }
         private readonly PropertyEditorCollection _propertyEditors;
 
-        protected BaseValueSetBuilder(PropertyEditorCollection propertyEditors)
+        protected BaseValueSetBuilder(PropertyEditorCollection propertyEditors, bool publishedValuesOnly)
         {
+            PublishedValuesOnly = publishedValuesOnly;
             _propertyEditors = propertyEditors ?? throw new System.ArgumentNullException(nameof(propertyEditors));
         }
 
@@ -27,7 +29,7 @@ namespace Umbraco.Examine
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null) return;
 
-            var indexVals = editor.PropertyIndexValues.GetIndexValues(property, culture, segment);
+            var indexVals = editor.PropertyIndexValues.GetIndexValues(property, culture, segment, PublishedValuesOnly);
             foreach (var keyVal in indexVals)
             {
                 if (keyVal.Key.IsNullOrWhiteSpace()) continue;

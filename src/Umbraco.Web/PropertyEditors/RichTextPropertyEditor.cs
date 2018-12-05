@@ -95,16 +95,16 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RichTextPropertyIndexValues : IPropertyIndexValues
         {
-            public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
+            public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
             {
-                var val = property.GetValue(culture, segment);
+                var val = property.GetValue(culture, segment, published);
 
                 if (!(val is string strVal)) yield break;
 
                 //index the stripped html values
-                yield return new KeyValuePair<string, object[]>(property.Alias, new object[] { strVal.StripHtml() });
+                yield return new KeyValuePair<string, IEnumerable<object>>(property.Alias, new object[] { strVal.StripHtml() });
                 //store the raw value
-                yield return new KeyValuePair<string, object[]>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new object[] { strVal });
+                yield return new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new object[] { strVal });
             }
         }
     }

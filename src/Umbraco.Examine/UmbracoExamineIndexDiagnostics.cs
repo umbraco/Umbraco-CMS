@@ -70,7 +70,7 @@ namespace Umbraco.Examine
                         _index.LuceneIndexFolder == null
                             ? string.Empty
                             : _index.LuceneIndexFolder.ToString().ToLowerInvariant().TrimStart(IOHelper.MapPath(SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/'),
-                    [nameof(UmbracoExamineIndexer.SupportSoftDelete)] = _index.SupportSoftDelete,
+                    [nameof(UmbracoExamineIndexer.PublishedValuesOnly)] = _index.PublishedValuesOnly,
                     //There's too much info here
                     //[nameof(UmbracoExamineIndexer.FieldDefinitionCollection)] = _index.FieldDefinitionCollection,
                 };
@@ -85,7 +85,7 @@ namespace Umbraco.Examine
 
                 if (_index.ValueSetValidator is ContentValueSetValidator cvsv)
                 {
-                    d[nameof(ContentValueSetValidator.SupportUnpublishedContent)] = cvsv.SupportUnpublishedContent;
+                    d[nameof(ContentValueSetValidator.PublishedValuesOnly)] = cvsv.PublishedValuesOnly;
                     d[nameof(ContentValueSetValidator.SupportProtectedContent)] = cvsv.SupportProtectedContent;
                     d[nameof(ContentValueSetValidator.ParentId)] = cvsv.ParentId;
                 }
