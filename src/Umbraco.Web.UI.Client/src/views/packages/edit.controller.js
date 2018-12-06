@@ -83,7 +83,15 @@
         }
 
         function createPackage() {
-            console.log("create package");
+
+            vm.createPackageButtonState = "busy";
+
+            packageResource.createPackage(vm.package).then((updatedPackage) => {
+                vm.package = updatedPackage;
+                vm.createPackageButtonState = "success";
+            }, function(error){
+                vm.createPackageButtonState = "error";
+            });
         }
 
         function save() {
