@@ -209,6 +209,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.Fetch(string.Empty))
                         },
                         {
+                            "packageApiBaseUrl ", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
+                                controller => controller.GetCreatedPackages())
+                        },
+                        {
                             "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
                                 controller => controller.GetById(0))
                         },
