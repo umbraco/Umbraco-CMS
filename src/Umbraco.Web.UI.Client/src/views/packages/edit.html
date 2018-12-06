@@ -255,13 +255,13 @@
                     </div>
                     <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
                         <umb-control-group 
-                            label="Readme"
+                            label="Actions"
                             description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation. 
                             All actions are formed as a xml node, containing data for the action to be performed.">
                             <div>
                                 <a ng-href="https://our.umbraco.com/documentation/Reference/Packaging/">Documentation</a>
                                 <div>
-                                    <textarea class="umb-property-editor" rows="10" ng-model="vm.package.readme"></textarea>
+                                    <textarea class="umb-property-editor" rows="10" ng-model="vm.package.actions"></textarea>
                                 </div>
                             </div>
                         </umb-control-group>

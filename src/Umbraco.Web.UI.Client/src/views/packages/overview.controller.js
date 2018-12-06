@@ -10,6 +10,8 @@
         // we will refresh and then navigate there.
 
         var installPackageUri = localStorageService.get("packageInstallUri");
+        const packageUri = $location.search().subview;
+
         if (installPackageUri) {            
             localStorageService.remove("packageInstallUri");                       
         }
@@ -28,28 +30,41 @@
                     "name": "Packages",
                     "icon": "icon-cloud",
                     "view": "views/packages/views/repo.html",
-                    "active": !installPackageUri || installPackageUri === "navigation",
-                    "alias": "umbPackages"
+                    "active": !packageUri || installPackageUri === "navigation" || packageUri === "navigation",
+                    "alias": "umbPackages",
+                    "action": function() {
+                        $location.search("subview", "navigation");
+                    }
                 },
                 {
                     "name": "Installed",
                     "icon": "icon-box",
                     "view": "views/packages/views/installed.html",
-                    "active": installPackageUri === "installed",
-                    "alias": "umbInstalled"
+                    "active": installPackageUri === "installed" || packageUri === "installed",
+                    "alias": "umbInstalled",
+                    "action": function() {
+                        $location.search("subview", "installed");
+                    }
                 },
                 {
                     "name": "Install local",
                     "icon": "icon-add",
                     "view": "views/packages/views/install-local.html",
-                    "active": installPackageUri === "local",
-                    "alias": "umbInstallLocal"
+                    "active": installPackageUri === "local" || packageUri === "local",
+                    "alias": "umbInstallLocal",
+                    "action": function() {
+                        $location.search("subview", "local");
+                    }
                 },
                 {
                     "name": "Created",
                     "icon": "icon-add",
                     "view": "views/packages/views/created.html",
-                    "alias": "umbCreatedPackages"
+                    "active": packageUri === "created",
+                    "alias": "umbCreatedPackages",
+                    "action": function() {
+                        $location.search("subview", "created");
+                    }
                 }
             ];
 
