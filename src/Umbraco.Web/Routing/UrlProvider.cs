@@ -217,11 +217,10 @@ namespace Umbraco.Web.Routing
         {
             var provider = _urlProviders.OfType<IUrlProvider>().FirstOrDefault();
 
-            var url = provider is DefaultUrlProvider
-            ? ((DefaultUrlProvider)provider).GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode)
-            : provider.GetUrl(UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode);
-
-
+            var url = provider is DefaultUrlProvider urlProvider
+                ? urlProvider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode)
+                : provider?.GetUrl(UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode) ?? route;
+            
             return url ?? "#";
         }
 
