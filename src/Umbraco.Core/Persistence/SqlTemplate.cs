@@ -97,7 +97,9 @@ namespace Umbraco.Core.Persistence
 
         internal void WriteToConsole()
         {
+#if DEBUG
             new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.ToArray()).WriteToConsole();
+#endif
         }
 
         /// <summary>

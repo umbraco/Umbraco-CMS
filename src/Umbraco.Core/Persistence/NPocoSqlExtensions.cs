@@ -1184,12 +1184,15 @@ namespace Umbraco.Core.Persistence
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
+
         internal static void WriteToConsole(this Sql sql)
         {
+#if DEBUG
             Console.WriteLine(sql.SQL);
             var i = 0;
             foreach (var arg in sql.Arguments)
                 Console.WriteLine($"  @{i++}: {arg}");
+#endif
         }
 
         #endregion
