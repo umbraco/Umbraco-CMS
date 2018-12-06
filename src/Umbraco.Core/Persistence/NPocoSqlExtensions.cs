@@ -1115,11 +1115,6 @@ namespace Umbraco.Core.Persistence
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
-        internal static void WriteToConsole(this Sql sql)
-        {
-            Console.Write(sql.ToText());
-        }
-
         internal static string ToText(this Sql sql)
         {
             var text = new StringBuilder();
