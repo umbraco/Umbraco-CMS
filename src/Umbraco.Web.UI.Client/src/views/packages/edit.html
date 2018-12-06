@@ -3,7 +3,7 @@
     <form name="editLanguageForm" no-validate val-form-manager>
 
         <umb-editor-view>
-    
+
             <umb-editor-header
                 name="vm.package.name"
                 on-back="vm.back()"
@@ -12,7 +12,7 @@
                 hide-description="true"
                 hide-alias="true">
             </umb-editor-header>
-    
+
             <umb-editor-container class="form-horizontal">
 
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
@@ -23,7 +23,7 @@
                         <div>Package Properties</div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</ins>
                     </div>
-            
+
                     <div class="umb-expansion-panel__content" ng-show="vm.propertiesOpen">
 
                         <umb-control-group label="Url" required="true">
@@ -39,7 +39,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Package File">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.packageFile" />
+                            <input class="umb-property-editor" type="text" ng-model="vm.package.packagePath" />
                         </umb-control-group>
 
                         <umb-control-group label="Umbraco version">
@@ -67,22 +67,24 @@
                         </umb-control-group>
 
                     </div>
-            
+
                 </div>
-                
+
                 <div class="umb-expansion-panel">
 
                     <div class="umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
                         <div>Package Content</div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</ins>
                     </div>
-            
+
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
 
                         <umb-control-group label="Content">
 
+                            <!-- TODO: This can be a single node AND child nodes selected -->
+                            <!-- TODO: This can be various specific nodes selected -->
                             <umb-node-preview
-                                ng-if="vm.package.contentItem.id"
+                                ng-if="vm.package.contentNodeId"
                                 icon="vm.package.contentItem.icon"
                                 name="vm.package.contentItem.name"
                                 allow-edit="true"
@@ -92,7 +94,7 @@
                             </umb-node-preview>
 
                             <a href=""
-                                ng-if="!vm.package.contentItem"
+                                ng-if="!vm.package.contentNodeId"
                                 style="margin-bottom: 10px;"
                                 class="umb-node-preview-add"
                                 ng-click="vm.openContentPicker()"
@@ -101,58 +103,62 @@
                             </a>
 
                             <label style="padding-left: 0;">
-                                <input type="checkbox" ng-model="vm.package.includeContentChildren" ng-disabled="!vm.package.contentItem.id" />
+                                <input type="checkbox" ng-model="vm.package.contentLoadChildNodes" ng-disabled="!vm.package.contentNodeId" />
                                 Include all child nodes
                             </label>
 
                         </umb-control-group>
 
                         <umb-control-group label="Document Types">
+                                <pre>{{vm.documentTypes | json }} </pre>
                             <div ng-repeat="doctype in vm.documentTypes">
                                 <label>
-                                    <input 
-                                        type="checkbox" 
-                                        ng-model="doctype.selected" 
+                                    <input
+                                        type="checkbox"
+                                        ng-model="doctype.selected"
                                         checklist-model="vm.package.contentTypes"
-                                        checklist-value="doctype.alias" />
+                                        checklist-value="doctype.id" />
                                     {{doctype.name}}
                                 </label>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="Templates">
+                            <pre>{{vm.templates | json }} </pre>
                             <div ng-repeat="template in vm.templates">
                                 <label>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checklist-model="vm.package.templates"
-                                        checklist-value="template.alias" />
+                                        checklist-value="template.id" />
                                     {{template.name}}
                                 </label>
                             </div>
                         </umb-control-group>
-                        
+
                         <umb-control-group label="Stylesheets">
+                            <pre>{{vm.stylesheets | json }}</pre>
                             <div ng-repeat="stylesheet in vm.stylesheets">
                                 <label>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checklist-model="vm.package.stylesheets"
                                         checklist-value="stylesheet.path" />
-                                    {{stylesheet.name}}
+                                    {{stylesheet.path}}
                                 </label>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="Macros">
-                            NOT IMPLEMENTED
+                            NOT IMPLEMENTED IN V8 YET
                         </umb-control-group>
 
                         <umb-control-group label="Languages">
+                                <pre>{{vm.languages | json }}</pre>
                             <div ng-repeat="language in vm.languages">
                                 <label>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checklist-model="vm.package.languages"
                                         checklist-value="stylesheet.id" />
                                     {{language.name}}
@@ -163,8 +169,8 @@
                         <umb-control-group label="Dictionary Items">
                             <div ng-repeat="dictionaryItem in vm.dictionaryItems">
                                 <label>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checklist-model="vm.package.dictionaryItems"
                                         checklist-value="dictionaryItem.id" />
                                     {{dictionaryItem.name}}
@@ -175,8 +181,8 @@
                         <umb-control-group label="Data Types">
                             <div ng-repeat="dataType in vm.dataTypes">
                                 <label>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checklist-model="vm.package.dataTypes"
                                         checklist-value="dataType.id" />
                                     {{dataType.name}}
@@ -194,20 +200,20 @@
                         <div>Package Files</div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</ins>
                     </div>
-            
+
                     <div class="umb-expansion-panel__content" ng-show="vm.filesOpen">
                         <!--
                         <p>Remember: .xslt and .ascx files for your macros will be added automaticly, but you will still need to add assemblies, images and script files manually to the list below.</p>
                         -->
-                        <umb-control-group 
+                        <umb-control-group
                             label="Path to file"
                             description="Absolute path to file (ie: /bin/umbraco.bin)">
 
                             <umb-node-preview
                                 ng-if="vm.package.files"
                                 ng-repeat="file in vm.package.files"
-                                icon="file.icon"
-                                name="file.name"
+                                icon="'icon-document'"
+                                name="file"
                                 allow-remove="true"
                                 on-remove="vm.removeFile($index)">
                             </umb-node-preview>
@@ -221,14 +227,14 @@
 
                         </umb-control-group>
 
-                        <umb-control-group 
+                        <umb-control-group
                             label="Control after installation"
                             description="Load control after installation (ex: /usercontrols/installer.ascx)">
 
                             <umb-node-preview
-                                ng-if="vm.package.control.id"
-                                icon="vm.package.control.icon"
-                                name="vm.package.control.name"
+                                ng-if="vm.package.loadControl"
+                                icon="'icon-box'"
+                                name="vm.package.loadControl"
                                 allow-edit="true"
                                 allow-remove="true"
                                 on-edit="vm.openControlPicker()"
@@ -236,7 +242,7 @@
                             </umb-node-preview>
 
                             <a href=""
-                                ng-if="!vm.package.control.id"
+                                ng-if="!vm.package.loadControl"
                                 class="umb-node-preview-add"
                                 ng-click="vm.openControlPicker()"
                                 prevent-default>
@@ -245,7 +251,7 @@
 
                         </umb-control-group>
                     </div>
-            
+
                 </div>
 
                 <div class="umb-expansion-panel">
@@ -254,9 +260,9 @@
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</ins>
                     </div>
                     <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
-                        <umb-control-group 
+                        <umb-control-group
                             label="Actions"
-                            description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation. 
+                            description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
                             All actions are formed as a xml node, containing data for the action to be performed.">
                             <div>
                                 <a ng-href="https://our.umbraco.com/documentation/Reference/Packaging/">Documentation</a>
@@ -275,7 +281,7 @@
             <umb-editor-footer>
 
                 <umb-editor-footer-content-right>
-                    <umb-button 
+                    <umb-button
                         type="button"
                         action="vm.createPackage()"
                         state="vm.createPackageButtonState"
@@ -286,9 +292,9 @@
                 </umb-editor-footer-content-right>
 
             </umb-editor-footer>
-    
+
         </umb-editor-view>
 
     </form>
-    
+
 </div>
