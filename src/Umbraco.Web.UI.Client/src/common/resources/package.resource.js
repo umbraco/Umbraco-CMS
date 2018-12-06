@@ -166,8 +166,26 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "packageApiBaseUrl",
-                        "GetCreated")),
+                        "GetCreatedPackages")),
                 'Failed to get created packages');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.packageInstallResource#getCreatedById
+         * @methodOf umbraco.resources.packageInstallResource
+         *
+         * @description
+         * Gets a created package by id       
+         */
+        getCreatedById: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "packageApiBaseUrl",
+                        "GetCreatedPackageById", 
+                        [{ id: id }])),
+                'Failed to get package');
         }
         
     };
