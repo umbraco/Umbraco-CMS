@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($location, $routeParams, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
+    function EditController($location, $routeParams, packageResource, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
 
         const vm = this;
 
@@ -35,10 +35,11 @@
                     "license": "MIT License",
                     "licenseUrl": "http://opensource.org/licenses/MIT"
                 };
-
             } else {
                 // load package
-
+                packageResource.getCreatedById(packageId).then(createdPackage => {
+                    vm.package = createdPackage;
+                }, angular.noop);
             }
 
             // get all doc types
