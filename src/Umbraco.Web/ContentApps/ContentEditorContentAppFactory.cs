@@ -6,10 +6,10 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
-    public class ContentInfoContentAppDefinition : IContentAppDefinition
+    internal class ContentEditorContentAppFactory : IContentAppFactory
     {
         // see note on ContentApp
-        private const int Weight = +100;
+        private const int Weight = -100;
 
         private ContentApp _contentApp;
         private ContentApp _mediaApp;
@@ -21,22 +21,25 @@ namespace Umbraco.Web.ContentApps
                 case IContent _:
                     return _contentApp ?? (_contentApp = new ContentApp
                     {
-                        Alias = "umbInfo",
-                        Name = "Info",
-                        Icon = "icon-info",
-                        View = "views/content/apps/info/info.html",
+                        Alias = "umbContent",
+                        Name = "Content",
+                        Icon = "icon-document",
+                        View = "views/content/apps/content/content.html",
+                        Weight = Weight
+                    });
+
+                case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
+                    return _mediaApp ?? (_mediaApp = new ContentApp
+                    {
+                        Alias = "umbContent",
+                        Name = "Content",
+                        Icon = "icon-document",
+                        View = "views/media/apps/content/content.html",
                         Weight = Weight
                     });
 
                 case IMedia _:
-                    return _mediaApp ?? (_mediaApp = new ContentApp
-                    {
-                        Alias = "umbInfo",
-                        Name = "Info",
-                        Icon = "icon-info",
-                        View = "views/media/apps/info/info.html",
-                        Weight = Weight
-                    });
+                    return null;
 
                 default:
                     throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");

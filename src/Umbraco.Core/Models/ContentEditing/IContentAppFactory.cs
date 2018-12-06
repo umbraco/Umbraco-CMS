@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models.ContentEditing
 {
 
+
     /// <summary>
     /// Represents a content app definition.
     /// </summary>
-    public interface IContentAppDefinition
+    public interface IContentAppFactory
     {
         /// <summary>
         /// Gets the content app for an object.

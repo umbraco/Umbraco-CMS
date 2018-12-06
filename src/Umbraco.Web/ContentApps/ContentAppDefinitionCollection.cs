@@ -5,15 +5,17 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
-    public class ContentAppDefinitionCollection : BuilderCollectionBase<IContentAppDefinition>
+    public class ContentAppDefinitionCollection : BuilderCollectionBase<IContentAppFactory>
     {
         private readonly ILogger _logger;
+        private readonly IContentAppFactory _factory;
 
-        public ContentAppDefinitionCollection(IEnumerable<IContentAppDefinition> items, ILogger logger)
+        public ContentAppDefinitionCollection(IEnumerable<IContentAppFactory> items, ILogger logger)
             : base(items)
         {
             _logger = logger;
@@ -32,7 +34,10 @@ namespace Umbraco.Web.ContentApps
         public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups=null)
         {
             var roles = GetCurrentUserGroups();
-            var apps = this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
+
+
+            var apps = Enumerable.Empty<ContentApp>();//  this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
+
 
             var aliases = new HashSet<string>();
             List<string> dups = null;

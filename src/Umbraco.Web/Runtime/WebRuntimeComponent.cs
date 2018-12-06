@@ -207,9 +207,9 @@ namespace Umbraco.Web.Runtime
 
             // register known content apps
             composition.Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>()
-                .Append<ListViewContentAppDefinition>()
-                .Append<ContentEditorContentAppDefinition>()
-                .Append<ContentInfoContentAppDefinition>();
+                .Append<ListViewContentAppFactory>()
+                .Append<ContentEditorContentAppFactory>()
+                .Append<ContentInfoContentAppFactory>();
         }
 
         internal void Initialize(

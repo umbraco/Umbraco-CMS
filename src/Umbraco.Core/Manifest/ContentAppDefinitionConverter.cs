@@ -6,11 +6,11 @@ using Umbraco.Core.Serialization;
 namespace Umbraco.Core.Manifest
 {
     /// <summary>
-    /// Implements a json read converter for <see cref="IContentAppDefinition"/>.
+    /// Implements a json read converter for <see cref="ManifestContentAppDefinition"/>.
     /// </summary>
-    internal class ContentAppDefinitionConverter : JsonReadConverter<IContentAppDefinition>
+    internal class ContentAppDefinitionConverter : JsonReadConverter<ManifestContentAppDefinition>
     {
-        protected override IContentAppDefinition Create(Type objectType, string path, JObject jObject)
+        protected override ManifestContentAppDefinition Create(Type objectType, string path, JObject jObject)
             => new ManifestContentAppDefinition();
     }
 }

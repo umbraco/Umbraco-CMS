@@ -67,7 +67,8 @@ namespace Umbraco.Tests.Manifest
         private void AssertDefinition(object source, bool expected, string[] show, IReadOnlyUserGroup[] groups)
         {
             var definition = JsonConvert.DeserializeObject<ManifestContentAppDefinition>("{" + (show.Length == 0 ? "" : " \"show\": [" + string.Join(",", show.Select(x => "\"" + x + "\"")) + "] ") + "}");
-            var app = definition.GetContentAppFor(source, groups);
+            var factory = new ManifestContentAppFactory(definition);
+            var app = factory.GetContentAppFor(source, groups);
             if (expected)
                 Assert.IsNotNull(app);
             else
