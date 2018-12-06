@@ -811,7 +811,7 @@ AND umbracoNode.id <> @id",
 
             sqlSelect
                 .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
-                .LeftJoin<TagDto>("xtags").On<TagDto, TagDto>((tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group && tag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
+                .LeftJoin<TagDto>("xtags").On<TagDto, TagDto>((tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group && xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
 
             if (contentTypeIds != null)
                 sqlSelect
