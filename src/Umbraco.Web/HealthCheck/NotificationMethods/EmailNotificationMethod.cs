@@ -14,8 +14,10 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
     public class EmailNotificationMethod : NotificationMethodBase
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtimeState;
+        private readonly ILogger _logger;
 
-        public EmailNotificationMethod(ILocalizedTextService textService)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger)
         {
             var recipientEmail = Settings["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
@@ -27,6 +29,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             RecipientEmail = recipientEmail;
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _runtimeState = runtimeState;
+            _logger = logger;
         }
 
         public string RecipientEmail { get; }
@@ -52,15 +56,9 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             // Include the umbraco Application URL host in the message subject so that
             // you can identify the site that these results are for.
-            var umbracoApplicationUrl = ApplicationContext.Current.UmbracoApplicationUrl;
-            var host = umbracoApplicationUrl;
+            var host = _runtimeState.ApplicationUrl;
 
-            if (Uri.TryCreate(umbracoApplicationUrl, UriKind.Absolute, out var umbracoApplicationUri))
-                host = umbracoApplicationUri.Host;
-            else
-                LogHelper.Debug<EmailNotificationMethod>($"umbracoApplicationUrl {umbracoApplicationUrl} appears to be invalid");
-
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host });
+            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
             var mailSender = new EmailSender();
             using (var mailMessage = CreateMailMessage(subject, message))
