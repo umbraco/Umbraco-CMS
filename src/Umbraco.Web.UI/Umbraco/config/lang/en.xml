@@ -1469,8 +1469,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
-    <key alias="availableEditors">Available editors</key>
-    <key alias="reuse">Reuse</key>
+    <key alias="availableEditors">Create new</key>
+    <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
