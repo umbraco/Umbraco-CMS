@@ -190,14 +190,14 @@ namespace Umbraco.Web.Routing
                 // else save routes for all descendants
                 var entityContent = contentCache.GetById(entity.Id);
                 if (entityContent == null) continue;
+
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
-                    var route = contentCache.GetRouteById(x.Id);
-                    if (IsNotRoute(route)) continue;
+                    if (IsNotRoute(x.Url)) continue;
                     var wk = UnwrapToKey(x);
                     if (wk == null) continue;
 
-                    OldRoutes[x.Id] = Tuple.Create(wk.Key, route);
+                    OldRoutes[x.Id] = Tuple.Create(wk.Key, x.Url);
                 }
             }
 
