@@ -39,7 +39,7 @@ namespace umbraco.cms.businesslogic.packager
         /// </summary>
         [DataMember(Name = "umbracoVersion")]
         public Version UmbracoVersion { get; set; }
-
+        
         [DataMember(Name = "author")]
         public string Author { get; set; }
 

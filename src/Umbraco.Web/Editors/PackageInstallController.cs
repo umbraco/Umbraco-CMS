@@ -289,25 +289,7 @@ namespace Umbraco.Web.Editors
                 })
                 .ToList();
         }
-
-        /// <summary>
-        /// Deletes a created package
-        /// </summary>
-        /// <param name="packageId"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [HttpDelete]
-        public IHttpActionResult DeleteCreatedPackage(int packageId)
-        {
-            var package = CreatedPackage.GetById(packageId);
-            if (package == null)
-                return NotFound();
-
-            package.Delete();
-
-            return Ok();
-        }
-
+        
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
             var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);

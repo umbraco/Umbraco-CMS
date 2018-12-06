@@ -49,16 +49,23 @@ namespace Umbraco.Web.Editors
             return newPackage.Data;
         }
 
+        /// <summary>
+        /// Deletes a created package
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <returns></returns>
+        [HttpPost]
         [HttpDelete]
-        public HttpResponseMessage DeleteCreatedPackageById(int id)
+        public IHttpActionResult DeleteCreatedPackage(int packageId)
         {
-            //TODO: Validation ensure can find it by ID
-            var package = CreatedPackage.GetById(id);
+            var package = CreatedPackage.GetById(packageId);
+            if (package == null)
+                return NotFound();
+
             package.Delete();
 
-            //204 No Content
-            return new HttpResponseMessage(HttpStatusCode.NoContent);
+            return Ok();
         }
-
+        
     }
 }
