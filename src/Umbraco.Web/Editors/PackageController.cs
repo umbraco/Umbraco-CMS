@@ -8,6 +8,8 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
+    //TODO: Packager stuff still lives in business logic - YUK
+
     /// <summary>
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
@@ -18,29 +20,31 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public List<CreatedPackage> GetCreatedPackages()
         {
-            //TODO: Packager stuff still lives in business logic - YUK
             //TODO: Could be too much data down the wire
             return CreatedPackage.GetAllCreatedPackages();
-
-            /*
-             * "author": "Test",
-                        "files": [],
-                        "iconUrl": "",
-                        "id": 1,
-                        "license": "MIT License",
-                        "licenseUrl": "http://opensource.org/licenses/MIT",
-                        "name": "Test v8",
-                        "url": "https://test.com",
-                        "version": "0.0.0"
-                        */
-
-
         }
 
         [HttpGet]
         public CreatedPackage GetCreatedPackageById(int id)
         {
             return CreatedPackage.GetById(id);
+        }
+
+        [HttpPost]
+        public CreatedPackage PostCreatePackage(PackageInstance model)
+        {
+            //TODO Validation on the model?!
+            var newPackage = new CreatedPackage
+            {
+                Data = model
+            };
+
+            //Save then publish
+            newPackage.Save();
+            newPackage.Publish();
+            
+            //We should have packagepath populated now
+            return newPackage;
         }
 
         [HttpDelete]
