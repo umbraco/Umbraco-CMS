@@ -53,9 +53,6 @@
                 }
             ];
 
-            $timeout(function () {
-                navigationService.syncTree({ tree: "packages", path: "-1" });
-            });
         }
 
     }
