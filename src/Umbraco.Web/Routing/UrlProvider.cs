@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;
 
-            UrlProviderMode provider = UrlProviderMode.Auto;
+            var provider = UrlProviderMode.Auto;
             Mode = provider;
 
             if (Enum<UrlProviderMode>.TryParse(routingSettings.UrlProviderMode, out provider))
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id)
         {
-            Attempt<int> intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1);
         }
 
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, bool absolute)
         {
-            Attempt<int> intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, absolute);
         }
 
@@ -111,7 +111,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, Uri current, bool absolute)
         {
-            Attempt<int> intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, current, absolute);
         }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, UrlProviderMode mode)
         {
-            Attempt<int> intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, mode);
         }
 
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(int id, bool absolute)
         {
-            UrlProviderMode mode = absolute ? UrlProviderMode.Absolute : Mode;
+            var mode = absolute ? UrlProviderMode.Absolute : Mode;
             return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode);
         }
 
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(int id, Uri current, bool absolute)
         {
-            UrlProviderMode mode = absolute ? UrlProviderMode.Absolute : Mode;
+            var mode = absolute ? UrlProviderMode.Absolute : Mode;
             return GetUrl(id, current, mode);
         }
 
@@ -208,14 +208,14 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(int id, Uri current, UrlProviderMode mode)
         {
-            string url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode))
+            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode))
                 .FirstOrDefault(u => u != null);
             return url ?? "#"; // legacy wants this
         }
 
         internal string GetUrlFromRoute(int id, string route)
         {
-            IUrlProvider provider = _urlProviders.OfType<IUrlProvider>().FirstOrDefault();
+            var provider = _urlProviders.OfType<IUrlProvider>().FirstOrDefault();
 
             var url = provider is DefaultUrlProvider
             ? ((DefaultUrlProvider)provider).GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode)
@@ -257,7 +257,7 @@ namespace Umbraco.Web.Routing
         public IEnumerable<string> GetOtherUrls(int id, Uri current)
         {
             // providers can return null or an empty list or a non-empty list, be prepared
-            IEnumerable<string> urls = _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<string>());
+            var urls = _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<string>());
 
             return urls;
         }
