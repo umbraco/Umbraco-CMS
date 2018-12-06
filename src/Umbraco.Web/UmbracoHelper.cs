@@ -33,7 +33,7 @@ namespace Umbraco.Web
         private readonly CacheHelper _appCache;
 
         private IUmbracoComponentRenderer _componentRenderer;
-        private PublishedContentQuery _query;
+        private IPublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
         private ITagQuery _tag;
         private IDataTypeService _dataTypeService;
@@ -133,10 +133,8 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the query context.
         /// </summary>
-        public PublishedContentQuery ContentQuery => _query ??
-            (_query = _iQuery != null
-                ? new PublishedContentQuery(_iQuery)
-                : new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+        public IPublishedContentQuery ContentQuery => _query ??
+            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
 
         /// <summary>
         /// Gets the Umbraco context.

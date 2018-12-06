@@ -22,7 +22,6 @@ namespace Umbraco.Web
     /// </summary>
     public class PublishedContentQuery : IPublishedContentQuery
     {
-        private readonly IPublishedContentQuery _query;
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
 
@@ -37,79 +36,52 @@ namespace Umbraco.Web
             _mediaCache = mediaCache ?? throw new ArgumentNullException(nameof(mediaCache));
         }
 
-        /// <summary>
-        /// Constructor used to wrap the ITypedPublishedContentQuery object passed in
-        /// </summary>
-        /// <param name="query"></param>
-        public PublishedContentQuery(IPublishedContentQuery query)
-        {
-            _query = query ?? throw new ArgumentNullException(nameof(query));
-        }
-
         #region Content
 
         public IPublishedContent Content(int id)
         {
-            return _query == null
-                ? ItemById(id, _contentCache)
-                : _query.Content(id);
+            return ItemById(id, _contentCache);
         }
 
         public IPublishedContent Content(Guid id)
         {
-            return _query == null
-                ? ItemById(id, _contentCache)
-                : _query.Content(id);
+            return ItemById(id, _contentCache);
         }
 
         public IPublishedContent Content(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return _query == null
-                ? ItemById(udi.Guid, _contentCache)
-                : _query.Content(udi.Guid);
+            return ItemById(udi.Guid, _contentCache);
         }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _query == null
-                ? ItemByXPath(xpath, vars, _contentCache)
-                : _query.ContentSingleAtXPath(xpath, vars);
+            return ItemByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
-            return _query == null
-                ? ItemsByIds(_contentCache, ids)
-                : _query.Content(ids);
+            return ItemsByIds(_contentCache, ids);
         }
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
         {
-            return _query == null
-                ? ItemsByIds(_contentCache, ids)
-                : _query.Content(ids);
+            return ItemsByIds(_contentCache, ids);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _query == null
-                ? ItemsByXPath(xpath, vars, _contentCache)
-                : _query.ContentAtXPath(xpath, vars);
+            return ItemsByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _query == null
-                ? ItemsByXPath(xpath, vars, _contentCache)
-                : _query.ContentAtXPath(xpath, vars);
+            return ItemsByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> ContentAtRoot()
         {
-            return _query == null
-                ? ItemsAtRoot(_contentCache)
-                : _query.ContentAtRoot();
+            return ItemsAtRoot(_contentCache);
         }
 
         #endregion
@@ -118,45 +90,33 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(int id)
         {
-            return _query == null
-                ? ItemById(id, _mediaCache)
-                : _query.Media(id);
+            return ItemById(id, _mediaCache);
         }
 
         public IPublishedContent Media(Guid id)
         {
-            return _query == null
-                ? ItemById(id, _mediaCache)
-                : _query.Media(id);
+            return ItemById(id, _mediaCache);
         }
 
         public IPublishedContent Media(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return _query == null
-                ? ItemById(udi.Guid, _mediaCache)
-                : _query.Media(udi.Guid);
+            return ItemById(udi.Guid, _mediaCache);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
-            return _query == null
-                ? ItemsByIds(_mediaCache, ids)
-                : _query.Media(ids);
+            return ItemsByIds(_mediaCache, ids);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
         {
-            return _query == null
-                ? ItemsByIds(_mediaCache, ids)
-                : _query.Media(ids);
+            return ItemsByIds(_mediaCache, ids);
         }
 
         public IEnumerable<IPublishedContent> MediaAtRoot()
         {
-            return _query == null
-                ? ItemsAtRoot(_mediaCache)
-                : _query.MediaAtRoot();
+            return ItemsAtRoot(_mediaCache);
         }
 
 
@@ -231,8 +191,6 @@ namespace Umbraco.Web
         {
             //TODO: Can we inject IExamineManager?
 
-            if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, indexName);
-
             var indexer = string.IsNullOrEmpty(indexName)
                 ? Examine.ExamineManager.Instance.GetIndexer(Constants.Examine.ExternalIndexer)
                 : Examine.ExamineManager.Instance.GetIndexer(indexName);
@@ -261,7 +219,6 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
         {
-            if (_query != null) return _query.Search(skip, take, out totalRecords, criteria, searchProvider);
 
             //TODO: Can we inject IExamineManager?
 

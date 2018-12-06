@@ -24,7 +24,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets all media tagged with any tag in the specified group.
         /// </summary>
-        IEnumerable<IPublishedContent> GetMediaByTagGroup(string group, string culture);
+        IEnumerable<IPublishedContent> GetMediaByTagGroup(string group, string culture = null);
 
         /// <summary>
         /// Gets all tags.
