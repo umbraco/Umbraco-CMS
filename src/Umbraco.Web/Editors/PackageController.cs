@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 using umbraco.cms.businesslogic.packager;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
@@ -15,6 +17,7 @@ namespace Umbraco.Web.Editors
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
+    [SerializeVersion]
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
