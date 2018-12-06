@@ -38,11 +38,11 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstance PostCreatePackage(PackageInstance model)
         {
+
+            var newPackage = CreatedPackage.MakeNew(model.Name);
+            newPackage.Data = model;
+
             //TODO Validation on the model?!
-            var newPackage = new CreatedPackage
-            {
-                Data = model
-            };
 
             //Save then publish
             newPackage.Save();
