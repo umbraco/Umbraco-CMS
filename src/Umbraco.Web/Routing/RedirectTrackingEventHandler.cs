@@ -94,14 +94,14 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Tracks a documents URLs during publishing in the current request
         /// </summary>
-        private static Dictionary<int, Tuple<Guid, string>> OldRoutes
+        private static Dictionary<int, Tuple<Guid, string>> OldUrls
         {
             get
             {
-                var oldRoutes = RequestCache.GetCacheItem<Dictionary<int, Tuple<Guid, string>>>(
+                var oldUrls = RequestCache.GetCacheItem<Dictionary<int, Tuple<Guid, string>>>(
                     ContextKey3,
                     () => new Dictionary<int, Tuple<Guid, string>>());
-                return oldRoutes;
+                return oldUrls;
             }
         }
 
@@ -193,11 +193,10 @@ namespace Umbraco.Web.Routing
 
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
-                    if (IsNotRoute(x.Url)) continue;
                     var wk = UnwrapToKey(x);
                     if (wk == null) continue;
 
-                    OldRoutes[x.Id] = Tuple.Create(wk.Key, x.Url);
+                    OldUrls[x.Id] = Tuple.Create(wk.Key, x.Url);
                 }
             }
 
@@ -244,21 +243,21 @@ namespace Umbraco.Web.Routing
             // only on master / single, not on replicas!
             if (IsReplicaServer) return;
 
-            // simply getting OldRoutes will register it in the request cache,
+            // simply getting oldUrls will register it in the request cache,
             // so whatever we do with it, try/finally it to ensure it's cleared
 
             try
             {
-                foreach (var oldRoute in OldRoutes)
+                foreach (var oldUrl in OldUrls)
                 {
                     // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
                     // to set a flag in 'Published' to indicate which entities have been refreshed ok
-                    CreateRedirect(oldRoute.Key, oldRoute.Value.Item1, oldRoute.Value.Item2);
+                    CreateRedirect(oldUrl.Key, oldUrl.Value.Item1, oldUrl.Value.Item2);
                 }
             }
             finally
             {
-                OldRoutes.Clear();
+                OldUrls.Clear();
                 RequestCache.ClearCacheItem(ContextKey3);
             }
         }
@@ -281,23 +280,18 @@ namespace Umbraco.Web.Routing
             LockedEvents = false;
         }
 
-        private static void CreateRedirect(int contentId, Guid contentKey, string oldRoute)
+        private static void CreateRedirect(int contentId, Guid contentKey, string oldUrl)
         {
 
             var contentCache = GetPublishedCache();
             if (contentCache == null) return;
 
-            var newRoute = contentCache.GetRouteById(contentId);
-            if (IsNotRoute(newRoute) || oldRoute == newRoute) return;
+            var newUrl = contentCache.GetById(contentId)?.Url;
+            if (newUrl == null || oldUrl == newUrl) return;
             var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
-            redirectUrlService.Register(oldRoute, contentKey);
+            redirectUrlService.Register(oldUrl, contentKey);
         }
 
-        private static bool IsNotRoute(string route)
-        {
-            // null if content not found
-            return route == null;
-        }
 
         // gets a value indicating whether server is 'replica'
         private static bool IsReplicaServer
