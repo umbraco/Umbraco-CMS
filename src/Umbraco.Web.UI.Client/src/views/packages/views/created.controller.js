@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function CreatedController($timeout, $location, localizationService, overlayService) {
+    function CreatedController($timeout, $location, packageResource, localizationService, overlayService) {
 
         const vm = this;
 
@@ -13,33 +13,9 @@
 
             vm.createdPackages = [];
 
-            //load created packages
-            $timeout(function(){
-                vm.createdPackages = [
-                    {
-                        "author": "Test",
-                        "files": [],
-                        "iconUrl": "",
-                        "id": 1,
-                        "license": "MIT License",
-                        "licenseUrl": "http://opensource.org/licenses/MIT",
-                        "name": "Test v8",
-                        "url": "https://test.com",
-                        "version": "0.0.0"
-                    },
-                    {
-                        "author": "Test",
-                        "files": [],
-                        "iconUrl": "",
-                        "id": 2,
-                        "license": "MIT License",
-                        "licenseUrl": "http://opensource.org/licenses/MIT",
-                        "name": "Another Test v8",
-                        "url": "https://test.com",
-                        "version": "0.0.0"
-                    }
-                ];
-            }, 1000);
+            packageResource.getAllCreated().then(createdPackages => {
+                vm.createdPackages = createdPackages;
+            }, angular.noop);
 
         }
 
@@ -72,7 +48,8 @@
         }
 
         function createPackage() {
-            console.log("create package");
+            $location.search('create', null);
+            $location.path("packages/packages/edit/-1").search("create", "true");
         }
 
         onInit();

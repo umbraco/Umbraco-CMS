@@ -151,7 +151,25 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                       "packageInstallApiBaseUrl",
                       "CleanUp"), umbPackage),
               'Failed to install package. Error during the step "CleanUp" ');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.packageInstallResource#getCreated
+         * @methodOf umbraco.resources.packageInstallResource
+         *
+         * @description
+         * Gets a list of created packages       
+         */
+        getAllCreated: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "packageApiBaseUrl",
+                        "GetCreated")),
+                'Failed to get created packages');
         }
+        
     };
 }
 

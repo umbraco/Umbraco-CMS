@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($location, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
+    function EditController($location, $routeParams, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
 
         const vm = this;
 
@@ -24,11 +24,22 @@
         vm.removeControl = removeControl;
 
         function onInit() {
-            // load package
 
-            vm.package = {
-                "name": "My package"
-            };
+            const packageId = $routeParams.id;
+            const create = $routeParams.create;
+
+            if(create) {
+                //pre populate package with some values
+                vm.package = {
+                    "version": "1.0.0",
+                    "license": "MIT License",
+                    "licenseUrl": "http://opensource.org/licenses/MIT"
+                };
+
+            } else {
+                // load package
+
+            }
 
             // get all doc types
             contentTypeResource.getAll().then(documentTypes => {
