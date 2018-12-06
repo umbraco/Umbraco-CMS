@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using umbraco.cms.businesslogic.packager;
 using Umbraco.Web.Mvc;
@@ -43,6 +41,16 @@ namespace Umbraco.Web.Editors
         public CreatedPackage GetCreatedPackageById(int id)
         {
             return CreatedPackage.GetById(id);
+        }
+
+        [HttpDelete]
+        public HttpResponseMessage DeleteCreatedPackageById(int id)
+        {
+            var package = CreatedPackage.GetById(id);
+            package.Delete();
+
+            //204 No Content
+            return new HttpResponseMessage(HttpStatusCode.NoContent);
         }
 
     }
