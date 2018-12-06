@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -18,20 +19,21 @@ namespace Umbraco.Web.Editors
     public class PackageController : UmbracoAuthorizedJsonController
     {
         [HttpGet]
-        public List<CreatedPackage> GetCreatedPackages()
+        public List<PackageInstance> GetCreatedPackages()
         {
             //TODO: Could be too much data down the wire
-            return CreatedPackage.GetAllCreatedPackages();
+            return CreatedPackage.GetAllCreatedPackages().Select(x => x.Data).ToList();
         }
 
         [HttpGet]
-        public CreatedPackage GetCreatedPackageById(int id)
+        public PackageInstance GetCreatedPackageById(int id)
         {
-            return CreatedPackage.GetById(id);
+            //TODO throw an error if cant find by ID
+            return CreatedPackage.GetById(id).Data;
         }
 
         [HttpPost]
-        public CreatedPackage PostCreatePackage(PackageInstance model)
+        public PackageInstance PostCreatePackage(PackageInstance model)
         {
             //TODO Validation on the model?!
             var newPackage = new CreatedPackage
@@ -42,14 +44,15 @@ namespace Umbraco.Web.Editors
             //Save then publish
             newPackage.Save();
             newPackage.Publish();
-            
+
             //We should have packagepath populated now
-            return newPackage;
+            return newPackage.Data;
         }
 
         [HttpDelete]
         public HttpResponseMessage DeleteCreatedPackageById(int id)
         {
+            //TODO: Validation ensure can find it by ID
             var package = CreatedPackage.GetById(id);
             package.Delete();
 
