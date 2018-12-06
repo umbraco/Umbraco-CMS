@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(
+                var upgrader = new Upgrader(
                     new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("done"));
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(
+                var upgrader = new Upgrader(
                     new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
@@ -108,7 +109,7 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(
+                var upgrader = new Upgrader(
                     new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(
+                var upgrader = new Upgrader(
                     new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
@@ -180,7 +181,7 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(
+                var upgrader = new Upgrader(
                     new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")

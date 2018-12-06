@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using System.Data;
 using Moq;
 using NUnit.Framework;
 using Semver;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
@@ -18,22 +16,7 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class MigrationTests
     {
-        public class TestUpgrader : Upgrader
-        {
-            private readonly MigrationPlan _plan;
-
-            public TestUpgrader(MigrationPlan plan)
-            {
-                _plan = plan;
-            }
-
-            protected override MigrationPlan CreatePlan()
-            {
-                return _plan;
-            }
-        }
-
-        public class TestUpgraderWithPostMigrations : TestUpgrader
+        public class TestUpgraderWithPostMigrations : Upgrader
         {
             private PostMigrationCollection _postMigrations;
 

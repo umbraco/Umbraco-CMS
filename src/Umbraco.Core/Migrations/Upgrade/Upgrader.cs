@@ -6,11 +6,17 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Migrations.Upgrade
 {
     /// <summary>
-    /// Provides an abstract base class for creating upgraders.
+    /// Represents an upgrader.
     /// </summary>
-    public abstract class Upgrader
+    public class Upgrader
     {
-        private MigrationPlan _plan;
+        /// <summary>
+        /// Initializes a new instance of the <see ref="Upgrader"/> class.
+        /// </summary>
+        public Upgrader(MigrationPlan plan)
+        {
+            Plan = plan;
+        }
 
         /// <summary>
         /// Gets the name of the migration plan.
@@ -20,12 +26,7 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// <summary>
         /// Gets the migration plan.
         /// </summary>
-        public MigrationPlan Plan => _plan ?? (_plan = CreatePlan());
-
-        /// <summary>
-        /// Creates the migration plan.
-        /// </summary>
-        protected abstract MigrationPlan CreatePlan();
+        public MigrationPlan Plan { get; }
 
         /// <summary>
         /// Gets the key for the state value.

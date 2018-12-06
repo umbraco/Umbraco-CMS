@@ -15,8 +15,12 @@ namespace Umbraco.Core.Migrations.Upgrade
     {
         private PostMigrationCollection _postMigrations;
 
-        /// <inheritdoc />
-        protected override MigrationPlan CreatePlan() => new UmbracoPlan();
+        /// <summary>
+        /// Initializes a new instance of the <see ref="UmbracoUpgrader" /> class.
+        /// </summary>
+        public UmbracoUpgrader()
+            : base(new UmbracoPlan())
+        { }
 
         /// <summary>
         /// Executes.
