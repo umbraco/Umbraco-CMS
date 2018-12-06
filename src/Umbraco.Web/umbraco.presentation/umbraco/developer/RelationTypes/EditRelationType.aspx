@@ -11,6 +11,8 @@
 
         table.relations td { background: transparent none no-repeat scroll center center }
 
+        table.relations td a { text-decoration: underline; }
+        
         /* objectType icons */
         table.relations td.ContentItemType {}
         table.relations td.ROOT {}
@@ -123,10 +125,10 @@
                 <ItemTemplate>
                             <tr>
                                 <td class="<%= this.ParentObjectType %>">&nbsp;</td>
-                                <td><%# DataBinder.Eval(Container.DataItem, "ParentText") %></td>
+                                <td><a href="<%# GetEditUrl(this.ParentObjectType, (int)DataBinder.Eval(Container.DataItem, "ParentId")) %>" target="_blank"><%# DataBinder.Eval(Container.DataItem, "ParentText") %></a></td>
                                 <td class="<%= this.RelationTypeDirection %>">&nbsp;</td>
                                 <td class="<%= this.ChildObjectType %>">&nbsp;</td>
-                                <td><%# DataBinder.Eval(Container.DataItem, "ChildText") %></td>
+                                <td><a href="<%# GetEditUrl(this.ChildObjectType, (int)DataBinder.Eval(Container.DataItem, "ChildId")) %>" target="_blank"><%# DataBinder.Eval(Container.DataItem, "ChildText") %></a></td>
                                 <td><%# DataBinder.Eval(Container.DataItem, "DateTime") %></td>
                                 <td><%# DataBinder.Eval(Container.DataItem, "Comment") %></td>
                             </tr>

@@ -38,14 +38,6 @@ namespace Umbraco.Web.Routing
 
             var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
 
-            // From: http://stackoverflow.com/a/22468386/5018
-            // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
-            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
-            // to problems if you rename a page back to it's original name or create a new page with the original name
-            frequest.Cacheability = HttpCacheability.NoCache;
-            frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
-            frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
-
             if (redirectUrl == null)
             {
                 _logger.Debug<ContentFinderByRedirectUrl>("No match for route: {Route}", route);
@@ -60,8 +52,21 @@ namespace Umbraco.Web.Routing
                 return false;
             }
 
+            // Apending any querystring from the incoming request to the redirect url.
+            url = string.IsNullOrEmpty(contentRequest.Uri.Query) ? url : url + contentRequest.Uri.Query;
+            
             _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
             frequest.SetRedirectPermanent(url);
+
+                
+            // From: http://stackoverflow.com/a/22468386/5018
+            // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
+            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads 
+            // to problems if you rename a page back to it's original name or create a new page with the original name
+            frequest.Cacheability = HttpCacheability.NoCache;
+            frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
+            frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
+
             return true;
         }
     }
