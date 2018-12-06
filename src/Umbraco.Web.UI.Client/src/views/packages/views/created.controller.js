@@ -19,28 +19,39 @@
 
         }
 
-        function deleteCreatedPackage(createdPackage) {
+        function deleteCreatedPackage(event, index, createdPackage) {
+
+            event.stopPropagation();
+            event.preventDefault();
 
             const dialog = {
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
                 submit: function (model) {
-                    performDelete(createdPackage);
+                    performDelete(index, createdPackage);
                     overlayService.close();
                 },
                 close: function () {
                     overlayService.close();
                 }
             };
+
+            const keys = [
+                "general_delete",
+                "defaultdialogs_confirmdelete"
+            ];
     
-            localizationService.localize("general_delete").then(value => {
-                dialog.title = value;
+            localizationService.localizeMany(keys).then(values => {
+                dialog.title = values[0];
+                dialog.content = values[1];
                 overlayService.open(dialog);
             });
 
         }
 
-        function performDelete(createdPackage) {
-            console.log("perform delete");
+        function performDelete(index, createdPackage) {            
+            packageResource.deleteCreatedPackage(createdPackage.id).then(()=> {
+                vm.createdPackages.splice(index, 1);
+            }, angular.noop);
         }
 
         function goToPackage(createdPackage) {
