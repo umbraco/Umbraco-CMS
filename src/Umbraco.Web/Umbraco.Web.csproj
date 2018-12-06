@@ -111,6 +111,7 @@
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
