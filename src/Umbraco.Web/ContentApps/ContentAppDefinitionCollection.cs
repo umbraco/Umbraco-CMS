@@ -36,7 +36,7 @@ namespace Umbraco.Web.ContentApps
             var roles = GetCurrentUserGroups();
 
 
-            var apps = Enumerable.Empty<ContentApp>();//  this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
+            var apps = this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
 
 
             var aliases = new HashSet<string>();
