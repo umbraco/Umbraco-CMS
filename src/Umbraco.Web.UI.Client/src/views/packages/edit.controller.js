@@ -31,9 +31,10 @@
             if(create) {
                 //pre populate package with some values
                 vm.package = {
-                    "version": "1.0.0",
+                    "version": "0.0.1",
                     "license": "MIT License",
-                    "licenseUrl": "http://opensource.org/licenses/MIT"
+                    "licenseUrl": "http://opensource.org/licenses/MIT",
+                    "umbracoVersion": Umbraco.Sys.ServerVariables.application.version
                 };
             } else {
                 // load package
