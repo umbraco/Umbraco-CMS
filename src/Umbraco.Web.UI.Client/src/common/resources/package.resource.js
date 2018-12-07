@@ -33,15 +33,6 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                'Failed to validate package ' + name);
         },
 
-        deleteCreatedPackage: function (packageId) {
-            return umbRequestHelper.resourcePromise(
-               $http.post(
-                   umbRequestHelper.getApiUrl(
-                       "packageInstallApiBaseUrl",
-                       "DeleteCreatedPackage", { packageId: packageId })),
-               'Failed to delete package ' + packageId);
-        },
-
         uninstall: function(packageId) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
@@ -203,6 +194,23 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "packageApiBaseUrl",
                         "PostCreatePackage"), umbPackage),
                 'Failed to create package');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.packageInstallResource#deleteCreatedPackage
+         * @methodOf umbraco.resources.packageInstallResource
+         *
+         * @description
+         * Detes a created package
+         */
+        deleteCreatedPackage: function (packageId) {
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "packageApiBaseUrl",
+                       "DeleteCreatedPackage", { packageId: packageId })),
+               'Failed to delete package ' + packageId);
         }
     };
 }
