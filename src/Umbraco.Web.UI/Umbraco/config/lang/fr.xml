@@ -1790,9 +1790,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="configurationServiceFileNotFound">Le fichier n'existe pas : '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Impossible de trouver <strong>'%0%'</strong> dans le fichier config <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Une erreur est survenue, consultez le log pour voir l'erreur complète : %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Total XML : %0%, Total : %1%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Total XML : %0%, Total : %1%</key>
-    <key alias="xmlDataIntegrityCheckContent">Total XML : %0%, Total publié : %1%</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Base de données - Le schéma de la base de données est correct pour cette version de Umbraco</key>
     <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problèmes ont été détectés avec le schéma de votre base de données (Voyez le fichier log pour les détails)</key>
     <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Des erreurs ont été détectées lors de la validation du schéma de la base de données par rapport à la version actuelle de Umbraco.</key>

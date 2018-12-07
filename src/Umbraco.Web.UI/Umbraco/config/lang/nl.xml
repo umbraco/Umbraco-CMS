@@ -1356,9 +1356,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="configurationServiceFileNotFound">Het volgende bestand bestaat niet: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[<strong>'%0%'</strong> kon niet gevonden worden in configuratie bestand <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Er is een fout opgetreden. Bekijk de log file voor de volledige fout: %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Members - Totaal XML: %0%, Totaal: %1%, Total incorrect: %2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Media - Totaal XML: %0%, Totaal: %1%, Total incorrect: %2%</key>
-    <key alias="xmlDataIntegrityCheckContent">Content - Totaal XML: %0%, Totaal gepubliceerd: %1%, Total incorrect: %2%</key>
     <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
     <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>

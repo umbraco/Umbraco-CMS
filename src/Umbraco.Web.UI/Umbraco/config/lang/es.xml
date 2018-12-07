@@ -1596,9 +1596,6 @@
     <key alias="configurationServiceFileNotFound">Archivo no existe: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[No se puedo encontrar <strong>'%0%'</strong> en archivo de configuración <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Hubo un error, revisa los logs para ver el error completo: %0%.</key>
-        <key alias="xmlDataIntegrityCheckMembers">Miembros - Total XML: %0%, Total: %1%, Total inválidos: %2%</key>
-        <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total inválidos: %2%</key>
-        <key alias="xmlDataIntegrityCheckContent">Contenido - Total XML: %0%, Total publicados: %1%, Total inválidos: %2%</key>
     <key alias="httpsCheckValidCertificate">El certificado de tu sitio es válido.</key>
     <key alias="httpsCheckInvalidCertificate">Error validando certificado: '%0%'</key>
         <key alias="httpsCheckExpiredCertificate">El certificado SSL de tu sitio ha caducado.</key>
