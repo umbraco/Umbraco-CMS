@@ -66,6 +66,7 @@
     "less": "3.9.0",
     "lodash": "4.17.11",
     "merge-stream": "1.0.1",
-    "run-sequence": "2.2.1"
+    "run-sequence": "2.2.1",
+    "marked": "^0.5.2"
   }
 }

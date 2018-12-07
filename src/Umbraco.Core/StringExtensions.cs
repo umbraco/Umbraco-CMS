@@ -540,7 +540,7 @@ namespace Umbraco.Core
         public static string StripHtml(this string text)
         {
             const string pattern = @"<(.|\n)*?>";
-            return Regex.Replace(text, pattern, string.Empty);
+            return Regex.Replace(text, pattern, string.Empty, RegexOptions.Compiled);
         }
 
         /// <summary>

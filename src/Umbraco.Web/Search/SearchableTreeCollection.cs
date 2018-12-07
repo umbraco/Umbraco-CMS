@@ -33,11 +33,7 @@ namespace Umbraco.Web.Search
             return dictionary;
         }
 
-        // fixme - oh why?!
-        public IReadOnlyDictionary<string, SearchableApplicationTree> AsReadOnlyDictionary()
-        {
-            return new ReadOnlyDictionary<string, SearchableApplicationTree>(_dictionary);
-        }
+        public IReadOnlyDictionary<string, SearchableApplicationTree> SearchableApplicationTrees => _dictionary;
 
         public SearchableApplicationTree this[string key] => _dictionary[key];
     }

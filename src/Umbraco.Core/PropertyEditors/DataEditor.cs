@@ -153,6 +153,9 @@ namespace Umbraco.Core.PropertyEditors
             set => _defaultConfiguration = value;
         }
 
+        /// <inheritdoc />
+        public virtual IPropertyIndexValueFactory PropertyIndexValueFactory => new DefaultPropertyIndexValueFactory();
+
         /// <summary>
         /// Creates a value editor instance.
         /// </summary>

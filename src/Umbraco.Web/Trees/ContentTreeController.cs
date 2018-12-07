@@ -35,7 +35,12 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureContentResult")]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public ContentTreeController(UmbracoTreeSearcher treeSearcher)
+        {
+            _treeSearcher = treeSearcher;
+        }
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -314,9 +319,9 @@ namespace Umbraco.Web.Trees
             menuItem.OpensDialog = opensDialog;
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
+            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

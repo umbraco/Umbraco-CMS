@@ -1915,9 +1915,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-    <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
     <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
     <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
@@ -1986,7 +1983,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
-    <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status</key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>

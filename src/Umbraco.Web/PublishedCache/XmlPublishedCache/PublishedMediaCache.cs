@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // method GetExamineManagerSafe().
         //
         private readonly ISearcher _searchProvider;
-        private readonly IIndexer _indexProvider;
+        private readonly IIndex _indexProvider;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
@@ -240,8 +240,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                //by default use the internal index
-                return eMgr.GetSearcher(Constants.Examine.InternalIndexer);
+                if (eMgr.TryGetIndex(Constants.Examine.InternalIndexer, out var index))
+                    return index.GetSearcher();
+                throw new InvalidOperationException($"No index found by name {Constants.Examine.InternalIndexer}");
             }
             catch (FileNotFoundException)
             {
@@ -353,13 +354,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return null;
         }
 
-        internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
+        internal CacheValues ConvertFromSearchResult(ISearchResult searchResult)
         {
             // note: fixing fields in 7.x, removed by Shan for 8.0
 
             return new CacheValues
             {
-                Values = searchResult.Fields,
+                Values = searchResult.Values,
                 FromExamine = true
             };
         }
