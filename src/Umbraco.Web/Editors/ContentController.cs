@@ -739,11 +739,12 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.PublishNew:
                     {
                         var publishStatus = PublishInternal(contentItem, out wasCancelled, out var successfulCultures);
+
                         //global notifications
-                        AddMessageForPublishStatus(new[] { publishStatus }, globalNotifications, successfulCultures);
+                        AddMessageForPublishStatus(new[] { publishStatus }, globalNotifications, successfulCultures, contentItem.PersistedContent.ContentSchedule);
                         //variant specific notifications
                         foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(new[] { publishStatus }, notifications.GetOrCreate(c), successfulCultures);
+                            AddMessageForPublishStatus(new[] { publishStatus }, notifications.GetOrCreate(c), successfulCultures, contentItem.PersistedContent.ContentSchedule);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendants:
@@ -1153,7 +1154,6 @@ namespace Umbraco.Web.Editors
         /// Performs the publishing operation for a content item
         /// </summary>
         /// <param name="contentItem"></param>
-        /// <param name="publishStatus"></param>
         /// <param name="wasCancelled"></param>
         /// <param name="successfulCultures">
         /// if the content is variant this will return an array of cultures that will be published (passed validation rules)
@@ -1863,12 +1863,13 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Adds notification messages to the outbound display model for a given published status
         /// </summary>
-        /// <param name="status"></param>
+        /// <param name="statuses"></param>
         /// <param name="display"></param>
         /// <param name="successfulCultures">
-        /// This is null when dealing with invariant content, else it's the cultures that were succesfully published
+        ///     This is null when dealing with invariant content, else it's the cultures that were succesfully published
         /// </param>
-        private void AddMessageForPublishStatus(IEnumerable<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null)
+        /// <param name="contentSchedule"></param>
+        private void AddMessageForPublishStatus(IEnumerable<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null, ContentScheduleCollection contentSchedule = null)
         {
             var totalStatusCount = statuses.Count();
 
@@ -1914,21 +1915,57 @@ namespace Umbraco.Web.Editors
                             var itemCount = status.Count();
                             if (totalStatusCount == 1 || totalStatusCount == itemCount)
                             {
+                                //inline method to output the messages for variants
+                                void AddNotificationForVariants(IEnumerable<string> cultures, ContentSchedule[] expire)
+                                {
+                                    foreach (var c in cultures)
+                                    {
+                                        var expires = expire.FirstOrDefault(x => x.Culture.InvariantEquals(c));
+                                        display.AddSuccessNotification(
+                                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                            expires == null
+                                                ? Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] {_allLangs.Value[c].CultureName})
+                                                : Services.TextService.Localize("speechBubbles/editVariantPublishedTextWithExpireDateText", new[]
+                                                {
+                                                    _allLangs.Value[c].CultureName,
+                                                    $"{expires.Date.ToLongDateString()} {expires.Date:HH:mm}"
+                                                }));
+                                    }
+                                }
+
+                                //check the content schedule and get the release dates for all cultures (and use string.Empty if invariant)
+                                var expireDates = contentSchedule == null
+                                    ? Array.Empty<ContentSchedule>()
+                                    : (successfulCultures == null || successfulCultures.Length == 0 ? new[] { string.Empty } : successfulCultures)
+                                    .SelectMany(x => contentSchedule.GetSchedule(x, ContentScheduleAction.Expire)).ToArray();
+
                                 if (successfulCultures == null || totalStatusCount == itemCount)
                                 {
                                     //either invariant single publish, or bulk publish where all statuses are already published
-                                    display.AddSuccessNotification(
-                                        Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                        Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+
+                                    if (expireDates.Length == 0)
+                                    {
+                                        //normal status, no release dates
+                                        display.AddSuccessNotification(
+                                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                            Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                                    }
+                                    else if (successfulCultures == null)
+                                    {
+                                        //this is invariant with a release date
+                                        display.AddSuccessNotification(
+                                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                            Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText", new[] {$"{expireDates[0].Date.ToLongDateString()} {expireDates[0].Date:HH:mm}"}));
+                                    }
+                                    else
+                                    {
+                                        //this is variant with release dates
+                                        AddNotificationForVariants(successfulCultures, expireDates);
+                                    }
                                 }
                                 else
                                 {
-                                    foreach (var c in successfulCultures)
-                                    {
-                                        display.AddSuccessNotification(
-                                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                            Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
-                                    }
+                                    AddNotificationForVariants(successfulCultures, expireDates);
                                 }
                             }
                         }

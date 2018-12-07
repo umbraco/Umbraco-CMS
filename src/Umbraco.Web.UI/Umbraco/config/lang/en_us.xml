@@ -1295,13 +1295,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and is visible on the website</key>
-    <key alias="editContentPublishedWithExpireDateText">and visible on the website until {0}</key>
+    <key alias="editContentPublishedWithExpireDateText">and visible on the website until %0%</key>
     <key alias="editMultiContentPublishedText">%0% documents published and visible on the website</key>
     <key alias="editVariantPublishedText">%0% published and visible on the website</key>
+    <key alias="editVariantPublishedTextWithExpireDateText">%0% published and visible on the website until %1%</key>
     <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
-    <key alias="editContentSavedWithReleaseDateText">Changes will be published on {0}</key>
     <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>
     <key alias="editVariantSavedText">%0% saved</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
