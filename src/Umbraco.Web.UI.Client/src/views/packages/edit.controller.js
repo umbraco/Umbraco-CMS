@@ -199,24 +199,24 @@
         function openControlPicker() {
             const controlPicker = {
                 title: "Select control",
+                section: "settings",
                 treeAlias: "files",
-                section:"settings",
                 entityType: "file",
-                submit: function(model) {
-                    if(model.selection && model.selection.length > 0) {
-                        vm.package.control = model.selection[0];
-                    }
+                onlyInitialized: false,
+                select: function(node) {
+                    const id = unescape(node.id);
+                    vm.package.loadControl = id;
                     editorService.close();
                 },
                 close: function() {
                     editorService.close();
                 }
             };
-            editorService.contentPicker(controlPicker);
+            editorService.treePicker(controlPicker);
         }
 
         function removeControl() {
-            vm.package.control = null;
+            vm.package.loadControl = null;
         }
 
         onInit();
