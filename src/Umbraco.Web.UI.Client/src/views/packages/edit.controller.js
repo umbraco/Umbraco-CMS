@@ -88,7 +88,7 @@
         }
 
         function back() {
-            $location.path("packages/packages/overview");
+            $location.path("packages/packages/overview").search('create', null);;
         }
 
         function createPackage() {
