@@ -169,12 +169,10 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IPublishedContent>(),
                 mockedTypedContent,
                 Mock.Of<ITagQuery>(),
-                Mock.Of<IDataTypeService>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 membershipHelper,
-                serviceContext,
-                CacheHelper.NoCache);
+                serviceContext);
 
             return CreateController(controllerType, request, umbHelper);
         }

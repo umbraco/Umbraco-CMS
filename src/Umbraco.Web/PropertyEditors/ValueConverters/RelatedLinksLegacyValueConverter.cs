@@ -24,13 +24,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILogger _logger;
         private readonly ServiceContext _services;
-        private readonly CacheHelper _appCache;
 
-        public RelatedLinksLegacyValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache, ILogger logger)
+        public RelatedLinksLegacyValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, ILogger logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _services = services;
-            _appCache = appCache;
             _logger = logger;
         }
 
@@ -56,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     //update the internal links if we have a context
                     if (UmbracoContext.Current != null)
                     {
-                        var helper = new UmbracoHelper(_umbracoContextAccessor.UmbracoContext, _services, _appCache);
+                        var helper = new UmbracoHelper(_umbracoContextAccessor.UmbracoContext, _services);
                         foreach (var a in obj)
                         {
                             var type = a.Value<string>("type");

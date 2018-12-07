@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
@@ -11,19 +10,20 @@ using Umbraco.Core;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Indexing;
+using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Xml;
 using Umbraco.Examine.Config;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
     /// </summary>
-    public abstract class UmbracoExamineIndexer : LuceneIndexer
+    public abstract class UmbracoExamineIndexer : LuceneIndex, IUmbracoIndexer, IIndexDiagnostics
     {
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -34,14 +34,15 @@ namespace Umbraco.Examine
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
-        public const string IndexPathFieldName = "__Path";
-        public const string NodeKeyFieldName = "__Key";
-        public const string IconFieldName = "__Icon";
-        public const string PublishedFieldName = "__Published";
+        public const string IndexPathFieldName = SpecialFieldPrefix + "Path";
+        public const string NodeKeyFieldName = SpecialFieldPrefix + "Key";
+        public const string IconFieldName = SpecialFieldPrefix + "Icon";
+        public const string PublishedFieldName = SpecialFieldPrefix + "Published";
+
         /// <summary>
         /// The prefix added to a field when it is duplicated in order to store the original raw value.
         /// </summary>
-        public const string RawFieldPrefix = "__Raw_";
+        public const string RawFieldPrefix = SpecialFieldPrefix + "Raw_";
 
         /// <summary>
         /// Constructor for config provider based indexes
@@ -52,25 +53,18 @@ namespace Umbraco.Examine
         {
             ProfilingLogger = Current.ProfilingLogger;
             _configBased = true;
-
-            //This is using the config so we'll validate based on that
-            ValueSetValidator = new ValueSetValidatorDelegate(set =>
-            {
-
-                //check if this document is of a correct type of node type alias
-                if (ConfigIndexCriteria.IncludeItemTypes.Any())
-                    if (!ConfigIndexCriteria.IncludeItemTypes.Contains(set.ItemType))
-                        return false;
-
-                //if this node type is part of our exclusion list, do not validate
-                if (ConfigIndexCriteria.ExcludeItemTypes.Any())
-                    if (ConfigIndexCriteria.ExcludeItemTypes.Contains(set.ItemType))
-                        return false;
-
-                return true;
-            });
         }
 
+        /// <summary>
+        /// Create a new <see cref="UmbracoExamineIndexer"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="fieldDefinitions"></param>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="defaultAnalyzer"></param>
+        /// <param name="profilingLogger"></param>
+        /// <param name="validator"></param>
+        /// <param name="indexValueTypes"></param>
         protected UmbracoExamineIndexer(
             string name,
             IEnumerable<FieldDefinition> fieldDefinitions,
@@ -82,6 +76,12 @@ namespace Umbraco.Examine
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
         {
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
+
+            //try to set the value of `LuceneIndexFolder` for diagnostic reasons
+            if (luceneDirectory is FSDirectory fsDir)
+                LuceneIndexFolder = fsDir.Directory;
+
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
         }
 
         private readonly bool _configBased = false;
@@ -91,7 +91,7 @@ namespace Umbraco.Examine
         /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
         /// for retreival after searching.
         /// </summary>
-        internal static readonly FieldDefinition[] UmbracoIndexFields =
+        public static readonly FieldDefinition[] UmbracoIndexFieldDefinitions =
         {
             new FieldDefinition("parentID", FieldDefinitionTypes.Integer),
             new FieldDefinition("level", FieldDefinitionTypes.Integer),
@@ -110,6 +110,10 @@ namespace Umbraco.Examine
             new FieldDefinition("urlName", FieldDefinitionTypes.InvariantCultureIgnoreCase),
             new FieldDefinition("path", FieldDefinitionTypes.Raw),
 
+            new FieldDefinition("email", FieldDefinitionTypes.EmailAddress),
+
+            new FieldDefinition(PublishedFieldName, FieldDefinitionTypes.Raw),
+            new FieldDefinition(NodeKeyFieldName, FieldDefinitionTypes.Raw),
             new FieldDefinition(IndexPathFieldName, FieldDefinitionTypes.Raw),
             new FieldDefinition(IconFieldName, FieldDefinitionTypes.Raw)
         };
@@ -119,17 +123,21 @@ namespace Umbraco.Examine
         /// <summary>
         /// Overridden to ensure that the umbraco system field definitions are in place
         /// </summary>
-        /// <param name="x"></param>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(Directory x, IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
         {
-            foreach (var field in UmbracoIndexFields)
+            //if config based then ensure the value types else it's assumed these were passed in via ctor
+            if (_configBased)
             {
-                FieldDefinitionCollection.TryAdd(field.Name, field);
+                foreach (var field in UmbracoIndexFieldDefinitions)
+                {
+                    FieldDefinitionCollection.TryAdd(field.Name, field);
+                }
             }
+            
 
-            return base.CreateFieldValueTypes(x, indexValueTypesFactory);
+            return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
 
         /// <summary>
@@ -137,10 +145,7 @@ namespace Umbraco.Examine
         /// </summary>
         public bool EnableDefaultEventHandler { get; set; } = true;
 
-        /// <summary>
-        /// the supported indexable types
-        /// </summary>
-        protected abstract IEnumerable<string> SupportedTypes { get; }
+        public bool PublishedValuesOnly { get; protected set; } = false;
 
         protected ConfigIndexCriteria ConfigIndexCriteria { get; private set; }
 
@@ -170,38 +175,35 @@ namespace Umbraco.Examine
             }
 
             //Need to check if the index set or IndexerData is specified...
-            if (config["indexSet"] == null && (FieldDefinitionCollection.Count == 0))
+            if (config["indexSet"] == null && FieldDefinitionCollection.Count == 0)
             {
                 //if we don't have either, then we'll try to set the index set by naming conventions
                 var found = false;
-                if (name.EndsWith("Indexer"))
+
+                var possibleSuffixes = new[] {"Index", "Indexer"};
+                foreach (var suffix in possibleSuffixes)
                 {
-                    var setNameByConvension = name.Remove(name.LastIndexOf("Indexer")) + "IndexSet";
+                    if (!name.EndsWith(suffix)) continue;
+
+                    var setNameByConvension = name.Remove(name.LastIndexOf(suffix, StringComparison.Ordinal)) + "IndexSet";
                     //check if we can assign the index set by naming convention
                     var set = IndexSets.Instance.Sets.Cast<IndexSet>().SingleOrDefault(x => x.SetName == setNameByConvension);
 
-                    if (set != null)
+                    if (set == null) continue;
+
+                    //we've found an index set by naming conventions :)
+                    IndexSetName = set.SetName;
+
+                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
+
+                    //get the index criteria and ensure folder
+                    ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
+                    foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
-                        //we've found an index set by naming conventions :)
-                        IndexSetName = set.SetName;
-
-                        var indexSet = IndexSets.Instance.Sets[IndexSetName];
-
-                        //if tokens are declared in the path, then use them (i.e. {machinename} )
-                        indexSet.ReplaceTokensInIndexPath();
-
-                        //get the index criteria and ensure folder
-                        ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
-                        foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
-                        {
-                            FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
-                        }
-
-                        //now set the index folder
-                        LuceneIndexFolder = new DirectoryInfo(Path.Combine(IndexSets.Instance.Sets[IndexSetName].IndexDirectory.FullName, "Index"));
-
-                        found = true;
+                        FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
                     }
+                    found = true;
+                    break;
                 }
 
                 if (!found)
@@ -222,86 +224,33 @@ namespace Umbraco.Examine
 
                     var indexSet = IndexSets.Instance.Sets[IndexSetName];
 
-                    //if tokens are declared in the path, then use them (i.e. {machinename} )
-                    indexSet.ReplaceTokensInIndexPath();
-
                     //get the index criteria and ensure folder
                     ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
                     foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
                         FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
                     }
-
-                    //now set the index folder
-                    LuceneIndexFolder = new DirectoryInfo(Path.Combine(IndexSets.Instance.Sets[IndexSetName].IndexDirectory.FullName, "Index"));
                 }
             }
 
             base.Initialize(name, config);
         }
-
+        
         #endregion
 
-
         /// <summary>
         /// override to check if we can actually initialize.
         /// </summary>
         /// <remarks>
         /// This check is required since the base examine lib will try to rebuild on startup
         /// </remarks>
-        public override void RebuildIndex()
-        {
-            if (CanInitialize())
-            {
-                ProfilingLogger.Logger.Debug(GetType(), "Rebuilding index");
-                using (new SafeCallContext())
-                {
-                    base.RebuildIndex();
-                }
-            }
-        }
-
-        /// <summary>
-        /// override to check if we can actually initialize.
-        /// </summary>
-        /// <remarks>
-        /// This check is required since the base examine lib will try to rebuild on startup
-        /// </remarks>
-        public override void IndexAll(string type)
+        protected override void PerformDeleteFromIndex(string nodeId, Action<IndexOperationEventArgs> onComplete)
         {
             if (CanInitialize())
             {
                 using (new SafeCallContext())
                 {
-                    base.IndexAll(type);
-                }
-            }
-        }
-
-        public override void IndexItems(IEnumerable<ValueSet> nodes)
-        {
-            if (CanInitialize())
-            {
-                using (new SafeCallContext())
-                {
-                    base.IndexItems(nodes);
-                }
-            }
-        }
-
-        /// <summary>
-        /// override to check if we can actually initialize.
-        /// </summary>
-        /// <remarks>
-        /// This check is required since the base examine lib will try to rebuild on startup
-        /// </remarks>
-        public override void DeleteFromIndex(string nodeId)
-        {
-            if (CanInitialize())
-            {
-                using (new SafeCallContext())
-                {
-                    base.DeleteFromIndex(nodeId);
+                    base.PerformDeleteFromIndex(nodeId, onComplete);
                 }
             }
         }
@@ -318,17 +267,6 @@ namespace Umbraco.Examine
         }
 
         /// <summary>
-        /// Reindexes all supported types
-        /// </summary>
-        protected override void PerformIndexRebuild()
-        {
-            foreach (var t in SupportedTypes)
-            {
-                IndexAll(t);
-            }
-        }
-
-        /// <summary>
         /// overridden for logging
         /// </summary>
         /// <param name="ex"></param>
@@ -339,17 +277,20 @@ namespace Umbraco.Examine
         }
 
         /// <summary>
-        /// This ensures that the special __Raw_ fields are indexed
+        /// This ensures that the special __Raw_ fields are indexed correctly
         /// </summary>
         /// <param name="docArgs"></param>
         protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
         {
             var d = docArgs.Document;
 
-            foreach (var f in docArgs.ValueSet.Values.Where(x => x.Key.StartsWith(RawFieldPrefix)))
+            foreach (var f in docArgs.ValueSet.Values.Where(x => x.Key.StartsWith(RawFieldPrefix)).ToList())
             {
                 if (f.Value.Count > 0)
                 {
+                    //remove the original value so we can store it the correct way
+                    d.RemoveField(f.Key);
+
                     d.Add(new Field(
                         f.Key,
                         f.Value[0].ToString(),
@@ -359,26 +300,21 @@ namespace Umbraco.Examine
                 }
             }
 
-            ProfilingLogger.Logger.Debug(GetType(),
-                "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
-                docArgs.ValueSet.Id,
-                docArgs.ValueSet.Category,
-                docArgs.ValueSet.ItemType);
-
-
             base.OnDocumentWriting(docArgs);
         }
 
         /// <summary>
         /// Overridden for logging.
         /// </summary>
-        protected override void AddDocument(Document doc, IndexItem item, IndexWriter writer)
+        protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
             ProfilingLogger.Logger.Debug(GetType(),
-                "AddDocument {DocumentId} with type {DocumentItemType}",
-                item.ValueSet.Id,
-                item.ValueSet.ItemType);
-            base.AddDocument(doc, item, writer);
+                "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
+                valueSet.Id,
+                valueSet.Category,
+                valueSet.ItemType);
+
+            base.AddDocument(doc, valueSet, writer);
         }
 
         protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
@@ -386,39 +322,16 @@ namespace Umbraco.Examine
             base.OnTransformingIndexValues(e);
 
             //ensure special __Path field
-            var path = e.IndexItem.ValueSet.GetValue("path");
+            var path = e.ValueSet.GetValue("path");
             if (path != null)
             {
-                e.IndexItem.ValueSet.Set(IndexPathFieldName, path);
-            }
-
-            //strip html of all users fields if we detect it has HTML in it.
-            //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
-            //the value of the field 'as-is'.
-            foreach (var value in e.IndexItem.ValueSet.Values.ToList()) //ToList here to make a diff collection else we'll get collection modified errors
-            {
-                if (value.Value == null) continue;
-
-                if (value.Value.Count > 0)
-                {
-                    if (value.Value.First() is string str)
-                    {
-                        if (XmlHelper.CouldItBeXml(str))
-                        {
-                            //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
-                            e.IndexItem.ValueSet.Values[string.Concat(RawFieldPrefix, value.Key)] = new List<object> { str };
-                            //now replace the original value with the stripped html
-                            //TODO: This should be done with an analzer?!
-                            e.IndexItem.ValueSet.Values[value.Key] = new List<object> { str.StripHtml() };
-                        }
-                    }
-                }
+                e.ValueSet.Set(IndexPathFieldName, path);
             }
 
             //icon
-            if (e.IndexItem.ValueSet.Values.TryGetValue("icon", out var icon) && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
+            if (e.ValueSet.Values.TryGetValue("icon", out var icon) && e.ValueSet.Values.ContainsKey(IconFieldName) == false)
             {
-                e.IndexItem.ValueSet.Values[IconFieldName] = icon;
+                e.ValueSet.Values[IconFieldName] = icon;
             }
         }
 
@@ -431,5 +344,16 @@ namespace Umbraco.Examine
                 indexSet.ExcludeNodeTypes.ToList().Select(x => x.Name).ToArray(),
                 indexSet.IndexParentId);
         }
+
+        #region IIndexDiagnostics
+
+        private readonly UmbracoExamineIndexDiagnostics _diagnostics;
+
+        public int DocumentCount => _diagnostics.DocumentCount;
+        public int FieldCount => _diagnostics.FieldCount;
+        public Attempt<string> IsHealthy() => _diagnostics.IsHealthy();
+        public virtual IReadOnlyDictionary<string, object> Metadata => _diagnostics.Metadata;
+
+        #endregion
     }
 }

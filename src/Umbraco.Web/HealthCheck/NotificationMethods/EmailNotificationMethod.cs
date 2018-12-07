@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
@@ -12,8 +14,10 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
     public class EmailNotificationMethod : NotificationMethodBase
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtimeState;
+        private readonly ILogger _logger;
 
-        public EmailNotificationMethod(ILocalizedTextService textService)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger)
         {
             var recipientEmail = Settings["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
@@ -25,6 +29,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             RecipientEmail = recipientEmail;
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _runtimeState = runtimeState;
+            _logger = logger;
         }
 
         public string RecipientEmail { get; }
@@ -48,7 +54,11 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 results.ResultsAsHtml(Verbosity)
             });
 
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject");
+            // Include the umbraco Application URL host in the message subject so that
+            // you can identify the site that these results are for.
+            var host = _runtimeState.ApplicationUrl;
+
+            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
             var mailSender = new EmailSender();
             using (var mailMessage = CreateMailMessage(subject, message))

@@ -35,7 +35,12 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureMediaResult")]
     public class MediaTreeController : ContentTreeControllerBase, ISearchableTree
     {
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public MediaTreeController(UmbracoTreeSearcher treeSearcher)
+        {
+            _treeSearcher = treeSearcher;
+        }
 
         protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
@@ -159,9 +164,9 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
+            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
 
         internal override IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)

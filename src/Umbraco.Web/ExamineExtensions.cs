@@ -12,7 +12,7 @@ namespace Umbraco.Web
     /// </summary>
     public static class ExamineExtensions
     {
-        public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(this IEnumerable<SearchResult> results, IPublishedCache cache)
+        public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(this IEnumerable<ISearchResult> results, IPublishedCache cache)
         {
             var list = new List<PublishedSearchResult>();
 

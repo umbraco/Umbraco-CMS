@@ -282,16 +282,15 @@ namespace Umbraco.Web
 
         #region Search
 
-        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
+        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
-            //TODO: we should pass in the IExamineManager?
+            //fixme: pass in the IExamineManager
 
-            var searcher = string.IsNullOrEmpty(indexName)
-                ? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
-                : ExamineManager.Instance.GetSearcher(indexName);
+            indexName = string.IsNullOrEmpty(indexName) ? Constants.Examine.ExternalIndexer : indexName;
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
+                throw new InvalidOperationException("No index found with name " + indexName);
 
-            if (searcher == null)
-                throw new InvalidOperationException("No searcher found for index " + indexName);
+            var searcher = index.GetSearcher();
 
             var t = term.Escape().Value;
             if (useWildCards)
@@ -303,21 +302,15 @@ namespace Umbraco.Web
             return content.Search(crit, searcher);
         }
 
-        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
-        {
-            return content.Search(term, useWildCards, indexName);
-        }
-
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
-            //TODO: we should pass in the IExamineManager?
+            //fixme: pass in the IExamineManager
 
-            var searcher = string.IsNullOrEmpty(indexName)
-                ? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
-                : ExamineManager.Instance.GetSearcher(indexName);
+            indexName = string.IsNullOrEmpty(indexName) ? Constants.Examine.ExternalIndexer : indexName;
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
+                throw new InvalidOperationException("No index found with name " + indexName);
 
-            if (searcher == null)
-                throw new InvalidOperationException("No searcher found for index " + indexName);
+            var searcher = index.GetSearcher();
 
             var t = term.Escape().Value;
             if (useWildCards)
@@ -329,13 +322,17 @@ namespace Umbraco.Web
             return content.Search(crit, searcher);
         }
 
-        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, ISearcher searchProvider = null)
         {
-            //TODO: we should pass in the IExamineManager?
+            //fixme: pass in the IExamineManager
 
-            var s = searchProvider ?? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
-
-            var results = s.Search(criteria);
+            if (searchProvider == null)
+            {
+                if (!ExamineManager.Instance.TryGetIndex(Constants.Examine.ExternalIndexer, out var index))
+                    throw new InvalidOperationException("No index found with name " + Constants.Examine.ExternalIndexer);
+                searchProvider = index.GetSearcher();
+            }
+            var results = searchProvider.Search(criteria);
             return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
         }
 

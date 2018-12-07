@@ -125,12 +125,10 @@ namespace Umbraco.Tests.Web.Mvc
                                                          //return mock of IPublishedContent for any call to GetById
                                                          Mock.Of<IPublishedContent>(content => content.Id == 2)),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<IDataTypeService>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 new MembershipHelper(umbracoContext, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()),
-                new ServiceContext(),
-                CacheHelper.CreateDisabledCacheHelper());
+                new ServiceContext());
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbracoContext, Umbraco = helper };
             var result = ctrl.GetContent(2) as PublishedContentResult;

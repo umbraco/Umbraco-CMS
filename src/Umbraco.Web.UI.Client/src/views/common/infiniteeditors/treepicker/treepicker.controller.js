@@ -1,18 +1,12 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
     function ($scope,
-        $q,
         entityResource,
         eventsService,
-        $log,
-        searchService,
         angularHelper,
         $timeout,
         localizationService,
         treeService,
-        contentResource,
-        mediaResource,
-        memberResource,
         languageResource) {
 
         //used as the result selection

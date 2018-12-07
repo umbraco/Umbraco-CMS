@@ -39,7 +39,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null);
 
         /// <summary>
         /// Searches content.
@@ -49,6 +49,6 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searcher = null);
     }
 }
