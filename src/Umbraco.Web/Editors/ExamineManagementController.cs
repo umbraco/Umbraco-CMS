@@ -167,15 +167,14 @@ namespace Umbraco.Web.Editors
             //now add a single handler
             index.IndexOperationComplete += Indexer_IndexOperationComplete;
 
-            var cacheKey = "temp_indexing_op_" + index.Name;
-
-            //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-            ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
-
             try
             {
                 //clear and replace
                 index.CreateIndex();
+
+                var cacheKey = "temp_indexing_op_" + index.Name;
+                //put temp val in cache which is used as a rudimentary way to know when the indexing is done
+                ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
 
                 _indexRebuilder.RebuildIndex(indexName);
 
@@ -280,6 +279,8 @@ namespace Umbraco.Web.Editors
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)
         {
             var indexer = (LuceneIndex)sender;
+
+            _logger.Debug<ExamineManagementController>("Logging operation completed for index {IndexName}", indexer.Name);
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

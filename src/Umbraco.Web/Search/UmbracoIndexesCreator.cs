@@ -112,12 +112,12 @@ namespace Umbraco.Web.Search
 
         public virtual IContentValueSetValidator GetContentValueSetValidator()
         {
-            return new ContentValueSetValidator(true, true, PublicAccessService);
+            return new ContentValueSetValidator(false, true, PublicAccessService);
         }
 
         public virtual IContentValueSetValidator GetPublishedContentValueSetValidator()
         {
-            return new ContentValueSetValidator(false, false, PublicAccessService);
+            return new ContentValueSetValidator(true, false, PublicAccessService);
         }
 
         /// <summary>

@@ -80,13 +80,13 @@ namespace Umbraco.Web.Search
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
                     factory.GetInstance<IUserService>(),
-                    false));
+                    true));
             composition.Container.Register<IContentValueSetBuilder, PerContainerLifetime>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
                     factory.GetInstance<IUserService>(),
-                    true));
+                    false));
             composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         }

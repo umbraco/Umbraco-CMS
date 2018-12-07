@@ -156,23 +156,31 @@ namespace Umbraco.Examine
                     : 1;
             });
 
+            var hasDeletes = false;
+            var hasUpdates = false;
             foreach (var group in invalidOrValid.OrderBy(x => x.Key))
             {
                 if (group.Key == 0)
                 {
+                    hasDeletes = true;
                     //these are the invalid items so we'll delete them
                     //since the path is not valid we need to delete this item in case it exists in the index already and has now
                     //been moved to an invalid parent.
                     foreach (var i in group)
-                    {
-                        PerformDeleteFromIndex(i.Id, x => { /*noop*/ });
-                    }
+                        QueueIndexOperation(new IndexOperation(new ValueSet(i.Id), IndexOperationType.Delete));
                 }
                 else
                 {
+                    hasUpdates = true;
                     //these are the valid ones, so just index them all at once
                     base.PerformIndexItems(group, onComplete);
                 }
+            }
+
+            if (hasDeletes && !hasUpdates || !hasDeletes && !hasUpdates)
+            {
+                //we need to manually call the completed method
+                onComplete(new IndexOperationEventArgs(this, 0));
             }
         }
 
