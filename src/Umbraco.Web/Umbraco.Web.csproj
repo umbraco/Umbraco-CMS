@@ -190,7 +190,7 @@
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
-    <Compile Include="Editors\DashboardHelper.cs" />
+    <Compile Include="Editors\Dashboards.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
@@ -272,7 +272,6 @@
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
-    <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="Models\BackOfficeTour.cs" />
     <Compile Include="Models\BackOfficeTourFile.cs" />
     <Compile Include="Models\BackOfficeTourStep.cs" />
@@ -471,7 +470,6 @@
     <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\SafeXmlReaderWriter.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheComponent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
@@ -1237,12 +1235,6 @@
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
-      <DependentUpon>EditRelationType.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.designer.cs">
-      <DependentUpon>EditRelationType.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1321,9 +1313,6 @@
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

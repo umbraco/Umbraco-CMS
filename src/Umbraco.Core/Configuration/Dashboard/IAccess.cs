@@ -4,6 +4,6 @@ namespace Umbraco.Core.Configuration.Dashboard
 {
     public interface IAccess
     {
-        IEnumerable<IAccessItem> Rules { get; }
+        IEnumerable<IAccessRule> Rules { get; }
     }
 }

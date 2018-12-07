@@ -32,7 +32,7 @@
                 }));
 
                 //no isolate scope to listen to element destroy
-                element.bind('$destroy', function () {
+                element.on('$destroy', function () {
                     for (var u in unsubscribe) {
                         unsubscribe[u]();
                     }

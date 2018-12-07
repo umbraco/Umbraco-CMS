@@ -3,6 +3,7 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models.ContentEditing
 {
+
     /// <summary>
     /// Represents a content app definition.
     /// </summary>

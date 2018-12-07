@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
@@ -17,105 +18,97 @@ namespace Umbraco.Web.Editors
 
         public static bool AuthorizeAccess(ISection dashboardSection, IUser user, ISectionService sectionService)
         {
-            if (user.Id.ToString(CultureInfo.InvariantCulture) == 0.ToInvariantString())
-            {
-                return true;
-            }
-
-            var denyTypes = dashboardSection.AccessRights.Rules.Where(x => x.Action == AccessType.Deny).ToArray();
-            var grantedTypes = dashboardSection.AccessRights.Rules.Where(x => x.Action == AccessType.Grant).ToArray();
-            var grantedBySectionTypes = dashboardSection.AccessRights.Rules.Where(x => x.Action == AccessType.GrantBySection).ToArray();
-
-            return CheckUserAccessByRules(user, sectionService, denyTypes, grantedTypes, grantedBySectionTypes);
+            return CheckUserAccessByRules(user, sectionService, dashboardSection.AccessRights.Rules);
         }
 
         public static bool AuthorizeAccess(IDashboardTab dashboardTab, IUser user, ISectionService sectionService)
         {
-            if (user.Id.ToString(CultureInfo.InvariantCulture) == Constants.System.Root.ToInvariantString())
-            {
-                return true;
-            }
-
-            var denyTypes = dashboardTab.AccessRights.Rules.Where(x => x.Action == AccessType.Deny).ToArray();
-            var grantedTypes = dashboardTab.AccessRights.Rules.Where(x => x.Action == AccessType.Grant).ToArray();
-            var grantedBySectionTypes = dashboardTab.AccessRights.Rules.Where(x => x.Action == AccessType.GrantBySection).ToArray();
-
-            return CheckUserAccessByRules(user, sectionService, denyTypes, grantedTypes, grantedBySectionTypes);
+            return CheckUserAccessByRules(user, sectionService, dashboardTab.AccessRights.Rules);
         }
 
-        public static bool AuthorizeAccess(IDashboardControl dashboardTab, IUser user, ISectionService sectionService)
+        public static bool AuthorizeAccess(IDashboardControl dashboardControl, IUser user, ISectionService sectionService)
         {
-            if (user.Id.ToString(CultureInfo.InvariantCulture) == Constants.System.Root.ToInvariantString())
-            {
-                return true;
-            }
-
-            var denyTypes = dashboardTab.AccessRights.Rules.Where(x => x.Action == AccessType.Deny).ToArray();
-            var grantedTypes = dashboardTab.AccessRights.Rules.Where(x => x.Action == AccessType.Grant).ToArray();
-            var grantedBySectionTypes = dashboardTab.AccessRights.Rules.Where(x => x.Action == AccessType.GrantBySection).ToArray();
-
-            return CheckUserAccessByRules(user, sectionService, denyTypes, grantedTypes, grantedBySectionTypes);
+            return CheckUserAccessByRules(user, sectionService, dashboardControl.AccessRights.Rules);
         }
 
-        public static bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IAccessItem[] denyTypes, IAccessItem[] grantedTypes, IAccessItem[] grantedBySectionTypes)
+        private static (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
         {
-            var allowedSoFar = false;
+            IAccessRule[] denyRules = null, grantRules = null, grantBySectionRules = null;
 
-            // if there's no grantBySection or grant rules defined - we allow access so far and skip to checking deny rules
-            if (grantedBySectionTypes.Any() == false && grantedTypes.Any() == false)
+            var groupedRules = rules.GroupBy(x => x.Type);
+            foreach (var group in groupedRules)
             {
-                allowedSoFar = true;
+                var a = group.ToArray();
+                switch (group.Key)
+                {
+                    case AccessRuleType.Deny:
+                        denyRules = a;
+                        break;
+                    case AccessRuleType.Grant:
+                        grantRules = a;
+                        break;
+                    case AccessRuleType.GrantBySection:
+                        grantBySectionRules = a;
+                        break;
+                    default:
+                        throw new Exception("panic");
+                }
             }
-            // else we check the rules and only allow if one matches
-            else
+
+            return (denyRules ?? Array.Empty<IAccessRule>(), grantRules ?? Array.Empty<IAccessRule>(), grantBySectionRules ?? Array.Empty<IAccessRule>());
+        }
+
+        public static bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
+        {
+            if (user.Id == Constants.Security.SuperUserId)
+                return true;
+
+            var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);
+
+            var hasAccess = true;
+            string[] assignedUserGroups = null;
+
+            // if there are no grant rules, then access is granted by default, unless denied
+            // otherwise, grant rules determine if access can be granted at all
+            if (grantBySectionRules.Length > 0 || grantRules.Length > 0)
             {
+                hasAccess = false;
+
                 // check if this item has any grant-by-section arguments.
                 // if so check if the user has access to any of the sections approved, if so they will be allowed to see it (so far)
-                if (grantedBySectionTypes.Any())
+                if (grantBySectionRules.Length > 0)
                 {
-                    var allowedApps = sectionService.GetAllowedSections(Convert.ToInt32(user.Id))
-                        .Select(x => x.Alias)
-                        .ToArray();
+                    var allowedSections = sectionService.GetAllowedSections(user.Id).Select(x => x.Alias).ToArray();
+                    var wantedSections = grantBySectionRules.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
 
-                    var allApprovedSections = grantedBySectionTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
-                    if (allApprovedSections.Any(allowedApps.Contains))
-                    {
-                        allowedSoFar = true;
-                    }
+                    if (wantedSections.Intersect(allowedSections).Any())
+                        hasAccess = true;
                 }
 
                 // if not already granted access, check if this item as any grant arguments.
                 // if so check if the user is in one of the user groups approved, if so they will be allowed to see it (so far)
-                if (allowedSoFar == false && grantedTypes.Any())
+                if (hasAccess == false && grantRules.Any())
                 {
-                    var allApprovedUserTypes = grantedTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
-                    foreach (var userGroup in user.Groups)
-                    {
-                        if (allApprovedUserTypes.InvariantContains(userGroup.Alias))
-                        {
-                            allowedSoFar = true;
-                            break;
-                        }
-                    }
+                    assignedUserGroups = user.Groups.Select(x => x.Alias).ToArray();
+                    var wantedUserGroups = grantRules.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+
+                    if (wantedUserGroups.Intersect(assignedUserGroups).Any())
+                        hasAccess = true;
                 }
             }
+
+            if (!hasAccess || denyRules.Length == 0)
+                return false;
 
             // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
             // be denied to see it no matter what
-            if (denyTypes.Any())
-            {
-                var allDeniedUserTypes = denyTypes.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
-                foreach (var userGroup in user.Groups)
-                {
-                    if (allDeniedUserTypes.InvariantContains(userGroup.Alias))
-                    {
-                        allowedSoFar = false;
-                        break;
-                    }
-                }
-            }
+            assignedUserGroups = assignedUserGroups ?? user.Groups.Select(x => x.Alias).ToArray();
+            var deniedUserGroups = denyRules.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
 
-            return allowedSoFar;
+            if (deniedUserGroups.Intersect(assignedUserGroups).Any())
+                hasAccess = false;
+
+            return hasAccess;
         }
     }
 }
