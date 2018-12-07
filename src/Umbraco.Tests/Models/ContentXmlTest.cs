@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Models
         public void Can_Generate_Xml_Representation_Of_Content()
         {
             // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 

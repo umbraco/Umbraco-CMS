@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
 
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
 
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
 
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
@@ -170,10 +170,10 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
 
-            var ct1 = MockedContentTypes.CreateTextpageContentType("ct1");
+            var ct1 = MockedContentTypes.CreateTextPageContentType("ct1");
             ServiceContext.FileService.SaveTemplate(ct1.DefaultTemplate);
             contentTypeService.Save(ct1);
-            var ct2 = MockedContentTypes.CreateTextpageContentType("ct2");
+            var ct2 = MockedContentTypes.CreateTextPageContentType("ct2");
             ServiceContext.FileService.SaveTemplate(ct2.DefaultTemplate);
             contentTypeService.Save(ct2);
 

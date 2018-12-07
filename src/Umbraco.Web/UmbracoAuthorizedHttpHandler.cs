@@ -13,12 +13,10 @@ namespace Umbraco.Web
         protected UmbracoAuthorizedHttpHandler()
         { }
 
-        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
-            : base(umbracoContext, services, appCache)
+        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
+            : base(umbracoContext, services)
         {
         }
-
-        private bool _hasValidated = false;
 
         /// <summary>
         /// Checks if the umbraco context id is valid

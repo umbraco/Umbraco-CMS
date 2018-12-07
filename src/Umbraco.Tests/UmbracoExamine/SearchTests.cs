@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Examine;
-using Lucene.Net.Store;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
 using Moq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -53,13 +55,17 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
+            var propertyEditors = Container.GetInstance<PropertyEditorCollection>();
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider.SqlContext, true);
+
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, contentService: contentService))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             using (indexer.ProcessNonAsync())
             {
-                indexer.RebuildIndex();
+                rebuilder.RegisterIndex(indexer.Name);
+                indexer.CreateIndex();
+                rebuilder.Populate(indexer);
                 
-
                 var searcher = indexer.GetSearcher();
 
                 var numberSortedCriteria = searcher.CreateCriteria()
@@ -80,12 +86,12 @@ namespace Umbraco.Tests.UmbracoExamine
             }
         }
 
-        private bool IsSortedByNumber(IEnumerable<SearchResult> results)
+        private bool IsSortedByNumber(IEnumerable<ISearchResult> results)
         {
             var currentSort = 0;
             foreach (var searchResult in results)
             {
-                var sort = int.Parse(searchResult.Fields["sortOrder"]);
+                var sort = int.Parse(searchResult.Values["sortOrder"]);
                 if (currentSort >= sort)
                 {
                     return false;

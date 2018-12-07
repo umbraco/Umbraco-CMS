@@ -98,8 +98,8 @@ namespace Umbraco.Web.Mvc
                 if (content == null && model is IContentModel)
                     content = ((IContentModel) model).Content;
                 _helper = content == null
-                    ? new UmbracoHelper(UmbracoContext, Services, ApplicationCache)
-                    : new UmbracoHelper(UmbracoContext, Services, ApplicationCache, content);
+                    ? new UmbracoHelper(UmbracoContext, Services)
+                    : new UmbracoHelper(UmbracoContext, Services, content);
                 return _helper;
             }
         }
