@@ -132,13 +132,12 @@
                         </umb-control-group>
 
                         <umb-control-group label="Document Types">
-                                <pre>{{vm.documentTypes | json }} </pre>
                             <div ng-repeat="doctype in vm.documentTypes">
                                 <label>
                                     <input
                                         type="checkbox"
                                         ng-model="doctype.selected"
-                                        checklist-model="vm.package.contentTypes"
+                                        checklist-model="vm.package.documenttypes"
                                         checklist-value="doctype.id" />
                                     {{doctype.name}}
                                 </label>
@@ -146,7 +145,6 @@
                         </umb-control-group>
 
                         <umb-control-group label="Templates">
-                            <pre>{{vm.templates | json }} </pre>
                             <div ng-repeat="template in vm.templates">
                                 <label>
                                     <input

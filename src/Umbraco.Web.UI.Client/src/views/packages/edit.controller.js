@@ -54,11 +54,21 @@
 
             // get all doc types
             contentTypeResource.getAll().then(documentTypes => {
+                // a package stores the id as a string so we 
+                // need to convert all ids to string for comparison
+                documentTypes.forEach(documentType => {
+                    documentType.id = documentType.id.toString();
+                });
                 vm.documentTypes = documentTypes;
             });
 
             // get all templates
             templateResource.getAll().then(templates => {
+                // a package stores the id as a string so we 
+                // need to convert all ids to string for comparison
+                templates.forEach(template => {
+                    template.id = template.id.toString();
+                });
                 vm.templates = templates;
             });
 
