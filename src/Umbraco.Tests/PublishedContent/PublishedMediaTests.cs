@@ -109,6 +109,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Ensure_Children_Sorted_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -136,6 +137,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Do_Not_Find_In_Recycle_Bin()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -183,6 +185,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Children_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -210,6 +213,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Descendants_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -237,6 +241,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void DescendantsOrSelf_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -264,6 +269,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Ancestors_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -289,6 +295,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        [Ignore("No point testing with Examine, should refactor this test.")]
         public void AncestorsOrSelf_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());

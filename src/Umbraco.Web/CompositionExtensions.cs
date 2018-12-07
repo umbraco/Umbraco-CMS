@@ -36,8 +36,8 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
-        public static ContentAppDefinitionCollectionBuilder ContentApps(this Composition composition)
-            => composition.WithCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
+        public static ContentAppFactoryCollectionBuilder ContentApps(this Composition composition)
+            => composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.

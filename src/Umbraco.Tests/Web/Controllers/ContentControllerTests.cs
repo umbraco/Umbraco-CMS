@@ -211,9 +211,8 @@ namespace Umbraco.Tests.Web.Controllers
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null); //do not find it
 
-                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(propertyEditorCollection);
                 return usersController;
             }
 
@@ -238,9 +237,8 @@ namespace Umbraco.Tests.Web.Controllers
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
-                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(propertyEditorCollection);
                 return usersController;
             }
 
@@ -270,9 +268,8 @@ namespace Umbraco.Tests.Web.Controllers
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
-                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(propertyEditorCollection);
                 return usersController;
             }
 
@@ -308,9 +305,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
-                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(propertyEditorCollection);
                 return usersController;
             }
 
@@ -340,9 +336,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
-                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(propertyEditorCollection);
                 return usersController;
             }
 
@@ -376,9 +371,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
-                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(propertyEditorCollection);
                 return usersController;
             }
 

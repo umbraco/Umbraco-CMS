@@ -104,6 +104,13 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
+            var contentCache = new Mock<IPublishedContentCache>();
+            var content = new Mock<IPublishedContent>();
+            content.Setup(x => x.Id).Returns(2);
+            contentCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(content.Object);
+            var mediaCache = new Mock<IPublishedMediaCache>();
+            publishedSnapshot.Setup(x => x.Content).Returns(contentCache.Object);
+            publishedSnapshot.Setup(x => x.Media).Returns(mediaCache.Object);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
             var globalSettings = TestObjects.GetGlobalSettings();
@@ -122,9 +129,6 @@ namespace Umbraco.Tests.Web.Mvc
             var helper = new UmbracoHelper(
                 umbracoContext,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<IPublishedContentQuery>(query => query.Content(It.IsAny<int>()) ==
-                                                         //return mock of IPublishedContent for any call to GetById
-                                                         Mock.Of<IPublishedContent>(content => content.Id == 2)),
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),

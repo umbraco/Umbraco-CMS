@@ -3,11 +3,10 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models.ContentEditing
 {
-
     /// <summary>
-    /// Represents a content app definition.
+    /// Represents a content app factory.
     /// </summary>
-    public interface IContentAppDefinition
+    public interface IContentAppFactory
     {
         /// <summary>
         /// Gets the content app for an object.

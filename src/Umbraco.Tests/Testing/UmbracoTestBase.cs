@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IMediaPathScheme, OriginalMediaPathScheme>();
 
             // register empty content apps collection
-            Composition.WithCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
+            Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
         }
 
         protected virtual void ComposeAutoMapper(bool configure)

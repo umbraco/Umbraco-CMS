@@ -153,11 +153,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbCtx), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>());
 
-            var mockedTypedContent = Mock.Of<IPublishedContentQuery>();
-
             var umbHelper = new UmbracoHelper(umbCtx,
                 Mock.Of<IPublishedContent>(),
-                mockedTypedContent,
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
