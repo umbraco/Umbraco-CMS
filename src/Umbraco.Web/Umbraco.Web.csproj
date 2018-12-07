@@ -156,8 +156,8 @@
     <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
-    <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
-    <Compile Include="ContentApps\ContentAppDefinitionCollectionBuilder.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
     <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
     <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />

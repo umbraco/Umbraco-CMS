@@ -153,7 +153,6 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
-                new ContentAppDefinitionConverter(),
                 new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here

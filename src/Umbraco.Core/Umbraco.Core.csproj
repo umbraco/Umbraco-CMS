@@ -334,7 +334,6 @@
     <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
-    <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />

@@ -5,26 +5,24 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.ContentApps
 {
-    public class ContentAppDefinitionCollectionBuilder : OrderedCollectionBuilderBase<ContentAppDefinitionCollectionBuilder, ContentAppDefinitionCollection, IContentAppFactory>
+    public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<ContentAppFactoryCollectionBuilder, ContentAppFactoryCollection, IContentAppFactory>
     {
-        public ContentAppDefinitionCollectionBuilder(IServiceContainer container)
+        public ContentAppFactoryCollectionBuilder(IServiceContainer container)
             : base(container)
-        {
-        }
+        { }
 
-        protected override ContentAppDefinitionCollectionBuilder This => this;
+        protected override ContentAppFactoryCollectionBuilder This => this;
 
         // need to inject dependencies in the collection, so override creation
-        public override ContentAppDefinitionCollection CreateCollection()
+        public override ContentAppFactoryCollection CreateCollection()
         {
             // get the logger just-in-time - see note below for manifest parser
             var logger = Container.GetInstance<ILogger>();
 
-            return new ContentAppDefinitionCollection(CreateItems(), logger);
+            return new ContentAppFactoryCollection(CreateItems(), logger);
         }
 
         protected override IEnumerable<IContentAppFactory> CreateItems(params object[] args)
@@ -34,7 +32,7 @@ namespace Umbraco.Web.ContentApps
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = Container.GetInstance<ManifestParser>();
 
-            return base.CreateItems(args).Concat(manifestParser.Manifest.ContentApps.Select(x=>new ManifestContentAppFactory(x)));
+            return base.CreateItems(args).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x)));
         }
     }
 }

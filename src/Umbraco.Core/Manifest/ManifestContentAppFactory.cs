@@ -26,12 +26,11 @@ namespace Umbraco.Core.Manifest
     // ]
 
     /// <summary>
-    /// Represents a content app definition, parsed from a manifest.
+    /// Represents a content app factory, for content apps parsed from the manifest.
     /// </summary>
     public class ManifestContentAppFactory : IContentAppFactory
     {
         private readonly ManifestContentAppDefinition _definition;
-
 
         public ManifestContentAppFactory(ManifestContentAppDefinition definition)
         {
