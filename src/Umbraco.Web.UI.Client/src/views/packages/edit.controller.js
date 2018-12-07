@@ -157,6 +157,9 @@
         }
 
         function openFilePicker() {
+
+            let selection = angular.copy(vm.package.files);
+
             const filePicker = {
                 title: "Select files",
                 section: "settings",
@@ -164,16 +167,22 @@
                 entityType: "file",
                 multiPicker: true,
                 onlyInitialized: false,
-                submit: function(model) {
-                    console.log(model.selection);
+                select: function(node) {
+                    node.selected = !node.selected;
 
-                    if(model && model.selection) {
-                        vm.package.files = vm.package.files ? vm.package.files : [];
-                        model.selection.forEach(selected => {
-                            vm.package.files.push(selected);
-                        });
+                    const id = unescape(node.id);
+                    const index = selection.indexOf(id);
+
+                    if(node.selected) {
+                        if(index === -1) {
+                            selection.push(id);
+                        }
+                    } else {
+                        selection.splice(index, 1);
                     }
-
+                },
+                submit: function() {
+                    vm.package.files = selection;
                     editorService.close();
                 },
                 close: function() {
