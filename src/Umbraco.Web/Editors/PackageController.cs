@@ -45,23 +45,34 @@ namespace Umbraco.Web.Editors
                 //Throw/bubble up errors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
+            
+            var package = new CreatedPackage
+            {
+                Data = model
+            };
 
-            var newPackage = CreatedPackage.MakeNew(model.Name);
-            var packageId = newPackage.Data.Id;
-            var packageGuid = newPackage.Data.PackageGuid;
+            //If ID is 0 & PackageGuid is null - its brand new
+            if(model.Id == 0 && model.PackageGuid == null)
+            {
+                //Brand new
+                package = CreatedPackage.MakeNew(model.Name);
 
-            //Need to reset the package ID - as the posted model the package ID is always 0
-            //MakeNew will init create the XML & update the file and give us an ID to use
-            newPackage.Data = model;
-            newPackage.Data.Id = packageId;
-            newPackage.Data.PackageGuid = packageGuid;
+                var packageId = package.Data.Id;
+                var packageGuid = package.Data.PackageGuid;
+
+                //Need to reset the package ID - as the posted model the package ID is always 0
+                //MakeNew will init create the XML & update the file and give us an ID to use
+                package.Data = model;
+                package.Data.Id = packageId;
+                package.Data.PackageGuid = packageGuid;
+            }
             
             //Save then publish
-            newPackage.Save();
-            newPackage.Publish();
+            package.Save();
+            package.Publish();
 
             //We should have packagepath populated now
-            return newPackage.Data;
+            return package.Data;
         }
 
         /// <summary>
