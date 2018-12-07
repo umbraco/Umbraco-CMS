@@ -22,7 +22,7 @@ namespace Umbraco.Web.Composing.Composers
             //
             // We scan and auto-registers:
             // - every IController and IHttpController that *we* have in Umbraco.Web
-            // - PluginController and UmbracoApiController in every assembly
+            // - PluginController, RenderMvcController and UmbracoApiController in every assembly
             //
             // We do NOT scan:
             // - any IController or IHttpController (anything not PluginController nor UmbracoApiController), outside of Umbraco.Web
@@ -59,7 +59,11 @@ namespace Umbraco.Web.Composing.Composers
             composition.RegisterControllers(umbracoWebControllers);
 
             // scan and register every PluginController in everything (PluginController is IDiscoverable and IController)
-            var nonUmbracoWebPluginController = composition.TypeLoader.GetTypes<PluginController>().Where(x => x.Assembly != umbracoWebAssembly);
+            var nonUmbracoWebPluginController = composition.TypeLoader
+                .GetTypes<PluginController>().Where(x => x.Assembly != umbracoWebAssembly)
+                .Union(composition.TypeLoader
+                    .GetTypes<RenderMvcController>().Where(x => x.Assembly != umbracoWebAssembly)
+                );
             composition.RegisterControllers(nonUmbracoWebPluginController);
 
             // scan and register every IHttpController in Umbraco.Web
