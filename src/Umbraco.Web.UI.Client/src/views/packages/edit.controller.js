@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($location, $routeParams, packageResource, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
+    function EditController($location, $routeParams, entityResource, packageResource, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
 
         const vm = this;
 
@@ -40,6 +40,15 @@
                 // load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
+
+                    // get render model for content node
+                    if(vm.package.contentNodeId) {
+                        entityResource.getById(vm.package.contentNodeId, "Document")
+                            .then((entity) => {
+                                vm.contentNodeDisplayModel = entity;
+                            });
+                    }
+
                 }, angular.noop);
             }
 
@@ -99,14 +108,15 @@
         }
 
         function removeContentItem() {
-            vm.package.contentItem = null;
+            vm.package.contentNodeId = null;
         }
 
         function openContentPicker() {
             const contentPicker = {
                 submit: function(model) {
                     if(model.selection && model.selection.length > 0) {
-                        vm.package.contentItem = model.selection[0];
+                        vm.package.contentNodeId = model.selection[0].id.toString();
+                        vm.contentNodeDisplayModel = model.selection[0];
                     }
                     editorService.close();
                 },

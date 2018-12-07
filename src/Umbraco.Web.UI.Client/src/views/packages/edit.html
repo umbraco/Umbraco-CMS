@@ -81,12 +81,10 @@
 
                         <umb-control-group label="Content">
 
-                            <!-- TODO: This can be a single node AND child nodes selected -->
-                            <!-- TODO: This can be various specific nodes selected -->
                             <umb-node-preview
                                 ng-if="vm.package.contentNodeId"
-                                icon="vm.package.contentItem.icon"
-                                name="vm.package.contentItem.name"
+                                icon="vm.contentNodeDisplayModel.icon"
+                                name="vm.contentNodeDisplayModel.name"
                                 allow-edit="true"
                                 allow-remove="true"
                                 on-edit="vm.openContentPicker()"
