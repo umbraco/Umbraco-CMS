@@ -1,6 +1,6 @@
-<div data-element="editor-languages" ng-controller="Umbraco.Editors.Packages.EditController as vm">
+<div data-element="editor-packages" ng-controller="Umbraco.Editors.Packages.EditController as vm">
 
-    <form name="editLanguageForm" no-validate val-form-manager>
+    <form name="editPackageForm" no-validate val-form-manager>
 
         <umb-editor-view>
 
@@ -27,43 +27,67 @@
                     <div class="umb-expansion-panel__content" ng-show="vm.propertiesOpen">
 
                         <umb-control-group label="Url" required="true">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.url" required />
+                            <input class="umb-property-editor" name="url" type="text" ng-model="vm.package.url" val-server-field="model.Url" required />
+
+                            <span ng-messages="editPackageForm.url.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.url.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-control-group label="Version" required="true">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.version" required />
+                            <input class="umb-property-editor" name="version" type="text" ng-model="vm.package.version" val-server-field="model.Version" required />
+
+                            <span ng-messages="editPackageForm.version.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.version.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-control-group label="Icon URL">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.iconUrl" />
+                            <input class="umb-property-editor" name="iconUrl" type="text" ng-model="vm.package.iconUrl" />
                         </umb-control-group>
 
                         <umb-control-group label="Package File">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.packagePath" />
+                            <input class="umb-property-editor" name="packagePath" type="text" ng-model="vm.package.packagePath" />
                         </umb-control-group>
 
                         <umb-control-group label="Umbraco version">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.umbracoVersion" />
+                            <input class="umb-property-editor" name="umbracoVersion" type="text" ng-model="vm.package.umbracoVersion" val-server-field="model.umbracoVersion" />
+
+                            <span ng-messages="editPackageForm.umbracoVersion.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.umbracoVersion.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-control-group label="Author name" required="true">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.author" required />
+                            <input class="umb-property-editor" name="author" type="text" ng-model="vm.package.author" val-server-field="model.Author" required />
+
+                            <span ng-messages="editPackageForm.author.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.author.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-control-group label="Author URL" required="true">
-                            <input type="text" class="umb-property-editor" ng-model="vm.package.authorUrl" required />
+                            <input class="umb-property-editor" name="authorUrl" type="text" ng-model="vm.package.authorUrl" val-server-field="model.AuthorUrl" required />
+
+                            <span ng-messages="editPackageForm.authorUrl.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.authorUrl.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-control-group label="License">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.license" />
+                            <input class="umb-property-editor" name="license" type="text" ng-model="vm.package.license" />
                         </umb-control-group>
 
                         <umb-control-group label="License URL">
-                            <input class="umb-property-editor" type="text" ng-model="vm.package.licenseUrl" />
+                            <input class="umb-property-editor" name="licenseUrl" type="text" ng-model="vm.package.licenseUrl" />
                         </umb-control-group>
 
                         <umb-control-group label="Readme">
-                            <textarea class="umb-property-editor" rows="10" ng-model="vm.package.readme"></textarea>
+                            <textarea class="umb-property-editor" name="readme" rows="10" ng-model="vm.package.readme"></textarea>
                         </umb-control-group>
 
                     </div>
@@ -281,7 +305,7 @@
                 <umb-editor-footer-content-right>
                     <umb-button
                         type="button"
-                        action="vm.createPackage()"
+                        action="vm.createPackage(editPackageForm)"
                         state="vm.createPackageButtonState"
                         button-style="success"
                         label="Create"

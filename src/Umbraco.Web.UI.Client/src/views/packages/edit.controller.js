@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($location, $routeParams, entityResource, packageResource, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService) {
+    function EditController($scope, $location, $routeParams, entityResource, packageResource, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService, formHelper) {
 
         const vm = this;
 
@@ -91,16 +91,20 @@
             $location.path("packages/packages/overview").search('create', null);;
         }
 
-        function createPackage() {
+        function createPackage(editPackageForm) {
 
-            vm.createPackageButtonState = "busy";
+            if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
 
-            packageResource.createPackage(vm.package).then((updatedPackage) => {
-                vm.package = updatedPackage;
-                vm.createPackageButtonState = "success";
-            }, function(error){
-                vm.createPackageButtonState = "error";
-            });
+                vm.createPackageButtonState = "busy";
+
+                packageResource.createPackage(vm.package).then((updatedPackage) => {
+                    vm.package = updatedPackage;
+                    vm.createPackageButtonState = "success";
+                }, function(err){
+                    formHelper.handleError(err);
+                    vm.createPackageButtonState = "error";
+                });
+            }
         }
 
         function save() {
@@ -144,7 +148,7 @@
                             vm.package.files.push(selected);
                         });
                     }
-                    
+
                     editorService.close();
                 },
                 close: function() {
