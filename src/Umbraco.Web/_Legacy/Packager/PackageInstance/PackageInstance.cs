@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace umbraco.cms.businesslogic.packager
@@ -20,9 +21,12 @@ namespace umbraco.cms.businesslogic.packager
         public bool HasUpdate { get; set; }
 
         [DataMember(Name = "name")]
+        [Required]
         public string Name { get; set; }
 
         [DataMember(Name = "url")]
+        [Required]
+        [Url]
         public string Url { get; set; }
 
         [DataMember(Name = "folder")]
@@ -32,6 +36,7 @@ namespace umbraco.cms.businesslogic.packager
         public string PackagePath { get; set; }
 
         [DataMember(Name = "version")]
+        [Required]
         public string Version { get; set; }
 
         /// <summary>
@@ -41,9 +46,12 @@ namespace umbraco.cms.businesslogic.packager
         public Version UmbracoVersion { get; set; }
         
         [DataMember(Name = "author")]
+        [Required]
         public string Author { get; set; }
 
         [DataMember(Name = "authorUrl")]
+        [Required]
+        [Url]
         public string AuthorUrl { get; set; }
 
         [DataMember(Name = "license")]

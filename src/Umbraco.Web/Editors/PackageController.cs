@@ -24,20 +24,28 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public List<PackageInstance> GetCreatedPackages()
         {
-            //TODO: Could be too much data down the wire
             return CreatedPackage.GetAllCreatedPackages().Select(x => x.Data).ToList();
         }
 
         [HttpGet]
         public PackageInstance GetCreatedPackageById(int id)
         {
-            //TODO throw an error if cant find by ID
-            return CreatedPackage.GetById(id).Data;
+            var package = CreatedPackage.GetById(id);
+            if (package == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            
+            return package.Data;
         }
 
         [HttpPost]
         public PackageInstance PostCreatePackage(PackageInstance model)
         {
+            if (ModelState.IsValid == false)
+            {
+                //Throw/bubble up errors
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
             var newPackage = CreatedPackage.MakeNew(model.Name);
             var packageId = newPackage.Data.Id;
             var packageGuid = newPackage.Data.PackageGuid;
@@ -48,8 +56,6 @@ namespace Umbraco.Web.Editors
             newPackage.Data.Id = packageId;
             newPackage.Data.PackageGuid = packageGuid;
             
-            //TODO Validation on the model?!
-
             //Save then publish
             newPackage.Save();
             newPackage.Publish();
