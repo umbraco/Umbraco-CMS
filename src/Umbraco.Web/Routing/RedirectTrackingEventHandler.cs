@@ -196,7 +196,9 @@ namespace Umbraco.Web.Routing
                     var wk = UnwrapToKey(x);
                     if (wk == null) continue;
 
-                    OldUrls[x.Id] = Tuple.Create(wk.Key, x.Url);
+                    var oldUrl = ToRouteFormat(x.Url);
+                    if (oldUrl == null) continue;
+                    OldUrls[x.Id] = Tuple.Create(wk.Key, oldUrl);
                 }
             }
 
@@ -287,11 +289,22 @@ namespace Umbraco.Web.Routing
             if (contentCache == null) return;
 
             var newUrl = contentCache.GetById(contentId)?.Url;
+            if (newUrl == null) return;
+            newUrl = ToRouteFormat(newUrl);
             if (newUrl == null || oldUrl == newUrl) return;
             var redirectUrlService = ApplicationContext.Current.Services.RedirectUrlService;
             redirectUrlService.Register(oldUrl, contentKey);
         }
 
+        private static string ToRouteFormat(string url)
+        {
+            Uri result;
+            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out result)) return null;
+
+            var path = result.IsAbsoluteUri ? result.AbsolutePath : result.ToString();
+            return path.EnsureStartsWith('/').TrimEnd("/");
+
+        }
 
         // gets a value indicating whether server is 'replica'
         private static bool IsReplicaServer
