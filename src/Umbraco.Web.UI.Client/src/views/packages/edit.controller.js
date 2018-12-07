@@ -92,11 +92,21 @@
 
             // get all dictionary items
             dictionaryResource.getList().then(dictionaryItems => {
+                // a package stores the id as a string so we 
+                // need to convert all ids to string for comparison
+                dictionaryItems.forEach(dictionaryItem => {
+                    dictionaryItem.id = dictionaryItem.id.toString();
+                });
                 vm.dictionaryItems = dictionaryItems;
             });
 
             // get all data types items
             dataTypeResource.getAll().then(dataTypes => {
+                // a package stores the id as a string so we 
+                // need to convert all ids to string for comparison
+                dataTypes.forEach(dataType => {
+                    dataType.id = dataType.id.toString();
+                });
                 vm.dataTypes = dataTypes;
             });
 
