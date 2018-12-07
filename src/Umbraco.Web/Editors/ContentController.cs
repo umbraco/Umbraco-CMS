@@ -697,8 +697,7 @@ namespace Umbraco.Web.Editors
                         display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
                             contentItem.ReleaseDate.HasValue
-                                ? string.Format(Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText"),
-                                    $"{contentItem.ReleaseDate.Value.ToLongDateString()} {contentItem.ReleaseDate.Value.ToString("HH:mm")}")
+                                ? Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText", new [] { $"{contentItem.ReleaseDate.Value.ToLongDateString()} {contentItem.ReleaseDate.Value.ToString("HH:mm")}" })
                                 : Services.TextService.Localize("speechBubbles/editContentSavedText")
                         );
                     }
@@ -1053,8 +1052,7 @@ namespace Umbraco.Web.Editors
                     display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
                             expireDate.HasValue
-                                ? string.Format(Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText"),
-                                    $"{expireDate.Value.ToLongDateString()} {expireDate.Value.ToString("HH:mm")}")
+                                ? Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText", new [] { $"{expireDate.Value.ToLongDateString()} {expireDate.Value.ToString("HH:mm")}" })
                                 : Services.TextService.Localize("speechBubbles/editContentPublishedText")
                     );
                     break;

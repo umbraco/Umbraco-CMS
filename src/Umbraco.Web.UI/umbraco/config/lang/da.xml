@@ -1079,10 +1079,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="dictionaryItemSaved">Ordbogsnøgle gemt</key>
     <key alias="editContentPublishedHeader">Indhold publiceret</key>
     <key alias="editContentPublishedText">og nu synligt for besøgende</key>
-    <key alias="editContentPublishedWithExpireDateText">og nu synligt for besøgende indtil {0}</key>
+    <key alias="editContentPublishedWithExpireDateText">og nu synligt for besøgende indtil %0%</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
-    <key alias="editContentSavedWithReleaseDateText">Ændringerne bliver publiceret den {0}</key>
+    <key alias="editContentSavedWithReleaseDateText">Ændringerne bliver publiceret den %0%</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
     <key alias="editMediaSaved">Medie gemt</key>
