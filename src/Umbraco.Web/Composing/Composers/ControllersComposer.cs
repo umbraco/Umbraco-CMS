@@ -59,12 +59,12 @@ namespace Umbraco.Web.Composing.Composers
             composition.RegisterControllers(umbracoWebControllers);
 
             // scan and register every PluginController in everything (PluginController is IDiscoverable and IController)
-            var nonUmbracoWebPluginController = composition.TypeLoader
-                .GetTypes<PluginController>().Where(x => x.Assembly != umbracoWebAssembly)
-                .Union(composition.TypeLoader
-                    .GetTypes<RenderMvcController>().Where(x => x.Assembly != umbracoWebAssembly)
-                );
+            var nonUmbracoWebPluginController = composition.TypeLoader.GetTypes<PluginController>().Where(x => x.Assembly != umbracoWebAssembly);
             composition.RegisterControllers(nonUmbracoWebPluginController);
+
+            // can and register every IRenderMvcController in everything (IRenderMvcController is IDiscoverable)
+            var renderMvcControllers = composition.TypeLoader.GetTypes<IRenderMvcController>().Where(x => x.Assembly != umbracoWebAssembly);
+            composition.RegisterControllers(renderMvcControllers);
 
             // scan and register every IHttpController in Umbraco.Web
             var umbracoWebHttpControllers = composition.TypeLoader.GetTypes<IHttpController>(specificAssemblies: new[] { umbracoWebAssembly });

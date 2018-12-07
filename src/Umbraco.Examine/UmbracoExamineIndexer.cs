@@ -81,7 +81,7 @@ namespace Umbraco.Examine
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
 
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger);
         }
 
         private readonly bool _configBased = false;
@@ -135,7 +135,7 @@ namespace Umbraco.Examine
                     FieldDefinitionCollection.TryAdd(field.Name, field);
                 }
             }
-            
+
 
             return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
@@ -235,7 +235,7 @@ namespace Umbraco.Examine
 
             base.Initialize(name, config);
         }
-        
+
         #endregion
 
         /// <summary>

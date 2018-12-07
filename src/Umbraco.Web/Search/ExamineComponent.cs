@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Examine;
-using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Index;
 using Umbraco.Core;
@@ -23,7 +22,6 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
-using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
 
@@ -57,38 +55,29 @@ namespace Umbraco.Web.Search
         {
             base.Compose(composition);
 
-            //fixme: I cannot do this since RegisterSingleton acts like TryRegisterSingleton and only allows one
-            //composition.Container.RegisterSingleton<IIndexPopulator, MemberIndexPopulator>();
-            //composition.Container.RegisterSingleton<IIndexPopulator, ContentIndexPopulator>();
-            //composition.Container.RegisterSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
-            //composition.Container.RegisterSingleton<IIndexPopulator, MediaIndexPopulator>();
+            // populators are not a collection: once cannot remove ours, and can only add more
+            // the container can inject IEnumerable<IIndexPopulator> and get them all
+            composition.Register<IIndexPopulator, MemberIndexPopulator>(Lifetime.Singleton);
+            composition.Register<IIndexPopulator, ContentIndexPopulator>(Lifetime.Singleton);
+            composition.Register<IIndexPopulator, PublishedContentIndexPopulator>(Lifetime.Singleton);
+            composition.Register<IIndexPopulator, MediaIndexPopulator>(Lifetime.Singleton);
 
-            // fixme -- CHANGE THIS WHEN THE DI PR IS MERGED
-            //fixme: Instead i have to do this, but this means that developers adding their own will also need to do this which isn't ideal
-            composition.Container.RegisterMany<IIndexPopulator, PerContainerLifetime>(new[]
-            {
-                typeof(MemberIndexPopulator),
-                typeof(ContentIndexPopulator),
-                typeof(PublishedContentIndexPopulator),
-                typeof(MediaIndexPopulator),
-            });
-
-            composition.Container.RegisterSingleton<IndexRebuilder>();
-            composition.Container.RegisterSingleton<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
-            composition.Container.Register<IPublishedContentValueSetBuilder, PerContainerLifetime>(factory =>
+            composition.Register<IndexRebuilder>(Lifetime.Singleton);
+            composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
+            composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
                     factory.GetInstance<IUserService>(),
                     true));
-            composition.Container.Register<IContentValueSetBuilder, PerContainerLifetime>(factory =>
+            composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
                     factory.GetInstance<IUserService>(),
                     false));
-            composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
-            composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+            composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
+            composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         }
 
         internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
@@ -135,7 +124,7 @@ namespace Umbraco.Web.Search
                 profilingLogger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-                Suspendable.ExamineEvents.SuspendIndexers(profilingLogger.Logger);
+                Suspendable.ExamineEvents.SuspendIndexers(profilingLogger);
                 _disableExamineIndexing = true;
                 return; //exit, do not continue
             }

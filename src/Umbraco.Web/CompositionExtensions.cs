@@ -113,16 +113,6 @@ namespace Umbraco.Core.Components
         }
 
         /// <summary>
-        /// Sets the type of the default rendering controller.
-        /// </summary>
-        /// <typeparam name="T">The type of the default rendering controller.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetDefaultRenderMvcControllerType<T>(this Composition composition)
-        {
-            Current.DefaultRenderMvcControllerType = typeof(T);
-        }
-
-        /// <summary>
         /// Sets the published snapshot service.
         /// </summary>
         /// <typeparam name="T">The type of the published snapshot service.</typeparam>
@@ -203,7 +193,8 @@ namespace Umbraco.Core.Components
         {
             composition.OnCreatingFactory["Umbraco.Core.DefaultRenderMvcController"] = () =>
             {
-                composition.Register(controllerType, Lifetime.Request);
+                // no need to register: all IRenderMvcController are registered
+                //composition.Register(controllerType, Lifetime.Request);
                 Current.DefaultRenderMvcControllerType = controllerType;
             };
         }
