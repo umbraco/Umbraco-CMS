@@ -1908,6 +1908,10 @@ namespace Umbraco.Web.Editors
                 {
                     case PublishResultType.SuccessPublishAlready:
                         {
+                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
+                            // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
+
                             //special case, we will only show messages for this if:
                             // * it's not a bulk publish operation
                             // * it's a bulk publish operation and all successful statuses are this one
@@ -1935,6 +1939,10 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.SuccessPublish:
                         {
+                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
+                            // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
+
                             var itemCount = status.Count();
                             if (successfulCultures == null)
                             {

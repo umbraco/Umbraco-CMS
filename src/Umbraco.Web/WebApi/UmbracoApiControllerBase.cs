@@ -114,7 +114,7 @@ namespace Umbraco.Web.WebApi
         /// Gets the Umbraco helper.
         /// </summary>
         public UmbracoHelper Umbraco => _umbracoHelper
-            ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services, ApplicationCache));
+            ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
 
         /// <summary>
         /// Gets the web security helper.

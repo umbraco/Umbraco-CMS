@@ -133,10 +133,10 @@ namespace Umbraco.Web.Trees
                 : null;
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
             var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound, filter: query);
-            return Mapper.Map<IEnumerable<SearchResultItem>>(results);
+            return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
         }
     }
 }

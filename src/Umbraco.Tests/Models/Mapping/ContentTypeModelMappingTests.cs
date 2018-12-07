@@ -425,7 +425,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             MockedContentTypes.EnsureAllIds(contentType, 8888);
 
             //Act

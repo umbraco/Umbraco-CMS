@@ -75,7 +75,7 @@ namespace Umbraco.Web.Mvc
             get
             {
                 return _umbracoHelper
-                    ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services, ApplicationCache));
+                    ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
             }
             internal set // tests
             {

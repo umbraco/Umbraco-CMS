@@ -62,7 +62,7 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.0-beta025" />
+    <PackageReference Include="Examine" Version="1.0.0-beta046" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
     <PackageReference Include="ImageProcessor">
       <Version>2.6.2.25</Version>
@@ -154,6 +154,8 @@
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\ContentEditing\RollbackVersion.cs" />
+    <Compile Include="Models\ContentEditing\SearchResult.cs" />
+    <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
@@ -162,6 +164,10 @@
     <Compile Include="ContentApps\ContentInfoContentAppDefinition.cs" />
     <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
+    <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
+    <Compile Include="Search\GenericIndexDiagnostics.cs" />
+    <Compile Include="Search\IUmbracoIndexesCreator.cs" />
+    <Compile Include="Search\UmbracoIndexesCreator.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
@@ -218,7 +224,6 @@
     <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\Filters\UserGroupValidateAttribute.cs" />
     <Compile Include="Editors\UsersController.cs" />
-    <Compile Include="ExamineStartup.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
     <Compile Include="Features\UmbracoFeatures.cs" />
@@ -275,7 +280,6 @@
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
-    <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="Models\BackOfficeTour.cs" />
     <Compile Include="Models\BackOfficeTourFile.cs" />
     <Compile Include="Models\BackOfficeTourStep.cs" />
@@ -475,7 +479,6 @@
     <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\SafeXmlReaderWriter.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheComponent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
@@ -946,7 +949,7 @@
     <Compile Include="Models\Trees\MenuItem.cs" />
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
-    <Compile Include="Models\ContentEditing\SearchResultItem.cs" />
+    <Compile Include="Models\ContentEditing\SearchResultEntity.cs" />
     <Compile Include="Models\Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />
@@ -995,8 +998,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\UmbracoContextCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
-    <Compile Include="Search\ExamineIndexerModel.cs" />
-    <Compile Include="Search\LuceneIndexerExtensions.cs" />
+    <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
@@ -1242,12 +1244,6 @@
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
-      <DependentUpon>EditRelationType.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.designer.cs">
-      <DependentUpon>EditRelationType.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1326,9 +1322,6 @@
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

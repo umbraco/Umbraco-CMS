@@ -88,10 +88,9 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
-    <PackageReference Include="Examine" Version="1.0.0-beta025" />
+    <PackageReference Include="Examine" Version="1.0.0-beta046" />
     <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
-    <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
@@ -194,8 +193,6 @@
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
-    <Content Include="App_Plugins\Test\two.html" />
-    <Content Include="App_Plugins\Test\one.html" />
     <Content Include="Config\grid.editors.config.js" />
     <Content Include="Config\Lang\cs-CZ.user.xml" />
     <Content Include="Config\Lang\da-DK.user.xml" />
@@ -233,7 +230,7 @@
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
-    <Content Include="App_Plugins\Test\package.manifest" />
+    <Content Include=".eslintignore" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -455,7 +452,10 @@
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>    
+	<WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+	<!-- Temporary addition for the VS2019 preview - can be removed when VS2019 final is released, then v16 above will be used -->
+	<WebPublishingTasks Condition="exists('$(ProgramFiles32)\Microsoft Visual Studio\2019\Preview\MSBuild\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(ProgramFiles32)\Microsoft Visual Studio\2019\Preview\MSBuild\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
   <!-- get TransformXml task from WebPublishingtasks -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />

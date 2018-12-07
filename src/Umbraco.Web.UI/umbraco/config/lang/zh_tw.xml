@@ -1199,9 +1199,6 @@
     <key alias="configurationServiceFileNotFound">檔案不存在：%0%。</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[於設定檔<strong>'%1%'</strong>中無法找到<strong>'%0%'</strong>。]]></key>
     <key alias="configurationServiceError">有錯誤產生，請參閱下列錯誤的紀錄：%0%。</key>
-    <key alias="xmlDataIntegrityCheckMembers">成員 - 所有XML：%0%，總共：%1%，不合格：%2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">媒體 - 所有XML：%0%，總共發佈：%1%，不合格：%2%</key>
-    <key alias="xmlDataIntegrityCheckContent">內容 - 所有XML：%0%，總共發佈：%1%，不合格：%2%</key>
     <key alias="httpsCheckInvalidCertificate">憑證驗證錯誤：%0%</key>
     <key alias="healthCheckInvalidUrl">網址探查錯誤：%0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">您目前使用HTTPS瀏覽本站：%0%</key>

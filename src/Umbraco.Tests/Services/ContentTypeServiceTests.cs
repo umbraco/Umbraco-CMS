@@ -612,7 +612,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Deleting_PropertyType_Removes_The_Property_From_Content()
         {
-            IContentType contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            IContentType contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent contentItem = MockedContent.CreateTextpageContent(contentType1, "Testing", -1);
@@ -634,11 +634,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Rebuild_Content_Xml_On_Alias_Change()
         {
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            var contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
 
-            var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "Test2");
+            var contentType2 = MockedContentTypes.CreateTextPageContentType("test2", "Test2");
             ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType2);
 
@@ -702,7 +702,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Rebuild_Content_Xml_On_Property_Removal()
         {
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            var contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();

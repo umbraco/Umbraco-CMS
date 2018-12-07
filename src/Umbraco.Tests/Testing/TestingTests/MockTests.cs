@@ -64,12 +64,10 @@ namespace Umbraco.Tests.Testing.TestingTests
                 Mock.Of<IPublishedContent>(),
                 Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<IDataTypeService>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>()),
-                new ServiceContext(),
-                CacheHelper.Disabled);
+                new ServiceContext());
             Assert.Pass();
         }
 

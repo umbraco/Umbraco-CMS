@@ -14,14 +14,14 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+            : this(Current.UmbracoContext, Current.Services)
         { }
 
-        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            Umbraco = new UmbracoHelper(umbracoContext, services);
 
             // fixme inject somehow
             Logger = Current.Logger;

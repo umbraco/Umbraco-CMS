@@ -964,7 +964,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ServiceContext.ContentTypeService.Save(simpleContentType);
 
             //Create and Save ContentType "textPage" -> (NodeDto.NodeIdSeed + 1)
-            ContentType textpageContentType = MockedContentTypes.CreateTextpageContentType();
+            ContentType textpageContentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.ContentTypeService.Save(textpageContentType);
         }
     }

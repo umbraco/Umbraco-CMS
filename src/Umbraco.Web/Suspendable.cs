@@ -1,6 +1,7 @@
 ﻿using System;
 using Examine;
 using Examine.Providers;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
@@ -63,25 +64,23 @@ namespace Umbraco.Web
                 }
             }
 
-            public static void SuspendIndexers()
+            public static void SuspendIndexers(ILogger logger)
             {
-                Current.Logger.Info(typeof (ExamineEvents), "Suspend indexers.");
+                logger.Info(typeof (ExamineEvents), "Suspend indexers.");
                 _suspended = true;
             }
 
-            public static void ResumeIndexers()
+            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger)
             {
                 _suspended = false;
 
-                Current.Logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
+                logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
 
-                // fixme - could we fork this on a background thread?
                 //TODO: when resuming do we always want a full rebuild of all indexes?
-                // fixme - can we inject IExamineManager somehow?
-                ExamineComponent.RebuildIndexes(false, ExamineManager.Instance, Current.Logger);
+                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false);
             }
         }
 

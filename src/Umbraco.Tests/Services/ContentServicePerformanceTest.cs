@@ -67,9 +67,9 @@ namespace Umbraco.Tests.Services
             // ... NOPE, made even more nice changes, it is now...
             // 4452ms !!!!!!!
 
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");
-            var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "test2");
-            var contentType3 = MockedContentTypes.CreateTextpageContentType("test3", "test3");
+            var contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "test1");
+            var contentType2 = MockedContentTypes.CreateTextPageContentType("test2", "test2");
+            var contentType3 = MockedContentTypes.CreateTextPageContentType("test3", "test3");
             ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
             contentType1.AllowedContentTypes = new[]
             {
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Services
         public void CreateTestData()
         {
             //Create and Save ContentType "textpage" -> NodeDto.NodeIdSeed
-            ContentType contentType = MockedContentTypes.CreateTextpageContentType();
+            ContentType contentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.ContentTypeService.Save(contentType);
         }
     }

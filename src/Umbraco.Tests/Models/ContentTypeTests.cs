@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone_Content_Type_With_Reset_Identities()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
 
             var i = 200;
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Models
         public void Can_Deep_Clone_Content_Type_Perf_Test()
         {
             // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
 
             var i = 200;
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Models
         public void Can_Deep_Clone_Content_Type()
         {
             // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
 
             var i = 200;
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Models
             var ss = new SerializationService(new JsonNetSerializer());
 
             // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
 
             var i = 200;

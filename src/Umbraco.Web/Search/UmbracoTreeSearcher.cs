@@ -11,15 +11,28 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Trees;
+using SearchResult = Examine.SearchResult;
 
 namespace Umbraco.Web.Search
 {
-    internal class UmbracoTreeSearcher
+    /// <summary>
+    /// Used for internal Umbraco implementations of <see cref="ISearchableTree"/>
+    /// </summary>
+    public class UmbracoTreeSearcher
     {
+        private readonly IExamineManager _examineManager;
+        private readonly UmbracoHelper _umbracoHelper;
+
+        public UmbracoTreeSearcher(IExamineManager examineManager, UmbracoHelper umbracoHelper)
+        {
+            _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
+            _umbracoHelper = umbracoHelper ?? throw new ArgumentNullException(nameof(umbracoHelper));
+        }
+
         /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
-        /// <param name="umbracoHelper"></param>
         /// <param name="query"></param>
         /// <param name="entityType"></param>
         /// <param name="totalFound"></param>
@@ -29,8 +42,7 @@ namespace Umbraco.Web.Search
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        public IEnumerable<SearchResultItem> ExamineSearch(
-            UmbracoHelper umbracoHelper,
+        public IEnumerable<SearchResultEntity> ExamineSearch(
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
@@ -39,16 +51,16 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var indexer = Constants.Examine.InternalIndexer;
+            var indexName = Constants.Examine.InternalIndexer;
             var fields = new[] { "id", "__NodeId" };
 
-            var umbracoContext = umbracoHelper.UmbracoContext;
+            var umbracoContext = _umbracoHelper.UmbracoContext;
 
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    indexer = Constants.Examine.InternalMemberIndexer;
+                    indexName = Constants.Examine.InternalMemberIndexer;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -72,7 +84,10 @@ namespace Umbraco.Web.Search
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
 
-            var internalSearcher = ExamineManager.Instance.GetSearcher(indexer);
+            if (!_examineManager.TryGetIndex(indexName, out var index))
+                throw new InvalidOperationException("No index found by name " + indexName);
+
+            var internalSearcher = index.GetSearcher();
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
@@ -95,7 +110,7 @@ namespace Umbraco.Web.Search
                 if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
                 {
                     totalFound = 0;
-                    return new List<SearchResultItem>();
+                    return new List<SearchResultEntity>();
                 }
 
                 //update the query with the query term
@@ -129,7 +144,7 @@ namespace Umbraco.Web.Search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
                 {
                     totalFound = 0;
-                    return new List<SearchResultItem>();
+                    return new List<SearchResultEntity>();
                 }
 
                 //update the query with the query term
@@ -197,7 +212,7 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     return MediaFromSearchResults(pagedResult);
                 case UmbracoEntityTypes.Document:
-                    return ContentFromSearchResults(umbracoHelper, pagedResult);
+                    return ContentFromSearchResults(pagedResult);
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
@@ -205,15 +220,13 @@ namespace Umbraco.Web.Search
 
         private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, IEntityService entityService)
         {
-            if (sb == null) throw new ArgumentNullException("sb");
-            if (entityService == null) throw new ArgumentNullException("entityService");
+            if (sb == null) throw new ArgumentNullException(nameof(sb));
+            if (entityService == null) throw new ArgumentNullException(nameof(entityService));
 
-            Udi udi;
-            Udi.TryParse(searchFrom, true, out udi);
+            Udi.TryParse(searchFrom, true, out var udi);
             searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
 
-            int searchFromId;
-            var entityPath = int.TryParse(searchFrom, out searchFromId) && searchFromId > 0
+            var entityPath = int.TryParse(searchFrom, out var searchFromId) && searchFromId > 0
                 ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
                 : null;
             if (entityPath != null)
@@ -265,9 +278,9 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> MemberFromSearchResults(SearchResult[] results)
+        private IEnumerable<SearchResultEntity> MemberFromSearchResults(ISearchResult[] results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultItem>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
@@ -278,14 +291,13 @@ namespace Umbraco.Web.Search
                 }
 
                 var searchResult = results.First(x => x.Id == m.Id.ToString());
-                if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
+                if (searchResult.Values.ContainsKey("email") && searchResult.Values["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Fields["email"];
+                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Values["email"];
                 }
-                if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
+                if (searchResult.Values.ContainsKey("__key") && searchResult.Values["__key"] != null)
                 {
-                    Guid key;
-                    if (Guid.TryParse(searchResult.Fields["__key"], out key))
+                    if (Guid.TryParse(searchResult.Values["__key"], out var key))
                     {
                         m.Key = key;
                     }
@@ -299,9 +311,9 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> MediaFromSearchResults(IEnumerable<SearchResult> results)
+        private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultItem>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
@@ -317,19 +329,18 @@ namespace Umbraco.Web.Search
         /// <summary>
         /// Returns a collection of entities for content based on search results
         /// </summary>
-        /// <param name="umbracoHelper"></param>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ContentFromSearchResults(UmbracoHelper umbracoHelper, IEnumerable<SearchResult> results)
+        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultItem>>(results).ToArray();
+            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
             foreach (var m in mapped)
             {
                 var intId = m.Id.TryConvertTo<int>();
                 if (intId.Success)
                 {
-                    m.AdditionalData["Url"] = umbracoHelper.Url(intId.Result);
+                    m.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result);
                 }
             }
             return mapped;

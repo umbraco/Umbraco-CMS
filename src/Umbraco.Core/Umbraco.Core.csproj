@@ -321,6 +321,7 @@
     <Compile Include="Constants-PropertyTypeGroups.cs" />
     <Compile Include="Constants-Security.cs" />
     <Compile Include="Constants-System.cs" />
+    <Compile Include="Constants-Indexes.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
@@ -453,6 +454,7 @@
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DefaultPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
     <Compile Include="PropertyEditors\IConfigurationEditor.cs" />
@@ -461,6 +463,7 @@
     <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
     <Compile Include="PropertyEditors\IManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IValueFormatValidator.cs" />
+    <Compile Include="PropertyEditors\IPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\IValueRequiredValidator.cs" />
     <Compile Include="PropertyEditors\LabelConfiguration.cs" />
     <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />

@@ -3,7 +3,7 @@
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "searchResult", Namespace = "")]
-    public class SearchResultItem : EntityBasic
+    public class SearchResultEntity : EntityBasic
     {
         /// <summary>
         /// The score of the search result
