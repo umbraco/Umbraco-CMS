@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,7 +8,6 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using System.Web.Http.ValueProviders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -23,16 +21,11 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebServices;
-
 using Constants = Umbraco.Core.Constants;
-using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
@@ -55,16 +48,13 @@ namespace Umbraco.Web.Editors
     [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
 
         public object Domains { get; private set; }
 
-        public ContentController(IPublishedSnapshotService publishedSnapshotService, PropertyEditorCollection propertyEditors)
+        public ContentController(PropertyEditorCollection propertyEditors)
         {
-            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
-            _publishedSnapshotService = publishedSnapshotService;
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
         }
@@ -352,7 +342,7 @@ namespace Umbraco.Web.Editors
         /// Gets an empty content item for the
         /// </summary>
         /// <param name="contentTypeAlias"></param>
-        /// <param name="parentId"></param>        
+        /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
@@ -1083,7 +1073,7 @@ namespace Umbraco.Web.Editors
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);
-                    }   
+                    }
                 }
             }
             noAccess = denied;
@@ -1241,11 +1231,11 @@ namespace Umbraco.Web.Editors
                 //Check if a mandatory language is missing from being published
 
                 var mandatoryVariant = cultureVariants.First(x => x.Culture.InvariantEquals(culture));
-                
+
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
                 result.Add((mandatoryVariant, isPublished));
 
-                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant); 
+                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant);
 
                 if (isPublished || isPublishing) continue;
 
@@ -1880,7 +1870,7 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.SuccessPublish:
                     case PublishResultType.SuccessPublishCulture:
                         //these 2 belong to a single group
-                        return PublishResultType.SuccessPublish;                    
+                        return PublishResultType.SuccessPublish;
                     case PublishResultType.FailedPublishAwaitingRelease:
                     case PublishResultType.FailedPublishCultureAwaitingRelease:
                         //these 2 belong to a single group
@@ -1903,7 +1893,7 @@ namespace Umbraco.Web.Editors
             });
 
             foreach (var status in statusGroup)
-            {   
+            {
                 switch (status.Key)
                 {
                     case PublishResultType.SuccessPublishAlready:
