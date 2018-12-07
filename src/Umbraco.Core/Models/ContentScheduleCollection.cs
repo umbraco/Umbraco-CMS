@@ -169,6 +169,7 @@ namespace Umbraco.Core.Models
         /// Gets the schedule for a culture
         /// </summary>
         /// <param name="culture"></param>
+        /// <param name="action"></param>
         /// <returns></returns>
         public IEnumerable<ContentSchedule> GetSchedule(string culture, ContentScheduleAction? action = null)
         {

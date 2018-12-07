@@ -122,13 +122,15 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 
-            composition.Container.RegisterSingleton<DashboardHelper>();
+            composition.Container.RegisterSingleton<Dashboards>();
 
             composition.Container.RegisterUmbracoControllers(typeLoader, GetType().Assembly);
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
 
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
+
+            composition.Container.Register<UmbracoTreeSearcher>(new PerRequestLifeTime());
 
             composition.Container.RegisterCollectionBuilder<EditorValidatorCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<IEditorValidator>());

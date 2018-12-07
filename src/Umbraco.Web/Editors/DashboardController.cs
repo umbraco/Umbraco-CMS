@@ -25,11 +25,11 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
-        private readonly DashboardHelper _dashboardHelper;
+        private readonly Dashboards _dashboards;
 
-        public DashboardController(DashboardHelper dashboardHelper)
+        public DashboardController(Dashboards dashboards)
         {
-            _dashboardHelper = dashboardHelper;
+            _dashboards = dashboards;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
-            return _dashboardHelper.GetDashboard(section, Security.CurrentUser);
+            return _dashboards.GetDashboards(section, Security.CurrentUser);
         }
     }
 }

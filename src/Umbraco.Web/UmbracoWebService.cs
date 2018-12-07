@@ -24,7 +24,7 @@ namespace Umbraco.Web
         protected UmbracoWebService()
         {
             UmbracoContext = Current.UmbracoContext;
-            Umbraco = new UmbracoHelper(UmbracoContext, Current.Services, Current.ApplicationCache);
+            Umbraco = new UmbracoHelper(UmbracoContext, Current.Services);
 
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
