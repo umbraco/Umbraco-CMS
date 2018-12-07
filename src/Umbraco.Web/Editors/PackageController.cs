@@ -38,10 +38,16 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstance PostCreatePackage(PackageInstance model)
         {
-
             var newPackage = CreatedPackage.MakeNew(model.Name);
-            newPackage.Data = model;
+            var packageId = newPackage.Data.Id;
+            var packageGuid = newPackage.Data.PackageGuid;
 
+            //Need to reset the package ID - as the posted model the package ID is always 0
+            //MakeNew will init create the XML & update the file and give us an ID to use
+            newPackage.Data = model;
+            newPackage.Data.Id = packageId;
+            newPackage.Data.PackageGuid = packageGuid;
+            
             //TODO Validation on the model?!
 
             //Save then publish
