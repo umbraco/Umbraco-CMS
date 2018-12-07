@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
             var name = foundType != null ? foundType.Name : listName;
 
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
 
             var display = new MemberListDisplay

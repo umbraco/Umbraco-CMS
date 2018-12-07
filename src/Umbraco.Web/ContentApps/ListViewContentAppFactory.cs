@@ -9,7 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.ContentApps
 {
-    internal class ListViewContentAppDefinition : IContentAppDefinition
+    internal class ListViewContentAppFactory : IContentAppFactory
     {
         // see note on ContentApp
         private const int Weight = -666;
@@ -17,7 +17,7 @@ namespace Umbraco.Web.ContentApps
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
 
-        public ListViewContentAppDefinition(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditors)
+        public ListViewContentAppFactory(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditors)
         {
             _dataTypeService = dataTypeService;
             _propertyEditors = propertyEditors;

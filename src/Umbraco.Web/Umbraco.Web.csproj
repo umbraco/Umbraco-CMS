@@ -110,6 +110,7 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
@@ -155,11 +156,10 @@
     <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
-    <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
-    <Compile Include="ContentApps\ContentAppDefinitionCollectionBuilder.cs" />
-    <Compile Include="ContentApps\ContentEditorContentAppDefinition.cs" />
-    <Compile Include="ContentApps\ContentInfoContentAppDefinition.cs" />
-    <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
+    <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
     <Compile Include="Search\GenericIndexDiagnostics.cs" />

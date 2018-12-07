@@ -99,7 +99,7 @@ namespace Umbraco.Web.Editors
         public MediaItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
             apps[0].Active = true;
             var display = new MediaItemDisplay
             {
