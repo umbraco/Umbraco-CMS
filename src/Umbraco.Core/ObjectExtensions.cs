@@ -723,8 +723,8 @@ namespace Umbraco.Core
             {
                 return typeConverter;
             }
-
-            TypeConverter converter = TypeDescriptor.GetConverter(target);
+            
+            var converter = TypeDescriptor.GetConverter(target);
             if (converter.CanConvertFrom(source))
             {
                 return DestinationTypeConverterCache[key] = converter;

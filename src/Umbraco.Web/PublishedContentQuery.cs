@@ -187,42 +187,43 @@ namespace Umbraco.Web
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
         {
-            //TODO: Can we inject IExamineManager?
+            //fixme: inject IExamineManager
 
-            var indexer = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetIndexer(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetIndexer(indexName);
+            indexName = string.IsNullOrEmpty(indexName)
+                ? Constants.Examine.ExternalIndexer
+                : indexName;
 
-            if (indexer == null) throw new InvalidOperationException("No index found by name " + indexName);
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
+                throw new InvalidOperationException($"No index found by name {indexName}");
 
-            var searcher = indexer.GetSearcher();
+            var searcher = index.GetSearcher();
 
-            if (skip == 0 && take == 0)
-            {
-                var results = searcher.Search(term, useWildCards);
-                totalRecords = results.TotalItemCount;
-                return results.ToPublishedSearchResults(_contentCache);
-            }
+            var results = skip == 0 && take == 0
+                ? searcher.Search(term, true)
+                : searcher.Search(term, true, maxResults: skip + take);
 
-            var criteria = SearchAllFields(term, useWildCards, searcher, indexer);
-            return Search(skip, take, out totalRecords, criteria, searcher);
+            totalRecords = results.TotalItemCount;
+            return results.ToPublishedSearchResults(_contentCache);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, ISearcher searchProvider = null)
         {
             return Search(0, 0, out _, criteria, searchProvider);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
         {
-
-            //TODO: Can we inject IExamineManager?
-
-            var searcher = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
+            //fixme: inject IExamineManager
+            if (searcher == null)
+            {
+                if (!ExamineManager.Instance.TryGetIndex(Constants.Examine.ExternalIndexer, out var index))
+                    throw new InvalidOperationException($"No index found by name {Constants.Examine.ExternalIndexer}");
+                searcher = index.GetSearcher();
+            }
 
             var results = skip == 0 && take == 0
                 ? searcher.Search(criteria)
@@ -231,28 +232,6 @@ namespace Umbraco.Web
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
-
-        /// <summary>
-        /// Creates an ISearchCriteria for searching all fields in a <see cref="BaseLuceneSearcher"/>.
-        /// </summary>
-        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, Examine.ISearcher searcher, Examine.IIndexer indexer)
-        {
-            var sc = searcher.CreateCriteria();
-
-            //if we're dealing with a lucene searcher, we can get all of it's indexed fields,
-            //else we can get the defined fields for the index. 
-            var searchFields = (searcher is BaseLuceneSearcher luceneSearcher)
-                ? luceneSearcher.GetAllIndexedFields()
-                : indexer.FieldDefinitionCollection.Keys;
-
-            //this is what Examine does internally to create ISearchCriteria for searching all fields
-            var strArray = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            sc = useWildcards == false
-                ? sc.GroupedOr(searchFields, strArray).Compile()
-                : sc.GroupedOr(searchFields, strArray.Select(x => (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray()).Compile();
-            return sc;
-        }        
 
 
         #endregion

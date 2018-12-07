@@ -16,10 +16,10 @@ namespace Umbraco.Web.UI.Controls
     {
         private UrlHelper _url;
 
-        protected UmbracoControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        protected UmbracoControl(UmbracoContext umbracoContext, ServiceContext services)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            Umbraco = new UmbracoHelper(umbracoContext, services);
 
             // fixme inject somehow
             Logger = Current.Logger;
@@ -31,7 +31,7 @@ namespace Umbraco.Web.UI.Controls
         /// Empty constructor, uses Singleton to resolve the UmbracoContext.
         /// </summary>
         protected UmbracoControl()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+            : this(Current.UmbracoContext, Current.Services)
         { }
 
         /// <summary>

@@ -30,13 +30,11 @@ namespace Umbraco.Web
         private readonly IPublishedContent _currentPage;
         private readonly IPublishedContentQuery _iQuery;
         private readonly ServiceContext _services;
-        private readonly CacheHelper _appCache;
-
+        
         private IUmbracoComponentRenderer _componentRenderer;
         private IPublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
         private ITagQuery _tag;
-        private IDataTypeService _dataTypeService;
         private ICultureDictionary _cultureDictionary;
 
         #region Constructors
@@ -48,34 +46,21 @@ namespace Umbraco.Web
         internal UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
             IPublishedContentQuery query,
             ITagQuery tagQuery,
-            IDataTypeService dataTypeService,
             ICultureDictionary cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
             MembershipHelper membershipHelper,
-            ServiceContext services,
-            CacheHelper appCache)
+            ServiceContext services)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            if (query == null) throw new ArgumentNullException(nameof(query));
             if (tagQuery == null) throw new ArgumentNullException(nameof(tagQuery));
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-            if (cultureDictionary == null) throw new ArgumentNullException(nameof(cultureDictionary));
-            if (componentRenderer == null) throw new ArgumentNullException(nameof(componentRenderer));
-            if (membershipHelper == null) throw new ArgumentNullException(nameof(membershipHelper));
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (appCache == null) throw new ArgumentNullException(nameof(appCache));
 
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _tag = tagQuery;
-            _dataTypeService = dataTypeService;
-            _cultureDictionary = cultureDictionary;
-            _componentRenderer = componentRenderer;
-            _membershipHelper = membershipHelper;
-            _currentPage = content;
-            _iQuery = query;
-            _services = services;
-            _appCache = appCache;
+            _cultureDictionary = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
+            _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
+            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
+            _currentPage = content ?? throw new ArgumentNullException(nameof(content));
+            _iQuery = query ?? throw new ArgumentNullException(nameof(query));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
         /// <summary>
@@ -93,13 +78,11 @@ namespace Umbraco.Web
         /// <param name="umbracoContext">An Umbraco context.</param>
         /// <param name="content">A content item.</param>
         /// <param name="services">A services context.</param>
-        /// <param name="appCache">An application cache helper.</param>
         /// <remarks>Sets the current page to the supplied content item.</remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache, IPublishedContent content)
-            : this(umbracoContext, services, appCache)
+        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, IPublishedContent content)
+            : this(umbracoContext, services)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            _currentPage = content;
+            _currentPage = content ?? throw new ArgumentNullException(nameof(content));
         }
 
         /// <summary>
@@ -107,19 +90,13 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="umbracoContext">An Umbraco context.</param>
         /// <param name="services">A services context.</param>
-        /// <param name="appCache">An application cache helper.</param>
         /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (appCache == null) throw new ArgumentNullException(nameof(appCache));
-
-            _umbracoContext = umbracoContext;
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             if (_umbracoContext.IsFrontEndUmbracoRequest)
                 _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
-            _services = services;
-            _appCache = appCache;
         }
 
         #endregion
@@ -159,12 +136,6 @@ namespace Umbraco.Web
         /// Gets the url provider.
         /// </summary>
         public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
-
-        /// <summary>
-        /// Gets the datatype service.
-        /// </summary>
-        private IDataTypeService DataTypeService => _dataTypeService
-            ?? (_dataTypeService = _services.DataTypeService);
 
         /// <summary>
         /// Gets the component renderer.
@@ -817,11 +788,11 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="term"></param>
         /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
+        /// <param name="indexName"></param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
         {
-            return ContentQuery.Search(term, useWildCards, searchProvider);
+            return ContentQuery.Search(term, useWildCards, indexName);
         }
 
         /// <summary>
@@ -832,11 +803,11 @@ namespace Umbraco.Web
         /// <param name="totalRecords"></param>
         /// <param name="term"></param>
         /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
+        /// <param name="indexName"></param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
         {
-            return ContentQuery.Search(skip, take, out totalRecords, term, useWildCards, searchProvider);
+            return ContentQuery.Search(skip, take, out totalRecords, term, useWildCards, indexName);
         }
 
         /// <summary>
@@ -848,7 +819,7 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
             return ContentQuery.Search(skip, take, out totalRecords, criteria, searchProvider);
         }
