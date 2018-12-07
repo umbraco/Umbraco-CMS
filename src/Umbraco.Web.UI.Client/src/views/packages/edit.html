@@ -174,13 +174,12 @@
                         </umb-control-group>
 
                         <umb-control-group label="Languages">
-                                <pre>{{vm.languages | json }}</pre>
                             <div ng-repeat="language in vm.languages">
                                 <label>
                                     <input
                                         type="checkbox"
                                         checklist-model="vm.package.languages"
-                                        checklist-value="stylesheet.id" />
+                                        checklist-value="language.id" />
                                     {{language.name}}
                                 </label>
                             </div>

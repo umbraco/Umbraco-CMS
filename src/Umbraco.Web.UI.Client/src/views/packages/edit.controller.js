@@ -82,6 +82,11 @@
 
             // get all languages
             languageResource.getAll().then(languages => {
+                // a package stores the id as a string so we 
+                // need to convert all ids to string for comparison
+                languages.forEach(language => {
+                    language.id = language.id.toString();
+                });
                 vm.languages = languages;
             });
 
