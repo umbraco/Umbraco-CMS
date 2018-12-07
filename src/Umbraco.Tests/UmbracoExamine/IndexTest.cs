@@ -187,21 +187,21 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
         {
+            // create a validator with
+            // publishedValuesOnly false
+            // parentId 1116 (only content under that parent will be indexed)
+            var validator = new ContentValueSetValidator(false, 1116);
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-                //make parent id 1116
-                validator: new ContentValueSetValidator(false, 1116)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, validator: validator))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
 
                 //get a node from the data repo (this one exists underneath 2222)
                 var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
-                                        .Root
-                                        .Elements()
-                                        .Where(x => (int)x.Attribute("id") == 2112)
-                                        .First();
+                                        .Root.Elements()
+                                        .First(x => (int) x.Attribute("id") == 2112);
 
                 var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
@@ -230,28 +230,27 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Move_Media_To_Non_Indexable_ParentID()
         {
+            // create a validator with
+            // publishedValuesOnly false
+            // parentId 2222 (only content under that parent will be indexed)
+            var validator = new ContentValueSetValidator(false, 2222);
+
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-                //make parent id 2222
-                validator: new ContentValueSetValidator(false, 2222)))
+            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, validator: validator))
             using (indexer1.ProcessNonAsync())
             {
                 var searcher = indexer1.GetSearcher();
 
                 //get a node from the data repo (this one exists underneath 2222)
                 var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
-                                    .Root
-                                    .Elements()
-                                    .Where(x => (int)x.Attribute("id") == 2112)
-                                    .First();
+                                    .Root.Elements()
+                                    .First(x => (int) x.Attribute("id") == 2112);
 
                 var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
 
                 //ensure it's indexed
                 indexer1.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
-
-
 
                 //it will exist because it exists under 2222
                 var results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
@@ -263,8 +262,6 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //now reindex the node, this should first delete it and then NOT add it because of the parent id constraint
                 indexer1.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
-
-
 
                 //now ensure it's deleted
                 results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
