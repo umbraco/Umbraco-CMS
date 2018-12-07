@@ -1396,10 +1396,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
         <key alias="editContentPublishedHeader">Content published</key>
         <key alias="editContentPublishedText">and visible on the website</key>
-        <key alias="editContentPublishedWithExpireDateText">and visible on the website until {0}</key>
+        <key alias="editContentPublishedWithExpireDateText">and visible on the website until %0% at %1%</key>
         <key alias="editContentSavedHeader">Content saved</key>
         <key alias="editContentSavedText">Remember to publish to make changes visible</key>
-        <key alias="editContentSavedWithReleaseDateText">Changes will be published on {0}</key>
+        <key alias="editContentSavedWithReleaseDateText">Changes will be published on %0% at %1%</key>
         <key alias="editContentSendToPublish">Sent For Approval</key>
         <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
         <key alias="editMediaSaved">Media saved</key>
