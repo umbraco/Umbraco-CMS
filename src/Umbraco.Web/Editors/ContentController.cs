@@ -2240,7 +2240,7 @@ namespace Umbraco.Web.Editors
                 }
                 foreach (var role in newRoles)
                 {
-                    entry.AddRule(Constants.Conventions.PublicAccess.MemberRoleRuleType, role);
+                    entry.AddRule(role, Constants.Conventions.PublicAccess.MemberRoleRuleType);
                 }
             }
 

@@ -53,22 +53,26 @@
                         </umb-pane>
                     </div>
 
-                    <div ng-show="vm.step === 'role' && !vm.groups.length">
+                    <div ng-show="vm.step === 'role' && !vm.hasGroups">
                         <p><localize key="publicAccess_paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</localize></p>
                     </div>
 
-                    <div ng-show="vm.step === 'role' && vm.groups.length">
+                    <div ng-show="vm.step === 'role' && vm.hasGroups">
                         <p><localize key="publicAccess_paSelectRoles" tokens="[currentNode.name]">Pick the roles who have access to this page</localize></p>
                         <umb-pane>
-                            <div ng-repeat="group in vm.groups | orderBy:'name'">
-                                <label>
-                                    <input type="checkbox" ng-model="group.selected"/> {{group.name}}
-                                </label>
-                            </div>
+                            <umb-node-preview ng-repeat="group in vm.groups | orderBy:'name'"
+                                              icon="'icon-users'"
+                                              name="group.name"
+                                              allow-remove="true"
+                                              on-remove="vm.removeGroup(group)">
+                            </umb-node-preview>
+                            <a href ng-click="vm.pickGroup()" class="umb-node-preview-add" prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
                         </umb-pane>
                     </div>
 
-                    <div ng-show="vm.step === 'user' || vm.groups.length">
+                    <div ng-show="vm.step === 'user' || vm.hasGroups">
                         <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
                         <umb-pane>
                             <div class="control-group umb-control-group -no-border">
@@ -145,16 +149,16 @@
 
             <umb-button ng-show="vm.canRemove && !vm.removing"
                         type="button"
-                        action="vm.remove()"
+                        action="vm.removeProtection()"
                         button-style="warning"
                         label-key="publicAccess_paRemoveProtection"
-                        disabled="vm.loading">
+                        disabled="vm.buttonState === 'busy'">
             </umb-button>
 
             <umb-button ng-show="vm.step && !vm.removing"
                         type="button"
                         action="vm.save()"
-                        state="vm.saveButtonState"
+                        state="vm.buttonState"
                         button-style="success"
                         label-key="buttons_save"
                         disabled="vm.buttonState === 'busy' || !vm.isValid()">
@@ -169,8 +173,8 @@
 
             <umb-button ng-show="vm.removing"
                         type="button"
-                        action="vm.removeConfirm()"
-                        state="vm.saveButtonState"
+                        action="vm.removeProtectionConfirm()"
+                        state="vm.buttonState"
                         button-style="success"
                         label-key="buttons_confirmActionConfirm"
                         disabled="vm.buttonState === 'busy'">

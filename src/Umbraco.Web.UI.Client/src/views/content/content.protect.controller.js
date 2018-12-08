@@ -7,7 +7,7 @@
         var id = $scope.currentNode.id;
 
         vm.loading = false;
-        vm.saveButtonState = "init";
+        vm.buttonState = "init";
 
         vm.isValid = isValid;
         vm.next = next;
@@ -16,8 +16,10 @@
         vm.toggle = toggle;
         vm.pickLoginPage = pickLoginPage;
         vm.pickErrorPage = pickErrorPage;
-        vm.remove = remove;
-        vm.removeConfirm = removeConfirm;
+        vm.pickGroup = pickGroup;
+        vm.removeGroup = removeGroup;
+        vm.removeProtection = removeProtection;
+        vm.removeProtectionConfirm = removeProtectionConfirm;
 
         vm.type = null;
         vm.step = null;
@@ -55,10 +57,10 @@
                 // Get all member groups
                 memberGroupResource.getGroups().then(function (groups) {
                     vm.step = vm.type;
-                    vm.groups = groups;
-                    // set groups "selected" according to currently selected roles for public access
-                    _.each(groups, function(group) {
-                        group.selected = _.contains(vm.roles, group.name);
+                    vm.allGroups = groups;
+                    vm.hasGroups = groups.length > 0;
+                    vm.groups = _.filter(groups, function(group) {
+                        return _.contains(vm.roles, group.name);
                     });
                     vm.loading = false;
                 });
@@ -79,15 +81,14 @@
                 return false;
             }
             if (vm.type === "role") {
-                return !!_.find(vm.groups, function(group) { return group.selected; });
+                return vm.groups && vm.groups.length > 0;
             }
             return true;
         }
 
         function save() {
-            vm.saveButtonState = "busy";
-            var selectedGroups = _.filter(vm.groups, function(group) { return group.selected; });
-            var roles = _.map(selectedGroups, function(group) { return group.name; });
+            vm.buttonState = "busy";
+            var roles = _.map(vm.groups, function (group) { return group.name; });
             contentResource.updatePublicAccess(id, vm.userName, vm.password, roles, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
@@ -98,7 +99,7 @@
                     navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true });
                 }, function (error) {
                     vm.error = error;
-                    vm.saveButtonState = "error";
+                    vm.buttonState = "error";
                 }
             );
         }
@@ -111,6 +112,35 @@
 
         function toggle(group) {
             group.selected = !group.selected;
+        }
+
+        function pickGroup() {
+            navigationService.allowHideDialog(false);
+            editorService.memberGroupPicker({
+                multiPicker: true,
+                submit: function(model) {
+                    var selectedGroupIds = model.selectedMemberGroups
+                        ? model.selectedMemberGroups
+                        : [model.selectedMemberGroup];
+                    _.each(selectedGroupIds,
+                        function(groupId) {
+                            var group = _.find(vm.allGroups, function(g) { return g.id === parseInt(groupId); });
+                            if (group && !_.contains(vm.groups, group)) {
+                                vm.groups.push(group);
+                            }
+                        });
+                    editorService.close();
+                    navigationService.allowHideDialog(true);
+                },
+                close: function() {
+                    editorService.close();
+                    navigationService.allowHideDialog(true);
+                }
+            });
+        }
+
+        function removeGroup(group) {
+            vm.groups = _.without(vm.groups, group);
         }
 
         function pickLoginPage() {
@@ -141,12 +171,12 @@
             });
         }
 
-        function remove() {
+        function removeProtection() {
             vm.removing = true;
         }
 
-        function removeConfirm() {
-            vm.saveButtonState = "busy";
+        function removeProtectionConfirm() {
+            vm.buttonState = "busy";
             contentResource.removePublicAccess(id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsRemoved", [$scope.currentNode.name]).then(function(value) {
@@ -157,7 +187,7 @@
                     navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true });
                 }, function (error) {
                     vm.error = error;
-                    vm.saveButtonState = "error";
+                    vm.buttonState = "error";
                 }
             );
         }
