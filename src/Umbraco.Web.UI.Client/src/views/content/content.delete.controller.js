@@ -38,7 +38,9 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
 
                 //If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
                 var location = "/content";
-                if ($scope.currentNode.parentId.toString() !== "-1")
+                if ($scope.currentNode.parentId.toString() === "-20")
+                    location = "/content/content/recyclebin";
+                else if ($scope.currentNode.parentId.toString() !== "-1")
                     location = "/content/content/edit/" + $scope.currentNode.parentId;
 
                 $location.path(location);
