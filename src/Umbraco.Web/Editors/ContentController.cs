@@ -2198,7 +2198,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] roles, [FromUri]int[] memberIds, int loginPageId, int errorPageId)
         {
-            if ((roles == null || roles.Any() == false) && (userIds == null || userIds.Any() == false))
+            if ((roles == null || roles.Any() == false) && (memberIds == null || memberIds.Any() == false))
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
             }
