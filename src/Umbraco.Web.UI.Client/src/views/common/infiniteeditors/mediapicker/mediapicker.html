@@ -69,7 +69,7 @@
                             </a>
     
                             <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                on-blur="submitFolder()" focus-when="{{showFolderInput}}" />
+                                ng-blur="submitFolder()" focus-when="{{showFolderInput}}" />
                         </li>
                     </ul>
                     <div class="umb-loader" ng-if="creatingFolder"></div>
