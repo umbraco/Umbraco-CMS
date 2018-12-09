@@ -20,11 +20,11 @@
 
                     <umb-pane>
                         <div class="pa-select-type">
-                            <input id="protectionTypeUser" type="radio" name="protectionType" value="user" ng-model="vm.type">
+                            <input id="protectionTypeMember" type="radio" name="protectionType" value="member" ng-model="vm.type">
 
-                            <label for="protectionTypeUser">
-                                <h5 class="pa-access-header"><localize key="publicAccess_paSimple">Single user protection</localize></h5>
-                                <p><localize key="publicAccess_paSimpleHelp">If you just want to setup simple protection using a single login and password</localize></p>
+                            <label for="protectionTypeMember">
+                                <h5 class="pa-access-header"><localize key="publicAccess_paMembers">Specific members protection</localize></h5>
+                                <p><localize key="publicAccess_paMembersHelp">If you want to grant access to specific members</localize></p>
                             </label>
                         </div>
 
@@ -40,16 +40,18 @@
                 </div>
 
                 <div ng-show="vm.step && !vm.loading && !vm.removing">
-                    <div ng-if="vm.step === 'user'">
-                        <p><localize key="publicAccess_paSetLogin" tokens="[currentNode.name]">Set the login and password for this page</localize></p>
+                    <div ng-if="vm.step === 'member'">
+                        <p><localize key="publicAccess_paSelectMembers" tokens="[currentNode.name]">Select the members that should have access to this page</localize></p>
                         <umb-pane>
-                            <umb-control-group label="@general_login">
-                                <input type="text" name="userName" ng-model="vm.userName" class="-full-width-input" required />
-                            </umb-control-group>
-                            <umb-control-group label="@general_password">
-                                <!-- TODO KJAC: get password regex from server -->
-                                <input type="password" name="password" ng-model="vm.password" class="-full-width-input" required pattern="^....$" />
-                            </umb-control-group>
+                            <umb-node-preview ng-repeat="member in vm.members | orderBy:'name'"
+                                              icon="'icon-user'"
+                                              name="member.name"
+                                              allow-remove="true"
+                                              on-remove="vm.removeMember(member)">
+                            </umb-node-preview>
+                            <a href ng-click="vm.pickMember()" class="umb-node-preview-add" prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
                         </umb-pane>
                     </div>
 
@@ -72,7 +74,7 @@
                         </umb-pane>
                     </div>
 
-                    <div ng-show="vm.step === 'user' || vm.hasGroups">
+                    <div ng-show="vm.step === 'member' || vm.hasGroups">
                         <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
                         <umb-pane>
                             <div class="control-group umb-control-group -no-border">

@@ -886,9 +886,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="paRemoveProtectionConfirm"><![CDATA[Er du sikker på at du vil fjerne beskyttelsen fra siden <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Vælg siderne der indeholder log ind-formularer og fejlmeddelelser</key>
     <key alias="paSelectRoles"><![CDATA[Vælg de roller der har adgang til siden <strong>%0%</strong>]]></key>
-    <key alias="paSetLogin"><![CDATA[Indstil login og kodeord for siden <strong>%0%</strong>]]></key>
-    <key alias="paSimple">Enkel brugerbeskyttelse</key>
-    <key alias="paSimpleHelp">Hvis du blot ønsker at opsætte simpel beskyttelse ved hjælp af et enkelt login og kodeord</key>
+    <key alias="paSelectMembers"><![CDATA[Vælg de medlemmer der har adgang til siden <strong>%0%</strong>]]></key>
+    <key alias="paMembers">Adgang til enkelte medlemmer</key>
+    <key alias="paMembersHelp">Hvis du ønsker at give adgang til enkelte medlemmer</key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>

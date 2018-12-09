@@ -18,6 +18,8 @@
         vm.pickErrorPage = pickErrorPage;
         vm.pickGroup = pickGroup;
         vm.removeGroup = removeGroup;
+        vm.pickMember = pickMember;
+        vm.removeMember = removeMember;
         vm.removeProtection = removeProtection;
         vm.removeProtectionConfirm = removeProtectionConfirm;
 
@@ -29,24 +31,25 @@
 
             // get the current public access protection
             contentResource.getPublicAccess(id).then(function (publicAccess) {
+                vm.loading = false;
+
                 // init the current settings for public access (if any)
                 vm.loginPage = publicAccess.loginPage;
                 vm.errorPage = publicAccess.errorPage;
-                vm.userName = publicAccess.userName;
-                vm.roles = publicAccess.roles;
+                vm.roles = publicAccess.roles || [];
+                vm.members = publicAccess.members || [];
                 vm.canRemove = true;
 
-                if (vm.userName) {
-                    vm.type = "user";
+                if (vm.members.length) {
+                    vm.type = "member";
                     next();
                 }
-                else if (vm.roles) {
+                else if (vm.roles.length) {
                     vm.type = "role";
                     next();
                 }
                 else {
                     vm.canRemove = false;
-                    vm.loading = false;
                 }
             });
         }
@@ -89,7 +92,8 @@
         function save() {
             vm.buttonState = "busy";
             var roles = _.map(vm.groups, function (group) { return group.name; });
-            contentResource.updatePublicAccess(id, vm.userName, vm.password, roles, vm.loginPage.id, vm.errorPage.id).then(
+            var memberIds = _.map(vm.members, function (member) { return member.id; });
+            contentResource.updatePublicAccess(id, roles, memberIds, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
                         vm.success = {
@@ -141,6 +145,41 @@
 
         function removeGroup(group) {
             vm.groups = _.without(vm.groups, group);
+        }
+
+        function pickMember() {
+            navigationService.allowHideDialog(false);
+            // TODO: once editorService has a memberPicker method, use that instead
+            editorService.treePicker({
+                multiPicker: true,
+                entityType: "Member",
+                section: "member",
+                treeAlias: "member",
+                filter: function (i) {
+                    return i.metaData.isContainer;
+                },
+                filterCssClass: "not-allowed",
+                submit: function (model) {
+                    if (model.selection && model.selection.length) {
+                        _.each(model.selection,
+                            function (member) {
+                                if (!_.find(vm.members, function (m) { return m.id === member.id })) {
+                                    vm.members.push(member);
+                                }
+                            });
+                    }
+                    editorService.close();
+                    navigationService.allowHideDialog(true);
+                },
+                close: function () {
+                    editorService.close();
+                    navigationService.allowHideDialog(true);
+                }
+            });
+        }
+
+        function removeMember(member) {
+            vm.members = _.without(vm.members, member);
         }
 
         function pickLoginPage() {
