@@ -2,7 +2,7 @@
 
 	<div ng-model="renderModel">
 		<umb-node-preview
-			ng-repeat="node in renderModel"
+			ng-repeat="node in renderModel | orderBy:'name'"
 			icon="node.icon"
 			name="node.name"
 			allow-remove="allowRemove"
