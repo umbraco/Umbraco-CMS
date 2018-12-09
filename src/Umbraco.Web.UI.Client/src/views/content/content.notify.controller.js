@@ -21,8 +21,8 @@
                 vm.loading = false;
                 vm.notifyOptions = options;
             });
-            localizationService.localize("notifications_editNotifications").then(function(value) {
-                vm.labels.headline = value.replace("%0%", $scope.currentNode.name);
+            localizationService.localize("notifications_editNotifications", [$scope.currentNode.name]).then(function(value) {
+                vm.labels.headline = value;
             });
         }
         function cancel() {
