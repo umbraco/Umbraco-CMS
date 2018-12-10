@@ -25,14 +25,14 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
 
     function createRelationType() {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createRelationTypeForm, statusMessage: "Creating relation type..." })) {
-            var node = $scope.dialogOptions.currentNode;
+            var node = $scope.currentNode;
 
             relationTypeResource.create(vm.relationType).then(function (data) {
                 navigationService.hideMenu();
 
                 // Set the new item as active in the tree
                 var currentPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "relationType", path: currentPath + "," + data, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "relationTypes", path: currentPath + "," + data, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
 

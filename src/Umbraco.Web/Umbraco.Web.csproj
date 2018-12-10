@@ -1242,13 +1242,6 @@
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.cs">
-      <DependentUpon>NewRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
-      <DependentUpon>NewRelationType.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1320,9 +1313,6 @@
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
       <SubType>ASPXCodeBehind</SubType>
