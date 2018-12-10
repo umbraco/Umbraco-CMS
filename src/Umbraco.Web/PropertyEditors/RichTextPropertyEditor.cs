@@ -104,7 +104,7 @@ namespace Umbraco.Web.PropertyEditors
                 //index the stripped html values
                 yield return new KeyValuePair<string, IEnumerable<object>>(property.Alias, new object[] { strVal.StripHtml() });
                 //store the raw value
-                yield return new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new object[] { strVal });
+                yield return new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndex.RawFieldPrefix}{property.Alias}", new object[] { strVal });
             }
         }
     }
