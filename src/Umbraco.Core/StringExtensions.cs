@@ -190,7 +190,7 @@ namespace Umbraco.Core
             return new string(outputArray);
         }
 
-        private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'+\"".ToCharArray();
+        private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
         /// <summary>
         /// Cleans string to aid in preventing xss attacks.
