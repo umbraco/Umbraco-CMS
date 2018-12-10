@@ -34,6 +34,7 @@
         vm.$onDestroy = onDestroy;
 
         vm.validateMandatory = validateMandatory;
+        vm.addTagOnEnter = addTagOnEnter;
         vm.addTag = addTag;
         vm.removeTag = removeTag;
         vm.showPrompt = showPrompt;
@@ -203,6 +204,16 @@
             }
         }
 
+        function addTagOnEnter(e) {
+            var code = e.keyCode || e.which;
+            if (code == 13) { //Enter keycode
+                if ($element.find('.tags-' + vm.htmlId).parent().find(".tt-menu .tt-cursor").length === 0) {
+                    //this is required, otherwise the html form will attempt to submit.
+                    e.preventDefault();
+                    addTag();
+                }
+            }
+        }
         function addTag() {
             //ensure that we're not pressing the enter key whilst selecting a typeahead value from the drop down
             //we need to use jquery because typeahead duplicates the text box
