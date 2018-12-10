@@ -11,7 +11,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
@@ -28,7 +27,6 @@ namespace Umbraco.Web
 
         private readonly UmbracoContext _umbracoContext;
         private readonly IPublishedContent _currentPage;
-        private readonly IPublishedContentQuery _iQuery;
         private readonly ServiceContext _services;
         
         private IUmbracoComponentRenderer _componentRenderer;
@@ -44,22 +42,18 @@ namespace Umbraco.Web
         /// </summary>
         /// <remarks>For tests.</remarks>
         internal UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
-            IPublishedContentQuery query,
             ITagQuery tagQuery,
             ICultureDictionary cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
             MembershipHelper membershipHelper,
             ServiceContext services)
         {
-            if (tagQuery == null) throw new ArgumentNullException(nameof(tagQuery));
-
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _tag = new TagQuery(tagQuery);
+            _tag = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
             _cultureDictionary = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
             _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
             _currentPage = content ?? throw new ArgumentNullException(nameof(content));
-            _iQuery = query ?? throw new ArgumentNullException(nameof(query));
             _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
@@ -105,15 +99,13 @@ namespace Umbraco.Web
         /// Gets the tag context.
         /// </summary>
         public ITagQuery TagQuery => _tag ??
-            (_tag = new TagQuery(_services.TagService, _iQuery ?? ContentQuery));
+            (_tag = new TagQuery(_services.TagService, ContentQuery));
 
         /// <summary>
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery => _query ??
-            (_query = _iQuery != null
-                ? new PublishedContentQuery(_iQuery)
-                : new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
 
         /// <summary>
         /// Gets the Umbraco context.

@@ -1,0 +1,40 @@
+<umb-box>
+    <umb-box-content>
+        <!-- ID -->
+        <umb-control-group label="Id">
+            <div>{{model.relationType.id}}</div>
+            <small>{{model.relationType.key}}</small>
+        </umb-control-group>
+
+        <!-- Direction -->
+        <umb-control-group label="@relationType_direction">
+            <ul class="unstyled">
+                <li>
+                    <label class="radio">
+                        <input type="radio" name="relationType-direction" ng-model="model.relationType.isBidirectional" ng-value="false"> <localize key="relationType_parentToChild">Parent to child</localize>
+                    </label>
+                </li>
+                <li>
+                    <label class="radio">
+                        <input type="radio" name="relationType-direction" ng-model="model.relationType.isBidirectional" ng-value="true"> <localize key="relationType_bidirectional">Bidirectional</localize>
+                    </label>
+                </li>
+            </ul>
+        </umb-control-group>
+
+        <!-- Parent-->
+        <umb-control-group label="@relationType_parent">
+            <div>{{model.relationType.parentObjectTypeName}}</div>
+        </umb-control-group>
+
+        <!-- Child -->
+        <umb-control-group label="@relationType_child">
+            <div>{{model.relationType.childObjectTypeName}}</div>
+        </umb-control-group>
+
+        <!-- Relation count -->
+        <umb-control-group label="@relationType_count" ng-if="model.relationType.relations.length > 0">
+            <div>{{model.relationType.relations.length}}</div>
+        </umb-control-group>
+    </umb-box-content>
+</umb-box>

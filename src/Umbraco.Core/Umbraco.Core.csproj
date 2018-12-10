@@ -353,6 +353,7 @@
     <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
+    <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
@@ -397,7 +398,7 @@
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
-    <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
+    <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentSchedule.cs" />
     <Compile Include="Models\ContentScheduleAction.cs" />
     <Compile Include="Models\ContentScheduleCollection.cs" />

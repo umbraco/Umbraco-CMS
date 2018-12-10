@@ -21,7 +21,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndexer : UmbracoExamineIndexer
+    public class UmbracoContentIndex : UmbracoExamineIndex
     {
         public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }
@@ -32,7 +32,7 @@ namespace Umbraco.Examine
         /// Constructor for configuration providers
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public UmbracoContentIndexer()
+        public UmbracoContentIndex()
         {
             LanguageService = Current.Services.LocalizationService;
 
@@ -50,7 +50,7 @@ namespace Umbraco.Examine
         /// <param name="languageService"></param>
         /// <param name="validator"></param>
         /// <param name="indexValueTypes"></param>
-        public UmbracoContentIndexer(
+        public UmbracoContentIndex(
             string name,
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
@@ -167,7 +167,7 @@ namespace Umbraco.Examine
                     //since the path is not valid we need to delete this item in case it exists in the index already and has now
                     //been moved to an invalid parent.
                     foreach (var i in group)
-                        QueueIndexOperation(new IndexOperation(new ValueSet(i.Id), IndexOperationType.Delete));
+                        base.PerformDeleteFromIndex(i.Id, args => { /*noop*/ });
                 }
                 else
                 {

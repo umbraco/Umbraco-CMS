@@ -57,10 +57,10 @@ namespace Umbraco.Web.Search
 
         private IIndex CreateInternalIndex()
         {
-            var index = new UmbracoContentIndexer(
+            var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.InternalIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
-                UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
+                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
@@ -71,10 +71,10 @@ namespace Umbraco.Web.Search
 
         private IIndex CreateExternalIndex()
         {
-            var index = new UmbracoContentIndexer(
+            var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.ExternalIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
-                UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
+                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
@@ -85,10 +85,10 @@ namespace Umbraco.Web.Search
 
         private IIndex CreateMemberIndex()
         {
-            var index = new UmbracoMemberIndexer(
+            var index = new UmbracoMemberIndex(
                 Constants.UmbracoIndexes.MembersIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
-                UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
+                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger, 

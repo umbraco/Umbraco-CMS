@@ -11,9 +11,9 @@ namespace Umbraco.Web.Models.Mapping
     // maps ContentApps when mapping IMedia to MediaItemDisplay
     internal class MediaAppResolver : IValueResolver<IMedia, MediaItemDisplay, IEnumerable<ContentApp>>
     {
-        private readonly ContentAppDefinitionCollection _contentAppDefinitions;
+        private readonly ContentAppFactoryCollection _contentAppDefinitions;
 
-        public MediaAppResolver(ContentAppDefinitionCollection contentAppDefinitions)
+        public MediaAppResolver(ContentAppFactoryCollection contentAppDefinitions)
         {
             _contentAppDefinitions = contentAppDefinitions;
         }

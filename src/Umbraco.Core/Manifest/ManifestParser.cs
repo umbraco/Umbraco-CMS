@@ -99,7 +99,7 @@ namespace Umbraco.Core.Manifest
             var propertyEditors = new List<IDataEditor>();
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
-            var contentApps = new List<IContentAppDefinition>();
+            var contentApps = new List<ManifestContentAppDefinition>();
             var dashboards = new List<ManifestDashboardDefinition>();
 
             foreach (var manifest in manifests)
@@ -153,7 +153,6 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
-                new ContentAppDefinitionConverter(),
                 new DashboardAccessRuleConverter());
 
             // scripts and stylesheets are raw string, must process here

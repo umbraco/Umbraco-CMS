@@ -301,6 +301,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllLanguages())
                         },
                         {
+						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                                controller => controller.GetById(1))
+                        },
+						{
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                                 controller => controller.GetNumberOfErrors())
                         }

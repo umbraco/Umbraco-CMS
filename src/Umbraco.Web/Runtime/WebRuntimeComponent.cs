@@ -208,10 +208,10 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             // register known content apps
-            composition.Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>()
-                .Append<ListViewContentAppDefinition>()
-                .Append<ContentEditorContentAppDefinition>()
-                .Append<ContentInfoContentAppDefinition>();
+            composition.Container.RegisterCollectionBuilder<ContentAppFactoryCollectionBuilder>()
+                .Append<ListViewContentAppFactory>()
+                .Append<ContentEditorContentAppFactory>()
+                .Append<ContentInfoContentAppFactory>();
         }
 
         internal void Initialize(

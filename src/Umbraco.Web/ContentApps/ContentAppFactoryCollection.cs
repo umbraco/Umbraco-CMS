@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -9,11 +8,11 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
-    public class ContentAppDefinitionCollection : BuilderCollectionBase<IContentAppDefinition>
+    public class ContentAppFactoryCollection : BuilderCollectionBase<IContentAppFactory>
     {
         private readonly ILogger _logger;
 
-        public ContentAppDefinitionCollection(IEnumerable<IContentAppDefinition> items, ILogger logger)
+        public ContentAppFactoryCollection(IEnumerable<IContentAppFactory> items, ILogger logger)
             : base(items)
         {
             _logger = logger;
@@ -32,6 +31,7 @@ namespace Umbraco.Web.ContentApps
         public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups=null)
         {
             var roles = GetCurrentUserGroups();
+
             var apps = this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
 
             var aliases = new HashSet<string>();
@@ -50,7 +50,7 @@ namespace Umbraco.Web.ContentApps
                 // dying is not user-friendly, so let's write to log instead, and wish people read logs...
 
                 //throw new InvalidOperationException($"Duplicate content app aliases found: {string.Join(",", dups)}");
-                _logger.Warn<ContentAppDefinitionCollection>("Duplicate content app aliases found: {DuplicateAliases}", string.Join(",", dups));
+                _logger.Warn<ContentAppFactoryCollection>("Duplicate content app aliases found: {DuplicateAliases}", string.Join(",", dups));
             }
 
             return apps;
