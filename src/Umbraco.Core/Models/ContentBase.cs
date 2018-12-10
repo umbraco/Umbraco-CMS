@@ -159,7 +159,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         [DataMember]
         public virtual IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos => _cultureInfos ?? NoInfos;
-        
+
         /// <inheritdoc />
         public string GetCultureName(string culture)
         {
@@ -222,6 +222,12 @@ namespace Umbraco.Core.Models
                 _cultureInfos = null;
         }
 
+        protected void TouchCultureInfo(string culture)
+        {
+            if (_cultureInfos == null || !_cultureInfos.TryGetValue(culture, out var infos)) return;
+            _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
+        }
+
         // internal for repository
         internal void SetCultureInfo(string culture, string name, DateTime date)
         {
@@ -235,7 +241,7 @@ namespace Umbraco.Core.Models
             {
                 _cultureInfos = new ContentCultureInfosCollection();
                 _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
-            }   
+            }
 
             _cultureInfos.AddOrUpdate(culture, name, date);
         }
@@ -368,7 +374,7 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region Validation
-        
+
         /// <inheritdoc />
         public virtual Property[] ValidateProperties(string culture = "*")
         {
@@ -496,7 +502,6 @@ namespace Umbraco.Core.Models
                 clonedContent._properties = (PropertyCollection) _properties.DeepClone(); //manually deep clone
                 clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
             }
-            
         }
     }
 }

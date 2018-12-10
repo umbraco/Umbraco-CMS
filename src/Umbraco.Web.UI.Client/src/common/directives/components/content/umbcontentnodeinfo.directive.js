@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $routeParams, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
+    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
         function link(scope, element, attrs, umbVariantContentCtrl) {
 
@@ -17,10 +17,13 @@
 
             function onInit() {
 
+                // if there are any infinite editors open we are in infinite editing
+                scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
+
                 userService.getCurrentUser().then(function(user){
                         // only allow change of media type if user has access to the settings sections
                         angular.forEach(user.sections, function(section){
-                            if(section.alias === "settings") {
+                            if(section.alias === "settings" && !scope.isInfiniteMode) {
                                 scope.allowChangeDocumentType = true;
                                 scope.allowChangeTemplate = true;
                             }
@@ -32,7 +35,9 @@
                     "content_unpublished", 
                     "content_published",
                     "content_publishedPendingChanges",
-                    "content_notCreated"
+                    "content_notCreated",
+                    "prompt_unsavedChanges",
+                    "prompt_doctypeChangeWarning"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -42,6 +47,8 @@
                         labels.published = data[2];
                         labels.publishedPendingChanges = data[3];
                         labels.notCreated = data[4];
+                        labels.unsavedChanges = data[5];
+                        labels.doctypeChangeWarning = data[6];
 
                         setNodePublishStatus(scope.node);
 
@@ -84,9 +91,40 @@
             };
 
             scope.openDocumentType = function (documentType) {
-                var editor = {
+
+                const variantIsDirty = _.some(scope.node.variants, function(variant) {
+                    return variant.isDirty;
+                });
+
+                // add confirmation dialog before opening the doc type editor
+                if(variantIsDirty) {
+                    const confirm = {
+                        title: labels.unsavedChanges,
+                        view: "default",
+                        content: labels.doctypeChangeWarning,
+                        submitButtonLabelKey: "general_continue",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function() {
+                            openDocTypeEditor(documentType);
+                            overlayService.close();
+                        },
+                        close: function() {
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(confirm);
+                } else {
+                    openDocTypeEditor(documentType);
+                }
+
+            };
+
+            function openDocTypeEditor(documentType) {
+                const editor = {
                     id: documentType.id,
                     submit: function(model) {
+                        const args = { node: scope.node };
+                        eventsService.emit('editors.content.reload', args);
                         editorService.close();
                     },
                     close: function() {
@@ -94,7 +132,7 @@
                     }
                 };
                 editorService.documentTypeEditor(editor);
-            };
+            }
 
             scope.openTemplate = function () {
                 var templateEditor = {

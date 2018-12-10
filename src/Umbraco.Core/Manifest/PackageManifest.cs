@@ -26,6 +26,9 @@ namespace Umbraco.Core.Manifest
         public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();
 
         [JsonProperty("contentApps")]
-        public IContentAppDefinition[] ContentApps { get; set; } = Array.Empty<IContentAppDefinition>();
+        public ManifestContentAppDefinition[] ContentApps { get; set; } = Array.Empty<ManifestContentAppDefinition>();
+
+        [JsonProperty("dashboards")]
+        public ManifestDashboardDefinition[] Dashboards { get; set; } = Array.Empty<ManifestDashboardDefinition>();
     }
 }

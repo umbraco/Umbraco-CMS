@@ -357,7 +357,9 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         else {
             $scope.renderModel = [];
-            validate();
+            if (validate) {
+                validate();
+            }
             setSortingState($scope.renderModel);
             return $q.when(true);
         }

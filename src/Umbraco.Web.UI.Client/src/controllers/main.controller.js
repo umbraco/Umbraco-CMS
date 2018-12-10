@@ -13,46 +13,37 @@ function MainController($scope, $location, appState, treeService, notificationsS
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
-    $scope.editors = [];
+    $scope.infiniteMode = false;
     $scope.overlay = {};
     $scope.drawer = {};
     $scope.search = {};
+    $scope.login = {};
     
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
-    };
-
-    $scope.closeDialogs = function (event) {
-        //only close dialogs if non-link and non-buttons are clicked
-        var el = event.target.nodeName;
-        var els = ["INPUT", "A", "BUTTON"];
-
-        if (els.indexOf(el) >= 0) { return; }
-
-        var parents = $(event.target).parents("a,button");
-        if (parents.length > 0) {
-            return;
-        }
-
-        //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        var nav = $(event.target).parents("#dialog");
-        if (nav.length === 1) {
-            return;
-        }
-
-        eventsService.emit("app.closeDialogs", event);
     };
 
     $scope.closeSearch = function() {
         appState.setSearchState("show", false);
     };
 
-    var evts = [];
+    $scope.showLoginScreen = function(isTimedOut) {
+        $scope.login.isTimedOut = isTimedOut;
+        $scope.login.show = true;
+    };
 
+    $scope.hideLoginScreen = function() {
+        $scope.login.show = false;
+    };
+
+    var evts = [];
+    
     //when a user logs out or timesout
-    evts.push(eventsService.on("app.notAuthenticated", function () {
+    evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
+        const isTimedOut = data && data.isTimedOut ? true : false;
+        $scope.showLoginScreen(isTimedOut);
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {
@@ -169,12 +160,12 @@ function MainController($scope, $location, appState, treeService, notificationsS
     }));
 
     // event for infinite editors
-    evts.push(eventsService.on("appState.editors.add", function (name, args) {
-        $scope.editors = args.editors;
+    evts.push(eventsService.on("appState.editors.open", function (name, args) {
+        $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
     }));
 
-    evts.push(eventsService.on("appState.editors.remove", function (name, args) {
-        $scope.editors = args.editors;
+    evts.push(eventsService.on("appState.editors.close", function (name, args) {
+        $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
     }));
 
     //ensure to unregister from all events!

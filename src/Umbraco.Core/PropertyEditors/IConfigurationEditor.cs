@@ -47,7 +47,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Converts the serialized database value into the actual configuration object.
         /// </summary>
         /// <remarks>Converting the configuration object to the serialized database value is
-        /// achieved by simply serializing the configuration.</remarks>
+        /// achieved by simply serializing the configuration. See <see cref="ConfigurationEditor.ToDatabase"/>.</remarks>
         object FromDatabase(string configurationJson);
 
         /// <summary>

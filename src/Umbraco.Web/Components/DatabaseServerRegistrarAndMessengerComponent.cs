@@ -11,6 +11,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
+using Umbraco.Examine;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Components
         private BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
         private bool _started;
         private IBackgroundTask[] _tasks;
-        private IExamineManager _examineManager;
+        private IndexRebuilder _indexRebuilder;
 
         public override void Compose(Composition composition)
         {
@@ -87,13 +88,13 @@ namespace Umbraco.Web.Components
                             //rebuild indexes if the server is not synced
                             // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                             // indexes then they can adjust this logic themselves.
-                            () => ExamineComponent.RebuildIndexes(false, _examineManager, _logger)
+                            () => ExamineComponent.RebuildIndexes(_indexRebuilder, _logger, false, 5000)
                         }
                     });
             });
         }
 
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IExamineManager examineManager)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IndexRebuilder indexRebuilder)
         {
             _registrar = serverRegistrar as DatabaseServerRegistrar;
             if (_registrar == null) throw new Exception("panic: registar.");
@@ -101,12 +102,10 @@ namespace Umbraco.Web.Components
             _messenger = serverMessenger as BatchedDatabaseServerMessenger;
             if (_messenger == null) throw new Exception("panic: messenger");
 
-            _messenger.Startup();
-
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
-            _examineManager = examineManager;
+            _indexRebuilder = indexRebuilder;
 
             _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
@@ -115,6 +114,9 @@ namespace Umbraco.Web.Components
 
             //We will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
+
+            // must come last, as it references some _variables
+            _messenger.Startup();
         }
 
         /// <summary>

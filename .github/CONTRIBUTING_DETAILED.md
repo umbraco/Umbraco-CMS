@@ -19,13 +19,13 @@ When contributing code to Umbraco there's plenty of things you'll want to know, 
   * [What branch should I target for my contributions?](#what-branch-should-i-target-for-my-contributions)
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
   * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
-  
+
 ## How Can I Contribute?
 
 ### Reporting Bugs
 This section guides you through submitting a bug report for Umbraco CMS. Following these guidelines helps maintainers and the community understand your report 📝, reproduce the behavior 💻 💻, and find related reports 🔎.
 
-Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](http://issues.umbraco.org/issues#newissue=61-30118), the information it asks for helps us resolve issues faster.
+Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](https://github.com/umbraco/Umbraco-CMS/issues/new/choose), the information it asks for helps us resolve issues faster.
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
 
@@ -52,7 +52,7 @@ Provide more context by answering these questions:
 
 Include details about your configuration and environment:
 
-  * **Which version of Umbraco are you using?** 
+  * **Which version of Umbraco are you using?**
   * **What is the environment you're using Umbraco in?** Is this a problem on your local machine or on a server. Tell us about your configuration: Windows version, IIS/IISExpress, database type, etc.
   * **Which packages do you have installed?**
 
@@ -80,7 +80,7 @@ The most successful pull requests usually look a like this:
   * Unit tests, while optional are awesome, thank you!
   * New code is commented with documentation from which [the reference documentation](https://our.umbraco.com/documentation/Reference/) is generated
 
-Again, these are guidelines, not strict requirements. 
+Again, these are guidelines, not strict requirements.
 
 ## Making changes after the PR was opened
 
@@ -90,7 +90,7 @@ If you make the corrections we ask for in the same branch and push them to your 
 
 To be honest, we don't like rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
 
-That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc. 
+That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc.
 
 ## What should I know before I get started?
 
@@ -124,6 +124,12 @@ We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-fl
 ![What branch do you want me to target?](img/defaultbranch.png)
 
 ### Building Umbraco from source code
+
+In order to build the Umbraco source code locally, first make sure you have the following installed.
+
+  * Visual Studio 2017 v15.3+
+  * Node v10+ (Installed via `build.bat` script. If you already have it installed, make sure you're running at least v10)
+  * npm v6.4.1+ (Installed via `build.bat` script. If you already have it installed, make sure you're running at least v6.4.1)
 
 The easiest way to get started is to run `build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
 

@@ -32,7 +32,9 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);
-            
+            var schedPublishReleaseDateResolver = new ScheduledPublishDateResolver(ContentScheduleAction.Release);
+            var schedPublishExpireDateResolver = new ScheduledPublishDateResolver(ContentScheduleAction.Expire);
+
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
@@ -63,6 +65,8 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IContent, ContentVariantDisplay>()
                 .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
+                .ForMember(dest => dest.ReleaseDate, opt => opt.ResolveUsing(schedPublishReleaseDateResolver))
+                .ForMember(dest => dest.ExpireDate, opt => opt.ResolveUsing(schedPublishExpireDateResolver))
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())

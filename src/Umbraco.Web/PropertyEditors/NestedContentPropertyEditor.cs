@@ -42,6 +42,8 @@ namespace Umbraco.Web.PropertyEditors
                 : Current.Services.ContentTypeService.Get(contentTypeAlias);
         }
 
+        //fixme: Need to add a custom IPropertyIndexValueFactory for this editor
+
         #region Pre Value Editor
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
@@ -312,7 +314,7 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 if (propValues[propKey] == null)
                                     yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be null", new[] { propKey });
-                                else if (propValues[propKey].ToString().IsNullOrWhiteSpace())
+                                else if (propValues[propKey].ToString().IsNullOrWhiteSpace() || (propValues[propKey].Type == JTokenType.Array && !propValues[propKey].HasValues))
                                     yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be empty", new[] { propKey });
                             }
 

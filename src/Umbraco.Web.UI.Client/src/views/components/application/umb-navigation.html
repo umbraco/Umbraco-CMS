@@ -19,7 +19,7 @@
             <div id="tree" ng-show="authenticated">
                 <umb-tree
                     api="treeApi"
-                    on-init="onTreeInit()" >
+                    on-init="onTreeInit()">
                 </umb-tree>
             </div>
         </div>
@@ -27,7 +27,7 @@
         <div class="offset6" id="navOffset" style="z-index: 10">
 
             <!-- The context menu -->
-            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-show="showContextMenu" ng-animate="'slide'">
+            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-if="showContextMenu" ng-animate="'slide'">
                 <umb-context-menu
                     menu-dialog-title="{{menuDialogTitle}}"
                     current-section="{{currentSection}}"
@@ -36,16 +36,17 @@
                 </umb-context-menu>
             </div>
 
+            <umb-context-dialog
+                ng-if="showContextMenuDialog"
+                title="menuDialogTitle"
+                current-node="menuNode"
+                view="dialogTemplateUrl">
+            </umb-context-dialog>
 
-            <!-- Tree dialogs -->
-            <div id="dialog" class='umb-modalcolumn fill shadow' ng-show="showContextMenuDialog" ng-animate="'slide'">
-                <div class='umb-modalcolumn-header'>
-                    <h1>{{menuDialogTitle}}</h1>
-                </div>
-                <div class='umb-modalcolumn-body'>
-                </div>
-            </div>
         </div>
+
+        <div class="umb-editor__overlay" ng-show="infiniteMode"></div>
+
     </div>
 
 </div>

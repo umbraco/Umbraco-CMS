@@ -299,6 +299,10 @@ namespace Umbraco.Web.Editors
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
+                        },
+                        {
+                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                                controller => controller.GetById(1))
                         }
                     }
                 },
@@ -423,15 +427,19 @@ namespace Umbraco.Web.Editors
         {
             var app = new Dictionary<string, object>
             {
-                {"assemblyVersion", UmbracoVersion.AssemblyVersion}
+                // add versions - see UmbracoVersion for details & differences
+
+                // the complete application version (eg "8.1.2-alpha.25")
+                { "version", _runtimeState.SemanticVersion.ToSemanticString() }, // fixme that's UmbracoVersion.Version!
+
+                // the assembly version (eg "8.0.0")
+                { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }
             };
 
             var version = _runtimeState.SemanticVersion.ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
-
-            app.Add("version", version);
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContext.Request.ApplicationPath.EnsureEndsWith('/'));

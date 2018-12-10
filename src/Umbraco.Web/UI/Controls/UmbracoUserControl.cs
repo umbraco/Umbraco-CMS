@@ -27,12 +27,11 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="services"></param>
-        /// <param name="appCache"></param>
-        protected UmbracoUserControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        protected UmbracoUserControl(UmbracoContext umbracoContext, ServiceContext services)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            Umbraco = new UmbracoHelper(umbracoContext, services);
             Members = new MembershipHelper(umbracoContext);
 
             // fixme inject somehow
@@ -45,7 +44,7 @@ namespace Umbraco.Web.UI.Controls
         /// Empty constructor, uses Singleton to resolve the UmbracoContext
         /// </summary>
         protected UmbracoUserControl()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+            : this(Current.UmbracoContext, Current.Services)
         { }
 
         // for debugging purposes

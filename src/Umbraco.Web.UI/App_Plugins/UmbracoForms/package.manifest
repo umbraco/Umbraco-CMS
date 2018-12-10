@@ -1,0 +1,10 @@
+﻿{
+    "dashboards": [
+    {
+      "name": "Install Umbraco Forms",
+      "alias": "installUmbracoForms",
+      "view": "views/dashboard/forms/formsdashboardintro.html",
+      "sections": [ "forms" ]
+    }
+  ]
+}

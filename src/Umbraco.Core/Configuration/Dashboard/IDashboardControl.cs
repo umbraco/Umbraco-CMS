@@ -2,10 +2,6 @@
 {
     public interface IDashboardControl
     {
-        bool ShowOnce { get; }
-
-        bool AddPanel { get; }
-
         string PanelCaption { get; }
 
         string ControlPath { get; }

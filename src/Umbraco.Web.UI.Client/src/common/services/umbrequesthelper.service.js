@@ -3,7 +3,7 @@
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService, formHelper) {
+function umbRequestHelper($http, $q, notificationsService, eventsService, formHelper) {
 
     return {
 

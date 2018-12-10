@@ -6,40 +6,40 @@ using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Relation = Umbraco.Web.Models.ContentEditing.Relation;
 
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     public class RelationController : UmbracoAuthorizedJsonController
     {
-        public Relation GetById(int id)
+        public RelationDisplay GetById(int id)
         {
-            return Mapper.Map<IRelation, Relation>(Services.RelationService.GetById(id));
+            return Mapper.Map<IRelation, RelationDisplay>(Services.RelationService.GetById(id));
         }
 
         //[EnsureUserPermissionForContent("childId")]
-        public IEnumerable<Relation> GetByChildId(int childId, string relationTypeAlias = "")
+        public IEnumerable<RelationDisplay> GetByChildId(int childId, string relationTypeAlias = "")
         {
             var relations = Services.RelationService.GetByChildId(childId).ToArray();
 
             if (relations.Any() == false)
             {
-                return Enumerable.Empty<Relation>();
+                return Enumerable.Empty<RelationDisplay>();
             }
 
             if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
             {
                 return
-                    Mapper.Map<IEnumerable<IRelation>, IEnumerable<Relation>>(
+                    Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(
                         relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)));
             }
 
-            return Mapper.Map<IEnumerable<IRelation>, IEnumerable<Relation>>(relations);
+            return Mapper.Map<IEnumerable<IRelation>, IEnumerable<RelationDisplay>>(relations);
         }
 
         [HttpDelete]

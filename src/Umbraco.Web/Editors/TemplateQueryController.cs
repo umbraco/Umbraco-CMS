@@ -59,8 +59,7 @@ namespace Umbraco.Web.Editors
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
-            var umbraco = new UmbracoHelper(UmbracoContext, Services, ApplicationCache);
-
+            
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
@@ -72,7 +71,7 @@ namespace Umbraco.Web.Editors
 
             timer.Start();
 
-            var currentPage = umbraco.ContentAtRoot().FirstOrDefault();
+            var currentPage = Umbraco.ContentAtRoot().FirstOrDefault();
             timer.Stop();
 
             var pointerNode = currentPage;
@@ -80,7 +79,7 @@ namespace Umbraco.Web.Editors
             // adjust the "FROM"
             if (model != null && model.Source != null && model.Source.Id > 0)
             {
-                var targetNode = umbraco.Content(model.Source.Id);
+                var targetNode = Umbraco.Content(model.Source.Id);
 
                 if (targetNode != null)
                 {

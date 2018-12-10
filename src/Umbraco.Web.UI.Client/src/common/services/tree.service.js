@@ -414,7 +414,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     for (var c = 0; c < tn.children.length; c++) {
                         if (tn.children[c].isContainer) {
                             //recurse
-                            return getTreeRoot(tn.children[c]);
+                            var root = getTreeRoot(tn.children[c]);
+
+                            //only return if we found the root in this child, otherwise continue.
+                            if(root){
+                                return root;
+                            }
                         }
                         else if (self.getTreeAlias(tn.children[c]) === treeAlias) {
                             return tn.children[c];

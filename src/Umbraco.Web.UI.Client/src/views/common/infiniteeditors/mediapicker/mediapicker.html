@@ -32,12 +32,10 @@
                                no-dirty-check />
 
                         <div class="form-search__toggle">
+                            <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
                             <label>
                                 <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
                             </label>
-                            <umb-toggle checked="showChilds"
-                                        on-click="toggle()">
-                            </umb-toggle>
                         </div>
                     </div>
     
@@ -70,8 +68,8 @@
                                 <i class="icon icon-add small"></i>
                             </a>
     
-                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                on-blur="submitFolder()" focus-when="{{showFolderInput}}" />
+                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
+                                ng-blur="submitFolder()" focus-when="{{showFolderInput}}" />
                         </li>
                     </ul>
                     <div class="umb-loader" ng-if="creatingFolder"></div>

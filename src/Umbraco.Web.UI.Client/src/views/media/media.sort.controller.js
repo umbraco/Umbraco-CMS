@@ -27,6 +27,7 @@
 
         vm.save = save;
         vm.sort = sort;
+        vm.close = close;
 
         function onInit() {
             vm.loading = true;
@@ -47,7 +48,9 @@
 
             mediaResource.sort(args)
                 .then(function(){
-                    navigationService.syncTree({ tree: "media", path: $scope.currentNode.path, forceReload: true, activate: false });
+                    navigationService.syncTree({ tree: "media", path: $scope.currentNode.path, forceReload: true })
+                        .then(() => navigationService.reloadNode($scope.currentNode));
+
                     vm.saveButtonState = "success";
                 }, function(error) {
                     vm.error = error;
@@ -72,6 +75,10 @@
                 vm.sortOrder.reverse = false;
             }
             vm.children = $filter('orderBy')(vm.children, vm.sortOrder.column, vm.sortOrder.reverse);
+        }
+
+        function close() {
+            navigationService.hideDialog();
         }
 
         onInit();

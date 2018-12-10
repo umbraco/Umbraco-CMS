@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Data;
+using Moq;
+using NUnit.Framework;
 using Semver;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Migrations
 {
+    [TestFixture]
     public class MigrationTests
     {
         public class TestUpgrader : Upgrader
@@ -66,6 +69,69 @@ namespace Umbraco.Tests.Migrations
 
             public IScopeContext Context { get; set; }
             public ISqlContext SqlContext { get; set;  }
+        }
+
+        [Test]
+        public void RunGoodMigration()
+        {
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            IMigration migration = new GoodMigration(migrationContext);
+            migration.Migrate();
+        }
+
+        [Test]
+        public void DetectBadMigration1()
+        {
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            IMigration migration = new BadMigration1(migrationContext);
+            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
+        }
+
+        [Test]
+        public void DetectBadMigration2()
+        {
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            IMigration migration = new BadMigration2(migrationContext);
+            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
+        }
+
+        public class GoodMigration : MigrationBase
+        {
+            public GoodMigration(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                Execute.Sql("").Do();
+            }
+        }
+
+        public class BadMigration1 : MigrationBase
+        {
+            public BadMigration1(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                Alter.Table("foo"); // stop here, don't Do it
+            }
+        }
+
+        public class BadMigration2 : MigrationBase
+        {
+            public BadMigration2(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                Alter.Table("foo"); // stop here, don't Do it
+
+                // and try to start another one
+                Alter.Table("bar");
+            }
         }
     }
 }

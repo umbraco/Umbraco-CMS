@@ -13,7 +13,7 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
 
     function createItem() {
 
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         dictionaryResource.create(node.id, vm.itemKey).then(function (data) {
             navigationService.hideMenu();

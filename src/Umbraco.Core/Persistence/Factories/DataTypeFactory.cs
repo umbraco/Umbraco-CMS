@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Factories
                 EditorAlias = entity.EditorAlias,
                 NodeId = entity.Id,
                 DbType = entity.DatabaseType.ToString(),
-                Configuration = entity.Configuration == null ? null : JsonConvert.SerializeObject(entity.Configuration, ConfigurationEditor.ConfigurationJsonSettings),
+                Configuration = ConfigurationEditor.ToDatabase(entity.Configuration),
                 NodeDto = BuildNodeDto(entity)
             };
 

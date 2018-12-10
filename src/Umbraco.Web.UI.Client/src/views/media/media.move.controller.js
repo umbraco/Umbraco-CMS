@@ -1,10 +1,9 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
     function ($scope, userService, eventsService, mediaResource, appState, treeService, navigationService) {
-	    var dialogOptions = $scope.dialogOptions;
 
 	    $scope.dialogTreeApi = {};
-	    var node = dialogOptions.currentNode;
+        $scope.source = _.clone($scope.currentNode);
 
         $scope.treeModel = {
             hideHeader: false
@@ -14,8 +13,8 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
         });
 
         function treeLoadedHandler(args) {
-            if (node && node.path) {
-                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
+            if ($scope.source && $scope.source.path) {
+                $scope.dialogTreeApi.syncTree({ path: $scope.source.path, activate: false });
             }
         }
 
@@ -48,11 +47,17 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
             $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
             $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
-        }	    
+        }	  
+        
+        $scope.close = function() {
+            navigationService.hideDialog();
+        };
 
 	    $scope.move = function () {
-	        mediaResource.move({ parentId: $scope.target.id, id: node.id })
+	        $scope.busy = true;
+            mediaResource.move({ parentId: $scope.target.id, id: $scope.source.id })
                 .then(function (path) {
+	                $scope.busy = false;
                     $scope.error = false;
                     $scope.success = true;
 

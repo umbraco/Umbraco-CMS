@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, mediaResource, listViewHelper, navigationService, editorService, overlayService, languageResource) {
+function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -58,6 +58,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         totalPages: 0,
         items: []
     };
+
+    $scope.createAllowedButtonSingle = false;
+    $scope.createAllowedButtonSingleWithBlueprints = false;
+    $scope.createAllowedButtonMultiWithBlueprints = false;
+
 
     //when this is null, we don't check permissions
     $scope.currentNodePermissions = null;
@@ -159,7 +164,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
-    
+
     //watch for culture changes in the query strings and update accordingly
     $scope.$watch(function () {
         return $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
@@ -230,7 +235,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         if (successMsgPromise) {
             localizationService.localize("bulk_done")
                 .then(function (v) {
-                    successMsgPromise.then(function(successMsg) {
+                    successMsgPromise.then(function (successMsg) {
                         notificationsService.success(v, successMsg);
                     })
                 });
@@ -258,11 +263,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     with simple values */
 
     $scope.getContent = function (contentId) {
-        
+
         $scope.reloadView($scope.contentId);
     }
 
-   $scope.reloadView = function (id) {
+    $scope.reloadView = function (id) {
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -277,13 +282,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             if ($scope.listViewResultSet.items) {
                 _.each($scope.listViewResultSet.items, function (e, index) {
                     setPropertyValues(e);
-               if (e.contentTypeAlias === 'Folder') {
-                   $scope.folders.push(e);
-               }
-            });
-         }
+                    if (e.contentTypeAlias === 'Folder') {
+                        $scope.folders.push(e);
+                    }
+                });
+            }
 
-          $scope.viewLoaded = true;
+            $scope.viewLoaded = true;
 
             //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
             // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
@@ -324,7 +329,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             $scope.reloadView($scope.contentId);
         }
     }
-    
+
     $scope.selectedItemsCount = function () {
         return $scope.selection.length;
     };
@@ -340,7 +345,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     function serial(selected, fn, getStatusMsg, index) {
         return fn(selected, index).then(function (content) {
             index++;
-            getStatusMsg(index, selected.length).then(function(value) {
+            getStatusMsg(index, selected.length).then(function (value) {
                 $scope.bulkStatus = value;
             });
             return index < selected.length ? serial(selected, fn, getStatusMsg, index) : content;
@@ -360,7 +365,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
         $scope.actionInProgress = true;
 
-        getStatusMsg(0, selected.length).then(function(value){
+        getStatusMsg(0, selected.length).then(function (value) {
             $scope.bulkStatus = value;
         });
 
@@ -404,7 +409,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             function (total) {
                 var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
                 return localizationService.localize(key, [total]);
-            }).then(function() {
+            }).then(function () {
                 $scope.reloadView($scope.contentId);
             });
     }
@@ -415,7 +420,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         // check if any of the selected nodes has variants
         $scope.selection.forEach(selectedItem => {
             $scope.listViewResultSet.items.forEach(resultItem => {
-                if((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
+                if ((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
                     variesByCulture = true;
                 }
             })
@@ -432,9 +437,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             submit: function (model) {
                 // create a comma seperated array of selected cultures
                 let selectedCultures = [];
-                if(model.languages && model.languages.length > 0) {
+                if (model.languages && model.languages.length > 0) {
                     model.languages.forEach(language => {
-                        if(language.publish) {
+                        if (language.publish) {
                             selectedCultures.push(language.culture);
                         }
                     });
@@ -446,12 +451,12 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 overlayService.close();
             }
         };
-        
+
         // if any of the selected nodes has variants we want to 
         // show a dialog where the languages can be chosen
-        if(selectionHasVariants()) {
+        if (selectionHasVariants()) {
             languageResource.getAll()
-                .then(languages => {                    
+                .then(languages => {
                     dialog.languages = languages;
                     overlayService.open(dialog);
                 }, error => {
@@ -473,7 +478,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             function (total) {
                 var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
                 return localizationService.localize(key, [total]);
-            }).then(function(){
+            }).then(function () {
                 $scope.reloadView($scope.contentId);
             });
     }
@@ -484,12 +489,12 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
             submit: function (model) {
-                
+
                 // create a comma seperated array of selected cultures
                 let selectedCultures = [];
-                if(model.languages && model.languages.length > 0) {
+                if (model.languages && model.languages.length > 0) {
                     model.languages.forEach(language => {
-                        if(language.unpublish) {
+                        if (language.unpublish) {
                             selectedCultures.push(language.culture);
                         }
                     });
@@ -505,9 +510,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
         // if any of the selected nodes has variants we want to 
         // show a dialog where the languages can be chosen
-        if(selectionHasVariants()) {
+        if (selectionHasVariants()) {
             languageResource.getAll()
-                .then(languages => {                    
+                .then(languages => {
                     dialog.languages = languages;
                     overlayService.open(dialog);
                 }, error => {
@@ -529,7 +534,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             function (total) {
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
-            }).then(function(){
+            }).then(function () {
                 $scope.reloadView($scope.contentId);
             });
     }
@@ -695,9 +700,27 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             id = -1;
         }
 
-        getContentTypesCallback(id).then(function (items) {
-            $scope.listViewAllowedTypes = items;
+        getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+            var blueprints = false;
+            $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+            angular.forEach(listViewAllowedTypes, function (allowedType) {
+                angular.forEach(allowedType.blueprints, function (value, key) {
+                    blueprints = true;
+                });
+            });
+
+            if (listViewAllowedTypes.length === 1 && blueprints === false) {
+                $scope.createAllowedButtonSingle = true;
+            }
+            if (listViewAllowedTypes.length === 1 && blueprints === true) {
+                $scope.createAllowedButtonSingleWithBlueprints = true;
+            }
+            if (listViewAllowedTypes.length > 1) {
+                $scope.createAllowedButtonMultiWithBlueprints = true;
+            }
         });
+
 
         $scope.contentId = id;
         $scope.isTrashed = id === "-20" || id === "-21";
@@ -711,7 +734,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             $scope.options.allowBulkMove ||
             $scope.options.allowBulkDelete;
 
-      $scope.reloadView($scope.contentId);
+        $scope.reloadView($scope.contentId);
     }
 
     function getLocalizedKey(alias) {
@@ -748,6 +771,22 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             }
         }
     }
+
+
+    function createBlank(entityType, docTypeAlias) {
+        $location
+            .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+            .search("doctype=" + docTypeAlias + "&create=true");
+    }
+
+    function createFromBlueprint(entityType, docTypeAlias, blueprintId) {
+        $location
+            .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+            .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+    }
+
+    $scope.createBlank = createBlank;
+    $scope.createFromBlueprint = createFromBlueprint;
 
     //GO!
     initView();

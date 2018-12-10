@@ -960,8 +960,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="imagecropper">
     <key alias="reset">Resetuj</key>
-    <key alias="defineCrop">Zdefiniuj przycięcie</key>
-    <key alias="defineCropDescription">Ustaw alias dla przycięcia, a także jego domyślną szerokość i długość</key>
     <key alias="saveCrop">Zapisz przycięcie</key>
     <key alias="addCrop">Dodaj nowe przycięcie</key>
   </area>
@@ -1436,9 +1434,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="configurationServiceFileNotFound">Plik nie istnieje: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Nie można znaleźć <strong>'%0%'</strong> w pliku konfiguracyjnym <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Wystąpił błąd, sprawdź logi, aby wyświetlić pełen opis błędu: %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Członkowie - Suma XML: %0%, Suma: %1%, Suma niepoprawnych: %2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Media - Suma XML: %0%, Suma: %1%, Suma niepoprawnych: %2%</key>
-    <key alias="xmlDataIntegrityCheckContent">Zawartość - Suma XML: %0%, Suma opublikowanych: %1%, Suma niepoprawnych: %2%</key>
     <key alias="httpsCheckValidCertificate">Certifikat Twojej strony jest poprawny.</key>
     <key alias="httpsCheckInvalidCertificate">Błąd walidacji certyfikatu: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Certyfikat SSL Twojej strony wygasł.</key>

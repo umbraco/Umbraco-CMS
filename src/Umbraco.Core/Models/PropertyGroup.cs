@@ -35,12 +35,12 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, string>(x => x.Name);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, int>(x => x.SortOrder);
-            public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, PropertyTypeCollection>(x => x.PropertyTypes);
+            public readonly PropertyInfo PropertyTypes = ExpressionHelper.GetPropertyInfo<PropertyGroup, PropertyTypeCollection>(x => x.PropertyTypes);
         }
 
         private void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyTypes);
         }
 
         /// <summary>
@@ -76,6 +76,8 @@ namespace Umbraco.Core.Models
             get => _propertyTypes;
             set
             {
+                if (_propertyTypes != null)
+                    _propertyTypes.CollectionChanged -= PropertyTypesChanged;
                 _propertyTypes = value;
 
                 // since we're adding this collection to this group,
@@ -83,6 +85,7 @@ namespace Umbraco.Core.Models
                 foreach (var propertyType in _propertyTypes)
                     propertyType.PropertyGroupId = new Lazy<int>(() => Id);
 
+                OnPropertyChanged(Ps.Value.PropertyTypes);
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
         }

@@ -40,8 +40,8 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
-        public static ContentAppDefinitionCollectionBuilder ContentApps(this Composition composition)
-            => composition.Container.GetInstance<ContentAppDefinitionCollectionBuilder>();
+        public static ContentAppFactoryCollectionBuilder ContentApps(this Composition composition)
+            => composition.Container.GetInstance<ContentAppFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.
