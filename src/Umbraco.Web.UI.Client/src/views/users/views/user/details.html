@@ -1,169 +1,169 @@
 ﻿<div class="umb-user-details-details">
 
-    <div class="umb-user-details-details__main-content">
+<div class="umb-user-details-details__main-content">
 
-        <umb-box>
+    <umb-box>
 
-            <umb-box-header title-key="user_profile"></umb-box-header>
+        <umb-box-header title-key="user_profile"></umb-box-header>
 
-            <umb-box-content class="block-form">
+        <umb-box-content class="block-form">
 
-                <umb-control-group label="@general_email" required="true" alias="email">
+            <umb-control-group label="@general_email" required="true" alias="email">
 
-                    <input type="email"
-                           localize="placeholder"
-                           placeholder="@placeholders_enteremail"
-                           class="input-block-level"
-                           ng-model="model.user.email"
-                           umb-auto-focus
-                           name="email"
-                           id="email"
-                           val-email
-                           ng-required="true"
-                           val-server-field="Email" />
-                    <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+                <input type="email"
+                       localize="placeholder"
+                       placeholder="@placeholders_enteremail"
+                       class="input-block-level"
+                       ng-model="model.user.email"
+                       umb-auto-focus
+                       name="email"
+                       id="email"
+                       val-email
+                       ng-required="true"
+                       val-server-field="Email" />
+                <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
+            </umb-control-group>
 
-                <umb-control-group label="@general_username" ng-if="!model.usernameIsEmail" required="true">
-                    <input type="text"
-                           localize="placeholder"
-                           placeholder="@placeholders_enterusername"
-                           class="input-block-level"
-                           ng-model="model.user.username"
-                           umb-auto-focus name="username"
-                           required
-                           val-server-field="Username" />
-                    <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+            <umb-control-group label="@general_username" ng-if="!model.usernameIsEmail" required="true">
+                <input type="text"
+                       localize="placeholder"
+                       placeholder="@placeholders_enterusername"
+                       class="input-block-level"
+                       ng-model="model.user.username"
+                       umb-auto-focus name="username"
+                       required
+                       val-server-field="Username" />
+                <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
+            </umb-control-group>
 
-                <umb-control-group label="@user_language" description="@user_languageHelp">
-                    <select class="input-block-level"
-                            ng-model="model.user.culture"
-                            ng-options="key as value for (key, value) in model.user.availableCultures"
-                            name="culture"
-                            required
-                            val-server-field="Culture"></select>
-                    <span class="help-inline" val-msg-for="culture" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="culture" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
-            </umb-box-content>
-        </umb-box>
+            <umb-control-group label="@user_language" description="@user_languageHelp">
+                <select class="input-block-level"
+                        ng-model="model.user.culture"
+                        ng-options="key as value for (key, value) in model.user.availableCultures"
+                        name="culture"
+                        required
+                        val-server-field="Culture"></select>
+                <span class="help-inline" val-msg-for="culture" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                <span class="help-inline" val-msg-for="culture" val-toggle-msg="valServerField"></span>
+            </umb-control-group>
+        </umb-box-content>
+    </umb-box>
 
-        <umb-box>
-            <umb-box-header title-key="user_assignAccess"></umb-box-header>
-            <umb-box-content class="block-form">
+    <umb-box>
+        <umb-box-header title-key="user_assignAccess"></umb-box-header>
+        <umb-box-content class="block-form">
 
-                <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp" required="true">
+            <umb-control-group style="margin-bottom: 25px;" label="@general_groups" description="@user_groupsHelp" required="true">
 
-                    <umb-user-group-preview ng-repeat="userGroup in model.user.userGroups"
-                                            icon="userGroup.icon"
-                                            name="userGroup.name"
-                                            sections="userGroup.sections"
-                                            content-start-node="userGroup.contentStartNode"
-                                            media-start-node="userGroup.mediaStartNode"
-                                            allow-remove="!model.user.isCurrentUser"
-                                            on-remove="model.removeSelectedItem($index, model.user.userGroups)">
-                    </umb-user-group-preview>
+                <umb-user-group-preview ng-repeat="userGroup in model.user.userGroups"
+                                        icon="userGroup.icon"
+                                        name="userGroup.name"
+                                        sections="userGroup.sections"
+                                        content-start-node="userGroup.contentStartNode"
+                                        media-start-node="userGroup.mediaStartNode"
+                                        allow-remove="!model.user.isCurrentUser"
+                                        on-remove="model.removeSelectedItem($index, model.user.userGroups)">
+                </umb-user-group-preview>
 
-                    <a href=""
-                       ng-if="!model.user.isCurrentUser"
-                       style="max-width: 100%;"
-                       class="umb-node-preview-add"
-                       ng-click="model.openUserGroupPicker()"
-                       prevent-default>
-                        <localize key="general_add">Add</localize>
-                    </a>
+                <a href=""
+                   ng-if="!model.user.isCurrentUser"
+                   style="max-width: 100%;"
+                   class="umb-node-preview-add"
+                   ng-click="model.openUserGroupPicker()"
+                   prevent-default>
+                    <localize key="general_add">Add</localize>
+                </a>
 
-                </umb-control-group>
+            </umb-control-group>
 
-                <umb-control-group style="margin-bottom: 25px;" label="@user_startnodes" description="@user_startnodeshelp">
+            <umb-control-group style="margin-bottom: 25px;" label="@user_startnodes" description="@user_startnodeshelp">
 
-                    <umb-node-preview style="max-width: 100%;"
-                                      ng-repeat="node in model.user.startContentIds"
-                                      icon="node.icon"
-                                      name="node.name"
-                                      allow-remove="!model.user.isCurrentUser"
-                                      on-remove="model.removeSelectedItem($index, model.user.startContentIds)">
-                    </umb-node-preview>
+                <umb-node-preview style="max-width: 100%;"
+                                  ng-repeat="node in model.user.startContentIds"
+                                  icon="node.icon"
+                                  name="node.name"
+                                  allow-remove="!model.user.isCurrentUser"
+                                  on-remove="model.removeSelectedItem($index, model.user.startContentIds)">
+                </umb-node-preview>
 
-                    <umb-node-preview ng-if="model.user.startContentIds.length === 0 && model.user.isCurrentUser"
-                                      style="max-width: 100%;"
-                                      name="model.labels.noStartNodes">
-                    </umb-node-preview>
+                <umb-node-preview ng-if="model.user.startContentIds.length === 0 && model.user.isCurrentUser"
+                                  style="max-width: 100%;"
+                                  name="model.labels.noStartNodes">
+                </umb-node-preview>
 
-                    <a href=""
-                       ng-if="!model.user.isCurrentUser"
-                       class="umb-node-preview-add"
-                       id="content-start-add"
-                       ng-click="model.openContentPicker()"
-                       prevent-default>
-                        <localize key="general_add">Add</localize>
-                    </a>
+                <a href=""
+                   ng-if="!model.user.isCurrentUser"
+                   class="umb-node-preview-add"
+                   id="content-start-add"
+                   ng-click="model.openContentPicker()"
+                   prevent-default>
+                    <localize key="general_add">Add</localize>
+                </a>
 
-                </umb-control-group>
+            </umb-control-group>
 
-                <umb-control-group label="@user_mediastartnodes" description="@user_mediastartnodeshelp">
+            <umb-control-group label="@user_mediastartnodes" description="@user_mediastartnodeshelp">
 
-                    <umb-node-preview style="max-width: 100%;"
-                                      ng-repeat="node in model.user.startMediaIds"
-                                      icon="node.icon"
-                                      name="node.name"
-                                      allow-remove="!model.user.isCurrentUser"
-                                      on-remove="model.removeSelectedItem($index, model.user.startMediaIds)">
-                    </umb-node-preview>
+                <umb-node-preview style="max-width: 100%;"
+                                  ng-repeat="node in model.user.startMediaIds"
+                                  icon="node.icon"
+                                  name="node.name"
+                                  allow-remove="!model.user.isCurrentUser"
+                                  on-remove="model.removeSelectedItem($index, model.user.startMediaIds)">
+                </umb-node-preview>
 
-                    <umb-node-preview ng-if="model.user.startMediaIds.length === 0 && model.user.isCurrentUser"
-                                      style="max-width: 100%;"
-                                      name="model.labels.noStartNodes">
-                    </umb-node-preview>
+                <umb-node-preview ng-if="model.user.startMediaIds.length === 0 && model.user.isCurrentUser"
+                                  style="max-width: 100%;"
+                                  name="model.labels.noStartNodes">
+                </umb-node-preview>
 
-                    <a href=""
-                       ng-if="!model.user.isCurrentUser"
-                     class="umb-node-preview-add"
-                       ng-click="model.openMediaPicker()"
-                       id="media-start-add"
-                       prevent-default>
-                        <localize key="general_add">Add</localize>
-                    </a>
+                <a href=""
+                   ng-if="!model.user.isCurrentUser"
+                   class="umb-node-preview-add"
+                   ng-click="model.openMediaPicker()"
+                   id="media-start-add"
+                   prevent-default>
+                    <localize key="general_add">Add</localize>
+                </a>
 
-                </umb-control-group>
+            </umb-control-group>
 
-            </umb-box-content>
-        </umb-box>
+        </umb-box-content>
+    </umb-box>
 
-        <umb-box>
-            <umb-box-header title-key="user_access" description-key="user_accessHelp"></umb-box-header>
-            <umb-box-content class="block-form" style="padding-bottom: 0;">
+    <umb-box>
+        <umb-box-header title-key="user_access" description-key="user_accessHelp"></umb-box-header>
+        <umb-box-content class="block-form" style="padding-bottom: 0;">
 
-                <umb-control-group label="@sections_content">
-                    <umb-node-preview style="max-width: 100%;"
-                                      ng-repeat="node in model.user.calculatedStartContentIds"
-                                      icon="node.icon"
-                                      name="node.name">
-                    </umb-node-preview>
-                    <umb-node-preview ng-if="model.user.calculatedStartContentIds.length === 0"
-                                      style="max-width: 100%;"
-                                      name="model.labels.noStartNodes">
-                    </umb-node-preview>
-                </umb-control-group>
+            <umb-control-group label="@sections_content">
+                <umb-node-preview style="max-width: 100%;"
+                                  ng-repeat="node in model.user.calculatedStartContentIds"
+                                  icon="node.icon"
+                                  name="node.name">
+                </umb-node-preview>
+                <umb-node-preview ng-if="model.user.calculatedStartContentIds.length === 0"
+                                  style="max-width: 100%;"
+                                  name="model.labels.noStartNodes">
+                </umb-node-preview>
+            </umb-control-group>
 
-                <umb-control-group label="@sections_media">
-                    <umb-node-preview style="max-width: 100%;"
-                                      ng-repeat="node in model.user.calculatedStartMediaIds"
-                                      icon="node.icon"
-                                      name="node.name">
-                    </umb-node-preview>
-                    <umb-node-preview ng-if="model.user.calculatedStartMediaIds.length === 0"
-                                      style="max-width: 100%;"
-                                      name="model.labels.noStartNodes">
-                    </umb-node-preview>
-                </umb-control-group>
+            <umb-control-group label="@sections_media">
+                <umb-node-preview style="max-width: 100%;"
+                                  ng-repeat="node in model.user.calculatedStartMediaIds"
+                                  icon="node.icon"
+                                  name="node.name">
+                </umb-node-preview>
+                <umb-node-preview ng-if="model.user.calculatedStartMediaIds.length === 0"
+                                  style="max-width: 100%;"
+                                  name="model.labels.noStartNodes">
+                </umb-node-preview>
+            </umb-control-group>
 
-            </umb-box-content>
-        </umb-box>
-    </div>
+        </umb-box-content>
+    </umb-box>
+</div>
 
     <div class="umb-user-details-details__sidebar">
 
@@ -251,7 +251,7 @@
                     </umb-button>
                 </div>
                 <div>
-                    <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
+                    <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && (model.user.isCurrentUser || model.user.userGroups[0].alias != 'admin')"
                                 button-style="[info,block]"
                                 action="model.toggleChangePassword()"
                                 label="Change password"
