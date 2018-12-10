@@ -34,7 +34,6 @@
         vm.$onDestroy = onDestroy;
 
         vm.validateMandatory = validateMandatory;
-        vm.addTagOnEnter = addTagOnEnter;
         vm.addTag = addTag;
         vm.removeTag = removeTag;
         vm.showPrompt = showPrompt;
@@ -60,20 +59,17 @@
                 tagsHound = new Bloodhound({
                     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                     queryTokenizer: Bloodhound.tokenizers.whitespace,
-                    dupDetector: function (remoteMatch, localMatch) {
-                        return (remoteMatch["value"] == localMatch["value"]);
-                    },
                     //pre-fetch the tags for this category
                     prefetch: {
                         url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture }),
                         //TTL = 5 minutes
                         ttl: 300000,
-                        filter: dataTransform
+                        transform: dataTransform
                     },
                     //dynamically get the tags for this category (they may have changed on the server)
                     remote: {
                         url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture }),
-                        filter: dataTransform
+                        transform: dataTransform
                     }
                 });
 
@@ -82,31 +78,36 @@
                 //configure the type ahead
                 $timeout(function () {
 
-                    typeahead = $element.find('.tags-' + vm.htmlId).typeahead(
-                        {
-                            //This causes some strangeness as it duplicates the textbox, best leave off for now.
-                            hint: false,
-                            highlight: true,
-                            cacheKey: new Date(),  // Force a cache refresh each time the control is initialized
-                            minLength: 1
-                        }, {
-                            //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
-                            // name = the data set name, we'll make this the tag group name
-                            name: vm.config.group,
-                            displayKey: "value",
-                            source: function (query, cb) {
-                                tagsHound.get(query, function (suggestions) {
+                    var sources = {
+                        //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
+                        // name = the data set name, we'll make this the tag group name
+                        name: vm.config.group,
+                        display: "value",
+                        //source: tagsHound
+                        source: function (query, cb) {
+                            tagsHound.search(query,
+                                function(suggestions) {
                                     cb(removeCurrentTagsFromSuggestions(suggestions));
                                 });
-                            }
-                        }).bind("typeahead:selected", function (obj, datum, name) {
+                        }
+                    };
+
+                    var opts = {
+                        //This causes some strangeness as it duplicates the textbox, best leave off for now.
+                        hint: false,
+                        highlight: true,
+                        cacheKey: new Date(),  // Force a cache refresh each time the control is initialized
+                        minLength: 1
+                    };
+
+                    typeahead = $element.find('.tags-' + vm.htmlId).typeahead(opts, sources)
+                        .bind("typeahead:selected", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
                                 addTagInternal(datum["value"]);
                                 vm.tagToAdd = "";
                                 // clear the typed text
                                 typeahead.typeahead('val', '');
                             });
-
                         }).bind("typeahead:autocompleted", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
                                 addTagInternal(datum["value"]);
@@ -114,7 +115,7 @@
                             });
 
                         }).bind("typeahead:opened", function (obj) {
-                            //console.log("opened ");
+                            console.log("opened ");
                         });
                 });
 
@@ -167,6 +168,9 @@
                         updateModelValue(vm.viewModel);
                     }
                 }
+                else if (angular.isArray(vm.value)) {
+                    vm.viewModel = vm.value;
+                }
             }
         }
 
@@ -195,17 +199,6 @@
                 if (vm.viewModel.indexOf(tagToAdd) < 0) {
                     vm.viewModel.push(tagToAdd);
                     updateModelValue(vm.viewModel);
-                }
-            }
-        }
-
-        function addTagOnEnter(e) {
-            var code = e.keyCode || e.which;
-            if (code == 13) { //Enter keycode
-                if ($element.find('.tags-' + vm.htmlId).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
-                    //this is required, otherwise the html form will attempt to submit.
-                    e.preventDefault();
-                    addTag();
                 }
             }
         }
