@@ -203,11 +203,14 @@
             }));
 
             evts.push(eventsService.on("appState.editors.close", function (name, args) {
-                removeEditor(args.editor);
-            }));
-
-            evts.push(eventsService.on("appState.editors.closeAll", function (name, args) {
-                scope.editors = [];
+                // remove the closed editor
+                if(args && args.editor) {
+                    removeEditor(args.editor);
+                }
+                // close all editors
+                if(args && args.editors.length === 0) {
+                    scope.editors = [];
+                }
             }));
 
             //ensure to unregister from all events!
