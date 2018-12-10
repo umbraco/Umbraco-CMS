@@ -11,18 +11,17 @@ namespace Umbraco.Web.Models.Mapping
         {
             // FROM IRelationType to RelationTypeDisplay
             CreateMap<IRelationType, RelationTypeDisplay>()
-                .ForMember(x => x.Icon, expression => expression.Ignore())
-                .ForMember(x => x.Trashed, expression => expression.Ignore())
-                .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.Path, expression => expression.Ignore())
-                .ForMember(x => x.AdditionalData, expression => expression.Ignore())
-                .ForMember(x => x.ChildObjectTypeName, expression => expression.Ignore())
-                .ForMember(x => x.ParentObjectTypeName, expression => expression.Ignore())
-                .ForMember(x => x.Relations, expression => expression.Ignore())
-                .ForMember(
-                    x => x.Udi,
-                    expression => expression.MapFrom(
-                        content => Udi.Create(Constants.UdiEntityType.RelationType, content.Key)))
+                .ForMember(dest => dest.Icon, opt => opt.Ignore())
+                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
+                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                .ForMember(dest => dest.Path, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.ChildObjectTypeName, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentObjectTypeName, opt => opt.Ignore())
+                .ForMember(dest => dest.Relations, opt => opt.Ignore())
+                .ForMember(dest => dest.ParentId, opt => opt.Ignore())
+                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.RelationType, content.Key)))
                 .AfterMap((src, dest) =>
                 {
                     // Build up the path
@@ -34,10 +33,15 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             // FROM IRelation to RelationDisplay
-            CreateMap<IRelation, RelationDisplay>();
+            CreateMap<IRelation, RelationDisplay>()
+                .ForMember(dest => dest.ParentName, opt => opt.Ignore())
+                .ForMember(dest => dest.ChildName, opt => opt.Ignore());
 
             // FROM RelationTypeSave to IRelationType
-            CreateMap<RelationTypeSave, IRelationType>();
+            CreateMap<RelationTypeSave, IRelationType>()
+                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdateDate, opt => opt.Ignore())
+                .ForMember(dest => dest.DeleteDate, opt => opt.Ignore());
         }
     }
 }
