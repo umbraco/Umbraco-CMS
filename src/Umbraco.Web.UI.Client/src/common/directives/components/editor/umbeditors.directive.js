@@ -208,7 +208,7 @@
                     removeEditor(args.editor);
                 }
                 // close all editors
-                if(args && args.editors.length === 0) {
+                if(args && !args.editor && args.editors.length === 0) {
                     scope.editors = [];
                 }
             }));
