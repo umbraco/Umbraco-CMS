@@ -15,6 +15,7 @@ namespace Umbraco.Web.Controllers
     public class UmbProfileController : SurfaceController
     {
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
             var provider = global::Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
