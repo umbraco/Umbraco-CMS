@@ -147,7 +147,7 @@ namespace Umbraco.Tests.PublishedContent
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //include unpublished content since this uses the 'internal' indexer, it's up to the media cache to filter
-                validator: new ContentValueSetValidator(true)))
+                validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
                 rebuilder.RegisterIndex(indexer.Name);
