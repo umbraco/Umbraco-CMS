@@ -26,7 +26,7 @@
               class="typeahead tags-{{model.alias}}"
               ng-model="$parent.tagToAdd"
               ng-keydown="$parent.addTagOnEnter($event)"
-              on-blur="$parent.addTag()"
+              ng-blur="$parent.addTag()"
               localize="placeholder"
               placeholder="@placeholders_enterTags" />
 

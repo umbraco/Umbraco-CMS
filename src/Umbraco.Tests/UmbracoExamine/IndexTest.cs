@@ -112,8 +112,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 Assert.AreEqual("value2", result.AllValues["grid.row1"][1]);
                 Assert.IsTrue(result.Values.ContainsKey("grid"));
                 Assert.AreEqual("value1 value2 ", result["grid"]);
-                Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineIndexer.RawFieldPrefix}grid"));
-                Assert.AreEqual(json, result[$"{UmbracoExamineIndexer.RawFieldPrefix}grid"]);
+                Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineIndex.RawFieldPrefix}grid"));
+                Assert.AreEqual(json, result[$"{UmbracoExamineIndex.RawFieldPrefix}grid"]);
             }
         }
 

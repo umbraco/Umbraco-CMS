@@ -9,10 +9,10 @@ namespace Umbraco.Examine
 {
     public class UmbracoExamineIndexDiagnostics : IIndexDiagnostics
     {
-        private readonly UmbracoExamineIndexer _index;
+        private readonly UmbracoExamineIndex _index;
         private readonly ILogger _logger;
 
-        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndexer index, ILogger logger)
+        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger)
         {
             _index = index;
             _logger = logger;
@@ -28,7 +28,7 @@ namespace Umbraco.Examine
                 }
                 catch (AlreadyClosedException)
                 {
-                    _logger.Warn(typeof(UmbracoContentIndexer), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                    _logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexDocumentCount, the writer is already closed");
                     return 0;
                 }
             }
@@ -44,7 +44,7 @@ namespace Umbraco.Examine
                 }
                 catch (AlreadyClosedException)
                 {
-                    _logger.Warn(typeof(UmbracoContentIndexer), "Cannot get GetIndexFieldCount, the writer is already closed");
+                    _logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexFieldCount, the writer is already closed");
                     return 0;
                 }
             }
@@ -62,15 +62,15 @@ namespace Umbraco.Examine
             {
                 var d = new Dictionary<string, object>
                 {
-                    [nameof(UmbracoExamineIndexer.CommitCount)] = _index.CommitCount,
-                    [nameof(UmbracoExamineIndexer.DefaultAnalyzer)] = _index.DefaultAnalyzer.GetType().Name,
-                    [nameof(UmbracoExamineIndexer.DirectoryFactory)] = _index.DirectoryFactory,
-                    [nameof(UmbracoExamineIndexer.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler,
-                    [nameof(UmbracoExamineIndexer.LuceneIndexFolder)] =
+                    [nameof(UmbracoExamineIndex.CommitCount)] = _index.CommitCount,
+                    [nameof(UmbracoExamineIndex.DefaultAnalyzer)] = _index.DefaultAnalyzer.GetType().Name,
+                    [nameof(UmbracoExamineIndex.DirectoryFactory)] = _index.DirectoryFactory,
+                    [nameof(UmbracoExamineIndex.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler,
+                    [nameof(UmbracoExamineIndex.LuceneIndexFolder)] =
                         _index.LuceneIndexFolder == null
                             ? string.Empty
                             : _index.LuceneIndexFolder.ToString().ToLowerInvariant().TrimStart(IOHelper.MapPath(SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/'),
-                    [nameof(UmbracoExamineIndexer.PublishedValuesOnly)] = _index.PublishedValuesOnly,
+                    [nameof(UmbracoExamineIndex.PublishedValuesOnly)] = _index.PublishedValuesOnly,
                     //There's too much info here
                     //[nameof(UmbracoExamineIndexer.FieldDefinitionCollection)] = _index.FieldDefinitionCollection,
                 };

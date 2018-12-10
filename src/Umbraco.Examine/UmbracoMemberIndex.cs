@@ -22,13 +22,13 @@ namespace Umbraco.Examine
     /// <summary>
     /// Custom indexer for members
     /// </summary>
-    public class UmbracoMemberIndexer : UmbracoExamineIndexer
+    public class UmbracoMemberIndex : UmbracoExamineIndex
     {
         /// <summary>
         /// Constructor for config/provider based indexes
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public UmbracoMemberIndexer()
+        public UmbracoMemberIndex()
         {
         }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Examine
         /// <param name="profilingLogger"></param>
         /// <param name="validator"></param>
         /// <param name="analyzer"></param>
-        public UmbracoMemberIndexer(
+        public UmbracoMemberIndex(
             string name, 
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,

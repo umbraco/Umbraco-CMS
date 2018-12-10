@@ -146,7 +146,7 @@ namespace Umbraco.Tests.UmbracoExamine
             return mediaTypeServiceMock.Object;
         }
 
-        public static UmbracoContentIndexer GetUmbracoIndexer(
+        public static UmbracoContentIndex GetUmbracoIndexer(
             IProfilingLogger profilingLogger,
             Directory luceneDir,
             Analyzer analyzer = null,
@@ -162,9 +162,9 @@ namespace Umbraco.Tests.UmbracoExamine
             if (validator == null)
                 validator = new ContentValueSetValidator(true);
             
-            var i = new UmbracoContentIndexer(
+            var i = new UmbracoContentIndex(
                 "testIndexer",
-                UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
+                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
                 luceneDir,
                 analyzer,
                 profilingLogger,

@@ -123,15 +123,15 @@ namespace Umbraco.Web.Models.Mapping
                   .AfterMap((src, dest) =>
                       {
                           //get the icon if there is one
-                          dest.Icon = src.Values.ContainsKey(UmbracoExamineIndexer.IconFieldName)
-                              ? src.Values[UmbracoExamineIndexer.IconFieldName]
+                          dest.Icon = src.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
+                              ? src.Values[UmbracoExamineIndex.IconFieldName]
                               : "icon-document";
 
                           dest.Name = src.Values.ContainsKey("nodeName") ? src.Values["nodeName"] : "[no name]";
-                          if (src.Values.ContainsKey(UmbracoExamineIndexer.NodeKeyFieldName))
+                          if (src.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
                           {
                               Guid key;
-                              if (Guid.TryParse(src.Values[UmbracoExamineIndexer.NodeKeyFieldName], out key))
+                              if (Guid.TryParse(src.Values[UmbracoExamineIndex.NodeKeyFieldName], out key))
                               {
                                   dest.Key = key;
 
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Models.Mapping
                                   dest.ParentId = -1;
                               }
                           }
-                          dest.Path = src.Values.ContainsKey(UmbracoExamineIndexer.IndexPathFieldName) ? src.Values[UmbracoExamineIndexer.IndexPathFieldName] : "";
+                          dest.Path = src.Values.ContainsKey(UmbracoExamineIndex.IndexPathFieldName) ? src.Values[UmbracoExamineIndex.IndexPathFieldName] : "";
 
                           if (src.Values.ContainsKey(LuceneIndex.ItemTypeFieldName))
                           {

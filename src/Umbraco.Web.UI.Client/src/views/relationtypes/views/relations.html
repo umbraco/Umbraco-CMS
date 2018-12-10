@@ -1,0 +1,23 @@
+<umb-box>
+    <umb-box-content>
+        <!-- Relations -->
+        <umb-control-group label="@relationType_relations" ng-if="model.relationType.relations.length > 0">
+                <div>
+                    <table class="table">
+                        <thead>
+                            <th><localize key="relationType_parent">Parent</localize></th>
+                            <th><localize key="relationType_child">Child</localize></th>
+                            <th><localize key="relationType_created">Created</localize></th>
+                            <th><localize key="relationType_comment">Comment</localize></th>
+                        </thead>
+                        <tr ng-repeat="relation in model.relationType.relations">
+                            <td>{{relation.parentName}}</td>
+                            <td>{{relation.childName}}</td>
+                            <td>{{relation.timestampFormatted}}</td>
+                            <td>{{relation.comment}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </umb-control-group>
+    </umb-box-content>
+</umb-box>

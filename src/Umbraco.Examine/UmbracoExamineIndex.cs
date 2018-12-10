@@ -23,7 +23,7 @@ namespace Umbraco.Examine
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
     /// </summary>
-    public abstract class UmbracoExamineIndexer : LuceneIndex, IUmbracoIndexer, IIndexDiagnostics
+    public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndexer, IIndexDiagnostics
     {
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -48,7 +48,7 @@ namespace Umbraco.Examine
         /// Constructor for config provider based indexes
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        protected UmbracoExamineIndexer()
+        protected UmbracoExamineIndex()
             : base()
         {
             ProfilingLogger = Current.ProfilingLogger;
@@ -56,7 +56,7 @@ namespace Umbraco.Examine
         }
 
         /// <summary>
-        /// Create a new <see cref="UmbracoExamineIndexer"/>
+        /// Create a new <see cref="UmbracoExamineIndex"/>
         /// </summary>
         /// <param name="name"></param>
         /// <param name="fieldDefinitions"></param>
@@ -65,7 +65,7 @@ namespace Umbraco.Examine
         /// <param name="profilingLogger"></param>
         /// <param name="validator"></param>
         /// <param name="indexValueTypes"></param>
-        protected UmbracoExamineIndexer(
+        protected UmbracoExamineIndex(
             string name,
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,

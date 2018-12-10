@@ -190,8 +190,8 @@ AND umbracoNode.nodeObjectType = @objectType",
                                         SortOrder = allowedContentType.SortOrder
                                     });
             }
-            
-        
+
+
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
@@ -328,14 +328,14 @@ AND umbracoNode.id <> @id",
             // We check if the entity's own PropertyTypes has been modified and then also check
             // any of the property groups PropertyTypes has been modified.
             // This specifically tells us if any property type collections have changed.
-            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
+            if (entity.IsPropertyDirty("NoGroupPropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
             {
                 var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { entity.Id });
-                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
+                var dbPropertyTypeIds = dbPropertyTypes.Select(x => x.Id);
                 var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
-                var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
-                foreach (var item in items)
-                    DeletePropertyType(entity.Id, item);
+                var propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
+                foreach (var propertyTypeId in propertyTypeToDeleteIds)
+                    DeletePropertyType(entity.Id, propertyTypeId);
             }
 
             // Delete tabs ... by excepting entries from db with entries from collections.
@@ -620,7 +620,7 @@ AND umbracoNode.id <> @id",
             var sqlDelete = Sql()
                 .Delete<RedirectUrlDto>()
                 .WhereIn((System.Linq.Expressions.Expression<Func<RedirectUrlDto, object>>)(x => x.ContentKey), sqlSelect);
-            
+
             Database.Execute(sqlDelete);
         }
 
@@ -690,7 +690,7 @@ AND umbracoNode.id <> @id",
                     //first clear out any existing names that might already exists under the default lang
                     //there's 2x tables to update
 
-                    //clear out the versionCultureVariation table 
+                    //clear out the versionCultureVariation table
                     var sqlSelect = Sql().Select<ContentVersionCultureVariationDto>(x => x.Id)
                         .From<ContentVersionCultureVariationDto>()
                         .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
