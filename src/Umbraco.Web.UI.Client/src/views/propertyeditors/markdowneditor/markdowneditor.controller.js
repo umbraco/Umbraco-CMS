@@ -8,6 +8,10 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
         $scope.model.value = $scope.model.config.defaultValue;
     }
 
+    // create a unique ID for the markdown editor, so the button bar bindings can handle split view
+    // - must be bound on scope, not scope.model - otherwise it won't work, because $scope.model is used in both sides of the split view
+    $scope.editorId = $scope.model.alias + _.uniqueId("-");
+
     function openMediaPicker(callback) {
         var mediaPicker = {
             disableFolderSelect: true,
@@ -40,7 +44,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
                 $timeout(function () {
                     $scope.markdownEditorInitComplete = false;
                     var converter2 = new Markdown.Converter();
-                    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
+                    var editor2 = new Markdown.Editor(converter2, "-" + $scope.editorId);
                     editor2.run();
 
                     //subscribe to the image dialog clicks

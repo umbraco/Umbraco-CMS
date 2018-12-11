@@ -11,9 +11,9 @@ namespace Umbraco.Web.Models.Mapping
     // maps ContentApps when mapping IContent to ContentItemDisplay
     internal class ContentAppResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentApp>>
     {
-        private readonly ContentAppDefinitionCollection _contentAppDefinitions;
+        private readonly ContentAppFactoryCollection _contentAppDefinitions;
 
-        public ContentAppResolver(ContentAppDefinitionCollection contentAppDefinitions)
+        public ContentAppResolver(ContentAppFactoryCollection contentAppDefinitions)
         {
             _contentAppDefinitions = contentAppDefinitions;
         }

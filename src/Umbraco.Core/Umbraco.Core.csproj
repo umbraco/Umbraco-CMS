@@ -111,7 +111,6 @@
     <Compile Include="AttemptOfTResultTStatus.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
-    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Cache\CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -194,8 +193,8 @@
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
-    <Compile Include="Configuration\Dashboard\AccessItem.cs" />
-    <Compile Include="Configuration\Dashboard\AccessType.cs" />
+    <Compile Include="Configuration\Dashboard\AccessRule.cs" />
+    <Compile Include="Configuration\Dashboard\AccessRuleType.cs" />
     <Compile Include="Configuration\Dashboard\AreaCollection.cs" />
     <Compile Include="Configuration\Dashboard\AreaElement.cs" />
     <Compile Include="Configuration\Dashboard\AreasElement.cs" />
@@ -203,7 +202,7 @@
     <Compile Include="Configuration\Dashboard\ControlElement.cs" />
     <Compile Include="Configuration\Dashboard\DashboardSection.cs" />
     <Compile Include="Configuration\Dashboard\IAccess.cs" />
-    <Compile Include="Configuration\Dashboard\IAccessItem.cs" />
+    <Compile Include="Configuration\Dashboard\IAccessRule.cs" />
     <Compile Include="Configuration\Dashboard\IArea.cs" />
     <Compile Include="Configuration\Dashboard\IDashboardControl.cs" />
     <Compile Include="Configuration\Dashboard\IDashboardSection.cs" />
@@ -313,6 +312,7 @@
     <Compile Include="Constants-PropertyTypeGroups.cs" />
     <Compile Include="Constants-Security.cs" />
     <Compile Include="Constants-System.cs" />
+    <Compile Include="Constants-Indexes.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
@@ -320,6 +320,8 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
+    <Compile Include="GuidUtils.cs" />
+    <Compile Include="HexEncoder.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
@@ -333,11 +335,10 @@
     <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
-    <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
+    <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
-    <Compile Include="Manifest\ManifestDashboardControl.cs" />
-    <Compile Include="Manifest\ManifestDashboardSection.cs" />
-    <Compile Include="Manifest\ManifestDashboardTab.cs" />
+    <Compile Include="Manifest\ManifestContentAppFactory.cs" />
+    <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
@@ -381,7 +382,7 @@
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
-    <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
+    <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentSchedule.cs" />
     <Compile Include="Models\ContentScheduleAction.cs" />
     <Compile Include="Models\ContentScheduleCollection.cs" />
@@ -442,6 +443,7 @@
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DefaultPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
     <Compile Include="PropertyEditors\IConfigurationEditor.cs" />
@@ -450,6 +452,7 @@
     <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
     <Compile Include="PropertyEditors\IManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IValueFormatValidator.cs" />
+    <Compile Include="PropertyEditors\IPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\IValueRequiredValidator.cs" />
     <Compile Include="PropertyEditors\LabelConfiguration.cs" />
     <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />

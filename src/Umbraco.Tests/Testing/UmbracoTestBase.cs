@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
 
             // register empty content apps collection
-            Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
+            Container.RegisterCollectionBuilder<ContentAppFactoryCollectionBuilder>();
         }
 
         protected virtual void ComposeCacheHelper()

@@ -21,6 +21,10 @@ namespace Umbraco.Core.Models
 
         public PublicAccessEntry(IContent protectedNode, IContent loginNode, IContent noAccessNode, IEnumerable<PublicAccessRule> ruleCollection)
         {
+            if (protectedNode == null) throw new ArgumentNullException(nameof(protectedNode));
+            if (loginNode == null) throw new ArgumentNullException(nameof(loginNode));
+            if (noAccessNode == null) throw new ArgumentNullException(nameof(noAccessNode));
+
             LoginNodeId = loginNode.Id;
             NoAccessNodeId = noAccessNode.Id;
             _protectedNodeId = protectedNode.Id;
