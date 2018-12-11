@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using SearchResult = Examine.SearchResult;
@@ -23,11 +24,13 @@ namespace Umbraco.Web.Search
     {
         private readonly IExamineManager _examineManager;
         private readonly UmbracoHelper _umbracoHelper;
+        private readonly ILocalizationService _languageService;
 
-        public UmbracoTreeSearcher(IExamineManager examineManager, UmbracoHelper umbracoHelper)
+        public UmbracoTreeSearcher(IExamineManager examineManager, UmbracoHelper umbracoHelper, ILocalizationService languageService)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoHelper = umbracoHelper ?? throw new ArgumentNullException(nameof(umbracoHelper));
+            _languageService = languageService;
         }
 
         /// <summary>
@@ -51,7 +54,7 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var indexName = Constants.Examine.InternalIndexer;
+            var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = new[] { "id", "__NodeId" };
 
             var umbracoContext = _umbracoHelper.UmbracoContext;
@@ -60,7 +63,7 @@ namespace Umbraco.Web.Search
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    indexName = Constants.Examine.InternalMemberIndexer;
+                    indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -90,8 +93,8 @@ namespace Umbraco.Web.Search
             var internalSearcher = index.GetSearcher();
 
             //build a lucene query:
-            // the __nodeName will be boosted 10x without wildcards
-            // then __nodeName will be matched normally with wildcards
+            // the nodeName will be boosted 10x without wildcards
+            // then nodeName will be matched normally with wildcards
             // the rest will be normal without wildcards
 
 
@@ -120,7 +123,7 @@ namespace Umbraco.Web.Search
                     query = string.Format("{0}{1}{0}", "\"", query);
 
                     //node name exactly boost x 10
-                    sb.Append("+(__nodeName: (");
+                    sb.Append("+(nodeName: (");
                     sb.Append(query.ToLower());
                     sb.Append(")^10.0 ");
 
@@ -155,14 +158,14 @@ namespace Umbraco.Web.Search
                     var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                     //node name exactly boost x 10
-                    sb.Append("+(__nodeName:");
+                    sb.Append("+(nodeName:");
                     sb.Append("\"");
                     sb.Append(query.ToLower());
                     sb.Append("\"");
                     sb.Append("^10.0 ");
 
                     //node name normally with wildcards
-                    sb.Append(" __nodeName:");
+                    sb.Append(" nodeName:");
                     sb.Append("(");
                     foreach (var w in querywords)
                     {
@@ -333,17 +336,28 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
+            var defaultLang = _languageService.GetDefaultLanguageIsoCode();
+
+            foreach (var result in results)
             {
-                var intId = m.Id.TryConvertTo<int>();
+                var entity = Mapper.Map<SearchResultEntity>(result);
+
+                var intId = entity.Id.TryConvertTo<int>();
                 if (intId.Success)
                 {
-                    m.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result);
+                    //TODO: Here we need to figure out how to get the URL based on variant, etc...
+                    if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "1")
+                    {
+                        entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result, defaultLang);
+                    }
+                    else
+                    {
+                        entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result);
+                    }
                 }
+
+                yield return entity;
             }
-            return mapped;
         }
 
     }

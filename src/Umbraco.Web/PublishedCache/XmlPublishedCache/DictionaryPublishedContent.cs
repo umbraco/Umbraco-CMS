@@ -55,7 +55,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
             //ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
-            ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName", "__nodeName");
+            ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");
             ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
             ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndex.ItemTypeFieldName);
             ValidateAndSetProperty(valueDictionary, val => _documentTypeId = Int32.Parse(val), "nodeType");
