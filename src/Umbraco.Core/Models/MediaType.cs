@@ -44,29 +44,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public override bool IsPublishing => IsPublishingConst;
 
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        public new IMediaType DeepCloneWithResetIdentities(string alias)
-        {
-            var clone = (MediaType)DeepClone();
-            clone.Alias = alias;
-            clone.Key = Guid.Empty;
-            foreach (var propertyGroup in clone.PropertyGroups)
-            {
-                propertyGroup.ResetIdentity();
-                propertyGroup.ResetDirtyProperties(false);
-            }
-            foreach (var propertyType in clone.PropertyTypes)
-            {
-                propertyType.ResetIdentity();
-                propertyType.ResetDirtyProperties(false);
-            }
-
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
+        /// <inheritdoc />
+        IMediaType IMediaType.DeepCloneWithResetIdentities(string newAlias) => (IMediaType)DeepCloneWithResetIdentities(newAlias);
     }
 }

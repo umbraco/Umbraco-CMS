@@ -132,6 +132,7 @@
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
+    <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
