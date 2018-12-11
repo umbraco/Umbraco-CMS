@@ -15,6 +15,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using System.Globalization;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
@@ -30,8 +31,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
+        public TreeNode GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             int asInt;
             Guid asGuid = Guid.Empty;
