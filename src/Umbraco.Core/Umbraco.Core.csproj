@@ -114,7 +114,6 @@
     <Compile Include="AttemptOfTResultTStatus.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
-    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Cache\CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -324,6 +323,8 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
+    <Compile Include="GuidUtils.cs" />
+    <Compile Include="HexEncoder.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
