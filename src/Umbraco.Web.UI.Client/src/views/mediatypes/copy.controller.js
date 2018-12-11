@@ -3,6 +3,7 @@ angular.module("umbraco")
     function ($scope, mediaTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
 
         $scope.dialogTreeApi = {};
+        $scope.source = _.clone($scope.currentNode);
 
         function nodeSelectHandler(args) {
             args.event.preventDefault();
@@ -22,7 +23,7 @@ angular.module("umbraco")
             $scope.busy = true;
             $scope.error = false;
 
-            mediaTypeResource.copy({ parentId: $scope.target.id, id: $scope.currentNode.id })
+            mediaTypeResource.copy({ parentId: $scope.target.id, id: $scope.source.id })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
