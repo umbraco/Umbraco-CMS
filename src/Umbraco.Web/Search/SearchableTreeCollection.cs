@@ -19,15 +19,17 @@ namespace Umbraco.Web.Search
 
         private Dictionary<string, SearchableApplicationTree> CreateDictionary(IApplicationTreeService treeService)
         {
-            var appTrees = treeService.GetAll().ToArray();
+            var appTrees = treeService.GetAll()
+                .OrderBy(x => x.SortOrder)
+                .ToArray();
             var dictionary = new Dictionary<string, SearchableApplicationTree>();
             var searchableTrees = this.ToArray();
-            foreach (var searchableTree in searchableTrees)
+            foreach (var appTree in appTrees)
             {
-                var found = appTrees.FirstOrDefault(x => x.Alias == searchableTree.TreeAlias);
+                var found = searchableTrees.FirstOrDefault(x => x.TreeAlias == appTree.Alias);
                 if (found != null)
                 {
-                    dictionary[searchableTree.TreeAlias] = new SearchableApplicationTree(found.ApplicationAlias, found.Alias, searchableTree);
+                    dictionary[found.TreeAlias] = new SearchableApplicationTree(appTree.ApplicationAlias, appTree.Alias, found);
                 }
             }
             return dictionary;

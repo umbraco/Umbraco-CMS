@@ -1,8 +1,11 @@
 ﻿using System;
 using Examine.LuceneEngine.Providers;
+using Lucene.Net.Analysis;
 using Lucene.Net.Index;
+using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Examine
 {
@@ -11,6 +14,29 @@ namespace Umbraco.Examine
     /// </summary>
     internal static class ExamineExtensions
     {
+        public static bool TryParseLuceneQuery(string query)
+        {
+            //TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll
+            // also do this rudimentary check
+            if (!query.Contains(":"))
+                return false;
+
+            try
+            {
+                //This will pass with a plain old string without any fields, need to figure out a way to have it properly parse
+                var parsed = new QueryParser(Version.LUCENE_30, "nodeName", new KeywordAnalyzer()).Parse(query);
+                return true;
+            }
+            catch (ParseException)
+            {
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Checks if the index can be read/opened
         /// </summary>
