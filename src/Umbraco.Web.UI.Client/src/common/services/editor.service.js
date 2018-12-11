@@ -98,7 +98,7 @@
                 editor: null
             };
 
-            eventsService.emit("appState.editors.closeAll", args);
+            eventsService.emit("appState.editors.close", args);
         }
 
         /**

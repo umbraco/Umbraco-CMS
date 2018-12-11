@@ -1,0 +1,122 @@
+/**
+ * @ngdoc service
+ * @name umbraco.resources.relationTypeResource
+ * @description Loads in data for relation types.
+ */
+function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
+    return {
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#getById
+         * @methodOf umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Gets a relation type with a given ID.
+         *
+         * ##usage
+         * <pre>
+         * relationTypeResource.getById(1234)
+         *    .then(function() {
+         *        alert('Found it!');
+         *    });
+         * </pre>
+         *
+         * @param {Int} id of the relation type to get.
+         * @returns {Promise} resourcePromise containing relation type data.
+         */
+        getById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "GetById", [{ id: id }])),
+                "Failed to get item " + id
+            );
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#getRelationObjectTypes
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Gets a list of Umbraco object types which can be associated with a relation.
+         *
+         * @returns {Object} A collection of Umbraco object types.
+         */
+        getRelationObjectTypes: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "GetRelationObjectTypes")
+                ),
+                "Failed to get object types"
+            );
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#save
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Updates a relation type.
+         *
+         * @param {Object} relationType The relation type object to update.
+         * @returns {Promise} A resourcePromise object.
+         */
+        save: function (relationType) {
+            var saveModel = umbDataFormatter.formatRelationTypePostData(relationType);
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "PostSave"), saveModel),
+                "Failed to save data for relation type ID" + relationType.id
+            );
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#create
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Creates a new relation type.
+         *
+         * @param {Object} relationType The relation type object to create.
+         * @returns {Promise} A resourcePromise object.
+         */
+        create: function (relationType) {
+            var createModel = umbDataFormatter.formatRelationTypePostData(relationType);
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "PostCreate"), createModel),
+                "Failed to create new realtion"
+            );
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#deleteById
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Deletes a relation type with a given ID.
+         *
+         * * ## Usage
+         * <pre>
+         * relationTypeResource.deleteById(1234).then(function() {
+         *    alert('Deleted it!');
+         * });
+         * </pre>
+         *
+         * @param {Int} id The ID of the relation type to delete.
+         * @returns {Promose} resourcePromise object.
+         */
+        deleteById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "DeleteById", [{ id: id }])),
+                "Failed to delete item " + id
+            );
+        }
+
+    };
+}
+
+angular.module("umbraco.resources").factory("relationTypeResource", relationTypeResource);
