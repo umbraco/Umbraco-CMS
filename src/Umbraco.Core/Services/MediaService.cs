@@ -779,16 +779,9 @@ namespace Umbraco.Core.Services
                     var originalPath = media.Path;
 
                     var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, parentId);
-                    var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
+                    var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
                     if (uow.Events.DispatchCancelable(Moving, this, moveEventArgs, "Moving"))
                     {
-                        if (moveEventArgs.Messages.Count > 0)
-                        {
-                            foreach (var message in moveEventArgs.Messages.GetAll())
-                            {
-                                evtMsgs.Add(message);
-                            }
-                        }
                         uow.Commit();
                         return OperationStatus.Cancelled(evtMsgs); ;
                     }
@@ -1111,16 +1104,9 @@ namespace Umbraco.Core.Services
                     media.EnsureValidPath(Logger, entity => GetById(entity.ParentId), QuickUpdate);
                     var originalPath = media.Path;
                     var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
-                    var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
+                    var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
                     if (uow.Events.DispatchCancelable(Trashing, this, moveEventArgs, "Trashing"))
                     {
-                        if (moveEventArgs.Messages.Count > 0)
-                        {
-                            foreach (var message in moveEventArgs.Messages.GetAll())
-                            {
-                                evtMsgs.Add(message);
-                            }
-                        }
                         uow.Commit();
                         return OperationStatus.Cancelled(evtMsgs);
                     }

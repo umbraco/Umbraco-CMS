@@ -34,22 +34,22 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
 				// is it a content link?
-				if (!$scope.model.target.isMedia) {
-					// get the content path
-					entityResource.getPath(id, "Document").then(function(path) {
-						//now sync the tree to this path
-						$scope.dialogTreeEventHandler.syncTree({
-							path: path,
-							tree: "content"
-						});
-					});
+			    if (!$scope.model.target.isMedia) {
+			        // get the content path
+			        entityResource.getPath(id, "Document").then(function(path) {
+			            //now sync the tree to this path
+			            $scope.dialogTreeEventHandler.syncTree({
+			                path: path,
+			                tree: "content"
+			            });
+			        });
 
-					// get the content properties to build the anchor name list
-					contentResource.getById(id).then(function (resp) {
-						$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-						$scope.model.target.url = resp.urls[0];
-					});
-				}
+			        // get the content properties to build the anchor name list
+			        contentResource.getById(id).then(function (resp) {
+			            $scope.model.target.url = resp.urls[0];
+			            $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+			        });
+			    }
 			} else if ($scope.model.target.url.length) {
 			    // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
                 // only do the substring if there's a # or a ?
@@ -88,8 +88,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				$scope.model.target.url = "/";
 			} else {
 				contentResource.getById(args.node.id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 					$scope.model.target.url = resp.urls[0];
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 				});
 			}
 
