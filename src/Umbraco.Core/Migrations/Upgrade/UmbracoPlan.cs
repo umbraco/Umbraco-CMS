@@ -17,7 +17,9 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// </summary>
         public UmbracoPlan()
             : base(Constants.System.UmbracoUpgradePlanName)
-        { }
+        {
+            DefinePlan();
+        }
 
         /// <inheritdoc />
         /// <remarks>
@@ -53,8 +55,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             }
         }
 
-        /// <inheritdoc />
-        protected override void DefinePlan()
+         // define the plan
+        protected void DefinePlan()
         {
             // MODIFYING THE PLAN
             //

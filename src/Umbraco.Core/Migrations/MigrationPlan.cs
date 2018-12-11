@@ -26,21 +26,12 @@ namespace Umbraco.Core.Migrations
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // (accepted)
-            DefinePlan();
         }
 
         /// <summary>
         /// Gets the transitions.
         /// </summary>
         public IReadOnlyDictionary<string, Transition> Transitions => _transitions;
-
-        /// <summary>
-        /// Defines the plan.
-        /// </summary>
-        protected virtual void DefinePlan() { }
 
         /// <summary>
         /// Gets the name of the plan.
@@ -144,25 +135,6 @@ namespace Umbraco.Core.Migrations
 
             return this;
         }
-
-        /// <summary>
-        /// Copies a chain.
-        /// </summary>
-        /// <remarks>Copies the chain going from startState to endState, with new states going from sourceState to targetState.</remarks>
-        [Obsolete("die", true)]
-        public MigrationPlan CopyChain(string sourceState, string startState, string endState, string targetState)
-        {
-            From(sourceState).To(targetState, startState, endState);
-            return this;
-        }
-
-        /// <summary>
-        /// Copies a chain.
-        /// </summary>
-        /// <remarks>Copies the chain going from startState to endState, with new states going from chain to targetState.</remarks>
-        [Obsolete("die", true)]
-        public MigrationPlan CopyChain(string startState, string endState, string targetState)
-            => To(targetState, startState, endState);
 
         /// <summary>
         /// Gets the initial state.
