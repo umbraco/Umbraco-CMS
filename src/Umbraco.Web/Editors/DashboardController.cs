@@ -131,6 +131,7 @@ namespace Umbraco.Web.Editors
         }
 
         [ValidateAngularAntiForgeryToken]
+        [OutgoingEditorModelEvent]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
             return _dashboards.GetDashboards(section, Security.CurrentUser);
