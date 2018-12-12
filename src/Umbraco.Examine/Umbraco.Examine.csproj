@@ -66,6 +66,7 @@
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="IContentValueSetBuilder.cs" />
     <Compile Include="IContentValueSetValidator.cs" />
+    <Compile Include="IIndexCreator.cs" />
     <Compile Include="IIndexDiagnostics.cs" />
     <Compile Include="IIndexPopulator.cs" />
     <Compile Include="IndexPopulator.cs" />
