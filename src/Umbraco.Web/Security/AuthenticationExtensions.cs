@@ -145,7 +145,7 @@ namespace Umbraco.Web.Security
         public static void UmbracoLogout(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            Logout(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            Logout(http, Current.Config.Umbraco().Security.AuthCookieName);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace Umbraco.Web.Security
             http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
-        
+
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
         /// </summary>
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Security
             var ticket = http.GetUmbracoAuthTicket();
             return ticket.GetRemainingAuthSeconds();
         }
-        
+
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
         /// </summary>
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
-            return GetAuthTicket(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            return GetAuthTicket(http, Current.Config.Umbraco().Security.AuthCookieName);
         }
 
         internal static AuthenticationTicket GetUmbracoAuthTicket(this HttpContext http)
@@ -227,7 +227,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
-            return GetAuthTicket(ctx, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            return GetAuthTicket(ctx, Current.Config.Umbraco().Security.AuthCookieName);
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace Umbraco.Web.Security
                 return null;
             }
             //get the ticket
-            
+
             return secureDataFormat.Unprotect(formsCookie);
         }
     }

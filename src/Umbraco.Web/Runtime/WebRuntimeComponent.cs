@@ -196,7 +196,7 @@ namespace Umbraco.Web.Runtime
 
             // register published router
             composition.RegisterUnique<PublishedRouter>();
-            composition.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
+            composition.Register(_ => Current.Config.Umbraco().WebRouting);
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());

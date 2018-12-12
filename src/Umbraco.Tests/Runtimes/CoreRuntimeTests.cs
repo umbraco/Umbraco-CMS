@@ -134,12 +134,12 @@ namespace Umbraco.Tests.Runtimes
                 composition.RegisterUnique(scopeProvider);
             }
 
-            private MainDom _mainDom;
+            private IMainDom _mainDom;
 
             public override IFactory Boot(IRegister container)
             {
                 var factory = base.Boot(container);
-                _mainDom = factory.GetInstance<MainDom>();
+                _mainDom = factory.GetInstance<IMainDom>();
                 return factory;
             }
 

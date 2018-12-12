@@ -2,6 +2,7 @@
 using System.Globalization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
@@ -36,7 +37,7 @@ namespace Umbraco.Tests.Routing
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByUrl(Logger);
 
-            Assert.IsTrue(UmbracoConfig.For.GlobalSettings().HideTopLevelNodeFromPath);
+            Assert.IsTrue(Current.Config.Global().HideTopLevelNodeFromPath);
 
             // fixme debugging - going further down, the routes cache is NOT empty?!
             if (urlString == "/home/sub1")
@@ -66,13 +67,13 @@ namespace Umbraco.Tests.Routing
             var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
             SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
-            
+
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByUrl(Logger);
 
-            Assert.IsFalse(UmbracoConfig.For.GlobalSettings().HideTopLevelNodeFromPath);
+            Assert.IsFalse(Current.Config.Global().HideTopLevelNodeFromPath);
 
             var result = lookup.TryFindContent(frequest);
 
@@ -97,7 +98,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByUrl(Logger);
-            
+
             var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Routing
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå"));
             var lookup = new ContentFinderByUrl(Logger);
-            
+
             var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);

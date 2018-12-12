@@ -233,13 +233,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
-            var gridConfig = UmbracoConfig.For.GridConfig(
-                Logger,
-                ApplicationCache.RuntimeCache,
-                new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
-                new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
-                HttpContext.IsDebuggingEnabled);
-
+            var gridConfig = Current.Config.Grids();
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 

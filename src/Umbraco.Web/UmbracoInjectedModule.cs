@@ -99,7 +99,7 @@ namespace Umbraco.Web
                 httpContext,
                 _publishedSnapshotService,
                 new WebSecurity(httpContext, _userService, _globalSettings),
-                UmbracoConfig.For.UmbracoSettings(),
+                Current.Config.Umbraco(),
                 _urlProviders,
                 _globalSettings,
                 _variationContextAccessor,
@@ -270,7 +270,7 @@ namespace Umbraco.Web
                     ReportRuntime(level, "Umbraco is booting.");
 
                     // let requests pile up and wait for 10s then show the splash anyway
-                    if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false
+                    if (Current.Config.Umbraco().Content.EnableSplashWhileLoading == false
                         && ((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
 
                     // redirect to booting page

@@ -69,7 +69,7 @@ namespace Umbraco.Core.Runtime
             var databaseFactory = GetDatabaseFactory();
 
             // type loader
-            var globalSettings = UmbracoConfig.For.GlobalSettings();
+            var globalSettings = Current.Config.Global();
             var localTempStorage = globalSettings.LocalTempStorageLocation;
             var typeLoader = new TypeLoader(runtimeCache, localTempStorage, profilingLogger);
 
@@ -77,16 +77,19 @@ namespace Umbraco.Core.Runtime
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
             _state = new RuntimeState(logger,
-                UmbracoConfig.For.UmbracoSettings(), UmbracoConfig.For.GlobalSettings(),
+                Current.Config.Umbraco(), Current.Config.Global(),
                 new Lazy<MainDom>(() => _factory.GetInstance<MainDom>()),
                 new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
             {
                 Level = RuntimeLevel.Boot
             };
 
+            // main dom
+            var mainDom = new MainDom(logger);
+
             // create the composition
             var composition = new Composition(register, typeLoader, profilingLogger, _state);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, appCaches, databaseFactory, typeLoader, _state);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
 
             // register runtime-level services
             // there should be none, really - this is here "just in case"
@@ -113,8 +116,7 @@ namespace Umbraco.Core.Runtime
 
                     logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
-                    var mainDom = AquireMainDom();
-                    composition.RegisterUnique(mainDom);
+                    AquireMainDom(mainDom);
 
                     DetermineRuntimeLevel(databaseFactory);
 
@@ -195,15 +197,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private MainDom AquireMainDom()
+        private void AquireMainDom(MainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    var mainDom = new MainDom(Logger);
                     mainDom.Acquire();
-                    return mainDom;
                 }
                 catch
                 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -86,7 +87,7 @@ namespace Umbraco.Web.Scheduling
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
                 _logger.Debug<SchedulerComponent>("Initializing the scheduler");
-                var settings = UmbracoConfig.For.UmbracoSettings();
+                var settings = Current.Config.Umbraco();
 
                 var tasks = new List<IBackgroundTask>();
 
@@ -95,7 +96,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterTaskRunner(settings));
                 tasks.Add(RegisterLogScrubber(settings));
 
-                var healthCheckConfig = UmbracoConfig.For.HealthCheck();
+                var healthCheckConfig = Current.Config.HealthChecks();
                 if (healthCheckConfig.NotificationSettings.Enabled)
                     tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _logger, _proflog));
 

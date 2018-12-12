@@ -11,12 +11,14 @@ namespace Umbraco.Core.Composing.Composers
     {
         public static Composition ComposeConfiguration(this Composition composition)
         {
-            composition.Register(factory => UmbracoConfig.For.UmbracoSettings());
-            composition.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            composition.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
-            composition.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
-            composition.Register(factory => UmbracoConfig.For.GlobalSettings());
-            composition.Register(factory => UmbracoConfig.For.DashboardSettings());
+            composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Umbraco());
+            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
+            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
+            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
+            composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Global());
+            composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Dashboards());
+            composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().HealthChecks());
+            composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Grids());
 
             // fixme - other sections we need to add?
 

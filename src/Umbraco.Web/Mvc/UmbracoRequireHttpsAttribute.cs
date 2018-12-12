@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
@@ -16,7 +17,7 @@ namespace Umbraco.Web.Mvc
         protected override void HandleNonHttpsRequest(AuthorizationContext filterContext)
         {
             // If umbracoUseSSL is set, let base method handle redirect.  Otherwise, we don't care.
-            if (UmbracoConfig.For.GlobalSettings().UseHttps)
+            if (Current.Config.Global().UseHttps)
             {
                 base.HandleNonHttpsRequest(filterContext);
             }
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Mvc
         public override void OnAuthorization(AuthorizationContext filterContext)
         {
             // If umbracoSSL is set, let base method handle checking for HTTPS.  Otherwise, we don't care.
-            if (UmbracoConfig.For.GlobalSettings().UseHttps)
+            if (Current.Config.Global().UseHttps)
             {
                 base.OnAuthorization(filterContext);
             }

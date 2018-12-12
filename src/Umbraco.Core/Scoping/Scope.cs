@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -491,7 +492,7 @@ namespace Umbraco.Core.Scoping
         // caching config
         // true if Umbraco.CoreDebug.LogUncompletedScope appSetting is set to "true"
         private static bool LogUncompletedScopes => (_logUncompletedScopes
-            ?? (_logUncompletedScopes = UmbracoConfig.For.CoreDebug().LogUncompletedScopes)).Value;
+            ?? (_logUncompletedScopes = Current.Config.CoreDebug().LogUncompletedScopes)).Value;
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds)

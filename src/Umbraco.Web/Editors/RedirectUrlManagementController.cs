@@ -13,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Editors
 {
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IHttpActionResult GetEnableState()
         {
-            var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = Current.Config.Umbraco().WebRouting.DisableRedirectUrlTracking == false;
             var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }

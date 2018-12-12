@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.UI.Umbraco
@@ -13,7 +14,7 @@ namespace Umbraco.Web.UI.Umbraco
         protected void Page_Load(object sender, EventArgs e)
         {
             Response.Status = "301 Moved Permanently";
-            Response.AddHeader("Location", UmbracoConfig.For.GlobalSettings().Path);
+            Response.AddHeader("Location", Current.Config.Global().Path);
         }
     }
 }

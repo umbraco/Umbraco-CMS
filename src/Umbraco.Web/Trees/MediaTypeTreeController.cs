@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedMediaTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedMediaTypes;
+            var enableInheritedMediaTypes = Current.Config.Umbraco().Content.EnableInheritedMediaTypes;
 
             if (id == Constants.System.Root.ToInvariantString())
             {

@@ -312,7 +312,7 @@ namespace Umbraco.Web.Macros
                     Alias = macro.Alias,
                     MacroSource = macro.MacroSource,
                     Exception = e,
-                    Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
+                    Behaviour = Current.Config.Umbraco().Content.MacroErrorBehaviour
                 };
 
                 OnError(macroErrorEventArgs);
@@ -604,7 +604,7 @@ namespace Umbraco.Web.Macros
                 querystring += $"&umb_{ide.Key}={HttpContext.Current.Server.UrlEncode((ide.Value ?? String.Empty).ToString())}";
 
             // create a new 'HttpWebRequest' object to the mentioned URL.
-            var useSsl = UmbracoConfig.For.GlobalSettings().UseHttps;
+            var useSsl = Current.Config.Global().UseHttps;
             var protocol = useSsl ? "https" : "http";
             var currentRequest = HttpContext.Current.Request;
             var serverVars = currentRequest.ServerVariables;
@@ -619,7 +619,7 @@ namespace Umbraco.Web.Macros
             // propagate the user's context
             // TODO: this is the worst thing ever.
             // also will not work if people decide to put their own custom auth system in place.
-            var inCookie = currentRequest.Cookies[UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName];
+            var inCookie = currentRequest.Cookies[Current.Config.Umbraco().Security.AuthCookieName];
             if (inCookie == null) throw new NullReferenceException("No auth cookie found");
             var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path, serverVars["SERVER_NAME"]);
             myHttpWebRequest.CookieContainer = new CookieContainer();

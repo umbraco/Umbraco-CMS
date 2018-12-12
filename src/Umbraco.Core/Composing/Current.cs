@@ -28,11 +28,18 @@ namespace Umbraco.Core.Composing
     {
         private static IFactory _factory;
 
+        // fixme - refactor
+        // we don't want Umbraco tests to die because the container has not been properly initialized,
+        // for some too-important things such as IShortStringHelper or loggers, so if it's not
+        // registered we setup a default one. We should really refactor our tests so that it does
+        // not happen.
+
         private static IShortStringHelper _shortStringHelper;
         private static ILogger _logger;
         private static IProfiler _profiler;
         private static IProfilingLogger _profilingLogger;
         private static IPublishedValueFallback _publishedValueFallback;
+        private static UmbracoConfig _config;
 
         /// <summary>
         /// Gets or sets the factory.
@@ -73,15 +80,9 @@ namespace Umbraco.Core.Composing
 
         #region Getters
 
-        // fixme - refactor
-        // we don't want Umbraco to die because the container has not been properly initialized,
-        // for some too-important things such as IShortStringHelper or loggers, so if it's not
-        // registered we setup a default one. We should really refactor our tests so that it does
-        // not happen. Will do when we get rid of IShortStringHelper.
-
         public static IShortStringHelper ShortStringHelper
             => _shortStringHelper ?? (_shortStringHelper = _factory?.TryGetInstance<IShortStringHelper>()
-                ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
+                ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Config.Umbraco())));
 
         public static ILogger Logger
             => _logger ?? (_logger = _factory?.TryGetInstance<ILogger>()
@@ -100,6 +101,10 @@ namespace Umbraco.Core.Composing
 
         public static TypeLoader TypeLoader
             => Factory.GetInstance<TypeLoader>();
+
+        public static UmbracoConfig Config
+            => _config ?? (_config = _factory?.TryGetInstance<UmbracoConfig>())
+               ?? (_config = new UmbracoConfig(Logger, _factory?.TryGetInstance<IRuntimeCacheProvider>(), _factory?.TryGetInstance<IRuntimeState>()));
 
         public static IFileSystems FileSystems
             => Factory.GetInstance<IFileSystems>();

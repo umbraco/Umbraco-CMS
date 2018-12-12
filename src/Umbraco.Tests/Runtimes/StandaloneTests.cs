@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -23,7 +21,7 @@ namespace Umbraco.Tests.Runtimes
     {
         [Test]
         [Explicit("This test must be run manually")]
-        public void Test()
+        public void ValidateComposition()
         {
             // this is almost what CoreRuntime does, without
             // - managing MainDom
@@ -40,26 +38,17 @@ namespace Umbraco.Tests.Runtimes
             var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
+            var mainDom = Mock.Of<IMainDom>();
+            Mock.Get(mainDom).Setup(x => x.IsMainDom).Returns(true);
 
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, appCaches, databaseFactory, typeLoader, runtimeState);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();
             coreRuntime.Compose(composition);
-
-            // fixme
-            // at that point, CoreRuntime also does
-            //composition.RegisterUnique(mainDom)
-            // we should make it
-            composition.RegisterUnique(Mock.Of<IMainDom>());
-            //composition.RegisterUnique<IMainDom>(new SimpleMainDom());
-            // because some components want to use it
-            // (and then, what would a standalone maindom be?)
-            //
-            // is this an essential thing then??
 
             // get the components
             // all of them?
@@ -92,34 +81,45 @@ namespace Umbraco.Tests.Runtimes
             foreach (var result in resultGroup)
             {
                 Console.WriteLine();
-                Console.WriteLine($"{result.Severity}: {WordWrap(result.Message, 120)}");
-                var target = result.ValidationTarget;
-                Console.Write("\tsvce: ");
-                Console.Write(target.ServiceName);
-                Console.Write(target.DeclaringService.ServiceType);
-                if (!target.DeclaringService.ServiceName.IsNullOrWhiteSpace())
-                {
-                    Console.Write(" '");
-                    Console.Write(target.DeclaringService.ServiceName);
-                    Console.Write("'");
-                }
-
-                Console.Write("     (");
-                if (target.DeclaringService.Lifetime == null)
-                    Console.Write("?");
-                else
-                    Console.Write(target.DeclaringService.Lifetime.ToString().TrimStart("LightInject."));
-                Console.WriteLine(")");
-                Console.Write("\timpl: ");
-                Console.WriteLine(target.DeclaringService.ImplementingType);
-                Console.Write("\tparm: ");
-                Console.Write(target.Parameter);
-                Console.WriteLine();
+                Console.Write(ToText(result));
             }
+
             Assert.AreEqual(0, results.Count);
         }
 
-        public static string WordWrap(string text, int width)
+        private static string ToText(ValidationResult result)
+        {
+            var text = new StringBuilder();
+
+            text.AppendLine($"{result.Severity}: {WordWrap(result.Message, 120)}");
+            var target = result.ValidationTarget;
+            text.Append("\tsvce: ");
+            text.Append(target.ServiceName);
+            text.Append(target.DeclaringService.ServiceType);
+            if (!target.DeclaringService.ServiceName.IsNullOrWhiteSpace())
+            {
+                text.Append(" '");
+                text.Append(target.DeclaringService.ServiceName);
+                text.Append("'");
+            }
+
+            text.Append("     (");
+            if (target.DeclaringService.Lifetime == null)
+                text.Append("Transient");
+            else
+                text.Append(target.DeclaringService.Lifetime.ToString().TrimStart("LightInject.").TrimEnd("Lifetime"));
+            text.AppendLine(")");
+            text.Append("\timpl: ");
+            text.Append(target.DeclaringService.ImplementingType);
+            text.AppendLine();
+            text.Append("\tparm: ");
+            text.Append(target.Parameter);
+            text.AppendLine();
+
+            return text.ToString();
+        }
+
+        private static string WordWrap(string text, int width)
         {
             int pos, next;
             var sb = new StringBuilder();
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Runtimes
             return sb.ToString();
         }
 
-        public static int BreakLine(string text, int pos, int max)
+        private static int BreakLine(string text, int pos, int max)
         {
             // Find last whitespace in line
             var i = max - 1;

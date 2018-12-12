@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO.MediaPathSchemes
@@ -30,7 +31,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
                 // prevpath should be "<int>/<filename>" OR "<int>-<filename>"
                 // and we want to reuse the "<int>" part, so try to find it
 
-                var sep = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories ? "/" : "-";
+                var sep = Current.Config.Umbraco().Content.UploadAllowDirectories ? "/" : "-";
                 var pos = previous.IndexOf(sep, StringComparison.Ordinal);
                 var s = pos > 0 ? previous.Substring(0, pos) : null;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
             if (directory == null)
                 throw new InvalidOperationException("Cannot use a null directory.");
 
-            return UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+            return Current.Config.Umbraco().Content.UploadAllowDirectories
                 ? Path.Combine(directory, filename).Replace('\\', '/')
                 : directory + "-" + filename;
         }

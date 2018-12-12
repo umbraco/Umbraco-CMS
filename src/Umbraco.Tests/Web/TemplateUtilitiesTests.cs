@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Web
 
             Udi.ResetUdiTypes();
 
-            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefaultUmbracoSettings());
+            Current.Config.SetUmbracoConfig(SettingsForTests.GetDefaultUmbracoSettings());
         }
 
         [TearDown]

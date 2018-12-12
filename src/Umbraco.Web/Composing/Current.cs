@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -199,6 +200,8 @@ namespace Umbraco.Web.Composing
         public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
 
         public static TypeLoader TypeLoader => CoreCurrent.TypeLoader;
+
+        public static UmbracoConfig Config => CoreCurrent.Config;
 
         public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
 

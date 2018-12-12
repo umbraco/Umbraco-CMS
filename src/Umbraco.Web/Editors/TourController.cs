@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Editors
         {
             var result = new List<BackOfficeTourFile>();
 
-            if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
+            if (Current.Config.Umbraco().BackOffice.Tours.EnableTours == false)
                 return result;
 
             //get all filters that will be applied to all tour aliases

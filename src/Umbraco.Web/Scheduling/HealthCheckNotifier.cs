@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
@@ -54,7 +55,7 @@ namespace Umbraco.Web.Scheduling
 
             using (_proflog.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = UmbracoConfig.For.HealthCheck();
+                var healthCheckConfig = Current.Config.HealthChecks();
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications

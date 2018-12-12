@@ -14,7 +14,7 @@ namespace Umbraco.Core
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
     /// </remarks>
-    internal class MainDom : IRegisteredObject
+    internal class MainDom : IMainDom, IRegisteredObject
     {
         #region Vars
 
