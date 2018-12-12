@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter) {
+    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, editorState, $filter) {
 
         var vm = this;
         var evts = [];        
@@ -52,16 +52,20 @@
 
                 vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
 
-                evts.push(eventsService.on("appState.treeState.changed", function (e, args) {                    
-                    setDocTypeTour();
+                evts.push(eventsService.on("appState.treeState.changed", function (e, args) {                                       
                     handleSectionChange();
                 }));
+
+                evts.push(eventsService.on("editorState.changed",
+                    function (e, args) {
+                        setDocTypeTour(args.entity);
+                    }));
 
                 findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
-
-            setDocTypeTour();
+            
+            setDocTypeTour(editorState.getCurrent());
             
             // check if a tour is running - if it is open the matching group
             var currentTour = tourService.getCurrentTour();
@@ -72,18 +76,18 @@
 
         }
 
-        function setDocTypeTour() {
+        function setDocTypeTour(node) {
             vm.showDocTypeTour = false;
             vm.docTypeTours = [];
             vm.nodeName = '';
 
             if (vm.section === 'content' && vm.tree === 'content') {
-                var treeNode = appState.getTreeState('selectedNode');
-                if (treeNode) {
-                    tourService.getToursForDoctype(treeNode.metaData.contentType).then(function (data) {                        
+                
+                if (node) {
+                    tourService.getToursForDoctype(node.contentTypeAlias).then(function (data) {                        
                         if (data && data.length > 0) {
                             vm.docTypeTours = data;
-                            vm.nodeName = treeNode.name;
+                            vm.nodeName = node.name;
                             vm.showDocTypeTour = true;
                         }
                     });  

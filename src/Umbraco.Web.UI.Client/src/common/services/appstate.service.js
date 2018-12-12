@@ -265,7 +265,7 @@ angular.module('umbraco.services').factory('appState', appState);
  *
  * it is possible to modify this object, so should be used with care
  */
-angular.module('umbraco.services').factory("editorState", function() {
+angular.module('umbraco.services').factory("editorState", function (eventsService) {
 
     var current = null;
     var state = {
@@ -284,6 +284,7 @@ angular.module('umbraco.services').factory("editorState", function() {
          */
         set: function (entity) {
             current = entity;
+            eventsService.emit("editorState.changed", { entity: entity });
         },
 
         /**
