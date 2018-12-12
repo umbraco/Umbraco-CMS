@@ -246,26 +246,13 @@ namespace Umbraco.Core.Persistence
 
         private string CommandToString(string sql, object[] args)
         {
-            var sb = new StringBuilder();
+            var text = new StringBuilder();
 #if DEBUG_DATABASES
-                sb.Append(InstanceId);
-                sb.Append(": ");
+                text.Append(InstanceId);
+                text.Append(": ");
 #endif
-            sb.Append(sql);
-            if (args.Length > 0)
-                sb.Append(" --");
-            var i = 0;
-            foreach (var arg in args)
-            {
-                sb.Append(" @");
-                sb.Append(i++);
-                sb.Append(":");
-                if (arg == DBNull.Value) sb.Append("<dbNull>");
-                else if (arg == null) sb.Append("<null>");
-                else sb.Append(arg);
-            }
-
-            return sb.ToString();
+            NPocoSqlExtensions.ToText(sql, args, text);
+            return text.ToString();
         }
 
         protected override void OnExecutedCommand(DbCommand cmd)

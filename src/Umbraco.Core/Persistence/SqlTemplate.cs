@@ -95,11 +95,10 @@ namespace Umbraco.Core.Persistence
             return new Sql<ISqlContext>(_sqlContext, isBuilt, _sql, args);
         }
 
-        internal void WriteToConsole()
+        internal string ToText()
         {
-#if DEBUG
-            new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.ToArray()).WriteToConsole();
-#endif
+            var sql = new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.ToArray());
+            return sql.ToText();
         }
 
         /// <summary>
