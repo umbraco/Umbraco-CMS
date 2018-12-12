@@ -86,6 +86,9 @@
             if (vm.type === "role") {
                 return vm.groups && vm.groups.length > 0;
             }
+            if (vm.type === "member") {
+                return vm.members && vm.members.length > 0;
+            }
             return true;
         }
 
