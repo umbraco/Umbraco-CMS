@@ -199,11 +199,7 @@
 
       getNode();
 
-    }
-
-      $scope.startTour = function() {
-          tourService.startTour($scope.page.tour);
-      }
+    }     
 
     $scope.unPublish = function () {								
 			// raising the event triggers the confirmation dialog			
