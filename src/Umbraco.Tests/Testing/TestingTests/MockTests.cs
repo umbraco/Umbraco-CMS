@@ -60,7 +60,6 @@ namespace Umbraco.Tests.Testing.TestingTests
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),

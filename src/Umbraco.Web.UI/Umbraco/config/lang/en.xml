@@ -1124,9 +1124,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="removeSpecialFormattering">Paste, but remove formatting (Recommended)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Role based protection</key>
-    <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups</key>
-    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
+    <key alias="paGroups">Group based protection</key>
+    <key alias="paGroupsHelp">If you want to grant access to all members of specific member groups</key>
+    <key alias="paGroupsNoGroups">You need to create a member group before you can use group based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
     <key alias="paHowWould"><![CDATA[Choose how to restrict access to the page <strong>%0%</strong>]]></key>
@@ -1137,10 +1137,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paRemoveProtection">Remove protection...</key>
     <key alias="paRemoveProtectionConfirm"><![CDATA[Are you sure you want to remove the protection from the page <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Select the pages that contain login form and error messages</key>
-    <key alias="paSelectRoles"><![CDATA[Pick the roles who have access to the page <strong>%0%</strong>]]></key>
-    <key alias="paSetLogin"><![CDATA[Set the login and password for the page <strong>%0%</strong>]]></key>
-    <key alias="paSimple">Single user protection</key>
-    <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
+    <key alias="paSelectGroups"><![CDATA[Select the groups who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paSelectMembers"><![CDATA[Select the members who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paMembers">Specific members protection</key>
+    <key alias="paMembersHelp">If you wish to grant access to specific members</key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
@@ -1475,8 +1475,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
-    <key alias="availableEditors">Available editors</key>
-    <key alias="reuse">Reuse</key>
+    <key alias="availableEditors">Create new</key>
+    <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
@@ -1965,5 +1965,19 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
     <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
     <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">Direction</key>
+    <key alias="parentToChild">Parent to child</key>
+    <key alias="bidirectional">Bidirectional</key>
+    <key alias="parent">Parent</key>
+    <key alias="child">Child</key>
+    <key alias="count">Count</key>
+    <key alias="relations">Relations</key>
+    <key alias="created">Created</key>
+    <key alias="comment">Comment</key>
+    <key alias="name">Name</key>
+    <key alias="tabRelationType">Relation Type</key>
+    <key alias="tabRelations">Relations</key>
   </area>
 </language>

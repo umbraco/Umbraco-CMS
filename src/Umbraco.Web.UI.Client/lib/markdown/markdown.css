@@ -26,6 +26,11 @@
 	width: 100%;
 }
 
+/* unset the negative margin applied in button-groups.less to avoid flickering when hovering the button bar */
+.wmd-panel .btn-toolbar .btn-group>.btn+.btn {
+    margin-left: 0;
+}
+
 /*
 .icon-link,
 .icon-blockquote,

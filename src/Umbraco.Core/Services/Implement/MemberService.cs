@@ -1033,7 +1033,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 var ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames));
+                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames), nameof(AssignedRoles));
                 scope.Complete();
             }
         }
@@ -1050,7 +1050,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 var ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames));
+                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames), nameof(RemovedRoles));
                 scope.Complete();
             }
         }
@@ -1066,7 +1066,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames));
+                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(AssignedRoles));
                 scope.Complete();
             }
         }
@@ -1082,7 +1082,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames));
+                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(RemovedRoles));
                 scope.Complete();
             }
         }

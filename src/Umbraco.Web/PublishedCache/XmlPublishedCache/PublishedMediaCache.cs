@@ -108,7 +108,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // +(+parentID:-1) +__IndexType:media
 
                     var criteria = searchProvider.CreateCriteria("media");
-                    var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = searchProvider.Search(filter.Compile());
                     if (result != null)
@@ -294,7 +294,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // note that since the use of the wildcard, it automatically escapes it in Lucene.
 
                     var criteria = searchProvider.CreateCriteria("media");
-                    var filter = criteria.Id(id.ToInvariantString()).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var filter = criteria.Id(id.ToInvariantString()).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = searchProvider.Search(filter.Compile()).FirstOrDefault();
                     if (result != null) return ConvertFromSearchResult(result);
@@ -476,7 +476,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             {
                 //We are going to check for a special field however, that is because in some cases we store a 'Raw'
                 //value in the index such as for xml/html.
-                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoExamineIndexer.RawFieldPrefix + alias));
+                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoExamineIndex.RawFieldPrefix + alias));
                 return rawValue
                        ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
@@ -509,7 +509,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     //first check in Examine as this is WAY faster
                     var criteria = searchProvider.CreateCriteria("media");
 
-                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
                     //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
                     //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
 

@@ -118,6 +118,8 @@
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
+    <Compile Include="CoreThings\GuidUtilsTests.cs" />
+    <Compile Include="CoreThings\HexEncoderTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
