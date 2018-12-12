@@ -3,8 +3,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
 		var dialogOptions = $scope.model;
 
-		var anchorPattern = /<a id=\\"(.*?)\\">/gi;
-
 		var searchText = "Search...";
 		localizationService.localize("general_search").then(function (value) {
 			searchText = value + "...";
@@ -48,12 +46,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 				// if a link exists, get the properties to build the anchor name list
 				contentResource.getById(id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 					$scope.model.target.url = resp.urls[0];
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 				});
 			} else if ($scope.model.target.url.length) {
-				// a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
-				$scope.model.target.url = $scope.model.target.url.substring(0, $scope.model.target.url.search(/(#|\?)/));				
+			    // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
+                // only do the substring if there's a # or a ?
+                var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);
+                if (indexOfAnchor > -1) {
+                    // populate the anchor
+                    $scope.model.target.anchor = $scope.model.target.url.substring(indexOfAnchor);
+                    // then rewrite the model and populate the link
+                    $scope.model.target.url = $scope.model.target.url.substring(0, indexOfAnchor);
+                }
 			}
 		} else if (dialogOptions.anchors) {
 			$scope.anchorValues = dialogOptions.anchors;
@@ -82,8 +87,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				$scope.model.target.url = "/";
 			} else {
 				contentResource.getById(args.node.id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 					$scope.model.target.url = resp.urls[0];
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 				});
 			}
 
@@ -114,8 +119,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 						$scope.model.target.isMedia = true;
 						$scope.model.target.name = media.name;
 						$scope.model.target.url = mediaHelper.resolveFile(media);
-						
-						debugger;
 
 						$scope.mediaPickerOverlay.show = false;
 						$scope.mediaPickerOverlay = null;

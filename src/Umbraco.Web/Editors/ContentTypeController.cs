@@ -207,56 +207,54 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
         
-        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, string collectionItemName, string collectionIcon, string collectionItemIcon)
+        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
-            var storeInContainer = false;
-            var allowUnderDocType = -1;
-            // check if it's a folder
-            if (Services.ContentTypeService.GetContentType(parentId) == null)
-            {
-                storeInContainer = true;
-            } else
-            {
-                // if it's not a container, we'll change the parentid to the root,
-                // and use the parent id as the doc type the collection should be allowed under
-                allowUnderDocType = parentId;
-                parentId = -1;
-            }
-
             // create item doctype
             var itemDocType = new ContentType(parentId);
             itemDocType.Name = collectionItemName;
-            itemDocType.Alias = collectionItemName.ToSafeAlias();
+            itemDocType.Alias = collectionItemName.ToSafeAlias(true);
             itemDocType.Icon = collectionItemIcon;
+            
+            // create item doctype template
+            if (collectionItemCreateTemplate)
+            {
+                var template = CreateTemplateForContentType(itemDocType.Alias, itemDocType.Name);
+                itemDocType.SetDefaultTemplate(template);
+            }
+
+            // save item doctype
             Services.ContentTypeService.Save(itemDocType);
 
             // create collection doctype
             var collectionDocType = new ContentType(parentId);
             collectionDocType.Name = collectionName;
-            collectionDocType.Alias = collectionName.ToSafeAlias();
+            collectionDocType.Alias = collectionName.ToSafeAlias(true);
             collectionDocType.Icon = collectionIcon;
             collectionDocType.IsContainer = true;
             collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
             {
                 new ContentTypeSort(itemDocType.Id, 0)
             };
-            Services.ContentTypeService.Save(collectionDocType);
-
-            // test if the parent id exist and then allow the collection underneath
-            if (storeInContainer == false && allowUnderDocType != -1)
+            
+            // create collection doctype template
+            if (collectionCreateTemplate)
             {
-                var parentCt = Services.ContentTypeService.GetContentType(allowUnderDocType);
-                if (parentCt != null)
-                {
-                    var allowedCts = parentCt.AllowedContentTypes.ToList();
-                    allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
-                    parentCt.AllowedContentTypes = allowedCts;
-                    Services.ContentTypeService.Save(parentCt);
-                } else
-                {
-                }
+                var template = CreateTemplateForContentType(collectionDocType.Alias, collectionDocType.Name);
+                collectionDocType.SetDefaultTemplate(template);
             }
 
+            // save collection doctype
+            Services.ContentTypeService.Save(collectionDocType);
+
+            // test if the parent exist and then allow the collection underneath
+            var parentCt = Services.ContentTypeService.GetContentType(parentId);
+            if (parentCt != null)
+            {
+                var allowedCts = parentCt.AllowedContentTypes.ToList();
+                allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
+                parentCt.AllowedContentTypes = allowedCts;
+                Services.ContentTypeService.Save(parentCt);
+            }
 
             return new DocumentTypeCollectionDisplay
             {
@@ -276,19 +274,7 @@ namespace Umbraco.Web.Editors
                     //create a default template if it doesnt exist -but only if default template is == to the content type
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
-                        var template = Services.FileService.GetTemplate(ctSave.Alias);
-                        if (template == null)
-                        {
-                            var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
-                            if (tryCreateTemplate == false)
-                            {
-                                Logger.Warn<ContentTypeController>(
-                                    "Could not create a template for the Content Type: {0}, status: {1}",
-                                    () => ctSave.Alias,
-                                    () => tryCreateTemplate.Result.StatusType);
-                            }
-                            template = tryCreateTemplate.Result.Entity;
-                        }
+                        var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
 
                         // If the alias has been manually updated before the first save,
                         // make sure to also update the first allowed template, as the
@@ -316,6 +302,26 @@ namespace Umbraco.Web.Editors
                             string.Empty);
 
             return display;
+        }
+
+        private ITemplate CreateTemplateForContentType(string contentTypeAlias, string contentTypeName)
+        {
+            var template = Services.FileService.GetTemplate(contentTypeAlias);
+            if (template == null)
+            {
+                var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(contentTypeAlias, contentTypeName);
+                if (tryCreateTemplate == false)
+                {
+                    Logger.Warn<ContentTypeController>(
+                        "Could not create a template for the Content Type: {0}, status: {1}",
+                        () => contentTypeAlias,
+                        () => tryCreateTemplate.Result.StatusType);
+                }
+
+                template = tryCreateTemplate.Result.Entity;
+            }
+
+            return template;
         }
 
         /// <summary>

@@ -22,6 +22,8 @@ namespace Umbraco.Web.Routing
         /// <remarks>If successful, also assigns the template.</remarks>
         public override bool TryFindContent(PublishedContentRequest docRequest)
         {
+            const string tracePrefix = "ContentFinderByNiceUrlAndTemplate: ";
+
             IPublishedContent node = null;
             string path = docRequest.Uri.GetAbsolutePathDecoded();
 
@@ -42,8 +44,16 @@ namespace Umbraco.Web.Routing
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
 
-                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false && node != null)
+                    if (node.IsAllowedTemplate(template.Id))
+                    {
                         docRequest.TemplateModel = template;
+                    }
+                    else
+                    {
+                        LogHelper.Warn<ContentFinderByNiceUrlAndTemplate>("Configuration settings prevent template \"{0}\" from showing for node \"{1}\"", () => templateAlias, () => node.Id);
+                        docRequest.PublishedContent = null;
+                        node = null;
+                    }
                 }
                 else
                 {

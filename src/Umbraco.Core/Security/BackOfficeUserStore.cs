@@ -630,7 +630,9 @@ namespace Umbraco.Core.Security
                 || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
             {
                 anythingChanged = true;
-                user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
+                //if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
+                var dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
+                user.LastLoginDate = dt;
             }
             if (identityUser.IsPropertyDirty("LastPasswordChangeDateUtc")
                 || (user.LastPasswordChangeDate != default(DateTime) && identityUser.LastPasswordChangeDateUtc.HasValue == false)

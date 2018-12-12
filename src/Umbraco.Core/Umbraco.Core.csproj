@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -45,8 +45,8 @@
     <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.9.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.6\lib\net45\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.9.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.7\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
@@ -365,6 +365,11 @@
     <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
+    <Compile Include="Media\Exif\SVGFile.cs" />
+    <Compile Include="Media\TypeDetector\JPEGDetector.cs" />
+    <Compile Include="Media\TypeDetector\RasterizedTypeDetector.cs" />
+    <Compile Include="Media\TypeDetector\SVGDetector.cs" />
+    <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
@@ -567,8 +572,8 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddInstructionCountColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddCmsMediaTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddUserLoginTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\RenameTrueFalseField.cs" />	
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\SetDefaultTagsStorageType.cs" />      
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\RenameTrueFalseField.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\SetDefaultTagsStorageType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoAuditTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoConsentTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddIsSensitiveMemberTypeColumn.cs" />
@@ -638,7 +643,7 @@
     <Compile Include="Media\Exif\TIFFStrip.cs" />
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\IncreaseLanguageIsoCodeColumnLength.cs" />      
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\IncreaseLanguageIsoCodeColumnLength.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\UpdateUmbracoConsent.cs" />
     <Compile Include="Persistence\PocoDataDataReader.cs" />
     <Compile Include="Persistence\Querying\CachedExpression.cs" />

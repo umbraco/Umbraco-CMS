@@ -9,12 +9,15 @@
             <div ng-if="notification.view">
                 <div ng-include="notification.view"></div>
             </div>
-
-            <div ng-if="notification.headline">
-                <a ng-href="{{notification.url}}" target="_blank">
+            <div ng-if="notification.headline" ng-switch on="{{notification}}">
+                <a ng-href="{{notification.url}}" ng-switch-when="{{notification.url && notification.url.trim() != ''}}" target="_blank">
                     <strong>{{notification.headline}}</strong>
                     <span ng-bind-html="notification.message"></span>
                 </a>
+                <div ng-switch-default>
+                    <strong>{{notification.headline}}</strong>
+                    <span ng-bind-html="notification.message"></span>
+                </div>
             </div>
         </li>
     </ul>

@@ -30,9 +30,13 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
                 var recycleBin = treeService.getDescendantNode(rootNode, -20);
                 if (recycleBin) {
                     recycleBin.hasChildren = true;
+                    //reload the recycle bin if it's already expanded so the deleted item is shown
+                    if (recycleBin.expanded) {
+                        treeService.loadNodeChildren({ node: recycleBin, section: "content" });
+                    }
                 }
             }
-            
+
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
             if (editorState.current && editorState.current.id == $scope.currentNode.id) {
 

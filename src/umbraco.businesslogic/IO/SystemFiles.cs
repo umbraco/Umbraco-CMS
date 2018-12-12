@@ -29,6 +29,7 @@ namespace umbraco.IO
 			get { return Umbraco.Core.IO.SystemFiles.TinyMceConfig; }
 		}
 
+        [Obsolete("This file is no longer used and should not be accessed!")]
 		public static string MetablogConfig
 		{
 			get { return Umbraco.Core.IO.SystemFiles.MetablogConfig; }

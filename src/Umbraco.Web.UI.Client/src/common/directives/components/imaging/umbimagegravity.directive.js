@@ -14,7 +14,7 @@ angular.module("umbraco.directives")
 				scope: {
 					src: '=',
 					center: "=",
-					onImageLoaded: "="
+                    onImageLoaded: "&"
 				},
 				link: function(scope, element, attrs) {
 
@@ -31,10 +31,10 @@ angular.module("umbraco.directives")
 					//elements
 					var $viewport = element.find(".viewport");
 					var $image = element.find("img");
-					var $overlay = element.find(".overlay");
+                    var $overlay = element.find(".overlay");
 
-					scope.style = function () {
-						if(scope.dimensions.width <= 0){
+				    scope.style = function () {
+                        if (scope.dimensions.width <= 0) {
 							setDimensions();
 						}
 
@@ -45,28 +45,28 @@ angular.module("umbraco.directives")
 					};
 
 					scope.setFocalPoint = function(event) {
+					    scope.$emit("imageFocalPointStart");
 
-						scope.$emit("imageFocalPointStart");
+					    var offsetX = event.offsetX - 10;
+					    var offsetY = event.offsetY - 10;
 
-						var offsetX = event.offsetX - 10;
-						var offsetY = event.offsetY - 10;
+					    calculateGravity(offsetX, offsetY);
 
-						calculateGravity(offsetX, offsetY);
-
-						lazyEndEvent();
-
+					    lazyEndEvent();
 					};
 
-					var setDimensions = function(){
-						scope.dimensions.width = $image.width();
-						scope.dimensions.height = $image.height();
-
-						if(scope.center){
-							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
-							scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
-						}else{
-							scope.center = { left: 0.5, top: 0.5 };
-						}
+                    var setDimensions = function () {
+                    if (scope.isCroppable) {
+					        scope.dimensions.width = $image.width();
+					        scope.dimensions.height = $image.height();
+                            
+					        if(scope.center){
+							    scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
+							    scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
+						    }else{
+							    scope.center = { left: 0.5, top: 0.5 };
+                            }
+                        }
 					};
 
 					var calculateGravity = function(offsetX, offsetY){
@@ -107,10 +107,32 @@ angular.module("umbraco.directives")
 					//// INIT /////
 					$image.load(function() {
 					    $timeout(function() {
+                        scope.isCroppable = true;
+                        scope.hasDimensions = true;
+
+                        if (scope.src) {
+                            if (scope.src.endsWith(".svg")) {
+                                scope.isCroppable = false;
+                                scope.hasDimensions = false;
+                            } else {
+                                // From: https://stackoverflow.com/a/51789597/5018
+                                var type = scope.src.substring(scope.src.indexOf("/") + 1, scope.src.indexOf(";base64"));
+                                if (type.startsWith("svg")) {
+                                    scope.isCroppable = false;
+                                    scope.hasDimensions = false;
+                                }
+                            }
+                        }
+
 					        setDimensions();
 					        scope.loaded = true;
 					        if (angular.isFunction(scope.onImageLoaded)) {
-					            scope.onImageLoaded();
+                                scope.onImageLoaded(
+                                    {
+                                        "isCroppable": scope.isCroppable,
+                                        "hasDimensions": scope.hasDimensions
+                                    }
+                                );
 					        }
 					    });
 					});

@@ -1,4 +1,4 @@
-<div>
+<div class="umb-minilistview">
 
     <div ng-repeat="miniListView in miniListViews" ng-animate="getMiniListViewAnimation()">
 
@@ -61,7 +61,7 @@
                 <div class="umb-table-row"
                     ng-repeat="child in miniListView.children"
                     ng-click="selectNode(child)"
-                    ng-class="{'-selected':child.selected}">
+                    ng-class="{'-selected':child.selected, 'not-allowed':!child.allowed}">
                     <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
                         <div class="flex items-center">
                             <ins class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.hasChildren !== true}">&nbsp;</ins>

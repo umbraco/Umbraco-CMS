@@ -1,12 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Web;
 using System.Web.Security;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -19,12 +21,12 @@ namespace Umbraco.Web.Install.InstallSteps
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll    
     /// display a simple continue installation view.
     /// </remarks>
-    [InstallSetupStep(InstallationType.NewInstall,
-        "User", 20, "")]
+    [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly HttpContextBase _http;
         private readonly ApplicationContext _applicationContext;
+        private static HttpClient _httpClient;
 
         public NewInstallStep(HttpContextBase http, ApplicationContext applicationContext)
         {
@@ -74,15 +76,18 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Username = user.Email.Trim();
 
             _applicationContext.Services.UserService.Save(admin);
-
-
+            
             if (user.SubscribeToNewsLetter)
             {
+                if (_httpClient == null)
+                    _httpClient = new HttpClient();
+
+                var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
+                var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
+
                 try
                 {
-                    var client = new System.Net.WebClient();
-                    var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email} };
-                    client.UploadValues("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", values);
+                    var response = _httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
                 }
                 catch { /* fail in silence */ }
             }
@@ -109,13 +114,16 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override string View
         {
-            get { return RequiresExecution(null)
-                //the user UI
-                ? "user" 
-                //the continue install UI
-                : "continueinstall"; }
+            get
+            {
+                return RequiresExecution(null)
+              //the user UI
+              ? "user"
+              //the continue install UI
+              : "continueinstall";
+            }
         }
-        
+
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data

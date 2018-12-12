@@ -38,9 +38,6 @@ namespace umbraco.cms.presentation.developer
 					.SetActiveTreeType(Constants.Trees.Xslt)
 					.SyncTree(path, false);
 			}
-
-
-
 		}
 
 		protected override void OnInit(EventArgs e)
@@ -48,7 +45,6 @@ namespace umbraco.cms.presentation.developer
 			base.OnInit(e);
 
             SaveButton = UmbracoPanel1.Menu.NewButton();
-            SaveButton.ToolTip = "Save Xslt File";
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";

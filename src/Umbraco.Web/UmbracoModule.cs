@@ -509,6 +509,13 @@ namespace Umbraco.Web
                 }
 		    };
 
+		    app.PostAuthenticateRequest += (sender, e) =>
+		    {
+		        var httpContext = ((HttpApplication)sender).Context;
+		        //ensure the thread culture is set
+		        httpContext.User?.Identity?.EnsureCulture();
+		    };
+
             app.PostResolveRequestCache += (sender, e) =>
 				{
 					var httpContext = ((HttpApplication)sender).Context;

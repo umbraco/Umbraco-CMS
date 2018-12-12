@@ -54,10 +54,17 @@ namespace Umbraco.Web.Routing
 
             alias = alias.TrimStart('/');
             var xpathBuilder = new StringBuilder();
-            xpathBuilder.Append(XPathStringsDefinition.Root);
+            
 
             if (rootNodeId > 0)
+            {
                 xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
+            }
+            else
+            {
+                xpathBuilder.Append(XPathStringsDefinition.Root);
+            }
+               
 
             XPathVariable var = null;
             if (alias.Contains('\'') || alias.Contains('"'))
@@ -92,20 +99,20 @@ namespace Umbraco.Web.Routing
 				{
 					// legacy XML schema
 					case 0:
-						DescendantDocumentById = "//node [@id={0}]";
+						DescendantDocumentById = "id({0})";
 						DescendantDocumentByAlias = "//node[("
-							+ "contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},')"
-							+ ")]";
+							+ "contains(concat(',',translate(translate(data [@alias='umbracoUrlAlias'], ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',{0},')"
+                            + " or contains(concat(',',translate(translate(data [@alias='umbracoUrlAlias'], ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',/{0},')"
+                            + ")]";
 						break;
 
 					// default XML schema as of 4.10
 					case 1:
-						DescendantDocumentById = "//* [@isDoc and @id={0}]";
+						DescendantDocumentById = "id({0})[@isDoc]";
 						DescendantDocumentByAlias = "//* [@isDoc and ("
-							+ "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
-							+ ")]";
+							+ "contains(concat(',',translate(translate(umbracoUrlAlias, ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',{0},')"
+                            + " or contains(concat(',',translate(translate(umbracoUrlAlias, ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',/{0},')"
+                            + ")]";
 						break;
 
 					default:

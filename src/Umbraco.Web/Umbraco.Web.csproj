@@ -107,8 +107,8 @@
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.9.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.6\lib\net45\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.9.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.7\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
       <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
@@ -338,7 +338,6 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
-    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
@@ -824,6 +823,7 @@
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
+    <Compile Include="WebApi\Binders\BlueprintItemBinder.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Semver;
+using System;
+using System.Collections.Concurrent;
 using System.Configuration;
 using System.Threading;
-using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -13,7 +13,7 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
     /// the Umbraco Application context
     /// </summary>
     /// <remarks>
@@ -282,7 +282,7 @@ namespace Umbraco.Core
 	    // ReSharper disable once InconsistentNaming
 	    internal string _umbracoApplicationUrl;
 
-        internal List<string> _umbracoApplicationDomains = new List<string>();
+        internal ConcurrentDictionary<string, string> _umbracoApplicationDomains = new ConcurrentDictionary<string, string>();
 
         internal string _umbracoApplicationDeploymentId;
 

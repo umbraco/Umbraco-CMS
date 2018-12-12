@@ -298,10 +298,10 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         },
 
-        createCollection: function (parentId, collectionName, collectionItemName, collectionIcon, collectionItemIcon) {
+        createCollection: function (parentId, collectionName, collectionCreateTemplate, collectionItemName, collectionItemCreateTemplate, collectionIcon, collectionItemIcon) {
 
             return umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateCollection", { parentId: parentId, collectionName: collectionName, collectionItemName: collectionItemName, collectionIcon: collectionIcon, collectionItemIcon: collectionItemIcon})),
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateCollection", { parentId: parentId, collectionName: collectionName, collectionCreateTemplate: collectionCreateTemplate, collectionItemName: collectionItemName, collectionItemCreateTemplate: collectionItemCreateTemplate, collectionIcon: collectionIcon, collectionItemIcon: collectionItemIcon})),
                 'Failed to create collection under ' + parentId);
 
         },

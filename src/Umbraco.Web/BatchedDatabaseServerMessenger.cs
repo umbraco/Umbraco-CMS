@@ -46,7 +46,7 @@ namespace Umbraco.Web
                 //start the background task runner for processing instructions
                 const int delayMilliseconds = 60000;
                 var instructionProcessingRunner = new BackgroundTaskRunner<IBackgroundTask>("InstructionProcessing", ApplicationContext.ProfilingLogger.Logger);
-                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, _appContext.ScopeProvider, delayMilliseconds, Options.ThrottleSeconds * 1000);
+                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, _appContext.ScopeProvider, ApplicationContext.ProfilingLogger.Logger, delayMilliseconds, Options.ThrottleSeconds * 1000);
                 instructionProcessingRunner.TryAdd(instructionProcessingTask);
                 e.Add(instructionProcessingTask);
             }
@@ -78,18 +78,36 @@ namespace Umbraco.Web
         {
             private readonly DatabaseServerMessenger _messenger;
             private readonly IScopeProvider _scopeProvider;
+            private readonly ILogger _logger;
 
             public InstructionProcessing(IBackgroundTaskRunner<RecurringTaskBase> runner,
                 DatabaseServerMessenger messenger,
                 IScopeProvider scopeProvider,
+                ILogger logger,
                 int delayMilliseconds, int periodMilliseconds)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 _messenger = messenger;
                 _scopeProvider = scopeProvider;
+                _logger = logger;
             }
 
             public override bool PerformRun()
+            {
+                try
+                {
+                    TryPerformRun();
+                }
+                catch (Exception e)
+                {
+                    _logger.Error<InstructionProcessing>("Failed (will repeat).", e);
+                }
+
+                //return true to repeat
+                return true;
+            }
+
+            private void TryPerformRun()
             {
                 // beware!
                 // DatabaseServerMessenger uses _appContext.DatabaseContext.Database without creating
@@ -102,8 +120,6 @@ namespace Umbraco.Web
                     _messenger.Sync();
                     scope.Complete();
                 }
-                //return true to repeat
-                return true;
             }
 
             public override bool IsAsync
@@ -167,7 +183,7 @@ namespace Umbraco.Web
             // can get the http context from it
             var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
                 // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
-                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be 
+                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
                 // the case if the asp.net synchronization context has kicked in
                 ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
 

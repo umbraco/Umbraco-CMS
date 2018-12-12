@@ -37,8 +37,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
                 var section = appState.getSectionState("currentSection");
 
             }, function(err) {
-
-               //TODO: Handle errors
+                $scope.error = err;
             });
         };
     }

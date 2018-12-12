@@ -40,11 +40,18 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 				// if a link exists, get the properties to build the anchor name list
 				contentResource.getById(id).then(function (resp) {
 					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-					$scope.model.target.url = resp.urls[0];
+					$scope.target.url = resp.urls[0];
 				});
 			} else if ($scope.target.url.length) {
-				// a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
-				$scope.target.url = $scope.model.url.substring(0, $scope.model.url.search(/(#|\?)/));
+                // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
+                // only do the substring if there's a # or a ?
+                var indexOfAnchor = $scope.target.url.search(/(#|\?)/);
+                if (indexOfAnchor > -1) {
+                    // populate the anchor
+                    $scope.target.anchor = $scope.target.url.substring(indexOfAnchor);
+                    // then rewrite the model and populate the link
+                    $scope.target.url = $scope.target.url.substring(0, indexOfAnchor);
+                }
 			}
 		}
 
@@ -81,7 +88,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 				} else {
 					contentResource.getById(args.node.id).then(function (resp) {
 						$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-						$scope.model.target.url = resp.urls[0];
+						$scope.target.url = resp.urls[0];
 					});
 				}
 

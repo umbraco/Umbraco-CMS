@@ -140,7 +140,7 @@
             {
                 "element": "[data-element='editor-description']",
                 "title": "Enter a description",
-                "content": "<p>A description helps to pick the right document type when creating content.</p><p>Write a description to our Home page. It could be: <br/><pre>The home page of the website</pre></p>"
+                "content": "<p>A description helps to pick the right document type when creating content.</p><p>Write a description for our Home page. It could be: <br/><pre>The home page of the website</pre></p>"
             },
             {
                 "element": "[data-element='group-add']",
@@ -169,7 +169,7 @@
             {
                 "element": "[data-element~='overlay-property-settings'] [data-element='property-description']",
                 "title": "Enter a description",
-                "content": "<p>A description will help to fill in the right content.</p><p>Enter a description for the property editor. It could be:<br/> <pre>Write a nice introduction text so the visitors feel welcome</pre></p>"
+                "content": "<p>A description will help your editor fill in the right content.</p><p>Enter a description for the property editor. It could be:<br/> <pre>Write a nice introduction text so the visitors feel welcome</pre></p>"
             },
             {
                 "element": "[data-element~='overlay-property-settings'] [data-element='editor-add']",
@@ -205,6 +205,18 @@
                 "element": "[data-element~='overlay-property-settings'] [data-element='button-overlaySubmit']",
                 "title": "Add property to document type",
                 "content": "Click <b>Submit</b> to add the property to the document type.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='sub-view-permissions']",
+                "title": "Check the document type permissions",
+                "content": "Click <b>Permissions</b> to view the permissions page.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='permissions-allow-as-root']",
+                "title": "Allow this document type to work at the root of your site",
+                "content": "Toggle the switch <b>Allow as root</b> to allow new content pages based on this document type to be created at the root of your site",
                 "event": "click"
             },
             {
@@ -247,7 +259,7 @@
                 "title": "Open context menu",
                 "content": "<p>Open the context menu by hovering over the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
                 "event": "click",
-                "eventElement": "[data-element='tree-root'] [data-element='tree-item-options']"
+                "eventElement": "#tree [data-element='tree-root'] [data-element='tree-item-options']"
             },
             {
                 "element": "[data-element='action-create-homePage']",
@@ -346,7 +358,7 @@
         "steps": [
             {
                 "title": "View your Umbraco site",
-                "content": "<p>Our three main components to a page are done: <b>Document type, Template, and Content</b>. It is now time to see the result.</p><p>In this tour you will learn how to see your published website.</p>",
+                "content": "<p>Our three main components for a page are done: <b>Document type, Template, and Content</b>. It is now time to see the result.</p><p>In this tour you will learn how to see your published website.</p>",
                 "type": "intro"
             },
             {

@@ -19,19 +19,19 @@ When contributing code to Umbraco there's plenty of things you'll want to know, 
   * [What branch should I target for my contributions?](#what-branch-should-i-target-for-my-contributions)
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
   * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
-  
+
 ## How Can I Contribute?
 
 ### Reporting Bugs
 This section guides you through submitting a bug report for Umbraco CMS. Following these guidelines helps maintainers and the community understand your report 📝, reproduce the behavior 💻 💻, and find related reports 🔎.
 
-Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](http://issues.umbraco.org/issues#newissue=61-30118), the information it asks for helps us resolve issues faster.
+Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report). Fill out [the required template](https://github.com/umbraco/Umbraco-CMS/issues/new/choose), the information it asks for helps us resolve issues faster.
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
 
 ##### Before Submitting A Bug Report
 
-  * Most importantly, check **if you can reproduce the problem** in the [latest version of Umbraco](https://our.umbraco.org/download/). We might have already fixed your particular problem.
+  * Most importantly, check **if you can reproduce the problem** in the [latest version of Umbraco](https://our.umbraco.com/download/). We might have already fixed your particular problem.
   * It also helps tremendously to check if the issue you're experiencing is present in **a clean install** of the Umbraco version you're currently using. Custom code can have side-effects that don't occur in a clean install.
   * **Use the Google**. Whatever you're experiencing, Google it plus "Umbraco" - usually you can get some pretty good hints from the search results, including open issues and further troubleshooting hints.
   * If you do find and existing issue has **and the issue is still open**, add a comment to the existing issue if you have additional information. If you have the same problem and no new info to add, just "star" the issue.
@@ -52,7 +52,7 @@ Provide more context by answering these questions:
 
 Include details about your configuration and environment:
 
-  * **Which version of Umbraco are you using?** 
+  * **Which version of Umbraco are you using?**
   * **What is the environment you're using Umbraco in?** Is this a problem on your local machine or on a server. Tell us about your configuration: Windows version, IIS/IISExpress, database type, etc.
   * **Which packages do you have installed?**
 
@@ -65,13 +65,11 @@ Most of the suggestions in the [reporting bugs](#reporting-bugs) section also co
 Some additional hints that may be helpful:
 
   * **Include screenshots and animated GIFs** which help you demonstrate the steps or point out the part of Umbraco which the suggestion is related to.
-  * **Explain why this enhancement would be useful to most Umbraco users** and isn't something that can or should be implemented as a [community package](https://our.umbraco.org/projects/).
+  * **Explain why this enhancement would be useful to most Umbraco users** and isn't something that can or should be implemented as a [community package](https://our.umbraco.com/projects/).
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` and issues](http://issues.umbraco.org/issues/U4?q=%28project%3A+%7BU4%7D+Difficulty%3A+%7BVery+Easy%7D+%23Easy+%23Unresolved+Priority%3A+Normal+%23Major+%23Show-stopper+State%3A+-%7BIn+Progress%7D+sort+by%3A+votes+Affected+versions%3A+-6.*+Affected+versions%3A+-4.*%29+OR+%28tag%3A+%7BUp+For+Grabs%7D+%23Unresolved+%29).
-
-The issue list is sorted by total number of upvotes. While not perfect, number of upvotes is a reasonable proxy for impact a given change will have.
+Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` and issues](https://issues.umbraco.org/issues?q=&project=U4&tagValue=upforgrabs&release=&issueType=&search=search) or on the [new issue tracker](https://github.com/umbraco/Umbraco-CMS/issues?q=is%3Aopen+is%3Aissue+label%3Acommunity%2Fup-for-grabs).
 
 ### Pull Requests
 
@@ -80,9 +78,9 @@ The most successful pull requests usually look a like this:
   * Fill in the required template
   * Include screenshots and animated GIFs in your pull request whenever possible.
   * Unit tests, while optional are awesome, thank you!
-  * New code is commented with documentation from which [the reference documentation](https://our.umbraco.org/documentation/Reference/) is generated
+  * New code is commented with documentation from which [the reference documentation](https://our.umbraco.com/documentation/Reference/) is generated
 
-Again, these are guidelines, not strict requirements. 
+Again, these are guidelines, not strict requirements.
 
 ## Making changes after the PR was opened
 
@@ -92,7 +90,7 @@ If you make the corrections we ask for in the same branch and push them to your 
 
 To be honest, we don't like rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
 
-That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc. 
+That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc.
 
 ## What should I know before I get started?
 
@@ -116,8 +114,8 @@ There's two big areas that you should know about:
 
 To find the general areas of something you're looking to fix or improve, have a look at the following two parts of the API documentation.
 
-  * [The AngularJS based backoffice files](https://our.umbraco.org/apidocs/ui/#/api) (to be found  in `src\Umbraco.Web.UI.Client\src`)
-  * [The rest](https://our.umbraco.org/apidocs/csharp/)
+  * [The AngularJS based backoffice files](https://our.umbraco.com/apidocs/ui/#/api) (to be found  in `src\Umbraco.Web.UI.Client\src`)
+  * [The rest](https://our.umbraco.com/apidocs/csharp/)
 
 ### What branch should I target for my contributions?
 
@@ -127,9 +125,15 @@ We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-fl
 
 ### Building Umbraco from source code
 
+In order to build the Umbraco source code locally, first make sure you have the following installed.
+
+  * Visual Studio 2017 v15.3+
+  * Node v10+ (Installed via `build.bat` script. If you already have it installed, make sure you're running at least v10)
+  * npm v6.4.1+ (Installed via `build.bat` script. If you already have it installed, make sure you're running at least v6.4.1)
+
 The easiest way to get started is to run `build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
 
-Alternatively, you can open `src\umbraco.sln` in Visual Studio 2017 ([the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
+Alternatively, you can open `src\umbraco.sln` in Visual Studio 2017 (version 15.3 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
 ![Gulp build in Visual Studio](img/gulpbuild.png)
 
