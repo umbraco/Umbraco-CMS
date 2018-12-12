@@ -91,7 +91,7 @@ namespace Umbraco.Tests.TestHelpers
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,
             IEventMessagesFactory eventMessagesFactory,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             TypeLoader typeLoader,
             IFactory factory = null)
         {

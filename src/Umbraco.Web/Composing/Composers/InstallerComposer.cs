@@ -2,6 +2,7 @@
 using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
+using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Composing.Composers
 {

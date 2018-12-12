@@ -22,6 +22,7 @@ namespace Umbraco.Tests.Runtimes
     public class StandaloneTests
     {
         [Test]
+        [Explicit("This test must be run manually")]
         public void Test()
         {
             // this is almost what CoreRuntime does, without
@@ -53,9 +54,12 @@ namespace Umbraco.Tests.Runtimes
             // at that point, CoreRuntime also does
             //composition.RegisterUnique(mainDom)
             // we should make it
-            //composition.RegisterUnique<IMainDom>(mainDom)
+            composition.RegisterUnique(Mock.Of<IMainDom>());
+            //composition.RegisterUnique<IMainDom>(new SimpleMainDom());
             // because some components want to use it
             // (and then, what would a standalone maindom be?)
+            //
+            // is this an essential thing then??
 
             // get the components
             // all of them?
@@ -84,13 +88,13 @@ namespace Umbraco.Tests.Runtimes
             // and then, validate
             var lightInjectContainer = (LightInject.ServiceContainer) factory.Concrete;
             var results = lightInjectContainer.Validate().ToList();
-            foreach (var resultGroup in results.GroupBy(x => x.Severity))
+            foreach (var resultGroup in results.GroupBy(x => x.Severity).OrderBy(x => x.Key))
             foreach (var result in resultGroup)
             {
                 Console.WriteLine();
                 Console.WriteLine($"{result.Severity}: {WordWrap(result.Message, 120)}");
                 var target = result.ValidationTarget;
-                Console.Write("\t");
+                Console.Write("\tsvce: ");
                 Console.Write(target.ServiceName);
                 Console.Write(target.DeclaringService.ServiceType);
                 if (!target.DeclaringService.ServiceName.IsNullOrWhiteSpace())
@@ -100,13 +104,15 @@ namespace Umbraco.Tests.Runtimes
                     Console.Write("'");
                 }
 
-                Console.Write("     ");
+                Console.Write("     (");
                 if (target.DeclaringService.Lifetime == null)
                     Console.Write("?");
                 else
                     Console.Write(target.DeclaringService.Lifetime.ToString().TrimStart("LightInject."));
-                Console.WriteLine();
-                Console.Write("\t");
+                Console.WriteLine(")");
+                Console.Write("\timpl: ");
+                Console.WriteLine(target.DeclaringService.ImplementingType);
+                Console.Write("\tparm: ");
                 Console.Write(target.Parameter);
                 Console.WriteLine();
             }

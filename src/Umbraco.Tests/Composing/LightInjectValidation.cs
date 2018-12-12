@@ -136,8 +136,8 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
                 {
                     var serviceType = validationTarget.ServiceType.GenericTypeArguments[0];
                     var underlyingvalidationTarget = validationTarget.WithServiceDescription(serviceType, string.Empty);
-                    registration = GetServiceRegistration(serviceMap, underlyingvalidationTarget);
-                    if (registration != null) return;
+                    var registrations = GetServiceRegistrations(serviceMap, underlyingvalidationTarget);
+                    if (registrations.Any()) return;
 
                     // strict: there has to be at least 1
                     string message = string.Format(MissingDeferredDependency, validationTarget.ServiceType, underlyingvalidationTarget.ServiceType);
@@ -198,9 +198,13 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
             LifeSpans.TryAdd(typeof(TLifetime), lifeSpan);
         }
 
+        private static IEnumerable<ServiceRegistration> GetServiceRegistrations(ServiceMap serviceMap, ValidationTarget validationTarget)
+        {
+            return serviceMap.Where(x => validationTarget.ServiceType.IsAssignableFrom(x.Key)).SelectMany(x => x.Value.Values);
+        }
+
         private static ServiceRegistration GetServiceRegistration(ServiceMap serviceMap, ValidationTarget validationTarget)
         {
-
             if (!serviceMap.TryGetValue(validationTarget.ServiceType, out var registrations))
             {
                 return null;
@@ -224,8 +228,6 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
             return null;
         }
 
-
-
         private static string GetLifetimeName(ILifetime lifetime)
         {
             if (lifetime == null)
@@ -234,7 +236,6 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
             }
             return lifetime.GetType().Name;
         }
-
 
         private static int GetLifespan(ILifetime lifetime)
         {
@@ -248,9 +249,6 @@ Ensure that 'NameSpace.IBar' is registered with a lifetime that is equal to or h
             }
             return 0;
         }
-
-
-
     }
 
 

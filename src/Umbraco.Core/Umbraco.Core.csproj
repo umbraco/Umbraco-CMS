@@ -329,6 +329,7 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
+    <Compile Include="IMainDom.cs" />
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -1431,6 +1432,7 @@
     <Compile Include="Components\ManifestWatcherComponent.cs" />
     <Compile Include="Components\RelateOnCopyComponent.cs" />
     <Compile Include="Components\RelateOnTrashComponent.cs" />
+    <Compile Include="SimpleMainDom.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
