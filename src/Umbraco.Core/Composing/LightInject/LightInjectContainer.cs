@@ -86,8 +86,9 @@ namespace Umbraco.Core.Composing.LightInject
         /// </summary>
         protected ServiceContainer Container { get; }
 
-        /// <inheritdoc />
-        public object ConcreteContainer => Container;
+        /// <inheritdoc cref="IRegister"/>
+        /// <inheritdoc cref="IFactory"/>
+        public object Concrete => Container;
 
         /// <inheritdoc />
         public void Dispose()

@@ -8,6 +8,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Composing
 {
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = RegisterFactory.Create();
             
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());

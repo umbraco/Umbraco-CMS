@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -36,14 +37,14 @@ namespace Umbraco.Tests.TestHelpers
 
             var container = RegisterFactory.Create();
 
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var pluginManager = new TypeLoader(NullCacheProvider.Instance,
-                SettingsForTests.GenerateMockGlobalSettings(),
+                LocalTempStorage.Default,
                 logger,
                 false);
             composition.RegisterUnique(pluginManager);

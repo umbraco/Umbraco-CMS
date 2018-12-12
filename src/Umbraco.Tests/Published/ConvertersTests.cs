@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -176,7 +177,7 @@ namespace Umbraco.Tests.Published
             Current.Reset();
             var register = RegisterFactory.Create();
 
-            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()

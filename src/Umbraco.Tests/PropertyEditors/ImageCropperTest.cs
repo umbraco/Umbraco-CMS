@@ -17,6 +17,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
 using Umbraco.Web;
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.PropertyEditors
             try
             {
                 var container = RegisterFactory.Create();
-                var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+                var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
                 composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 

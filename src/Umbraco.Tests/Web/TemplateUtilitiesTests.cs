@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Web
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
             Current.Factory = container.Object;
 

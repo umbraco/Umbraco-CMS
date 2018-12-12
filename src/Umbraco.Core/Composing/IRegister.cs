@@ -21,7 +21,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets the concrete container.
         /// </summary>
-        object ConcreteContainer { get; }
+        object Concrete { get; }
 
         /// <summary>
         /// Registers a service as its own implementation.

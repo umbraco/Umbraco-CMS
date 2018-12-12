@@ -77,7 +77,7 @@ namespace Umbraco.Core.Components
                     // otherwise, user components have Run min level, anything else is Unknown (always run)
                     var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
                     var minLevel = attr?.MinLevel ?? (x.Implements<IUmbracoUserComponent>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
-                    return _composition.RuntimeLevel >= minLevel;
+                    return _composition.RuntimeState.Level >= minLevel;
                 })
                 .ToList();
 
@@ -114,7 +114,6 @@ namespace Umbraco.Core.Components
 
             // bit verbose but should help for troubleshooting
             var text = "Ordered Components: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComponentTypes) + Environment.NewLine;
-            Console.WriteLine(text);
             _logger.Debug<Components>("Ordered Components: {SortedComponentTypes}", sortedComponentTypes);
 
             return sortedComponentTypes;

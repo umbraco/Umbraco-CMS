@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Components
         private static readonly List<Type> Composed = new List<Type>();
         private static readonly List<string> Initialized = new List<string>();
 
-        private static IFactory GetMockFactory(Action<Mock<IFactory>> setup = null)
+        private static IFactory MockFactory(Action<Mock<IFactory>> setup = null)
         {
             // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
@@ -40,21 +40,28 @@ namespace Umbraco.Tests.Components
             return mock.Object;
         }
 
-        private static IRegister GetMockRegister()
+        private static IRegister MockRegister()
         {
             return Mock.Of<IRegister>();
         }
 
-        private static TypeLoader GetMockTypeLoader()
+        private static TypeLoader MockTypeLoader()
         {
             return new TypeLoader();
+        }
+
+        public static IRuntimeState MockRuntimeState(RuntimeLevel level)
+        {
+            var runtimeState = Mock.Of<IRuntimeState>();
+            Mock.Get(runtimeState).Setup(x => x.Level).Returns(level);
+            return runtimeState;
         }
 
         [Test]
         public void Boot1A()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Component1, Component2, Component3, Component4>();
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -69,8 +76,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Boot1B()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));
 
             var types = TypeArray<Component1, Component2, Component3, Component4>();
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -85,8 +92,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Boot2()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Component20, Component21>();
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -100,8 +107,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Boot3()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Component22, Component24, Component25>();
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -117,8 +124,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void BrokenRequire()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Component1, Component2, Component3>();
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -140,8 +147,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void BrokenRequired()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Component2, Component4, Component13>();
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -157,12 +164,12 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Initialize()
         {
-            var register = GetMockRegister();
-            var factory = GetMockFactory(m =>
+            var register = MockRegister();
+            var factory = MockFactory(m =>
             {
                 m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
             });
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Component1), typeof(Component5) };
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -180,8 +187,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Requires1()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Component6), typeof(Component7), typeof(Component8) };
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -195,8 +202,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Requires2A()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Component9), typeof(Component2), typeof(Component4) };
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -211,9 +218,9 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Requires2B()
         {
-            var register = GetMockRegister();
-            var factory = GetMockFactory();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var register = MockRegister();
+            var factory = MockFactory();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));
 
             var types = new[] { typeof(Component9), typeof(Component2), typeof(Component4) };
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -229,8 +236,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void WeakDependencies()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Component10) };
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
@@ -260,8 +267,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void DisableMissing()
         {
-            var register = GetMockRegister();
-            var composition = new Composition(register, GetMockTypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Unknown);
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Component6), typeof(Component8) }; // 8 disables 7 which is not in the list
             var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());

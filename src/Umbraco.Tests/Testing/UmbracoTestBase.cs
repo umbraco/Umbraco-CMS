@@ -29,6 +29,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -130,7 +131,7 @@ namespace Umbraco.Tests.Testing
 
             var register = RegisterFactory.Create();
 
-            Composition = new Composition(register, typeLoader, proflogger, RuntimeLevel.Run);
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
@@ -267,7 +268,7 @@ namespace Umbraco.Tests.Testing
         // common to all tests = cannot be overriden
         private static TypeLoader CreateCommonTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(runtimeCache, globalSettings, logger, false)
+            return new TypeLoader(runtimeCache, globalSettings.LocalTempStorageLocation, logger, false)
             {
                 AssembliesToScan = new[]
                 {

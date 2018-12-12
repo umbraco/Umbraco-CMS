@@ -55,17 +55,6 @@ namespace Umbraco.Web.Runtime
             return factory;
         }
 
-        /// <inheritdoc/>
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-
-            // some components may want to initialize with the UmbracoApplicationBase
-            // well, they should not - we should not do this
-            // TODO remove this eventually.
-            composition.RegisterUnique(_umbracoApplication);
-        }
-
         #region Getters
 
         protected override IProfiler GetProfiler() => new WebProfiler();

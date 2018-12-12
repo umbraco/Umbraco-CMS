@@ -6,7 +6,6 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
 
 namespace Umbraco.Web
 {

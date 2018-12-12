@@ -9,6 +9,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Composing
 {
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderHandlesTypes()
         {
             var container = CreateRegister();
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderHandlesProducers()
         {
             var container = CreateRegister();
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderHandlesTypesAndProducers()
         {
             var container = CreateRegister();
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderThrowsOnIllegalTypes()
         {
             var container = CreateRegister();
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -141,7 +142,7 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderCanExcludeTypes()
         {
             var container = CreateRegister();
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()

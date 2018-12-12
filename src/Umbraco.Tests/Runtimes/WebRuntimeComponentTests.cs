@@ -2,14 +2,13 @@
 using System.Web.Mvc;
 using NUnit.Framework;
 using Umbraco.Core.Profiling;
-using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Runtime;
 
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
-    public class WebRuntimeTests
+    public class WebRuntimeComponentTests
     {
         [Test]
         public void WrapViewEngines_HasEngines_WrapsAll()
@@ -43,7 +42,6 @@ namespace Umbraco.Tests.Runtimes
             Assert.That(((ProfilingViewEngine)engines[1]).Inner, Is.InstanceOf<PluginViewEngine>());
         }
 
-
         [Test]
         public void WrapViewEngines_HasProfiledEngine_AddsSameInstance()
         {
@@ -61,10 +59,7 @@ namespace Umbraco.Tests.Runtimes
         [Test]
         public void WrapViewEngines_CollectionIsNull_DoesNotThrow()
         {
-            IList<IViewEngine> engines = null;
-            Assert.DoesNotThrow(() => WebRuntimeComponent.WrapViewEngines(engines));
-            Assert.That(engines, Is.Null);
+            Assert.DoesNotThrow(() => WebRuntimeComponent.WrapViewEngines(null));
         }
-
     }
 }

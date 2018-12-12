@@ -25,13 +25,13 @@ namespace Umbraco.Core.Components
         /// <param name="register">A register.</param>
         /// <param name="typeLoader">A type loader.</param>
         /// <param name="logger">A logger.</param>
-        /// <param name="level">The runtime level.</param>
-        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, RuntimeLevel level)
+        /// <param name="runtimeState">The runtime state.</param>
+        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState)
         {
             _register = register;
             TypeLoader = typeLoader;
             Logger = logger;
-            RuntimeLevel = level;
+            RuntimeState = runtimeState;
         }
 
         #region Services
@@ -47,16 +47,16 @@ namespace Umbraco.Core.Components
         public TypeLoader TypeLoader { get; }
 
         /// <summary>
-        /// Gets the runtime level.
+        /// Gets the runtime state.
         /// </summary>
-        public RuntimeLevel RuntimeLevel { get; }
+        public IRuntimeState RuntimeState { get; }
 
         #endregion
 
         #region IRegister
 
         /// <inheritdoc />
-        public object ConcreteContainer => _register.ConcreteContainer;
+        public object Concrete => _register.Concrete;
 
         /// <inheritdoc />
         public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)

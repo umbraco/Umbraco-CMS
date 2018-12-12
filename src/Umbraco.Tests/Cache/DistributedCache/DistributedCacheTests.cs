@@ -9,6 +9,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Cache.DistributedCache
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             var register = RegisterFactory.Create();
 
-            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.RegisterUnique<IServerRegistrar>(_ => new TestServerRegistrar());
             composition.RegisterUnique<IServerMessenger>(_ => new TestServerMessenger());

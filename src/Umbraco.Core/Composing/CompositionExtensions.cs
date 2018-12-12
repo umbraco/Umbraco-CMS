@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Components;
+﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Composing
 {
@@ -7,6 +10,31 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public static class CompositionExtensions
     {
+        #region Essentials
+
+        /// <summary>
+        /// Registers essential services.
+        /// </summary>
+        public static void RegisterEssentials(this Composition composition,
+            ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
+            CacheHelper appCaches,
+            IUmbracoDatabaseFactory databaseFactory,
+            TypeLoader typeLoader,
+            IRuntimeState state)
+        {
+            composition.RegisterUnique(logger);
+            composition.RegisterUnique(profiler);
+            composition.RegisterUnique(profilingLogger);
+            composition.RegisterUnique(appCaches);
+            composition.RegisterUnique(factory => factory.GetInstance<CacheHelper>().RuntimeCache);
+            composition.RegisterUnique(databaseFactory);
+            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
+            composition.RegisterUnique(typeLoader);
+            composition.RegisterUnique(state);
+        }
+
+        #endregion
+
         #region Unique
 
         /// <summary>

@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 
@@ -413,7 +414,7 @@ namespace Umbraco.Tests.FrontEnd
                 .Setup(x => x.GetInstance(typeof(TypeLoader)))
                 .Returns(new TypeLoader(
                     NullCacheProvider.Instance,
-                    globalSettings,
+                    LocalTempStorage.Default,
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )
                 );

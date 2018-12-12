@@ -275,7 +275,7 @@ namespace Umbraco.Web.Runtime
         {
             if (viewEngines == null || viewEngines.Count == 0) return;
 
-            var originalEngines = viewEngines.Select(e => e).ToArray();
+            var originalEngines = viewEngines.ToList();
             viewEngines.Clear();
             foreach (var engine in originalEngines)
             {

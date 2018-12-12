@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.IO
 
             _register = RegisterFactory.Create();
 
-            var composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());

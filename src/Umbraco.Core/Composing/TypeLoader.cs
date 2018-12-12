@@ -29,30 +29,29 @@ namespace Umbraco.Core.Composing
         private const string CacheKey = "umbraco-types.list";
 
         private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly IGlobalSettings _globalSettings;
         private readonly IProfilingLogger _logger;
 
-        private readonly object _typesLock = new object();
+        private readonly object _locko = new object();
         private readonly Dictionary<TypeListKey, TypeList> _types = new Dictionary<TypeListKey, TypeList>();
 
         private string _cachedAssembliesHash;
         private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
-        private static LocalTempStorage _localTempStorage = LocalTempStorage.Unknown;
+        private static LocalTempStorage _localTempStorage;
         private static string _fileBasePath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
         /// <param name="runtimeCache">The application runtime cache.</param>
-        /// <param name="globalSettings"></param>
+        /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, bool detectChanges = true)
+        internal TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges = true)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _localTempStorage = localTempStorage == LocalTempStorage.Unknown ? LocalTempStorage.Default : localTempStorage;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             if (detectChanges)
@@ -370,14 +369,15 @@ namespace Umbraco.Core.Composing
 
         private string GetFileBasePath()
         {
-            var localTempStorage = _globalSettings.LocalTempStorageLocation;
-            if (_localTempStorage != localTempStorage)
+            lock (_locko)
             {
-                string path;
-                switch (_globalSettings.LocalTempStorageLocation)
+                if (_fileBasePath != null)
+                    return _fileBasePath;
+
+                switch (_localTempStorage)
                 {
                     case LocalTempStorage.AspNetTemp:
-                        path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "umbraco-types");
+                        _fileBasePath = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "umbraco-types");
                         break;
                     case LocalTempStorage.EnvironmentTemp:
                         // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
@@ -385,27 +385,24 @@ namespace Umbraco.Core.Composing
                         // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
                         var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
                         var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
-                        path = Path.Combine(cachePath, "umbraco-types");
+                        _fileBasePath = Path.Combine(cachePath, "umbraco-types");
                         break;
                     case LocalTempStorage.Default:
                     default:
                         var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
-                        path =  Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName);
+                        _fileBasePath = Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName);
                         break;
                 }
 
-                _fileBasePath = path;
-                _localTempStorage = localTempStorage;
+                // ensure that the folder exists
+                var directory = Path.GetDirectoryName(_fileBasePath);
+                if (directory == null)
+                    throw new InvalidOperationException($"Could not determine folder for path \"{_fileBasePath}\".");
+                if (Directory.Exists(directory) == false)
+                    Directory.CreateDirectory(directory);
+
+                return _fileBasePath;
             }
-
-            // ensure that the folder exists
-            var directory = Path.GetDirectoryName(_fileBasePath);
-            if (directory == null)
-                throw new InvalidOperationException($"Could not determine folder for path \"{_fileBasePath}\".");
-            if (Directory.Exists(directory) == false)
-                Directory.CreateDirectory(directory);
-
-            return _fileBasePath;
         }
 
         //private string GetFilePath(string extension)
@@ -638,7 +635,7 @@ namespace Umbraco.Core.Composing
 
             var name = GetName(baseType, attributeType);
 
-            lock (_typesLock)
+            lock (_locko)
             using (_logger.TraceDuration<TypeLoader>(
                 "Getting " + name,
                 "Got " + name)) // cannot contain typesFound.Count as it's evaluated before the find

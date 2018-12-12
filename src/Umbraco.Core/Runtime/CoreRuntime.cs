@@ -70,7 +70,8 @@ namespace Umbraco.Core.Runtime
 
             // type loader
             var globalSettings = UmbracoConfig.For.GlobalSettings();
-            var typeLoader = new TypeLoader(runtimeCache, globalSettings, profilingLogger);
+            var localTempStorage = globalSettings.LocalTempStorageLocation;
+            var typeLoader = new TypeLoader(runtimeCache, localTempStorage, profilingLogger);
 
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -84,19 +85,11 @@ namespace Umbraco.Core.Runtime
             };
 
             // create the composition
-            var composition = new Composition(register, typeLoader, profilingLogger, RuntimeLevel.Boot);
-
-            composition.RegisterUnique(logger);
-            composition.RegisterUnique(profiler);
-            composition.RegisterUnique<IProfilingLogger>(profilingLogger);
-            composition.RegisterUnique(appCaches);
-            composition.RegisterUnique(runtimeCache);
-            composition.RegisterUnique(databaseFactory);
-            composition.RegisterUnique(_ => databaseFactory.SqlContext);
-            composition.RegisterUnique(typeLoader);
-            composition.RegisterUnique<IRuntimeState>(_state);
+            var composition = new Composition(register, typeLoader, profilingLogger, _state);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, appCaches, databaseFactory, typeLoader, _state);
 
             // register runtime-level services
+            // there should be none, really - this is here "just in case"
             Compose(composition);
 
             // the boot loader boots using a container scope, so anything that is PerScope will

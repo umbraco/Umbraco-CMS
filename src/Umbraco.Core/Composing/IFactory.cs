@@ -16,6 +16,11 @@ namespace Umbraco.Core.Composing
     public interface IFactory
     {
         /// <summary>
+        /// Gets the concrete factory.
+        /// </summary>
+        object Concrete { get; }
+
+        /// <summary>
         /// Gets an instance of a service.
         /// </summary>
         /// <param name="type">The type of the service.</param>

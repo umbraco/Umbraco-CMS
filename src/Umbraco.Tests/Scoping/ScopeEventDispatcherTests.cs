@@ -16,6 +16,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Scoping
 
             var register = RegisterFactory.Create();
 
-            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             _testObjects = new TestObjects(register);
 
