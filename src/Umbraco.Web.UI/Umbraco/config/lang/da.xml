@@ -872,9 +872,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="removeSpecialFormattering">Indsæt, men fjern formattering som ikke bør være på en webside (Anbefales)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Rollebaseret beskyttelse</key>
-    <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
-    <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
+    <key alias="paGroups">Gruppebaseret beskyttelse</key>
+    <key alias="paGroupsHelp">Hvis du ønsker at give adgang til alle medlemmer af specifikke medlemsgrupper</key>
+    <key alias="paGroupsNoGroups">Du skal oprette en medlemsgruppe før du kan bruge gruppebaseret beskyttelse</key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
     <key alias="paHowWould"><![CDATA[Vælg hvordan siden <strong>%0%</strong> skal beskyttes]]></key>
@@ -885,7 +885,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="paRemoveProtection">Fjern beskyttelse...</key>
     <key alias="paRemoveProtectionConfirm"><![CDATA[Er du sikker på at du vil fjerne beskyttelsen fra siden <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Vælg siderne der indeholder log ind-formularer og fejlmeddelelser</key>
-    <key alias="paSelectRoles"><![CDATA[Vælg de roller der har adgang til siden <strong>%0%</strong>]]></key>
+    <key alias="paSelectGroups"><![CDATA[Vælg de grupper der har adgang til siden <strong>%0%</strong>]]></key>
     <key alias="paSelectMembers"><![CDATA[Vælg de medlemmer der har adgang til siden <strong>%0%</strong>]]></key>
     <key alias="paMembers">Adgang til enkelte medlemmer</key>
     <key alias="paMembersHelp">Hvis du ønsker at give adgang til enkelte medlemmer</key>

@@ -2201,15 +2201,18 @@ namespace Umbraco.Web.Editors
                     break;
             }
 
-            var roles = entry.Rules
+            var allGroups = Services.MemberGroupService.GetAll().ToArray();
+            var groups = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                .Select(rule => rule.RuleValue)
+                .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
+                .Where(memberGroup => memberGroup != null)
+                .Select(Mapper.Map<MemberGroupDisplay>)
                 .ToArray();
 
             return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
             {
                 Members = members,
-                Roles = roles,
+                Groups = groups,
                 LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
                 ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
             });
@@ -2218,9 +2221,9 @@ namespace Umbraco.Web.Editors
         // set up public access using role based access
         [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
         [HttpPost]
-        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] roles, [FromUri]string[] usernames, int loginPageId, int errorPageId)
+        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] groups, [FromUri]string[] usernames, int loginPageId, int errorPageId)
         {
-            if ((roles == null || roles.Any() == false) && (usernames == null || usernames.Any() == false))
+            if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
             }
@@ -2233,11 +2236,11 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
             }
 
-            var isRoleBased = roles != null && roles.Any();
-            var candidateRuleValues = isRoleBased
-                ? roles
+            var isGroupBased = groups != null && groups.Any();
+            var candidateRuleValues = isGroupBased
+                ? groups
                 : usernames;
-            var newRuleType = isRoleBased
+            var newRuleType = isGroupBased
                 ? Constants.Conventions.PublicAccess.MemberRoleRuleType
                 : Constants.Conventions.PublicAccess.MemberUsernameRuleType;
 
@@ -2247,9 +2250,9 @@ namespace Umbraco.Web.Editors
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 
-                foreach (var role in candidateRuleValues)
+                foreach (var ruleValue in candidateRuleValues)
                 {
-                    entry.AddRule(role, newRuleType);
+                    entry.AddRule(ruleValue, newRuleType);
                 }
             }
             else
@@ -2272,9 +2275,9 @@ namespace Umbraco.Web.Editors
                 {
                     entry.RemoveRule(rule);
                 }
-                foreach (var role in newRuleValues)
+                foreach (var ruleValue in newRuleValues)
                 {
-                    entry.AddRule(role, newRuleType);
+                    entry.AddRule(ruleValue, newRuleType);
                 }
             }
 
