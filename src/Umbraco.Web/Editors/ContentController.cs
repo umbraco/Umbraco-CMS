@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
+using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -2173,13 +2174,33 @@ namespace Umbraco.Web.Editors
 
             // unwrap the current public access setup for the client
             // - this API method is the single point of entry for both "modes" of public access (single user and role based)
-            // TODO: support custom membership providers here
-            var members = entry.Rules
+            var usernames = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType)
-                .Select(rule => Services.MemberService.GetByUsername(rule.RuleValue))
-                .Where(member => member != null)
-                .Select(Mapper.Map<MemberDisplay>)
-                .ToArray();
+                .Select(rule => rule.RuleValue).ToArray();
+
+            MemberDisplay[] members;
+            switch (Services.MemberService.GetMembershipScenario())
+            {
+                case MembershipScenario.NativeUmbraco:
+                    members = usernames
+                        .Select(username => Services.MemberService.GetByUsername(username))
+                        .Where(member => member != null)
+                        .Select(Mapper.Map<MemberDisplay>)
+                        .ToArray();
+                    break;
+                // TODO: test support custom membership providers
+                case MembershipScenario.CustomProviderWithUmbracoLink:
+                case MembershipScenario.StandaloneCustomProvider:
+                default:
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    members = usernames
+                        .Select(username => provider.GetUser(username, false))
+                        .Where(membershipUser => membershipUser != null)
+                        .Select(Mapper.Map<MembershipUser, MemberDisplay>)
+                        .ToArray();
+                    break;
+            }
+
             var roles = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
                 .Select(rule => rule.RuleValue)
