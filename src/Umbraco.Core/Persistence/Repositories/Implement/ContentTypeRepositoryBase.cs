@@ -772,26 +772,26 @@ AND umbracoNode.id <> @id",
             // delete existing relations (for target language)
             // do *not* delete existing tags
 
-            var sqlTagToDelete = Sql()
+            var sqlSelectTagsToDelete = Sql()
                 .Select<TagDto>(x => x.Id)
                 .From<TagDto>()
                 .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId);
 
             if (contentTypeIds != null)
-                sqlTagToDelete
+                sqlSelectTagsToDelete
                     .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
-            sqlTagToDelete
+            sqlSelectTagsToDelete
                 .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
                 .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
 
-            var sqlDeleteRel = Sql()
+            var sqlDeleteRelations = Sql()
                 .Delete<TagRelationshipDto>()
-                .WhereIn<TagRelationshipDto>(x => x.TagId, sqlTagToDelete);
+                .WhereIn<TagRelationshipDto>(x => x.TagId, sqlSelectTagsToDelete);
 
-            sqlDeleteRel.WriteToConsole();
-            Database.Execute(sqlDeleteRel);
+            sqlDeleteRelations.WriteToConsole();
+            Database.Execute(sqlDeleteRelations);
 
             // do *not* delete the tags - they could be used by other content types / property types
             /*
@@ -802,76 +802,90 @@ AND umbracoNode.id <> @id",
             */
 
             // copy tags from source language to target language
+            // target tags may exist already, so we have to check for existence here
+            //
+            // select tags to insert: tags pointed to by a relation ship, for proper property/content types,
+            // and of source language, and where we cannot left join to an existing tag with same text,
+            // group and languageId
 
             var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
-            var sqlSelect = Sql()
+            var sqlSelectTagsToInsert = Sql()
                 .Select<TagDto>(x => x.Text, x => x.Group)
                 .Append(", " + targetLanguageIdS)
                 .From<TagDto>();
 
-            sqlSelect
+            sqlSelectTagsToInsert
                 .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
                 .LeftJoin<TagDto>("xtags").On<TagDto, TagDto>((tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group && xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
 
             if (contentTypeIds != null)
-                sqlSelect
-                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId);
-
-            sqlSelect
-                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
-                .WhereNull<TagDto>(x => x.Id, "xtags"); // ie, not exists
-
-            if (contentTypeIds != null)
-                sqlSelect
+                sqlSelectTagsToInsert
+                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
-            sqlSelect.Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
+            sqlSelectTagsToInsert
+                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
+                .WhereNull<TagDto>(x => x.Id, "xtags") // ie, not exists
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
 
             var cols = Sql().Columns<TagDto>(x => x.Text, x => x.Group, x => x.LanguageId);
-            var sqlInsertTag = Sql($"INSERT INTO {TagDto.TableName} ({cols})").Append(sqlSelect);
+            var sqlInsertTags = Sql($"INSERT INTO {TagDto.TableName} ({cols})").Append(sqlSelectTagsToInsert);
 
-            sqlInsertTag.WriteToConsole();
-            Database.Execute(sqlInsertTag);
+            sqlInsertTags.WriteToConsole();
+            Database.Execute(sqlInsertTags);
 
             // create relations to new tags
+            // any existing relations have been deleted above, no need to check for existence here
+            //
+            // select node id and property type id from existing relations to tags of source language,
+            // for proper property/content types, and select new tag id from tags, with matching text,
+            // and group, but for the target language
 
-            var sqlFoo = Sql()
+            var sqlSelectRelationsToInsert = Sql()
                 .Select<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId)
                 .AndSelect<TagDto>("otag", x => x.Id)
                 .From<TagRelationshipDto>()
                 .InnerJoin<TagDto>().On<TagRelationshipDto, TagDto>((rel, tag) => rel.TagId == tag.Id)
-                .InnerJoin<TagDto>("otag").On<TagDto, TagDto>((tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group && otag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "otag")
-                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
+                .InnerJoin<TagDto>("otag").On<TagDto, TagDto>((tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group && otag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "otag");
 
-            var cols2 = Sql().Columns<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
-            var sqlInsertRel = Sql($"INSERT INTO {TagRelationshipDto.TableName} ({cols2})").Append(sqlFoo);
+            if (contentTypeIds != null)
+                sqlSelectRelationsToInsert
+                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
-            sqlInsertRel.WriteToConsole();
-            Database.Execute(sqlInsertRel);
+            sqlSelectRelationsToInsert
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1))
+                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds);
+
+            var relationColumnsToInsert = Sql().Columns<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
+            var sqlInsertRelations = Sql($"INSERT INTO {TagRelationshipDto.TableName} ({relationColumnsToInsert})").Append(sqlSelectRelationsToInsert);
+
+            sqlInsertRelations.WriteToConsole();
+            Database.Execute(sqlInsertRelations);
 
             // delete original relations - *not* the tags - all of them
             // cannot really "go back" with relations, would have to do it with property values
 
-            sqlTagToDelete = Sql()
+            sqlSelectTagsToDelete = Sql()
                 .Select<TagDto>(x => x.Id)
                 .From<TagDto>()
                 .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId);
 
             if (contentTypeIds != null)
-                sqlTagToDelete
+                sqlSelectTagsToDelete
                     .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
-            sqlTagToDelete
+            sqlSelectTagsToDelete
                 .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
                 .Where<TagDto>(x => !x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
 
-            sqlDeleteRel = Sql()
+            sqlDeleteRelations = Sql()
                 .Delete<TagRelationshipDto>()
-                .WhereIn<TagRelationshipDto>(x => x.TagId, sqlTagToDelete);
+                .WhereIn<TagRelationshipDto>(x => x.TagId, sqlSelectTagsToDelete);
 
-            sqlDeleteRel.WriteToConsole();
-            Database.Execute(sqlDeleteRel);
+            sqlDeleteRelations.WriteToConsole();
+            Database.Execute(sqlDeleteRelations);
 
             // no
             /*
