@@ -51,7 +51,9 @@
                     "content_publishedPendingChanges",
                     "content_notCreated",
                     "prompt_unsavedChanges",
-                    "prompt_doctypeChangeWarning"
+                    "prompt_doctypeChangeWarning",
+                    "general_history",
+                    "auditTrails_historyIncludingVariants"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -63,7 +65,9 @@
                         labels.notCreated = data[4];
                         labels.unsavedChanges = data[5];
                         labels.doctypeChangeWarning = data[6];
-
+                        
+                        scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
+                
                         setNodePublishStatus();
 
                     });
