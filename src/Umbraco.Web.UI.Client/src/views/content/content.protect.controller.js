@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentProtectController($scope, $routeParams, contentResource, memberGroupResource, navigationService, localizationService, editorService) {
+    function ContentProtectController($scope, $q, contentResource, memberResource, memberGroupResource, navigationService, localizationService, editorService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -92,8 +92,8 @@
         function save() {
             vm.buttonState = "busy";
             var roles = _.map(vm.groups, function (group) { return group.name; });
-            var memberIds = _.map(vm.members, function (member) { return member.id; });
-            contentResource.updatePublicAccess(id, roles, memberIds, vm.loginPage.id, vm.errorPage.id).then(
+            var usernames = _.map(vm.members, function (member) { return member.username; });
+            contentResource.updatePublicAccess(id, roles, usernames, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
                         vm.success = {
@@ -161,15 +161,30 @@
                 filterCssClass: "not-allowed",
                 submit: function (model) {
                     if (model.selection && model.selection.length) {
+                        var promises = [];
+                        // get the selected member usernames
                         _.each(model.selection,
                             function (member) {
-                                if (!_.find(vm.members, function (m) { return m.id === member.id })) {
-                                    vm.members.push(member);
-                                }
+                                // TODO:
+                                // as-is we need to fetch all the picked members one at a time to get their usernames.
+                                // when editorService has a memberPicker method, see if this can't be avoided - otherwise
+                                // add a memberResource.getByKeys() method to do all this in one request
+                                promises.push(
+                                    memberResource.getByKey(member.key).then(function(newMember) {
+                                        if (!_.find(vm.members, function (currentMember) { return currentMember.username === newMember.username })) {
+                                            vm.members.push(newMember);
+                                        }
+                                    })
+                                );                                
                             });
+                        editorService.close();
+                        navigationService.allowHideDialog(true);
+                        // wait for all the member lookups to complete 
+                        vm.loading = true;
+                        $q.all(promises).then(function() {
+                            vm.loading = false;
+                        });
                     }
-                    editorService.close();
-                    navigationService.allowHideDialog(true);
                 },
                 close: function () {
                     editorService.close();

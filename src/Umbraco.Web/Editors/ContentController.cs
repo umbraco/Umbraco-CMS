@@ -2173,6 +2173,7 @@ namespace Umbraco.Web.Editors
 
             // unwrap the current public access setup for the client
             // - this API method is the single point of entry for both "modes" of public access (single user and role based)
+            // TODO: support custom membership providers here
             var members = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType)
                 .Select(rule => Services.MemberService.GetByUsername(rule.RuleValue))
@@ -2196,9 +2197,9 @@ namespace Umbraco.Web.Editors
         // set up public access using role based access
         [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
         [HttpPost]
-        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] roles, [FromUri]int[] memberIds, int loginPageId, int errorPageId)
+        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] roles, [FromUri]string[] usernames, int loginPageId, int errorPageId)
         {
-            if ((roles == null || roles.Any() == false) && (memberIds == null || memberIds.Any() == false))
+            if ((roles == null || roles.Any() == false) && (usernames == null || usernames.Any() == false))
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
             }
@@ -2214,7 +2215,7 @@ namespace Umbraco.Web.Editors
             var isRoleBased = roles != null && roles.Any();
             var candidateRuleValues = isRoleBased
                 ? roles
-                : memberIds.Select(id => Services.MemberService.GetById(id)?.Username).Where(s => s != null).ToArray();
+                : usernames;
             var newRuleType = isRoleBased
                 ? Constants.Conventions.PublicAccess.MemberRoleRuleType
                 : Constants.Conventions.PublicAccess.MemberUsernameRuleType;

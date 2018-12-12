@@ -991,13 +991,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * @param {Int} contentId The content Id
           * @param {Array} roles The roles that should have access (if using role based protection)
-          * @param {Array} memberIds The IDs of the members that should have access (if using member based protection)
+          * @param {Array} usernames The usernames of the members that should have access (if using member based protection)
           * @param {Int} loginPageId The Id of the login page
           * @param {Int} errorPageId The Id of the error page
           * @returns {Promise} resourcePromise object containing the public access protection
           *
           */
-        updatePublicAccess: function (contentId, roles, memberIds, loginPageId, errorPageId) {
+        updatePublicAccess: function (contentId, roles, usernames, loginPageId, errorPageId) {
             var publicAccess = {
                 contentId: contentId,
                 loginPageId: loginPageId,
@@ -1006,8 +1006,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             if (angular.isArray(roles) && roles.length) {
                 publicAccess.roles = roles;
             }
-            else if (angular.isArray(memberIds) && memberIds.length) {
-                publicAccess.memberIds = memberIds;
+            else if (angular.isArray(usernames) && usernames.length) {
+                publicAccess.usernames = usernames;
             }
             else {
                 throw "must supply either userName/password or roles";
