@@ -66,6 +66,7 @@
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="IContentValueSetBuilder.cs" />
     <Compile Include="IContentValueSetValidator.cs" />
+    <Compile Include="IIndexCreator.cs" />
     <Compile Include="IIndexDiagnostics.cs" />
     <Compile Include="IIndexPopulator.cs" />
     <Compile Include="IndexPopulator.cs" />
@@ -83,12 +84,13 @@
     <Compile Include="IndexTypes.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UmbracoContentIndexer.cs" />
+    <Compile Include="UmbracoContentIndex.cs" />
     <Compile Include="ContentValueSetValidator.cs" />
     <Compile Include="UmbracoExamineIndexDiagnostics.cs" />
-    <Compile Include="UmbracoExamineIndexer.cs" />
+    <Compile Include="UmbracoExamineIndex.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />
-    <Compile Include="UmbracoMemberIndexer.cs" />
+    <Compile Include="LuceneIndexCreator.cs" />
+    <Compile Include="UmbracoMemberIndex.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
