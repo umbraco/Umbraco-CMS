@@ -89,6 +89,7 @@
     <Compile Include="UmbracoExamineIndexDiagnostics.cs" />
     <Compile Include="UmbracoExamineIndex.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />
+    <Compile Include="LuceneIndexCreator.cs" />
     <Compile Include="UmbracoMemberIndex.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
