@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Examine;
+using Examine.LuceneEngine.Directories;
 using Lucene.Net.Store;
 using Umbraco.Core.IO;
 
@@ -29,10 +30,13 @@ namespace Umbraco.Examine
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
 
             var luceneDir = new SimpleFSDirectory(dirInfo);
+
             //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
             //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
             //which simply checks the existence of the lock file
-            luceneDir.SetLockFactory(new NoPrefixSimpleFsLockFactory(dirInfo));
+            // The full syntax of this is: new NoPrefixSimpleFsLockFactory(dirInfo)
+            // however, we are setting the DefaultLockFactory in startup so we'll use that instead since it can be managed globally.
+            luceneDir.SetLockFactory(DirectoryFactory.DefaultLockFactory(dirInfo));
             return luceneDir;
         }
     }
