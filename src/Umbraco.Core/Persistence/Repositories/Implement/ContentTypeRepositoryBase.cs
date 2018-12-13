@@ -809,7 +809,7 @@ AND umbracoNode.id <> @id",
 
             var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
             var sqlSelectTagsToInsert = Sql()
-                .Select<TagDto>(x => x.Text, x => x.Group)
+                .SelectDistinct<TagDto>(x => x.Text, x => x.Group)
                 .Append(", " + targetLanguageIdS)
                 .From<TagDto>();
 
@@ -840,7 +840,7 @@ AND umbracoNode.id <> @id",
             // and group, but for the target language
 
             var sqlSelectRelationsToInsert = Sql()
-                .Select<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId)
+                .SelectDistinct<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId)
                 .AndSelect<TagDto>("otag", x => x.Id)
                 .From<TagRelationshipDto>()
                 .InnerJoin<TagDto>().On<TagRelationshipDto, TagDto>((rel, tag) => rel.TagId == tag.Id)

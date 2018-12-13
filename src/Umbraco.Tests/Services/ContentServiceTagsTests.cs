@@ -257,6 +257,53 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void TagsCanBecomeInvariant2()
+        {
+            var languageService = ServiceContext.LocalizationService;
+            languageService.Save(new Language("fr-FR")); // en-US is already there
+
+            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            PropertyType propertyType;
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                {
+                    DataTypeId = 1041,
+                    Variations = ContentVariation.Culture
+                });
+            contentType.Variations = ContentVariation.Culture;
+            contentTypeService.Save(contentType);
+
+            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.SetCultureName("name-fr", "fr-FR");
+            content1.SetCultureName("name-en", "en-US");
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
+            content1.AssignTags("tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
+            contentService.SaveAndPublish(content1);
+
+            IContent content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            content2.SetCultureName("name-fr", "fr-FR");
+            content2.SetCultureName("name-en", "en-US");
+            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
+            content2.AssignTags("tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
+            contentService.SaveAndPublish(content2);
+
+            //// pretend we already have invariant values
+            //using (var scope = ScopeProvider.CreateScope())
+            //{
+            //    scope.Database.Execute("INSERT INTO [cmsTags] ([tag], [group], [languageId]) SELECT DISTINCT [tag], [group], NULL FROM [cmsTags] WHERE [languageId] IS NOT NULL");
+            //}
+
+            // this should work
+            propertyType.Variations = ContentVariation.Nothing;
+            Assert.DoesNotThrow(() => contentTypeService.Save(contentType));
+        }
+
+        [Test]
         public void TagsCanBecomeInvariantByPropertyType()
         {
             var languageService = ServiceContext.LocalizationService;
