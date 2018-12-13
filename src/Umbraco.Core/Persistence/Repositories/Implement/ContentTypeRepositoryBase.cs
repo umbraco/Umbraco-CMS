@@ -790,7 +790,6 @@ AND umbracoNode.id <> @id",
                 .Delete<TagRelationshipDto>()
                 .WhereIn<TagRelationshipDto>(x => x.TagId, sqlSelectTagsToDelete);
 
-            sqlDeleteRelations.WriteToConsole();
             Database.Execute(sqlDeleteRelations);
 
             // do *not* delete the tags - they could be used by other content types / property types
@@ -831,7 +830,6 @@ AND umbracoNode.id <> @id",
             var cols = Sql().Columns<TagDto>(x => x.Text, x => x.Group, x => x.LanguageId);
             var sqlInsertTags = Sql($"INSERT INTO {TagDto.TableName} ({cols})").Append(sqlSelectTagsToInsert);
 
-            sqlInsertTags.WriteToConsole();
             Database.Execute(sqlInsertTags);
 
             // create relations to new tags
@@ -860,7 +858,6 @@ AND umbracoNode.id <> @id",
             var relationColumnsToInsert = Sql().Columns<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
             var sqlInsertRelations = Sql($"INSERT INTO {TagRelationshipDto.TableName} ({relationColumnsToInsert})").Append(sqlSelectRelationsToInsert);
 
-            sqlInsertRelations.WriteToConsole();
             Database.Execute(sqlInsertRelations);
 
             // delete original relations - *not* the tags - all of them
@@ -884,7 +881,6 @@ AND umbracoNode.id <> @id",
                 .Delete<TagRelationshipDto>()
                 .WhereIn<TagRelationshipDto>(x => x.TagId, sqlSelectTagsToDelete);
 
-            sqlDeleteRelations.WriteToConsole();
             Database.Execute(sqlDeleteRelations);
 
             // no
