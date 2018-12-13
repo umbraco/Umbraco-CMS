@@ -42,8 +42,8 @@ namespace Umbraco.Examine
         /// <param name="validator"></param>
         /// <param name="analyzer"></param>
         public UmbracoMemberIndex(
-            string name, 
-            IEnumerable<FieldDefinition> fieldDefinitions,
+            string name,
+            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,

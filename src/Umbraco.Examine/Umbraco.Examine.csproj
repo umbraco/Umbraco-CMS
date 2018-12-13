@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine" Version="1.0.0-beta046" />
+    <PackageReference Include="Examine" Version="1.0.0-beta050" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>
@@ -72,7 +72,7 @@
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />
     <Compile Include="IPublishedContentValueSetBuilder.cs" />
-    <Compile Include="IUmbracoIndexer.cs" />
+    <Compile Include="IUmbracoIndex.cs" />
     <Compile Include="IValueSetBuilder.cs" />
     <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />

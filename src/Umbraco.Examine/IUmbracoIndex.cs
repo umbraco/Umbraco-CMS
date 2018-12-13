@@ -5,7 +5,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// A Marker interface for defining an Umbraco indexer
     /// </summary>
-    public interface IUmbracoIndexer : IIndex
+    public interface IUmbracoIndex : IIndex
     {
         /// <summary>
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically

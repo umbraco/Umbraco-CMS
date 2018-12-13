@@ -149,7 +149,7 @@ namespace Umbraco.Web.Search
 
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
-            var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
+            var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
             profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
@@ -166,7 +166,17 @@ namespace Umbraco.Web.Search
 
             EnsureUnlocked(profilingLogger.Logger, examineManager);
 
+            //TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
             RebuildIndexes(indexRebuilder, profilingLogger.Logger, true, 5000);
+        }
+
+        private void TestExtending(IExamineManager examineManager)
+        {
+            if (examineManager.TryGetIndex("Test", out var index) && index is LuceneIndex umbIndex)
+            {
+                umbIndex.FieldValueTypeCollection.ValueTypeFactories.TryAdd()
+                umbIndex.FieldDefinitionCollection.TryAdd("productName_es-es", new FieldDefinition("productName_es-es", ""));
+            }
         }
 
 
@@ -496,7 +506,7 @@ namespace Umbraco.Web.Search
                 //Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
                 foreach (var id in ci.Value.removedIds)
                 {
-                    foreach (var index in _examineManager.Indexes.OfType<IUmbracoIndexer>())
+                    foreach (var index in _examineManager.Indexes.OfType<IUmbracoIndex>())
                     {
                         var searcher = index.GetSearcher();
 
@@ -702,7 +712,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
             {
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
                     .Where(x => x.EnableDefaultEventHandler))
@@ -739,7 +749,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
                     .Where(x => x.EnableDefaultEventHandler))
@@ -768,7 +778,7 @@ namespace Umbraco.Web.Search
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
                 var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => x.EnableDefaultEventHandler))
                 {
@@ -798,7 +808,7 @@ namespace Umbraco.Web.Search
             public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     
                     .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))

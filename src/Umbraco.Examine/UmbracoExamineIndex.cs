@@ -23,7 +23,7 @@ namespace Umbraco.Examine
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
     /// </summary>
-    public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndexer, IIndexDiagnostics
+    public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -67,7 +67,7 @@ namespace Umbraco.Examine
         /// <param name="indexValueTypes"></param>
         protected UmbracoExamineIndex(
             string name,
-            IEnumerable<FieldDefinition> fieldDefinitions,
+            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,

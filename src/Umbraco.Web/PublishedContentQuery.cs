@@ -243,8 +243,8 @@ namespace Umbraco.Web
             var searcher = index.GetSearcher();
 
             var results = skip == 0 && take == 0
-                ? searcher.Search(term, true)
-                : searcher.Search(term, true, maxResults: skip + take);
+                ? searcher.Search(term)
+                : searcher.Search(term, maxResults: skip + take);
 
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);

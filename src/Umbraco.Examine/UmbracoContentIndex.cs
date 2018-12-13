@@ -19,6 +19,45 @@ using Examine.LuceneEngine;
 namespace Umbraco.Examine
 {
     /// <summary>
+    /// Custom <see cref="FieldDefinitionCollection"/> allowing dynamic creation of <see cref="FieldDefinition"/>
+    /// </summary>
+    public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
+    {
+        
+        public UmbracoFieldDefinitionCollection()
+            : base(UmbracoExamineIndex.UmbracoIndexFieldDefinitions)
+        {
+        }
+
+        ///// <summary>
+        ///// Overridden to dynamically add field definitions for culture variations
+        ///// </summary>
+        ///// <param name="fieldName"></param>
+        ///// <param name="fieldDefinition"></param>
+        ///// <returns></returns>
+        //public override bool TryGetValue(string fieldName, out FieldDefinition fieldDefinition)
+        //{
+        //    var result = base.TryGetValue(fieldName, out fieldDefinition);
+        //    if (result) return true;
+
+        //    //if the fieldName is not suffixed with _iso-Code
+        //    var underscoreIndex = fieldName.LastIndexOf('_');
+        //    if (underscoreIndex == -1) return false;
+
+
+
+        //    var isoCode = fieldName.Substring(underscoreIndex);
+        //    if (isoCode.Length < 6) return false; //invalid isoCode
+
+        //    var hyphenIndex = isoCode.IndexOf('-');
+        //    if (hyphenIndex != 3) return false; //invalid isoCode
+
+        //    //we'll assume this is a valid isoCode
+
+        //}
+    }
+
+    /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
     public class UmbracoContentIndex : UmbracoExamineIndex
@@ -52,7 +91,7 @@ namespace Umbraco.Examine
         /// <param name="indexValueTypes"></param>
         public UmbracoContentIndex(
             string name,
-            IEnumerable<FieldDefinition> fieldDefinitions,
+            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
@@ -213,27 +252,6 @@ namespace Umbraco.Examine
             }
 
             base.PerformDeleteFromIndex(nodeId, onComplete);
-        }
-
-        /// <summary>
-        /// Overridden to ensure that the variant system fields have the right value types
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="indexValueTypesFactory"></param>
-        /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
-        {
-            //fixme: languages are dynamic so although this will work on startup it wont work when languages are edited
-            foreach(var lang in LanguageService.GetAllLanguages())
-            {
-                foreach (var field in UmbracoIndexFieldDefinitions)
-                {
-                    var def = new FieldDefinition($"{field.Name}_{lang.IsoCode.ToLowerInvariant()}", field.Type);
-                    FieldDefinitionCollection.TryAdd(def.Name, def);
-                }
-            }
-
-            return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
         
     }
