@@ -23,6 +23,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
+using Examine.LuceneEngine.Indexing;
 using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
@@ -169,16 +170,6 @@ namespace Umbraco.Web.Search
             //TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
             RebuildIndexes(indexRebuilder, profilingLogger.Logger, true, 5000);
         }
-
-        private void TestExtending(IExamineManager examineManager)
-        {
-            if (examineManager.TryGetIndex("Test", out var index) && index is LuceneIndex umbIndex)
-            {
-                umbIndex.FieldValueTypeCollection.ValueTypeFactories.TryAdd()
-                umbIndex.FieldDefinitionCollection.TryAdd("productName_es-es", new FieldDefinition("productName_es-es", ""));
-            }
-        }
-
 
         /// <summary>
         /// Called to rebuild empty indexes on startup
