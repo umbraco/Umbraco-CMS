@@ -202,7 +202,6 @@ namespace Umbraco.Core.Logging.Serilog
         private static bool IsTimeoutThreadAbortException(Exception exception)
         {
             if (!(exception is ThreadAbortException abort)) return false;
-
             if (abort.ExceptionState == null) return false;
 
             var stateType = abort.ExceptionState.GetType();

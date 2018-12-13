@@ -30,10 +30,24 @@ namespace Umbraco.Core.Persistence
             Templates = new SqlTemplates(this);
         }
 
-        // fixme
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlContext"/> class.
+        /// </summary>
+        /// <remarks>Initializes an empty context which must be fully initialized using the
+        /// <see cref="Initialize"/> method; this is done in <see cref="UmbracoDatabaseFactory"/>
+        /// as soon as the factory is fully configured.</remarks>
         internal SqlContext()
         { }
 
+        /// <summary>
+        /// Initializes this <see cref="SqlContext"/>.
+        /// </summary>
+        /// <param name="sqlSyntax">The sql syntax provider.</param>
+        /// <param name="pocoDataFactory">The Poco data factory.</param>
+        /// <param name="databaseType">The database type.</param>
+        /// <param name="mappers">The mappers.</param>
+        /// <remarks>Fully initializes an initially empty context; this is done in <see cref="UmbracoDatabaseFactory"/>
+        /// as soon as the factory is fully configured.</remarks>
         internal void Initialize(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
         {
             // for tests

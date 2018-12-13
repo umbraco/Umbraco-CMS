@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence
             var (s, a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
         }
-        
+
         /// <summary>
         /// Appends a WHERE clause to the Sql statement.
         /// </summary>
@@ -1115,12 +1115,37 @@ namespace Umbraco.Core.Persistence
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
-        internal static void WriteToConsole(this Sql sql)
+        internal static string ToText(this Sql sql)
         {
-            Console.WriteLine(sql.SQL);
+            var text = new StringBuilder();
+            sql.ToText(text);
+            return text.ToString();
+        }
+
+        internal static void ToText(this Sql sql, StringBuilder text)
+        {
+            ToText(sql.SQL, sql.Arguments, text);
+        }
+
+        internal static void ToText(string sql, object[] arguments, StringBuilder text)
+        {
+            text.AppendLine(sql);
+
+            if (arguments == null || arguments.Length == 0)
+                return;
+
+            text.Append(" --");
+
             var i = 0;
-            foreach (var arg in sql.Arguments)
-                Console.WriteLine($"  @{i++}: {arg}");
+            foreach (var arg in arguments)
+            {
+                text.Append(" @");
+                text.Append(i++);
+                text.Append(":");
+                text.Append(arg);
+            }
+
+            text.AppendLine();
         }
 
         #endregion
