@@ -29,11 +29,11 @@ angular.module("umbraco.directives")
             currentNode: '=',
             enablelistviewexpand: '@',
             node: '=',
-            tree: '='
+            tree: '=',
+            isDialog: '='
         },
         
         link: function (scope, element, attrs, umbTreeCtrl) {
-
             localizationService.localize("general_search").then(function (value) {
                 scope.searchAltText = value;
             });
