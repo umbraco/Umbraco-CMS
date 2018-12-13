@@ -330,9 +330,15 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     new ContentPropertyDisplay
                     {
+                        Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = _localizedTextService.Localize("general/id"),
+                        Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
+                        View = "idwithguid"
+                    },
+                    new ContentPropertyDisplay
+                    {
                         Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                         Label = _localizedTextService.Localize("content/membertype"),
-                        //Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
                         Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
                         View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                     },

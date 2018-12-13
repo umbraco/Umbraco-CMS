@@ -15,7 +15,7 @@
         }
 
         /// <summary>
-        /// Sets the node style to show that it is currently protected publicly
+        /// Sets the node style to show that it is a container type
         /// </summary>
         /// <param name="treeNode"></param>
         public static void SetContainerStyle(this TreeNode treeNode)

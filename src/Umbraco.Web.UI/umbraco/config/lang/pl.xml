@@ -1022,8 +1022,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="imagecropper">
     <key alias="reset">Resetuj</key>
-    <key alias="defineCrop">Zdefiniuj przycięcie</key>
-    <key alias="defineCropDescription">Ustaw alias dla przycięcia, a także jego domyślną szerokość i długość</key>
     <key alias="saveCrop">Zapisz przycięcie</key>
     <key alias="addCrop">Dodaj nowe przycięcie</key>
   </area>

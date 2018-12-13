@@ -43,7 +43,7 @@ namespace Umbraco.Web.Trees
             //find all tree definitions that have the current application alias
             var appTrees = Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
 
-            if (string.IsNullOrEmpty(tree) == false || appTrees.Length == 1 || appTrees.Any() == false)
+            if (string.IsNullOrEmpty(tree) == false || appTrees.Length == 1)
             {
                 var apptree = string.IsNullOrEmpty(tree) == false 
                     ? appTrees.SingleOrDefault(x => x.Alias == tree)

@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
+    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -374,6 +374,15 @@
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
             }
+        });
+
+        // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowedTemplates.length + vm.contentType.isContainer", function (newVal, oldVal) {
+            if (oldVal === undefined) {
+                // still initializing, ignore
+                return;
+            }
+            angularHelper.getCurrentForm($scope).$setDirty();
         });
     }
 

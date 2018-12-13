@@ -5,7 +5,8 @@
             ng-switch-default
             ng-change="updateSingleDropdownValue()"
             ng-model="model.singleDropdownValue"
-            ng-options="item.id as item.value for item in model.config.items">
+            ng-options="item.id as item.value for item in model.config.items"
+            ng-required="model.validation.mandatory">
         <option></option>
     </select>
 
@@ -15,5 +16,6 @@
             ng-switch-when="1"
             multiple
             ng-model="model.value"
-            ng-options="item.id as item.value for item in model.config.items"></select>
+            ng-options="item.id as item.value for item in model.config.items"
+            ng-required="model.validation.mandatory"></select>
 </div>

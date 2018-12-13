@@ -1286,7 +1286,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   <area alias="imagecropper">
     <key alias="reset">Réinitialiser</key>
     <key alias="defineCrop">Définir le recadrage</key>
-    <key alias="defineCropDescription">Donnez un alias au recadrage ainsi que sa largeur et sa hauteur par défaut</key>
     <key alias="saveCrop">Sauvegarder le recadrage</key>
     <key alias="addCrop">Ajouter un nouveau recadrage</key>
   </area>
@@ -2170,7 +2169,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Un email de notification a été envoyé à <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[L'adresse email de notification est toujours à sa valeur par défaut : <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Les résultats de l'exécution du Umbraco Health Checks planifiée le %0% à %1% sont les suivants :</p>%2%</body></html>]]></key>
-    <key alias="scheduledHealthCheckEmailSubject">Statut du Umbraco Health Check</key>
+    <key alias="scheduledHealthCheckEmailSubject">Statut du Umbraco Health Check: %0%</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Désactiver URL tracker</key>
