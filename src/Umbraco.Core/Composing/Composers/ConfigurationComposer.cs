@@ -11,6 +11,7 @@ namespace Umbraco.Core.Composing.Composers
     {
         public static Composition ComposeConfiguration(this Composition composition)
         {
+            composition.RegisterUnique<UmbracoConfig>();
             composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Umbraco());
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);

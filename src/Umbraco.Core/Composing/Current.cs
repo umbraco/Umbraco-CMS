@@ -103,8 +103,8 @@ namespace Umbraco.Core.Composing
             => Factory.GetInstance<TypeLoader>();
 
         public static UmbracoConfig Config
-            => _config ?? (_config = _factory?.TryGetInstance<UmbracoConfig>())
-               ?? (_config = new UmbracoConfig(Logger, _factory?.TryGetInstance<IRuntimeCacheProvider>(), _factory?.TryGetInstance<IRuntimeState>()));
+            => _config ?? (_config = _factory?.TryGetInstance<UmbracoConfig>()
+               ?? new UmbracoConfig(Logger, _factory?.TryGetInstance<IRuntimeCacheProvider>(), _factory?.TryGetInstance<IRuntimeState>()));
 
         public static IFileSystems FileSystems
             => Factory.GetInstance<IFileSystems>();

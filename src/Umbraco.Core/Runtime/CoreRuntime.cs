@@ -78,7 +78,7 @@ namespace Umbraco.Core.Runtime
             // as the second one captures the current value (null) and therefore fails
             _state = new RuntimeState(logger,
                 Current.Config.Umbraco(), Current.Config.Global(),
-                new Lazy<MainDom>(() => _factory.GetInstance<MainDom>()),
+                new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
                 new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
             {
                 Level = RuntimeLevel.Boot

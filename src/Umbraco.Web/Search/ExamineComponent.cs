@@ -80,7 +80,7 @@ namespace Umbraco.Web.Search
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         }
 
-        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
+        internal void Initialize(IRuntimeState runtime, IMainDom mainDom, PropertyEditorCollection propertyEditors,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             IndexRebuilder indexRebuilder, ServiceContext services,
@@ -188,7 +188,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        
+
 
         /// <summary>
         /// Must be called to each index is unlocked before any indexing occurs
@@ -584,7 +584,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        
+
         #endregion
 
         #region ReIndex/Delete for entity
@@ -785,7 +785,7 @@ namespace Umbraco.Web.Search
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
-                    
+
                     .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
