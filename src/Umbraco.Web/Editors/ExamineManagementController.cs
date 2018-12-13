@@ -109,7 +109,7 @@ namespace Umbraco.Web.Editors
             if (!validate.IsSuccessStatusCode)
                 throw new HttpResponseException(validate);
 
-            validate = ValidatePopulator(indexName);
+            validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode)
                 throw new HttpResponseException(validate);
 
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Editors
             if (!validate.IsSuccessStatusCode)
                 return validate;
 
-            validate = ValidatePopulator(indexName);
+            validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode)
                 return validate;
 
@@ -201,7 +201,7 @@ namespace Umbraco.Web.Editors
                 Name = indexName,
                 HealthStatus = isHealth.Success ? (isHealth.Result ?? "Healthy") : (isHealth.Result ?? "Unhealthy"),
                 ProviderProperties = properties,
-                CanRebuild = _indexRebuilder.CanRebuild(indexName)
+                CanRebuild = _indexRebuilder.CanRebuild(index)
             };
 
 
@@ -228,13 +228,13 @@ namespace Umbraco.Web.Editors
             return response1;
         }
 
-        private HttpResponseMessage ValidatePopulator(string indexName)
+        private HttpResponseMessage ValidatePopulator(IIndex index)
         {
-            if (_indexRebuilder.CanRebuild(indexName))
+            if (_indexRebuilder.CanRebuild(index))
                 return Request.CreateResponse(HttpStatusCode.OK);
 
             var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response.Content = new StringContent($"The index {indexName} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
+            response.Content = new StringContent($"The index {index.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
             response.ReasonPhrase = "Index cannot be rebuilt";
             return response;
         }

@@ -130,8 +130,6 @@ namespace Umbraco.Tests.UmbracoExamine
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
-                contentRebuilder.RegisterIndex(indexer.Name);
-                mediaRebuilder.RegisterIndex(indexer.Name);
 
                 var searcher = indexer.GetSearcher();
 
@@ -283,7 +281,6 @@ namespace Umbraco.Tests.UmbracoExamine
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
-                rebuilder.RegisterIndex(indexer.Name);
 
                 var searcher = indexer.GetSearcher();
 

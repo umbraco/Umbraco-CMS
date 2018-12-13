@@ -62,7 +62,6 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             using (indexer.ProcessNonAsync())
             {
-                rebuilder.RegisterIndex(indexer.Name);
                 indexer.CreateIndex();
                 rebuilder.Populate(indexer);
                 
