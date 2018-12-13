@@ -20,8 +20,7 @@ namespace Umbraco.Examine
 {
 
     /// <summary>
-    /// An abstract provider containing the basic functionality to be able to query against
-    /// Umbraco data.
+    /// An abstract provider containing the basic functionality to be able to query against Umbraco data.
     /// </summary>
     public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
@@ -53,6 +52,7 @@ namespace Umbraco.Examine
         {
             ProfilingLogger = Current.ProfilingLogger;
             _configBased = true;
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
         }
 
         /// <summary>
@@ -121,26 +121,6 @@ namespace Umbraco.Examine
         protected ProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
-        /// Overridden to ensure that the umbraco system field definitions are in place
-        /// </summary>
-        /// <param name="indexValueTypesFactory"></param>
-        /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypesFactory = null)
-        {
-            //if config based then ensure the value types else it's assumed these were passed in via ctor
-            if (_configBased)
-            {
-                foreach (var field in UmbracoIndexFieldDefinitions)
-                {
-                    FieldDefinitionCollection.TryAdd(field);
-                }
-            }
-            
-
-            return base.CreateFieldValueTypes(indexValueTypesFactory);
-        }
-
-        /// <summary>
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
         /// </summary>
         public bool EnableDefaultEventHandler { get; set; } = true;
@@ -174,12 +154,15 @@ namespace Umbraco.Examine
                 EnableDefaultEventHandler = enabled;
             }
 
-            //Need to check if the index set or IndexerData is specified...
-            if (config["indexSet"] == null && FieldDefinitionCollection.Count == 0)
+            //this is config based, so add the default definitions
+            foreach (var field in UmbracoIndexFieldDefinitions)
             {
-                //if we don't have either, then we'll try to set the index set by naming conventions
-                var found = false;
+                FieldDefinitionCollection.TryAdd(field);
+            }
 
+            //Need to check if the index set is specified...
+            if (config["indexSet"] == null)
+            {
                 var possibleSuffixes = new[] {"Index", "Indexer"};
                 foreach (var suffix in possibleSuffixes)
                 {
@@ -200,36 +183,29 @@ namespace Umbraco.Examine
                     ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
                     foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
-                        FieldDefinitionCollection.TryAdd(fieldDefinition);
+                        //replace any existing or add
+                        FieldDefinitionCollection.AddOrUpdate(fieldDefinition);
                     }
-                    found = true;
                     break;
                 }
-
-                if (!found)
-                    throw new ArgumentNullException("indexSet on LuceneExamineIndexer provider has not been set in configuration and/or the IndexerData property has not been explicitly set");
-
             }
-            else if (config["indexSet"] != null)
+            else
             {
                 //if an index set is specified, ensure it exists and initialize the indexer based on the set
 
                 if (IndexSets.Instance.Sets[config["indexSet"]] == null)
-                {
                     throw new ArgumentException("The indexSet specified for the LuceneExamineIndexer provider does not exist");
-                }
-                else
+
+                IndexSetName = config["indexSet"];
+
+                var indexSet = IndexSets.Instance.Sets[IndexSetName];
+
+                //get the index criteria and ensure folder
+                ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
+                foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                 {
-                    IndexSetName = config["indexSet"];
-
-                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
-
-                    //get the index criteria and ensure folder
-                    ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
-                    foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
-                    {
-                        FieldDefinitionCollection.TryAdd(fieldDefinition);
-                    }
+                    //replace any existing or add
+                    FieldDefinitionCollection.AddOrUpdate(fieldDefinition);
                 }
             }
 
