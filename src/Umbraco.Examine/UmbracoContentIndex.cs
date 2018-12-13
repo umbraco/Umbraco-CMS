@@ -246,10 +246,7 @@ namespace Umbraco.Examine
             ProfilingLogger.Logger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
             //need to queue a delete item for each one found
-            foreach (var r in results)
-            {
-                QueueIndexOperation(new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete));
-            }
+            QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));
 
             base.PerformDeleteFromIndex(nodeId, onComplete);
         }
