@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using NPoco;
+using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations.Expressions.Execute
 {
@@ -12,5 +14,10 @@ namespace Umbraco.Core.Migrations.Expressions.Execute
         /// Specifies the Sql statement to execute.
         /// </summary>
         IExecutableBuilder Sql(string sqlStatement);
+
+        /// <summary>
+        /// Specifies the Sql statement to execute.
+        /// </summary>
+        IExecutableBuilder Sql(Sql<ISqlContext> sql);
     }
 }

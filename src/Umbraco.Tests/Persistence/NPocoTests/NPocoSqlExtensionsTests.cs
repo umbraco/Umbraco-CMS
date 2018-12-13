@@ -117,7 +117,6 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
             var sql = Sql()
                 .Update<DataTypeDto>(u => u.Set(x => x.EditorAlias, "Umbraco.ColorPicker"))
                 .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias");
-            sql.WriteToConsole();
         }
 
         [TableName("dto1")]
