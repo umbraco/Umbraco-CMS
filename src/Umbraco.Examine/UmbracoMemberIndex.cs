@@ -64,10 +64,10 @@ namespace Umbraco.Examine
         /// </summary>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypesFactory = null)
         {
             var keyDef = new FieldDefinition("__key", FieldDefinitionTypes.Raw);
-            FieldDefinitionCollection.TryAdd(keyDef.Name, keyDef);
+            FieldDefinitionCollection.TryAdd(keyDef);
 
             return base.CreateFieldValueTypes(indexValueTypesFactory);
         }

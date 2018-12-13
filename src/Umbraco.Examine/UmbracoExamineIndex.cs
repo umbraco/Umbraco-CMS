@@ -72,7 +72,7 @@ namespace Umbraco.Examine
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
             IValueSetValidator validator = null,
-            IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
+            IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
         {
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
@@ -125,14 +125,14 @@ namespace Umbraco.Examine
         /// </summary>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypesFactory = null)
         {
             //if config based then ensure the value types else it's assumed these were passed in via ctor
             if (_configBased)
             {
                 foreach (var field in UmbracoIndexFieldDefinitions)
                 {
-                    FieldDefinitionCollection.TryAdd(field.Name, field);
+                    FieldDefinitionCollection.TryAdd(field);
                 }
             }
             
@@ -200,7 +200,7 @@ namespace Umbraco.Examine
                     ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
                     foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
-                        FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
+                        FieldDefinitionCollection.TryAdd(fieldDefinition);
                     }
                     found = true;
                     break;
@@ -228,7 +228,7 @@ namespace Umbraco.Examine
                     ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
                     foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
                     {
-                        FieldDefinitionCollection.TryAdd(fieldDefinition.Name, fieldDefinition);
+                        FieldDefinitionCollection.TryAdd(fieldDefinition);
                     }
                 }
             }

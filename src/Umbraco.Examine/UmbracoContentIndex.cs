@@ -97,7 +97,7 @@ namespace Umbraco.Examine
             ProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
-            IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
+            IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
