@@ -417,7 +417,7 @@ namespace Umbraco.Core.Migrations.Install
 
         #region Database Schema
 
-        internal DatabaseSchemaResult ValidateDatabaseSchema()
+        public DatabaseSchemaResult ValidateDatabaseSchema()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -442,7 +442,7 @@ namespace Umbraco.Core.Migrations.Install
             return _databaseSchemaValidationResult;
         }
 
-        internal Result CreateDatabaseSchemaAndData()
+        public Result CreateDatabaseSchemaAndData()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -522,7 +522,7 @@ namespace Umbraco.Core.Migrations.Install
         }
 
         // This assumes all of the previous checks are done!
-        internal Result UpgradeSchemaAndData()
+        public Result UpgradeSchemaAndData()
         {
             try
             {
@@ -630,7 +630,7 @@ namespace Umbraco.Core.Migrations.Install
             };
         }
 
-        internal class Result
+        public class Result
         {
             public bool RequiresUpgrade { get; set; }
             public string Message { get; set; }
