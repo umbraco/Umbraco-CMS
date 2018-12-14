@@ -5,6 +5,7 @@ using LightInject;
 using Examine;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
+using Examine.SearchCriteria;
 using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 var stringSortedCriteria = searcher.CreateCriteria()
                     .ParentId(1148).And()
-                    .OrderBy("sortOrder"); //will default to string
+                    .OrderBy(new SortableField("sortOrder"));//will default to string
                 var stringSortedResult = searcher.Search(stringSortedCriteria.Compile());
 
                 Assert.AreEqual(12, numberSortedResult.TotalItemCount);

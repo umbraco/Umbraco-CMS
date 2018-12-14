@@ -8,6 +8,7 @@ using System.Xml.XPath;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
+using Examine.SearchCriteria;
 using Lucene.Net.Store;
 using Umbraco.Core;
 using Umbraco.Core.Logging;

@@ -86,37 +86,7 @@ namespace Umbraco.Examine
 
         private readonly bool _configBased = false;
 
-        /// <summary>
-        /// A type that defines the type of index for each Umbraco field (non user defined fields)
-        /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
-        /// for retreival after searching.
-        /// </summary>
-        public static readonly FieldDefinition[] UmbracoIndexFieldDefinitions =
-        {
-            new FieldDefinition("parentID", FieldDefinitionTypes.Integer),
-            new FieldDefinition("level", FieldDefinitionTypes.Integer),
-            new FieldDefinition("writerID", FieldDefinitionTypes.Integer),
-            new FieldDefinition("creatorID", FieldDefinitionTypes.Integer),
-            new FieldDefinition("sortOrder", FieldDefinitionTypes.Integer),
-            new FieldDefinition("template", FieldDefinitionTypes.Integer),
-
-            new FieldDefinition("createDate", FieldDefinitionTypes.DateTime),
-            new FieldDefinition("updateDate", FieldDefinitionTypes.DateTime),
-
-            new FieldDefinition("key", FieldDefinitionTypes.InvariantCultureIgnoreCase),
-            new FieldDefinition("version", FieldDefinitionTypes.Raw),
-            new FieldDefinition("nodeType", FieldDefinitionTypes.InvariantCultureIgnoreCase),
-            new FieldDefinition("template", FieldDefinitionTypes.Raw),
-            new FieldDefinition("urlName", FieldDefinitionTypes.InvariantCultureIgnoreCase),
-            new FieldDefinition("path", FieldDefinitionTypes.Raw),
-
-            new FieldDefinition("email", FieldDefinitionTypes.EmailAddress),
-
-            new FieldDefinition(PublishedFieldName, FieldDefinitionTypes.Raw),
-            new FieldDefinition(NodeKeyFieldName, FieldDefinitionTypes.Raw),
-            new FieldDefinition(IndexPathFieldName, FieldDefinitionTypes.Raw),
-            new FieldDefinition(IconFieldName, FieldDefinitionTypes.Raw)
-        };
+        
 
         protected ProfilingLogger ProfilingLogger { get; }
 
@@ -155,7 +125,7 @@ namespace Umbraco.Examine
             }
 
             //this is config based, so add the default definitions
-            foreach (var field in UmbracoIndexFieldDefinitions)
+            foreach (var field in UmbracoFieldDefinitionCollection.UmbracoIndexFieldDefinitions)
             {
                 FieldDefinitionCollection.TryAdd(field);
             }
