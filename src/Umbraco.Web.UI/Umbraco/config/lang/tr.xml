@@ -14,7 +14,7 @@
     <key alias="createPackage">Paket Oluştur</key>
     <key alias="delete">Sil</key>
     <key alias="disable">Devre Dışı Bırak</key>
-    <key alias="emptyTrashcan">Geri Dönüşümü Boşat</key>
+    <key alias="emptyRecycleBin">Geri Dönüşümü Boşat</key>
     <key alias="exportDocumentType">Belge Türü Çıkart</key>
     <key alias="importDocumentType">Belge Türü Al</key>
     <key alias="importPackage">Paket Ekle</key>
@@ -191,7 +191,6 @@
     <key alias="closeThisWindow">Bu pencereyi kapatın</key>
     <key alias="confirmdelete">Silmek istediğine emin misin</key>
     <key alias="confirmdisable">Eğer devre dışı bırakmak istediğinizden emin misiniz</key>
-    <key alias="confirmEmptyTrashcan">%0% öğe(lerin) silinmesi onaylamak için bu kutuyu kontrol edin</key>
     <key alias="confirmlogout">Emin misiniz?</key>
     <key alias="confirmSure">Emin misiniz?</key>
     <key alias="cut">Kes</key>

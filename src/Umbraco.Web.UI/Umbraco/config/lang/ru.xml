@@ -17,7 +17,7 @@
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
-    <key alias="emptyTrashcan">Очистить корзину</key>
+    <key alias="emptyRecycleBin">Очистить корзину</key>
     <key alias="enable">Включить</key>
     <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
@@ -346,7 +346,6 @@
     <key alias="closeThisWindow">Закрыть это окно</key>
     <key alias="confirmdelete">Вы уверены, что хотите удалить</key>
     <key alias="confirmdisable">Вы уверены, что хотите запретить</key>
-    <key alias="confirmEmptyTrashcan">Пожалуйста, подтвердите удаление из корзины %0% элементов</key>
     <key alias="confirmlogout">Вы уверены?</key>
     <key alias="confirmSure">Вы уверены?</key>
     <key alias="cut">Вырезать</key>
