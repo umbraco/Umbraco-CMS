@@ -14,7 +14,7 @@
     <key alias="createPackage">Nieuwe package</key>
     <key alias="delete">Verwijderen</key>
     <key alias="disable">Uitschakelen</key>
-    <key alias="emptyTrashcan">Prullenbak leegmaken</key>
+    <key alias="emptyRecycleBin">Prullenbak leegmaken</key>
     <key alias="exportDocumentType">Documenttype exporteren</key>
     <key alias="importDocumentType">Documenttype importeren</key>
     <key alias="importPackage">Package importeren</key>
@@ -249,7 +249,6 @@
     <key alias="closeThisWindow">Sluit dit venster</key>
     <key alias="confirmdelete">Weet je zeker dat je dit wilt verwijderen</key>
     <key alias="confirmdisable">Weet je zeker dat je dit wilt uitschakelen</key>
-    <key alias="confirmEmptyTrashcan">Vink aub dit keuzevak aan om het verwijderen van %0% item(s) te bevestigen</key>
     <key alias="confirmlogout">Weet je het zeker?</key>
     <key alias="confirmSure">Weet je het zeker?</key>
     <key alias="cut">Knippen</key>

@@ -13,7 +13,7 @@
     <key alias="createPackage">패키지 새로 만들기</key>
     <key alias="delete">삭제</key>
     <key alias="disable">비활성</key>
-    <key alias="emptyTrashcan">휴지통 비우기</key>
+    <key alias="emptyRecycleBin">휴지통 비우기</key>
     <key alias="exportDocumentType">추출 문서 유형</key>
     <key alias="importDocumentType">등록 문서 유형</key>
     <key alias="importPackage">패키지 등록</key>
@@ -158,7 +158,6 @@
     <key alias="closeThisWindow">이창 닫기</key>
     <key alias="confirmdelete">정말로 삭제하시겠습니까?</key>
     <key alias="confirmdisable">정말로 비활성화하시겠습니까?</key>
-    <key alias="confirmEmptyTrashcan">%0% 항목(들)을 삭제하시려면 이 박스를 체크하세요</key>
     <key alias="confirmlogout">로그아웃 하시겠습니까?</key>
     <key alias="confirmSure">확실합니까?</key>
     <key alias="cut">TRANSLATE ME: 'Cut'</key>

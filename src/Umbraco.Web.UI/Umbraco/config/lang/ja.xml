@@ -14,7 +14,7 @@
     <key alias="createPackage">パッケージの作成</key>
     <key alias="delete">削除</key>
     <key alias="disable">無効</key>
-    <key alias="emptyTrashcan">ごみ箱を空にする</key>
+    <key alias="emptyRecycleBin">ごみ箱を空にする</key>
     <key alias="exportDocumentType">ドキュメントタイプの書出</key>
     <key alias="importDocumentType">ドキュメントタイプの読込</key>
     <key alias="importPackage">パッケージの読み込み</key>
@@ -224,7 +224,6 @@
     <key alias="closeThisWindow">このウィンドウを閉じる</key>
     <key alias="confirmdelete">削除しますか？</key>
     <key alias="confirmdisable">無効にしますか？</key>
-    <key alias="confirmEmptyTrashcan">これらの %0% 個の項目を削除する場合は、チェックボックスにチェックを入れてください</key>
     <key alias="confirmlogout">ログアウトしますか？</key>
     <key alias="confirmSure">本当にいいですか？</key>
     <key alias="cut">切り取り</key>
