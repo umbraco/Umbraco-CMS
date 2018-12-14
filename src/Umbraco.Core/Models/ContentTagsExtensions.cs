@@ -15,10 +15,10 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">The property alias.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
-        /// <remarks>Tags do not support variants.</remarks>
-        public static void AssignTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool merge = false)
+        /// <param name="culture">A culture, for multi-lingual properties.</param>
+        public static void AssignTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool merge = false, string culture = null)
         {
-            content.GetTagProperty(propertyTypeAlias).AssignTags(tags, merge);
+            content.GetTagProperty(propertyTypeAlias).AssignTags(tags, merge, culture);
         }
 
         /// <summary>
@@ -27,10 +27,10 @@ namespace Umbraco.Core.Models
         /// <param name="content">The content item.</param>
         /// <param name="propertyTypeAlias">The property alias.</param>
         /// <param name="tags">The tags.</param>
-        /// <remarks>Tags do not support variants.</remarks>
-        public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags)
+        /// <param name="culture">A culture, for multi-lingual properties.</param>
+        public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string culture = null)
         {
-            content.GetTagProperty(propertyTypeAlias).RemoveTags(tags);
+            content.GetTagProperty(propertyTypeAlias).RemoveTags(tags, culture);
         }
 
         // gets and validates the property

@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(IPublishedContent content, bool absolute, string culture = null, Uri current = null)
             => GetUrl(content, GetMode(absolute), culture, current);
-        
+
         /// <summary>
         /// Gets the url of a published content.
         /// </summary>
@@ -195,10 +195,6 @@ namespace Umbraco.Web.Routing
             {
                 if (culture == null)
                     culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
-            }
-            else
-            {
-                culture = null;
             }
 
             if (current == null)
