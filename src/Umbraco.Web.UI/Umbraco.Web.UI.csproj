@@ -321,7 +321,6 @@
     </Content>
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="Umbraco\endPreview.aspx" />
     <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml">
       <SubType>Designer</SubType>
