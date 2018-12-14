@@ -52,8 +52,7 @@ namespace Umbraco.Tests.Configurations
             SystemDirectories.Root = rootPath;
             Assert.AreEqual(outcome, UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea());
         }
-
-        [TestCase("/umbraco/umbraco.aspx")]
+        
         [TestCase("/umbraco/editContent.aspx")]
         [TestCase("/install/default.aspx")]
         [TestCase("/install/")]

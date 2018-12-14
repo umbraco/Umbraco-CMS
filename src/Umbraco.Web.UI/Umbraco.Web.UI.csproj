@@ -218,14 +218,6 @@
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
-    <Content Include="Umbraco\umbraco.aspx" />
-    <Compile Include="Umbraco\umbraco.aspx.cs">
-      <DependentUpon>umbraco.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\umbraco.aspx.designer.cs">
-      <DependentUpon>umbraco.aspx</DependentUpon>
-    </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
