@@ -89,8 +89,8 @@
                                 <localize key="validation_fieldIsMandatory"></localize>
                             </label>
                     
-                            <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
-                                <option value=""><localize key="validation_validation">Validation</localize></option>
+                            <select class="umb-dropdown" ng-init="vm.selectedValidationType = options[0]" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
+                                <option value=""><localize key="validation_noValidation">No validation</localize></option>
                             </select>
                     
                             <textarea class="editor-validation-pattern"
