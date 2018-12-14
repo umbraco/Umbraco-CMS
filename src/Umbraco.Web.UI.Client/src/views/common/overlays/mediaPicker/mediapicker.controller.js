@@ -157,7 +157,6 @@ angular.module("umbraco")
                 } else {
                     $scope.path = [];
                 }
-                console.log("Go go folder", folder)
                 mediaTypeHelper.getAllowedImagetypes(folder.id)
                     .then(function (types) {
                         $scope.acceptedMediatypes = types;
