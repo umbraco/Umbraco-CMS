@@ -21,6 +21,12 @@ namespace Umbraco.Core.Models
         string Text { get; set; }
 
         /// <summary>
+        /// Gets or sets the tag language.
+        /// </summary>
+        [DataMember]
+        int? LanguageId { get; set; }
+
+        /// <summary>
         /// Gets the number of nodes tagged with this tag.
         /// </summary>
         /// <remarks>Only when returning from queries.</remarks>
