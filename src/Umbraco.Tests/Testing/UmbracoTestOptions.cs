@@ -26,7 +26,7 @@
             NewSchemaPerTest
         }
 
-        public enum PluginManager
+        public enum TypeLoader
         {
             // the default, global plugin manager for tests
             Default,
