@@ -406,9 +406,6 @@
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
-    <Content Include="Umbraco\ping.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Masterpages\default.Master" />
     <None Include="web.Template.config">
