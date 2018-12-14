@@ -217,8 +217,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var property in entity.Properties)
             {
                 var tagConfiguration = property.GetTagConfiguration();
-                if (tagConfiguration == null) continue;
-                tagRepo.Assign(entity.Id, property.PropertyTypeId, property.GetTagsValue().Select(x => new Tag { Group = tagConfiguration.Group, Text = x }), true);
+                if (tagConfiguration == null) continue; // not a tags property
+
+                if (property.PropertyType.VariesByCulture())
+                {
+                    var tags = new List<ITag>();
+                    foreach (var pvalue in property.Values)
+                    {
+                        var tagsValue = property.GetTagsValue(pvalue.Culture);
+                        var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
+                        var cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
+                        tags.AddRange(cultureTags);
+                    }
+                    tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
+                }
+                else
+                {
+                    var tagsValue = property.GetTagsValue(); // strings
+                    var tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
+                    tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
+                }
             }
         }
 
@@ -540,16 +558,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (temp.VersionId != temp.PublishedVersionId && indexedPropertyDataDtos.TryGetValue(temp.PublishedVersionId, out var propertyDataDtos2))
                     propertyDataDtos.AddRange(propertyDataDtos2);
                 var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).ToList();
-
-                // deal with tags
-                foreach (var property in properties)
-                {
-                    if (!tagConfigurations.TryGetValue(property.PropertyType.PropertyEditorAlias, out var tagConfiguration))
-                        continue;
-
-                    //fixme doesn't take into account variants
-                    property.SetTagsValue(property.GetValue(), tagConfiguration);
-                }
 
                 if (result.ContainsKey(temp.VersionId))
                 {

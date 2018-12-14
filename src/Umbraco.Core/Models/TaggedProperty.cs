@@ -7,6 +7,9 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class TaggedProperty
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TaggedProperty"/> class.
+        /// </summary>
         public TaggedProperty(int propertyTypeId, string propertyTypeAlias, IEnumerable<ITag> tags)
         {
             PropertyTypeId = propertyTypeId;
@@ -15,18 +18,18 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Id of the PropertyType, which this tagged property is based on
+        /// Gets the identifier of the property type.
         /// </summary>
-        public int PropertyTypeId { get; private set; }
+        public int PropertyTypeId { get; }
 
         /// <summary>
-        /// Alias of the PropertyType, which this tagged property is based on
+        /// Gets the alias of the property type.
         /// </summary>
-        public string PropertyTypeAlias { get; private set; }
+        public string PropertyTypeAlias { get; }
 
         /// <summary>
-        /// An enumerable list of Tags for the property
+        /// Gets the tags.
         /// </summary>
-        public IEnumerable<ITag> Tags { get; private set; }
+        public IEnumerable<ITag> Tags { get; }
     }
 }
