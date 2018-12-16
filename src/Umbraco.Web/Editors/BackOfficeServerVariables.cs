@@ -299,6 +299,10 @@ namespace Umbraco.Web.Editors
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
+                        },
+                        {
+                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                                controller => controller.GetById(1))
                         }
                     }
                 },

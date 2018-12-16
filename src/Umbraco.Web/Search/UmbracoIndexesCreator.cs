@@ -21,7 +21,7 @@ namespace Umbraco.Web.Search
     /// <summary>
     /// Creates the indexes used by Umbraco
     /// </summary>
-    public class UmbracoIndexesCreator : IUmbracoIndexesCreator
+    public class UmbracoIndexesCreator : LuceneIndexCreator, IUmbracoIndexesCreator
     {
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Search
         /// Creates the Umbraco indexes
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IIndex> Create()
+        public override IEnumerable<IIndex> Create()
         {
             return new []
             {
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Search
                 Constants.UmbracoIndexes.InternalIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
-                GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
+                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 LanguageService, 
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Search
                 Constants.UmbracoIndexes.ExternalIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
-                GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
+                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
                 LanguageService,
@@ -89,27 +89,13 @@ namespace Umbraco.Web.Search
                 Constants.UmbracoIndexes.MembersIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
-                GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
+                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger, 
                 GetMemberValueSetValidator());
             return index;
         }
-
-        public virtual Lucene.Net.Store.Directory GetFileSystemLuceneDirectory(string name)
-        {
-            var dirInfo = new DirectoryInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Data), "TEMP", "ExamineIndexes", name));
-            if (!dirInfo.Exists)
-                System.IO.Directory.CreateDirectory(dirInfo.FullName);
-
-            var luceneDir = new SimpleFSDirectory(dirInfo);
-            //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
-            //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
-            //which simply checks the existence of the lock file
-            luceneDir.SetLockFactory(new NoPrefixSimpleFsLockFactory(dirInfo));
-            return luceneDir;
-        }
-
+        
         public virtual IContentValueSetValidator GetContentValueSetValidator()
         {
             return new ContentValueSetValidator(false, true, PublicAccessService);
