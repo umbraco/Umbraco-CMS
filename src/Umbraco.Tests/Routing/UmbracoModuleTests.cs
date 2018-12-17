@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Routing
             var logger = Mock.Of<ILogger>();
             var globalSettings = TestObjects.GetGlobalSettings();
             var runtime = new RuntimeState(logger, Mock.Of<IUmbracoSettingsSection>(), globalSettings,
-                new Lazy<MainDom>(), new Lazy<IServerRegistrar>());
+                new Lazy<IMainDom>(), new Lazy<IServerRegistrar>());
 
             _module = new UmbracoInjectedModule
             (

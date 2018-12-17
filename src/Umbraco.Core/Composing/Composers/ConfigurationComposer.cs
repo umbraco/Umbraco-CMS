@@ -16,6 +16,7 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
+            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Security);
             composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Global());
             composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().Dashboards());
             composition.RegisterUnique(factory => factory.GetInstance<UmbracoConfig>().HealthChecks());

@@ -120,7 +120,7 @@ namespace Umbraco.Core.Migrations.Install
 
         #region Configure Connection String
 
-        private const string EmbeddedDatabaseConnectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
+        public const string EmbeddedDatabaseConnectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
 
         /// <summary>
         /// Configures a connection string for the embedded database.

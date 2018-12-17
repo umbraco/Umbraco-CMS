@@ -29,6 +29,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructor
 
+        // fixme ISSUE
+        // after the current snapshot has been resync-ed
+        // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
+        // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
+
         public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
             : base(previewDefault)
         {

@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Configuration;
+using System.Data.SqlServerCe;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -8,17 +13,210 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Tests.Composing;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
+using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Runtime;
+using File = System.IO.File;
 
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
     public class StandaloneTests
     {
+        [Test]
+        [Explicit("This test must be run manually")]
+        public void StandaloneTest()
+        {
+            IFactory factory = null;
+
+            // clear
+            foreach (var file in Directory.GetFiles(Path.Combine(IOHelper.MapPath("~/App_Data")), "NuCache.*"))
+                File.Delete(file);
+
+            // settings
+            // reset the current version to 0.0.0
+            ConfigurationManager.AppSettings["umbracoConfigurationStatus"] = "";
+            // fixme we need a better management of settings here (and, true config files?)
+
+            // create the very basic and essential things we need
+            var logger = new ConsoleLogger();
+            var profiler = new LogProfiler(logger);
+            var profilingLogger = new ProfilingLogger(logger, profiler);
+            var appCaches = new CacheHelper(); // fixme has HttpRuntime stuff?
+            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
+            var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
+            var mainDom = new SimpleMainDom();
+            var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()));
+
+            // create the register and the composition
+            var register = RegisterFactory.Create();
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState);
+
+            // create the core runtime and have it compose itself
+            var coreRuntime = new CoreRuntime();
+            coreRuntime.Compose(composition);
+
+            // determine actual runtime level
+            runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
+            // going to be Install BUT we want to force components to be there (nucache etc)
+            runtimeState.Level = RuntimeLevel.Run;
+
+            var componentTypes = typeLoader.GetTypes<IUmbracoComponent>() // all of them
+                .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
+                .Where(x => x != typeof(WebRuntimeComponent)); // exclude web runtime
+            var components = new Core.Components.Components(composition, componentTypes, profilingLogger);
+            components.Compose();
+
+            // must registers stuff that WebRuntimeComponent would register otherwise
+            // fixme UmbracoContext creates a snapshot that it does not register with the accessor
+            //  and so, we have to use the UmbracoContextPublishedSnapshotAccessor
+            //  the UmbracoContext does not know about the accessor
+            //  else that would be a catch-22 where they both know about each other?
+            //composition.Register<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>(Lifetime.Singleton);
+            composition.Register<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>(Lifetime.Singleton);
+            composition.Register<IUmbracoContextAccessor, TestUmbracoContextAccessor>(Lifetime.Singleton);
+            composition.Register<IVariationContextAccessor, TestVariationContextAccessor>(Lifetime.Singleton);
+            composition.Register<IDefaultCultureAccessor, TestDefaultCultureAccessor>(Lifetime.Singleton);
+            composition.Register<ISiteDomainHelper>(_ => Mock.Of<ISiteDomainHelper>(), Lifetime.Singleton);
+            composition.RegisterUnique(f => new DistributedCache());
+            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
+
+            // create and register the factory
+            Current.Factory = factory = composition.CreateFactory();
+
+            // initialize some components individually
+            components.Get<CacheRefresherComponent>().Initialize(factory.GetInstance<DistributedCache>());
+
+            // do stuff
+            Console.WriteLine(runtimeState.Level);
+
+            // install
+            if (true || runtimeState.Level == RuntimeLevel.Install)
+            {
+                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var file = Path.Combine(path, "Umbraco.sdf");
+                if (File.Exists(file))
+                    File.Delete(file);
+
+                // create the database file
+                // databaseBuilder.ConfigureEmbeddedDatabaseConnection() can do it too,
+                // but then it wants to write the connection string to web.config = bad
+                using (var engine = new SqlCeEngine("Data Source=|DataDirectory|\\Umbraco.sdf;Flush Interval=1;"))
+                {
+                    engine.CreateDatabase();
+                }
+
+                //var databaseBuilder = factory.GetInstance<DatabaseBuilder>();
+                //databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+                //databaseBuilder.CreateDatabaseSchemaAndData();
+
+                databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+
+                var scopeProvider = factory.GetInstance<IScopeProvider>();
+                using (var scope = scopeProvider.CreateScope())
+                {
+                    var creator = new DatabaseSchemaCreator(scope.Database, logger);
+                    creator.InitializeDatabaseSchema();
+                    scope.Complete();
+                }
+            }
+
+            // done installing
+            runtimeState.Level = RuntimeLevel.Run;
+
+            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            SettingsForTests.ConfigureSettings(globalSettings);
+            var umbracoSettings = SettingsForTests.GetDefaultUmbracoSettings();
+            SettingsForTests.ConfigureSettings(umbracoSettings);
+
+            // instantiate to register events
+            // should be done by Initialize?
+            // should we invoke Initialize?
+            _ = factory.GetInstance<IPublishedSnapshotService>();
+
+            // at that point, Umbraco can run!
+            // though, we probably still need to figure out what depends on HttpContext...
+            var contentService = factory.GetInstance<IContentService>();
+            var content = contentService.GetById(1234);
+            Assert.IsNull(content);
+
+            // create a document type and a document
+            var contentType = new ContentType(-1) { Alias = "ctype", Name = "ctype" };
+            factory.GetInstance<IContentTypeService>().Save(contentType);
+            content = new Content("test", -1, contentType);
+            contentService.Save(content);
+
+            // assert that it is possible to get the document back
+            content = contentService.GetById(content.Id);
+            Assert.IsNotNull(content);
+            Assert.AreEqual("test", content.Name);
+
+            // need an UmbracoCOntext to access the cache
+            // fixme - not exactly pretty, should not depend on HttpContext
+            var httpContext = Mock.Of<HttpContextBase>();
+            var withUmbracoContext = UmbracoContext.EnsureContext(httpContext);
+            var umbracoContext = Umbraco.Web.Composing.Current.UmbracoContext;
+
+            // assert that there is no published document
+            var pcontent = umbracoContext.ContentCache.GetById(content.Id);
+            Assert.IsNull(pcontent);
+
+            // but a draft document
+            pcontent = umbracoContext.ContentCache.GetById(true, content.Id);
+            Assert.IsNotNull(pcontent);
+            Assert.AreEqual("test", pcontent.Name);
+            Assert.IsTrue(pcontent.IsDraft);
+
+            // no published url
+            Assert.AreEqual("#", pcontent.GetUrl());
+
+            // now publish the document + make some unpublished changes
+            contentService.SaveAndPublish(content);
+            content.Name = "testx";
+            contentService.Save(content);
+
+            // assert that snapshot has been updated and there is now a published document
+            pcontent = umbracoContext.ContentCache.GetById(content.Id);
+            Assert.IsNotNull(pcontent);
+            Assert.AreEqual("test", pcontent.Name);
+            Assert.IsFalse(pcontent.IsDraft);
+
+            // but the url is the published one - no draft url
+            Assert.AreEqual("/test/", pcontent.GetUrl());
+
+            // and also an updated draft document
+            pcontent = umbracoContext.ContentCache.GetById(true, content.Id);
+            Assert.IsNotNull(pcontent);
+            Assert.AreEqual("testx", pcontent.Name);
+            Assert.IsTrue(pcontent.IsDraft);
+
+            // and the published document has a url
+            Assert.AreEqual("/test/", pcontent.GetUrl());
+
+            withUmbracoContext.Dispose();
+            mainDom.Stop();
+            components.Terminate();
+
+            // exit!
+        }
+
         [Test]
         [Explicit("This test must be run manually")]
         public void ValidateComposition()

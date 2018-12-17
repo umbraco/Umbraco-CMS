@@ -432,62 +432,57 @@ namespace Umbraco.Core.Migrations.Install
 
             if (tableExist == false)
             {
-                using (var transaction = _database.GetTransaction())
+                //Execute the Create Table sql
+                var created = _database.Execute(new Sql(createSql));
+                _logger.Info<DatabaseSchemaCreator>("Create Table '{TableName}' ({Created}): \n {Sql}", tableName, created, createSql);
+
+                //If any statements exists for the primary key execute them here
+                if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
                 {
-                    //Execute the Create Table sql
-                    var created = _database.Execute(new Sql(createSql));
-                    _logger.Info<DatabaseSchemaCreator>("Create Table '{TableName}' ({Created}): \n {Sql}", tableName, created, createSql);
+                    var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
+                    _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
+                }
 
-                    //If any statements exists for the primary key execute them here
-                    if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
-                    {
-                        var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
-                        _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
-                    }
+                //Turn on identity insert if db provider is not mysql
+                if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                    _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} ON "));
 
-                    //Turn on identity insert if db provider is not mysql
-                    if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                        _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} ON "));
+                //Call the NewTable-event to trigger the insert of base/default data
+                //OnNewTable(tableName, _db, e, _logger);
 
-                    //Call the NewTable-event to trigger the insert of base/default data
-                    //OnNewTable(tableName, _db, e, _logger);
+                dataCreation.InitializeBaseData(tableName);
 
-                    dataCreation.InitializeBaseData(tableName);
+                //Turn off identity insert if db provider is not mysql
+                if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                    _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
 
-                    //Turn off identity insert if db provider is not mysql
-                    if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                        _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+                //Special case for MySql
+                if (SqlSyntax is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
+                {
+                    _database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
+                }
 
-                    //Special case for MySql
-                    if (SqlSyntax is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
-                    {
-                        _database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
-                    }
+                //Loop through index statements and execute sql
+                foreach (var sql in indexSql)
+                {
+                    var createdIndex = _database.Execute(new Sql(sql));
+                    _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
+                }
 
-                    //Loop through index statements and execute sql
-                    foreach (var sql in indexSql)
-                    {
-                        var createdIndex = _database.Execute(new Sql(sql));
-                        _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
-                    }
+                //Loop through foreignkey statements and execute sql
+                foreach (var sql in foreignSql)
+                {
+                    var createdFk = _database.Execute(new Sql(sql));
+                    _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
+                }
 
-                    //Loop through foreignkey statements and execute sql
-                    foreach (var sql in foreignSql)
-                    {
-                        var createdFk = _database.Execute(new Sql(sql));
-                        _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
-                    }
-
-                    transaction.Complete();
-
-                    if (overwrite)
-                    {
-                        _logger.Info<Database>("Table '{TableName}' was recreated", tableName);
-                    }
-                    else
-                    {
-                        _logger.Info<Database>("New table '{TableName}' was created", tableName);
-                    }
+                if (overwrite)
+                {
+                    _logger.Info<Database>("Table '{TableName}' was recreated", tableName);
+                }
+                else
+                {
+                    _logger.Info<Database>("New table '{TableName}' was created", tableName);
                 }
             }
             else

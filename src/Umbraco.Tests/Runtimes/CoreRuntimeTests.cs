@@ -107,12 +107,15 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
+            // fixme so how the f* should we do it now?
+            /*
             // pretend we have the proper migration
             // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
             protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
             {
                 return true;
             }
+            */
 
             // because we don't even have the core runtime component,
             // there are a few required stuff that we need to compose

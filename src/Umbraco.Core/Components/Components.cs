@@ -35,12 +35,13 @@ namespace Umbraco.Core.Components
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        internal T Get<T>() => _components.OfType<T>().SingleOrDefault();
+
         private class EnableInfo
         {
             public bool Enabled;
             public int Weight = -1;
         }
-
 
         public void Compose()
         {

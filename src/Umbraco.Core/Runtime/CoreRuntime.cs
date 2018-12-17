@@ -118,7 +118,7 @@ namespace Umbraco.Core.Runtime
 
                     AquireMainDom(mainDom);
 
-                    DetermineRuntimeLevel(databaseFactory);
+                    DetermineRuntimeLevel(databaseFactory, profilingLogger);
 
                     var componentTypes = ResolveComponentTypes(typeLoader);
                     _components = new Components.Components(composition, componentTypes, profilingLogger);
@@ -214,19 +214,19 @@ namespace Umbraco.Core.Runtime
         }
 
         // internal for tests
-        internal void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory)
+        internal void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
         {
-            using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
+            using (var timer = profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
                 try
                 {
-                    _state.Level = DetermineRuntimeLevel2(databaseFactory);
+                    _state.DetermineRuntimeLevel(databaseFactory, profilingLogger);
 
-                    ProfilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel}", _state.Level);
+                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel}", _state.Level);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {
-                        ProfilingLogger.Debug<CoreRuntime>("Configure database factory for upgrades.");
+                        profilingLogger.Debug<CoreRuntime>("Configure database factory for upgrades.");
                         databaseFactory.ConfigureForUpgrade();
                     }
                 }
@@ -270,111 +270,6 @@ namespace Umbraco.Core.Runtime
         public virtual void Compose(Composition composition)
         {
             // nothing
-        }
-
-        private RuntimeLevel DetermineRuntimeLevel2(IUmbracoDatabaseFactory databaseFactory)
-        {
-            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
-            var codeVersion = _state.SemanticVersion; // the executing code version
-            var connect = false;
-
-            if (localVersion == null)
-            {
-                // there is no local version, we are not installed
-                Logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
-                return RuntimeLevel.Install;
-            }
-
-            if (localVersion < codeVersion)
-            {
-                // there *is* a local version, but it does not match the code version
-                // need to upgrade
-                Logger.Debug<CoreRuntime>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
-            }
-            else if (localVersion > codeVersion)
-            {
-                Logger.Warn<CoreRuntime>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
-
-                // in fact, this is bad enough that we want to throw
-                throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
-            }
-            else if (databaseFactory.Configured == false)
-            {
-                // local version *does* match code version, but the database is not configured
-                // install (again? this is a weird situation...)
-                Logger.Debug<CoreRuntime>("Database is not configured, need to install Umbraco.");
-                return RuntimeLevel.Install;
-            }
-
-            // else, keep going,
-            // anything other than install wants a database - see if we can connect
-            // (since this is an already existing database, assume localdb is ready)
-            for (var i = 0; i < 5; i++)
-            {
-                connect = databaseFactory.CanConnect;
-                if (connect) break;
-                Logger.Debug<CoreRuntime>("Could not immediately connect to database, trying again.");
-                Thread.Sleep(1000);
-            }
-
-            if (connect == false)
-            {
-                // cannot connect to configured database, this is bad, fail
-                Logger.Debug<CoreRuntime>("Could not connect to database.");
-
-                // in fact, this is bad enough that we want to throw
-                throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
-            }
-
-            // if we already know we want to upgrade,
-            // still run EnsureUmbracoUpgradeState to get the states
-            // (v7 will just get a null state, that's ok)
-
-            // else
-            // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
-            // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
-            bool noUpgrade;
-            try
-            {
-                noUpgrade = EnsureUmbracoUpgradeState(databaseFactory);
-            }
-            catch (Exception e)
-            {
-                // can connect to the database but cannot check the upgrade state... oops
-                Logger.Warn<CoreRuntime>(e, "Could not check the upgrade state.");
-                throw new BootFailedException("Could not check the upgrade state.", e);
-            }
-
-            if (noUpgrade)
-            {
-                // the database version matches the code & files version, all clear, can run
-                return RuntimeLevel.Run;
-            }
-
-            // the db version does not match... but we do have a migration table
-            // so, at least one valid table, so we quite probably are installed & need to upgrade
-
-            // although the files version matches the code version, the database version does not
-            // which means the local files have been upgraded but not the database - need to upgrade
-            Logger.Debug<CoreRuntime>("Has not reached the final upgrade step, need to upgrade Umbraco.");
-            return RuntimeLevel.Upgrade;
-        }
-
-        protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
-        {
-            var umbracoPlan = new UmbracoPlan();
-            var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
-
-            // no scope, no service - just directly accessing the database
-            using (var database = databaseFactory.CreateDatabase())
-            {
-                _state.CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
-                _state.FinalMigrationState = umbracoPlan.FinalState;
-            }
-
-            Logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, _state.CurrentMigrationState ?? "<null>");
-
-            return _state.CurrentMigrationState == _state.FinalMigrationState;
         }
 
         #region Getters
