@@ -180,7 +180,7 @@
                 $location.search("invite", null);
             }
             else if (state === "inviteUser") {
-                clearAddUserForm();
+                clearAddUserFormName();
 
                 $location.search("create", null);
                 $location.search("invite", "true");
@@ -536,6 +536,7 @@
 
                 usersResource.inviteUser(vm.newUser)
                     .then(function (saved) {
+
                         //success
                         vm.page.createButtonState = "success";
                         vm.newUser = saved;
@@ -691,6 +692,14 @@
             vm.newUser.email = "";
             vm.newUser.userGroups = [];
             vm.newUser.message = "";
+            // clear button state
+            vm.page.createButtonState = "init";
+        }
+
+        function clearAddUserFormName() {
+            // clear form data
+            vm.newUser.name = "";
+            vm.newUser.email = "";
             // clear button state
             vm.page.createButtonState = "init";
         }
