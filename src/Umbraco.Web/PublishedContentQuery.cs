@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.XPath;
 using Examine;
 using Examine.Search;
@@ -9,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -179,26 +181,49 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null)
         {
-            return Search(term, 0, 0, out _, indexName);
+            return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null)
         {
             indexName = string.IsNullOrEmpty(indexName)
                 ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
-                throw new InvalidOperationException($"No index found by name {indexName}");
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
 
-            var searcher = index.GetSearcher();
+            var searcher = umbIndex.GetSearcher();
 
-            var results = skip == 0 && take == 0
-                ? searcher.Search(term)
-                : searcher.Search(term, maxResults: skip + take);
+            ISearchResults results;
+            if (!culture.IsNullOrWhiteSpace())
+            {
+                results = searcher.Search(term, (skip == 0 && take == 0
+                    ? 500 //default max results
+                    : skip + take));
+            }
+            else
+            {
+                //get all index fields suffixed with the culture name supplied
+                var cultureFields = new List<string>();
+                var fields = umbIndex.GetFields();
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, 1); //must vary by culture
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (var field in fields)
+                {
+                    var match = CultureIsoCodeFieldName.Match(field);
+                    if (match.Success && match.Groups.Count == 2 && culture.InvariantEquals(match.Groups[1].Value))
+                        cultureFields.Add(field);
+                }
+
+                results = qry.And().ManagedQuery(term, cultureFields.ToArray()).Execute((skip == 0 && take == 0
+                    ? 500 //default max results
+                    : skip + take));
+
+            }
 
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
@@ -220,6 +245,14 @@ namespace Umbraco.Web
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
+
+        /// <summary>
+        /// Matches a culture iso name suffix
+        /// </summary>
+        /// <remarks>
+        /// myFieldName_en-us will match the "en-us"
+        /// </remarks>
+        private static readonly Regex CultureIsoCodeFieldName = new Regex("^[_\\w]+_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
 
         #endregion

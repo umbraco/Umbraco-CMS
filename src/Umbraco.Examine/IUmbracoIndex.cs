@@ -1,4 +1,5 @@
-﻿using Examine;
+﻿using System.Collections.Generic;
+using Examine;
 
 namespace Umbraco.Examine
 {
@@ -21,5 +22,11 @@ namespace Umbraco.Examine
         /// * non-published Variants
         /// </remarks>
         bool PublishedValuesOnly { get; }
+
+        /// <summary>
+        /// Returns a list of all indexed fields
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetFields();
     }
 }

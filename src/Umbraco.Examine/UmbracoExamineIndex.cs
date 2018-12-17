@@ -97,6 +97,14 @@ namespace Umbraco.Examine
 
         public bool PublishedValuesOnly { get; protected set; } = false;
 
+        /// <inheritdoc />
+        public IEnumerable<string> GetFields()
+        {
+            //we know this is a LuceneSearcher
+            var searcher = (LuceneSearcher) GetSearcher();
+            return searcher.GetAllIndexedFields();
+        }
+
         protected ConfigIndexCriteria ConfigIndexCriteria { get; private set; }
 
         /// <summary>

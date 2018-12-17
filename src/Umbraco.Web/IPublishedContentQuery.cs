@@ -35,12 +35,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(string term, string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null);
 
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null);
 
         /// <summary>
         /// Executes the query and converts the results to PublishedSearchResult.
