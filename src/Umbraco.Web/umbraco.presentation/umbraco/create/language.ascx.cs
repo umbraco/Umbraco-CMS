@@ -6,6 +6,9 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Web.UI;
 using umbraco.BasePages;
+using umbraco.cms.businesslogic.language;
+using System.Linq;
+
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
@@ -23,7 +26,13 @@ namespace umbraco.cms.presentation.create.controls
             var sortedCultures = new SortedList();
             Cultures.Items.Clear();
             Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-            foreach (var cultureInfo in CultureInfo.GetCultures(CultureTypes.AllCultures))
+
+            var languagesUsed = Language.GetAllAsList();
+
+            var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures)
+                .Where(ci => !languagesUsed.Any(lu => lu.CultureAlias == ci.Name));
+
+            foreach (var cultureInfo in cultures)
                 sortedCultures.Add(cultureInfo.DisplayName + "|||" + Guid.NewGuid(), cultureInfo.Name);
 
             var dictionaryEnumerator = sortedCultures.GetEnumerator();
