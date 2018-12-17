@@ -200,9 +200,9 @@ namespace Umbraco.Examine
             var descendantPath = $@"\-1\,*{nodeId}\,*";
             var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
             var searcher = GetSearcher();
-            var c = searcher.CreateCriteria();
-            var filtered = c.RawQuery(rawQuery);
-            var results = searcher.Search(filtered);
+            var c = searcher.CreateQuery();
+            var filtered = c.NativeQuery(rawQuery);
+            var results = filtered.Execute();
 
             ProfilingLogger.Logger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 

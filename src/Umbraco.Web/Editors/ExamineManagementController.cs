@@ -74,7 +74,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(msg);
 
             var results = Examine.ExamineExtensions.TryParseLuceneQuery(query)
-                ? searcher.Search(searcher.CreateCriteria().RawQuery(query), maxResults: pageSize * (pageIndex + 1))
+                ? searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1))
                 : searcher.Search(query, maxResults: pageSize * (pageIndex + 1));
 
             var pagedResults = results.Skip(pageIndex * pageSize);

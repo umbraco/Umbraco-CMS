@@ -4,9 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.XPath;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -181,16 +179,14 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string indexName = null)
         {
-            return Search(0, 0, out _, term, useWildCards, indexName);
+            return Search(term, 0, 0, out _, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string indexName = null)
         {
-            //fixme: inject IExamineManager
-
             indexName = string.IsNullOrEmpty(indexName)
                 ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
@@ -209,25 +205,17 @@ namespace Umbraco.Web
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, ISearcher searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
         {
-            return Search(0, 0, out _, criteria, searchProvider);
+            return Search(query, 0, 0, out _);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
         {
-            //fixme: inject IExamineManager
-            if (searcher == null)
-            {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
-                    throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.ExternalIndexName}");
-                searcher = index.GetSearcher();
-            }
-
             var results = skip == 0 && take == 0
-                ? searcher.Search(criteria)
-                : searcher.Search(criteria, maxResults: skip + take);
+                ? query.Execute()
+                : query.Execute(maxResults: skip + take);
 
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
