@@ -199,7 +199,7 @@ namespace Umbraco.Web
             var searcher = umbIndex.GetSearcher();
 
             ISearchResults results;
-            if (!culture.IsNullOrWhiteSpace())
+            if (culture.IsNullOrWhiteSpace())
             {
                 results = searcher.Search(term, (skip == 0 && take == 0
                     ? 500 //default max results
