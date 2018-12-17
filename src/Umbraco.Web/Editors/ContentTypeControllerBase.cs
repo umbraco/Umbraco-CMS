@@ -109,7 +109,7 @@ namespace Umbraco.Web.Editors
 
             var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
-            Func<IContentType, IEnumerable<EntityContainer>> getEntityContainers = contentType =>
+            Func<IContentTypeComposition, IEnumerable<EntityContainer>> getEntityContainers = contentType =>
             {
                 if (contentType == null)
                 {
@@ -118,8 +118,11 @@ namespace Umbraco.Web.Editors
                 switch (type)
                 {
                     case UmbracoObjectTypes.DocumentType:
-                        return Services.ContentTypeService.GetContentTypeContainers(contentType);
-                    // TODO: add the rest
+                        return Services.ContentTypeService.GetContentTypeContainers(contentType as IContentType);
+                    case UmbracoObjectTypes.MediaType:
+                        return Services.ContentTypeService.GetMediaTypeContainers(contentType as IMediaType);
+                    case UmbracoObjectTypes.MemberType:
+                        return new EntityContainer[0];
                     default:
                         throw new ArgumentOutOfRangeException("The entity type was not a content type");
                 }
