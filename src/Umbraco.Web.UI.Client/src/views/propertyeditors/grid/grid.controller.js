@@ -27,7 +27,6 @@ angular.module("umbraco")
         $scope.currentControl = null;
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
-        $scope.showRowConfigurations = true;
         $scope.sortMode = false;
         $scope.reorderKey = "general_reorder";
 
@@ -351,7 +350,7 @@ angular.module("umbraco")
                 currentForm.$setDirty();
             }
 
-            $scope.showRowConfigurations = false;
+            section.showRowConfigurations = false;
 
             eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
@@ -366,7 +365,7 @@ angular.module("umbraco")
             }
 
             if(section.rows.length === 0) {
-               $scope.showRowConfigurations = true;
+               section.showRowConfigurations = true;
             }
         };
 
@@ -641,8 +640,8 @@ angular.module("umbraco")
             scopedObject.deletePrompt = false;
         };
 
-        $scope.toggleAddRow = function() {
-          $scope.showRowConfigurations = !$scope.showRowConfigurations;
+        $scope.toggleAddRow = function(section) {
+          section.showRowConfigurations = !section.showRowConfigurations;
         };
 
 
@@ -732,6 +731,8 @@ angular.module("umbraco")
                 section.rows = [];
                 if(section.$allowedLayouts.length === 1){
                     $scope.addRow(section, section.$allowedLayouts[0], true);
+                } else {
+                    section.showRowConfigurations = true;
                 }
             } else {
                 _.forEach(section.rows, function (row, index) {
@@ -748,7 +749,7 @@ angular.module("umbraco")
                 });
 
                 // if there is more than one row added - hide row add tools
-                $scope.showRowConfigurations = false;
+                section.showRowConfigurations = false;
             }
         };
 

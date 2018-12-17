@@ -252,8 +252,8 @@
 
                        <a href=""
                           class="iconBox"
-                          ng-click="toggleAddRow()"
-                          ng-if="!showRowConfigurations">
+                          ng-click="toggleAddRow(section)"
+                          ng-if="!section.showRowConfigurations">
 
                           <i class=" icon icon-add" title="@general_add" localize="title"></i>
 
@@ -261,7 +261,7 @@
 
                     </div>
 
-                    <div class="templates-preview" ng-if="showRowConfigurations">
+                    <div class="templates-preview" ng-if="section.showRowConfigurations">
 
                         <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows" /></strong></p>
 
