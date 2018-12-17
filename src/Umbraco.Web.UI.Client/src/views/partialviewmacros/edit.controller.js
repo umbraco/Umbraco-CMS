@@ -201,7 +201,7 @@
                 var emptyStateMessage = values[1];
 
                 var dictionaryPicker = {
-                    section: "settings",
+                    section: "translation",
                     treeAlias: "dictionary",
                     entityType: "dictionary",
                     multiPicker: false,
