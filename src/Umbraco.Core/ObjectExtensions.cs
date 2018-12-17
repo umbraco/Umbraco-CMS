@@ -595,7 +595,6 @@ namespace Umbraco.Core
             return null;
         }
 
-
         /// <summary>
         /// Attempts to serialize the value to an XmlString using ToXmlString
         /// </summary>
@@ -788,5 +787,7 @@ namespace Umbraco.Core
 
             return BoolConvertCache[type] = false;
         }
+
+        
     }
 }

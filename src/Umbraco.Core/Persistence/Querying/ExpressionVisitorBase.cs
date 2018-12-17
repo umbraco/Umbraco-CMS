@@ -653,6 +653,23 @@ namespace Umbraco.Core.Persistence.Querying
                     else
                         throw new NotSupportedException("Expression is not a proper lambda.");
 
+                // c# 'x == null' becomes sql 'x IS NULL' which is fine
+                // c# 'x == y' becomes sql 'x = @0' which is fine - unless they are nullable types,
+                //  because sql 'x = NULL' is always false and the 'IS NULL' syntax is required,
+                // so for comparing nullable types, we use x.SqlNullableEquals(y, fb) where fb is a fallback
+                // value which will be used when values are null - turning the comparison into
+                // sql 'COALESCE(x,fb) = COALESCE(y,fb)' - of course, fb must be a value outside
+                // of x and y range - and if that is not possible, then a manual comparison need
+                // to be written
+                //TODO support SqlNullableEquals with 0 parameters, using the full syntax below
+                case "SqlNullableEquals":
+                    var compareTo = Visit(m.Arguments[1]);
+                    var fallback = Visit(m.Arguments[2]);
+                    // that would work without a fallback value but is more cumbersome
+                    //return Visited ? string.Empty : $"((({compareTo} is null) AND ({visitedMethodObject} is null)) OR (({compareTo} is not null) AND ({visitedMethodObject} = {compareTo})))";
+                    // use a fallback value
+                    return Visited ? string.Empty : $"(COALESCE({visitedMethodObject},{fallback}) = COALESCE({compareTo},{fallback}))";
+
                 default:
 
                     throw new ArgumentOutOfRangeException("No logic supported for " + m.Method.Name);
