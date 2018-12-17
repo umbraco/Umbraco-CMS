@@ -34,7 +34,7 @@
     </div>
     <div ng-if="vm.availableGroups.length > 0">
         <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
-            <li style="font-weight: bold">
+            <li style="font-weight: bold" ng-show="vm.availableGroups.length > 1">
                 <i class="icon-folder umb-checkbox-list__item-icon"></i>
                 {{group.containerPath}}
             </li>
