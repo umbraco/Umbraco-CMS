@@ -80,6 +80,7 @@
 
     function editorService(eventsService) {
 
+        let escBound = false;
         var editors = [];
         
         /**
@@ -129,8 +130,37 @@
                 editors: editors,
                 editor: editor
             };
+
+            bindEsc();
             
             eventsService.emit("appState.editors.open", args);
+
+        }
+
+        function bindEsc() {
+            if(!escBound) {
+                $(document).on("keydown.infiniteEsc", function (event) {
+                    // esc
+                    if (event.which === 27) {
+                        const length = editors.length;
+                        const lastEditor = editors[length - 1];
+
+                        if(lastEditor.close) {
+                            lastEditor.close();
+                        }
+
+                        if(getNumberOfEditors() === 0) {
+                            unbindEsc();
+                        }
+                    }
+                });
+                escBound = true;
+            }
+        }
+
+        function unbindEsc() {
+            $(document).off("keydown.infiniteEsc");
+            escBound = false;
         }
 
         /**
