@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
                     x.Item1.Name = TranslateItem(x.Item1.Name);
 
                     var contentType = allContentTypes.FirstOrDefault(c => c.Key == x.Item1.Key);
-                    var containers = getEntityContainers(contentType as IContentType)?.ToArray();
+                    var containers = getEntityContainers(contentType)?.ToArray();
                     var containerPath = $"/{(containers != null && containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
                     x.Item1.AdditionalData["containerPath"] = containerPath;
 
