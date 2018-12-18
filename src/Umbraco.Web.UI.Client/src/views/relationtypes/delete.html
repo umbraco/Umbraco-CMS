@@ -1,12 +1,27 @@
-<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.RelationTypes.DeleteController as vm">
-    <div class="umb-dialog-body" auto-scale="90">
+<div class="umb-dialog" ng-controller="Umbraco.Editors.RelationTypes.DeleteController as vm">
+    <div class="umb-dialog-body umb-pane">
 
-        <p class="umb-abstract">
+        <p class="abstract">
             <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
         </p>
 
-        <umb-confirm on-confirm="vm.performDelete" on-cancel="vm.cancel">
-        </umb-confirm>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+        <umb-button
+            type="button"
+            button-style="link"
+            label-key="general_cancel"
+            action="vm.cancel()">
+        </umb-button>
+
+        <umb-button
+            type="button"
+            button-style="success"
+            label-key="actions_delete"
+            action="vm.performDelete()">
+        </umb-button>
 
     </div>
 </div>
