@@ -840,9 +840,6 @@
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
-    <Compile Include="Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
-    <Compile Include="Migrations\EnsureListViewDataTypeIsCreated.cs" />
-    <Compile Include="Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
     <Compile Include="Components\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
@@ -1010,7 +1007,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Migrations\RebuildXmlCachesAfterUpgrade.cs" />
     <Compile Include="Components\PublicAccessComponent.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />

@@ -40,7 +40,7 @@ namespace Umbraco.Web.Install.Controllers
 
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
-            var canConnect = _databaseBuilder.CheckConnection(model.DatabaseType.ToString(), model.ConnectionString, model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
+            var canConnect = _databaseBuilder.CanConnect(model.DatabaseType.ToString(), model.ConnectionString, model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
             return canConnect;
         }
 

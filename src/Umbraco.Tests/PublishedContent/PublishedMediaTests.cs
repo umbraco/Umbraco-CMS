@@ -104,12 +104,11 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = publishedMedia.Value("Content");
-            Assert.IsInstanceOf<IHtmlString>(propVal3);
+            Assert.IsInstanceOf<IHtmlString>(propVal3); 
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Ensure_Children_Sorted_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -117,7 +116,9 @@ namespace Umbraco.Tests.PublishedContent
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 validator: new ContentValueSetValidator(true)))
+            using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
                 var searcher = indexer.GetSearcher();
@@ -137,7 +138,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Do_Not_Find_In_Recycle_Bin()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -145,9 +145,10 @@ namespace Umbraco.Tests.PublishedContent
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //include unpublished content since this uses the 'internal' indexer, it's up to the media cache to filter
-                validator: new ContentValueSetValidator(true)))
+                validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
                 var searcher = indexer.GetSearcher();
@@ -185,7 +186,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Children_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -195,6 +195,7 @@ namespace Umbraco.Tests.PublishedContent
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
                 var searcher = indexer.GetSearcher();
@@ -213,7 +214,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Descendants_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -223,6 +223,7 @@ namespace Umbraco.Tests.PublishedContent
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
                 var searcher = indexer.GetSearcher();
@@ -241,7 +242,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void DescendantsOrSelf_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -251,6 +251,7 @@ namespace Umbraco.Tests.PublishedContent
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
                 var searcher = indexer.GetSearcher();
@@ -269,7 +270,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void Ancestors_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -280,6 +280,7 @@ namespace Umbraco.Tests.PublishedContent
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
                 var ctx = GetUmbracoContext("/test");
@@ -295,7 +296,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("No point testing with Examine, should refactor this test.")]
         public void AncestorsOrSelf_With_Examine()
         {
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
@@ -305,6 +305,7 @@ namespace Umbraco.Tests.PublishedContent
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
                 rebuilder.Populate(indexer);
 
 

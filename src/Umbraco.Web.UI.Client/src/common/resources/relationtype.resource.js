@@ -35,7 +35,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
         /**
          * @ngdoc method
          * @name umbraco.resources.relationTypeResource#getRelationObjectTypes
-         * @methodof umbraco.resources.relationTypeResource
+         * @methodOf umbraco.resources.relationTypeResource
          *
          * @description
          * Gets a list of Umbraco object types which can be associated with a relation.
@@ -54,7 +54,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
         /**
          * @ngdoc method
          * @name umbraco.resources.relationTypeResource#save
-         * @methodof umbraco.resources.relationTypeResource
+         * @methodOf umbraco.resources.relationTypeResource
          *
          * @description
          * Updates a relation type.
@@ -74,7 +74,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
         /**
          * @ngdoc method
          * @name umbraco.resources.relationTypeResource#create
-         * @methodof umbraco.resources.relationTypeResource
+         * @methodOf umbraco.resources.relationTypeResource
          *
          * @description
          * Creates a new relation type.
@@ -94,7 +94,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
         /**
          * @ngdoc method
          * @name umbraco.resources.relationTypeResource#deleteById
-         * @methodof umbraco.resources.relationTypeResource
+         * @methodOf umbraco.resources.relationTypeResource
          *
          * @description
          * Deletes a relation type with a given ID.

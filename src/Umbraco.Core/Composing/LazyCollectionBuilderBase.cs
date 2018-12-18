@@ -66,37 +66,6 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Removes a type from the collection.
-        /// </summary>
-        /// <typeparam name="T">The type to remove.</typeparam>
-        /// <returns>The builder.</returns>
-        public TBuilder Remove<T>()
-            where T : TItem
-        {
-            Configure(types =>
-            {
-                var type = typeof(T);
-                if (types.Contains(type)) types.Remove(type);
-            });
-            return This;
-        }
-
-        /// <summary>
-        /// Removes a type from the collection.
-        /// </summary>
-        /// <param name="type">The type to remove.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Remove(Type type)
-        {
-            Configure(types =>
-            {
-                EnsureType(type, "remove");
-                if (types.Contains(type)) types.Remove(type);
-            });
-            return This;
-        }
-
-        /// <summary>
         /// Adds a types producer to the collection.
         /// </summary>
         /// <param name="producer">The types producer.</param>

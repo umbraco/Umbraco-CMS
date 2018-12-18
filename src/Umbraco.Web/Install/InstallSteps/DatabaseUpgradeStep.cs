@@ -63,18 +63,10 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))
             {
-                //Since a connection string was present we verify whether this is an upgrade or an empty db
-                var result = _databaseBuilder.ValidateDatabaseSchema();
-
-                var determinedVersion = result.DetermineInstalledVersion();
-                if (determinedVersion.Equals(new Version(0, 0, 0)))
-                {
-                    //Fresh install
-                    return false;
-                }
-
-                //Upgrade
-                return true;
+                // a connection string was present, determine whether this is an install/upgrade
+                // return true (upgrade) if there is an installed version, else false (install)
+                var result = _databaseBuilder.ValidateSchema();
+                return result.DetermineHasInstalledVersion();
             }
 
             //no connection string configured, probably a fresh install

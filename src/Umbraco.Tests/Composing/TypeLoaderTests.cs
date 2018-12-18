@@ -23,6 +23,7 @@ namespace Umbraco.Tests.Composing
     public class TypeLoaderTests
     {
         private TypeLoader _typeLoader;
+
         [SetUp]
         public void Initialize()
         {
@@ -54,6 +55,12 @@ namespace Umbraco.Tests.Composing
         public void TearDown()
         {
             _typeLoader = null;
+
+
+            // cleanup
+            var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+            foreach (var d in Directory.GetDirectories(Path.Combine(assDir.FullName, "TypeLoader")))
+                Directory.Delete(d, true);
         }
 
         private DirectoryInfo PrepareFolder()

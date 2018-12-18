@@ -1206,7 +1206,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 foreach (var (culture, info) in infos)
                 {
-                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
+                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(culture);
+                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
                 }
             }
 

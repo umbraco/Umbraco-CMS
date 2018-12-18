@@ -29,7 +29,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (_runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
 
-            var result = _databaseBuilder.CreateDatabaseSchemaAndData();
+            var result = _databaseBuilder.CreateSchemaAndData();
 
             if (result.Success == false)
             {

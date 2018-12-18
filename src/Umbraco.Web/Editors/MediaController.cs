@@ -484,8 +484,9 @@ namespace Umbraco.Web.Editors
             MapPropertyValuesForPersistence<IMedia, MediaItemSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
-                (save, property) => property.GetValue(),        //get prop val
-                (save, property, v) => property.SetValue(v));   //set prop val
+                (save, property) => property.GetValue(), //get prop val
+                (save, property, v) => property.SetValue(v), //set prop val
+                null); // media are all invariant
 
             //We need to manually check the validation results here because:
             // * We still need to save the entity even if there are validation value errors
