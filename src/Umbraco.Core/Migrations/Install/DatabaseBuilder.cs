@@ -610,7 +610,7 @@ namespace Umbraco.Core.Migrations.Install
         public class Result
         {
             /// <summary>
-            /// Gets or sets ... fixme
+            /// Gets or sets a value indicating whether an upgrade is required.
             /// </summary>
             public bool RequiresUpgrade { get; set; }
 
@@ -625,7 +625,7 @@ namespace Umbraco.Core.Migrations.Install
             public bool Success { get; set; }
 
             /// <summary>
-            /// Gets or sets ... fixme
+            /// Gets or sets an install progress pseudo-percentage.
             /// </summary>
             public string Percentage { get; set; }
         }
