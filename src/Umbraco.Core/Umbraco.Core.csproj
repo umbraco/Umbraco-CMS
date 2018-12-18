@@ -1311,6 +1311,7 @@
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
+    <Compile Include="Serialization\CaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\IFormatter.cs" />

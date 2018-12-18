@@ -815,7 +815,7 @@
 
                     //ensure the save flag is set
                     selectedVariant.save = true;
-                    performSave({ saveMethod: contentResource.publish, action: "save" }).then(function (data) {
+                    performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
                         previewWindow.location.href = redirect;
                     }, function (err) {
                         //validation issues ....

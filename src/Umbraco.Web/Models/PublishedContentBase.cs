@@ -142,7 +142,7 @@ namespace Umbraco.Web.Models
         public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
-        public abstract bool IsDraft { get; }
+        public abstract bool IsDraft(string culture = null);
 
         #endregion
 

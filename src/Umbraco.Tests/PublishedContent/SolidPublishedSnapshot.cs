@@ -162,7 +162,6 @@ namespace Umbraco.Tests.PublishedContent
             WriterId = CreatorId = 0;
             CreateDate = UpdateDate = DateTime.Now;
             Version = Guid.Empty;
-            IsDraft = false;
 
             ContentType = contentType;
         }
@@ -192,7 +191,7 @@ namespace Umbraco.Tests.PublishedContent
         public string GetUrl(string culture = null) => throw new NotSupportedException();
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
-        public bool IsDraft { get; set; }
+        public bool IsDraft(string culture = null) => false;
 
         #endregion
 
