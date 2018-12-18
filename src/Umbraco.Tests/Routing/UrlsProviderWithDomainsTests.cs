@@ -418,8 +418,8 @@ namespace Umbraco.Tests.Routing
             foreach (var x in result) Console.WriteLine(x);
 
             Assert.AreEqual(2, result.Length);
-            Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
-            Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
+            Assert.AreEqual(result[0].Text, "http://domain1a.com/en/1001-1-1/");
+            Assert.AreEqual(result[1].Text, "http://domain1b.com/en/1001-1-1/");
         }
     }
 }

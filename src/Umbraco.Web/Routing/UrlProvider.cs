@@ -202,7 +202,7 @@ namespace Umbraco.Web.Routing
 
             var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, content, mode, culture, current))
                 .FirstOrDefault(u => u != null);
-            return url ?? "#"; // legacy wants this
+            return url?.Text ?? "#"; // legacy wants this
         }
 
         internal string GetUrlFromRoute(int id, string route, string culture)
@@ -210,7 +210,7 @@ namespace Umbraco.Web.Routing
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture);
+                : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
             return url ?? "#";
         }
 
@@ -228,7 +228,7 @@ namespace Umbraco.Web.Routing
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// <para>The results depend on the current url.</para>
         /// </remarks>
-        public IEnumerable<string> GetOtherUrls(int id)
+        public IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
             return GetOtherUrls(id, _umbracoContext.CleanedUmbracoUrl);
         }
@@ -243,10 +243,10 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<string> GetOtherUrls(int id, Uri current)
+        public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             // providers can return null or an empty list or a non-empty list, be prepared
-            var urls = _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<string>());
+            var urls = _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current));
 
             return urls;
         }

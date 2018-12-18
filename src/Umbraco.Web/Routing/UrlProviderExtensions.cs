@@ -34,14 +34,11 @@ namespace Umbraco.Web.Routing
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            var urls = new List<UrlInfo>();
-
             if (content.Published == false)
-            {
-                urls.Add(UrlInfo.Message(textService.Localize("content/itemNotPublished")));
-                return urls;
-            }
-            
+                yield return UrlInfo.Message(textService.Localize("content/itemNotPublished"));
+
+            var urls = new HashSet<UrlInfo>();
+
             // build a list of urls, for the back-office
             // which will contain
             // - the 'main' urls, which is what .Url would return, for each culture
@@ -92,37 +89,18 @@ namespace Umbraco.Web.Routing
                 }
             }
 
-            // prepare for de-duplication
-            var durl = new Dictionary<string, List<UrlInfo>>();
-            var dmsg = new Dictionary<string, List<UrlInfo>>();
-            foreach (var url in urls)
-            {
-                var d = url.IsUrl ? durl : dmsg;
-                if (!d.TryGetValue(url.Text, out var l))
-                    d[url.Text] = l = new List<UrlInfo>();
-                l.Add(url);
-            }
-
-            // deduplicate, order urls first then messages, concatenate cultures (hide if 'all')
-            var ret = new List<UrlInfo>();
-            foreach (var (text, infos) in durl)
-                ret.Add(UrlInfo.Url(text, infos.Count == cultures.Count ?  null : string.Join(", ", infos.Select(x => x.Culture))));
-            foreach (var (text, infos) in dmsg)
-                ret.Add(UrlInfo.Message(text, infos.Count == cultures.Count ?  null : string.Join(", ", infos.Select(x => x.Culture))));
+            //return the real urls first, then the messages
+            foreach (var urlGroup in urls.GroupBy(x => x.IsUrl).OrderByDescending(x => x.Key))
+                foreach (var url in urlGroup)
+                    yield return url;
 
             // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
             // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
-            // also, we are not dealing with cultures at all - that will have to wait
-            foreach(var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id))
-            {
-                if (urls.Any(x => x.IsUrl && x.Text == otherUrl)) continue;
-                ret.Add(UrlInfo.Url(otherUrl));
-            }
-
-            return ret;
+            foreach (var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id))
+                yield return otherUrl;
         }
 
-        private static void HandleCouldNotGetUrl(IContent content, string culture, List<UrlInfo> urls, IContentService contentService, ILocalizedTextService textService)
+        private static void HandleCouldNotGetUrl(IContent content, string culture, ICollection<UrlInfo> urls, IContentService contentService, ILocalizedTextService textService)
         {
             // document has a published version yet its url is "#" => a parent must be
             // unpublished, walk up the tree until we find it, and report.
@@ -143,7 +121,7 @@ namespace Umbraco.Web.Routing
                 urls.Add(UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] { parent.Name }), culture));
         }
 
-        private static bool DetectCollision(IContent content, string url, List<UrlInfo> urls, string culture, UmbracoContext umbracoContext, PublishedRouter publishedRouter, ILocalizedTextService textService)
+        private static bool DetectCollision(IContent content, string url, ICollection<UrlInfo> urls, string culture, UmbracoContext umbracoContext, PublishedRouter publishedRouter, ILocalizedTextService textService)
         {
             // test for collisions on the 'main' url
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
