@@ -23,7 +23,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlInfo"/> class.
         /// </summary>
-        private UrlInfo(string text, bool isUrl, string culture)
+        public UrlInfo(string text, bool isUrl, string culture)
         {
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(text));
             IsUrl = isUrl;

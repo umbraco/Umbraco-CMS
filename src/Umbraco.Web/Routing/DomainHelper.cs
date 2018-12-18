@@ -207,8 +207,14 @@ namespace Umbraco.Web.Routing
                 var cultureDomains = domainsAndUris.Where(x => x.Culture.Name.InvariantEquals(culture)).ToList();
                 if (cultureDomains.Count > 0) return cultureDomains;
 
+
                 // if a culture is supplied, we *want* a url for that culture, else fail
-                throw new InvalidOperationException($"Could not find a domain for culture \"{culture}\".");
+                //throw new InvalidOperationException($"Could not find a domain for culture \"{culture}\".");
+                //fixme: Review - throwing here causes a problem because the UrlProviderExtensions.GetContentUrls iterates through
+                // ALL cultures even if those cultures are not assigned for use within a branch. Returning null
+                // here fixes that problem and the URLs resolve correctly, however i don't know if this is causing other
+                // residual problems. It would also suggest that below in GetByCulture we don't throw either but instead return null??
+                return null;
             }
 
             if (defaultCulture != null) // try the defaultCulture culture
