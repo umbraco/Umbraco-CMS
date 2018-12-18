@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
@@ -34,11 +35,12 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test",  builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "done"));
+                var upgrader = new Upgrader(
+                    new MigrationPlan("test")
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
 
                 var helper = new DatabaseSchemaCreator(scope.Database, logger);
                 var exists = helper.TableExists("umbracoUser");
@@ -71,12 +73,13 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<DeleteKeysAndIndexesMigration>("a", "done"));
+                var upgrader = new Upgrader(
+                    new MigrationPlan("test")
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<DeleteKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }
@@ -106,13 +109,14 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test",  builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<DeleteKeysAndIndexesMigration>("a", "b")
-                        .Add<CreateKeysAndIndexesOfTDtoMigration>("b", "done"));
+                var upgrader = new Upgrader(
+                    new MigrationPlan("test")
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<DeleteKeysAndIndexesMigration>("b")
+                        .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }
@@ -142,13 +146,14 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test",  builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<DeleteKeysAndIndexesMigration>("a", "b")
-                        .Add<CreateKeysAndIndexesMigration>("b", "done"));
+                var upgrader = new Upgrader(
+                    new MigrationPlan("test")
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<DeleteKeysAndIndexesMigration>("b")
+                        .To<CreateKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }
@@ -176,12 +181,13 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", builder, logger)
-                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
-                        .Add<CreateColumnMigration>("a", "done"));
+                var upgrader = new Upgrader(
+                    new MigrationPlan("test")
+                        .From(string.Empty)
+                        .To<CreateTableOfTDtoMigration>("a")
+                        .To<CreateColumnMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }

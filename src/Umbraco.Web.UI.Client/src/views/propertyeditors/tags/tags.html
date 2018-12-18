@@ -1,35 +1,10 @@
 <div ng-controller="Umbraco.PropertyEditors.TagsController" class="umb-property-editor umb-tags">
 
-    <div ng-if="isLoading">
-       <localize key="loading">Loading</localize>...
-   </div>
-
-   <div ng-if="!isLoading">
-
-       <input type="hidden" name="tagCount" ng-model="model.value.length" val-property-validator="validateMandatory" />
-
-       <span ng-repeat="tag in model.value track by $index" class="label label-primary tag">
-           <span ng-bind-html="tag"></span>
-
-               <i class="icon-trash" ng-click="$parent.showPrompt($index, tag)" localize="title" title="@buttons_deleteTag"></i>
-
-               <umb-confirm-action
-                   ng-if="$parent.promptIsVisible === $index"
-                   direction="left"
-                   on-confirm="$parent.removeTag(tag)"
-                   on-cancel="$parent.hidePrompt()">
-               </umb-confirm-action>
-       </span>
-
-       <input type="text"
-              id="{{model.alias}}"
-              class="typeahead tags-{{model.alias}}"
-              ng-model="$parent.tagToAdd"
-              ng-keydown="$parent.addTagOnEnter($event)"
-              ng-blur="$parent.addTag()"
-              localize="placeholder"
-              placeholder="@placeholders_enterTags" />
-
-   </div>
+    <umb-tags-editor value="model.value"
+                     config="model.config"
+                     validation="model.validation"
+                     on-value-changed="valueChanged(value)"
+                     culture="model.culture">
+    </umb-tags-editor>
 
 </div>

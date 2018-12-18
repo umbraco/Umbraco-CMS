@@ -111,7 +111,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                                "DELETE FROM umbracoPropertyData WHERE languageId = @id",
                                "DELETE FROM umbracoContentVersionCultureVariation WHERE languageId = @id",
                                "DELETE FROM umbracoDocumentCultureVariation WHERE languageId = @id",
-                               "DELETE FROM umbracoLanguage WHERE id = @id"
+                               "DELETE FROM umbracoLanguage WHERE id = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id"
                            };
             return list;
         }
