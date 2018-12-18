@@ -125,7 +125,7 @@
                 so we need to store the shortcuts for the current editor so they can be rebound
                 when the infinite editor closes
             */
-            storeKeyboardShortcuts();
+            unbindKeyboardShortcuts();
 
             // set flag so we know when the editor is open in "infinie mode"
             editor.infiniteMode = true;
@@ -676,9 +676,15 @@
          * to each editor so they can be rebound when an editor closes
          * 
          */
-        function storeKeyboardShortcuts() {
+        function unbindKeyboardShortcuts() {
             const shortcuts = angular.copy(keyboardService.keyboardEvent);
             editorsKeyboardShorcuts.push(shortcuts);
+
+            // unbind the current shortcuts because we only want to 
+            // shortcuts from the newly opened editor working
+            for (let [key, value] of Object.entries(shortcuts)) {
+                keyboardService.unbind(key);
+            }
         }
 
         /**
