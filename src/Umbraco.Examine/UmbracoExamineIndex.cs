@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
@@ -9,11 +8,9 @@ using Lucene.Net.Index;
 using Umbraco.Core;
 using Examine;
 using Examine.LuceneEngine;
-using Examine.LuceneEngine.Indexing;
 using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Examine.Config;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Examine
@@ -44,18 +41,6 @@ namespace Umbraco.Examine
         public const string RawFieldPrefix = SpecialFieldPrefix + "Raw_";
 
         /// <summary>
-        /// Constructor for config provider based indexes
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected UmbracoExamineIndex()
-            : base()
-        {
-            ProfilingLogger = Current.ProfilingLogger;
-            _configBased = true;
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
-        }
-
-        /// <summary>
         /// Create a new <see cref="UmbracoExamineIndex"/>
         /// </summary>
         /// <param name="name"></param>
@@ -67,13 +52,13 @@ namespace Umbraco.Examine
         /// <param name="indexValueTypes"></param>
         protected UmbracoExamineIndex(
             string name,
-            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
+            FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
+            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
         {
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
 
@@ -104,93 +89,6 @@ namespace Umbraco.Examine
             var searcher = (LuceneSearcher) GetSearcher();
             return searcher.GetAllIndexedFields();
         }
-
-        protected ConfigIndexCriteria ConfigIndexCriteria { get; private set; }
-
-        /// <summary>
-        /// The index set name which references an Examine <see cref="IndexSet"/>
-        /// </summary>
-        public string IndexSetName { get; private set; }
-
-        #region Initialize
-
-
-        /// <summary>
-        /// Setup the properties for the indexer from the provider settings
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="config"></param>
-        /// <remarks>
-        /// This is ONLY used for configuration based indexes
-        /// </remarks>
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
-        {
-            ProfilingLogger.Logger.Debug(GetType(), "{IndexerName} indexer initializing", name);
-
-            if (config["enableDefaultEventHandler"] != null && bool.TryParse(config["enableDefaultEventHandler"], out var enabled))
-            {
-                EnableDefaultEventHandler = enabled;
-            }
-
-            //this is config based, so add the default definitions
-            foreach (var field in UmbracoFieldDefinitionCollection.UmbracoIndexFieldDefinitions)
-            {
-                FieldDefinitionCollection.TryAdd(field);
-            }
-
-            //Need to check if the index set is specified...
-            if (config["indexSet"] == null)
-            {
-                var possibleSuffixes = new[] {"Index", "Indexer"};
-                foreach (var suffix in possibleSuffixes)
-                {
-                    if (!name.EndsWith(suffix)) continue;
-
-                    var setNameByConvension = name.Remove(name.LastIndexOf(suffix, StringComparison.Ordinal)) + "IndexSet";
-                    //check if we can assign the index set by naming convention
-                    var set = IndexSets.Instance.Sets.Cast<IndexSet>().SingleOrDefault(x => x.SetName == setNameByConvension);
-
-                    if (set == null) continue;
-
-                    //we've found an index set by naming conventions :)
-                    IndexSetName = set.SetName;
-
-                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
-
-                    //get the index criteria and ensure folder
-                    ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
-                    foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
-                    {
-                        //replace any existing or add
-                        FieldDefinitionCollection.AddOrUpdate(fieldDefinition);
-                    }
-                    break;
-                }
-            }
-            else
-            {
-                //if an index set is specified, ensure it exists and initialize the indexer based on the set
-
-                if (IndexSets.Instance.Sets[config["indexSet"]] == null)
-                    throw new ArgumentException("The indexSet specified for the LuceneExamineIndexer provider does not exist");
-
-                IndexSetName = config["indexSet"];
-
-                var indexSet = IndexSets.Instance.Sets[IndexSetName];
-
-                //get the index criteria and ensure folder
-                ConfigIndexCriteria = CreateFieldDefinitionsFromConfig(indexSet);
-                foreach (var fieldDefinition in ConfigIndexCriteria.StandardFields.Union(ConfigIndexCriteria.UserFields))
-                {
-                    //replace any existing or add
-                    FieldDefinitionCollection.AddOrUpdate(fieldDefinition);
-                }
-            }
-
-            base.Initialize(name, config);
-        }
-        
-        #endregion
 
         /// <summary>
         /// override to check if we can actually initialize.
@@ -288,17 +186,7 @@ namespace Umbraco.Examine
                 e.ValueSet.Values[IconFieldName] = icon;
             }
         }
-
-        private ConfigIndexCriteria CreateFieldDefinitionsFromConfig(IndexSet indexSet)
-        {
-            return new ConfigIndexCriteria(
-                indexSet.IndexAttributeFields.Cast<ConfigIndexField>().Select(x => new FieldDefinition(x.Name, x.Type)).ToArray(),
-                indexSet.IndexUserFields.Cast<ConfigIndexField>().Select(x => new FieldDefinition(x.Name, x.Type)).ToArray(),
-                indexSet.IncludeNodeTypes.ToList().Select(x => x.Name).ToArray(),
-                indexSet.ExcludeNodeTypes.ToList().Select(x => x.Name).ToArray(),
-                indexSet.IndexParentId);
-        }
-
+        
         #region IIndexDiagnostics
 
         private readonly UmbracoExamineIndexDiagnostics _diagnostics;

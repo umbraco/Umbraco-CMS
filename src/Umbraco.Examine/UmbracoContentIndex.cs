@@ -6,14 +6,10 @@ using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Examine.LuceneEngine.Indexing;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Examine.Config;
 using Examine.LuceneEngine;
 
 namespace Umbraco.Examine
@@ -27,18 +23,7 @@ namespace Umbraco.Examine
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
-
-        /// <summary>
-        /// Constructor for configuration providers
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public UmbracoContentIndex()
-        {
-            LanguageService = Current.Services.LocalizationService;
-
-            //note: The validator for this config based indexer is set in the Initialize method
-        }
-
+        
         /// <summary>
         /// Create an index at runtime
         /// </summary>
@@ -52,79 +37,20 @@ namespace Umbraco.Examine
         /// <param name="indexValueTypes"></param>
         public UmbracoContentIndex(
             string name,
-            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
+            FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
+            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
 
             if (validator is IContentValueSetValidator contentValueSetValidator)
                 PublishedValuesOnly = contentValueSetValidator.PublishedValuesOnly;
-        }
-
-        #endregion
-
-        #region Initialize
-
-        /// <summary>
-        /// Set up all properties for the indexer based on configuration information specified. This will ensure that
-        /// all of the folders required by the indexer are created and exist. This will also create an instruction
-        /// file declaring the computer name that is part taking in the indexing. This file will then be used to
-        /// determine the master indexer machine in a load balanced environment (if one exists).
-        /// </summary>
-        /// <param name="name">The friendly name of the provider.</param>
-        /// <param name="config">A collection of the name/value pairs representing the provider-specific attributes specified in the configuration for this provider.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// The name of the provider is null.
-        /// </exception>
-        /// <exception cref="T:System.ArgumentException">
-        /// The name of the provider has a length of zero.
-        /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
-        /// </exception>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override void Initialize(string name, NameValueCollection config)
-        {
-            base.Initialize(name, config);
-
-            var supportUnpublished = false;
-            var supportProtected = false;
-
-            //check if there's a flag specifying to support unpublished content,
-            //if not, set to false;
-            if (config["supportUnpublished"] != null)
-                bool.TryParse(config["supportUnpublished"], out supportUnpublished);
-
-            //check if there's a flag specifying to support protected content,
-            //if not, set to false;
-            if (config["supportProtected"] != null)
-                bool.TryParse(config["supportProtected"], out supportProtected);
-
-
-            //now we need to build up the indexer options so we can create our validator
-            int? parentId = null;
-            if (IndexSetName.IsNullOrWhiteSpace() == false)
-            {
-                var indexSet = IndexSets.Instance.Sets[IndexSetName];
-                parentId = indexSet.IndexParentId;
-            }
-
-            ValueSetValidator = new ContentValueSetValidator(
-                supportUnpublished, supportProtected,
-                //Using a singleton here, we can't inject this when using config based providers and we don't use this
-                //anywhere else in this class
-                Current.Services.PublicAccessService,
-                parentId,
-                ConfigIndexCriteria?.IncludeItemTypes, ConfigIndexCriteria?.ExcludeItemTypes);
-
-            PublishedValuesOnly = supportUnpublished;
         }
 
         #endregion

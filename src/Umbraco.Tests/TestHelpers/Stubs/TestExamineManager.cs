@@ -9,14 +9,16 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         private readonly ConcurrentDictionary<string, IIndex> _indexers = new ConcurrentDictionary<string, IIndex>();
         private readonly ConcurrentDictionary<string, ISearcher> _searchers = new ConcurrentDictionary<string, ISearcher>();
 
-        public void AddIndex(IIndex indexer)
+        public IIndex AddIndex(IIndex indexer)
         {
             _indexers.TryAdd(indexer.Name, indexer);
+            return indexer;
         }
 
-        public void AddSearcher(ISearcher searcher)
+        public ISearcher AddSearcher(ISearcher searcher)
         {
             _searchers.TryAdd(searcher.Name, searcher);
+            return searcher;
         }
         
         public void Dispose()
