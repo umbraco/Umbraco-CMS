@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Events;
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Migrations.Install
     /// <summary>
     /// Creates the initial database schema during install.
     /// </summary>
-    internal class DatabaseSchemaCreator
+    public class DatabaseSchemaCreator
     {
         private readonly IUmbracoDatabase _database;
         private readonly ILogger _logger;
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Migrations.Install
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
 
         // all tables, in order
-        public static readonly List<Type> OrderedTables = new List<Type>
+        public static readonly ICollection<Type> OrderedTables = new ReadOnlyCollection<Type>(new[]
         {
             typeof (UserDto),
             typeof (NodeDto),
@@ -83,7 +84,7 @@ namespace Umbraco.Core.Migrations.Install
             typeof (ContentVersionCultureVariationDto),
             typeof (DocumentCultureVariationDto),
             typeof (ContentScheduleDto)
-        };
+        });
 
         /// <summary>
         /// Drops all Umbraco tables in the db.
@@ -389,7 +390,7 @@ namespace Umbraco.Core.Migrations.Install
         /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
         /// not do anything if the parameter is <c>false</c>.
         /// </remarks>
-        internal void CreateTable<T>(bool overwrite = false)
+        public void CreateTable<T>(bool overwrite = false)
             where T : new()
         {
             var tableType = typeof(T);
@@ -411,7 +412,7 @@ namespace Umbraco.Core.Migrations.Install
         /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
         /// not do anything if the parameter is <c>false</c>.
         /// </remarks>
-        public void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
+        internal void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
         {
             var tableDefinition = DefinitionFactory.GetTableDefinition(modelType, SqlSyntax);
             var tableName = tableDefinition.Name;
