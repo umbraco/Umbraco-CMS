@@ -12,10 +12,11 @@
                 
                 //expose the property/methods for other directives to use
                 this.content = $scope.content;
-
-                $scope.activeVariant = _.find(this.content.variants, variant => {
+                this.activeVariant = _.find(this.content.variants, variant => {
                     return variant.active;
                 });
+
+                $scope.activeVariant = this.activeVariant;
 
                 $scope.defaultVariant = _.find(this.content.variants, variant => {
                     return variant.language.isDefault;

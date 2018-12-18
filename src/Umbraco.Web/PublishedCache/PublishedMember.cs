@@ -79,7 +79,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override PublishedItemType ItemType => PublishedItemType.Member;
 
-        public override bool IsDraft => false;
+        public override bool IsDraft(string culture = null) => false;
 
         public override IPublishedContent Parent => null;
 

@@ -467,9 +467,9 @@ namespace umbraco
                 get { return PublishedItemType.Content; }
             }
 
-            public bool IsDraft
+            public bool IsDraft(string culture = null)
             {
-                get { throw new NotImplementedException(); }
+                throw new NotImplementedException();
             }
 
             public IPublishedContent Parent
