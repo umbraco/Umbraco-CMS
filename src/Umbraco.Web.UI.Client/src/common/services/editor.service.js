@@ -78,8 +78,9 @@
 (function () {
     "use strict";
 
-    function editorService(eventsService) {
+    function editorService(eventsService, keyboardService) {
 
+        let editorsKeyboardShorcuts = [];
         var editors = [];
         
         /**
@@ -120,6 +121,12 @@
          */
         function open(editor) {
 
+            /* keyboard shortcuts will be overwritten by the new infinite editor
+                so we need to store the shortcuts for the current editor so they can be rebound
+                when the infinite editor closes
+            */
+            storeKeyboardShortcuts();
+
             // set flag so we know when the editor is open in "infinie mode"
             editor.infiniteMode = true;
 
@@ -142,9 +149,9 @@
          * Method to close the latest opened editor
          */
         function close() {
-            var length = editors.length;
-            var closedEditor = editors[length - 1];
+
             // close last opened editor
+            const closedEditor = editors[editors.length - 1];
             editors.splice(-1, 1);
 
             var args = {
@@ -152,7 +159,12 @@
                 editor: closedEditor
             };
 
+            // emit event to let components know an editor has been removed
             eventsService.emit("appState.editors.close", args);
+
+            // rebind keyboard shortcuts for the new editor in focus
+            rebindKeyboardShortcuts();
+            
         }
 
         /**
@@ -650,6 +662,46 @@
             editor.view = "views/common/infiniteeditors/membergrouppicker/membergrouppicker.html";
             editor.size = "small";
             open(editor);
+        }
+
+        ///////////////////////
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#storeKeyboardShortcuts
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Internal method to keep track of keyboard shortcuts registered 
+         * to each editor so they can be rebound when an editor closes
+         * 
+         */
+        function storeKeyboardShortcuts() {
+            const shortcuts = angular.copy(keyboardService.keyboardEvent);
+            editorsKeyboardShorcuts.push(shortcuts);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#rebindKeyboardShortcuts
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Internal method to rebind keyboard shortcuts for the editor in focus
+         * 
+         */
+        function rebindKeyboardShortcuts() {
+            // find the shortcuts from the previous editor
+            const lastSetOfShortcutsIndex = editorsKeyboardShorcuts.length - 1;
+            var lastSetOfShortcuts = editorsKeyboardShorcuts[lastSetOfShortcutsIndex];
+
+            // rebind shortcuts
+            for (let [key, value] of Object.entries(lastSetOfShortcuts)) {
+                keyboardService.bind(key, value.callback, value.opt);
+            }
+
+            // remove the shortcuts from the collection
+            editorsKeyboardShorcuts.splice(lastSetOfShortcutsIndex, 1);
         }
 
         var service = {
