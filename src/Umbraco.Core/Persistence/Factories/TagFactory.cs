@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static ITag BuildEntity(TagDto dto)
         {
-            var entity = new Tag(dto.Id, dto.Group, dto.Text) { NodeCount = dto.NodeCount };
+            var entity = new Tag(dto.Id, dto.Group, dto.Text, dto.LanguageId) { NodeCount = dto.NodeCount };
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
             return entity;
@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Id = entity.Id,
                 Group = entity.Group,
                 Text = entity.Text,
+                LanguageId = entity.LanguageId
                 //Key = entity.Group + "/" + entity.Text // de-normalize
             };
         }

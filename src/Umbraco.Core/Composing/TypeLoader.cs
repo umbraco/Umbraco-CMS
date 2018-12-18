@@ -48,8 +48,19 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="globalSettings"></param>
         /// <param name="logger">A profiling logger.</param>
+        /// <remarks>Used by LightInject.</remarks>
+        public TypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, ProfilingLogger logger)
+            : this(runtimeCache, globalSettings, logger, true)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TypeLoader"/> class.
+        /// </summary>
+        /// <param name="runtimeCache">The application runtime cache.</param>
+        /// <param name="globalSettings"></param>
+        /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, ProfilingLogger logger, bool detectChanges = true)
+        internal TypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, ProfilingLogger logger, bool detectChanges)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
@@ -400,39 +411,6 @@ namespace Umbraco.Core.Composing
 
             return _fileBasePath;
         }
-
-        //private string GetFilePath(string extension)
-        //{
-        //    string path;
-        //    switch (_globalSettings.LocalTempStorageLocation)
-        //    {
-        //        case LocalTempStorage.AspNetTemp:
-        //            path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "umbraco-types." + extension);
-        //            break;
-        //        case LocalTempStorage.EnvironmentTemp:
-        //            // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-        //            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-        //            // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-        //            var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
-        //            var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
-        //            path = Path.Combine(cachePath, "umbraco-types." + extension);
-        //            break;
-        //        case LocalTempStorage.Default:
-        //        default:
-        //            var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
-        //            path =  Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName + "." + extension);
-        //            break;
-        //    }
-
-        //    // ensure that the folder exists
-        //    var directory = Path.GetDirectoryName(path);
-        //    if (directory == null)
-        //        throw new InvalidOperationException($"Could not determine folder for file \"{path}\".");
-        //    if (Directory.Exists(directory) == false)
-        //        Directory.CreateDirectory(directory);
-
-        //    return path;
-        //}
 
         // internal for tests
         internal void WriteCache()

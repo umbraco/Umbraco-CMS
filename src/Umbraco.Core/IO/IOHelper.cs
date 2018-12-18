@@ -284,11 +284,12 @@ namespace Umbraco.Core.IO
 
             binFolder = Path.Combine(GetRootDirectorySafe(), "bin");
 
-#if DEBUG
+            // do this all the time (no #if DEBUG) because Umbraco release
+            // can be used in tests by an app (eg Deploy) being debugged
             var debugFolder = Path.Combine(binFolder, "debug");
             if (Directory.Exists(debugFolder))
                 return debugFolder;
-#endif
+
             var releaseFolder = Path.Combine(binFolder, "release");
             if (Directory.Exists(releaseFolder))
                 return releaseFolder;

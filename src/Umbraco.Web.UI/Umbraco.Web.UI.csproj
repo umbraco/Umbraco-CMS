@@ -231,7 +231,6 @@
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
     <Content Include=".eslintignore" />
-    <Content Include="App_Plugins\UmbracoForms\package.manifest" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
