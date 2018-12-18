@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -88,9 +89,11 @@ namespace Umbraco.Tests.Persistence
             // create the umbraco database
             DatabaseSchemaCreator schemaHelper;
             using (var database = _databaseFactory.CreateDatabase())
+            using (var transaction = database.GetTransaction())
             {
                 schemaHelper = new DatabaseSchemaCreator(database, _logger);
                 schemaHelper.InitializeDatabaseSchema();
+                transaction.Complete();
             }
 
             var umbracoNodeTable = schemaHelper.TableExists("umbracoNode");
