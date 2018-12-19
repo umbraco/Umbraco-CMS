@@ -35,7 +35,10 @@ namespace Umbraco.Web.Routing
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             if (content.Published == false)
+            {
                 yield return UrlInfo.Message(textService.Localize("content/itemNotPublished"));
+                yield break;
+            }   
 
             var urls = new HashSet<UrlInfo>();
 
@@ -65,13 +68,13 @@ namespace Umbraco.Web.Routing
                 // * The entire branch is invariant
                 // * If there are less domain/cultures assigned to the branch than the number of cultures/languages installed
 
-                foreach (var dUrl in urlGroup.DistinctBy(x => x.Text.ToUpperInvariant()))
+                foreach (var dUrl in urlGroup.DistinctBy(x => x.Text.ToUpperInvariant()).OrderBy(x => x.Text).ThenBy(x => x.Culture))
                     yield return dUrl;
             }
 
             // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
             // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
-            foreach (var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id))
+            foreach (var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text).ThenBy(x => x.Culture))
                 if (urls.Add(otherUrl)) //avoid duplicates
                     yield return otherUrl;
         }
