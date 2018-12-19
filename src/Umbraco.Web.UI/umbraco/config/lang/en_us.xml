@@ -2217,8 +2217,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
         <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
-        <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
-        <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+        <key alias="itemCannotBeRestoredHelpText">There is no location where this item can be automatically restored. You can move the item manually using the tree below.</key>
+        <key alias="wasRestored">was restored under</key>
     </area>
     <area alias="notify">
         <key alias="notifySet">Select your notifications for</key>
