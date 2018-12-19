@@ -141,49 +141,34 @@ namespace Umbraco.Web
 
         #endregion
 
-        // fixme - .HasValue() and .Value() refactoring - in progress - see exceptions below
-
-        #region HasValue
+        #region HasValue, Value, Value<T>
 
         /// <summary>
         /// Gets a value indicating whether the content has a value for a property identified by its alias.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to navigate the tree upwards until a property with a value is found.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
-        /// <remarks>Returns true if <c>GetProperty(alias, recurse)</c> is not <c>null</c> and <c>GetProperty(alias, recurse).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedContent content, string alias, bool recurse)
+        /// <remarks>Returns true if HasValue is true, or a fallback strategy can provide a value.</remarks>
+        public static bool HasValue(this IPublishedContent content, string alias, string culture = null, string segment = null, Fallback fallback = default)
         {
-            throw new NotImplementedException("WorkInProgress");
+            var property = content.GetProperty(alias);
 
-            //var prop = content.GetProperty(alias, recurse);
-            //return prop != null && prop.HasValue();
+            // if we have a property, and it has a value, return that value
+            if (property != null && property.HasValue(culture, segment))
+                return true;
+
+            // else let fallback try to get a value
+            // fixme - really?
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _))
+                return true;
+
+            // else... no
+            return false;
         }
-
-        /// <summary>
-        /// Returns one of two strings depending on whether the content has a value for a property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to navigate the tree upwards until a property with a value is found.</param>
-        /// <param name="valueIfTrue">The value to return if the content has a value for the property.</param>
-        /// <param name="valueIfFalse">The value to return if the content has no value for the property.</param>
-        /// <returns>Either <paramref name="valueIfTrue"/> or <paramref name="valueIfFalse"/> depending on whether the content
-        /// has a value for the property identified by the alias.</returns>
-        public static IHtmlString HasValue(this IPublishedContent content, string alias, bool recurse,
-            string valueIfTrue, string valueIfFalse = null)
-        {
-            throw new NotImplementedException("WorkInProgress");
-
-            //return content.HasValue(alias, recurse)
-            //    ? new HtmlString(valueIfTrue)
-            //    : new HtmlString(valueIfFalse ?? string.Empty);
-        }
-
-        #endregion
-
-        #region Value
 
         /// <summary>
         /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
@@ -207,14 +192,13 @@ namespace Umbraco.Web
             if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
                 return value;
 
+            if (property == null)
+                return null;
+
             // else... if we have a property, at least let the converter return its own
-            // vision of 'no value' (could be an empty enumerable) - otherwise, default
-            return property?.GetValue(culture, segment);
+            // vision of 'no value' (could be an empty enumerable)
+            return property.GetValue(culture, segment);
         }
-
-        #endregion
-
-        #region Value<T>
 
         /// <summary>
         /// Gets the value of a content's property identified by its alias, converted to a specified type.
@@ -381,16 +365,6 @@ namespace Umbraco.Web
                 return true;
 
             return recursive && content.IsComposedOf(docTypeAlias);
-        }
-
-        public static bool IsNull(this IPublishedContent content, string alias, bool recurse)
-        {
-            return content.HasValue(alias, recurse) == false;
-        }
-
-        public static bool IsNull(this IPublishedContent content, string alias)
-        {
-            return content.HasValue(alias) == false;
         }
 
         #endregion

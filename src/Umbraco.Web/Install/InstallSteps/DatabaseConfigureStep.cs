@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
@@ -29,7 +28,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 database = new DatabaseModel();
             }
 
-            if (_databaseBuilder.CheckConnection(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
+            if (_databaseBuilder.CanConnect(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
             {
                 throw new InstallException("Could not connect to the database");
             }
@@ -79,8 +78,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 try
                 {
                     //Since a connection string was present we verify the db can connect and query
-                    var result = _databaseBuilder.ValidateDatabaseSchema();
-                    result.DetermineInstalledVersion();
+                    _ = _databaseBuilder.ValidateSchema();
                     return false;
                 }
                 catch (Exception ex)

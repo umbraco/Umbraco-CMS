@@ -33,6 +33,9 @@ namespace Umbraco.Core.Migrations.Install
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseBuilder"/> class.
+        /// </summary>
         public DatabaseBuilder(IScopeProvider scopeProvider, IGlobalSettings globalSettings, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations)
         {
             _scopeProvider = scopeProvider;
@@ -49,23 +52,20 @@ namespace Umbraco.Core.Migrations.Install
 
         /// <summary>
         /// Gets a value indicating whether the database is configured. It does not necessarily
-        /// mean that it is possible to connect, nor that Umbraco is installed, nor
-        /// up-to-date.
+        /// mean that it is possible to connect, nor that Umbraco is installed, nor up-to-date.
         /// </summary>
         public bool IsDatabaseConfigured => _databaseFactory.Configured;
 
         /// <summary>
-        /// Gets a value indicating whether it is possible to connect to the database.
+        /// Gets a value indicating whether it is possible to connect to the configured database.
+        /// It does not necessarily mean that Umbraco is installed, nor up-to-date.
         /// </summary>
-        public bool CanConnect => _databaseFactory.CanConnect;
+        public bool CanConnectToDatabase => _databaseFactory.CanConnect;
 
-        // that method was originally created by Per in DatabaseHelper- tests the db connection for install
-        // fixed by Shannon to not-ignore the provider
-        // fixed by Stephan as part of the v8 persistence cleanup, now using provider names + SqlCe exception
-        // moved by Stephan to DatabaseBuilder
-        // probably needs to be cleaned up
-
-        public bool CheckConnection(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
+        /// <summary>
+        /// Verifies whether a it is possible to connect to a database.
+        /// </summary>
+        public bool CanConnect(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
         {
             // we do not test SqlCE connection
             if (databaseType.InvariantContains("sqlce"))
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Migrations.Install
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
         }
 
-        public bool HasSomeNonDefaultUser()
+        internal bool HasSomeNonDefaultUser()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -417,17 +417,24 @@ namespace Umbraco.Core.Migrations.Install
 
         #region Database Schema
 
-        internal DatabaseSchemaResult ValidateDatabaseSchema()
+        /// <summary>
+        /// Validates the database schema.
+        /// </summary>
+        /// <remarks>
+        /// <para>This assumes that the database exists and the connection string is
+        /// configured and it is possible to connect to the database.</para>
+        /// </remarks>
+        internal DatabaseSchemaResult ValidateSchema()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                var result = ValidateDatabaseSchema(scope);
+                var result = ValidateSchema(scope);
                 scope.Complete();
                 return result;
             }
         }
 
-        private DatabaseSchemaResult ValidateDatabaseSchema(IScope scope)
+        private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
             if (_databaseFactory.Configured == false)
                 return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
@@ -442,17 +449,24 @@ namespace Umbraco.Core.Migrations.Install
             return _databaseSchemaValidationResult;
         }
 
-        internal Result CreateDatabaseSchemaAndData()
+        /// <summary>
+        /// Creates the database schema and inserts initial data.
+        /// </summary>
+        /// <remarks>
+        /// <para>This assumes that the database exists and the connection string is
+        /// configured and it is possible to connect to the database.</para>
+        /// </remarks>
+        public Result CreateSchemaAndData()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                var result = CreateDatabaseSchemaAndData(scope);
+                var result = CreateSchemaAndData(scope);
                 scope.Complete();
                 return result;
             }
         }
 
-        private Result CreateDatabaseSchemaAndData(IScope scope)
+        private Result CreateSchemaAndData(IScope scope)
         {
             try
             {
@@ -468,28 +482,14 @@ namespace Umbraco.Core.Migrations.Install
 
                 // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
                 // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
-
-                /*
-                var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
-                if (supportsCaseInsensitiveQueries  == false)
-                {
-                    message = "<p>&nbsp;</p><p>The database you're trying to use does not support case insensitive queries. <br />We currently do not support these types of databases.</p>" +
-                              "<p>You can fix this by changing the following setting in your my.ini file in your MySQL installation directory:</p>" +
-                              "<pre>lower_case_table_names=1</pre><br />" +
-                              "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                              "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-                              "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
-
-                    return new Result { Message = message, Success = false, Percentage = "15" };
-                }
-                */
-
-                var message = GetResultMessageForMySql();
-                var schemaResult = ValidateDatabaseSchema();
-                var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
+                var message = database.DatabaseType.IsMySql() ? ResultMessageForMySql : "";
+                var schemaResult = ValidateSchema();
+                var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
+                //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
+                //var hasInstalledVersion = !installedSchemaVersion.Equals(new Version(0, 0, 0));
 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
+                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && !hasInstalledVersion)
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
@@ -521,8 +521,15 @@ namespace Umbraco.Core.Migrations.Install
             }
         }
 
-        // This assumes all of the previous checks are done!
-        internal Result UpgradeSchemaAndData()
+        /// <summary>
+        /// Upgrades the database schema and data by running migrations.
+        /// </summary>
+        /// <remarks>
+        /// <para>This assumes that the database exists and the connection string is
+        /// configured and it is possible to connect to the database.</para>
+        /// <para>Runs whichever migrations need to run.</para>
+        /// </remarks>
+        public Result UpgradeSchemaAndData()
         {
             try
             {
@@ -534,7 +541,7 @@ namespace Umbraco.Core.Migrations.Install
 
                 _logger.Info<DatabaseBuilder>("Database upgrade started");
 
-                var message = GetResultMessageForMySql();
+                var message = _scopeProvider.SqlContext.DatabaseType.IsMySql() ? ResultMessageForMySql : "";
 
                 // upgrade
                 var upgrader = new UmbracoUpgrader();
@@ -554,47 +561,14 @@ namespace Umbraco.Core.Migrations.Install
             }
         }
 
-        private string GetResultMessageForMySql()
-        {
-            if (_databaseFactory.GetType() == typeof(MySqlSyntaxProvider))
-            {
-                return "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
-                       "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
-                       "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
-                       "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                       "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
-                       "<pre>lower_case_table_names=1</pre><br />" +
-                       "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-                       "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
-            }
-            return string.Empty;
-        }
-
-        /*
-        private string GetResultMessageForMySql(bool? supportsCaseInsensitiveQueries)
-        {
-            if (supportsCaseInsensitiveQueries == null)
-            {
-                return "<p>&nbsp;</p><p>Warning! Could not check if your database type supports case insensitive queries. <br />We currently do not support these databases that do not support case insensitive queries.</p>" +
-                          "<p>You can check this by looking for the following setting in your my.ini file in your MySQL installation directory:</p>" +
-                          "<pre>lower_case_table_names=1</pre><br />" +
-                          "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                          "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-                          "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
-            }
-            if (SqlSyntax.GetType() == typeof(MySqlSyntaxProvider))
-            {
-                return "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
-                       "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
-                       "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
-                       "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                       "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
-                       "<pre>lower_case_table_names=1</pre><br />" +
-                       "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-                       "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
-            }
-            return string.Empty;
-        }*/
+        private const string ResultMessageForMySql = "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
+             "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
+             "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
+             "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+             "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
+             "<pre>lower_case_table_names=1</pre><br />" +
+             "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+             "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
 
         private Attempt<Result> CheckReadyForInstall()
         {
@@ -630,11 +604,29 @@ namespace Umbraco.Core.Migrations.Install
             };
         }
 
-        internal class Result
+        /// <summary>
+        /// Represents the result of a database creation or upgrade.
+        /// </summary>
+        public class Result
         {
+            /// <summary>
+            /// Gets or sets a value indicating whether an upgrade is required.
+            /// </summary>
             public bool RequiresUpgrade { get; set; }
+
+            /// <summary>
+            /// Gets or sets the message returned by the operation.
+            /// </summary>
             public string Message { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the operation succeeded.
+            /// </summary>
             public bool Success { get; set; }
+
+            /// <summary>
+            /// Gets or sets an install progress pseudo-percentage.
+            /// </summary>
             public string Percentage { get; set; }
         }
 
