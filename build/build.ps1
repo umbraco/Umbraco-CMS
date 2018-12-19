@@ -111,16 +111,8 @@
     &npm install >> $log 2>&1
     Write-Output ">> $? $($error.Count)" >> $log 2>&1
 
-    Write-Output "### install gulp" >> $log 2>&1
-    &npm install -g gulp >> $log 2>&1
-    $error.Clear() # that one fails 'cos deprecated stuff - ignore
-
-    Write-Output "### install gulp-cli" >> $log 2>&1
-    &npm install -g gulp-cli --quiet >> $log 2>&1
-    $error.Clear() # that one fails 'cos some files not being removed - ignore
-
     Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
-    &gulp build --buildversion=$this.Version.Release >> $log 2>&1
+    &npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
     if (-not $?) { throw "Failed to build" } # that one is expected to work
 
     Pop-Location
