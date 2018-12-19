@@ -7,28 +7,47 @@
  * The controller for the content editor
  */
 function ContentBlueprintEditController($scope, $routeParams, contentResource) {
-  var excludedProps = ["_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"];
+    function getScaffold() {
+        return contentResource.getScaffold(-1, $routeParams.doctype)
+            .then(function (scaffold) {
+                return initialize(scaffold);
+            });
+    }
 
-  function getScaffold() {
-    return contentResource.getScaffold(-1, $routeParams.doctype)
-      .then(function (scaffold) {
-        var lastTab = scaffold.tabs[scaffold.tabs.length - 1];
-        lastTab.properties = _.filter(lastTab.properties,
-          function(p) {
-            return excludedProps.indexOf(p.alias) === -1;
-          });
-        scaffold.allowPreview = false;
-        scaffold.allowedActions = ["A", "S", "C"];
+    function getBlueprintById(id) {
+        return contentResource.getBlueprintById(id).then(function (blueprint) {
+            return initialize(blueprint);
+        });
+    }
 
-        return scaffold;
-      });
-  }
+    function initialize(content) {
+        if (content.apps && content.apps.length) {
+            var contentApp = _.find(content.apps, function (app) {
+                return app.alias === "umbContent";
+            });
+            content.apps = [contentApp];
+        }
+        content.allowPreview = false;
+        content.allowedActions = ["A", "S", "C"];
+        return content;
+    }
 
-  $scope.contentId = $routeParams.id;
-  $scope.isNew = $routeParams.id === "-1";
-  $scope.saveMethod = contentResource.saveBlueprint;
-  $scope.getMethod = contentResource.getBlueprintById;
-  $scope.getScaffoldMethod = getScaffold;
+    $scope.contentId = $routeParams.id;
+    $scope.isNew = $routeParams.id === "-1";
+    $scope.saveMethod = contentResource.saveBlueprint;
+    $scope.getMethod = getBlueprintById;
+    $scope.getScaffoldMethod = getScaffold;
+
+    //load the default culture selected in the main tree if any
+    $scope.culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
+
+    //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
+    //This is so we can listen to changes on the cculture parameter since that will not cause a route change
+    // and then we can pass in the updated culture to the editor
+    $scope.$on('$routeUpdate', function (event, next) {
+        $scope.culture = next.params.cculture ? next.params.cculture : $routeParams.mculture;
+    });
+
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.ContentBlueprint.EditController", ContentBlueprintEditController);
