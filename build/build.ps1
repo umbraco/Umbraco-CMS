@@ -92,36 +92,38 @@
     # so we have to take care of it else they'll bubble and kill the build
     if ($error.Count -gt 0) { return }
 
-    Push-Location "$($this.SolutionRoot)\src\Umbraco.Web.UI.Client"
-    Write-Output "" > $log
+    try {
+        Push-Location "$($this.SolutionRoot)\src\Umbraco.Web.UI.Client"
+        Write-Output "" > $log
 
-    Write-Output "### node version is:" > $log
-    &node -v >> $log 2>&1
-    if (-not $?) { throw "Failed to report node version." }
+        Write-Output "### node version is:" > $log
+        &node -v >> $log 2>&1
+        if (-not $?) { throw "Failed to report node version." }
 
-    Write-Output "### npm version is:" >> $log 2>&1
-    &npm -v >> $log 2>&1
-    if (-not $?) { throw "Failed to report npm version." }
+        Write-Output "### npm version is:" >> $log 2>&1
+        &npm -v >> $log 2>&1
+        if (-not $?) { throw "Failed to report npm version." }
 
-    Write-Output "### clean npm cache" >> $log 2>&1
-    &npm cache clean --force >> $log 2>&1
-    $error.Clear() # that one can fail 'cos security bug - ignore
+        Write-Output "### clean npm cache" >> $log 2>&1
+        &npm cache clean --force >> $log 2>&1
+        $error.Clear() # that one can fail 'cos security bug - ignore
 
-    Write-Output "### npm install" >> $log 2>&1
-    &npm install >> $log 2>&1
-    Write-Output ">> $? $($error.Count)" >> $log 2>&1
+        Write-Output "### npm install" >> $log 2>&1
+        &npm install >> $log 2>&1
+        Write-Output ">> $? $($error.Count)" >> $log 2>&1
 
-    Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
-    &npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
-    if (-not $?) { throw "Failed to build" } # that one is expected to work
+        Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
+        &npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
+        if (-not $?) { throw "Failed to build" } # that one is expected to work
+    } finally {
+        Pop-Location
 
-    Pop-Location
+        # fixme - should we filter the log to find errors?
+        #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
 
-    # fixme - should we filter the log to find errors?
-    #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
-
-    # restore
-    $this.RestoreNode()
+        # restore
+        $this.RestoreNode()
+    }
 
     # setting node_modules folder to hidden
     # used to prevent VS13 from crashing on it while loading the websites project
