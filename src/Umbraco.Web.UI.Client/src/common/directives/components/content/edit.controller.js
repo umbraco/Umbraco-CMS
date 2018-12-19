@@ -24,16 +24,19 @@
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = infiniteMode ? true : false;
         $scope.allowOpen = true;
+        $scope.app = null;
 
         function init(content) {
-
-            // set first app to active
-            content.apps[0].active = true;
+            if (!$scope.app) {
+                // set first app to active
+                content.apps[0].active = true;
+                $scope.app = content.apps[0];
+            }
 
             if (infiniteMode) {
                 createInfiniteModeButtons(content);
             } else {
-                createButtons(content, content.apps[0]);
+                createButtons(content);
             }
 
             editorState.set($scope.content);
@@ -146,11 +149,11 @@
          * @param {any} content the content node
          * @param {any} app the active content app
          */
-        function createButtons(content, app) {
+        function createButtons(content) {
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if (app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -899,7 +902,8 @@
          * @param {any} app
          */
         $scope.appChanged = function (app) {
-            createButtons($scope.content, app);
+            $scope.app = app;
+            createButtons($scope.content);
         };
 
         // methods for infinite editing
