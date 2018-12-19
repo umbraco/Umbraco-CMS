@@ -19,12 +19,7 @@
                     : [model.selectedMemberGroup],
                     function(id) { return parseInt(id) }
                 );
-                // TODO: replace with memberGroupResource.getByIds(selectedGroupIds) if it's merged in (see #3845) - or rewrite it for this
-                memberGroupResource.getGroups().then(function (selectedGroups) {
-                    // TODO: this filter can be removed once we have memberGroupResource.getByIds(selectedGroupIds)
-                    selectedGroups = _.filter(selectedGroups, function(group) {
-                        return selectedGroupIds.indexOf(group.id) >= 0;
-                    });
+                memberGroupResource.getByIds(selectedGroupIds).then(function (selectedGroups) {
                     _.each(selectedGroups, function(group) {
                         $scope.model.value[group.name] = true;
                     });
