@@ -5,29 +5,29 @@
  * @description
  * Added in Umbraco 8.0. Application-wide service for handling infinite editing.
  * 
+ *
  * 
+ * 
+<h2><strong>Open a build-in infinite editor (media picker)</strong></h2>
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="My.Controller as vm">
-
-        <button type="button" ng-click="vm.open()">Open</button>
-
+    <div ng-controller="My.MediaPickerController as vm">
+        <button type="button" ng-click="vm.openMediaPicker()">Open</button>
     </div>
 </pre>
 
 <h3>Controller example</h3>
 <pre>
     (function () {
-
         "use strict";
 
-        function Controller() {
+        function MediaPickerController(editorService) {
 
             var vm = this;
 
-            vm.open = open;
+            vm.openMediaPicker = openMediaPicker;
 
-            function open() {
+            function openMediaPicker() {
                 var mediaPickerOptions = {
                     multiPicker: true,
                     submit: function(model) {
@@ -36,22 +36,29 @@
                     close: function() {
                         editorService.close();
                     }
-                }
+                };
                 editorService.mediaPicker(mediaPickerOptions);
             };
         }
 
-        angular.module("umbraco").controller("My.Controller", Controller);
+        angular.module("umbraco").controller("My.MediaPickerController", MediaPickerController);
     })();
 </pre>
 
-<h3>Custom view example</h3>
+<h2><strong>Building a custom infinite editor</strong></h2>
+<h3>Open the custom infinite editor (Markup)</h3>
+<pre>
+    <div ng-controller="My.Controller as vm">
+        <button type="button" ng-click="vm.open()">Open</button>
+    </div>
+</pre>
+
+<h3>Open the custom infinite editor (Controller)</h3>
 <pre>
     (function () {
-
         "use strict";
 
-        function Controller() {
+        function Controller(editorService) {
 
             var vm = this;
 
@@ -59,14 +66,15 @@
 
             function open() {
                 var options = {
-                    view: "path/to/view.html"
+                    title: "My custom infinite editor",
+                    view: "path/to/view.html",
                     submit: function(model) {
                         editorService.close();
                     },
                     close: function() {
                         editorService.close();
                     }
-                }
+                };
                 editorService.open(options);
             };
         }
@@ -74,7 +82,83 @@
         angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
+
+<h3><strong>The custom infinite editor view</strong></h3>
+When building a custom infinite editor view you can use the same components as a normal editor ({@link umbraco.directives.directive:umbEditorView umbEditorView}).
+<pre>
+    <div ng-controller="My.InfiniteEditorController as vm">
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+        
+            <umb-editor-container>
+                <umb-box>
+                    <umb-box-content>
+                        {{model | json}}
+                    </umb-box-content>
+                </umb-box>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        action="vm.close()">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label-key="general_submit"
+                        action="vm.submit(model)">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </div>
+</pre>
+
+<h3>The custom infinite editor controller</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function InfiniteEditorController($scope) {
+
+            var vm = this;
+
+            vm.submit = submit;
+            vm.close = close;
+
+            function submit() {
+                if($scope.model.submit) {
+                    $scope.model.submit($scope.model);
+                }
+            }
+
+            function close() {
+                if($scope.model.close) {
+                    $scope.model.close();
+                }
+            }
+
+        }
+
+        angular.module("umbraco").controller("My.InfiniteEditorController", InfiniteEditorController);
+    })();
+</pre>
  */
+
 (function () {
     "use strict";
 
