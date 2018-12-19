@@ -18,26 +18,26 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
-        private IEnumerable<OperathorTerm> Terms
+        private IEnumerable<OperatorTerm> Terms
         {
             get
             {
-                return new List<OperathorTerm>()
+                return new List<OperatorTerm>()
                 {
-                    new OperathorTerm(Services.TextService.Localize("template/is"), Operathor.Equals, new [] {"string"}),
-                    new OperathorTerm(Services.TextService.Localize("template/isNot"), Operathor.NotEquals, new [] {"string"}),
-                    new OperathorTerm(Services.TextService.Localize("template/before"), Operathor.LessThan, new [] {"datetime"}),
-                    new OperathorTerm(Services.TextService.Localize("template/beforeIncDate"), Operathor.LessThanEqualTo, new [] {"datetime"}),
-                    new OperathorTerm(Services.TextService.Localize("template/after"), Operathor.GreaterThan, new [] {"datetime"}),
-                    new OperathorTerm(Services.TextService.Localize("template/afterIncDate"), Operathor.GreaterThanEqualTo, new [] {"datetime"}),
-                    new OperathorTerm(Services.TextService.Localize("template/equals"), Operathor.Equals, new [] {"int"}),
-                    new OperathorTerm(Services.TextService.Localize("template/doesNotEqual"), Operathor.NotEquals, new [] {"int"}),
-                    new OperathorTerm(Services.TextService.Localize("template/contains"), Operathor.Contains, new [] {"string"}),
-                    new OperathorTerm(Services.TextService.Localize("template/doesNotContain"), Operathor.NotContains, new [] {"string"}),
-                    new OperathorTerm(Services.TextService.Localize("template/greaterThan"), Operathor.GreaterThan, new [] {"int"}),
-                    new OperathorTerm(Services.TextService.Localize("template/greaterThanEqual"), Operathor.GreaterThanEqualTo, new [] {"int"}),
-                    new OperathorTerm(Services.TextService.Localize("template/lessThan"), Operathor.LessThan, new [] {"int"}),
-                    new OperathorTerm(Services.TextService.Localize("template/lessThanEqual"), Operathor.LessThanEqualTo, new [] {"int"})
+                    new OperatorTerm(Services.TextService.Localize("template/is"), Operator.Equals, new [] {"string"}),
+                    new OperatorTerm(Services.TextService.Localize("template/isNot"), Operator.NotEquals, new [] {"string"}),
+                    new OperatorTerm(Services.TextService.Localize("template/before"), Operator.LessThan, new [] {"datetime"}),
+                    new OperatorTerm(Services.TextService.Localize("template/beforeIncDate"), Operator.LessThanEqualTo, new [] {"datetime"}),
+                    new OperatorTerm(Services.TextService.Localize("template/after"), Operator.GreaterThan, new [] {"datetime"}),
+                    new OperatorTerm(Services.TextService.Localize("template/afterIncDate"), Operator.GreaterThanEqualTo, new [] {"datetime"}),
+                    new OperatorTerm(Services.TextService.Localize("template/equals"), Operator.Equals, new [] {"int"}),
+                    new OperatorTerm(Services.TextService.Localize("template/doesNotEqual"), Operator.NotEquals, new [] {"int"}),
+                    new OperatorTerm(Services.TextService.Localize("template/contains"), Operator.Contains, new [] {"string"}),
+                    new OperatorTerm(Services.TextService.Localize("template/doesNotContain"), Operator.NotContains, new [] {"string"}),
+                    new OperatorTerm(Services.TextService.Localize("template/greaterThan"), Operator.GreaterThan, new [] {"int"}),
+                    new OperatorTerm(Services.TextService.Localize("template/greaterThanEqual"), Operator.GreaterThanEqualTo, new [] {"int"}),
+                    new OperatorTerm(Services.TextService.Localize("template/lessThan"), Operator.LessThan, new [] {"int"}),
+                    new OperatorTerm(Services.TextService.Localize("template/lessThanEqual"), Operator.LessThanEqualTo, new [] {"int"})
                 };
             }
         }

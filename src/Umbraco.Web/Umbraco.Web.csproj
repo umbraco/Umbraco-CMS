@@ -685,8 +685,8 @@
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />
     <Compile Include="Models\TemplateQuery\TemplateQueryResult.cs" />
     <Compile Include="Models\TemplateQuery\SortExpression.cs" />
-    <Compile Include="Models\TemplateQuery\Operathor.cs" />
-    <Compile Include="Models\TemplateQuery\OperathorTerm.cs" />
+    <Compile Include="Models\TemplateQuery\Operator.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorTerm.cs" />
     <Compile Include="Models\TemplateQuery\QueryCondition.cs" />
     <Compile Include="Models\TemplateQuery\QueryModel.cs" />
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
