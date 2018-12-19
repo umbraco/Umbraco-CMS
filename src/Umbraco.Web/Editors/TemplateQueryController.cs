@@ -67,6 +67,7 @@ namespace Umbraco.Web.Editors
 
             sb.Append("Model.Root()");
 
+            //fixme: This timer thing is not correct, it's definitely not timing the resulting query, the timer really isn't important and might as well be removed
             var timer = new Stopwatch();
 
             timer.Start();
