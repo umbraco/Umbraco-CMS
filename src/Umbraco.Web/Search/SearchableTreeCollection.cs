@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
@@ -22,11 +24,11 @@ namespace Umbraco.Web.Search
             var appTrees = treeService.GetAll()
                 .OrderBy(x => x.SortOrder)
                 .ToArray();
-            var dictionary = new Dictionary<string, SearchableApplicationTree>();
+            var dictionary = new Dictionary<string, SearchableApplicationTree>(StringComparer.OrdinalIgnoreCase);
             var searchableTrees = this.ToArray();
             foreach (var appTree in appTrees)
             {
-                var found = searchableTrees.FirstOrDefault(x => x.TreeAlias == appTree.Alias);
+                var found = searchableTrees.FirstOrDefault(x => x.TreeAlias.InvariantEquals(appTree.Alias));
                 if (found != null)
                 {
                     dictionary[found.TreeAlias] = new SearchableApplicationTree(appTree.ApplicationAlias, appTree.Alias, found);
