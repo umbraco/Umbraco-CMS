@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Trees
 {
-    public interface ISearchableTree
+    public interface ISearchableTree : IDiscoverable
     {
         /// <summary>
         /// The alias of the tree that the <see cref="ISearchableTree"/> belongs to

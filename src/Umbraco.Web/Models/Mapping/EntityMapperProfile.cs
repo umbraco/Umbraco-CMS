@@ -122,6 +122,8 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                   .AfterMap((src, dest) =>
                       {
+                          //TODO: Properly map this (not aftermap)
+
                           //get the icon if there is one
                           dest.Icon = src.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
                               ? src.Values[UmbracoExamineIndex.IconFieldName]

@@ -73,7 +73,7 @@ namespace Umbraco.Web.Editors
             if (!msg.IsSuccessStatusCode)
                 throw new HttpResponseException(msg);
 
-            var results = TryParseLuceneQuery(query)
+            var results = Examine.ExamineExtensions.TryParseLuceneQuery(query)
                 ? searcher.Search(searcher.CreateCriteria().RawQuery(query), maxResults: pageSize * (pageIndex + 1))
                 : searcher.Search(query, true, maxResults: pageSize * (pageIndex + 1));
 
@@ -92,28 +92,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
-        private bool TryParseLuceneQuery(string query)
-        {
-            //TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll
-            // also do this rudimentary check
-            if (!query.Contains(":"))
-                return false;
-
-            try
-            {
-                //This will pass with a plain old string without any fields, need to figure out a way to have it properly parse
-                var parsed = new QueryParser(Version.LUCENE_30, "nodeName", new KeywordAnalyzer()).Parse(query);
-                return true;
-            }
-            catch (ParseException)
-            {
-                return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+       
 
         /// <summary>
         /// Check if the index has been rebuilt
