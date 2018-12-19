@@ -25,25 +25,6 @@
                     // shown so we don't animate a lot of editors which aren't necessary
                     var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ allowedNumberOfVisibleEditors +')');
 
-                    // this is a temporary fix because the animations doesn't perform well
-                    // TODO: fix animation and remove this
-                    moveEditors.forEach(function(editor, index){
-
-                        // resize the small editors to 100% so we can easily slide them
-                        if(editor.classList.contains("umb-editor--small")) {
-                            editor.style.width = "100%";
-                        }
-
-                        // set left position to indent the editors
-                        if(scope.editors.length >= allowedNumberOfVisibleEditors) {
-                            $(editor).css({"left": index * editorIndent});
-                        } else {
-                            $(editor).css({"left": (index + 1) * editorIndent});
-                        }
-
-                    });
-
-                    /*
                     // collapse open editors before opening the new one
                     var collapseEditorAnimation = anime({
                         targets: moveEditors,
@@ -61,9 +42,8 @@
                             return (index + 1) * editorIndent;
                         },
                         easing: 'easeInOutQuint',
-                        duration: 500
+                        duration: 300
                     });
-                    */
 
                     // push the new editor to the dom
                     scope.editors.push(editor);
@@ -95,7 +75,7 @@
                         translateX: [100 + '%', 0],
                         opacity: [0, 1],
                         easing: 'easeInOutQuint',
-                        duration: 400,
+                        duration: 300,
                         complete: function() {
                             $timeout(function(){
                                 editor.animating = false;
@@ -126,10 +106,11 @@
                             $timeout(function(){
                                 scope.editors.splice(-1,1);
                                 removeOverlayFromPrevEditor();
-                                expandEditors();
                             });
                         }
                     });
+
+                    expandEditors();
 
                 });
 
@@ -142,42 +123,32 @@
                     var editorsElement = el[0];
                     // only select the editors which are allowed to be 
                     // shown so we don't animate a lot of editors which aren't necessary
-                    var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ 4 +')');
+                    // as the last element hasn't been removed from the dom yet we have to select the last four and then skip the last child (as it is the one closing).
+                    var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ allowedNumberOfVisibleEditors + 1 +'):not(:last-child)');
+                    var editorWidth = editorsElement.offsetWidth;
 
-                    // this is a temporary fix because the animations doesn't perform well
-                    // TODO: fix animation and remove this
-                    moveEditors.forEach(function(editor, index){
-                        // set left position
-                        $(editor).css({"left": (index + 1) * editorIndent});
-
-                        // if the new top editor is a small editor we will have to resize it back to the right size on 
-                        // move it all the way to the right side
-                        if(editor.classList.contains("umb-editor--small") && index + 1 === moveEditors.length) {
-                            editor.style.width = "500px";
-                            $(editor).css({"left": ""});
-                        }
-                    });
-
-                    // We need to figure out how to performance optimize this
-                    // TODO: optimize animation
-                    /*
                     var expandEditorAnimation = anime({
                         targets: moveEditors,
                         left: function(el, index, length){
-                            return (index + 1) * editorIndent;
+                            // move the editor all the way to the right if the top one is a small
+                            if(el.classList.contains("umb-editor--small")) {
+                                // only change the size if it is the editor on top
+                                if(index + 1 === length) {
+                                    return editorWidth - 500;
+                                }
+                            } else {
+                                return (index + 1) * editorIndent;
+                            }
                         },
                         width: function(el, index, length) {
-                            if(el.classList.contains("umb-editor--small")) {
+                            // set the correct size if the top editor is of type "small"
+                            if(el.classList.contains("umb-editor--small") && index + 1 === length) {
                                 return "500px";
                             }
                         },
                         easing: 'easeInOutQuint',
-                        duration: 500,
-                        completed: function() {
-
-                        }
+                        duration: 300
                     });
-                    */
     
                 });
 

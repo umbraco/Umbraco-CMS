@@ -176,7 +176,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override int Level => _level;
 
-        public override bool IsDraft => false;
+        public override bool IsDraft(string culture = null) => false;
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 

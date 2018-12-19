@@ -525,9 +525,6 @@
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
-    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
@@ -685,8 +682,8 @@
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />
     <Compile Include="Models\TemplateQuery\TemplateQueryResult.cs" />
     <Compile Include="Models\TemplateQuery\SortExpression.cs" />
-    <Compile Include="Models\TemplateQuery\Operathor.cs" />
-    <Compile Include="Models\TemplateQuery\OperathorTerm.cs" />
+    <Compile Include="Models\TemplateQuery\Operator.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorTerm.cs" />
     <Compile Include="Models\TemplateQuery\QueryCondition.cs" />
     <Compile Include="Models\TemplateQuery\QueryModel.cs" />
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
@@ -1164,9 +1161,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">
