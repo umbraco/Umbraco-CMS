@@ -43,7 +43,7 @@
     "@babel/preset-env": "7.1.6",
     "autoprefixer": "9.3.1",
     "cssnano": "4.1.7",
-    "gulp": "^4.0.0",
+    "gulp": "^3.9.1",
     "gulp-babel": "8.0.0",
     "gulp-clean-css": "4.0.0",
     "gulp-cli": "^2.0.1",
