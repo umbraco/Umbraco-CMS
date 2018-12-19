@@ -53,7 +53,8 @@
                     "prompt_unsavedChanges",
                     "prompt_doctypeChangeWarning",
                     "general_history",
-                    "auditTrails_historyIncludingVariants"
+                    "auditTrails_historyIncludingVariants",
+                    "content_itemNotPublished"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -65,10 +66,22 @@
                         labels.notCreated = data[4];
                         labels.unsavedChanges = data[5];
                         labels.doctypeChangeWarning = data[6];
+                        labels.notPublished = data[9];
                         
                         scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
                 
                         setNodePublishStatus();
+
+                        if (scope.currentUrls.length === 0) {
+                            if (scope.node.id > 0) {
+                                //it's created but not published
+                                scope.currentUrls.push({ text: labels.notPublished, isUrl: false });
+                            }
+                            else {
+                                //it's new
+                                scope.currentUrls.push({ text: labels.notCreated, isUrl: false })
+                            }
+                        }
 
                     });
 

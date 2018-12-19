@@ -8,13 +8,19 @@
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in currentUrls">
                         <span ng-if="url.isUrl">
+
+                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <a href="{{url.text}}" target="_blank">
                                 <i class="icon icon-window-popin"></i>
                                 <span>{{url.text}}</span>
                             </a>
+
                         </span>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
-                            <span>{{url.text}}</span>
+
+                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
+                            <em>{{url.text}}</em>
+
                         </div>
                     </li>
                 </ul>
