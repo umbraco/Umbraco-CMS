@@ -4,6 +4,11 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
+    // fixme
+    // this is not authenticated, and therefore public, and therefore reveals we
+    // are running Umbraco - but, all requests should come from localhost really,
+    // so there should be a way to 404 when the request comes from the outside.
+
     public class KeepAliveController : UmbracoApiController
     {
         [HttpGet]
@@ -14,7 +19,7 @@ namespace Umbraco.Web.Editors
                 Success = true,
                 Message = "I'm alive!"
             };
-        }   
+        }
     }
 
     public class KeepAlivePingResult

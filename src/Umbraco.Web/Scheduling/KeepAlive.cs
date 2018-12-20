@@ -59,7 +59,7 @@ namespace Umbraco.Web.Scheduling
                         return true; // repeat
                     }
 
-                    var url = umbracoAppUrl + "api/keepalive/ping";
+                    var url = umbracoAppUrl.TrimEnd('/') + "/api/keepalive/ping";
 
                     var request = new HttpRequestMessage(HttpMethod.Get, url);
                     var result = await _httpClient.SendAsync(request, token);
