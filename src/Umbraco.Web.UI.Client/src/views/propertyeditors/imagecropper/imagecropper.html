@@ -45,25 +45,48 @@
                 <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
             </div>
 
-            <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
-                <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias, 'has-custom-crop':!!value.coordinates}" ng-click="crop(value)">
+            <div ng-if="isCroppable" class="cropList-container">
+                <div ng-if="hasAutomaticCrops()">
+                    <h5><localize key="imagecropper_automaticCropList">Automatic crops</localize></h5>
+                    <ul class="umb-sortable-thumbnails cropList clearfix">
+                        <li ng-repeat=" (key,value) in getAutomaticCrops()" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 
-                    <umb-image-thumbnail center="model.value.focalPoint"
-                                         crop="value.coordinates"
-                                         src="imageSrc"
-                                         height="{{value.height}}"
-                                         width="{{value.width}}"
-                                         max-size="75">
-                     </umb-image-thumbnail>
+                            <umb-image-thumbnail center="model.value.focalPoint"
+                                                 crop="value.coordinates"
+                                                 src="imageSrc"
+                                                 height="{{value.height}}"
+                                                 width="{{value.width}}"
+                                                 max-size="75">
+                            </umb-image-thumbnail>
 
-                    <div class="crop-information">
-                        <span class="crop-name crop-text">{{value.alias}}</span>
-                        <span class="crop-size crop-text">{{value.width}}px x {{value.height}}px</span>
-                    </div>
-                </li>
-            </ul>
+                            <div class="crop-information">
+                                <span class="crop-name crop-text">{{value.alias}}</span>
+                                <span class="crop-size crop-text">{{value.width}}px x {{value.height}}px</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div ng-if="hasCustomCrops()">
+                    <h5><localize key="imagecropper_customCropList">User defined crops</localize></h5>
+                    <ul class="umb-sortable-thumbnails cropList clearfix">
+                        <li ng-repeat=" (key,value) in getCustomCrops()" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 
+                            <umb-image-thumbnail center="model.value.focalPoint"
+                                                 crop="value.coordinates"
+                                                 src="imageSrc"
+                                                 height="{{value.height}}"
+                                                 width="{{value.width}}"
+                                                 max-size="75">
+                            </umb-image-thumbnail>
 
+                            <div class="crop-information">
+                                <span class="crop-name crop-text">{{value.alias}}</span>
+                                <span class="crop-size crop-text">{{value.width}}px x {{value.height}}px</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
     </div>

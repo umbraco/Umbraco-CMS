@@ -98,6 +98,40 @@ angular.module('umbraco')
             $scope.hasDimensions = hasDimensions;
         };
 
+        $scope.hasAutomaticCrops = function() {
+            return $scope.isCroppable && _.find($scope.model.value.crops, function(crop) {
+                return !isCustomCrop(crop);
+            }) != null;
+        }
+
+        $scope.getAutomaticCrops = function () {
+            if (!$scope.isCroppable) {
+                return null;
+            }
+            return _.filter($scope.model.value.crops, function(crop) {
+                return !isCustomCrop(crop);
+            });
+        }
+
+        $scope.hasCustomCrops = function () {
+            return $scope.isCroppable && _.find($scope.model.value.crops, function (crop) {
+                return isCustomCrop(crop);
+            }) != null;
+        }
+
+        $scope.getCustomCrops = function () {
+            if (!$scope.isCroppable) {
+                return null;
+            }
+            return _.filter($scope.model.value.crops, function (crop) {
+                return isCustomCrop(crop);
+            });
+        }
+
+        function isCustomCrop(crop) {
+            return !!crop.coordinates;
+        }
+
         //on image selected, update the cropper
         $scope.$on("filesSelected", function (ev, args) {
             $scope.model.value = config;
