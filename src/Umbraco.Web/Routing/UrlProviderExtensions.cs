@@ -5,7 +5,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using LightInject;
 
 namespace Umbraco.Web.Routing
 {
@@ -38,24 +37,25 @@ namespace Umbraco.Web.Routing
             {
                 yield return UrlInfo.Message(textService.Localize("content/itemNotPublished"));
                 yield break;
-            }   
-
-            var urls = new HashSet<UrlInfo>();
+            }
 
             // build a list of urls, for the back-office
             // which will contain
             // - the 'main' urls, which is what .Url would return, for each culture
             // - the 'other' urls we know (based upon domains, etc)
             //
-            // need to work through each installed culture.
-            // fixme: Why not just work with each culture assigned to domains in the branch?
-            // on invariant nodes, each culture returns the same url segment
-            // but, we don't know if the branch to this content is invariant so we need to ask
+            // need to work through each installed culture:
+            // on invariant nodes, each culture returns the same url segment but,
+            // we don't know if the branch to this content is invariant, so we need to ask
             // for URLs for all cultures.
+            // and, not only for those assigned to domains in the branch, because we want
+            // to show what GetUrl() would return, for every culture.
 
+            var urls = new HashSet<UrlInfo>();
             var cultures = localizationService.GetAllLanguages().Select(x => x.IsoCode).ToList();
 
             //get all URLs for all cultures
+            //in a HashSet, so de-duplicates too
             foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, logger))
             {
                 urls.Add(cultureUrl);
