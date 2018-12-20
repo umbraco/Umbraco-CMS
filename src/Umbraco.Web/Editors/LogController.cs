@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
-            var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
+            var mapped = result.Select(item => Mapper.Map<AuditLog>(item)); //   Mapper.Map<IEnumerable<AuditLog>>(result);            
             
             var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
