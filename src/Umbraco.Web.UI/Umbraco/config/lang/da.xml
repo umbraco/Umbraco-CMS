@@ -15,7 +15,7 @@
     <key alias="createGroup">Opret gruppe</key>
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
-    <key alias="emptyTrashcan">Tøm papirkurv</key>
+    <key alias="emptyRecycleBin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="importDocumentType">Importér dokumenttype</key>
@@ -333,7 +333,6 @@
     <key alias="closeThisWindow">Luk denne dialog</key>
     <key alias="confirmdelete">Er du sikker på at du vil slette</key>
     <key alias="confirmdisable">Er du sikker på du vil deaktivere</key>
-    <key alias="confirmEmptyTrashcan">Afkryds venligst denne boks for at bekræfte sletningen af %0% enhed(er)</key>
     <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>

@@ -14,7 +14,7 @@
     <key alias="createPackage">Paket erstellen</key>
     <key alias="delete">Löschen</key>
     <key alias="disable">Deaktivieren</key>
-    <key alias="emptyTrashcan">Papierkorb leeren</key>
+    <key alias="emptyRecycleBin">Papierkorb leeren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
     <key alias="importDocumentType">Dokumenttyp importieren</key>
     <key alias="importPackage">Paket importieren</key>
@@ -222,7 +222,6 @@
     <key alias="closeThisWindow">Fenster schließen</key>
     <key alias="confirmdelete">Sind Sie sicher?</key>
     <key alias="confirmdisable">Deaktivieren bestätigen</key>
-    <key alias="confirmEmptyTrashcan">Löschen von %0% Element(en) bestätigen</key>
     <key alias="confirmlogout">Sind Sie sicher?</key>
     <key alias="confirmSure">Sind Sie sicher?</key>
     <key alias="cut">Ausschneiden</key>
@@ -881,7 +880,7 @@ das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
 
 Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/translation/details.aspx?id=%4%.
 
-Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/Umbraco.aspx
+Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/umbraco
 
 Einen schönen Tag wünscht
 Ihr freundlicher Umbraco-Robot

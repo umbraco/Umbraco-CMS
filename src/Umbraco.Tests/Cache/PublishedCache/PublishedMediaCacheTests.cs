@@ -111,7 +111,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         [TestCase("id")]
-        [TestCase("nodeId")]
         [TestCase("__NodeId")]
         public void DictionaryDocument_Id_Keys(string key)
         {
@@ -128,7 +127,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         [TestCase("nodeName")]
-        [TestCase("__nodeName")]
         public void DictionaryDocument_NodeName_Keys(string key)
         {
             var dicDoc = GetDictionaryDocument(nodeNameKey: key);

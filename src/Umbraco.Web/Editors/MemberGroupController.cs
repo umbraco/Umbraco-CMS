@@ -36,6 +36,17 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
+        public IEnumerable<MemberGroupDisplay> GetByIds([FromUri]int[] ids)
+        {
+            if (_provider.IsUmbracoMembershipProvider())
+            {
+                return Services.MemberGroupService.GetByIds(ids)
+                    .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
+            }
+
+            return Enumerable.Empty<MemberGroupDisplay>();
+        }
+
         [HttpDelete]
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)

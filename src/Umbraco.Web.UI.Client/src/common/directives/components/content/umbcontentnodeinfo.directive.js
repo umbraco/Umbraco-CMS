@@ -35,14 +35,11 @@
                 scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
 
                 userService.getCurrentUser().then(function(user){
-                        // only allow change of media type if user has access to the settings sections
-                        angular.forEach(user.sections, function(section){
-                            if(section.alias === "settings" && !scope.isInfiniteMode) {
-                                scope.allowChangeDocumentType = true;
-                                scope.allowChangeTemplate = true;
-                            }
-                        });
-                    });
+                    // only allow change of media type if user has access to the settings sections
+                    const hasAccessToSettings = user.allowedSections.indexOf("settings") !== -1 ? true : false;
+                    scope.allowChangeDocumentType = hasAccessToSettings;
+                    scope.allowChangeTemplate = hasAccessToSettings;
+                });
 
                 var keys = [
                     "general_deleted", 
