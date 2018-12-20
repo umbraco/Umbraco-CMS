@@ -2,7 +2,7 @@
     <div class="umb-tree-item__inner" ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
         <ins data-element="tree-item-expand" 
             ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}" 
-            ng-style="{'visibility': (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === 'true') ? 'visible' : 'hidden'}"
+            ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
             ng-click="load(node)">&nbsp;</ins>
 
         <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.routePath}}" ng-click="select(node, $event)" ng-style="::node.style"></i>
@@ -14,7 +14,7 @@
     </div>
     
     <ul ng-class="{collapsed: !node.expanded}">
-        <umb-tree-item class="umb-animated" ng-repeat="child in node.children track by child.id" enablelistviewexpand="{{enablelistviewexpand}}" tree="tree" current-node="currentNode" node="child" section="{{section}}"></umb-tree-item>
+        <umb-tree-item class="umb-animated" ng-repeat="child in node.children track by child.id" enablelistviewexpand="{{enablelistviewexpand}}" tree="tree" current-node="currentNode" node="child" is-dialog="isDialog" section="{{section}}"></umb-tree-item>
     </ul>
 </li>
 

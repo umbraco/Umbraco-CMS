@@ -29,6 +29,22 @@ function memberGroupResource($q, $http, umbRequestHelper) {
                "Failed to retrieve member group");
         },
 
+        getByIds: function (ids) {
+
+            var idQuery = "";
+            _.each(ids, function (item) {
+                idQuery += "ids=" + item + "&";
+            });
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberGroupApiBaseUrl",
+                        "GetByIds",
+                        idQuery)),
+                "Failed to retrieve member group");
+        },
+
         deleteById: function (id) {
 
             return umbRequestHelper.resourcePromise(

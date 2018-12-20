@@ -486,7 +486,10 @@ namespace Umbraco.Web.Editors
 
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                    Items = entities.Select(entity => Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
+                            options.AfterMap((src, dest) => { dest.AdditionalData["hasChildren"] = src.HasChildren; })
+                        )
+                    )
                 };
 
                 return pagedResult;

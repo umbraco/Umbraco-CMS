@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -57,6 +58,19 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _memberGroupRepository.GetMany();
+            }
+        }
+
+        public IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids)
+        {
+            if (ids == null || ids.Any() == false)
+            {
+                return new IMemberGroup[0];
+            }
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _memberGroupRepository.GetMany(ids.ToArray());
             }
         }
 
