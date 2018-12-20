@@ -5,29 +5,29 @@
  * @description
  * Added in Umbraco 8.0. Application-wide service for handling infinite editing.
  * 
+ *
  * 
+ * 
+<h2><strong>Open a build-in infinite editor (media picker)</strong></h2>
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="My.Controller as vm">
-
-        <button type="button" ng-click="vm.open()">Open</button>
-
+    <div ng-controller="My.MediaPickerController as vm">
+        <button type="button" ng-click="vm.openMediaPicker()">Open</button>
     </div>
 </pre>
 
 <h3>Controller example</h3>
 <pre>
     (function () {
-
         "use strict";
 
-        function Controller() {
+        function MediaPickerController(editorService) {
 
             var vm = this;
 
-            vm.open = open;
+            vm.openMediaPicker = openMediaPicker;
 
-            function open() {
+            function openMediaPicker() {
                 var mediaPickerOptions = {
                     multiPicker: true,
                     submit: function(model) {
@@ -36,22 +36,29 @@
                     close: function() {
                         editorService.close();
                     }
-                }
+                };
                 editorService.mediaPicker(mediaPickerOptions);
             };
         }
 
-        angular.module("umbraco").controller("My.Controller", Controller);
+        angular.module("umbraco").controller("My.MediaPickerController", MediaPickerController);
     })();
 </pre>
 
-<h3>Custom view example</h3>
+<h2><strong>Building a custom infinite editor</strong></h2>
+<h3>Open the custom infinite editor (Markup)</h3>
+<pre>
+    <div ng-controller="My.Controller as vm">
+        <button type="button" ng-click="vm.open()">Open</button>
+    </div>
+</pre>
+
+<h3>Open the custom infinite editor (Controller)</h3>
 <pre>
     (function () {
-
         "use strict";
 
-        function Controller() {
+        function Controller(editorService) {
 
             var vm = this;
 
@@ -59,14 +66,15 @@
 
             function open() {
                 var options = {
-                    view: "path/to/view.html"
+                    title: "My custom infinite editor",
+                    view: "path/to/view.html",
                     submit: function(model) {
                         editorService.close();
                     },
                     close: function() {
                         editorService.close();
                     }
-                }
+                };
                 editorService.open(options);
             };
         }
@@ -74,12 +82,89 @@
         angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
+
+<h3><strong>The custom infinite editor view</strong></h3>
+When building a custom infinite editor view you can use the same components as a normal editor ({@link umbraco.directives.directive:umbEditorView umbEditorView}).
+<pre>
+    <div ng-controller="My.InfiniteEditorController as vm">
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+        
+            <umb-editor-container>
+                <umb-box>
+                    <umb-box-content>
+                        {{model | json}}
+                    </umb-box-content>
+                </umb-box>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        action="vm.close()">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label-key="general_submit"
+                        action="vm.submit(model)">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </div>
+</pre>
+
+<h3>The custom infinite editor controller</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function InfiniteEditorController($scope) {
+
+            var vm = this;
+
+            vm.submit = submit;
+            vm.close = close;
+
+            function submit() {
+                if($scope.model.submit) {
+                    $scope.model.submit($scope.model);
+                }
+            }
+
+            function close() {
+                if($scope.model.close) {
+                    $scope.model.close();
+                }
+            }
+
+        }
+
+        angular.module("umbraco").controller("My.InfiniteEditorController", InfiniteEditorController);
+    })();
+</pre>
  */
+
 (function () {
     "use strict";
 
-    function editorService(eventsService) {
+    function editorService(eventsService, keyboardService) {
 
+        let editorsKeyboardShorcuts = [];
         var editors = [];
         
         /**
@@ -120,6 +205,12 @@
          */
         function open(editor) {
 
+            /* keyboard shortcuts will be overwritten by the new infinite editor
+                so we need to store the shortcuts for the current editor so they can be rebound
+                when the infinite editor closes
+            */
+            unbindKeyboardShortcuts();
+
             // set flag so we know when the editor is open in "infinie mode"
             editor.infiniteMode = true;
 
@@ -142,9 +233,9 @@
          * Method to close the latest opened editor
          */
         function close() {
-            var length = editors.length;
-            var closedEditor = editors[length - 1];
+
             // close last opened editor
+            const closedEditor = editors[editors.length - 1];
             editors.splice(-1, 1);
 
             var args = {
@@ -152,7 +243,12 @@
                 editor: closedEditor
             };
 
+            // emit event to let components know an editor has been removed
             eventsService.emit("appState.editors.close", args);
+
+            // rebind keyboard shortcuts for the new editor in focus
+            rebindKeyboardShortcuts();
+            
         }
 
         /**
@@ -650,6 +746,52 @@
             editor.view = "views/common/infiniteeditors/membergrouppicker/membergrouppicker.html";
             editor.size = "small";
             open(editor);
+        }
+
+        ///////////////////////
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#storeKeyboardShortcuts
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Internal method to keep track of keyboard shortcuts registered 
+         * to each editor so they can be rebound when an editor closes
+         * 
+         */
+        function unbindKeyboardShortcuts() {
+            const shortcuts = angular.copy(keyboardService.keyboardEvent);
+            editorsKeyboardShorcuts.push(shortcuts);
+
+            // unbind the current shortcuts because we only want to 
+            // shortcuts from the newly opened editor working
+            for (let [key, value] of Object.entries(shortcuts)) {
+                keyboardService.unbind(key);
+            }
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#rebindKeyboardShortcuts
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Internal method to rebind keyboard shortcuts for the editor in focus
+         * 
+         */
+        function rebindKeyboardShortcuts() {
+            // find the shortcuts from the previous editor
+            const lastSetOfShortcutsIndex = editorsKeyboardShorcuts.length - 1;
+            var lastSetOfShortcuts = editorsKeyboardShorcuts[lastSetOfShortcutsIndex];
+
+            // rebind shortcuts
+            for (let [key, value] of Object.entries(lastSetOfShortcuts)) {
+                keyboardService.bind(key, value.callback, value.opt);
+            }
+
+            // remove the shortcuts from the collection
+            editorsKeyboardShorcuts.splice(lastSetOfShortcutsIndex, 1);
         }
 
         var service = {

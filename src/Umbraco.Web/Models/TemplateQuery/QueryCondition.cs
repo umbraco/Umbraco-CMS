@@ -4,7 +4,7 @@
     {
 
         public PropertyModel Property { get; set; }
-        public OperathorTerm Term { get; set; }
+        public OperatorTerm Term { get; set; }
         public string ConstraintValue { get; set; }
     }
 
@@ -53,30 +53,30 @@
 
             }
 
-            switch (condition.Term.Operathor)
+            switch (condition.Term.Operator)
             {
-                case Operathor.Equals:
+                case Operator.Equals:
                     operand =   " == ";
                     break;
-                case Operathor.NotEquals:
+                case Operator.NotEquals:
                     operand = " != ";
                     break;
-                case Operathor.GreaterThan:
+                case Operator.GreaterThan:
                     operand = " > ";
                     break;
-                case Operathor.GreaterThanEqualTo:
+                case Operator.GreaterThanEqualTo:
                     operand = " >= ";
                     break;
-                case Operathor.LessThan:
+                case Operator.LessThan:
                     operand = " < ";
                     break;
-                case Operathor.LessThanEqualTo:
+                case Operator.LessThanEqualTo:
                     operand = " <= ";
                     break;
-                case Operathor.Contains:
+                case Operator.Contains:
                     value = string.Format("{0}{1}.Contains({2})", prefix, condition.Property.Alias, constraintValue);
                     break;
-                case Operathor.NotContains:
+                case Operator.NotContains:
                     value =  string.Format("!{0}{1}.Contains({2})", prefix, condition.Property.Alias, constraintValue);
                     break;
                 default :

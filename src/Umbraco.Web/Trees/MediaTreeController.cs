@@ -59,18 +59,15 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            //Special check to see if it ia a container, if so then we'll hide children.
-            var isContainer = entity.IsContainer; // && (queryStrings.Get("isDialog") != "true");
-
             var node = CreateTreeNode(
                 entity,
                 Constants.ObjectTypes.Media,
                 parentId,
                 queryStrings,
-                entity.HasChildren && !isContainer);
+                entity.HasChildren);
 
             // entity is either a container, or a media
-            if (isContainer)
+            if (entity.IsContainer)
             {
                 node.SetContainerStyle();
                 node.AdditionalData.Add("isContainer", true);

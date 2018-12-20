@@ -14,7 +14,7 @@
     <key alias="createPackage">創建擴展包</key>
     <key alias="delete">刪除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyTrashcan">清空回收站</key>
+    <key alias="emptyRecycleBin">清空回收站</key>
     <key alias="exportDocumentType">匯出文檔類型</key>
     <key alias="importDocumentType">導入文檔類型</key>
     <key alias="importPackage">導入擴展包</key>
@@ -234,7 +234,6 @@
     <key alias="closeThisWindow">關閉窗口</key>
     <key alias="confirmdelete">您確定要刪除嗎</key>
     <key alias="confirmdisable">您確定要禁用嗎</key>
-    <key alias="confirmEmptyTrashcan">按一下此框確定刪除%0%項</key>
     <key alias="confirmlogout">您確定嗎?</key>
     <key alias="confirmSure">您確定嗎？</key>
     <key alias="cut">剪切</key>

@@ -192,7 +192,7 @@ namespace Umbraco.Web
             //fixme: inject IExamineManager
 
             indexName = string.IsNullOrEmpty(indexName)
-                ? Constants.Examine.ExternalIndexer
+                ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -220,8 +220,8 @@ namespace Umbraco.Web
             //fixme: inject IExamineManager
             if (searcher == null)
             {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.Examine.ExternalIndexer, out var index))
-                    throw new InvalidOperationException($"No index found by name {Constants.Examine.ExternalIndexer}");
+                if (!ExamineManager.Instance.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
+                    throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.ExternalIndexName}");
                 searcher = index.GetSearcher();
             }
 

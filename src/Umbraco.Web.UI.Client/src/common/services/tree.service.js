@@ -287,7 +287,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "No node defined on args object for loadNodeChildren";
             }
 
-            this.removeChildNodes(args.node);
+            // don't remove the children for container nodes in dialogs, as it'll remove the right arrow indicator
+            if (!args.isDialog || !args.node.metaData.isContainer) {
+                this.removeChildNodes(args.node);
+            }
             args.node.loading = true;
 
             return this.getChildren(args)

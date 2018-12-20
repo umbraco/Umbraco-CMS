@@ -14,7 +14,7 @@
     <key alias="createPackage">Vytvořit balíček</key>
     <key alias="delete">Odstranit</key>
     <key alias="disable">Deaktivovat</key>
-    <key alias="emptyTrashcan">Vyprázdnit koš</key>
+    <key alias="emptyRecycleBin">Vyprázdnit koš</key>
     <key alias="exportDocumentType">Exportovat typ dokumentu</key>
     <key alias="importDocumentType">Importovat typ dokumentu</key>
     <key alias="importPackage">Importovat balíček</key>
@@ -210,7 +210,6 @@
     <key alias="closeThisWindow">Zavřít toto okno</key>
     <key alias="confirmdelete">Jste si jistí. že chcete odstranit</key>
     <key alias="confirmdisable">Jste si jistí, že chcete deaktivovat</key>
-    <key alias="confirmEmptyTrashcan">Zatrhněte, prosím, tento box, abyste potvrdili odstranění %0% položek</key>
     <key alias="confirmlogout">Jste si jistí?</key>
     <key alias="confirmSure">Jste si jistí?</key>
     <key alias="cut">Vyjmout</key>

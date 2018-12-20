@@ -128,7 +128,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
 
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
+                .Add(() => typeLoader.GetTypes<ISearchableTree>());
 
             composition.Container.Register<UmbracoTreeSearcher>(new PerRequestLifeTime());
 

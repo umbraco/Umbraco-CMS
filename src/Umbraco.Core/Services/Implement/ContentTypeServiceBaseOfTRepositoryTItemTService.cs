@@ -739,7 +739,7 @@ namespace Umbraco.Core.Services.Implement
 
                 try
                 {
-                    var container = new EntityContainer(Constants.ObjectTypes.DocumentType)
+                    var container = new EntityContainer(ContainedObjectType)
                     {
                         Name = name,
                         ParentId = parentId,
