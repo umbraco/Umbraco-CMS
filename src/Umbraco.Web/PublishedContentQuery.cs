@@ -198,12 +198,13 @@ namespace Umbraco.Web
 
             var searcher = umbIndex.GetSearcher();
 
+            // default to max 500 results
+            var count = skip == 0 && take == 0 ? 500 : skip + take;
+
             ISearchResults results;
             if (culture.IsNullOrWhiteSpace())
             {
-                results = searcher.Search(term, (skip == 0 && take == 0
-                    ? 500 //default max results
-                    : skip + take));
+                results = searcher.Search(term, count);
             }
             else
             {
@@ -219,10 +220,8 @@ namespace Umbraco.Web
                         cultureFields.Add(field);
                 }
 
-                results = qry.And().ManagedQuery(term, cultureFields.ToArray()).Execute((skip == 0 && take == 0
-                    ? 500 //default max results
-                    : skip + take));
-
+                qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
+                results = qry.Execute(count);
             }
 
             totalRecords = results.TotalItemCount;
