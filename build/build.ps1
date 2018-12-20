@@ -97,23 +97,23 @@
         Write-Output "" > $log
 
         Write-Output "### node version is:" > $log
-        &node -v >> $log 2>&1
+        node -v >> $log 2>&1
         if (-not $?) { throw "Failed to report node version." }
 
         Write-Output "### npm version is:" >> $log 2>&1
-        &npm -v >> $log 2>&1
+        npm -v >> $log 2>&1
         if (-not $?) { throw "Failed to report npm version." }
 
         Write-Output "### clean npm cache" >> $log 2>&1
-        &npm cache clean --force >> $log 2>&1
+        npm cache clean --force >> $log 2>&1
         $error.Clear() # that one can fail 'cos security bug - ignore
 
         Write-Output "### npm install" >> $log 2>&1
-        &npm install >> $log 2>&1
+        npm install >> $log 2>&1
         Write-Output ">> $? $($error.Count)" >> $log 2>&1
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
-        &npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
+        npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
         if (-not $?) { throw "Failed to build" } # that one is expected to work
     } finally {
         Pop-Location
