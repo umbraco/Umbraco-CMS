@@ -171,6 +171,6 @@ namespace Umbraco.Web.Trees
             // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
             // See this issue for details on why we need this:
             // https://github.com/umbraco/Umbraco-CMS/issues/3457
-            => ((EntityService)Services.EntityService).GetMediaChildrenWithoutPropertyData(entityId).ToList();
+            => ((EntityService)Services.EntityService).GetMediaChildrenWithoutPropertyData(entityId).ToList();        
     }
 }

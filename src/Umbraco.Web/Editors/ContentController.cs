@@ -354,6 +354,9 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
+            // translate the content type name if applicable
+            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
