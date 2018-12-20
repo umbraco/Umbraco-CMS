@@ -39,13 +39,13 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SavePartialViewMacro(string filename, string oldName, string contents)
         {
-            var svce = (FileService) Services.FileService;
+            var svce = (FileService)Services.FileService;
 
             return SavePartialView(svce,
                 filename, oldName, contents,
                 "MacroPartials/",
                 (s, n) => s.GetPartialViewMacro(n),
-                (s, v) => s.ValidatePartialViewMacro((PartialView) v),
+                (s, v) => s.ValidatePartialViewMacro((PartialView)v),
                 (s, v) => s.SavePartialViewMacro(v));
         }
 
@@ -59,13 +59,13 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SavePartialView(string filename, string oldName, string contents)
         {
-            var svce = (FileService) Services.FileService;
+            var svce = (FileService)Services.FileService;
 
             return SavePartialView(svce,
                 filename, oldName, contents,
                 "Partials/",
                 (s, n) => s.GetPartialView(n),
-                (s, v) => s.ValidatePartialView((PartialView) v),
+                (s, v) => s.ValidatePartialView((PartialView)v),
                 (s, v) => s.SavePartialView(v));
         }
 
@@ -77,9 +77,7 @@ namespace Umbraco.Web.WebServices
             Func<IFileService, IPartialView, Attempt<IPartialView>> save)
         {
             // sanitize input - partial view names have an extension
-            filename = filename
-                .Replace('\\', '/')
-                .TrimStart('/');
+            filename = CleanFilename(filename);
 
             // sharing the editor with partial views & partial view macros,
             // using path prefix to differenciate,
@@ -98,7 +96,7 @@ namespace Umbraco.Web.WebServices
                     oldname = oldname.TrimStart(pathPrefix);
             }
 
-            var currentView = oldname.IsNullOrWhiteSpace() 
+            var currentView = oldname.IsNullOrWhiteSpace()
                 ? get(svce, filename)
                 : get(svce, oldname);
 
@@ -108,7 +106,7 @@ namespace Umbraco.Web.WebServices
                 currentView.Path = filename;
             currentView.Content = contents;
 
-            
+
 
 
             Attempt<IPartialView> attempt;
@@ -166,7 +164,7 @@ namespace Umbraco.Web.WebServices
                 if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
                 {
                     t.MasterTemplate = Math.Max(masterTemplateId, 0);
-                    pathChanged = true;                  
+                    pathChanged = true;
                 }
             }
             catch (ArgumentException ex)
@@ -206,11 +204,9 @@ namespace Umbraco.Web.WebServices
         public JsonResult SaveScript(string filename, string oldName, string contents)
         {
             // sanitize input - script names have an extension
-            filename = filename
-                .Replace('\\', '/')
-                .TrimStart('/');
+            filename = CleanFilename(filename);
 
-            var svce = (FileService) Services.FileService;
+            var svce = (FileService)Services.FileService;
             var script = svce.GetScriptByName(oldName);
             if (script == null)
                 script = new Script(filename);
@@ -223,7 +219,7 @@ namespace Umbraco.Web.WebServices
                 if (svce.ValidateScript(script) == false)
                     return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"),
                                     new FileSecurityException("File '" + filename + "' is not a valid script file."));
-                
+
                 svce.SaveScript(script);
             }
             catch (Exception e)
@@ -245,12 +241,18 @@ namespace Umbraco.Web.WebServices
         public JsonResult SaveStylesheet(string filename, string oldName, string contents)
         {
             // sanitize input - stylesheet names have no extension
-            filename = filename
-                .Replace('\\', '/')
-                .TrimStart('/')
-                .EnsureEndsWith(".css");
+            var svce = (FileService)Services.FileService;
 
-            var svce = (FileService) Services.FileService;
+            filename = CleanFilename(filename);
+            oldName = CleanFilename(oldName);
+
+            if (filename != oldName)
+            {
+                var stylesheetExists = svce.GetStylesheetByName(filename);
+                if (stylesheetExists != null)
+                    return Failed(ui.Text("speechBubbles", "cssErrorText"), "A file named '" + filename + ".css' already exists.");
+            }
+
             var stylesheet = svce.GetStylesheetByName(oldName);
             if (stylesheet == null)
                 stylesheet = new Stylesheet(filename);
@@ -279,6 +281,14 @@ namespace Umbraco.Web.WebServices
                     url = stylesheet.VirtualPath,
                     contents = stylesheet.Content
                 });
+        }
+
+        private static string CleanFilename(string filename)
+        {
+            return filename
+                .Replace('\\', '/')
+                .TrimStart('/')
+                .EnsureEndsWith(".css");
         }
 
         /// <summary>

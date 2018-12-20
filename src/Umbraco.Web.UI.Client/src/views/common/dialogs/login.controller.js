@@ -207,7 +207,7 @@
             }
         }
 
-        $scope.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
+        $scope.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
 
         $scope.showLogin = function () {
             $scope.errorMsg = "";

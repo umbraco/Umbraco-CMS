@@ -153,6 +153,7 @@
         <key alias="rollback">Content rollback performed by user</key>
         <key alias="sendtopublish">Content Send To Publish performed by user</key>
         <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="sort">Sort child items performed by user</key>
         <key alias="smallCopy">Copy</key>
         <key alias="smallPublish">Publish</key>
         <key alias="smallMove">Move</key>
@@ -162,6 +163,7 @@
         <key alias="smallRollBack">Rollback</key>
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
+        <key alias="smallSort">Sort</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -267,11 +269,15 @@
         <key alias="dropFilesHere">Drop your files here...</key>
         <key alias="urls">Link to media</key>
         <key alias="orClickHereToUpload">or click here to choose files</key>
-        <key alias="dragFilesHereToUpload">You can drag files here to upload</key>
+        <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
         <key alias="onlyAllowedFiles">Only allowed file types are</key>
         <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
         <key alias="maxFileSize">Max file size is</key>
         <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     </area>
     <area alias="member">
         <key alias="createNewMember">Create a new member</key>
@@ -462,6 +468,8 @@
         <key alias="enterMessage">Enter a message...</key>
         <key alias="usernameHint">Your username is usually your email</key>
         <key alias="anchor">#value or ?key=value</key>
+        <key alias="enterAlias">Enter alias...</key>
+        <key alias="generatingAlias">Generating alias...</key>
     </area>
     <area alias="editcontenttype">
         <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -595,6 +603,7 @@
         <key alias="hide">Hide</key>
         <key alias="history">History</key>
         <key alias="icon">Icon</key>
+        <key alias="id">Id</key>
         <key alias="import">Import</key>
         <key alias="info">Info</key>
         <key alias="innerMargin">Inner margin</key>
@@ -647,7 +656,7 @@
         <key alias="rights">Permissions</key>
         <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
-        <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
         <key alias="show">Show</key>
@@ -1217,7 +1226,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="publicAccess">
         <key alias="paAdvanced">Role based protection</key>
-        <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
+        <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
         <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
         <key alias="paErrorPage">Error Page</key>
         <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
@@ -1294,11 +1303,11 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="externalLinkPlaceholder">Enter the link</key>
     </area>
     <area alias="imagecropper">
-        <key alias="reset">Reset</key>
-        <key alias="defineCrop">Define crop</key>
-        <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
+        <key alias="reset">Reset crop</key>
         <key alias="saveCrop">Save crop</key>
         <key alias="addCrop">Add new crop</key>
+        <key alias="updateEditCrop">Done</key>
+        <key alias="undoEditCrop">Undo edits</key>
     </area>
     <area alias="rollback">
         <key alias="currentVersion">Current version</key>
@@ -1388,11 +1397,14 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
         <key alias="editContentPublishedHeader">Content published</key>
         <key alias="editContentPublishedText">and visible on the website</key>
+        <key alias="editContentPublishedWithExpireDateText">and visible on the website until %0% at %1%</key>
         <key alias="editContentSavedHeader">Content saved</key>
         <key alias="editContentSavedText">Remember to publish to make changes visible</key>
+        <key alias="editContentSavedWithReleaseDateText">Changes will be published on %0% at %1%</key>
         <key alias="editContentSendToPublish">Sent For Approval</key>
         <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
         <key alias="editMediaSaved">Media saved</key>
+        <key alias="editMemberGroupSaved">Member group saved</key>
         <key alias="editMediaSavedText">Media saved without any errors</key>
         <key alias="editMemberSaved">Member saved</key>
         <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
@@ -1930,7 +1942,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
         <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
         <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
-        <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
+        <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
         <key alias="writer">Writer</key>
         <key alias="translator">Translator</key>
         <key alias="change">Change</key>
@@ -2181,7 +2193,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
-        <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status</key>
+        <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Disable URL tracker</key>
@@ -2212,7 +2224,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
         <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
-        <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
-        <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+        <key alias="itemCannotBeRestoredHelpText">There is no location where this item can be automatically restored. You can move the item manually using the tree below.</key>
+        <key alias="wasRestored">was restored under</key>
     </area>
 </language>

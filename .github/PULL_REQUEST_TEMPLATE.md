@@ -1,11 +1,12 @@
 ### Prerequisites
 
-- [ ] I have [created an issue](https://github.com/umbraco/Umbraco-CMS/issues) for the proposed changes in this PR, the link is:
 - [ ] I have added steps to test this contribution in the description below
 
+If there's an existing issue for this PR then this fixes: <!-- link to the issue here! -->
+
 ### Description
-<!-- A description of the changes proposed in the pull-request -->
-<!-- Make sure to link to the related issue number so we can easily find it in the issue tracker -->
+<!-- A description of the changes proposed in the pull-request and how to test these changes -->
+
 
 
 <!-- Thanks for contributing to Umbraco CMS! -->

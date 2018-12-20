@@ -38,6 +38,22 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     };
     $(document).bind("click", $scope.hidePicker);
 
+    //here we declare a special method which will be called whenever the value has changed from the server
+    //this is instead of doing a watch on the model.value = faster
+    $scope.model.onValueChanged = function (newVal, oldVal) {
+        if (newVal != oldVal) {
+            //check for c# System.DateTime.MinValue being passed as the clear indicator
+            var minDate = moment('0001-01-01');
+            var newDate = moment(newVal);
+
+            if (newDate.isAfter(minDate)) {
+                applyDate({ date: moment(newVal) });
+            } else {
+                $scope.clearDate();
+            }
+        }
+    };
+    
     //handles the date changing via the api
     function applyDate(e) {
         angularHelper.safeApply($scope, function() {

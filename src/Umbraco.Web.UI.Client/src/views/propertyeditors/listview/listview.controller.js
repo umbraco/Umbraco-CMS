@@ -58,6 +58,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       items: []
    };
 
+   $scope.createAllowedButtonSingle = false;
+   $scope.createAllowedButtonSingleWithBlueprints = false;
+   $scope.createAllowedButtonMultiWithBlueprints = false;
+
+
    //when this is null, we don't check permissions
    $scope.currentNodePermissions = null;
 
@@ -391,6 +396,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                         if (activeNode) {
                             navigationService.reloadNode(activeNode);
                         }
+                        $scope.getContent();
                     });
                 }
             });
@@ -598,7 +604,32 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          id = -1;
       }
 
-      $scope.listViewAllowedTypes = getContentTypesCallback(id);
+       //$scope.listViewAllowedTypes = getContentTypesCallback(id);
+      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+          $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+          var blueprints = false;
+          _.each(listViewAllowedTypes, function (allowedType) {
+              if (_.isEmpty(allowedType.blueprints)) {
+                  // this helps the view understand that there are no blueprints available
+                  allowedType.blueprints = null;
+              }
+              else {
+                  blueprints = true;
+              }
+          });
+
+          if (listViewAllowedTypes.length === 1 && blueprints === false) {
+              $scope.createAllowedButtonSingle = true;
+          }
+          if (listViewAllowedTypes.length === 1 && blueprints === true) {
+              $scope.createAllowedButtonSingleWithBlueprints = true;
+          }
+          if (listViewAllowedTypes.length > 1) {
+              $scope.createAllowedButtonMultiWithBlueprints = true;
+          }
+      });
+
 
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
@@ -649,6 +680,22 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          }
       }
    }
+
+
+   function createBlank(entityType,docTypeAlias) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true");
+   }
+
+   function createFromBlueprint(entityType,docTypeAlias, blueprintId) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+   }
+
+   $scope.createBlank = createBlank;
+   $scope.createFromBlueprint = createFromBlueprint;
 
    //GO!
    initView();

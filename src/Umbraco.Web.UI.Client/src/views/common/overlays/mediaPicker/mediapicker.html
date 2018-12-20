@@ -20,12 +20,13 @@
                        ng-change="changeSearch()"
                        type="text"
                        no-dirty-check />
-                <br />
-                <label>
-                    <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
-                    <input type="checkbox" ng-model="showChilds"
-                           ng-change="changeSearch()">
-                </label>
+
+                <div class="form-search__toggle">
+                    <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
+                    <label>
+                        <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
+                    </label>
+                </div>
             </div>
 
             <div class="upload-button">

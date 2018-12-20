@@ -207,6 +207,9 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
+        internal override IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId)
+            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
+
         /// <summary>
         /// Returns a collection of all menu items that can be on a content node
         /// </summary>
@@ -252,6 +255,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionRestore>(ui.Text("actions", ActionRestore.Instance.Alias));
+            menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
 
             menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);

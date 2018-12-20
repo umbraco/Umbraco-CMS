@@ -158,8 +158,16 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     var preValues = editorValue.PreValues.FormatAsDictionary();
                     var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                    using (var image = Image.FromStream(filestream))
-                        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
+                    try
+                    {
+                        using (var image = Image.FromStream(filestream))
+                            _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        // send any argument errors caused by the thumbnail generation to the log instead of failing miserably 
+                        LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not extract image thumbnails.", ex);
+                    }
                 }
 
                 // all related properties (auto-fill) are managed by ImageCropperPropertyEditor

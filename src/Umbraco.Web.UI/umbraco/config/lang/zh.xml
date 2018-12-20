@@ -999,8 +999,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Reset</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
   </area>
