@@ -12,6 +12,7 @@ namespace Umbraco.Web.Controllers
     public class UmbLoginStatusController : SurfaceController
     {
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
         {
             if (ModelState.IsValid == false)

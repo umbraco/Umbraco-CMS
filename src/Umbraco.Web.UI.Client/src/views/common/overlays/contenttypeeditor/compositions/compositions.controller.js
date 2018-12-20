@@ -1,12 +1,27 @@
  (function() {
 	"use strict";
 
-	function CompositionsOverlay($scope,$location) {
+	function CompositionsOverlay($scope,$location,$filter) {
 
         var vm = this;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
+
+        // group the content types by their container paths
+        vm.availableGroups = $filter("orderBy")(
+            _.map(
+                _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
+                    return compositeContentType.contentType.metaData.containerPath;
+                }), function(group) {
+                    return {
+                        containerPath: group[0].contentType.metaData.containerPath,
+                        compositeContentTypes: group
+                    };
+                }
+            ), function (group) {
+                return group.containerPath.replace(/\//g, " ");
+            });
 
         function isSelected(alias) {
             if($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
