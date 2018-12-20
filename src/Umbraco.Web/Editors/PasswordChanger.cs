@@ -100,7 +100,7 @@ namespace Umbraco.Web.Editors
                 {
                     var errors = string.Join(". ", resetResult.Errors);
                     _logger.Warn<PasswordChanger>(string.Format("Could not reset user password {0}", errors));
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "resetPassword" }) });
                 }
 
                 return Attempt.Succeed(new PasswordChangedModel());
@@ -120,21 +120,24 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
             }
 
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
+            //is the old password correct?
+            var backOfficeIdentityUser = AutoMapper.Mapper.Map<BackOfficeIdentityUser>(savingUser);
+            var validateResult = await userMgr.CheckPasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword);
+            if(validateResult == false)
             {
-                //if an old password is suplied try to change it
-                var changeResult = await userMgr.ChangePasswordAsync(savingUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
-                if (changeResult.Succeeded == false)
-                {
-                    var errors = string.Join(". ", changeResult.Errors);
-                    _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "oldPassword" }) });
-                }
-                return Attempt.Succeed(new PasswordChangedModel());
+                //no, fail with an error message for "oldPassword"
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" }) });
             }
-
-            //We shouldn't really get here
-            return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid information supplied", new[] { "value" }) });
+            //can we change to the new password?
+            var changeResult = await userMgr.ChangePasswordAsync(savingUser.Id, passwordModel.OldPassword, passwordModel.NewPassword);
+            if (changeResult.Succeeded == false)
+            {
+                //no, fail with error messages for "password"
+                var errors = string.Join(". ", changeResult.Errors);
+                _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
+            }
+            return Attempt.Succeed(new PasswordChangedModel());
         }
 
         /// <summary>
