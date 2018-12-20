@@ -15,8 +15,9 @@
                     <div class="alert alert-success">
                         <localize key="notifications_notificationsSavedFor"></localize> <strong>{{currentNode.name}}</strong>
                     </div>
+                    <button class="btn btn-primary" ng-click="vm.cancel()"><localize key="general_ok">Ok</localize></button>
                 </div>
-                <div ng-cloak>
+                <div ng-hide="vm.saveSuccces || vm.saveError" ng-cloak>
                     <div class="block-form" ng-show="!vm.loading">
                         <span ng-bind-html="vm.labels.headline"></span>
                         <umb-control-group>
@@ -31,7 +32,7 @@
             </form>
         </div>
     </div>
-    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="vm.saveSuccces || vm.saveError">
         <umb-button label-key="general_cancel"
                     action="vm.cancel()"
                     type="button"
@@ -40,6 +41,7 @@
         <umb-button label-key="buttons_save"
                     type="button"
                     action="vm.save(vm.notifyOptions)"
+                    state="vm.saveState"
                     button-style="success">
         </umb-button>
     </div>

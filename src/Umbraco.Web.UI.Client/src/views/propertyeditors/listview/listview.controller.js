@@ -396,6 +396,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                         if (activeNode) {
                             navigationService.reloadNode(activeNode);
                         }
+                        $scope.getContent();
                     });
                 }
             });
@@ -605,13 +606,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
        //$scope.listViewAllowedTypes = getContentTypesCallback(id);
       getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-          var blueprints = false;
           $scope.listViewAllowedTypes = listViewAllowedTypes;
 
-          angular.forEach(listViewAllowedTypes, function (allowedType) {
-              angular.forEach(allowedType.blueprints, function (value, key) {
+          var blueprints = false;
+          _.each(listViewAllowedTypes, function (allowedType) {
+              if (_.isEmpty(allowedType.blueprints)) {
+                  // this helps the view understand that there are no blueprints available
+                  allowedType.blueprints = null;
+              }
+              else {
                   blueprints = true;
-              });
+              }
           });
 
           if (listViewAllowedTypes.length === 1 && blueprints === false) {
