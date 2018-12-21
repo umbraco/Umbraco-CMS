@@ -237,10 +237,10 @@ namespace Umbraco.Core.Runtime
             // and only these things - the rest should be composed in runtime components
 
             // register basic things
+            // logging, runtime state, configuration
             container.RegisterSingleton<IProfiler, LogProfiler>();
             container.RegisterSingleton<ProfilingLogger>();
             container.RegisterSingleton<IRuntimeState, RuntimeState>();
-
             container.RegisterFrom<ConfigurationCompositionRoot>();
 
             // register caches
@@ -254,8 +254,8 @@ namespace Umbraco.Core.Runtime
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
             container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 
-            // register the plugin manager
-            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
+            // register the type loader
+            container.RegisterSingleton<TypeLoader>();
 
             // register syntax providers - required by database factory
             container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
@@ -389,14 +389,14 @@ namespace Umbraco.Core.Runtime
 
         protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var umbracoPlan = new UmbracoPlan();
-            var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
+            var upgrader = new UmbracoUpgrader();
+            var stateValueKey = upgrader.StateValueKey;
 
             // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
                 _state.CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
-                _state.FinalMigrationState = umbracoPlan.FinalState;
+                _state.FinalMigrationState = upgrader.Plan.FinalState;
             }
 
             logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, _state.CurrentMigrationState ?? "<null>");

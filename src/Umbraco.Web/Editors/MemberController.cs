@@ -400,8 +400,9 @@ namespace Umbraco.Web.Editors
             base.MapPropertyValuesForPersistence<IMember, MemberSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
-                (save, property) => property.GetValue(),        //get prop val
-                (save, property, v) => property.SetValue(v));   //set prop val
+                (save, property) => property.GetValue(), //get prop val
+                (save, property, v) => property.SetValue(v), //set prop val
+                null); // member are all invariant
         }
 
         /// <summary>

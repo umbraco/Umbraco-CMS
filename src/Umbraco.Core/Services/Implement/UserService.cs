@@ -227,30 +227,6 @@ namespace Umbraco.Core.Services.Implement
             Save(membershipUser);
         }
 
-        [Obsolete("ASP.NET Identity APIs like the BackOfficeUserManager should be used to manage passwords, this will not work with correct security practices because you would need the existing password")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SavePassword(IUser user, string password)
-        {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
-
-            if (provider.IsUmbracoMembershipProvider() == false)
-                throw new NotSupportedException("When using a non-Umbraco membership provider you must change the user password by using the MembershipProvider.ChangePassword method");
-
-            provider.ChangePassword(user.Username, "", password);
-
-            //go re-fetch the member and update the properties that may have changed
-            var result = GetByUsername(user.Username);
-            if (result != null)
-            {
-                //should never be null but it could have been deleted by another thread.
-                user.RawPasswordValue = result.RawPasswordValue;
-                user.LastPasswordChangeDate = result.LastPasswordChangeDate;
-                user.UpdateDate = result.UpdateDate;
-            }
-        }
-
         /// <summary>
         /// Deletes or disables a User
         /// </summary>

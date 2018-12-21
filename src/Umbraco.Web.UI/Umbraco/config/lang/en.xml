@@ -16,7 +16,7 @@
     <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
-    <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
@@ -350,7 +350,6 @@
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
-    <key alias="confirmEmptyTrashcan">Please check this box to confirm deletion of %0% item(s)</key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -1816,6 +1815,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
+    <key alias="noValidation">No validation</key>
     <key alias="validateAsEmail">Validate as an email address</key>
     <key alias="validateAsNumber">Validate as a number</key>
     <key alias="validateAsUrl">Validate as a URL</key>
@@ -1964,5 +1964,19 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
     <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
     <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">Direction</key>
+    <key alias="parentToChild">Parent to child</key>
+    <key alias="bidirectional">Bidirectional</key>
+    <key alias="parent">Parent</key>
+    <key alias="child">Child</key>
+    <key alias="count">Count</key>
+    <key alias="relations">Relations</key>
+    <key alias="created">Created</key>
+    <key alias="comment">Comment</key>
+    <key alias="name">Name</key>
+    <key alias="tabRelationType">Relation Type</key>
+    <key alias="tabRelations">Relations</key>
   </area>
 </language>

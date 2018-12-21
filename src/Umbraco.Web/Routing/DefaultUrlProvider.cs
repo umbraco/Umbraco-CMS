@@ -29,7 +29,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public virtual string GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
+        public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal string GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture)
+        internal UrlInfo GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -58,7 +58,9 @@ namespace Umbraco.Web.Routing
                 : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, culture);
 
             // assemble the url from domainUri (maybe null) and path
-            return AssembleUrl(domainUri, path, current, mode).ToString();
+            var url = AssembleUrl(domainUri, path, current, mode).ToString();
+
+            return UrlInfo.Url(url, culture);
         }
 
         #endregion
@@ -76,10 +78,11 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
+        public virtual IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.ContentCache.GetById(id);
-            if (node == null) return Enumerable.Empty<string>();
+            if (node == null)
+                yield break;
 
             var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
@@ -94,13 +97,14 @@ namespace Umbraco.Web.Routing
 
             // no domains = exit
             if (domainUris ==null)
-                return Enumerable.Empty<string>();
+                yield break;
 
-            var result = new List<string>();
             foreach (var d in domainUris)
             {
+                var culture = d?.Culture?.Name;
+
                 //although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-                var route = umbracoContext.ContentCache.GetRouteById(id, d?.Culture?.Name);
+                var route = umbracoContext.ContentCache.GetRouteById(id, culture);
                 if (route == null) continue;
 
                 //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
@@ -109,9 +113,8 @@ namespace Umbraco.Web.Routing
 
                 var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
                 uri = UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
-                result.Add(uri.ToString());
+                yield return UrlInfo.Url(uri.ToString(), culture);
             }
-            return result;
         }
 
         #endregion
@@ -146,7 +149,7 @@ namespace Umbraco.Web.Routing
                         uri = new Uri(path, UriKind.Relative);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException("mode");
+                        throw new ArgumentOutOfRangeException(nameof(mode));
                 }
             }
             else // a domain was found
@@ -169,7 +172,7 @@ namespace Umbraco.Web.Routing
                         uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException("mode");
+                        throw new ArgumentOutOfRangeException(nameof(mode));
                 }
             }
 

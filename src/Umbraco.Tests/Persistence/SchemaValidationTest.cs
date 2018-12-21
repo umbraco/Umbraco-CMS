@@ -26,7 +26,6 @@ namespace Umbraco.Tests.Persistence
 
             // Assert
             Assert.That(result.Errors.Count, Is.EqualTo(0));
-            Assert.AreEqual(result.DetermineInstalledVersion(), UmbracoVersion.Current);
         }
     }
 }

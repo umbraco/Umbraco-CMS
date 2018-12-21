@@ -15,7 +15,7 @@
     <key alias="createGroup">Crear grupo</key>
     <key alias="delete">Borrar</key>
     <key alias="disable">Deshabilitar</key>
-    <key alias="emptyTrashcan">Vaciar Papelera</key>
+    <key alias="emptyRecycleBin">Vaciar Papelera</key>
     <key alias="enable">Activar</key>
     <key alias="exportDocumentType">Exportar Documento (tipo)</key>
     <key alias="importDocumentType">Importar Documento (tipo)</key>
@@ -296,7 +296,6 @@
     <key alias="closeThisWindow">Cerrar esta ventana</key>
         <key alias="confirmdelete">Estás seguro que quieres borrar</key>
         <key alias="confirmdisable">Estás seguro que quieres deshabilitar</key>
-        <key alias="confirmEmptyTrashcan">Por favor selecciona esta casilla para confirmar la eliminación de %0% entrada(s)</key>
         <key alias="confirmlogout">¿Estás seguro?</key>
         <key alias="confirmSure">¿Estás seguro?</key>
     <key alias="cut">Cortar</key>

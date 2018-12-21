@@ -138,9 +138,8 @@ namespace Umbraco.Core.Migrations.Install
         {
             var result = new DatabaseSchemaResult(SqlSyntax);
 
-            //get the db index defs
-            result.DbIndexDefinitions = SqlSyntax.GetDefinedIndexes(_database)
-                .Select(x => new DbIndexDefinition(x)).ToArray();
+            result.IndexDefinitions.AddRange(SqlSyntax.GetDefinedIndexes(_database)
+                .Select(x => new DbIndexDefinition(x)));
 
             result.TableDefinitions.AddRange(OrderedTables
                 .Select(x => DefinitionFactory.GetTableDefinition(x, SqlSyntax)));
@@ -279,7 +278,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             //These are just column indexes NOT constraints or Keys
             //var colIndexesInDatabase = result.DbIndexDefinitions.Where(x => x.IndexName.InvariantStartsWith("IX_")).Select(x => x.IndexName).ToList();
-            var colIndexesInDatabase = result.DbIndexDefinitions.Select(x => x.IndexName).ToList();
+            var colIndexesInDatabase = result.IndexDefinitions.Select(x => x.IndexName).ToList();
             var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
 
             //Add valid and invalid index differences to the result object

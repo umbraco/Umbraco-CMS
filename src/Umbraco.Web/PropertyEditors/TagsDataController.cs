@@ -15,9 +15,10 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class TagsDataController : UmbracoAuthorizedApiController
     {
-        public IEnumerable<TagModel> GetTags(string tagGroup)
+        public IEnumerable<TagModel> GetTags(string tagGroup, string culture)
         {
-            return Umbraco.TagQuery.GetAllTags(tagGroup);
+            if (culture == string.Empty) culture = null;
+            return Umbraco.TagQuery.GetAllTags(tagGroup, culture);
         }
     }
 }
