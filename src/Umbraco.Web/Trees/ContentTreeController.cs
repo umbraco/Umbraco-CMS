@@ -263,6 +263,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));

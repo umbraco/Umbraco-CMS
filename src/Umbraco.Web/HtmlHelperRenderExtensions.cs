@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
@@ -222,6 +223,7 @@ namespace Umbraco.Web
             {
                 _viewContext = viewContext;
                 _method = method;
+			    _controllerName = controllerName;
                 _encryptedString = UmbracoHelper.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
             }
 
@@ -229,12 +231,23 @@ namespace Umbraco.Web
             private readonly FormMethod _method;
             private bool _disposed;
             private readonly string _encryptedString;
+		    private readonly string _controllerName;
 
             protected override void Dispose(bool disposing)
             {
                 if (this._disposed)
                     return;
                 this._disposed = true;
+
+                //Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
+                // We have a controllerName and area so we can match
+                if (_controllerName == "UmbRegister"
+                    || _controllerName == "UmbProfile"
+                    || _controllerName == "UmbLoginStatus"
+                    || _controllerName == "UmbLogin")
+			    {
+			        _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+			    }
 
                 //write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
