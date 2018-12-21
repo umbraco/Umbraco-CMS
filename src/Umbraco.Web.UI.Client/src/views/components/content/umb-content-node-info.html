@@ -2,21 +2,25 @@
 
     <div class="umb-package-details__main-content">
 
-        <umb-box ng-if="node.urls" data-element="node-info-urls">
+        <umb-box ng-if="currentUrls" data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
-                    <li ng-repeat="url in node.urls">
+                    <li ng-repeat="url in currentUrls">
                         <span ng-if="url.isUrl">
+
+                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
                             <a href="{{url.text}}" target="_blank">
                                 <i class="icon icon-window-popin"></i>
                                 <span>{{url.text}}</span>
                             </a>
-                            <span ng-if="url.culture" style="font-size: 13px; color: #cccccc; margin-left: 20px;">{{url.culture}}</span>
+
                         </span>
                         <div ng-if="!url.isUrl" style="margin-top: 4px;">
-                            <span>{{url.text}}</span>
-                            <span ng-if="url.culture" style="font-size: 13px; color: #cccccc; margin-left: 20px;">{{url.culture}}</span>
+
+                            <span ng-if="node.variants.length === 1 && url.culture" style="font-size: 13px; color: #cccccc; width: 50px;display: inline-block">{{url.culture}}</span>
+                            <em>{{url.text}}</em>
+
                         </div>
                     </li>
                 </ul>
@@ -43,7 +47,8 @@
         <umb-box data-element="node-info-history">
 
             <umb-box-header
-                title-key="general_history">
+                title="{{historyLabel}}">
+                
                 <umb-button
                     type="button"
                     button-style="outline"
@@ -62,8 +67,9 @@
                     <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
 
                     <div ng-show="auditTrail.length === 0" style="padding: 10px;">
-                        <umb-empty-state position="center"
-                                         size="small">
+                        <umb-empty-state 
+                            position="center"
+                            size="small">
                             <localize key="content_noChanges"></localize>
                         </umb-empty-state>
                     </div>
@@ -96,7 +102,6 @@
                                     class="history-item__badge"
                                     size="xs"
                                     color="{{item.logTypeColor}}">
-
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
                                 <span>
@@ -130,16 +135,13 @@
             <umb-box-content class="block-form">
 
                 <umb-control-group data-element="node-info-status" label="@general_status">
-                    <div ng-repeat="status in publishStatus" style="margin-bottom: 5px;">
-                        <span ng-show="status.culture"><em>{{status.culture}}: </em></span>
-                        <umb-badge size="xs" color="{{status.color}}">
-                            {{status.label}}
-                        </umb-badge>
-                    </div>
+                    <umb-badge size="xs" color="{{status.color}}">
+                        <umb-variant-state variant="currentVariant"></umb-variant-state>
+                    </umb-badge>
                 </umb-control-group>
 
                 <umb-control-group ng-show="node.id !== 0" data-element="node-info-create-date" label="@template_createdDate">
-                    {{node.createDateFormatted}} <localize key="general_by">by</localize> {{ node.owner.name }}
+                    {{currentVariant.createDateFormatted}}
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">

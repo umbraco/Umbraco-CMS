@@ -9,7 +9,7 @@
         /// Determines whether an editor supports tags.
         /// </summary>
         public static bool IsTagsEditor(this IDataEditor editor)
-            => editor?.GetType().GetCustomAttribute<TagsPropertyEditorAttribute>(false) != null;
+            => editor.GetTagAttribute() != null;
 
         /// <summary>
         /// Gets the tags configuration attribute of an editor.

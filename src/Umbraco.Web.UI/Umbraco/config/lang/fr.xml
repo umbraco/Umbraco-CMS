@@ -16,7 +16,7 @@
     <key alias="createPackage">Créer un package</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyTrashcan">Vider la corbeille</key>
+    <key alias="emptyRecycleBin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
     <key alias="importDocumentType">Importer un type de document</key>
@@ -310,7 +310,6 @@
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
     <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
     <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
-    <key alias="confirmEmptyTrashcan">Cochez cette case pour confirmer la suppression de %0% élément(s)</key>
     <key alias="confirmlogout">Êtes-vous certain(e)?</key>
     <key alias="confirmSure">Êtes-vous certain(e)?</key>
     <key alias="cut">Couper</key>

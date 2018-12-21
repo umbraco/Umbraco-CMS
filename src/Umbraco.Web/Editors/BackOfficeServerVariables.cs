@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags(""))
+                                controller => controller.GetTags("", ""))
                         },
                         {
                             "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
@@ -299,6 +299,10 @@ namespace Umbraco.Web.Editors
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
+                        },
+                        {
+                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                                controller => controller.GetById(1))
                         }
                     }
                 },

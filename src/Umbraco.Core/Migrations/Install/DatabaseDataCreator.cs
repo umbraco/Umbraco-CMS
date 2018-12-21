@@ -321,9 +321,9 @@ namespace Umbraco.Core.Migrations.Install
         {
             // on install, initialize the umbraco migration plan with the final state
 
-            var plan = new UmbracoPlan();
-            var stateValueKey = Upgrader.GetStateValueKey(plan);
-            var finalState = plan.FinalState;
+            var upgrader = new UmbracoUpgrader();
+            var stateValueKey = upgrader.StateValueKey;
+            var finalState = upgrader.Plan.FinalState;
 
             _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false, new KeyValueDto { Key = stateValueKey, Value = finalState, Updated = DateTime.Now });
         }

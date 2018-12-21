@@ -95,7 +95,7 @@ angular.module('umbraco.directives')
     };
 })
 
-.directive('onOutsideClick', function ($timeout) {
+.directive('onOutsideClick', function ($timeout, angularHelper) {
     return function (scope, element, attrs) {
 
         var eventBindings = [];
@@ -136,7 +136,7 @@ angular.module('umbraco.directives')
                     return;
                 }
 
-                scope.$apply(attrs.onOutsideClick);
+            angularHelper.safeApply(scope, attrs.onOutsideClick);
         }
 
 

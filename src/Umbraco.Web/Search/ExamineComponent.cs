@@ -26,6 +26,8 @@ using Examine.LuceneEngine.Directories;
 using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
@@ -52,6 +54,7 @@ namespace Umbraco.Web.Search
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
+
 
         public override void Compose(Composition composition)
         {
@@ -219,23 +222,7 @@ namespace Umbraco.Web.Search
                 if (_isConfigured) return;
 
                 _isConfigured = true;
-
-                foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
-                {
-                    //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
-                    //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
-                    //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
-                    luceneIndexer.WaitForIndexQueueOnShutdown = false;
-
-                    //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
-                    //the indexes are not operational unless MainDom is true
-                    var dir = luceneIndexer.GetLuceneDirectory();
-                    if (IndexWriter.IsLocked(dir))
-                    {
-                        logger.Info<ExamineComponent>("Forcing index {IndexerName} to be unlocked since it was left in a locked state", luceneIndexer.Name);
-                        IndexWriter.Unlock(dir);
-                    }
-                }
+                examineManager.UnlockLuceneIndexes(logger);
             }
         }
 

@@ -3,11 +3,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.TagRelationship)]
+    [TableName(TableName)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class TagRelationshipDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.TagRelationship;
+
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship", OnColumns = "nodeId, propertyTypeId, tagId")]
         [ForeignKey(typeof(ContentDto), Name = "FK_cmsTagRelationship_cmsContent", Column = "nodeId")]

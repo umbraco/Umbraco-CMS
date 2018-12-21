@@ -111,7 +111,6 @@
     <Compile Include="AttemptOfTResultTStatus.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
-    <Compile Include="ByteArrayExtensions.cs" />
     <Compile Include="Cache\CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
@@ -304,7 +303,6 @@
     <Compile Include="Constants-DataTypes.cs" />
     <Compile Include="Constants-Composing.cs" />
     <Compile Include="Constants-DeploySelector.cs" />
-    <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="Constants-ObjectTypes.cs" />
     <Compile Include="Constants-PackageRepository.cs" />
@@ -321,6 +319,8 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
+    <Compile Include="GuidUtils.cs" />
+    <Compile Include="HexEncoder.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
@@ -366,6 +366,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTemplateDesignColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\MakeTagsVariant.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
@@ -1310,6 +1311,7 @@
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
+    <Compile Include="Serialization\CaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\IFormatter.cs" />

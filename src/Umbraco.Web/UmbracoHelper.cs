@@ -30,7 +30,7 @@ namespace Umbraco.Web
         private readonly ServiceContext _services;
         
         private IUmbracoComponentRenderer _componentRenderer;
-        private PublishedContentQuery _query;
+        private IPublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
         private ITagQuery _tag;
         private ICultureDictionary _cultureDictionary;

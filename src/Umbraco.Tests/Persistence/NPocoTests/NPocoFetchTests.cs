@@ -403,7 +403,6 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                     .From<Thing1Dto>()
                     .Where<Thing1Dto>(x => x.Id == 1);
 
-                sql.WriteToConsole();
                 var dto = scope.Database.Fetch<Thing1Dto>(sql).FirstOrDefault();
                 Assert.IsNotNull(dto);
                 Assert.AreEqual("one", dto.Name);
@@ -415,7 +414,6 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 //Assert.AreEqual("one", dto.Name);
 
                 var sql3 = new Sql(sql.SQL, 1);
-                sql.WriteToConsole();
                 dto = scope.Database.Fetch<Thing1Dto>(sql3).FirstOrDefault();
                 Assert.IsNotNull(dto);
                 Assert.AreEqual("one", dto.Name);
