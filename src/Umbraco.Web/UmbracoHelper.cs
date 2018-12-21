@@ -775,62 +775,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Search
-
-        /// <summary>
-        /// Searches content.
-        /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="indexName"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
-        {
-            return ContentQuery.Search(term, useWildCards, indexName);
-        }
-
-        /// <summary>
-        /// Searches content.
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="indexName"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
-        {
-            return ContentQuery.Search(skip, take, out totalRecords, term, useWildCards, indexName);
-        }
-
-        /// <summary>
-        /// Searhes content.
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-        {
-            return ContentQuery.Search(skip, take, out totalRecords, criteria, searchProvider);
-        }
-
-        /// <summary>
-        /// Searhes content.
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-        {
-            return ContentQuery.Search(criteria, searchProvider);
-        }
-
-        #endregion
-
         #region Strings
 
         /// <summary>

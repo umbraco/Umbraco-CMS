@@ -5,13 +5,26 @@ using Umbraco.Core.Collections;
 
 namespace Umbraco.Examine
 {
+    /// <summary>
+    /// An <see cref="IIndexPopulator"/> that is automatically associated to any index of type <see cref="TIndex"/>
+    /// </summary>
+    /// <typeparam name="TIndex"></typeparam>
+    public abstract class IndexPopulator<TIndex> : IndexPopulator where TIndex : IIndex
+    {
+        public override bool IsRegistered(IIndex index)
+        {
+            if (base.IsRegistered(index)) return true;
+            return index is TIndex;
+        }
+    }
+
     public abstract class IndexPopulator : IIndexPopulator
     {
         private readonly ConcurrentHashSet<string> _registeredIndexes = new ConcurrentHashSet<string>();
 
-        public bool IsRegistered(string indexName)
+        public virtual bool IsRegistered(IIndex index)
         {
-            return _registeredIndexes.Contains(indexName);
+            return _registeredIndexes.Contains(index.Name);
         }
 
         /// <summary>
@@ -25,7 +38,7 @@ namespace Umbraco.Examine
 
         public void Populate(params IIndex[] indexes)
         {
-            PopulateIndexes(indexes.Where(x => IsRegistered(x.Name)));
+            PopulateIndexes(indexes.Where(IsRegistered));
         }
 
         protected abstract void PopulateIndexes(IEnumerable<IIndex> indexes);

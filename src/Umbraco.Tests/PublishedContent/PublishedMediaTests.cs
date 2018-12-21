@@ -173,9 +173,9 @@ namespace Umbraco.Tests.PublishedContent
 
 
                 //ensure it still exists in the index (raw examine search)
-                var criteria = searcher.CreateCriteria();
+                var criteria = searcher.CreateQuery();
                 var filter = criteria.Id(3113);
-                var found = searcher.Search(filter.Compile());
+                var found = filter.Execute();
                 Assert.IsNotNull(found);
                 Assert.AreEqual(1, found.TotalItemCount);
 
