@@ -120,8 +120,14 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
             }
 
+            //get the user
+            var backOfficeIdentityUser = await userMgr.FindByIdAsync(savingUser.Id);
+            if (backOfficeIdentityUser == null)
+            {
+                //this really shouldn't ever happen... but just in case
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" }) });
+            }
             //is the old password correct?
-            var backOfficeIdentityUser = AutoMapper.Mapper.Map<BackOfficeIdentityUser>(savingUser);
             var validateResult = await userMgr.CheckPasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword);
             if(validateResult == false)
             {
