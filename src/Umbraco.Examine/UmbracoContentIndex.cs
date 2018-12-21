@@ -52,13 +52,13 @@ namespace Umbraco.Examine
         /// <param name="indexValueTypes"></param>
         public UmbracoContentIndex(
             string name,
-            IEnumerable<FieldDefinition> fieldDefinitions,
+            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
-            IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
+            IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
@@ -122,7 +122,7 @@ namespace Umbraco.Examine
                 //anywhere else in this class
                 Current.Services.PublicAccessService,
                 parentId,
-                ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
+                ConfigIndexCriteria?.IncludeItemTypes, ConfigIndexCriteria?.ExcludeItemTypes);
 
             PublishedValuesOnly = supportUnpublished;
         }
@@ -200,40 +200,16 @@ namespace Umbraco.Examine
             var descendantPath = $@"\-1\,*{nodeId}\,*";
             var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
             var searcher = GetSearcher();
-            var c = searcher.CreateCriteria();
-            var filtered = c.RawQuery(rawQuery);
-            var results = searcher.Search(filtered);
+            var c = searcher.CreateQuery();
+            var filtered = c.NativeQuery(rawQuery);
+            var results = filtered.Execute();
 
             ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
             //need to queue a delete item for each one found
-            foreach (var r in results)
-            {
-                QueueIndexOperation(new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete));
-            }
+            QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));
 
             base.PerformDeleteFromIndex(nodeId, onComplete);
-        }
-
-        /// <summary>
-        /// Overridden to ensure that the variant system fields have the right value types
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="indexValueTypesFactory"></param>
-        /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
-        {
-            //fixme: languages are dynamic so although this will work on startup it wont work when languages are edited
-            foreach(var lang in LanguageService.GetAllLanguages())
-            {
-                foreach (var field in UmbracoIndexFieldDefinitions)
-                {
-                    var def = new FieldDefinition($"{field.Name}_{lang.IsoCode.ToLowerInvariant()}", field.Type);
-                    FieldDefinitionCollection.TryAdd(def.Name, def);
-                }
-            }
-
-            return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
         
     }

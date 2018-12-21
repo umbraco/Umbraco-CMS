@@ -3,12 +3,14 @@ using Examine;
 
 namespace Umbraco.Examine
 {
-    
-
     public interface IIndexPopulator
     {
-        bool IsRegistered(string indexName);
-        void RegisterIndex(string indexName);
+        /// <summary>
+        /// If this index is registered with this populatr
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        bool IsRegistered(IIndex index);
 
         /// <summary>
         /// Populate indexers 

@@ -103,7 +103,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 var searcher = indexer.GetSearcher();
 
-                var results = searcher.Search(searcher.CreateCriteria().Id(555).Compile());
+                var results = searcher.CreateQuery().Id(555).Execute();
                 Assert.AreEqual(1, results.TotalItemCount);
 
                 var result = results.First();
@@ -128,8 +128,6 @@ namespace Umbraco.Tests.UmbracoExamine
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
-                contentRebuilder.RegisterIndex(indexer.Name);
-                mediaRebuilder.RegisterIndex(indexer.Name);
 
                 var searcher = indexer.GetSearcher();
 
@@ -137,7 +135,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 contentRebuilder.Populate(indexer);
                 mediaRebuilder.Populate(indexer);
 
-                var result = searcher.Search(searcher.CreateCriteria().All().Compile());
+                var result = searcher.CreateQuery().All().Execute();
 
                 Assert.AreEqual(29, result.TotalItemCount);
             }
@@ -208,7 +206,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
                 //it will not exist because it exists under 2222
-                var results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
+                var results = searcher.CreateQuery().Id(2112).Execute();
                 Assert.AreEqual(0, results.Count());
 
                 //now mimic moving 2112 to 1116
@@ -220,7 +218,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
 
                 //now ensure it exists
-                results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
+                results = searcher.CreateQuery().Id(2112).Execute();
                 Assert.AreEqual(1, results.Count());
             }
         }
@@ -251,7 +249,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer1.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
                 //it will exist because it exists under 2222
-                var results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
+                var results = searcher.CreateQuery().Id(2112).Execute();
                 Assert.AreEqual(1, results.Count());
 
                 //now mimic moving the node underneath 1116 instead of 2222
@@ -262,7 +260,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer1.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
 
                 //now ensure it's deleted
-                results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
+                results = searcher.CreateQuery().Id(2112).Execute();
                 Assert.AreEqual(0, results.Count());
             }
         }
@@ -281,14 +279,13 @@ namespace Umbraco.Tests.UmbracoExamine
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
-                rebuilder.RegisterIndex(indexer.Name);
 
                 var searcher = indexer.GetSearcher();
 
                 //create the whole thing
                 rebuilder.Populate(indexer);
 
-                var result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Compile());
+                var result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
                 Assert.AreEqual(21, result.TotalItemCount);
 
                 //delete all content
@@ -299,13 +296,13 @@ namespace Umbraco.Tests.UmbracoExamine
 
 
                 //ensure it's all gone
-                result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Compile());
+                result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
                 Assert.AreEqual(0, result.TotalItemCount);
 
                 //call our indexing methods
                 rebuilder.Populate(indexer);
 
-                result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Compile());
+                result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
                 Assert.AreEqual(21, result.TotalItemCount);
             }
         }
@@ -333,10 +330,10 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer.DeleteFromIndex(1140.ToString());
                 //this node had children: 1141 & 1142, let's ensure they are also removed
 
-                var results = searcher.Search(searcher.CreateCriteria().Id(1141).Compile());
+                var results = searcher.CreateQuery().Id(1141).Execute();
                 Assert.AreEqual(0, results.Count());
 
-                results = searcher.Search(searcher.CreateCriteria().Id(1142).Compile());
+                results = searcher.CreateQuery().Id(1142).Execute();
                 Assert.AreEqual(0, results.Count());
 
             }

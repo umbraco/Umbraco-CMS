@@ -23,6 +23,7 @@ namespace Umbraco.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
         {
             if (ModelState.IsValid == false)

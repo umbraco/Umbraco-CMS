@@ -4,6 +4,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -30,6 +31,6 @@ namespace Umbraco.Core.Persistence.Repositories
         bool Exists(Guid key);
 
         IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null);
+            IQuery<IUmbracoEntity> filter, Ordering ordering);
     }
 }

@@ -23,6 +23,7 @@ namespace Umbraco.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
         {
             if (ModelState.IsValid == false)

@@ -42,8 +42,8 @@ namespace Umbraco.Examine
         /// <param name="validator"></param>
         /// <param name="analyzer"></param>
         public UmbracoMemberIndex(
-            string name, 
-            IEnumerable<FieldDefinition> fieldDefinitions,
+            string name,
+            FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
@@ -64,10 +64,10 @@ namespace Umbraco.Examine
         /// </summary>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypesFactory = null)
         {
             var keyDef = new FieldDefinition("__key", FieldDefinitionTypes.Raw);
-            FieldDefinitionCollection.TryAdd(keyDef.Name, keyDef);
+            FieldDefinitionCollection.TryAdd(keyDef);
 
             return base.CreateFieldValueTypes(indexValueTypesFactory);
         }

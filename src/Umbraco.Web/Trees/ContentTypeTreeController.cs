@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 
@@ -145,7 +146,8 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound,
+                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
             return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
         }
     }

@@ -24,16 +24,6 @@ angular.module("umbraco")
     		    return ((spans / $scope.columns) * 100).toFixed(8);
     		};
 
-    		$scope.toggleCollection = function(collection, toggle){
-    		    if(toggle){
-    		        collection = [];
-    		    }else{
-    		        collection = null;
-    		    }
-    		};
-
-
-
     		/****************
     		    Section
     		*****************/
@@ -47,7 +37,17 @@ angular.module("umbraco")
     		    }
     		    
     		    $scope.currentSection = section;
+    		    $scope.currentSection.allowAll = section.allowAll || !section.allowed || !section.allowed.length;
     		};
+
+            $scope.toggleAllowed = function (section) {
+                if (section.allowed) {
+                    delete section.allowed;
+                }
+                else {
+                    section.allowed = [];
+                }
+            }
 
     		$scope.deleteSection = function(section, template) {
     			if ($scope.currentSection === section) {
