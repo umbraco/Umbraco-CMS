@@ -1065,7 +1065,7 @@ namespace Umbraco.Web.Editors
                 var descendants = Services.EntityService.GetPagedDescendants(contentItem.Id, UmbracoObjectTypes.Document, page++, pageSize, out total,
                                 //order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
                                 //early if a permission higher up fails
-                                "path", Direction.Ascending);
+                                ordering: Ordering.By("path", Direction.Ascending));
 
                 foreach (var c in descendants)
                 {
