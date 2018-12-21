@@ -107,6 +107,7 @@ src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 src/Umbraco.Web.UI/[Uu]ser[Cc]ontrols/
 
 src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
+src/Umbraco.Web.UI.Client/vwd.webinfo
 
 src/Umbraco.Web.UI/App_Plugins/*
 src/*.psess

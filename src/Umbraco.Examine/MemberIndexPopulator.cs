@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
 {
-    public class MemberIndexPopulator : IndexPopulator
+    public class MemberIndexPopulator : IndexPopulator<UmbracoMemberIndex>
     {
         private readonly IMemberService _memberService;
         private readonly IValueSetBuilder<IMember> _valueSetBuilder;
@@ -16,8 +16,6 @@ namespace Umbraco.Examine
         {
             _memberService = memberService;
             _valueSetBuilder = valueSetBuilder;
-
-            RegisterIndex(Core.Constants.UmbracoIndexes.MembersIndexName);
         }
         protected override void PopulateIndexes(IEnumerable<IIndex> indexes)
         {
