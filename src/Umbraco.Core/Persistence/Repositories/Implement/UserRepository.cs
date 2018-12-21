@@ -423,6 +423,7 @@ ORDER BY colName";
             {
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
+                "DELETE FROM umbracoUserStartNode WHERE userId = @Id",
                 "DELETE FROM umbracoUser WHERE id = @id",
                 "DELETE FROM umbracoExternalLogin WHERE id = @id"
             };
