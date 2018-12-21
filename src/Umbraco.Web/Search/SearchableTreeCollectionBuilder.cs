@@ -6,5 +6,8 @@ namespace Umbraco.Web.Search
     internal class SearchableTreeCollectionBuilder : LazyCollectionBuilderBase<SearchableTreeCollectionBuilder, SearchableTreeCollection, ISearchableTree>
     {
         protected override SearchableTreeCollectionBuilder This => this;
+
+        //per request because generally an instance of ISearchableTree is a controller
+        protected override Lifetime CollectionLifetime => Lifetime.Request;
     }
 }

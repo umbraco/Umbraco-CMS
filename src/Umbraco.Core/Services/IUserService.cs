@@ -91,16 +91,6 @@ namespace Umbraco.Core.Services
             string filter = null);
 
         /// <summary>
-        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
-        /// </summary>
-        /// <remarks>
-        /// This method exists so that Umbraco developers can use one entry point to create/update users if they choose to.
-        /// </remarks>
-        /// <param name="user">The user to save the password for</param>
-        /// <param name="password">The password to save</param>
-        void SavePassword(IUser user, string password);
-
-        /// <summary>
         /// Deletes or disables a User
         /// </summary>
         /// <param name="user"><see cref="IUser"/> to delete</param>

@@ -270,7 +270,7 @@ namespace Umbraco.Web
         {
             //fixme: pass in the IExamineManager
 
-            indexName = string.IsNullOrEmpty(indexName) ? Constants.Examine.ExternalIndexer : indexName;
+            indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found with name " + indexName);
 
@@ -290,7 +290,7 @@ namespace Umbraco.Web
         {
             //fixme: pass in the IExamineManager
 
-            indexName = string.IsNullOrEmpty(indexName) ? Constants.Examine.ExternalIndexer : indexName;
+            indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found with name " + indexName);
 
@@ -312,8 +312,8 @@ namespace Umbraco.Web
 
             if (searchProvider == null)
             {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.Examine.ExternalIndexer, out var index))
-                    throw new InvalidOperationException("No index found with name " + Constants.Examine.ExternalIndexer);
+                if (!ExamineManager.Instance.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
+                    throw new InvalidOperationException("No index found with name " + Constants.UmbracoIndexes.ExternalIndexName);
                 searchProvider = index.GetSearcher();
             }
             var results = searchProvider.Search(criteria);

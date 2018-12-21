@@ -47,7 +47,7 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, ProfilingLogger logger)
+        public TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
             : this(runtimeCache, localTempStorage, logger, true)
         { }
 
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, ProfilingLogger logger, bool detectChanges)
+        internal TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempStorage = localTempStorage == LocalTempStorage.Unknown ? LocalTempStorage.Default : localTempStorage;

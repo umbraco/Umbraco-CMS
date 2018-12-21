@@ -1,49 +1,58 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController",
-    function ($scope, relationResource, contentResource, navigationService, appState, treeService, localizationService) {
+    function ($scope, relationResource, contentResource, entityResource, navigationService, appState, treeService, localizationService) {
 
-		var node = $scope.currentNode;
+        $scope.source = _.clone($scope.currentNode);
 
 		$scope.error = null;
-	    $scope.success = false;
+        $scope.success = false;
+        $scope.loading = true;
 
-		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
+        relationResource.getByChildId($scope.source.id, "relateParentDocumentOnDelete").then(function (data) {
+            $scope.loading = false;
 
-            if (data.length == 0) {
-                $scope.success = false;
-                $scope.error = {
-                    errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
-                    data: {
-                        Message: localizationService.localize('recycleBin_noRestoreRelation')
-                    }
-                }
+            if (!data.length) {
+                localizationService.localizeMany(["recycleBin_itemCannotBeRestored", "recycleBin_noRestoreRelation"])
+                    .then(function(values) {
+                        $scope.success = false;
+                        $scope.error = {
+                            errorMsg: values[0],
+                            data: {
+                                Message: values[1]
+                            }
+                        }
+                    });
                 return;
             }
 
 		    $scope.relation = data[0];
 
-			if ($scope.relation.parentId == -1) {
+			if ($scope.relation.parentId === -1) {
 				$scope.target = { id: -1, name: "Root" };
 
-			} else {
-			    contentResource.getById($scope.relation.parentId).then(function (data) {
+            } else {
+			    $scope.loading = true;
+                entityResource.getById($scope.relation.parentId, "Document").then(function (data) {
+                    $scope.loading = false;
 					$scope.target = data;
-
 					// make sure the target item isn't in the recycle bin
 					if($scope.target.path.indexOf("-20") !== -1) {
-						$scope.error = {
-                            errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
-							data: {
-                                Message: localizationService.localize('recycleBin_restoreUnderRecycled').then(function (value) {
-                                    value.replace('%0%', $scope.target.name);
-                                })
-							}
-						};
+                        localizationService.localizeMany(["recycleBin_itemCannotBeRestored", "recycleBin_restoreUnderRecycled"])
+					        .then(function (values) {
+					            $scope.success = false;
+					            $scope.error = {
+					                errorMsg: values[0],
+					                data: {
+                                        Message: values[1].replace('%0%', $scope.target.name)
+					                }
+					            }
+					        });
 						$scope.success = false;
 					}
 
 				}, function (err) {
 					$scope.success = false;
 					$scope.error = err;
+                    $scope.loading = false;
 				});
 			}
 
@@ -53,10 +62,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 		});
 
 		$scope.restore = function () {
+		    $scope.loading = true;
 			// this code was copied from `content.move.controller.js`
-			contentResource.move({ parentId: $scope.target.id, id: node.id })
+            contentResource.move({ parentId: $scope.target.id, id: $scope.source.id })
 				.then(function (path) {
 
+                    $scope.loading = false;
 					$scope.success = true;
 
 					//first we need to remove the node that launched the dialog
@@ -79,6 +90,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 				}, function (err) {
 					$scope.success = false;
 					$scope.error = err;
+                    $scope.loading = false;
 				});
-		};
+        };
+
+        $scope.close = function () {
+            navigationService.hideDialog();
+        };
+
 	});

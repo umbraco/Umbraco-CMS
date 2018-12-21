@@ -311,7 +311,6 @@
     <Compile Include="Constants-DataTypes.cs" />
     <Compile Include="Constants-Composing.cs" />
     <Compile Include="Constants-DeploySelector.cs" />
-    <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="Constants-ObjectTypes.cs" />
     <Compile Include="Constants-PackageRepository.cs" />

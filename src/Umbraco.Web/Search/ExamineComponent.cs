@@ -24,6 +24,8 @@ using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
@@ -50,6 +52,7 @@ namespace Umbraco.Web.Search
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
+
 
         public override void Compose(Composition composition)
         {

@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Runtimes
             pcontent = umbracoContext.ContentCache.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
             Assert.AreEqual("test", pcontent.Name);
-            Assert.IsTrue(pcontent.IsDraft);
+            Assert.IsTrue(pcontent.IsDraft());
 
             // no published url
             Assert.AreEqual("#", pcontent.GetUrl());
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Runtimes
             pcontent = umbracoContext.ContentCache.GetById(content.Id);
             Assert.IsNotNull(pcontent);
             Assert.AreEqual("test", pcontent.Name);
-            Assert.IsFalse(pcontent.IsDraft);
+            Assert.IsFalse(pcontent.IsDraft());
 
             // but the url is the published one - no draft url
             Assert.AreEqual("/test/", pcontent.GetUrl());
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Runtimes
             pcontent = umbracoContext.ContentCache.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
             Assert.AreEqual("testx", pcontent.Name);
-            Assert.IsTrue(pcontent.IsDraft);
+            Assert.IsTrue(pcontent.IsDraft());
 
             // and the published document has a url
             Assert.AreEqual("/test/", pcontent.GetUrl());

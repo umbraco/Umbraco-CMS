@@ -15,7 +15,7 @@
     <key alias="createGroup">Stwórz grupę</key>
     <key alias="delete">Usuń</key>
     <key alias="disable">Deaktywuj</key>
-    <key alias="emptyTrashcan">Opróżnij kosz</key>
+    <key alias="emptyRecycleBin">Opróżnij kosz</key>
     <key alias="enable">Aktywuj</key>
     <key alias="exportDocumentType">Eksportuj typ dokumentu</key>
     <key alias="importDocumentType">Importuj typ dokumentu</key>
@@ -298,7 +298,6 @@
     <key alias="closeThisWindow">Zamknij to okno</key>
     <key alias="confirmdelete">Jesteś pewny, że chcesz usunąć</key>
     <key alias="confirmdisable">Jesteś pewny, że chcesz wyłączyć</key>
-    <key alias="confirmEmptyTrashcan">Proszę zaznaczyć, aby potwierdzić usunięcie %0% elementów.</key>
     <key alias="confirmlogout">Jesteś pewny?</key>
     <key alias="confirmSure">Jesteś pewny?</key>
     <key alias="cut">Wytnij</key>

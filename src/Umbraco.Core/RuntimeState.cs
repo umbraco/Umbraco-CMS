@@ -225,14 +225,14 @@ namespace Umbraco.Core
 
         protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var umbracoPlan = new UmbracoPlan();
-            var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
+            var upgrader = new UmbracoUpgrader();
+            var stateValueKey = upgrader.StateValueKey;
 
             // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
                 CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
-                FinalMigrationState = umbracoPlan.FinalState;
+                FinalMigrationState = upgrader.Plan.FinalState;
             }
 
             logger.Debug<RuntimeState>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", CurrentMigrationState, FinalMigrationState ?? "<null>");

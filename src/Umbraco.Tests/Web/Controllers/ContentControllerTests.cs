@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Web.Controllers
                 });
 
             var textService = new Mock<ILocalizedTextService>();
-            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("");
+            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("text");
 
             Composition.RegisterUnique(f => Mock.Of<IContentService>());
             Composition.RegisterUnique(f => userServiceMock.Object);

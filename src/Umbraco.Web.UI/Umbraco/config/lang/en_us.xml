@@ -16,7 +16,7 @@
     <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
-    <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
@@ -147,8 +147,9 @@
     <key alias="atViewingFor">Viewing for</key>
     <key alias="delete">Content deleted</key>
     <key alias="unpublish">Content unpublished</key>
-    <key alias="publish">Content saved and Published</key>
-    <key alias="publishvariant">Content saved and published for languages: %0% </key>
+    <key alias="unpublishvariant">Content unpublished for languages: %0% </key>
+    <key alias="publish">Content published</key>
+    <key alias="publishvariant">Content published for languages: %0% </key>
     <key alias="save">Content saved</key>
     <key alias="savevariant">Content saved for languages: %0%</key>
     <key alias="move">Content moved</key>
@@ -165,10 +166,12 @@
     <key alias="smallSaveVariant">Save</key>
     <key alias="smallDelete">Delete</key>
     <key alias="smallUnpublish">Unpublish</key>
+    <key alias="smallUnpublishVariant">Unpublish</key>
     <key alias="smallRollBack">Rollback</key>
     <key alias="smallSendToPublish">Send To Publish</key>
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
+    <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -373,7 +376,6 @@
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
-    <key alias="confirmEmptyTrashcan">Please check this box to confirm deletion of %0% item(s)</key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>

@@ -14,7 +14,7 @@
     <key alias="createPackage">Opprett pakke</key>
     <key alias="delete">Slett</key>
     <key alias="disable">Deaktiver</key>
-    <key alias="emptyTrashcan">Tøm papirkurv</key>
+    <key alias="emptyRecycleBin">Tøm papirkurv</key>
     <key alias="exportDocumentType">Eksporter dokumenttype</key>
     <key alias="importDocumentType">Importer dokumenttype</key>
     <key alias="importPackage">Importer pakke</key>
@@ -218,7 +218,6 @@
     <key alias="closeThisWindow">Lukk dette vinduet</key>
     <key alias="confirmdelete">Er du sikker på at du vil slette</key>
     <key alias="confirmdisable">Er du sikker på at du vil deaktivere</key>
-    <key alias="confirmEmptyTrashcan">Vennligst kryss av i denne boksen for å bekrefte sletting av %0% element(er)</key>
     <key alias="confirmlogout">Er du sikker på at du vil forlate Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klipp ut</key>

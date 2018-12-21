@@ -88,5 +88,23 @@ namespace Umbraco.Web.Editors
         //    if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException(nameof(editor));
         //    return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
         //}
+
+        public ActionResult End(string redir = null)
+        {
+            var previewToken = Request.GetPreviewCookieValue();
+            var service = Current.PublishedSnapshotService;
+            service.ExitPreview(previewToken);
+
+            System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
+
+            if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
+                && redir.StartsWith("//") == false
+                && Uri.TryCreate(redir, UriKind.Relative, out Uri url))
+            {
+                return Redirect(url.ToString());
+            }
+
+            return Redirect("/");
+        }
     }
 }

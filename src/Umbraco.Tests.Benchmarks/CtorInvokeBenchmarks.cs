@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark]
         public void EmitCtor()
         {
-            var ctor = ReflectionUtilities.EmitConstuctor<Func<IFoo, Foo>>();
+            var ctor = ReflectionUtilities.EmitConstructor<Func<IFoo, Foo>>();
             var foo = ctor(_foo);
         }
 
