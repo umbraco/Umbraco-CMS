@@ -2,24 +2,24 @@
 
 namespace Umbraco.Web.Models.TemplateQuery
 {
-    public class OperathorTerm
+    public class OperatorTerm
     {
-        public OperathorTerm()
+        public OperatorTerm()
         {
             Name = "is";
-            Operathor = Operathor.Equals;
+            Operator = Operator.Equals;
             AppliesTo = new [] { "string" };
         }
 
-        public OperathorTerm(string name, Operathor operathor, IEnumerable<string> appliesTo)
+        public OperatorTerm(string name, Operator @operator, IEnumerable<string> appliesTo)
         {
             Name = name;
-            Operathor = operathor;
+            Operator = @operator;
             AppliesTo = appliesTo;
         }
 
         public string Name { get; set; }
-        public Operathor Operathor { get; set; }
+        public Operator Operator { get; set; }
         public IEnumerable<string> AppliesTo { get; set; }
     }
 }

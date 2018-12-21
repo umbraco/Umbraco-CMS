@@ -14,13 +14,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\BUILD.md = ..\docs\BUILD.md
-		..\docs\CODE_OF_CONDUCT.md = ..\docs\CODE_OF_CONDUCT.md
-		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
-		..\LICENSE.md = ..\LICENSE.md
-		..\docs\PULL_REQUEST_TEMPLATE.md = ..\docs\PULL_REQUEST_TEMPLATE.md
-		..\docs\README.md = ..\docs\README.md
-		..\docs\V8_GETTING_STARTED.md = ..\docs\V8_GETTING_STARTED.md
+		..\.github\BUILD.md = ..\.github\BUILD.md
+		..\.github\CLEAR.md = ..\.github\CLEAR.md
+		..\.github\CODE_OF_CONDUCT.md = ..\.github\CODE_OF_CONDUCT.md
+		..\.github\CONTRIBUTING.md = ..\.github\CONTRIBUTING.md
+		..\.github\CONTRIBUTING_DETAILED.md = ..\.github\CONTRIBUTING_DETAILED.md
+		..\.github\CONTRIBUTION_GUIDELINES.md = ..\.github\CONTRIBUTION_GUIDELINES.md
+		..\.github\PULL_REQUEST_TEMPLATE.md = ..\.github\PULL_REQUEST_TEMPLATE.md
+		..\.github\README.md = ..\.github\README.md
+		..\.github\REVIEW_PROCESS.md = ..\.github\REVIEW_PROCESS.md
+		..\.github\V8_GETTING_STARTED.md = ..\.github\V8_GETTING_STARTED.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
@@ -92,6 +95,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemplates", "{C7311C00-2184-409B-B506-52A5FAEA8736}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\ISSUE_TEMPLATE\1_Bug.md = ..\.github\ISSUE_TEMPLATE\1_Bug.md
+		..\.github\ISSUE_TEMPLATE\2_Feature_request.md = ..\.github\ISSUE_TEMPLATE\2_Feature_request.md
+		..\.github\ISSUE_TEMPLATE\3_Support_question.md = ..\.github\ISSUE_TEMPLATE\3_Support_question.md
+		..\.github\ISSUE_TEMPLATE\4_Documentation_issue.md = ..\.github\ISSUE_TEMPLATE\4_Documentation_issue.md
+		..\.github\ISSUE_TEMPLATE\5_Security_issue.md = ..\.github\ISSUE_TEMPLATE\5_Security_issue.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +147,7 @@ Global
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{53594E5B-64A2-4545-8367-E3627D266AE8} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{C7311C00-2184-409B-B506-52A5FAEA8736} = {FD962632-184C-4005-A5F3-E705D92FC645}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

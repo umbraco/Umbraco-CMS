@@ -35,11 +35,26 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
+        /// <param name="term">Term to search.</param>
+        /// <param name="culture">Optional culture.</param>
+        /// <param name="indexName">Optional index name.</param>
+        /// <remarks>
+        /// <para>When the <paramref name="culture"/> is not specified, all cultures are searched.</para>
+        /// </remarks>
         IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null);
 
         /// <summary>
         /// Searches content.
         /// </summary>
+        /// <param name="term">Term to search.</param>
+        /// <param name="skip">Numbers of items to skip.</param>
+        /// <param name="take">Numbers of items to return.</param>
+        /// <param name="totalRecords">Total number of matching items.</param>
+        /// <param name="culture">Optional culture.</param>
+        /// <param name="indexName">Optional index name.</param>
+        /// <remarks>
+        /// <para>When the <paramref name="culture"/> is not specified, all cultures are searched.</para>
+        /// </remarks>
         IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null);
 
         /// <summary>

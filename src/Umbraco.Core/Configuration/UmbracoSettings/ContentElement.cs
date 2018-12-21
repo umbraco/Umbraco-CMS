@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentElement : UmbracoConfigurationElement, IContentSection
     {
-        private const string DefaultPreviewBadge = @"<a id=""umbracoPreviewBadge"" style=""z-index:99999; position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{0}/assets/img/preview-mode-badge.png') no-repeat;"" href=""#"" OnClick=""javascript:window.top.location.href = '{0}/endPreview.aspx?redir={1}'""><span style=""display:none;"">In Preview Mode - click to end</span></a>";
+        private const string DefaultPreviewBadge = @"<a id=""umbracoPreviewBadge"" style=""z-index:99999; position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{0}/assets/img/preview-mode-badge.png') no-repeat;"" href=""#"" OnClick=""javascript:window.top.location.href = '{0}/preview/end?redir={1}'""><span style=""display:none;"">In Preview Mode - click to end</span></a>";
 
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging => (ContentImagingElement) this["imaging"];

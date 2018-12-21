@@ -127,12 +127,8 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterUmbracoControllers(typeLoader, GetType().Assembly);
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
 
-            //we aren't scanning for ISearchableTree since that is not IDiscoverable, instead we'll just filter what we've
-            //already scanned since all of our ISearchableTree is of type UmbracoApiController and in most cases any developers'
-            //own trees they want searched will also be of type UmbracoApiController. If a developer wants to replace one of ours
-            //then they will have to manually register/replace.
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<UmbracoApiController>().Where(x => x.Implements<ISearchableTree>()));
+                .Add(() => typeLoader.GetTypes<ISearchableTree>());
 
             composition.Container.Register<UmbracoTreeSearcher>(new PerRequestLifeTime());
 

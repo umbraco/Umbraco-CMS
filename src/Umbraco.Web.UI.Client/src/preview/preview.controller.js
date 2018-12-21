@@ -107,7 +107,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         /*****************************************************************************/
 
         $scope.exitPreview = function () {
-            window.top.location.href = "../endPreview.aspx?redir=%2f" + $scope.pageId;
+            window.top.location.href = "../preview/end?redir=%2f" + $scope.pageId;
         };
 
         $scope.onFrameLoaded = function (iframe) {

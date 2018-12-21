@@ -62,8 +62,7 @@ namespace Umbraco.Tests.Routing
 
         // do not test for /base here as it's handled before EnsureUmbracoRoutablePage is called
         [TestCase("/umbraco_client/Tree/treeIcons.css", false)]
-        [TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", false)]
-        [TestCase("/umbraco/umbraco.aspx", false)]
+        [TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", false)]        
         [TestCase("/umbraco/editContent.aspx", false)]
         [TestCase("/install/default.aspx", false)]
         [TestCase("/install/?installStep=license", false)]

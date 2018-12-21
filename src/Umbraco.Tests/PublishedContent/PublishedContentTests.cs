@@ -25,7 +25,7 @@ namespace Umbraco.Tests.PublishedContent
     /// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
     /// </summary>
     [TestFixture]
-    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
+    [UmbracoTest(TypeLoader = UmbracoTestOptions.TypeLoader.PerFixture)]
     public class PublishedContentTests : PublishedContentTestBase
     {
         protected override void Compose()
@@ -72,9 +72,9 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        protected override TypeLoader CreateTypeLoader(IServiceFactory f)
         {
-            var pluginManager = base.CreatePluginManager(f);
+            var pluginManager = base.CreateTypeLoader(f);
 
             // this is so the model factory looks into the test assembly
             pluginManager.AssembliesToScan = pluginManager.AssembliesToScan

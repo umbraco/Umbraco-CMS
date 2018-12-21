@@ -13,5 +13,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         [JsonProperty("date")]
         public DateTime Date { get; set; }
+
+        [JsonProperty("isDraft")]
+        public bool IsDraft { get; set; }
     }
 }

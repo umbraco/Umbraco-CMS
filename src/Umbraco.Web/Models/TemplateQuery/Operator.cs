@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Web.Models.TemplateQuery
 {
-    public enum Operathor
+    public enum Operator
     {
         Equals = 1,
         NotEquals = 2,
