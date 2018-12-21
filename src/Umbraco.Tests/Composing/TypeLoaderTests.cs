@@ -58,18 +58,17 @@ namespace Umbraco.Tests.Composing
 
             // cleanup
             var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            foreach (var d in Directory.GetDirectories(Path.Combine(assDir.FullName, "TypeLoader")))
-                Directory.Delete(d, true);
+            var tlDir = Path.Combine(assDir.FullName, "TypeLoader");
+            if (!Directory.Exists(tlDir))
+                return;
+            Directory.Delete(tlDir, true);
         }
 
         private DirectoryInfo PrepareFolder()
         {
             var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "TypeLoader", Guid.NewGuid().ToString("N")));
-            foreach (var f in dir.GetFiles())
-            {
-                f.Delete();
-            }
+            var tlDir = Path.Combine(assDir.FullName, "TypeLoader");
+            var dir = Directory.CreateDirectory(Path.Combine(tlDir, Guid.NewGuid().ToString("N")));
             return dir;
         }
 
