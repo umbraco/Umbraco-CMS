@@ -121,24 +121,27 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            //return a normal node menu:
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionSort>(Services.TextService);
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
-            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
+                menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
                 menu.DefaultMenuAlias = null;
-                menu.Items.Insert(2, new MenuItem(ActionRestore.ActionAlias, Services.TextService)
-                {
-                    OpensDialog = true
-                });
+                
             }
             else
             {
+                //return a normal node menu:
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionSort>(Services.TextService);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
             }
