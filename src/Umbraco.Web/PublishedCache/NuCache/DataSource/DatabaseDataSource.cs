@@ -182,27 +182,30 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             ContentData d = null;
             ContentData p = null;
 
-            if (dto.EditData == null)
+            if (dto.Edited)
             {
-                if (Debugger.IsAttached)
-                    throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
-                Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
-            }
-            else
-            {
-                var nested = DeserializeNestedData(dto.EditData);
-
-                d = new ContentData
+                if (dto.EditData == null)
                 {
-                    Name = dto.EditName,
-                    Published = false,
-                    TemplateId = dto.EditTemplateId,
-                    VersionId = dto.VersionId,
-                    VersionDate = dto.EditVersionDate,
-                    WriterId = dto.EditWriterId,
-                    Properties = nested.PropertyData,
-                    CultureInfos = nested.CultureData
-                };
+                    if (Debugger.IsAttached)
+                        throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
+                }
+                else
+                {
+                    var nested = DeserializeNestedData(dto.EditData);
+
+                    d = new ContentData
+                    {
+                        Name = dto.EditName,
+                        Published = false,
+                        TemplateId = dto.EditTemplateId,
+                        VersionId = dto.VersionId,
+                        VersionDate = dto.EditVersionDate,
+                        WriterId = dto.EditWriterId,
+                        Properties = nested.PropertyData,
+                        CultureInfos = nested.CultureData
+                    };
+                }
             }
 
             if (dto.Published)

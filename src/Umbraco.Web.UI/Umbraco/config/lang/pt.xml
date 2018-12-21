@@ -13,7 +13,7 @@
     <key alias="createPackage">Criar Pacote</key>
     <key alias="delete">Remover</key>
     <key alias="disable">Desabilitar</key>
-    <key alias="emptyTrashcan">Esvaziar Lixeira</key>
+    <key alias="emptyRecycleBin">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
     <key alias="importDocumentType">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>
@@ -158,7 +158,6 @@
     <key alias="closeThisWindow">Fechar esta janela</key>
     <key alias="confirmdelete">Certeza em remover</key>
     <key alias="confirmdisable">Certeza em desabilitar</key>
-    <key alias="confirmEmptyTrashcan">Favor selecionar esta caixa para confirmar a remoção de %0% item(s)</key>
     <key alias="confirmlogout">Tem certeza</key>
     <key alias="confirmSure">Tem certeza?</key>
     <key alias="cut">Cortar</key>

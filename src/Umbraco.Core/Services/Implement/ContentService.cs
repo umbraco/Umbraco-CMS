@@ -2710,11 +2710,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                if (string.IsNullOrWhiteSpace(content.Name))
-                {
-                    throw new ArgumentException("Cannot save content blueprint with empty name.");
-                }
-
                 if (content.HasIdentity == false)
                 {
                     content.CreatorId = userId;

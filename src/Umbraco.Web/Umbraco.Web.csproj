@@ -36,6 +36,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -112,6 +113,8 @@
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\KeepAliveController.cs" />
+    <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
@@ -151,6 +154,10 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\ObjectType.cs" />
+    <Compile Include="Models\ContentEditing\RelationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\RelationTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\RelationTypeSave.cs" />
     <Compile Include="Models\ContentEditing\RollbackVersion.cs" />
     <Compile Include="Models\ContentEditing\SearchResult.cs" />
     <Compile Include="Models\ContentEditing\SearchResults.cs" />
@@ -520,9 +527,6 @@
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
-    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
@@ -627,9 +631,7 @@
     <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
-    <Compile Include="Models\ContentEditing\Relation.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
-    <Compile Include="Models\ContentEditing\RelationType.cs" />
     <Compile Include="ITagQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Models\Mapping\RelationMapperProfile.cs" />
@@ -682,8 +684,8 @@
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />
     <Compile Include="Models\TemplateQuery\TemplateQueryResult.cs" />
     <Compile Include="Models\TemplateQuery\SortExpression.cs" />
-    <Compile Include="Models\TemplateQuery\Operathor.cs" />
-    <Compile Include="Models\TemplateQuery\OperathorTerm.cs" />
+    <Compile Include="Models\TemplateQuery\Operator.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorTerm.cs" />
     <Compile Include="Models\TemplateQuery\QueryCondition.cs" />
     <Compile Include="Models\TemplateQuery\QueryModel.cs" />
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
@@ -832,9 +834,6 @@
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
-    <Compile Include="Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
-    <Compile Include="Migrations\EnsureListViewDataTypeIsCreated.cs" />
-    <Compile Include="Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
     <Compile Include="Components\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
@@ -1002,7 +1001,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Migrations\RebuildXmlCachesAfterUpgrade.cs" />
     <Compile Include="Components\PublicAccessComponent.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
@@ -1167,9 +1165,6 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1238,13 +1233,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.cs">
-      <DependentUpon>NewRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
-      <DependentUpon>NewRelationType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
@@ -1317,9 +1305,6 @@
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
       <SubType>ASPXCodeBehind</SubType>

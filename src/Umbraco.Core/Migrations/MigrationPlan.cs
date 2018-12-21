@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
+using Type = System.Type;
 
 namespace Umbraco.Core.Migrations
 {
@@ -12,8 +13,6 @@ namespace Umbraco.Core.Migrations
     /// </summary>
     public class MigrationPlan
     {
-        private readonly IMigrationBuilder _migrationBuilder;
-        private readonly ILogger _logger;
         private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
 
         private string _prevState;
@@ -23,64 +22,24 @@ namespace Umbraco.Core.Migrations
         /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
         /// </summary>
         /// <param name="name">The name of the plan.</param>
-        /// <remarks>The plan cannot be executed. Use this constructor e.g. when only validating the plan,
-        /// or trying to get its final state, without actually needing to execute it.</remarks>
         public MigrationPlan(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // (accepted)
-            DefinePlan();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
+        /// Gets the transitions.
         /// </summary>
-        /// <param name="name">The name of the plan.</param>
-        /// <param name="migrationBuilder">A migration builder.</param>
-        /// <param name="logger">A logger.</param>
-        /// <remarks>The plan can be executed.</remarks>
-        public MigrationPlan(string name, IMigrationBuilder migrationBuilder, ILogger logger)
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            Name = name;
-            _migrationBuilder = migrationBuilder ?? throw new ArgumentNullException(nameof(migrationBuilder));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // (accepted)
-            DefinePlan();
-        }
-
-        /// <summary>
-        /// Defines the plan.
-        /// </summary>
-        protected virtual void DefinePlan() { }
+        public IReadOnlyDictionary<string, Transition> Transitions => _transitions;
 
         /// <summary>
         /// Gets the name of the plan.
         /// </summary>
         public string Name { get; }
 
-        /// <summary>
-        /// Adds an empty migration from source to target state.
-        /// </summary>
-        public MigrationPlan Add(string sourceState, string targetState)
-            => Add<NoopMigration>(sourceState, targetState);
-
-        /// <summary>
-        /// Adds a migration from source to target state.
-        /// </summary>
-        public MigrationPlan Add<TMigration>(string sourceState, string targetState)
-            where TMigration : IMigration
-            => Add(sourceState, targetState, typeof(TMigration));
-
-        /// <summary>
-        /// Adds a migration from source to target state.
-        /// </summary>
-        public MigrationPlan Add(string sourceState, string targetState, Type migration)
+        // adds a transition
+        private MigrationPlan Add(string sourceState, string targetState, Type migration)
         {
             if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
             if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentNullOrEmptyException(nameof(targetState));
@@ -113,26 +72,26 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-        /// Chains an empty migration from chain to target state.
-        /// </summary>
-        public MigrationPlan Chain(string targetState)
-            => Chain<NoopMigration>(targetState);
+    /// Adds a transition to a target state through an empty migration.
+    /// </summary>
+        public MigrationPlan To(string targetState)
+            => To<NoopMigration>(targetState);
 
         /// <summary>
-        /// Chains a migration from chain to target state.
+        /// Adds a transition to a target state through a migration.
         /// </summary>
-        public MigrationPlan Chain<TMigration>(string targetState)
+        public MigrationPlan To<TMigration>(string targetState)
             where TMigration : IMigration
-            => Chain(targetState, typeof(TMigration));
+            => To(targetState, typeof(TMigration));
 
         /// <summary>
-        /// Chains a migration from chain to target state.
+        /// Adds a transition to a target state through a migration.
         /// </summary>
-        public MigrationPlan Chain(string targetState, Type migration)
+        public MigrationPlan To(string targetState, Type migration)
             => Add(_prevState, targetState, migration);
 
         /// <summary>
-        /// Sets the chain state.
+        /// Sets the starting state.
         /// </summary>
         public MigrationPlan From(string sourceState)
         {
@@ -141,19 +100,16 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-        /// Copies a chain.
+        /// Adds transitions to a target state by copying transitions from a start state to an end state.
         /// </summary>
-        /// <remarks>Copies the chain going from startState to endState, with new states going from sourceState to targetState.</remarks>
-        public MigrationPlan CopyChain(string sourceState, string startState, string endState, string targetState)
+        public MigrationPlan To(string targetState, string startState, string endState)
         {
-            if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
             if (string.IsNullOrWhiteSpace(startState)) throw new ArgumentNullOrEmptyException(nameof(startState));
             if (string.IsNullOrWhiteSpace(endState)) throw new ArgumentNullOrEmptyException(nameof(endState));
             if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentNullOrEmptyException(nameof(targetState));
-            if (sourceState == targetState) throw new ArgumentException("Source and target states cannot be identical.");
+
             if (startState == endState) throw new ArgumentException("Start and end states cannot be identical.");
 
-            sourceState = sourceState.Trim();
             startState = startState.Trim();
             endState = endState.Trim();
             targetState = targetState.Trim();
@@ -168,25 +124,17 @@ namespace Umbraco.Core.Migrations
                 visited.Add(state);
 
                 if (!_transitions.TryGetValue(state, out var transition))
-                    throw new InvalidOperationException($"There is no transition from state \"{sourceState}\".");
+                    throw new InvalidOperationException($"There is no transition from state \"{state}\".");
 
                 var newTargetState = transition.TargetState == endState
                     ? targetState
                     : Guid.NewGuid().ToString("B").ToUpper();
-                Add(sourceState, newTargetState, transition.MigrationType);
-                sourceState = newTargetState;
+                To(newTargetState, transition.MigrationType);
                 state = transition.TargetState;
             }
 
             return this;
         }
-
-        /// <summary>
-        /// Copies a chain.
-        /// </summary>
-        /// <remarks>Copies the chain going from startState to endState, with new states going from chain to targetState.</remarks>
-        public MigrationPlan CopyChain(string startState, string endState, string targetState)
-            => CopyChain(_prevState, startState, endState, targetState);
 
         /// <summary>
         /// Gets the initial state.
@@ -260,50 +208,92 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         /// <param name="scope">A scope.</param>
         /// <param name="fromState">The state to start execution at.</param>
+        /// <param name="migrationBuilder">A migration builder.</param>
+        /// <param name="logger">A logger.</param>
         /// <returns>The final state.</returns>
         /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-        public string Execute(IScope scope, string fromState)
+        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger logger)
         {
             Validate();
 
-            if (_migrationBuilder == null || _logger == null)
-                throw new InvalidOperationException("Cannot execute a non-executing plan.");
+            if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            _logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
+            logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
 
             var origState = fromState ?? string.Empty;
 
-            _logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
+            logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
                 throw new Exception($"Unknown state \"{origState}\".");
 
-            var context = new MigrationContext(scope.Database, _logger);
+            var context = new MigrationContext(scope.Database, logger);
 
             while (transition != null)
             {
-                var migration = _migrationBuilder.Build(transition.MigrationType, context);
+                var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
 
                 var nextState = transition.TargetState;
                 origState = nextState;
 
-                _logger.Info<MigrationPlan>("At {OrigState}", origState);
+                logger.Info<MigrationPlan>("At {OrigState}", origState);
 
                 if (!_transitions.TryGetValue(origState, out transition))
                     throw new Exception($"Unknown state \"{origState}\".");
             }
 
-            _logger.Info<MigrationPlan>("Done (pending scope completion).");
+            logger.Info<MigrationPlan>("Done (pending scope completion).");
 
-            // fixme - what about post-migrations?
+            // safety check
+            if (origState != _finalState)
+                throw new Exception($"Internal error, reached state {origState} which is not final state {_finalState}");
+
+            return origState;
+        }
+
+        /// <summary>
+        /// Follows a path (for tests and debugging).
+        /// </summary>
+        /// <remarks>Does the same thing Execute does, but does not actually execute migrations.</remarks>
+        internal string FollowPath(string fromState, string toState = null)
+        {
+            toState = toState.NullOrWhiteSpaceAsNull();
+
+            Validate();
+
+            var origState = fromState ?? string.Empty;
+
+            if (!_transitions.TryGetValue(origState, out var transition))
+                throw new Exception($"Unknown state \"{origState}\".");
+
+            while (transition != null)
+            {
+                var nextState = transition.TargetState;
+                origState = nextState;
+
+                if (nextState == toState)
+                {
+                    transition = null;
+                    continue;
+                }
+
+                if (!_transitions.TryGetValue(origState, out transition))
+                    throw new Exception($"Unknown state \"{origState}\".");
+            }
+
+            // safety check
+            if (origState != (toState ?? _finalState))
+                throw new Exception($"Internal error, reached state {origState} which is not state {toState ?? _finalState}");
+
             return origState;
         }
 
         /// <summary>
         /// Represents a plan transition.
         /// </summary>
-        private class Transition
+        public class Transition
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="Transition"/> class.

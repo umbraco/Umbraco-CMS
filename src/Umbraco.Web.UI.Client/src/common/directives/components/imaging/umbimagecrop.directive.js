@@ -274,7 +274,7 @@ angular.module("umbraco.directives")
 					}
 
 					//// INIT /////
-					$image.load(function(){
+					$image.on("load", function(){
 						$timeout(function(){
 							init($image);
 						});

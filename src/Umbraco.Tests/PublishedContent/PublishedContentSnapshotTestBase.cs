@@ -40,9 +40,9 @@ namespace Umbraco.Tests.PublishedContent
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        protected override TypeLoader CreateTypeLoader(IServiceFactory f)
         {
-            var pluginManager = base.CreatePluginManager(f);
+            var pluginManager = base.CreateTypeLoader(f);
 
             // this is so the model factory looks into the test assembly
             pluginManager.AssembliesToScan = pluginManager.AssembliesToScan

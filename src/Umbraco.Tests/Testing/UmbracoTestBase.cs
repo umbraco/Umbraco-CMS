@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Testing
             ComposeLogging(Options.Logger);
             ComposeCacheHelper();
             ComposeAutoMapper(Options.AutoMapper);
-            ComposePluginManager(Options.PluginManager);
+            ComposeTypeLoader(Options.TypeLoader);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
 
@@ -230,30 +230,30 @@ namespace Umbraco.Tests.Testing
             Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
         }
 
-        protected virtual void ComposePluginManager(UmbracoTestOptions.PluginManager pluginManager)
+        protected virtual void ComposeTypeLoader(UmbracoTestOptions.TypeLoader typeLoader)
         {
             Container.RegisterSingleton(f =>
             {
-                switch (pluginManager)
+                switch (typeLoader)
                 {
-                    case UmbracoTestOptions.PluginManager.Default:
-                        return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonPluginManager(f));
-                    case UmbracoTestOptions.PluginManager.PerFixture:
-                        return _featureTypeLoader ?? (_featureTypeLoader = CreatePluginManager(f));
-                    case UmbracoTestOptions.PluginManager.PerTest:
-                        return CreatePluginManager(f);
+                    case UmbracoTestOptions.TypeLoader.Default:
+                        return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(f));
+                    case UmbracoTestOptions.TypeLoader.PerFixture:
+                        return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(f));
+                    case UmbracoTestOptions.TypeLoader.PerTest:
+                        return CreateTypeLoader(f);
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(pluginManager));
+                        throw new ArgumentOutOfRangeException(nameof(typeLoader));
                 }
             });
         }
 
-        protected virtual TypeLoader CreatePluginManager(IServiceFactory f)
+        protected virtual TypeLoader CreateTypeLoader(IServiceFactory f)
         {
-            return CreateCommonPluginManager(f);
+            return CreateCommonTypeLoader(f);
         }
 
-        private static TypeLoader CreateCommonPluginManager(IServiceFactory f)
+        private static TypeLoader CreateCommonTypeLoader(IServiceFactory f)
         {
             return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>(), false)
             {
