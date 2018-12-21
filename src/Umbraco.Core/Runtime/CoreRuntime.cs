@@ -36,6 +36,11 @@ namespace Umbraco.Core.Runtime
         protected ILogger Logger { get; private set; }
 
         /// <summary>
+        /// Gets the profiler.
+        /// </summary>
+        protected IProfiler Profiler { get; private set; }
+
+        /// <summary>
         /// Gets the profiling logger.
         /// </summary>
         protected IProfilingLogger ProfilingLogger { get; private set; }
@@ -50,50 +55,9 @@ namespace Umbraco.Core.Runtime
             // ie the bare minimum required to boot
 
             // loggers
-            var logger = GetLogger();
-            Logger = logger;
-            var profiler = GetProfiler();
-            var profilingLogger = new ProfilingLogger(logger, profiler);
-            ProfilingLogger = profilingLogger;
-
-            // application environment
-            ConfigureUnhandledException();
-            ConfigureAssemblyResolve();
-            ConfigureApplicationRootPath();
-
-            // application caches
-            var appCaches = GetAppCaches();
-            var runtimeCache = appCaches.RuntimeCache;
-
-            // database factory
-            var databaseFactory = GetDatabaseFactory();
-
-            // type loader
-            var globalSettings = Current.Config.Global();
-            var localTempStorage = globalSettings.LocalTempStorageLocation;
-            var typeLoader = new TypeLoader(runtimeCache, localTempStorage, profilingLogger);
-
-            // runtime state
-            // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
-            // as the second one captures the current value (null) and therefore fails
-            _state = new RuntimeState(logger,
-                Current.Config.Umbraco(), Current.Config.Global(),
-                new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
-                new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
-            {
-                Level = RuntimeLevel.Boot
-            };
-
-            // main dom
-            var mainDom = new MainDom(logger);
-
-            // create the composition
-            var composition = new Composition(register, typeLoader, profilingLogger, _state);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
-
-            // register runtime-level services
-            // there should be none, really - this is here "just in case"
-            Compose(composition);
+            var logger = Logger = GetLogger();
+            var profiler = Profiler = GetProfiler();
+            var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -104,56 +68,109 @@ namespace Umbraco.Core.Runtime
             // are NOT disposed - which is not a big deal as long as they remain lightweight
             // objects.
 
-            using (var bootTimer = ProfilingLogger.TraceDuration<CoreRuntime>(
+            using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
                 $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()} on {NetworkHelper.MachineName}.",
                 "Booted.",
                 "Boot failed."))
             {
-                try
+                logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+
+                // application environment
+                ConfigureUnhandledException();
+                ConfigureAssemblyResolve();
+                ConfigureApplicationRootPath();
+
+                Boot(register, timer);
+            }
+
+            return _factory;
+        }
+
+        /// <summary>
+        /// Boots the runtime within a timer.
+        /// </summary>
+        protected virtual IFactory Boot(IRegister register, DisposableTimer timer)
+        {
+            Composition composition = null;
+
+            try
+            {
+                // throws if not full-trust
+                new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
+
+                // application caches
+                var appCaches = GetAppCaches();
+                var runtimeCache = appCaches.RuntimeCache;
+
+                // database factory
+                var databaseFactory = GetDatabaseFactory();
+
+                // type loader
+                var globalSettings = Current.Config.Global();
+                var localTempStorage = globalSettings.LocalTempStorageLocation;
+                var typeLoader = new TypeLoader(runtimeCache, localTempStorage, ProfilingLogger);
+
+                // runtime state
+                // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
+                // as the second one captures the current value (null) and therefore fails
+                _state = new RuntimeState(Logger,
+                    Current.Config.Umbraco(), Current.Config.Global(),
+                    new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
+                    new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
                 {
-                    // throws if not full-trust
-                    new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
+                    Level = RuntimeLevel.Boot
+                };
 
-                    logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                // main dom
+                var mainDom = new MainDom(Logger);
 
-                    AquireMainDom(mainDom);
+                // create the composition
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
 
-                    DetermineRuntimeLevel(databaseFactory, profilingLogger);
+                // register runtime-level services
+                // there should be none, really - this is here "just in case"
+                Compose(composition);
 
-                    var componentTypes = ResolveComponentTypes(typeLoader);
-                    _components = new Components.Components(composition, componentTypes, profilingLogger);
+                // acquire the main domain, determine our runtime level
+                AcquireMainDom(mainDom);
+                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
-                    _components.Compose();
+                // get components, and compose them
+                var componentTypes = ResolveComponentTypes(typeLoader);
+                _components = new Components.Components(composition, componentTypes, ProfilingLogger);
+                _components.Compose();
 
-                    _factory = Current.Factory = composition.CreateFactory();
+                // create the factory
+                _factory = Current.Factory = composition.CreateFactory();
 
-                    _components.Initialize(_factory);
-                }
-                catch (Exception e)
+                // initialize the components
+                _components.Initialize(_factory);
+            }
+            catch (Exception e)
+            {
+                _state.Level = RuntimeLevel.BootFailed;
+                var bfe = e as BootFailedException ?? new BootFailedException("Boot failed.", e);
+                _state.BootFailedException = bfe;
+                timer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
+
+                // if something goes wrong above, we may end up with no factory
+                // meaning nothing can get the runtime state, etc - so let's try
+                // to make sure we have a factory
+                if (_factory == null)
                 {
-                    _state.Level = RuntimeLevel.BootFailed;
-                    var bfe = e as BootFailedException ?? new BootFailedException("Boot failed.", e);
-                    _state.BootFailedException = bfe;
-                    bootTimer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
-
-                    // if something goes wrong above, we may end up with no factory
-                    // meaning nothing can get the runtime state, etc - so let's try
-                    // to make sure we have a factory
-                    if (_factory == null)
+                    try
                     {
-                        try
-                        {
-                            _factory = Current.Factory = composition.CreateFactory();
-                        }
-                        catch { /* yea */ }
+                        _factory = Current.Factory = composition?.CreateFactory();
                     }
-
-                    // throwing here can cause w3wp to hard-crash and we want to avoid it.
-                    // instead, we're logging the exception and setting level to BootFailed.
-                    // various parts of Umbraco such as UmbracoModule and UmbracoDefaultOwinStartup
-                    // understand this and will nullify themselves, while UmbracoModule will
-                    // throw a BootFailedException for every requests.
+                    catch { /* yea */ }
                 }
+
+                // throwing here can cause w3wp to hard-crash and we want to avoid it.
+                // instead, we're logging the exception and setting level to BootFailed.
+                // various parts of Umbraco such as UmbracoModule and UmbracoDefaultOwinStartup
+                // understand this and will nullify themselves, while UmbracoModule will
+                // throw a BootFailedException for every requests.
             }
 
             return _factory;
@@ -197,7 +214,7 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private void AquireMainDom(MainDom mainDom)
+        private void AcquireMainDom(MainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {

@@ -57,7 +57,7 @@ namespace Umbraco.Web.Runtime
 
         #region Getters
 
-        protected override IProfiler GetProfiler() => new WebProfiler();
+        protected override IProfiler GetProfiler() => _webProfiler;
 
         protected override CacheHelper GetAppCaches() => new CacheHelper(
                 // we need to have the dep clone runtime cache provider to ensure

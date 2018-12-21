@@ -34,7 +34,7 @@ namespace Umbraco.Core.Composing
 
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
         private readonly object _locko = new object();
-        private readonly object _timerLock = new object(); #error
+        private readonly object _timerLock = new object();
 
         private Timer _timer;
         private bool _timing;

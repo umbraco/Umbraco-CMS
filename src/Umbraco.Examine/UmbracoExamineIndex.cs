@@ -48,11 +48,10 @@ namespace Umbraco.Examine
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected UmbracoExamineIndex()
-            : base()
         {
             ProfilingLogger = Current.ProfilingLogger;
             _configBased = true;
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger);
         }
 
         /// <summary>
