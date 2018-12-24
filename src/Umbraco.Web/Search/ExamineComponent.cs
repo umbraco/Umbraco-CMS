@@ -23,6 +23,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
+using Examine.LuceneEngine.Indexing;
 using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
@@ -92,6 +93,11 @@ namespace Umbraco.Web.Search
                     false));
             composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+
+            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
+            //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
+            //is instantiated, as the value is used during instantiation
+            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
         }
 
         internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
@@ -110,10 +116,6 @@ namespace Umbraco.Web.Search
             _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
-
-            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
-            //and then we'll use MainDom to control Examine's shutdown
-            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
 
             //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
             //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
@@ -149,7 +151,7 @@ namespace Umbraco.Web.Search
 
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
-            var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
+            var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
             profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
@@ -166,9 +168,9 @@ namespace Umbraco.Web.Search
 
             EnsureUnlocked(profilingLogger.Logger, examineManager);
 
+            //TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
             RebuildIndexes(indexRebuilder, profilingLogger.Logger, true, 5000);
         }
-
 
         /// <summary>
         /// Called to rebuild empty indexes on startup
@@ -202,7 +204,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        
+
 
         /// <summary>
         /// Must be called to each index is unlocked before any indexing occurs
@@ -480,7 +482,7 @@ namespace Umbraco.Web.Search
                 //Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
                 foreach (var id in ci.Value.removedIds)
                 {
-                    foreach (var index in _examineManager.Indexes.OfType<IUmbracoIndexer>())
+                    foreach (var index in _examineManager.Indexes.OfType<IUmbracoIndex>())
                     {
                         var searcher = index.GetSearcher();
 
@@ -489,9 +491,7 @@ namespace Umbraco.Web.Search
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.Search(
-                                    searcher.CreateCriteria().Field("nodeType", id).Compile(),
-                                    maxResults: pageSize * (page + 1));
+                            var results = searcher.CreateQuery().Field("nodeType", id).Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 
@@ -582,7 +582,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        
+
         #endregion
 
         #region ReIndex/Delete for entity
@@ -686,7 +686,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
             {
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
                     .Where(x => x.EnableDefaultEventHandler))
@@ -723,7 +723,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
                     .Where(x => x.EnableDefaultEventHandler))
@@ -752,7 +752,7 @@ namespace Umbraco.Web.Search
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
                 var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => x.EnableDefaultEventHandler))
                 {
@@ -782,8 +782,8 @@ namespace Umbraco.Web.Search
             public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndexer>()
-                    
+                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+
                     .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {

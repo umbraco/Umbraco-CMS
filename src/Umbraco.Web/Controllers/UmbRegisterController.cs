@@ -10,6 +10,7 @@ namespace Umbraco.Web.Controllers
     public class UmbRegisterController : SurfaceController
     {
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
         {
             if (ModelState.IsValid == false)

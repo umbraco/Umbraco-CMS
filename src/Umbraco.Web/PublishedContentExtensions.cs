@@ -4,12 +4,13 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using Examine;
-using Examine.LuceneEngine.SearchCriteria;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
@@ -266,7 +267,7 @@ namespace Umbraco.Web
 
         #region Search
 
-        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
+        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
             //fixme: pass in the IExamineManager
 
@@ -276,17 +277,18 @@ namespace Umbraco.Web
 
             var searcher = index.GetSearcher();
 
-            var t = term.Escape().Value;
-            if (useWildCards)
-                t = term.MultipleCharacterWildcard().Value;
+            //var t = term.Escape().Value;
+            //var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
 
-            var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
-            var crit = searcher.CreateCriteria().RawQuery(luceneQuery);
+            var query = searcher.CreateQuery()
+                .Field(UmbracoExamineIndex.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
+                .And()
+                .ManagedQuery(term);
 
-            return content.Search(crit, searcher);
+            return query.Execute().ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
         }
 
-        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
+        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
         {
             //fixme: pass in the IExamineManager
 
@@ -296,28 +298,15 @@ namespace Umbraco.Web
 
             var searcher = index.GetSearcher();
 
-            var t = term.Escape().Value;
-            if (useWildCards)
-                t = term.MultipleCharacterWildcard().Value;
+            //var t = term.Escape().Value;
+            //var luceneQuery = "+parentID:" + content.Id + " +" + t;
 
-            var luceneQuery = "+parentID:" + content.Id + " +" + t;
-            var crit = searcher.CreateCriteria().RawQuery(luceneQuery);
+            var query = searcher.CreateQuery()
+                .Field("parentID", content.Id)
+                .And()
+                .ManagedQuery(term);
 
-            return content.Search(crit, searcher);
-        }
-
-        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, ISearcher searchProvider = null)
-        {
-            //fixme: pass in the IExamineManager
-
-            if (searchProvider == null)
-            {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
-                    throw new InvalidOperationException("No index found with name " + Constants.UmbracoIndexes.ExternalIndexName);
-                searchProvider = index.GetSearcher();
-            }
-            var results = searchProvider.Search(criteria);
-            return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
+            return query.Execute().ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
         }
 
         #endregion

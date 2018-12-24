@@ -14,7 +14,7 @@
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
-        <dependencies>
+        <dependencies> 
             <!--
               note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
               the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
@@ -25,8 +25,7 @@
             <dependency id="ClientDependency" version="[1.9.7,1.999999)" />
             <dependency id="ClientDependency-Mvc5" version="[1.8.0,1.999999)" />
             <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.999999)" />
-            <dependency id="Examine" version="[1.0.0-beta046,1.999999)" />
-            <dependency id="Lucene.Net.Contrib" version="[3.0.3,3.999999)" />
+            <dependency id="Examine" version="[1.0.0-beta067,1.999999)" />
             <dependency id="HtmlAgilityPack" version="[1.8.9,1.999999)" />
             <dependency id="ImageProcessor" version="[2.6.2.25,2.999999)" />
             <dependency id="LightInject.Mvc" version="[2.0.0,2.999999)" />

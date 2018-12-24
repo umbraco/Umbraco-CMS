@@ -292,7 +292,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
-    <key alias="dragFilesHereToUpload">You can drag files here to upload</key>
+        <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
@@ -1757,7 +1757,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
     <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
-    <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
+        <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
     <key alias="writer">Writer</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>

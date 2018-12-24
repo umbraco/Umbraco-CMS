@@ -109,11 +109,9 @@ namespace Umbraco.Web.Search
                 return Enumerable.Empty<SearchResultEntity>();
             }
 
-            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString());
-
-            var result = internalSearcher
+            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString())
                 //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-                .Search(raw, Convert.ToInt32(pageSize * (pageIndex + 1)));
+                .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
 
             totalFound = result.TotalItemCount;
 

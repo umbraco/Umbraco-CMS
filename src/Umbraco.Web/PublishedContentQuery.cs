@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.XPath;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -181,57 +181,77 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null)
         {
-            return Search(0, 0, out _, term, useWildCards, indexName);
+            return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null)
         {
-            //fixme: inject IExamineManager
-
             indexName = string.IsNullOrEmpty(indexName)
                 ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
-                throw new InvalidOperationException($"No index found by name {indexName}");
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
 
-            var searcher = index.GetSearcher();
+            var searcher = umbIndex.GetSearcher();
 
-            var results = skip == 0 && take == 0
-                ? searcher.Search(term, true)
-                : searcher.Search(term, true, maxResults: skip + take);
+            // default to max 500 results
+            var count = skip == 0 && take == 0 ? 500 : skip + take;
 
-            totalRecords = results.TotalItemCount;
-            return results.ToPublishedSearchResults(_contentCache);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, ISearcher searchProvider = null)
-        {
-            return Search(0, 0, out _, criteria, searchProvider);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
-        {
-            //fixme: inject IExamineManager
-            if (searcher == null)
+            ISearchResults results;
+            if (culture.IsNullOrWhiteSpace())
             {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
-                    throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.ExternalIndexName}");
-                searcher = index.GetSearcher();
+                results = searcher.Search(term, count);
+            }
+            else
+            {
+                //get all index fields suffixed with the culture name supplied
+                var cultureFields = new List<string>();
+                var fields = umbIndex.GetFields();
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, 1); //must vary by culture
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (var field in fields)
+                {
+                    var match = CultureIsoCodeFieldName.Match(field);
+                    if (match.Success && match.Groups.Count == 2 && culture.InvariantEquals(match.Groups[1].Value))
+                        cultureFields.Add(field);
+                }
+
+                qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
+                results = qry.Execute(count);
             }
 
+            totalRecords = results.TotalItemCount;
+            return results.ToPublishedSearchResults(_contentCache);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
+        {
+            return Search(query, 0, 0, out _);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
+        {
             var results = skip == 0 && take == 0
-                ? searcher.Search(criteria)
-                : searcher.Search(criteria, maxResults: skip + take);
+                ? query.Execute()
+                : query.Execute(maxResults: skip + take);
 
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
+
+        /// <summary>
+        /// Matches a culture iso name suffix
+        /// </summary>
+        /// <remarks>
+        /// myFieldName_en-us will match the "en-us"
+        /// </remarks>
+        private static readonly Regex CultureIsoCodeFieldName = new Regex("^[_\\w]+_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
 
         #endregion
