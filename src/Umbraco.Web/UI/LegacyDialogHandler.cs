@@ -207,7 +207,7 @@ namespace Umbraco.Web.UI
 
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
-            typeInstance.Alias = text;
+            typeInstance.Alias = text.CleanForXss();
 
             // check for returning url
             ITaskReturnUrl returnUrlTask = typeInstance as LegacyDialogTask;
