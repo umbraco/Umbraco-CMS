@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -293,6 +295,12 @@ namespace Umbraco.Core.IO
         {
             var property = GetProperty(content, propertyTypeAlias);
             var svalue = property.Value as string;
+            if (svalue != null && svalue.DetectIsJson())
+            {
+                // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
+                var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
+                svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
+            }
             var oldpath = svalue == null ? null : GetRelativePath(svalue);
             var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
             property.Value = GetUrl(filepath);
