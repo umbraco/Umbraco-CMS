@@ -618,6 +618,8 @@ namespace Umbraco.Core.Composing
             // doesn't actualy load in all assemblies, only the types that have been referenced so far.
             // However, in a web context, the BuildManager will have executed which will force all assemblies
             // to be loaded so it's fine for now.
+            // It could be fairly easy to parse the typeName to get the assembly name and then do Assembly.Load and
+            // find the type from there.
 
             //now try fall back procedures.
             type = Type.GetType(typeName);

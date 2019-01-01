@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
@@ -11,6 +12,80 @@ namespace Umbraco.Tests.Persistence.NPocoTests
     [TestFixture]
     public class NPocoSqlExtensionsTests : BaseUsingSqlCeSyntax
     {
+        [Test]
+        public void WhereTest()
+        {
+            var sql = new Sql<ISqlContext>(SqlContext)
+                .Select("*")
+                .From<PropertyDataDto>()
+                .Where<PropertyDataDto>(x => x.LanguageId == null);
+            Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] is null))", sql.SQL, sql.SQL);
+
+            sql = new Sql<ISqlContext>(SqlContext)
+                .Select("*")
+                .From<PropertyDataDto>()
+                .Where<PropertyDataDto>(x => x.LanguageId == 123);
+            Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))", sql.SQL, sql.SQL);
+
+            var id = 123;
+
+            sql = new Sql<ISqlContext>(SqlContext)
+                .Select("*")
+                .From<PropertyDataDto>()
+                .Where<PropertyDataDto>(x => x.LanguageId == id);
+            Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))", sql.SQL, sql.SQL);
+
+            int? nid = 123;
+
+            sql = new Sql<ISqlContext>(SqlContext)
+                .Select("*")
+                .From<PropertyDataDto>()
+                .Where<PropertyDataDto>(x => x.LanguageId == nid);
+            Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))", sql.SQL, sql.SQL);
+
+            // but the above comparison fails if @0 is null
+            // what we want is something similar to:
+
+            sql = new Sql<ISqlContext>(SqlContext)
+                .Select("*")
+                .From<PropertyDataDto>()
+                .Where<PropertyDataDto>(x => (nid == null && x.LanguageId == null) || (nid != null && x.LanguageId == nid));
+            Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE ((((@0 is null) AND ([umbracoPropertyData].[languageId] is null)) OR ((@1 is not null) AND ([umbracoPropertyData].[languageId] = @2))))", sql.SQL, sql.SQL);
+
+            // new SqlNullableEquals method does it automatically
+            // 'course it would be nicer if '==' could do it
+            // see note in ExpressionVisitorBase for SqlNullableEquals
+
+            //sql = new Sql<ISqlContext>(SqlContext)
+            //    .Select("*")
+            //    .From<PropertyDataDto>()
+            //    .Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(nid));
+            //Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE ((((@0 is null) AND ([umbracoPropertyData].[languageId] is null)) OR ((@0 is not null) AND ([umbracoPropertyData].[languageId] = @0))))", sql.SQL, sql.SQL);
+
+            // but, the expression above fails with SQL CE, 'specified argument for the function is not valid' in 'isnull' function
+            // so... compare with fallback values
+
+            sql = new Sql<ISqlContext>(SqlContext)
+                .Select("*")
+                .From<PropertyDataDto>()
+                .Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(nid, -1));
+            Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE ((COALESCE([umbracoPropertyData].[languageId],@0) = COALESCE(@1,@0)))", sql.SQL, sql.SQL);
+        }
+
+        [Test]
+        public void SqlNullableEqualsTest()
+        {
+            int? a, b;
+            a = b = null;
+            Assert.IsTrue(a.SqlNullableEquals(b, -1));
+            b = 2;
+            Assert.IsFalse(a.SqlNullableEquals(b, -1));
+            a = 2;
+            Assert.IsTrue(a.SqlNullableEquals(b, -1));
+            b = null;
+            Assert.IsFalse(a.SqlNullableEquals(b, -1));
+        }
+
         [Test]
         public void WhereInValueFieldTest()
         {

@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using SearchResult = Examine.SearchResult;
@@ -23,11 +24,18 @@ namespace Umbraco.Web.Search
     {
         private readonly IExamineManager _examineManager;
         private readonly UmbracoHelper _umbracoHelper;
+        private readonly ILocalizationService _languageService;
+        private readonly IEntityService _entityService;
 
-        public UmbracoTreeSearcher(IExamineManager examineManager, UmbracoHelper umbracoHelper)
+        public UmbracoTreeSearcher(IExamineManager examineManager,
+            UmbracoHelper umbracoHelper,
+            ILocalizationService languageService,
+            IEntityService entityService)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoHelper = umbracoHelper ?? throw new ArgumentNullException(nameof(umbracoHelper));
+            _languageService = languageService;
+            _entityService = entityService;
         }
 
         /// <summary>
@@ -51,16 +59,22 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var indexName = Constants.Examine.InternalIndexer;
+            var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = new[] { "id", "__NodeId" };
 
             var umbracoContext = _umbracoHelper.UmbracoContext;
 
-            //TODO: WE should really just allow passing in a lucene raw query
+            //TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
+            // manipulation for things like start paths, member types, etc... 
+            //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
+            //{
+
+            //}
+
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    indexName = Constants.Examine.InternalMemberIndexer;
+                    indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -72,13 +86,13 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(Current.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, Current.Services.EntityService);
+                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(Current.Services.EntityService);
-                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, Current.Services.EntityService);
+                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, _entityService);
                     break;
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
@@ -89,11 +103,41 @@ namespace Umbraco.Web.Search
 
             var internalSearcher = index.GetSearcher();
 
+            if (!BuildQuery(sb, query, searchFrom, fields, type))
+            {
+                totalFound = 0;
+                return Enumerable.Empty<SearchResultEntity>();
+            }
+
+            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString())
+                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
+                .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
+
+            totalFound = result.TotalItemCount;
+
+            var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
+
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.Member:
+                    return MemberFromSearchResults(pagedResult.ToArray());
+                case UmbracoEntityTypes.Media:
+                    return MediaFromSearchResults(pagedResult);
+                case UmbracoEntityTypes.Document:
+                    return ContentFromSearchResults(pagedResult);
+                default:
+                    throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
+            }
+        }
+
+        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, string[] fields, string type)
+        {
             //build a lucene query:
-            // the __nodeName will be boosted 10x without wildcards
-            // then __nodeName will be matched normally with wildcards
+            // the nodeName will be boosted 10x without wildcards
+            // then nodeName will be matched normally with wildcards
             // the rest will be normal without wildcards
 
+            var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
             //check if text is surrounded by single or double quotes, if so, then exact match
             var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
@@ -102,15 +146,14 @@ namespace Umbraco.Web.Search
             if (surroundedByQuotes)
             {
                 //strip quotes, escape string, the replace again
-                query = query.Trim(new[] { '\"', '\'' });
+                query = query.Trim('\"', '\'');
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
                 {
-                    totalFound = 0;
-                    return new List<SearchResultEntity>();
+                    return false;
                 }
 
                 //update the query with the query term
@@ -119,10 +162,9 @@ namespace Umbraco.Web.Search
                     //add back the surrounding quotes
                     query = string.Format("{0}{1}{0}", "\"", query);
 
-                    //node name exactly boost x 10
-                    sb.Append("+(__nodeName: (");
-                    sb.Append(query.ToLower());
-                    sb.Append(")^10.0 ");
+                    sb.Append("+(");
+
+                    AppendNodeNamePhraseWithBoost(sb, query, allLangs);
 
                     foreach (var f in fields)
                     {
@@ -143,8 +185,7 @@ namespace Umbraco.Web.Search
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
                 {
-                    totalFound = 0;
-                    return new List<SearchResultEntity>();
+                    return false;
                 }
 
                 //update the query with the query term
@@ -154,24 +195,12 @@ namespace Umbraco.Web.Search
 
                     var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    //node name exactly boost x 10
-                    sb.Append("+(__nodeName:");
-                    sb.Append("\"");
-                    sb.Append(query.ToLower());
-                    sb.Append("\"");
-                    sb.Append("^10.0 ");
+                    sb.Append("+(");
 
-                    //node name normally with wildcards
-                    sb.Append(" __nodeName:");
-                    sb.Append("(");
-                    foreach (var w in querywords)
-                    {
-                        sb.Append(w.ToLower());
-                        sb.Append("* ");
-                    }
-                    sb.Append(") ");
+                    AppendNodeNameExactWithBoost(sb, query, allLangs);
 
-
+                    AppendNodeNameWithWildcards(sb, querywords, allLangs);
+                   
                     foreach (var f in fields)
                     {
                         //additional fields normally
@@ -195,26 +224,69 @@ namespace Umbraco.Web.Search
             sb.Append("+__IndexType:");
             sb.Append(type);
 
-            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString());
+            return true;
+        }
 
-            var result = internalSearcher
-                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-                .Search(raw, Convert.ToInt32(pageSize * (pageIndex + 1)));
+        private void AppendNodeNamePhraseWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
+        {
+            //node name exactly boost x 10
+            sb.Append("nodeName: (");
+            sb.Append(query.ToLower());
+            sb.Append(")^10.0 ");
 
-            totalFound = result.TotalItemCount;
-
-            var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
-
-            switch (entityType)
+            //also search on all variant node names
+            foreach (var lang in allLangs)
             {
-                case UmbracoEntityTypes.Member:
-                    return MemberFromSearchResults(pagedResult.ToArray());
-                case UmbracoEntityTypes.Media:
-                    return MediaFromSearchResults(pagedResult);
-                case UmbracoEntityTypes.Document:
-                    return ContentFromSearchResults(pagedResult);
-                default:
-                    throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
+                //node name exactly boost x 10
+                sb.Append($"nodeName_{lang}: (");
+                sb.Append(query.ToLower());
+                sb.Append(")^10.0 ");
+            }
+        }
+
+        private void AppendNodeNameExactWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
+        {
+            //node name exactly boost x 10
+            sb.Append("nodeName:");
+            sb.Append("\"");
+            sb.Append(query.ToLower());
+            sb.Append("\"");
+            sb.Append("^10.0 ");
+            //also search on all variant node names
+            foreach (var lang in allLangs)
+            {
+                //node name exactly boost x 10
+                sb.Append($"nodeName_{lang}:");
+                sb.Append("\"");
+                sb.Append(query.ToLower());
+                sb.Append("\"");
+                sb.Append("^10.0 ");
+            }
+        }
+
+        private void AppendNodeNameWithWildcards(StringBuilder sb, string[] querywords, IEnumerable<string> allLangs)
+        {
+            //node name normally with wildcards
+            sb.Append("nodeName:");
+            sb.Append("(");
+            foreach (var w in querywords)
+            {
+                sb.Append(w.ToLower());
+                sb.Append("* ");
+            }
+            sb.Append(") ");
+            //also search on all variant node names
+            foreach (var lang in allLangs)
+            {
+                //node name normally with wildcards
+                sb.Append($"nodeName_{lang}:");
+                sb.Append("(");
+                foreach (var w in querywords)
+                {
+                    sb.Append(w.ToLower());
+                    sb.Append("* ");
+                }
+                sb.Append(") ");
             }
         }
 
@@ -278,32 +350,33 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultEntity> MemberFromSearchResults(ISearchResult[] results)
+        private IEnumerable<SearchResultEntity> MemberFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
-            foreach (var m in mapped)
+            foreach (var result in results)
             {
+                var m = Mapper.Map<SearchResultEntity>(result);
+
                 //if no icon could be mapped, it will be set to document, so change it to picture
                 if (m.Icon == "icon-document")
                 {
                     m.Icon = "icon-user";
                 }
-
-                var searchResult = results.First(x => x.Id == m.Id.ToString());
-                if (searchResult.Values.ContainsKey("email") && searchResult.Values["email"] != null)
+                
+                if (result.Values.ContainsKey("email") && result.Values["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Values["email"];
+                    m.AdditionalData["Email"] = result.Values["email"];
                 }
-                if (searchResult.Values.ContainsKey("__key") && searchResult.Values["__key"] != null)
+                if (result.Values.ContainsKey("__key") && result.Values["__key"] != null)
                 {
-                    if (Guid.TryParse(searchResult.Values["__key"], out var key))
+                    if (Guid.TryParse(result.Values["__key"], out var key))
                     {
                         m.Key = key;
                     }
                 }
+
+                yield return m;
             }
-            return mapped;
         }
 
         /// <summary>
@@ -313,17 +386,17 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
             //add additional data
-            foreach (var m in mapped)
+            foreach (var result in results)
             {
+                var m = Mapper.Map<SearchResultEntity>(result);
                 //if no icon could be mapped, it will be set to document, so change it to picture
                 if (m.Icon == "icon-document")
                 {
                     m.Icon = "icon-picture";
                 }
+                yield return m;
             }
-            return mapped;
         }
 
         /// <summary>
@@ -333,17 +406,28 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results)
         {
-            var mapped = Mapper.Map<IEnumerable<SearchResultEntity>>(results).ToArray();
-            //add additional data
-            foreach (var m in mapped)
+            var defaultLang = _languageService.GetDefaultLanguageIsoCode();
+
+            foreach (var result in results)
             {
-                var intId = m.Id.TryConvertTo<int>();
+                var entity = Mapper.Map<SearchResultEntity>(result);
+
+                var intId = entity.Id.TryConvertTo<int>();
                 if (intId.Success)
                 {
-                    m.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result);
+                    //if it varies by culture, return the default language URL
+                    if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "1")
+                    {
+                        entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result, defaultLang);
+                    }
+                    else
+                    {
+                        entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result);
+                    }
                 }
+
+                yield return entity;
             }
-            return mapped;
         }
 
     }

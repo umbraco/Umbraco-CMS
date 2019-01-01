@@ -77,7 +77,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Examine" Version="1.0.0-beta046" />
+    <PackageReference Include="Examine" Version="1.0.0-beta067" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.9</Version>
     </PackageReference>
@@ -133,7 +133,9 @@
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
+    <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
+    <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />

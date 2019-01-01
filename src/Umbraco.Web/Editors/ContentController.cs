@@ -354,6 +354,9 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
+            // translate the content type name if applicable
+            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
@@ -1062,7 +1065,7 @@ namespace Umbraco.Web.Editors
                 var descendants = Services.EntityService.GetPagedDescendants(contentItem.Id, UmbracoObjectTypes.Document, page++, pageSize, out total,
                                 //order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
                                 //early if a permission higher up fails
-                                "path", Direction.Ascending);
+                                ordering: Ordering.By("path", Direction.Ascending));
 
                 foreach (var c in descendants)
                 {
@@ -1768,7 +1771,8 @@ namespace Umbraco.Web.Editors
                     contentSave,
                     propertyCollection,
                     (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
+                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    variant.Culture);
 
                 variantIndex++;
             }

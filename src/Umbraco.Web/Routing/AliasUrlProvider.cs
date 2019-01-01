@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public string GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
+        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -51,13 +51,14 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
+        public IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.ContentCache.GetById(id);
-            if (node == null) return Enumerable.Empty<string>();
+            if (node == null)
+                yield break;
 
             if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
-                return Enumerable.Empty<string>();
+                yield break;
 
             var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
@@ -82,20 +83,19 @@ namespace Umbraco.Web.Routing
                 //  the content finder may work, depending on the 'current' culture,
                 //  but there's no way we can return something meaningful here
                 if (varies)
-                    return Enumerable.Empty<string>();
+                    yield break;
 
                 var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
                 if (string.IsNullOrWhiteSpace(umbracoUrlName))
-                    return Enumerable.Empty<string>();
+                    yield break;
 
                 var path = "/" + umbracoUrlName;
                 var uri = new Uri(path, UriKind.Relative);
-                return new[] { UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString() };
+                yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
             }
             else
             {
                 // some domains: one url per domain, which is "<domain>/<alias>"
-                var result = new List<string>();
                 foreach(var domainUri in domainUris)
                 {
                     // if the property is invariant, get the invariant value, url is "<domain>/<invariant-alias>"
@@ -108,14 +108,13 @@ namespace Umbraco.Web.Routing
                         ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
                         : node.Value<string>(Constants.Conventions.Content.UrlAlias);
 
-                    if (!string.IsNullOrWhiteSpace(umbracoUrlName))
-                    {
-                        var path = "/" + umbracoUrlName;
-                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                        result.Add(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
-                    }
+                    if (string.IsNullOrWhiteSpace(umbracoUrlName))
+                        continue;
+
+                    var path = "/" + umbracoUrlName;
+                    var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
                 }
-                return result;
             }
         }
 

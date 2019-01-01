@@ -25,16 +25,35 @@
 		    <div ng-hide="success">
             
 			    <div ng-hide="miniListView">
-				    <umb-tree
-					    section="media"
-				            hideheader="{{treeModel.hideHeader}}"
-					    hideoptions="true"
-					    isdialog="true"
+                    <umb-tree-search-box 
+                        hide-search-callback="hideSearch"
+                        search-callback="onSearchResults"
+                        search-from-id="{{searchInfo.searchFromId}}"
+                        search-from-name="{{searchInfo.searchFromName}}"
+                        show-search="{{searchInfo.showSearch}}"
+                        section="media">
+                    </umb-tree-search-box>
+
+                    <br />
+
+                    <umb-tree-search-results
+                        ng-if="searchInfo.showSearch"
+                        results="searchInfo.results"
+                        select-result-callback="selectResult">
+                    </umb-tree-search-results>
+
+                    <div ng-hide="searchInfo.showSearch">
+                        <umb-tree
+                            section="media"
+                            hideheader="{{treeModel.hideHeader}}"
+                            hideoptions="true"
+                            isdialog="true"
 					    api="dialogTreeApi"
                                             on-init="onTreeInit()"
-					    enablelistviewexpand="true"
-					    enablecheckboxes="true">
-				    </umb-tree>
+                            enablelistviewexpand="true"
+                            enablecheckboxes="true">
+                        </umb-tree>
+                    </div>
 			    </div>
 
 			    <umb-mini-list-view

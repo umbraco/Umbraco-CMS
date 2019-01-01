@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Xml.XPath;
 using Examine;
-using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
+using Examine.Search;
 using Lucene.Net.Store;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -15,7 +15,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Examine;
-using umbraco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -107,10 +106,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // first check in Examine for the cache values
                     // +(+parentID:-1) +__IndexType:media
 
-                    var criteria = searchProvider.CreateCriteria("media");
+                    var criteria = searchProvider.CreateQuery("media");
                     var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
-                    var result = searchProvider.Search(filter.Compile());
+                    var result = filter.Execute();
                     if (result != null)
                         return result.Select(x => CreateFromCacheValues(ConvertFromSearchResult(x)));
                 }
@@ -240,9 +239,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                if (eMgr.TryGetIndex(Constants.Examine.InternalIndexer, out var index))
+                if (eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index))
                     return index.GetSearcher();
-                throw new InvalidOperationException($"No index found by name {Constants.Examine.InternalIndexer}");
+                throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.InternalIndexName}");
             }
             catch (FileNotFoundException)
             {
@@ -293,10 +292,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     //
                     // note that since the use of the wildcard, it automatically escapes it in Lucene.
 
-                    var criteria = searchProvider.CreateCriteria("media");
+                    var criteria = searchProvider.CreateQuery("media");
                     var filter = criteria.Id(id.ToInvariantString()).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
-                    var result = searchProvider.Search(filter.Compile()).FirstOrDefault();
+                    var result = filter.Execute().FirstOrDefault();
                     if (result != null) return ConvertFromSearchResult(result);
                 }
                 catch (Exception ex)
@@ -507,15 +506,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 try
                 {
                     //first check in Examine as this is WAY faster
-                    var criteria = searchProvider.CreateCriteria("media");
+                    var criteria = searchProvider.CreateQuery("media");
 
-                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndex.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard())
+                        .OrderBy(new SortableField("sortOrder", SortType.Int));
                     //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
                     //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
 
                     // sort with the Sort field (updated for 8.0)
-                    var results = searchProvider.Search(
-                        filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
+                    var results = filter.Execute();
 
                     if (results.Any())
                     {

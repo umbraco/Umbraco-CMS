@@ -30,12 +30,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
     var retainedQueryStrings = ["mculture"];
 
-    //used to track the current dialog object
-    var currentDialog = null;
-
-    //tracks the user profile dialog
-    var userDialog = null;
-
+        
     function setMode(mode) {
         switch (mode) {
         case 'tree':
@@ -287,7 +282,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
             appState.setGlobalState("showTray", false);
         },
 
-        /**
+        /**     
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService

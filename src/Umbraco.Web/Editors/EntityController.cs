@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Examine;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Search;
@@ -477,7 +478,9 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
-                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords, orderBy, orderDirection, filter);
+                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords,
+                    SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                    Ordering.By(orderBy, orderDirection));
 
                 if (totalRecords == 0)
                 {
@@ -486,7 +489,10 @@ namespace Umbraco.Web.Editors
 
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                    Items = entities.Select(entity => Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
+                            options.AfterMap((src, dest) => { dest.AdditionalData["hasChildren"] = src.HasChildren; })
+                        )
+                    )
                 };
 
                 return pagedResult;
@@ -542,12 +548,18 @@ namespace Umbraco.Web.Editors
                     }
 
                     entities = aids == null || aids.Contains(Constants.System.Root)
-                        ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
-                        : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                        ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords,
+                            SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                            Ordering.By(orderBy, orderDirection), includeTrashed: false)
+                        : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
+                            SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                            Ordering.By(orderBy, orderDirection));
                 }
                 else
                 {
-                    entities = Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                    entities = Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
+                        SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                        Ordering.By(orderBy, orderDirection));
                 }
 
                 if (totalRecords == 0)

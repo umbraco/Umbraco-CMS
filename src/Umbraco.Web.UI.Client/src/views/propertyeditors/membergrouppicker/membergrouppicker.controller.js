@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberGroupPicker($scope, editorService){
+function memberGroupPicker($scope, editorService, memberGroupResource){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -9,26 +9,35 @@ function memberGroupPicker($scope, editorService){
 
     $scope.renderModel = [];
     $scope.allowRemove = true;
-    
+    $scope.groupIds = [];
+
     if ($scope.model.value) {
-        var modelIds = $scope.model.value.split(',');
-        _.each(modelIds, function (item, i) {
-            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
+        var groupIds = $scope.model.value.split(',');
+        memberGroupResource.getByIds(groupIds).then(function(groups) {
+            $scope.renderModel = groups;
         });
     }
 
     $scope.openMemberGroupPicker = function() {
         var memberGroupPicker = {
             multiPicker: true,
-            submit: function(model) {
-                if(model.selectedMemberGroups) {
-                    _.each(model.selectedMemberGroups, function (item, i) {
-                        $scope.add(item);
+            submit: function (model) {
+                var selectedGroupIds = _.map(model.selectedMemberGroups
+                    ? model.selectedMemberGroups
+                    : [model.selectedMemberGroup],
+                    function (id) { return parseInt(id); }
+                );
+                // figure out which groups are new and fetch them
+                var newGroupIds = _.difference(selectedGroupIds, renderModelIds());
+                if (newGroupIds && newGroupIds.length) {
+                    memberGroupResource.getByIds(newGroupIds).then(function (groups) {
+                        $scope.renderModel = _.union($scope.renderModel, groups);
+                        editorService.close();
                     });
                 }
-                if(model.selectedMemberGroup) {
-                    $scope.clear();
-                    $scope.add(model.selectedMemberGroup);
+                else {
+                    // no new groups selected
+                    editorService.close();
                 }
                 editorService.close();
             },
@@ -57,11 +66,14 @@ function memberGroupPicker($scope, editorService){
         $scope.renderModel = [];
     };
 
-    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-        var currIds = _.map($scope.renderModel, function (i) {
+    function renderModelIds() {
+        return _.map($scope.renderModel, function (i) {
             return i.id;
         });
-        $scope.model.value = trim(currIds.join(), ",");
+    }
+
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        $scope.model.value = trim(renderModelIds().join(), ",");
     });
 
     //when the scope is destroyed we need to unsubscribe

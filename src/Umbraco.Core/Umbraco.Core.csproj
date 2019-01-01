@@ -306,7 +306,6 @@
     <Compile Include="Constants-DataTypes.cs" />
     <Compile Include="Constants-Composing.cs" />
     <Compile Include="Constants-DeploySelector.cs" />
-    <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="Constants-ObjectTypes.cs" />
     <Compile Include="Constants-PackageRepository.cs" />
@@ -357,6 +356,7 @@
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
+    <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
@@ -384,6 +384,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTemplateDesignColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\MakeTagsVariant.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
@@ -1328,6 +1329,7 @@
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
+    <Compile Include="Serialization\CaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\IFormatter.cs" />

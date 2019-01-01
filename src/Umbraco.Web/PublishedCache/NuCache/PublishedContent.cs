@@ -273,8 +273,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
+        // fixme
+        // was => _contentData.Published == false;
         /// <inheritdoc />
-        public override bool IsDraft => _contentData.Published == false;
+        public override bool IsDraft(string culture = null)
+        {
+            // if this is the 'published' published content, nothing can be draft
+            if (_contentData.Published)
+                return false;
+
+            // not the 'published' published content, and does not vary = must be draft
+            if (!ContentType.VariesByCulture())
+                return true;
+
+            // handle context culture
+            if (culture == null)
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+
+            // not the 'published' published content, and varies
+            // = depends on the culture
+            return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
+        }
 
         #endregion
 
@@ -410,7 +429,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private string AsPreviewingCacheKey => _asPreviewingCacheKey ?? (_asPreviewingCacheKey = CacheKeys.PublishedContentAsPreviewing(Key));
 
         // used by ContentCache
-        internal IPublishedContent AsPreviewingModel()
+        internal IPublishedContent AsDraft()
         {
             if (IsPreviewing)
                 return this;

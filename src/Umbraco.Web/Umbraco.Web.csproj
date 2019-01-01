@@ -36,6 +36,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -62,7 +63,7 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.0-beta046" />
+    <PackageReference Include="Examine" Version="1.0.0-beta067" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
     <PackageReference Include="ImageProcessor">
       <Version>2.6.2.25</Version>
@@ -112,6 +113,7 @@
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
@@ -527,9 +529,6 @@
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
-    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
@@ -687,8 +686,8 @@
     <Compile Include="Models\TemplateQuery\SourceModel.cs" />
     <Compile Include="Models\TemplateQuery\TemplateQueryResult.cs" />
     <Compile Include="Models\TemplateQuery\SortExpression.cs" />
-    <Compile Include="Models\TemplateQuery\Operathor.cs" />
-    <Compile Include="Models\TemplateQuery\OperathorTerm.cs" />
+    <Compile Include="Models\TemplateQuery\Operator.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorTerm.cs" />
     <Compile Include="Models\TemplateQuery\QueryCondition.cs" />
     <Compile Include="Models\TemplateQuery\QueryModel.cs" />
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
@@ -1166,9 +1165,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">

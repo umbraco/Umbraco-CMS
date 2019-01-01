@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.XPath;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -22,7 +22,6 @@ namespace Umbraco.Web
     /// </summary>
     public class PublishedContentQuery : IPublishedContentQuery
     {
-        private readonly IPublishedContentQuery _query;
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
 
@@ -37,79 +36,52 @@ namespace Umbraco.Web
             _mediaCache = mediaCache ?? throw new ArgumentNullException(nameof(mediaCache));
         }
 
-        /// <summary>
-        /// Constructor used to wrap the ITypedPublishedContentQuery object passed in
-        /// </summary>
-        /// <param name="query"></param>
-        public PublishedContentQuery(IPublishedContentQuery query)
-        {
-            _query = query ?? throw new ArgumentNullException(nameof(query));
-        }
-
         #region Content
 
         public IPublishedContent Content(int id)
         {
-            return _query == null
-                ? ItemById(id, _contentCache)
-                : _query.Content(id);
+            return ItemById(id, _contentCache);
         }
 
         public IPublishedContent Content(Guid id)
         {
-            return _query == null
-                ? ItemById(id, _contentCache)
-                : _query.Content(id);
+            return ItemById(id, _contentCache);
         }
 
         public IPublishedContent Content(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return _query == null
-                ? ItemById(udi.Guid, _contentCache)
-                : _query.Content(udi.Guid);
+            return ItemById(udi.Guid, _contentCache);
         }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _query == null
-                ? ItemByXPath(xpath, vars, _contentCache)
-                : _query.ContentSingleAtXPath(xpath, vars);
+            return ItemByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
-            return _query == null
-                ? ItemsByIds(_contentCache, ids)
-                : _query.Content(ids);
+            return ItemsByIds(_contentCache, ids);
         }
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
         {
-            return _query == null
-                ? ItemsByIds(_contentCache, ids)
-                : _query.Content(ids);
+            return ItemsByIds(_contentCache, ids);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _query == null
-                ? ItemsByXPath(xpath, vars, _contentCache)
-                : _query.ContentAtXPath(xpath, vars);
+            return ItemsByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _query == null
-                ? ItemsByXPath(xpath, vars, _contentCache)
-                : _query.ContentAtXPath(xpath, vars);
+            return ItemsByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> ContentAtRoot()
         {
-            return _query == null
-                ? ItemsAtRoot(_contentCache)
-                : _query.ContentAtRoot();
+            return ItemsAtRoot(_contentCache);
         }
 
         #endregion
@@ -118,45 +90,33 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(int id)
         {
-            return _query == null
-                ? ItemById(id, _mediaCache)
-                : _query.Media(id);
+            return ItemById(id, _mediaCache);
         }
 
         public IPublishedContent Media(Guid id)
         {
-            return _query == null
-                ? ItemById(id, _mediaCache)
-                : _query.Media(id);
+            return ItemById(id, _mediaCache);
         }
 
         public IPublishedContent Media(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return _query == null
-                ? ItemById(udi.Guid, _mediaCache)
-                : _query.Media(udi.Guid);
+            return ItemById(udi.Guid, _mediaCache);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
-            return _query == null
-                ? ItemsByIds(_mediaCache, ids)
-                : _query.Media(ids);
+            return ItemsByIds(_mediaCache, ids);
         }
 
         public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
         {
-            return _query == null
-                ? ItemsByIds(_mediaCache, ids)
-                : _query.Media(ids);
+            return ItemsByIds(_mediaCache, ids);
         }
 
         public IEnumerable<IPublishedContent> MediaAtRoot()
         {
-            return _query == null
-                ? ItemsAtRoot(_mediaCache)
-                : _query.MediaAtRoot();
+            return ItemsAtRoot(_mediaCache);
         }
 
 
@@ -221,61 +181,77 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null)
         {
-            return Search(0, 0, out _, term, useWildCards, indexName);
+            return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null)
         {
-            //fixme: inject IExamineManager
-
-            if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, indexName);
-
             indexName = string.IsNullOrEmpty(indexName)
-                ? Constants.Examine.ExternalIndexer
+                ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
-                throw new InvalidOperationException($"No index found by name {indexName}");
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
 
-            var searcher = index.GetSearcher();
+            var searcher = umbIndex.GetSearcher();
 
-            var results = skip == 0 && take == 0
-                ? searcher.Search(term, true)
-                : searcher.Search(term, true, maxResults: skip + take);
+            // default to max 500 results
+            var count = skip == 0 && take == 0 ? 500 : skip + take;
 
-            totalRecords = results.TotalItemCount;
-            return results.ToPublishedSearchResults(_contentCache);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, ISearcher searchProvider = null)
-        {
-            return Search(0, 0, out _, criteria, searchProvider);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
-        {
-            if (_query != null) return _query.Search(skip, take, out totalRecords, criteria, searcher);
-
-            //fixme: inject IExamineManager
-            if (searcher == null)
+            ISearchResults results;
+            if (culture.IsNullOrWhiteSpace())
             {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.Examine.ExternalIndexer, out var index))
-                    throw new InvalidOperationException($"No index found by name {Constants.Examine.ExternalIndexer}");
-                searcher = index.GetSearcher();
+                results = searcher.Search(term, count);
+            }
+            else
+            {
+                //get all index fields suffixed with the culture name supplied
+                var cultureFields = new List<string>();
+                var fields = umbIndex.GetFields();
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, 1); //must vary by culture
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (var field in fields)
+                {
+                    var match = CultureIsoCodeFieldName.Match(field);
+                    if (match.Success && match.Groups.Count == 2 && culture.InvariantEquals(match.Groups[1].Value))
+                        cultureFields.Add(field);
+                }
+
+                qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
+                results = qry.Execute(count);
             }
 
+            totalRecords = results.TotalItemCount;
+            return results.ToPublishedSearchResults(_contentCache);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
+        {
+            return Search(query, 0, 0, out _);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
+        {
             var results = skip == 0 && take == 0
-                ? searcher.Search(criteria)
-                : searcher.Search(criteria, maxResults: skip + take);
+                ? query.Execute()
+                : query.Execute(maxResults: skip + take);
 
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
+
+        /// <summary>
+        /// Matches a culture iso name suffix
+        /// </summary>
+        /// <remarks>
+        /// myFieldName_en-us will match the "en-us"
+        /// </remarks>
+        private static readonly Regex CultureIsoCodeFieldName = new Regex("^[_\\w]+_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
 
         #endregion

@@ -44,14 +44,15 @@
     "@babel/core": "7.1.6",
     "@babel/preset-env": "7.1.6",
     "autoprefixer": "9.3.1",
-    "gulp-clean-css": "4.0.0",
     "cssnano": "4.1.7",
-    "gulp": "3.9.1",
+    "gulp": "^3.9.1",
     "gulp-babel": "8.0.0",
+    "gulp-clean-css": "4.0.0",
+    "gulp-cli": "^2.0.1",
     "gulp-concat": "2.6.1",
     "gulp-connect": "5.6.1",
     "gulp-eslint": "^5.0.0",
-    "gulp-imagemin": "5.0.3",
+    "gulp-imagemin": "^4.1.0",
     "gulp-less": "4.0.1",
     "gulp-ngdocs": "0.3.0",
     "gulp-open": "3.0.1",
@@ -67,8 +68,8 @@
     "karma-phantomjs-launcher": "1.0.4",
     "less": "3.9.0",
     "lodash": "4.17.11",
+    "marked": "^0.5.2",
     "merge-stream": "1.0.1",
-    "run-sequence": "2.2.1",
-    "marked": "^0.5.2"
+    "run-sequence": "2.2.1"
   }
 }
