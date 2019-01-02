@@ -97,12 +97,13 @@ namespace Umbraco.Tests.Runtimes
             composition.Register<ISiteDomainHelper>(_ => Mock.Of<ISiteDomainHelper>(), Lifetime.Singleton);
             composition.RegisterUnique(f => new DistributedCache());
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
+            composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
 
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();
 
             // initialize some components individually
-            components.Get<CacheRefresherComponent>().Initialize(factory.GetInstance<DistributedCache>());
+            components.Get<DistributedCacheBinderComponent>().Initialize(factory.GetInstance<DistributedCacheBinder>());
 
             // do stuff
             Console.WriteLine(runtimeState.Level);

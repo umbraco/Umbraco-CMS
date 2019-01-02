@@ -10,6 +10,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Scoping
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ScopedNuCacheTests : TestWithDatabaseBase
     {
-        private CacheRefresherComponent _cacheRefresher;
+        private DistributedCacheBinder _distributedCacheBinder;
 
         protected override void Compose()
         {
@@ -54,8 +55,8 @@ namespace Umbraco.Tests.Scoping
         {
             base.TearDown();
 
-            _cacheRefresher?.Unbind();
-            _cacheRefresher = null;
+            _distributedCacheBinder?.UnbindEvents();
+            _distributedCacheBinder = null;
 
             _onPublishedAssertAction = null;
             ContentService.Published -= OnPublishedAssert;
@@ -127,8 +128,8 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize(new DistributedCache());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder.BindEvents(true);
 
             // create document type, document
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };

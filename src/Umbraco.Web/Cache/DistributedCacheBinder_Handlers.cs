@@ -1,55 +1,50 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using Umbraco.Core;
+using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using System.Linq;
-using System.Reflection;
-using System.Web;
-using System.Web.Hosting;
-using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Security;
 using Umbraco.Web.Services;
-using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 
 namespace Umbraco.Web.Cache
 {
     /// <summary>
-    /// Installs listeners on service events in order to refresh our caches.
+    /// Default <see cref="IDistributedCacheBinder"/> implementation.
     /// </summary>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    [RequiredByComponent(typeof(IUmbracoCoreComponent))] // runs before every other IUmbracoCoreComponent!
-    public class CacheRefresherComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public partial class DistributedCacheBinder
     {
-        private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();
-        private DistributedCache _distributedCache;
         private List<Action> _unbinders;
 
-        public CacheRefresherComponent()
-        { }
+        private void Bind(Action binder, Action unbinder)
+        {
+            // bind now
+            binder();
 
-        // for tests
-        public CacheRefresherComponent(bool supportUnbinding)
+            // and register unbinder for later, if needed
+            _unbinders?.Add(unbinder);
+        }
+
+        /// <inheritdoc />
+        public void UnbindEvents()
+        {
+            if (_unbinders == null)
+                throw new NotSupportedException();
+            foreach (var unbinder in _unbinders)
+                unbinder();
+            _unbinders = null;
+        }
+
+        /// <inheritdoc />
+        public void BindEvents(bool supportUnbinding = false)
         {
             if (supportUnbinding)
                 _unbinders = new List<Action>();
-        }
 
-        public void Initialize(DistributedCache distributedCache)
-        {
-            Current.Logger.Info<CacheRefresherComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
-
-            _distributedCache = distributedCache;
+            _logger.Info<DistributedCacheBinderComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
 
             // bind to application tree events
             Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
@@ -169,74 +164,6 @@ namespace Umbraco.Web.Cache
                 () => RelationService.DeletedRelationType -= RelationService_DeletedRelationType);
         }
 
-        #region Events binding and handling
-
-        private void Bind(Action binder, Action unbinder)
-        {
-            // bind now
-            binder();
-
-            // and register unbinder for later, if needed
-            _unbinders?.Add(unbinder);
-        }
-
-        // for tests
-        internal void Unbind()
-        {
-            if (_unbinders == null)
-                throw new NotSupportedException();
-            foreach (var unbinder in _unbinders)
-                unbinder();
-            _unbinders = null;
-        }
-
-        internal static MethodInfo FindHandler(IEventDefinition eventDefinition)
-        {
-            var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
-
-            return FoundHandlers.GetOrAdd(name, n => CandidateHandlers.Value.FirstOrDefault(x => x.Name == n));
-        }
-
-        private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
-        {
-            var underscore = new[] { '_' };
-
-            return typeof(CacheRefresherComponent)
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Select(x =>
-                {
-                    if (x.Name.Contains("_") == false) return null;
-
-                    var parts = x.Name.Split(underscore, StringSplitOptions.RemoveEmptyEntries).Length;
-                    if (parts != 2) return null;
-
-                    var parameters = x.GetParameters();
-                    if (parameters.Length != 2) return null;
-                    if (typeof(EventArgs).IsAssignableFrom(parameters[1].ParameterType) == false) return null;
-                    return x;
-                })
-                .WhereNotNull()
-                .ToArray();
-        });
-
-        internal static void HandleEvents(IEnumerable<IEventDefinition> events)
-        {
-            // ensure we run with an UmbracoContext, because this may run in a background task,
-            // yet developers may be using the 'current' UmbracoContext in the event handlers
-            using (UmbracoContext.EnsureContext())
-            {
-                foreach (var e in events)
-                {
-                    var handler = FindHandler(e);
-                    if (handler == null) continue;
-
-                    handler.Invoke(null, new[] { e.Sender, e.Args });
-                }
-            }
-        }
-
-        #endregion
-
         #region PublicAccessService
 
         private void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
@@ -263,7 +190,8 @@ namespace Umbraco.Web.Cache
         /// case then we need to clear all user permissions cache.
         /// </remarks>
         private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
-        { }
+        {
+        }
 
         /// <summary>
         /// Handles cache refreshing for when content is saved (not published)
@@ -275,7 +203,8 @@ namespace Umbraco.Web.Cache
         /// stay up-to-date for unpublished content.
         /// </remarks>
         private void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
-        { }
+        {
+        }
 
         private void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
@@ -323,12 +252,12 @@ namespace Umbraco.Web.Cache
 
         #region Application event handlers
 
-        private void SectionService_New(Section sender, EventArgs e)
+        private void SectionService_New(ISectionService sender, EventArgs e)
         {
             _distributedCache.RefreshAllApplicationCache();
         }
 
-        private void SectionService_Deleted(Section sender, EventArgs e)
+        private void SectionService_Deleted(ISectionService sender, EventArgs e)
         {
             _distributedCache.RefreshAllApplicationCache();
         }
@@ -438,7 +367,8 @@ namespace Umbraco.Web.Cache
 
         #region UserService
 
-        static void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
+        // fixme STATIC??
+        private void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
         {
             //TODO: Not sure if we need this yet depends if we start caching permissions
             //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
@@ -567,6 +497,7 @@ namespace Umbraco.Web.Cache
                 _distributedCache.RemoveMemberGroupCache(m.Id);
             }
         }
+
         #endregion
 
         #region RelationType

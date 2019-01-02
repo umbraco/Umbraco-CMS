@@ -1,22 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
     [UmbracoTest(WithApplication = true)]
-    public class CacheRefresherEventHandlerTests : UmbracoTestBase
+    public class DistributedCacheBinderTests : UmbracoTestBase
     {
+        protected override void Compose(Composition composition)
+        {
+            base.Compose(composition);
+            // refreshers.HandleEvents wants a UmbracoContext
+            // which wants these
+            composition.RegisterUnique(_ => Mock.Of<IPublishedSnapshotService>());
+            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
+        }
+
         [Test]
         public void Can_Find_All_Event_Handlers()
         {
@@ -114,7 +126,7 @@ namespace Umbraco.Tests.Cache
             var ok = true;
             foreach (var definition in definitions)
             {
-                var found = CacheRefresherComponent.FindHandler(definition);
+                var found = DistributedCacheBinder.FindHandler(definition);
                 if (found == null)
                 {
                     Console.WriteLine("Couldn't find method for " + definition.EventName + " on " + definition.Sender.GetType());
@@ -122,6 +134,31 @@ namespace Umbraco.Tests.Cache
                 }
             }
             Assert.IsTrue(ok, "see log for details");
+        }
+
+        [Test]
+        public void CanHandleEvent()
+        {
+            // refreshers.HandleEvents wants a UmbracoContext
+            // which wants an HttpContext, which we build using a SimpleWorkerRequest
+            // which requires these to be non-null
+            var domain = Thread.GetDomain();
+            if (domain.GetData(".appPath") == null)
+                domain.SetData(".appPath", "");
+            if (domain.GetData(".appVPath") == null)
+                domain.SetData(".appVPath", "");
+
+            // create some event definitions
+            var definitions = new IEventDefinition[]
+            {
+                // works because that event definition maps to an empty handler
+                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
+
+            };
+
+            // just assert it does not throw
+            var refreshers = new DistributedCacheBinder(null, null);
+            refreshers.HandleEvents(definitions);
         }
     }
 }

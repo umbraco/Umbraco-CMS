@@ -55,11 +55,6 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "create.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/create")));
-                case ActionProtect actionProtect:
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/protectPage.aspx?mode=cut&nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/protect")));
             }
             return Attempt<LegacyUrlAction>.Fail();
         }

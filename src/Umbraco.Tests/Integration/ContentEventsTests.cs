@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -31,8 +32,8 @@ namespace Umbraco.Tests.Integration
         {
             base.SetUp();
 
-            _h1 = new CacheRefresherComponent(true);
-            _h1.Initialize(new DistributedCache());
+            _h1 = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _h1.BindEvents(true);
 
             _events = new List<EventInstance>();
 
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.Integration
         {
             base.TearDown();
 
-            _h1?.Unbind();
+            _h1?.UnbindEvents();
 
             // clear ALL events
 
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.Integration
             ContentCacheRefresher.CacheUpdated -= ContentCacheUpdated;
         }
 
-        private CacheRefresherComponent _h1;
+        private DistributedCacheBinder _h1;
         private IList<EventInstance> _events;
         private int _msgCount;
         private IContentType _contentType;
