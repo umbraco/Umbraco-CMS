@@ -352,6 +352,7 @@
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
+    <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />

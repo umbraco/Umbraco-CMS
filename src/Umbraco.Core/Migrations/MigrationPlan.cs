@@ -72,8 +72,8 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-    /// Adds a transition to a target state through an empty migration.
-    /// </summary>
+        /// Adds a transition to a target state through an empty migration.
+        /// </summary>
         public MigrationPlan To(string targetState)
             => To<NoopMigration>(targetState);
 
@@ -100,9 +100,39 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-        /// Adds transitions to a target state by copying transitions from a start state to an end state.
+        /// Adds a transition to a target state through a migration, replacing a previous migration.
         /// </summary>
-        public MigrationPlan To(string targetState, string startState, string endState)
+        /// <typeparam name="TMigrationNew">The new migration.</typeparam>
+        /// <typeparam name="TMigrationRecover">The migration to use to recover from the previous target state.</typeparam>
+        /// <param name="recoverState">The previous target state, which we need to recover from through <typeparamref name="TMigrationRecover"/>.</param>
+        /// <param name="targetState">The new target state.</param>
+        public MigrationPlan ToWithReplace<TMigrationNew, TMigrationRecover>(string recoverState, string targetState)
+            where TMigrationNew: IMigration
+            where TMigrationRecover : IMigration
+        {
+            To<TMigrationNew>(targetState);
+            From(recoverState).To<TMigrationRecover>(targetState);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a transition to a target state through a migration, replacing a previous migration.
+        /// </summary>
+        /// <typeparam name="TMigrationNew">The new migration.</typeparam>
+        /// <param name="recoverState">The previous target state, which we can recover from directly.</param>
+        /// <param name="targetState">The new target state.</param>
+        public MigrationPlan ToWithReplace<TMigrationNew>(string recoverState, string targetState)
+            where TMigrationNew : IMigration
+        {
+            To<TMigrationNew>(targetState);
+            From(recoverState).To(targetState);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds transitions to a target state by cloning transitions from a start state to an end state.
+        /// </summary>
+        public MigrationPlan ToWithClone(string startState, string endState, string targetState)
         {
             if (string.IsNullOrWhiteSpace(startState)) throw new ArgumentNullOrEmptyException(nameof(startState));
             if (string.IsNullOrWhiteSpace(endState)) throw new ArgumentNullOrEmptyException(nameof(endState));
@@ -128,13 +158,24 @@ namespace Umbraco.Core.Migrations
 
                 var newTargetState = transition.TargetState == endState
                     ? targetState
-                    : Guid.NewGuid().ToString("B").ToUpper();
+                    : CreateRandomState();
                 To(newTargetState, transition.MigrationType);
                 state = transition.TargetState;
             }
 
             return this;
         }
+
+        /// <summary>
+        /// Creates a random, unique state.
+        /// </summary>
+        public virtual string CreateRandomState()
+            => Guid.NewGuid().ToString("B").ToUpper();
+
+        /// <summary>
+        /// Begins a merge.
+        /// </summary>
+        public MergeBuilder Merge() => new MergeBuilder(this);
 
         /// <summary>
         /// Gets the initial state.
@@ -257,13 +298,14 @@ namespace Umbraco.Core.Migrations
         /// Follows a path (for tests and debugging).
         /// </summary>
         /// <remarks>Does the same thing Execute does, but does not actually execute migrations.</remarks>
-        internal string FollowPath(string fromState, string toState = null)
+        internal IReadOnlyList<string> FollowPath(string fromState = null, string toState = null)
         {
             toState = toState.NullOrWhiteSpaceAsNull();
 
             Validate();
 
             var origState = fromState ?? string.Empty;
+            var states = new List<string> { origState };
 
             if (!_transitions.TryGetValue(origState, out var transition))
                 throw new Exception($"Unknown state \"{origState}\".");
@@ -272,6 +314,7 @@ namespace Umbraco.Core.Migrations
             {
                 var nextState = transition.TargetState;
                 origState = nextState;
+                states.Add(origState);
 
                 if (nextState == toState)
                 {
@@ -287,7 +330,7 @@ namespace Umbraco.Core.Migrations
             if (origState != (toState ?? _finalState))
                 throw new Exception($"Internal error, reached state {origState} which is not state {toState ?? _finalState}");
 
-            return origState;
+            return states;
         }
 
         /// <summary>
