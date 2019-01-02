@@ -6,11 +6,11 @@
         function link($scope) {
             
             $scope.outSideClick = function() {
-                navigationService.hideNavigation();
+                navigationService.hideDialog();
             }
 
             keyboardService.bind("esc", function() {
-                navigationService.hideNavigation();
+                navigationService.hideDialog();
             });
 
             //ensure to unregister from all events!

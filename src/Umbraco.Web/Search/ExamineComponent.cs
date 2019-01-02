@@ -93,6 +93,11 @@ namespace Umbraco.Web.Search
                     false));
             composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+
+            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
+            //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
+            //is instantiated, as the value is used during instantiation
+            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
         }
 
         internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
@@ -111,10 +116,6 @@ namespace Umbraco.Web.Search
             _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
-
-            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
-            //and then we'll use MainDom to control Examine's shutdown
-            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
 
             //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
             //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
@@ -203,7 +204,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        
+
 
         /// <summary>
         /// Must be called to each index is unlocked before any indexing occurs
@@ -581,7 +582,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        
+
         #endregion
 
         #region ReIndex/Delete for entity
@@ -782,7 +783,7 @@ namespace Umbraco.Web.Search
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    
+
                     .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NPoco;
@@ -68,7 +69,6 @@ namespace Umbraco.Tests.Migrations
                 // save new state
                 kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);
 
-                // fixme - what about post-migrations?
                 s.Complete();
             }
 
@@ -140,11 +140,11 @@ namespace Umbraco.Tests.Migrations
             var plan = new UmbracoPlan();
             plan.Validate();
             Console.WriteLine(plan.FinalState);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(plan.FinalState));
+            Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());
         }
 
         [Test]
-        public void CanCopyChain()
+        public void CanClone()
         {
             var plan = new MigrationPlan("default");
             plan
@@ -157,14 +157,46 @@ namespace Umbraco.Tests.Migrations
 
             plan
                 .From("xxx")
-                .To("yyy", "bbb", "ddd")
+                .ToWithClone("bbb", "ddd", "yyy")
                 .To("eee");
 
             WritePlanToConsole(plan);
 
             plan.Validate();
-            Assert.AreEqual("eee", plan.FollowPath("xxx"));
-            Assert.AreEqual("yyy", plan.FollowPath("xxx", "yyy"));
+            Assert.AreEqual("eee", plan.FollowPath("xxx").Last());
+            Assert.AreEqual("yyy", plan.FollowPath("xxx", "yyy").Last());
+        }
+
+        [Test]
+        public void CanMerge()
+        {
+            var plan = new MigrationPlan("default");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .Merge()
+                    .To("bbb")
+                    .To("ccc")
+                .With()
+                    .To("ddd")
+                    .To("eee")
+                .As("fff")
+                .To("ggg");
+
+            WritePlanToConsole(plan);
+
+            plan.Validate();
+            AssertList(plan.FollowPath(), "", "aaa", "bbb", "ccc", "*", "*", "fff", "ggg");
+            AssertList(plan.FollowPath("ccc"), "ccc", "*", "*", "fff", "ggg");
+            AssertList(plan.FollowPath("eee"), "eee", "*", "*", "fff", "ggg");
+        }
+
+        private void AssertList(IReadOnlyList<string> states, params string[] expected)
+        {
+            Assert.AreEqual(expected.Length, states.Count, string.Join(", ", states));
+            for (var i = 0; i < expected.Length; i++)
+                if (expected[i] != "*")
+                    Assert.AreEqual(expected[i], states[i], "at:" + i);
         }
 
         private void WritePlanToConsole(MigrationPlan plan)

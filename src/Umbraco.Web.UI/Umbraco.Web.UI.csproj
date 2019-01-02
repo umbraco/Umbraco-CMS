@@ -319,7 +319,6 @@
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
-    <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
