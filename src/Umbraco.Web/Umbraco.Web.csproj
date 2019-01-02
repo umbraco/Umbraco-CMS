@@ -108,7 +108,10 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
+    <Compile Include="Cache\DistributedCacheBinder.cs" />
+    <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
+    <Compile Include="Cache\IDistributedCacheBinder.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
@@ -652,7 +655,7 @@
     <Compile Include="Cache\DictionaryCacheRefresher.cs" />
     <Compile Include="Cache\DistributedCache.cs" />
     <Compile Include="Cache\DistributedCacheExtensions.cs" />
-    <Compile Include="Cache\CacheRefresherComponent.cs" />
+    <Compile Include="Cache\DistributedCacheBinderComponent.cs" />
     <Compile Include="Cache\DomainCacheRefresher.cs" />
     <Compile Include="Cache\LanguageCacheRefresher.cs" />
     <Compile Include="Cache\MacroCacheRefresher.cs" />

@@ -200,7 +200,7 @@ namespace Umbraco.Web.Services
                 }, true);
 
                 //raise event
-                OnNew(new Section(name, alias, sortOrder), new EventArgs());
+                OnNew(this /*new Section(name, alias, sortOrder)*/, new EventArgs());
             }
         }
 
@@ -235,7 +235,7 @@ namespace Umbraco.Web.Services
                 }, true);
 
                 //raise event
-                OnDeleted(section, new EventArgs());
+                OnDeleted(this, new EventArgs());
             }
         }
 
@@ -262,8 +262,8 @@ namespace Umbraco.Web.Services
             return tmp;
         }
 
-        internal static event TypedEventHandler<Section, EventArgs> Deleted;
-        private static void OnDeleted(Section app, EventArgs args)
+        internal static event TypedEventHandler<ISectionService, EventArgs> Deleted;
+        private static void OnDeleted(ISectionService app, EventArgs args)
         {
             if (Deleted != null)
             {
@@ -271,8 +271,8 @@ namespace Umbraco.Web.Services
             }
         }
 
-        internal static event TypedEventHandler<Section, EventArgs> New;
-        private static void OnNew(Section app, EventArgs args)
+        internal static event TypedEventHandler<ISectionService, EventArgs> New;
+        private static void OnNew(ISectionService app, EventArgs args)
         {
             if (New != null)
             {
