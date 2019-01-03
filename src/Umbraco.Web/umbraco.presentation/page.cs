@@ -141,7 +141,7 @@ namespace umbraco
             _elements.Add("path", path);
             _elements.Add("splitpath", _splitpath);
         }
-        
+
         /// <summary>
         /// Puts the properties of the node into the elements table
         /// </summary>
@@ -328,7 +328,8 @@ namespace umbraco
                 _creatorName = _inner.GetCreatorProfile().Name;
                 _writerName = _inner.GetWriterProfile().Name;
 
-                _contentType = Current.PublishedContentTypeFactory.CreateContentType(_inner.ContentType);
+
+                _contentType = Current.PublishedContentTypeFactory.CreateContentType(Current.Services.ContentTypeService.Get(_inner.ContentTypeId));
 
                 _properties = _contentType.PropertyTypes
                     .Select(x =>

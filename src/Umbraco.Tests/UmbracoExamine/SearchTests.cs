@@ -42,7 +42,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.Published == true &&
-                        m.ContentType == Mock.Of<IContentType>(mt =>
+                        m.ContentType == Mock.Of<ISimpleContentType>(mt =>
                             mt.Icon == "test" &&
                             mt.Alias == x.Name.LocalName &&
                             mt.Id == (int)x.Attribute("nodeType"))))
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.UmbracoExamine
             {
                 indexer.CreateIndex();
                 rebuilder.Populate(indexer);
-                
+
                 var searcher = indexer.GetSearcher();
 
                 var numberSortedCriteria = searcher.CreateQuery()

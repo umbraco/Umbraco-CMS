@@ -104,8 +104,9 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             {
                 // Below root, so only include those allowed as sub-nodes for the parent
                 var parentNode = Services.ContentService.GetById(_content.ParentId);
+                var parentContentType = Services.ContentTypeService.Get(parentNode.ContentTypeId);
                 return documentTypes
-                    .Where(x => parentNode.ContentType.AllowedContentTypes
+                    .Where(x => parentContentType.AllowedContentTypes
                         .Select(y => y.Id.Value)
                         .Contains(x.Id));
             }
@@ -149,7 +150,8 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private void PopulatePropertyMappingWithSources()
         {
-            PropertyMappingRepeater.DataSource = GetPropertiesOfContentType(_content.ContentType);
+            var contentType = Services.ContentTypeService.Get(_content.ContentTypeId);
+            PropertyMappingRepeater.DataSource = contentType.CompositionPropertyTypes;
             PropertyMappingRepeater.DataBind();
         }
 
@@ -159,7 +161,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             var contentType = GetSelectedDocumentType();
 
             // Get properties of new document type (including any from parent types)
-            var properties = GetPropertiesOfContentType(contentType);
+            var properties = contentType.CompositionPropertyTypes;
 
             // Loop through list of source properties and populate destination options with all those of same property type
             foreach (RepeaterItem ri in PropertyMappingRepeater.Items)
@@ -193,10 +195,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             return Services.ContentTypeService.Get(int.Parse(NewDocumentTypeList.SelectedItem.Value));
         }
 
-        private IEnumerable<PropertyType> GetPropertiesOfContentType(IContentType contentType)
-        {
-            return contentType.CompositionPropertyTypes;
-        }
+
 
         private void DisplayNotAvailable()
         {

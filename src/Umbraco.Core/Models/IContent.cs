@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the content type of this content.
         /// </summary>
-        IContentType ContentType { get; }
+        ISimpleContentType ContentType { get; }
 
         /// <summary>
         /// Gets a value indicating whether a culture is published.

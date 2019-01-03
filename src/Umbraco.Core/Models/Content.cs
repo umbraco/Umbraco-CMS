@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Content : ContentBase, IContent
     {
-        private IContentType _contentType;
+        private ISimpleContentType _contentType;
         private ITemplate _template;
         private ContentScheduleCollection _schedule;
         private bool _published;
@@ -48,7 +48,8 @@ namespace Umbraco.Core.Models
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parent, contentType, properties, culture)
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+            _contentType = new SimpleContentType(contentType);
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -75,7 +76,8 @@ namespace Umbraco.Core.Models
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+            _contentType = new SimpleContentType(contentType);
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -181,7 +183,7 @@ namespace Umbraco.Core.Models
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IContentType ContentType => _contentType;
+        public ISimpleContentType ContentType => _contentType;
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -423,7 +425,7 @@ namespace Umbraco.Core.Models
         public void ChangeContentType(IContentType contentType)
         {
             ContentTypeId = contentType.Id;
-            _contentType = contentType;
+            _contentType = new SimpleContentType(contentType);
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
 
@@ -442,7 +444,7 @@ namespace Umbraco.Core.Models
             if(clearProperties)
             {
                 ContentTypeId = contentType.Id;
-                _contentType = contentType;
+                _contentType = new SimpleContentType(contentType);
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
 
@@ -460,8 +462,6 @@ namespace Umbraco.Core.Models
 
             if (Template != null)
                 Template.ResetDirtyProperties(rememberDirty);
-            if (ContentType != null)
-                ContentType.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
@@ -502,7 +502,9 @@ namespace Umbraco.Core.Models
             var clonedContent = (Content)clone;
 
             //need to manually clone this since it's not settable
-            clonedContent._contentType = (IContentType) ContentType.DeepClone();
+            clonedContent._contentType = ContentType;
+
+
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._publishInfos != null)

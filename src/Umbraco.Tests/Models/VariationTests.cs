@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Models
                     if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
                     throw new Exception("oops");
                 });
-            
+
         }
 
         [Test]
@@ -285,6 +285,7 @@ namespace Umbraco.Tests.Models
             // change - now we vary by culture
             contentType.Variations |= ContentVariation.Culture;
             propertyType.Variations |= ContentVariation.Culture;
+            content.ChangeContentType(contentType);
 
             // can set value
             // and get values
@@ -401,8 +402,11 @@ namespace Umbraco.Tests.Models
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             // change - now we vary by culture
+
             contentType.Variations |= ContentVariation.Culture;
             propertyType.Variations |= ContentVariation.Culture;
+
+            content.ChangeContentType(contentType);
 
             Assert.Throws<NotSupportedException>(() => content.SetValue("prop", "a")); // invariant = no
             content.SetValue("prop", "a-fr", langFr);
@@ -430,7 +434,7 @@ namespace Umbraco.Tests.Models
             Assert.IsTrue(content.IsCultureAvailable(langUk));
             Assert.IsFalse(content.IsCulturePublished(langUk));
             Assert.IsNull(content.GetPublishName(langUk));
-            Assert.IsNull(content.GetPublishDate(langUk)); // not published            
+            Assert.IsNull(content.GetPublishDate(langUk)); // not published
 
             Assert.IsFalse(content.IsCultureAvailable(langEs));
             Assert.IsFalse(content.IsCultureEdited(langEs)); // not avail, so... not edited
@@ -438,7 +442,7 @@ namespace Umbraco.Tests.Models
 
             // not published!
             Assert.IsNull(content.GetPublishName(langEs));
-            Assert.IsNull(content.GetPublishDate(langEs)); 
+            Assert.IsNull(content.GetPublishDate(langEs));
 
             // cannot test IsCultureEdited here - as that requires the content service and repository
             // see: ContentServiceTests.Can_SaveRead_Variations

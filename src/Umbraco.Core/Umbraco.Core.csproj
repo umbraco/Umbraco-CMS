@@ -404,6 +404,7 @@
     <Compile Include="Models\IAuditEntry.cs" />
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
+    <Compile Include="Models\ISimpleContentType.cs" />
     <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />

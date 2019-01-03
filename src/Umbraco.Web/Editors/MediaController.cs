@@ -50,9 +50,10 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        public MediaController(PropertyEditorCollection propertyEditors)
+        public MediaController(PropertyEditorCollection propertyEditors, IContentTypeService contentTypeService)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _contentTypeService = contentTypeService;
         }
 
         /// <summary>
@@ -236,6 +237,7 @@ namespace Umbraco.Web.Editors
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IContentTypeService _contentTypeService;
 
         protected int[] UserStartNodes
         {
@@ -295,7 +297,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //better to not use this without paging where possible, currently only the sort dialog does
-                children = Services.MediaService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
+                children = Services.MediaService.GetPagedChildren(id,0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -426,7 +428,7 @@ namespace Umbraco.Web.Editors
             var toMove = ValidateMoveOrCopy(move);
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
-            
+
             var moveResult = Services.MediaService.Move(toMove, move.ParentId);
 
             if (sourceParentID == destinationParentID)
@@ -544,7 +546,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-        
+
         /// <summary>
         /// Empties the recycle bin
         /// </summary>
@@ -597,11 +599,11 @@ namespace Umbraco.Web.Editors
                 throw;
             }
         }
-        
+
         public MediaItemDisplay PostAddFolder(PostedFolder folder)
         {
             var intParentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
-            
+
             var mediaService = Services.MediaService;
 
             var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
@@ -641,10 +643,10 @@ namespace Umbraco.Web.Editors
             //get the string json from the request
             string currentFolderId = result.FormData["currentFolder"];
             int parentId = GetParentIdAsInt(currentFolderId, validatePermissions: true);
-           
+
             var tempFiles = new PostedFiles();
             var mediaService = Services.MediaService;
-            
+
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (result.FormData.ContainsKey("path"))
             {
@@ -727,7 +729,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(Constants.Conventions.Media.File, fileName, fs);
+                        f.SetValue(_contentTypeService, Constants.Conventions.Media.File,fileName, fs);
                     }
 
                     var saveResult = mediaService.Save(f, Security.CurrentUser.Id);

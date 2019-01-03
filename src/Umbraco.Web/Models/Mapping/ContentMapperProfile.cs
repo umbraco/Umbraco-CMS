@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
@@ -29,7 +30,8 @@ namespace Umbraco.Web.Models.Mapping
             var creatorResolver = new CreatorResolver(userService);
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
-            var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
+            var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>(contentTypeService);
+            var allowedTemplatesResolver = new AllowedTemplatesResolver(contentTypeService);
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);
             var schedPublishReleaseDateResolver = new ScheduledPublishDateResolver(ContentScheduleAction.Release);
@@ -56,10 +58,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Errors, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentType, opt => opt.ResolveUsing(contentTypeBasicResolver))
-                .ForMember(dest => dest.AllowedTemplates, opt =>
-                    opt.MapFrom(content => content.ContentType.AllowedTemplates
-                        .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-                        .ToDictionary(t => t.Alias, t => t.Name)))                
+                .ForMember(dest => dest.AllowedTemplates, opt => opt.ResolveUsing(allowedTemplatesResolver))
                 .ForMember(dest => dest.AllowedActions, opt => opt.ResolveUsing(src => actionButtonsResolver.Resolve(src)))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
@@ -140,5 +139,27 @@ namespace Umbraco.Web.Models.Mapping
                 return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"(({source.Name}))";
             }
         }
-    }    
+
+
+        private class AllowedTemplatesResolver : IValueResolver<IContent, ContentItemDisplay, IDictionary<string, string>>
+        {
+            private readonly IContentTypeService _contentTypeService;
+
+            public AllowedTemplatesResolver(IContentTypeService contentTypeService)
+            {
+                _contentTypeService = contentTypeService;
+            }
+
+            public IDictionary<string, string> Resolve(IContent source, ContentItemDisplay destination, IDictionary<string, string> destMember, ResolutionContext context)
+            {
+                var contentType = _contentTypeService.Get(source.ContentTypeId);
+
+                return contentType.AllowedTemplates
+                    .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
+                    .ToDictionary(t => t.Alias, t => t.Name);
+            }
+        }
+    }
+
+
 }

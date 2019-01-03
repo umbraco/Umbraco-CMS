@@ -43,6 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IContentTypeService _contentTypeService;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
         // volatile because we read it with no lock
@@ -85,7 +86,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeService contentTypeService)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -102,6 +103,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
+            _contentTypeService = contentTypeService;
 
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
@@ -1196,7 +1198,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            if (content.GetContentType().VariesByCulture())
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            if (contentType.VariesByCulture())
             {
                 var infos = content is IContent document
                     ? (published

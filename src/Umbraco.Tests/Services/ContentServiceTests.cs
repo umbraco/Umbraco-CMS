@@ -139,29 +139,33 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Create_Content_From_Blueprint()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var contentService = ServiceContext.ContentService;
+                var contentTypeService = ServiceContext.ContentTypeService;
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentTypeService.Save(contentType);
+                var contentType = MockedContentTypes.CreateTextPageContentType();
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+                contentTypeService.Save(contentType);
 
-            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
-            blueprint.SetValue("title", "blueprint 1");
-            blueprint.SetValue("bodyText", "blueprint 2");
-            blueprint.SetValue("keywords", "blueprint 3");
-            blueprint.SetValue("description", "blueprint 4");
+                var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+                blueprint.SetValue("title", "blueprint 1");
+                blueprint.SetValue("bodyText", "blueprint 2");
+                blueprint.SetValue("keywords", "blueprint 3");
+                blueprint.SetValue("description", "blueprint 4");
 
-            contentService.SaveBlueprint(blueprint);
+                contentService.SaveBlueprint(blueprint);
 
-            var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
-            contentService.Save(fromBlueprint);
+                var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
+                contentService.Save(fromBlueprint);
 
-            Assert.IsTrue(fromBlueprint.HasIdentity);
-            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
-            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
-            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
-            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+                Assert.IsTrue(fromBlueprint.HasIdentity);
+                Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
+                Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
+                Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
+                Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+            }
+
         }
 
         [Test]
@@ -222,7 +226,7 @@ namespace Umbraco.Tests.Services
                     c.ContentSchedule.Add(now.AddSeconds(5), null); //release in 5 seconds
                     var r = ServiceContext.ContentService.Save(c);
                     Assert.IsTrue(r.Success, r.Result.ToString());
-                }   
+                }
                 else
                 {
                     c.ContentSchedule.Add(null, now.AddSeconds(5)); //expire in 5 seconds
@@ -258,7 +262,7 @@ namespace Umbraco.Tests.Services
                 variant.Add(c);
             }
 
-            
+
             var runSched = ServiceContext.ContentService.PerformScheduledPublish(
                 now.AddMinutes(1)).ToList(); //process anything scheduled before a minute from now
 
@@ -742,7 +746,7 @@ namespace Umbraco.Tests.Services
         public void Can_Unpublish_Content_Variation()
         {
             // Arrange
-            
+
             var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
@@ -1066,7 +1070,7 @@ namespace Umbraco.Tests.Services
                 foreach (var x in descendants)
                     Console.WriteLine("          ".Substring(0, x.Level) + x.Id);
             }
-            
+
             Console.WriteLine();
 
             // publish parent & its branch
@@ -1420,7 +1424,7 @@ namespace Umbraco.Tests.Services
             var descendants = new List<IContent>();
             while(page * pageSize < total)
                 descendants.AddRange(contentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
-            
+
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
             Assert.AreEqual(3, descendants.Count);
