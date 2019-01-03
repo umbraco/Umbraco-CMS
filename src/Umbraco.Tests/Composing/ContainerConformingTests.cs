@@ -255,6 +255,40 @@ namespace Umbraco.Tests.Composing
         }
 
         [Test]
+        public void CanGetEmptyEnumerableOfBase()
+        {
+            var register = GetRegister();
+            var factory = register.CreateFactory();
+
+            var things = factory.GetInstance<IEnumerable<ThingBase>>();
+            Assert.AreEqual(0, things.Count());
+        }
+
+        [Test]
+        public void CanGetEmptyAllInstancesOfBase()
+        {
+            var register = GetRegister();
+            var factory = register.CreateFactory();
+
+            var things = factory.GetAllInstances<ThingBase>();
+            Assert.AreEqual(0, things.Count());
+        }
+
+        [Test]
+        public void CanTryGetEnumerableOfBase()
+        {
+            var register = GetRegister();
+
+            register.Register<Thing1>();
+            register.Register<Thing2>();
+
+            var factory = register.CreateFactory();
+
+            var things = factory.TryGetInstance<IEnumerable<ThingBase>>();
+            Assert.AreEqual(2, things.Count());
+        }
+
+        [Test]
         public void CanRegisterSingletonInterface()
         {
             var register = GetRegister();
