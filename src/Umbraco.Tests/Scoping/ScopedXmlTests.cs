@@ -7,6 +7,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Scoping
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ScopedXmlTests : TestWithDatabaseBase
     {
-        private CacheRefresherComponent _cacheRefresher;
+        private DistributedCacheBinder _distributedCacheBinder;
 
         protected override void Compose()
         {
@@ -42,8 +43,8 @@ namespace Umbraco.Tests.Scoping
         [TearDown]
         public void Teardown()
         {
-            _cacheRefresher?.Unbind();
-            _cacheRefresher = null;
+            _distributedCacheBinder?.UnbindEvents();
+            _distributedCacheBinder = null;
 
             _onPublishedAssertAction = null;
             ContentService.Published -= OnPublishedAssert;
@@ -90,8 +91,8 @@ namespace Umbraco.Tests.Scoping
             var item = new Content("name", -1, contentType);
 
             // wire cache refresher
-            _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize(new DistributedCache());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"
             var xml = XmlInContext;
@@ -209,8 +210,8 @@ namespace Umbraco.Tests.Scoping
             Current.Services.ContentTypeService.Save(contentType);
 
             // wire cache refresher
-            _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize(new DistributedCache());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"
             var xml = XmlInContext;

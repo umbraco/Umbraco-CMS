@@ -479,7 +479,9 @@ namespace Umbraco.Web.Editors
             if (objectType.HasValue)
             {
                 var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords,
-                    SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                    filter.IsNullOrWhiteSpace()
+                        ? null
+                        : SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
                     Ordering.By(orderBy, orderDirection));
 
                 if (totalRecords == 0)

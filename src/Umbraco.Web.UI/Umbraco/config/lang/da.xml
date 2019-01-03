@@ -32,8 +32,11 @@
     <key alias="rename" version="7.3.0">Omdøb</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+    <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
-    <key alias="toInTheTreeStructureBelow">I træstrukturen nedenfor</key>
+    <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="wasMovedTo">blev flyttet til</key>
+    <key alias="wasCopiedTo">blev kopieret til</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -772,7 +775,8 @@
     <key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
+    <key alias="editNotifications"><![CDATA[Vælg dine notificeringer for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notificeringer er gemt for</key>
     <key alias="mailBody"><![CDATA[
 Hej %0%
 
@@ -871,22 +875,23 @@ Mange hilsner fra Umbraco robotten
     <key alias="removeSpecialFormattering">Indsæt, men fjern formattering som ikke bør være på en webside (Anbefales)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Rollebaseret beskyttelse</key>
-    <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
-    <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
+    <key alias="paGroups">Gruppebaseret beskyttelse</key>
+    <key alias="paGroupsHelp">Hvis du ønsker at give adgang til alle medlemmer af specifikke medlemsgrupper</key>
+    <key alias="paGroupsNoGroups">Du skal oprette en medlemsgruppe før du kan bruge gruppebaseret beskyttelse</key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
-    <key alias="paHowWould">Vælg hvordan siden skal beskyttes</key>
-    <key alias="paIsProtected">%0% er nu beskyttet</key>
-    <key alias="paIsRemoved">Beskyttelse fjernet fra %0%</key>
+    <key alias="paHowWould"><![CDATA[Vælg hvordan siden <strong>%0%</strong> skal beskyttes]]></key>
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> er nu beskyttet]]></key>
+    <key alias="paIsRemoved"><![CDATA[Beskyttelse fjernet fra <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Log ind-side</key>
     <key alias="paLoginPageHelp">Vælg siden der indeholder log ind-formularen</key>
-    <key alias="paRemoveProtection">Fjern beskyttelse</key>
+    <key alias="paRemoveProtection">Fjern beskyttelse...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Er du sikker på at du vil fjerne beskyttelsen fra siden <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Vælg siderne der indeholder log ind-formularer og fejlmeddelelser</key>
-    <key alias="paSelectRoles">Vælg de roller der har adgang til denne side</key>
-    <key alias="paSetLogin">Indstil login og kodeord for denne side</key>
-    <key alias="paSimple">Enkel brugerbeskyttelse</key>
-    <key alias="paSimpleHelp">Hvis du blot ønsker at opsætte simpel beskyttelse ved hjælp af et enkelt login og kodeord</key>
+    <key alias="paSelectGroups"><![CDATA[Vælg de grupper der har adgang til siden <strong>%0%</strong>]]></key>
+    <key alias="paSelectMembers"><![CDATA[Vælg de medlemmer der har adgang til siden <strong>%0%</strong>]]></key>
+    <key alias="paMembers">Adgang til enkelte medlemmer</key>
+    <key alias="paMembersHelp">Hvis du ønsker at give adgang til enkelte medlemmer</key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
@@ -931,6 +936,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="undoEditCrop">Fortryd</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>

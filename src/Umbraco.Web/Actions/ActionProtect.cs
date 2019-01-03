@@ -10,7 +10,9 @@ namespace Umbraco.Web.Actions
     /// </summary>
     public class ActionProtect : IAction
     {
-        public char Letter => 'P';
+        public const char ActionLetter = 'P';
+
+        public char Letter => ActionLetter;
         public string Alias => "protect";
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
         public string Icon => "lock";

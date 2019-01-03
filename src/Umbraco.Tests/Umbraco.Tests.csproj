@@ -111,7 +111,7 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\CacheRefresherComponentTests.cs" />
+    <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
