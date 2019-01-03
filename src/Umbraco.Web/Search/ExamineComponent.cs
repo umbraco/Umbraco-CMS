@@ -50,7 +50,7 @@ namespace Umbraco.Web.Search
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        internal ExamineComponent(IMainDom mainDom,
+        public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             IndexRebuilder indexRebuilder, ServiceContext services,
