@@ -40,6 +40,8 @@ namespace Umbraco.Web.Runtime
     {
         public void Compose(Composition composition)
         {
+            composition.Components().Append<WebRuntimeComponent>();
+
             composition.Register<UmbracoInjectedModule>();
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors

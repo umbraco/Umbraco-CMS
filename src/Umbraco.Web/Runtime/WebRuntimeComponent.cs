@@ -36,7 +36,7 @@ namespace Umbraco.Web.Runtime
 {
     public class WebRuntimeComponent : IComponent
     {
-        internal WebRuntimeComponent(
+        public WebRuntimeComponent(
             IRuntimeState runtime,
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
