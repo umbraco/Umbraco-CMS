@@ -156,16 +156,6 @@ namespace Umbraco.Core
                                                           .Contains(property.PropertyTypeId));
         }
 
-//        public static IContentTypeComposition GetContentType(this IContentBase contentBase)
-//        {
-//            if (contentBase == null) throw new ArgumentNullException(nameof(contentBase));
-//
-//            if (contentBase is IContent content) return content.ContentType;
-//            if (contentBase is IMedia media) return media.ContentType;
-//            if (contentBase is IMember member) return member.ContentType;
-//            throw new NotSupportedException("Unsupported IContentBase implementation: " + contentBase.GetType().FullName + ".");
-//        }
-
         #region SetValue for setting file contents
 
         /// <summary>
