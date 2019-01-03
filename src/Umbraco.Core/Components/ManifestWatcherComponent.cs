@@ -1,11 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.Components
 {
-    public class ManifestWatcherComponent : IComponent
+    public class ManifestWatcherComponent : IComponent, IDisposable
     {
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change
@@ -25,9 +26,11 @@ namespace Umbraco.Core.Components
             _mw.Start(Directory.GetDirectories(appPlugins));
         }
 
-        public void Terminate()
+        public void Dispose()
         {
-            _mw?.Dispose();
+            if (_mw == null) return;
+
+            _mw.Dispose();
             _mw = null;
         }
     }
