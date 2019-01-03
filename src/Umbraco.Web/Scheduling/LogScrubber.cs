@@ -16,12 +16,11 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtime;
         private readonly IAuditService _auditService;
         private readonly IUmbracoSettingsSection _settings;
-        private readonly ILogger _logger;
-        private readonly IProfilingLogger _proflog;
+        private readonly IProfilingLogger _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, ILogger logger, IProfilingLogger proflog)
+            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
@@ -29,7 +28,6 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
             _scopeProvider = scopeProvider;
             _logger = logger;
-            _proflog = proflog;
         }
 
         // maximum age, in minutes
@@ -86,7 +84,7 @@ namespace Umbraco.Web.Scheduling
             // running on a background task, and Log.CleanLogs uses the old SqlHelper,
             // better wrap in a scope and ensure it's all cleaned up and nothing leaks
             using (var scope = _scopeProvider.CreateScope())
-            using (_proflog.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
+            using (_logger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
                 scope.Complete();

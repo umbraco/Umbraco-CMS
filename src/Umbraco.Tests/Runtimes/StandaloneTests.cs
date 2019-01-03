@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Web;
+using Examine;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -50,7 +51,7 @@ namespace Umbraco.Tests.Runtimes
                 File.Delete(file);
 
             // settings
-            // reset the current version to 0.0.0
+            // reset the current version to 0.0.0, clear connection strings
             ConfigurationManager.AppSettings["umbracoConfigurationStatus"] = "";
             // fixme we need a better management of settings here (and, true config files?)
 
@@ -75,14 +76,15 @@ namespace Umbraco.Tests.Runtimes
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
+            Console.WriteLine(runtimeState.Level);
             // going to be Install BUT we want to force components to be there (nucache etc)
             runtimeState.Level = RuntimeLevel.Run;
 
-            var componentTypes = typeLoader.GetTypes<IUmbracoComponent>() // all of them
+            var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
-                .Where(x => x != typeof(WebRuntimeComponent)); // exclude web runtime
-            var components = new Core.Components.Components(composition, componentTypes, profilingLogger);
-            components.Compose();
+                .Where(x => x != typeof(WebRuntimeComposer)); // exclude web runtime
+            var composers = new Composers(composition, composerTypes, profilingLogger);
+            composers.Compose();
 
             // must registers stuff that WebRuntimeComponent would register otherwise
             // fixme UmbracoContext creates a snapshot that it does not register with the accessor
@@ -98,12 +100,18 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterUnique(f => new DistributedCache());
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
+            composition.RegisterUnique<IExamineManager>(f => ExamineManager.Instance);
+
+            // initialize some components only/individually
+            composition.WithCollectionBuilder<ComponentCollectionBuilder>()
+                .Clear()
+                .Append<DistributedCacheBinderComponent>();
 
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();
 
-            // initialize some components individually
-            components.Get<DistributedCacheBinderComponent>().Initialize(factory.GetInstance<DistributedCacheBinder>());
+            // instantiate and initialize components
+            var components = factory.GetInstance<ComponentCollection>();
 
             // do stuff
             Console.WriteLine(runtimeState.Level);
@@ -251,16 +259,16 @@ namespace Umbraco.Tests.Runtimes
 
             // get the components
             // all of them?
-            var componentTypes = typeLoader.GetTypes<IUmbracoComponent>();
+            var composerTypes = typeLoader.GetTypes<IComposer>();
             // filtered?
             //var componentTypes = typeLoader.GetTypes<IUmbracoComponent>()
             //    .Where(x => !x.FullName.StartsWith("Umbraco.Web"));
             // single?
             //var componentTypes = new[] { typeof(CoreRuntimeComponent) };
-            var components = new Core.Components.Components(composition, componentTypes, profilingLogger);
+            var composers = new Composers(composition, composerTypes, profilingLogger);
 
             // get components to compose themselves
-            components.Compose();
+            composers.Compose();
 
             // create the factory
             var factory = composition.CreateFactory();
@@ -276,6 +284,11 @@ namespace Umbraco.Tests.Runtimes
             // and then, validate
             var lightInjectContainer = (LightInject.ServiceContainer) factory.Concrete;
             var results = lightInjectContainer.Validate().ToList();
+            foreach (var resultGroup in results.GroupBy(x => x.Severity).OrderBy(x => x.Key))
+            {
+                Console.WriteLine($"{resultGroup.Key}: {resultGroup.Count()}");
+            }
+
             foreach (var resultGroup in results.GroupBy(x => x.Severity).OrderBy(x => x.Key))
             foreach (var result in resultGroup)
             {

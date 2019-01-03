@@ -6,21 +6,11 @@ using Umbraco.Core.Services.Implement;
 namespace Umbraco.Core.Components
 {
     //TODO: This should just exist in the content service/repo!
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class RelateOnCopyComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class RelateOnCopyComponent : IComponent
     {
-        public override void Compose(Composition composition)
+        public RelateOnCopyComponent()
         {
-            base.Compose(composition);
-            composition.Initializers().Append<Initializer>();
-        }
-
-        public class Initializer : IUmbracoInitializer
-        {
-            public void Initialize()
-            {
-                ContentService.Copied += ContentServiceCopied;
-            }
+            ContentService.Copied += ContentServiceCopied;
         }
 
         private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)

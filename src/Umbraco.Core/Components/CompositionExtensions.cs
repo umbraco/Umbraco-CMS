@@ -116,10 +116,10 @@ namespace Umbraco.Core.Components
             => composition.WithCollectionBuilder<PostMigrationCollectionBuilder>();
 
         /// <summary>
-        /// Gets the initializers collection builder.
+        /// Gets the components collection builder.
         /// </summary>
-        public static UmbracoInitializerCollectionBuilder Initializers(this Composition composition)
-            => composition.WithCollectionBuilder<UmbracoInitializerCollectionBuilder>();
+        public static ComponentCollectionBuilder Components(this Composition composition)
+            => composition.WithCollectionBuilder<ComponentCollectionBuilder>();
 
         #endregion
 

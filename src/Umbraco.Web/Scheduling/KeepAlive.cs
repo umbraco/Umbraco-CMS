@@ -16,12 +16,11 @@ namespace Umbraco.Web.Scheduling
         private readonly IProfilingLogger _proflog;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, ILogger logger, IProfilingLogger proflog)
+            IRuntimeState runtime, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _logger = logger;
-            _proflog = proflog;
             if (_httpClient == null)
                 _httpClient = new HttpClient();
         }

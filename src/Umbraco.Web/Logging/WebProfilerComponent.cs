@@ -6,7 +6,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Logging
 {
-    internal class WebProfilerComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    internal class WebProfilerComponent : IComponent
     {
         // the profiler is too important to be composed in a component,
         // it is composed first thing in WebRuntime.Compose - this component
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Logging
 
         private WebProfiler _profiler;
 
-        public void Initialize(IProfiler profiler, ILogger logger, IRuntimeState runtime)
+        public WebProfilerComponent(IProfiler profiler, ILogger logger, IRuntimeState runtime)
         {
             // although registered in WebRuntime.Compose, ensure that we have not
             // been replaced by another component, and we are still "the" profiler

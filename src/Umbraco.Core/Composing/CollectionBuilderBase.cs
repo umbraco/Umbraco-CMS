@@ -40,7 +40,7 @@ namespace Umbraco.Core.Composing
             Container = container;
 
             // register the collection
-            Container.Register(factory => CreateCollection(factory), CollectionLifetime);
+            Container.Register(CreateCollection, CollectionLifetime);
         }
 
         /// <summary>
@@ -103,9 +103,15 @@ namespace Umbraco.Core.Composing
             RegisterTypes(); // will do it only once
 
             return _registeredTypes // respect order
-                .Select(x => (TItem) factory.GetInstance(x))
+                .Select(x => CreateItem(factory, x))
                 .ToArray(); // safe
         }
+
+        /// <summary>
+        /// Creates a collection item.
+        /// </summary>
+        protected virtual TItem CreateItem(IFactory factory, Type itemType)
+            => (TItem) factory.GetInstance(itemType);
 
         /// <summary>
         /// Creates a collection.

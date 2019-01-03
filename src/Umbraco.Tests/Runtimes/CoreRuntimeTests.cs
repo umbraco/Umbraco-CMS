@@ -63,10 +63,9 @@ namespace Umbraco.Tests.Runtimes
                 }
 
                 Assert.AreNotEqual(RuntimeLevel.BootFailed, app.Runtime.State.Level, m);
+                Assert.IsTrue(TestComposer.Ctored);
+                Assert.IsTrue(TestComposer.Composed);
                 Assert.IsTrue(TestComponent.Ctored);
-                Assert.IsTrue(TestComponent.Composed);
-                Assert.IsTrue(TestComponent.Initialized1);
-                Assert.IsTrue(TestComponent.Initialized2);
                 Assert.IsNotNull(TestComponent.ProfilingLogger);
                 Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
                 Assert.IsInstanceOf<DebugDiagnosticsLogger>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
@@ -155,62 +154,65 @@ namespace Umbraco.Tests.Runtimes
             // runs with only one single component
             // UmbracoCoreComponent will be force-added too
             // and that's it
-            protected override IEnumerable<Type> GetComponentTypes(TypeLoader typeLoader)
+            protected override IEnumerable<Type> GetComposerTypes(TypeLoader typeLoader)
             {
-                return new[] { typeof(TestComponent) };
+                return new[] { typeof(TestComposer) };
             }
         }
 
 
-        public class TestComponent : UmbracoComponentBase
+        public class TestComposer : IComposer
         {
             // test flags
             public static bool Ctored;
             public static bool Composed;
+
+            public static void Reset()
+            {
+                Ctored = Composed = false;
+            }
+
+            public TestComposer()
+            {
+                Ctored = true;
+            }
+
+            public void Compose(Composition composition)
+            {
+                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.RegisterUnique<IExamineManager, TestExamineManager>();
+                composition.Components().Append<TestComponent>();
+
+                Composed = true;
+            }
+        }
+
+        public class TestComponent : IComponent, IDisposable
+        {
+            // test flags
+            public static bool Ctored;
             public static bool Initialized1;
             public static bool Initialized2;
             public static bool Terminated;
             public static IProfilingLogger ProfilingLogger;
 
+            public bool Disposed;
+
             public static void Reset()
             {
-                Ctored = Composed = Initialized1 = Initialized2 = Terminated = false;
+                Ctored = Initialized1 = Initialized2 = Terminated = false;
                 ProfilingLogger = null;
             }
 
-            public TestComponent()
+            public TestComponent(IProfilingLogger proflog)
             {
                 Ctored = true;
-            }
-
-            public override void Compose(Composition composition)
-            {
-                base.Compose(composition);
-
-                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
-                composition.RegisterUnique<IExamineManager, TestExamineManager>();
-
-                Composed = true;
-            }
-
-            public void Initialize()
-            {
-                Initialized1 = true;
-            }
-
-            public void Initialize(ILogger logger)
-            {
-                Initialized2 = true;
-            }
-
-            public void Initialize(IProfilingLogger proflog)
-            {
                 ProfilingLogger = proflog;
             }
 
-            public override void Terminate()
+            public void Dispose()
             {
-                base.Terminate();
+                Disposed = true;
                 Terminated = true;
             }
         }

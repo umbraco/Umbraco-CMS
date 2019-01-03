@@ -109,11 +109,15 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
+    <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
     <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\IDistributedCacheBinder.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
+    <Compile Include="Components\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Components\NotificationsComposer.cs" />
+    <Compile Include="Components\PublicAccessComposer.cs" />
     <Compile Include="Composing\Composers\InstallerComposer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
@@ -123,6 +127,7 @@
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
+    <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -176,6 +181,12 @@
     <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorsComposer.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
+    <Compile Include="Routing\RedirectTrackingComposer.cs" />
+    <Compile Include="Runtime\WebRuntimeComposer.cs" />
+    <Compile Include="Scheduling\SchedulerComposer.cs" />
+    <Compile Include="Search\ExamineComposer.cs" />
     <Compile Include="Search\GenericIndexDiagnostics.cs" />
     <Compile Include="Search\IUmbracoIndexesCreator.cs" />
     <Compile Include="Search\UmbracoIndexesCreator.cs" />
@@ -202,6 +213,7 @@
     <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
+    <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />

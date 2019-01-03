@@ -15,20 +15,18 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtimeState;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
-        private readonly ILogger _logger;
-        private readonly IProfilingLogger _proflog;
+        private readonly IProfilingLogger _logger;
 
         public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IRuntimeState runtimeState,
-            ILogger logger, IProfilingLogger proflog)
+            IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _healthChecks = healthChecks;
             _notifications = notifications;
             _runtimeState = runtimeState;
             _logger = logger;
-            _proflog = proflog;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
@@ -53,7 +51,7 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            using (_proflog.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
+            using (_logger.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
             {
                 var healthCheckConfig = Current.Config.HealthChecks();
 

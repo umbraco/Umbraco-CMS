@@ -2,20 +2,25 @@
 
 namespace Umbraco.Core.Components
 {
-    /// <summary>
-    /// Represents an Umbraco component.
-    /// </summary>
-    public interface IUmbracoComponent : IDiscoverable
-    {
-        /// <summary>
-        /// Composes the component.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        void Compose(Composition composition);
+    // FIXME BREAK THIS!
 
-        /// <summary>
-        /// Terminates the component.
-        /// </summary>
-        void Terminate();
+    public interface IComposer : IDiscoverable
+    {
+        void Compose(Composition composition);
     }
+
+    public interface IRuntimeComposer : IComposer
+    { }
+
+    [Require(typeof(IRuntimeComposer))]
+    public interface ICoreComposer : IComposer
+    { }
+
+    [Require(typeof(ICoreComposer))]
+    public interface IUserComposer : IComposer
+    { }
+
+    // will be disposed if disposable, CANT be disposed multiple times, beware!
+    public interface IComponent
+    { }
 }

@@ -7,7 +7,6 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Actions;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using System.Linq;
@@ -17,16 +16,9 @@ using System.Globalization;
 
 namespace Umbraco.Web.Components
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class NotificationsComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class NotificationsComponent : IComponent
     {
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-            composition.RegisterUnique<Notifier>();
-        }
-
-        public void Initialize(INotificationService notificationService, Notifier notifier, ActionCollection actions)
+        public NotificationsComponent(INotificationService notificationService, Notifier notifier, ActionCollection actions)
         {
             //Send notifications for the send to publish action
             ContentService.SentToPublish += (sender, args) => notifier.Notify(actions.GetAction<ActionToPublish>(), args.Entity);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Web;
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Runtime
     /// should be possible to use this runtime in console apps.</remarks>
     public class CoreRuntime : IRuntime
     {
-        private Components.Components _components;
+        private ComponentCollection _components;
         private IFactory _factory;
         private RuntimeState _state;
 
@@ -136,17 +137,17 @@ namespace Umbraco.Core.Runtime
                 AcquireMainDom(mainDom);
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
-                // get components, and compose them
-                var componentTypes = ResolveComponentTypes(typeLoader);
-                _components = new Components.Components(composition, componentTypes, ProfilingLogger);
-                _components.Compose();
+                // get composers, and compose
+                var composerTypes = ResolveComposerTypes(typeLoader);
+                composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+                var composers = new Composers(composition, composerTypes, ProfilingLogger);
+                composers.Compose();
 
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
-                // run the initializers
-                for
-                _components.Initialize(_factory);
+                // create the components
+                _components = _factory.GetInstance<ComponentCollection>();
             }
             catch (Exception e)
             {
@@ -257,13 +258,13 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        private IEnumerable<Type> ResolveComponentTypes(TypeLoader typeLoader)
+        private IEnumerable<Type> ResolveComposerTypes(TypeLoader typeLoader)
         {
-            using (var timer = ProfilingLogger.TraceDuration<CoreRuntime>("Resolving component types.", "Resolved."))
+            using (var timer = ProfilingLogger.TraceDuration<CoreRuntime>("Resolving composer types.", "Resolved."))
             {
                 try
                 {
-                    return GetComponentTypes(typeLoader);
+                    return GetComposerTypes(typeLoader);
                 }
                 catch
                 {
@@ -276,10 +277,7 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual void Terminate()
         {
-            using (ProfilingLogger.DebugDuration<CoreRuntime>("Terminating Umbraco.", "Terminated."))
-            {
-                _components?.Terminate();
-            }
+            _components.Terminate();
         }
 
         /// <summary>
@@ -295,10 +293,10 @@ namespace Umbraco.Core.Runtime
         // getters can be implemented by runtimes inheriting from CoreRuntime
 
         /// <summary>
-        /// Gets all component types.
+        /// Gets all composer types.
         /// </summary>
-        protected virtual IEnumerable<Type> GetComponentTypes(TypeLoader typeLoader)
-            => typeLoader.GetTypes<IUmbracoComponent>();
+        protected virtual IEnumerable<Type> GetComposerTypes(TypeLoader typeLoader)
+            => typeLoader.GetTypes<IComposer>();
 
         /// <summary>
         /// Gets a logger.

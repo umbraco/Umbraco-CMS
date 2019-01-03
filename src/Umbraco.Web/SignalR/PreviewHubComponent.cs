@@ -1,24 +1,16 @@
 ﻿using System;
 using Microsoft.AspNet.SignalR;
-using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.SignalR
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class PreviewHubComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public class PreviewHubComponent : IComponent
     {
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
-        }
-
         // using a lazy arg here means that we won't create the hub until necessary
         // and therefore we won't have too bad an impact on boot time
-        public void Initialize(Lazy<IHubContext<IPreviewHub>> hubContext)
+        public PreviewHubComponent(Lazy<IHubContext<IPreviewHub>> hubContext)
         {
             // ContentService.Saved is too soon - the content cache is not ready yet
             // try using the content cache refresher event, because when it triggers
