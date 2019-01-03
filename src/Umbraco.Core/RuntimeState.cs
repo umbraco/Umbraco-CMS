@@ -151,6 +151,7 @@ namespace Umbraco.Core
                 // there *is* a local version, but it does not match the code version
                 // need to upgrade
                 logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
+                Level = RuntimeLevel.Upgrade;
             }
             else if (localVersion > codeVersion)
             {
