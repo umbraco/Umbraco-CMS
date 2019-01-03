@@ -115,6 +115,12 @@ namespace Umbraco.Core.Components
         internal static PostMigrationCollectionBuilder PostMigrations(this Composition composition)
             => composition.WithCollectionBuilder<PostMigrationCollectionBuilder>();
 
+        /// <summary>
+        /// Gets the initializers collection builder.
+        /// </summary>
+        public static UmbracoInitializerCollectionBuilder Initializers(this Composition composition)
+            => composition.WithCollectionBuilder<UmbracoInitializerCollectionBuilder>();
+
         #endregion
 
         #region Uniques

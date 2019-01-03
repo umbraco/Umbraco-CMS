@@ -51,11 +51,27 @@ namespace Umbraco.Core.Components
             ComposeComponents();
         }
 
-        public void Initialize(IFactory factory)
+        public void Initialize(IFactory factory) // fixme refactor!!!
         {
-            using (var scope = factory.GetInstance<IScopeProvider>().CreateScope())
+            // use a container scope to ensure that PerScope instances are disposed
+            // components that require instances that should not survive should register them with PerScope lifetime
+
+            var scopeProvider = factory.GetInstance<IScopeProvider>();
+            var initializers = factory.GetInstance<UmbracoInitializerCollection>();
+
+            using (var scope = scopeProvider.CreateScope())
+            using (_logger.DebugDuration<Components>($"Initializing. (log when >{LogThresholdMilliseconds}ms)", "Initialized."))
+            using (factory.BeginScope())
             {
-                InitializeComponents(factory);
+                foreach (var initializer in initializers)
+                {
+                    var initializerType = initializer.GetType();
+                    using (_logger.DebugDuration<Components>($"Run {initializerType.FullName}.", $"Completed {initializerType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    {
+                        initializer.Initialize();
+                    }
+                }
+
                 scope.Complete();
             }
         }
@@ -302,49 +318,6 @@ namespace Umbraco.Core.Components
                     }
                 }
             }
-        }
-
-        private void InitializeComponents(IFactory factory)
-        {
-            // use a container scope to ensure that PerScope instances are disposed
-            // components that require instances that should not survive should register them with PerScope lifetime
-            using (_logger.DebugDuration<Components>($"Initializing components. (log when >{LogThresholdMilliseconds}ms)", "Initialized components."))
-            using (factory.BeginScope())
-            {
-                foreach (var component in _components)
-                {
-                    var componentType = component.GetType();
-                    var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                        .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false && x.IsStatic == false);
-                    using (_logger.DebugDuration<Components>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
-                    {
-                        foreach (var initializer in initializers)
-                        {
-                            var parameters = initializer.GetParameters()
-                                .Select(x => GetParameter(factory, componentType, x.ParameterType))
-                                .ToArray();
-                            initializer.Invoke(component, parameters);
-                        }
-                    }
-                }
-            }
-        }
-
-        private object GetParameter(IFactory factory, Type componentType, Type parameterType)
-        {
-            object param;
-
-            try
-            {
-                param = factory.TryGetInstance(parameterType);
-            }
-            catch (Exception e)
-            {
-                throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.", e);
-            }
-
-            if (param == null) throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.");
-            return param;
         }
 
         public void Terminate()

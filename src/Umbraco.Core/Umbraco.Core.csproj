@@ -162,12 +162,15 @@
     <Compile Include="Components\IRuntimeComponent.cs" />
     <Compile Include="Components\IUmbracoComponent.cs" />
     <Compile Include="Components\IUmbracoCoreComponent.cs" />
+    <Compile Include="Components\IUmbracoInitializer.cs" />
     <Compile Include="Components\IUmbracoUserComponent.cs" />
     <Compile Include="Components\RequireComponentAttribute.cs" />
     <Compile Include="Components\RequiredByComponentAttribute.cs" />
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\UmbracoComponentBase.cs" />
     <Compile Include="Components\UmbracoCoreComponentBase.cs" />
+    <Compile Include="Components\UmbracoInitializerCollection.cs" />
+    <Compile Include="Components\UmbracoInitializerCollectionBuilder.cs" />
     <Compile Include="Components\UmbracoUserComponentBase.cs" />
     <Compile Include="Composing\BuilderCollectionBase.cs" />
     <Compile Include="Composing\CollectionBuilderBase.cs" />

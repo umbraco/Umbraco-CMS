@@ -10,12 +10,21 @@ namespace Umbraco.Core.Components
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class RelateOnTrashComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        public void Initialize()
+        public override void Compose(Composition composition)
         {
-            ContentService.Moved += ContentService_Moved;
-            ContentService.Trashed += ContentService_Trashed;
-            MediaService.Moved += MediaService_Moved;
-            MediaService.Trashed += MediaService_Trashed;
+            base.Compose(composition);
+            composition.Initializers().Append<Initializer>();
+        }
+
+        public class Initializer : IUmbracoInitializer
+        {
+            public void Initialize()
+            {
+                ContentService.Moved += ContentService_Moved;
+                ContentService.Trashed += ContentService_Trashed;
+                MediaService.Moved += MediaService_Moved;
+                MediaService.Trashed += MediaService_Trashed;
+            }
         }
 
         private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)

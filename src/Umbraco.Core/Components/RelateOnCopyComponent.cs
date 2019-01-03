@@ -9,9 +9,18 @@ namespace Umbraco.Core.Components
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class RelateOnCopyComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        public void Initialize()
+        public override void Compose(Composition composition)
         {
-            ContentService.Copied += ContentServiceCopied;
+            base.Compose(composition);
+            composition.Initializers().Append<Initializer>();
+        }
+
+        public class Initializer : IUmbracoInitializer
+        {
+            public void Initialize()
+            {
+                ContentService.Copied += ContentServiceCopied;
+            }
         }
 
         private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
