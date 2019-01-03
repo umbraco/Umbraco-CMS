@@ -7,7 +7,7 @@ namespace Umbraco.Core.Runtime
 {
     public class CoreRuntimeComponent : IComponent
     {
-        internal CoreRuntimeComponent(IEnumerable<Profile> mapperProfiles)
+        public CoreRuntimeComponent(IEnumerable<Profile> mapperProfiles)
         {
             // mapper profiles have been registered & are created by the container
             Mapper.Initialize(configuration =>
