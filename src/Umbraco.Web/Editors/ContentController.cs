@@ -1094,6 +1094,7 @@ namespace Umbraco.Web.Editors
                 //TODO: Deal with multiple cancelations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = Array.Empty<string>();
+                return publishStatus;
             }
 
             //All variants in this collection should have a culture if we get here! but we'll double check and filter here
