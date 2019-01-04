@@ -102,7 +102,7 @@ namespace umbraco
         /// Initializes a new instance of the page for a content.
         /// </summary>
         /// <param name="content">The content.</param>
-        /// <remarks>This is for <see cref="MacroController"/> usage only.</remarks>
+        /// <remarks>This is for <see cref="MacroRenderingController"/> usage only.</remarks>
         internal page(IContent content, IVariationContextAccessor variationContextAccessor)
             : this(new PagePublishedContent(content, variationContextAccessor))
         { }

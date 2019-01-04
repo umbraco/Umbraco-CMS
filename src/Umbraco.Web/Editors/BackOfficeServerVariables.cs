@@ -169,7 +169,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllowedChildren(0))
                         },
                         {
-                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroController>(
+                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                                 controller => controller.GetMacroParameters(0))
                         },
                         {
