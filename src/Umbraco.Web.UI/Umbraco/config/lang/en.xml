@@ -33,8 +33,11 @@
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="wasMovedTo">was moved to</key>
+    <key alias="wasCopiedTo">was copied to</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -942,7 +945,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Edit your notification for %0%</key>
+    <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
 
@@ -1196,6 +1200,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
