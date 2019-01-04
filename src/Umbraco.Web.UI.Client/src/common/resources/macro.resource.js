@@ -76,6 +76,19 @@ function macroResource($q, $http, umbRequestHelper) {
                 'Failed to create macro "' + filename + '"'
             );
 
+        },
+
+        createMacro: function(name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "macroApiBaseUrl",
+                        "Create"), {
+                        name : name,
+                    }
+                ),
+                'Failed to create macro "' + name + '"'
+            );
         }
     };
 }
