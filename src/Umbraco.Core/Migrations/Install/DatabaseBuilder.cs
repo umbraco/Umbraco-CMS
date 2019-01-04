@@ -120,7 +120,7 @@ namespace Umbraco.Core.Migrations.Install
 
         #region Configure Connection String
 
-        private const string EmbeddedDatabaseConnectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
+        public const string EmbeddedDatabaseConnectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
 
         /// <summary>
         /// Configures a connection string for the embedded database.
@@ -365,52 +365,6 @@ namespace Umbraco.Core.Migrations.Install
             }
 
             return true;
-        }
-
-        #endregion
-
-        #region Utils
-
-        internal static void GiveLegacyAChance(IUmbracoDatabaseFactory factory, ILogger logger)
-        {
-            // look for the legacy appSettings key
-            var legacyConnString = ConfigurationManager.AppSettings[Constants.System.UmbracoConnectionName];
-            if (string.IsNullOrWhiteSpace(legacyConnString)) return;
-
-            var test = legacyConnString.ToLowerInvariant();
-            if (test.Contains("sqlce4umbraco"))
-            {
-                // sql ce
-                ConfigureEmbeddedDatabaseConnection(factory, logger);
-            }
-            else if (test.Contains("tcp:"))
-            {
-                // sql azure
-                SaveConnectionString(legacyConnString, Constants.DbProviderNames.SqlServer, logger);
-                factory.Configure(legacyConnString, Constants.DbProviderNames.SqlServer);
-            }
-            else if (test.Contains("datalayer=mysql"))
-            {
-                // mysql
-
-                // strip the datalayer part off
-                var connectionStringWithoutDatalayer = string.Empty;
-                // ReSharper disable once LoopCanBeConvertedToQuery
-                foreach (var variable in legacyConnString.Split(';').Where(x => x.ToLowerInvariant().StartsWith("datalayer") == false))
-                    connectionStringWithoutDatalayer = $"{connectionStringWithoutDatalayer}{variable};";
-
-                SaveConnectionString(connectionStringWithoutDatalayer, Constants.DbProviderNames.MySql, logger);
-                factory.Configure(connectionStringWithoutDatalayer, Constants.DbProviderNames.MySql);
-            }
-            else
-            {
-                // sql server
-                SaveConnectionString(legacyConnString, Constants.DbProviderNames.SqlServer, logger);
-                factory.Configure(legacyConnString, Constants.DbProviderNames.SqlServer);
-            }
-
-            // remove the legacy connection string, so we don't end up in a loop if something goes wrong
-            GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName);
         }
 
         #endregion

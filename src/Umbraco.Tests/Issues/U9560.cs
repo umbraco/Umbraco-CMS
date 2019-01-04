@@ -3,7 +3,8 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Testing;
-using LightInject;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Issues
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.Issues
             var aliasName = string.Empty;
 
             // read fields, same as what we do with PetaPoco Fetch<dynamic>
-            using (var db = Container.GetInstance<IUmbracoDatabaseFactory>().CreateDatabase())
+            using (var db = Factory.GetInstance<IUmbracoDatabaseFactory>().CreateDatabase())
             {
                 db.OpenSharedConnection();
                 try
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Issues
             Assert.AreEqual("Alias", aliasName);
 
             // try differently
-            using (var db = Container.GetInstance<IUmbracoDatabaseFactory>().CreateDatabase())
+            using (var db = Factory.GetInstance<IUmbracoDatabaseFactory>().CreateDatabase())
             {
                 db.OpenSharedConnection();
                 try

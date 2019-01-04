@@ -4,6 +4,7 @@ using System.Data;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.PublishedContent
             // use any local db files, does not rely on any database) - and tests variations
 
             SettingsForTests.ConfigureSettings(SettingsForTests.GenerateMockUmbracoSettings());
-            var globalSettings = UmbracoConfig.For.GlobalSettings();
+            var globalSettings = Current.Config.Global();
 
             // create a content node kit
             var kit = new ContentNodeKit

@@ -1,14 +1,11 @@
 using System;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using System.Web.UI;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Pages
@@ -33,7 +30,7 @@ namespace Umbraco.Web.UI.Pages
         /// <summary>
         /// Gets the profiling helper.
         /// </summary>
-        public ProfilingLogger ProfilingLogger => Current.ProfilingLogger;
+        public IProfilingLogger ProfilingLogger => Current.ProfilingLogger;
 
         /// <summary>
         /// Gets the Url helper.
@@ -75,7 +72,7 @@ namespace Umbraco.Web.UI.Pages
         {
             base.OnLoad(e);
 
-            if (Request.IsSecureConnection || UmbracoConfig.For.GlobalSettings().UseHttps == false) return;
+            if (Request.IsSecureConnection || Current.Config.Global().UseHttps == false) return;
 
             var serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
             Response.Redirect($"https://{serverName}{Request.FilePath}");

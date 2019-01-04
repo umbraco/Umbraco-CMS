@@ -11,7 +11,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    [SqlSyntaxProvider(Constants.DbProviderNames.MySql)]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         private readonly ILogger _logger;
@@ -334,7 +333,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return null; // NOT SUPPORTED!             
+                    return null; // NOT SUPPORTED!
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
             }

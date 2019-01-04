@@ -26,11 +26,11 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
 
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
 
         #region Constructors
 
-        public MediaService(IScopeProvider provider, MediaFileSystem mediaFileSystem, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public MediaService(IScopeProvider provider, IMediaFileSystem mediaFileSystem, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository)
             : base(provider, logger, eventMessagesFactory)
@@ -757,8 +757,7 @@ namespace Umbraco.Core.Services.Implement
                 var args = new DeleteEventArgs<IMedia>(c, false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args);
 
-                _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                    (file, e) => Logger.Error<MediaService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
+                // media files deleted by QueuingEventDispatcher
             }
 
             const int pageSize = 500;

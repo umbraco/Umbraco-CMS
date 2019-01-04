@@ -2,6 +2,7 @@
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
@@ -50,7 +51,7 @@ namespace Umbraco.Tests.Configurations
             SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             SystemDirectories.Root = rootPath;
-            Assert.AreEqual(outcome, UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea());
+            Assert.AreEqual(outcome, Current.Config.Global().GetUmbracoMvcArea());
         }
         
         [TestCase("/umbraco/editContent.aspx")]

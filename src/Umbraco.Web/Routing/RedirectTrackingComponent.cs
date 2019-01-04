@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Events;
@@ -13,23 +12,13 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Redirects
 {
-    /// <summary>
-    /// Implements an Application Event Handler for managing redirect urls tracking.
-    /// </summary>
-    /// <remarks>
-    /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old url</para>
-    /// <para>not managing domains because we don't know how to do it - changing domains => must create a higher level strategy using rewriting rules probably</para>
-    /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
-    /// </remarks>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    [DisableComponent] // fixme - re-enable when we fix redirect tracking with variants
-    public class RedirectTrackingComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class RedirectTrackingComponent : IComponent
     {
         private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";
         private const string ContextKey2 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.2";
         private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
 
-        protected void Initialize()
+        public RedirectTrackingComponent()
         {
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order

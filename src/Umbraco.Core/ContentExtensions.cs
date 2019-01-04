@@ -18,8 +18,8 @@ namespace Umbraco.Core
     public static class ContentExtensions
     {
         // this ain't pretty
-        private static MediaFileSystem _mediaFileSystem;
-        private static MediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.FileSystems.MediaFileSystem);
+        private static IMediaFileSystem _mediaFileSystem;
+        private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
 
         #region IContent
 

@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Routing
 {
@@ -19,8 +20,8 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Container.RegisterSingleton(_ => Mock.Of<IDomainService>());
-            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.RegisterUnique(_ => Mock.Of<IDomainService>());
+            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         void SetDomains1()

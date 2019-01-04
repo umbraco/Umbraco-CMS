@@ -3,17 +3,17 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
@@ -34,13 +34,11 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the database context.
         /// </summary>
-        [Inject]
         public ServiceContext Services { get; set; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        [Inject]
         public CacheHelper ApplicationCache { get; set; }
 
         // fixme
@@ -108,6 +106,20 @@ namespace Umbraco.Web.Mvc
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper Members => Umbraco.MembershipHelper;
+
+        protected UmbracoViewPage()
+            : this(
+                Current.Factory.GetInstance<ServiceContext>(),
+                Current.Factory.GetInstance<CacheHelper>()
+            )
+        {
+        }
+
+        protected UmbracoViewPage(ServiceContext services, CacheHelper applicationCache)
+        {
+            Services = services;
+            ApplicationCache = applicationCache;
+        }
 
         // view logic below:
 
@@ -204,7 +216,7 @@ namespace Umbraco.Web.Mvc
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                string.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
+                                string.Format(Current.Config.Umbraco().Content.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
                         }

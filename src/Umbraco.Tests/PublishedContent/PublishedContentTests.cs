@@ -9,8 +9,9 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
-using LightInject;
 using Moq;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -32,9 +33,9 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
-            Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(
@@ -44,14 +45,14 @@ namespace Umbraco.Tests.PublishedContent
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
-            Container.RegisterSingleton<IDataTypeService>(f => dataTypeService);
+            Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
         }
 
         protected override void Initialize()
         {
             base.Initialize();
 
-            var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -72,9 +73,9 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-        protected override TypeLoader CreateTypeLoader(IServiceFactory f)
+        protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreateTypeLoader(f);
+            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 
             // this is so the model factory looks into the test assembly
             pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
@@ -453,7 +454,7 @@ namespace Umbraco.Tests.PublishedContent
         public void FirstChildAsT()
         {
             var doc = GetNode(1046); // has child nodes
-           
+
             var model = doc.FirstChild<Anything>(x => true); // predicate
 
             Assert.IsNotNull(model);
@@ -817,7 +818,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void FragmentProperty()
         {
-            var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             var pt = factory.CreatePropertyType("detached", 1003);
             var ct = factory.CreateContentType(0, "alias", new[] { pt });
@@ -836,7 +837,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Fragment2()
         {
-            var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             var pt1 = factory.CreatePropertyType("legend", 1004);
             var pt2 = factory.CreatePropertyType("image", 1005);

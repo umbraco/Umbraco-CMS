@@ -38,7 +38,7 @@ namespace Umbraco.Web.Security.Providers
 
         public override string ProviderName
         {
-            get { return UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider; }
+            get { return Current.Config.Umbraco().Providers.DefaultBackOfficeUserProvider; }
         }
 
         protected override MembershipUser ConvertToMembershipUser(IUser entity)

@@ -25,7 +25,7 @@ namespace Umbraco.Web.Search
     {
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
-        public UmbracoIndexesCreator(ProfilingLogger profilingLogger,
+        public UmbracoIndexesCreator(IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
             IMemberService memberService)
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Search
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
         }
 
-        protected ProfilingLogger ProfilingLogger { get; }
+        protected IProfilingLogger ProfilingLogger { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Search
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
-                LanguageService, 
+                LanguageService,
                 GetContentValueSetValidator());
             return index;
         }
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Search
                 new UmbracoFieldDefinitionCollection(),
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
-                ProfilingLogger, 
+                ProfilingLogger,
                 GetMemberValueSetValidator());
             return index;
         }
@@ -111,6 +111,6 @@ namespace Umbraco.Web.Search
         {
             return new MemberValueSetValidator();
         }
-        
+
     }
 }

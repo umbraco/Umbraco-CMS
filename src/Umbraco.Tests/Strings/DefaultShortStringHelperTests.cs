@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -71,7 +69,7 @@ namespace Umbraco.Tests.Strings
                 }));
 
             // fixme - move to a "compose" thing?
-            Container.RegisterSingleton<IShortStringHelper>(f => _helper);
+            Composition.RegisterUnique<IShortStringHelper>(f => _helper);
         }
 
         private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);

@@ -6,9 +6,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -19,12 +16,11 @@ namespace Umbraco.Tests.Templates
     public class TemplateRepositoryTests
     {
         private readonly Mock<CacheHelper> _cacheMock = new Mock<CacheHelper>();
-        private readonly Mock<IFileSystem> _viewFileSystemMock = new Mock<IFileSystem>();
-        private readonly Mock<IFileSystem> _masterpageFileSystemMock = new Mock<IFileSystem>();
         private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<ITemplatesSection>();
+        private readonly IFileSystems _fileSystems = Mock.Of<IFileSystems>();
         private TemplateRepository _templateRepository;
 
-        private readonly TestObjects TestObjects = new TestObjects(null);
+        private readonly TestObjects _testObjects = new TestObjects(null);
 
         [SetUp]
         public void Setup()
@@ -33,12 +29,16 @@ namespace Umbraco.Tests.Templates
 
             var accessorMock = new Mock<IScopeAccessor>();
             var scopeMock = new Mock<IScope>();
-            var database = TestObjects.GetUmbracoSqlCeDatabase(logger);
+            var database = _testObjects.GetUmbracoSqlCeDatabase(logger);
             scopeMock.Setup(x => x.Database).Returns(database);
             accessorMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
 
-            _templateRepository = new TemplateRepository(accessorMock.Object, _cacheMock.Object, logger, _templateConfigMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object);
+            var mvcFs = Mock.Of<IFileSystem>();
+            var masterFs = Mock.Of<IFileSystem>();
+            Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(mvcFs);
+            Mock.Get(_fileSystems).Setup(x => x.MasterPagesFileSystem).Returns(masterFs);
 
+            _templateRepository = new TemplateRepository(accessorMock.Object, _cacheMock.Object, logger, _templateConfigMock.Object, _fileSystems);
         }
 
         [Test]
@@ -53,7 +53,8 @@ namespace Umbraco.Tests.Templates
             templateMock.Setup(x => x.Content).Returns("<asp:Content />");
 
             // but MVC View already exists
-            _viewFileSystemMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+            Mock.Get(_fileSystems.MvcViewsFileSystem)
+                .Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
 
             var res = _templateRepository.DetermineTemplateRenderingEngine(templateMock.Object);
             Assert.AreEqual(RenderingEngine.Mvc, res);
@@ -71,7 +72,8 @@ namespace Umbraco.Tests.Templates
             templateMock.Setup(x => x.Content).Returns("<asp:Content />");
 
             // MVC View doesn't exist
-            _viewFileSystemMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
+            Mock.Get(_fileSystems.MvcViewsFileSystem)
+                .Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
             var res = _templateRepository.DetermineTemplateRenderingEngine(templateMock.Object);
             Assert.AreEqual(RenderingEngine.WebForms, res);
@@ -87,8 +89,10 @@ namespace Umbraco.Tests.Templates
             templateMock.Setup(x => x.Alias).Returns("Something");
 
             // but masterpage already exists
-            _viewFileSystemMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
-            _masterpageFileSystemMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+            Mock.Get(_fileSystems.MvcViewsFileSystem)
+                .Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
+            Mock.Get(_fileSystems.MasterPagesFileSystem)
+                .Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
 
             var res = _templateRepository.DetermineTemplateRenderingEngine(templateMock.Object);
             Assert.AreEqual(RenderingEngine.WebForms, res);
@@ -104,8 +108,10 @@ namespace Umbraco.Tests.Templates
             templateMock.Setup(x => x.Alias).Returns("Something");
 
             // but MVC View already exists
-            _viewFileSystemMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
-            _masterpageFileSystemMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
+            Mock.Get(_fileSystems.MvcViewsFileSystem)
+                .Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+            Mock.Get(_fileSystems.MasterPagesFileSystem)
+                .Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
             var res = _templateRepository.DetermineTemplateRenderingEngine(templateMock.Object);
             Assert.AreEqual(RenderingEngine.Mvc, res);

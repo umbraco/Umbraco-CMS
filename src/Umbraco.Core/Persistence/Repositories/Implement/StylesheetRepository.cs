@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -12,8 +11,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        public StylesheetRepository([Inject("StylesheetFileSystem")] IFileSystem fileSystem)
-            : base(fileSystem)
+        public StylesheetRepository(IFileSystems fileSystems)
+            : base(fileSystems.StylesheetsFileSystem)
         { }
 
         #region Overrides of FileRepository<string,Stylesheet>

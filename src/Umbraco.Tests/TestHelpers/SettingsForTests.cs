@@ -3,6 +3,7 @@ using System.IO;
 using System.Configuration;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -13,7 +14,7 @@ namespace Umbraco.Tests.TestHelpers
     {
         public static void ConfigureSettings(IGlobalSettings settings)
         {
-            UmbracoConfig.For.SetGlobalConfig(settings);
+            Current.Config.SetGlobalConfig(settings);
         }
 
         // umbracoSettings
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="settings"></param>
         public static void ConfigureSettings(IUmbracoSettingsSection settings)
         {
-            UmbracoConfig.For.SetUmbracoSettings(settings);
+            Current.Config.SetUmbracoConfig(settings);
         }
 
         public static IGlobalSettings GenerateMockGlobalSettings()
@@ -103,7 +104,7 @@ namespace Umbraco.Tests.TestHelpers
         //    SaveSetting("umbracoConfigurationStatus");
         //}
 
-      
+
 
         // reset & defaults
 

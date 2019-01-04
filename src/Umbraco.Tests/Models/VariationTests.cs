@@ -1,5 +1,4 @@
 ﻿using System;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -27,8 +26,8 @@ namespace Umbraco.Tests.Models
             // need to be able to retrieve them all...
 
             Current.Reset();
-            var container = Mock.Of<IServiceContainer>();
-            Current.Container = container;
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
@@ -50,7 +49,7 @@ namespace Umbraco.Tests.Models
                 dataTypeService: dataTypeService,
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
-            Mock.Get(container)
+            Mock.Get(factory)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {

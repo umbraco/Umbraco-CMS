@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
@@ -31,12 +29,8 @@ namespace Umbraco.Web.Editors
             var sectionModels = sections.Select(Mapper.Map<Core.Models.Section, Section>).ToArray();
             
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
-            // since tree's by nature are controllers and require request contextual data - and then we have to
-            // remember to inject properties - nasty indeed
-            // fixme - this controller could/should be able to be created from the container and/or from webapi's IHttpControllerTypeResolver
-            var appTreeController = new ApplicationTreeController();
-            Current.Container.InjectProperties(appTreeController);
-            appTreeController.ControllerContext = ControllerContext;
+            // since tree's by nature are controllers and require request contextual data
+            var appTreeController = new ApplicationTreeController { ControllerContext = ControllerContext };
 
             var dashboards = _dashboards.GetDashboards(Security.CurrentUser);
 

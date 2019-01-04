@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -69,7 +70,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         private MailMessage CreateMailMessage(string subject, string message)
         {
-            var to = UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress;
+            var to = Current.Config.Umbraco().Content.NotificationEmailAddress;
 
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";
