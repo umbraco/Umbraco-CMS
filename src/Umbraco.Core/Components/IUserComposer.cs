@@ -6,7 +6,7 @@
     /// <remarks>
     /// <para>All user composers require (compose after) all core composers.</para>
     /// </remarks>
-    [Require(typeof(ICoreComposer))]
+    [ComposeAfter(typeof(ICoreComposer))]
     public interface IUserComposer : IComposer
     { }
 }

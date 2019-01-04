@@ -19,13 +19,13 @@ namespace Umbraco.Core.Components
     /// </remarks>
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    public sealed class RequiredByAttribute : Attribute
+    public sealed class ComposeBeforeAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequiredByAttribute"/> class.
+        /// Initializes a new instance of the <see cref="ComposeBeforeAttribute"/> class.
         /// </summary>
         /// <param name="requiringType">The type of the required composer.</param>
-        public RequiredByAttribute(Type requiringType)
+        public ComposeBeforeAttribute(Type requiringType)
         {
             if (typeof(IComposer).IsAssignableFrom(requiringType) == false)
                 throw new ArgumentException($"Type {requiringType.FullName} is invalid here because it does not implement {typeof(IComposer).FullName}.");

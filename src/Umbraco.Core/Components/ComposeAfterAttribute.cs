@@ -18,13 +18,13 @@ namespace Umbraco.Core.Components
     /// declared as strong (and at least one composer must be enabled).</para>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    public sealed class RequireAttribute : Attribute
+    public sealed class ComposeAfterAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequireAttribute"/> class.
+        /// Initializes a new instance of the <see cref="ComposeAfterAttribute"/> class.
         /// </summary>
         /// <param name="requiredType">The type of the required composer.</param>
-        public RequireAttribute(Type requiredType)
+        public ComposeAfterAttribute(Type requiredType)
         {
             if (typeof(IComposer).IsAssignableFrom(requiredType) == false)
                 throw new ArgumentException($"Type {requiredType.FullName} is invalid here because it does not implement {typeof(IComposer).FullName}.");
@@ -32,11 +32,11 @@ namespace Umbraco.Core.Components
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequireAttribute"/> class.
+        /// Initializes a new instance of the <see cref="ComposeAfterAttribute"/> class.
         /// </summary>
         /// <param name="requiredType">The type of the required composer.</param>
         /// <param name="weak">A value indicating whether the requirement is weak.</param>
-        public RequireAttribute(Type requiredType, bool weak)
+        public ComposeAfterAttribute(Type requiredType, bool weak)
             : this(requiredType)
         {
             Weak = weak;

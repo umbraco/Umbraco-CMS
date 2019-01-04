@@ -8,7 +8,7 @@ namespace Umbraco.Web.Cache
     /// Installs listeners on service events in order to refresh our caches.
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    [RequiredBy(typeof(ICoreComposer))] // runs before every other IUmbracoCoreComponent!
+    [ComposeBefore(typeof(ICoreComposer))] // runs before every other IUmbracoCoreComponent!
     public sealed class DistributedCacheBinderComposer : ICoreComposer
     {
         public void Compose(Composition composition)

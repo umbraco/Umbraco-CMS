@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Components
         public class Composer1 : TestComposerBase
         { }
 
-        [Require(typeof(Composer4))]
+        [ComposeAfter(typeof(Composer4))]
         public class Composer2 : TestComposerBase, ICoreComposer
         { }
 
@@ -352,19 +352,19 @@ namespace Umbraco.Tests.Components
         public class Composer9 : TestComposerBase, ITestComposer
         { }
 
-        [Require(typeof(ITestComposer))]
+        [ComposeAfter(typeof(ITestComposer))]
         public class Composer10 : TestComposerBase
         { }
 
-        [Require(typeof(ITestComposer), false)]
+        [ComposeAfter(typeof(ITestComposer), false)]
         public class Composer11 : TestComposerBase
         { }
 
-        [Require(typeof(Composer4), true)]
+        [ComposeAfter(typeof(Composer4), true)]
         public class Composer12 : TestComposerBase, ICoreComposer
         { }
 
-        [RequiredBy(typeof(Composer1))]
+        [ComposeBefore(typeof(Composer1))]
         public class Composer13 : TestComposerBase
         { }
 
@@ -375,14 +375,14 @@ namespace Umbraco.Tests.Components
         public class Composer20 : TestComposerBase
         { }
 
-        [RequiredBy(typeof(Composer20))]
+        [ComposeBefore(typeof(Composer20))]
         public class Composer21 : TestComposerBase
         { }
 
         public class Composer22 : TestComposerBase
         { }
 
-        [Require(typeof(Composer22))]
+        [ComposeAfter(typeof(Composer22))]
         public interface IComposer23 : IComposer
         { }
 
@@ -390,7 +390,7 @@ namespace Umbraco.Tests.Components
         { }
 
         // should insert itself between 22 and anything i23
-        [RequiredBy(typeof(IComposer23))]
+        [ComposeBefore(typeof(IComposer23))]
         //[RequireComponent(typeof(Component22))] - not needed, implement i23
         public class Composer25 : TestComposerBase, IComposer23
         { }

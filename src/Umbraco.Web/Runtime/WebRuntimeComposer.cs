@@ -35,7 +35,7 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
 {
-    [Require(typeof(CoreRuntimeComposer))]
+    [ComposeAfter(typeof(CoreRuntimeComposer))]
     public sealed class WebRuntimeComposer : IRuntimeComposer
     {
         public void Compose(Composition composition)

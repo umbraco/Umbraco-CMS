@@ -208,6 +208,10 @@ namespace Umbraco.Core
                 throw new BootFailedException("Could not check the upgrade state.", e);
             }
 
+            // if we already know we want to upgrade, exit here
+            if (Level == RuntimeLevel.Upgrade)
+                return;
+
             if (noUpgrade)
             {
                 // the database version matches the code & files version, all clear, can run

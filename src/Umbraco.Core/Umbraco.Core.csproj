@@ -168,8 +168,8 @@
     <Compile Include="Components\ManifestWatcherComposer.cs" />
     <Compile Include="Components\RelateOnCopyComposer.cs" />
     <Compile Include="Components\RelateOnTrashComposer.cs" />
-    <Compile Include="Components\RequireAttribute.cs" />
-    <Compile Include="Components\RequiredByAttribute.cs" />
+    <Compile Include="Components\ComposeAfterAttribute.cs" />
+    <Compile Include="Components\ComposeBeforeAttribute.cs" />
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\ComponentCollection.cs" />
     <Compile Include="Components\ComponentCollectionBuilder.cs" />

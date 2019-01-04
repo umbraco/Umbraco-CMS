@@ -35,7 +35,7 @@ namespace Umbraco.Web.Components
 
     // during Initialize / Startup, we end up checking Examine, which needs to be initialized beforehand
     // todo - should not be a strong dependency on "examine" but on an "indexing component"
-    [Require(typeof(ExamineComposer))]
+    [ComposeAfter(typeof(ExamineComposer))]
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ICoreComposer
     {
