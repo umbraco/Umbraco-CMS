@@ -32,7 +32,7 @@ using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
 {
-    internal sealed class WebRuntimeComponent : IComponent
+    public sealed class WebRuntimeComponent : IComponent
     {
         public WebRuntimeComponent(
             IRuntimeState runtime,

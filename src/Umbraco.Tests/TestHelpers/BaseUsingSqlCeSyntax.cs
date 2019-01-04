@@ -37,20 +37,21 @@ namespace Umbraco.Tests.TestHelpers
 
             var container = RegisterFactory.Create();
 
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+            var typeLoader = new TypeLoader(NullCacheProvider.Instance,
+                LocalTempStorage.Default,
+                logger,
+                false);
+
+            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
             composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
 
-            var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var pluginManager = new TypeLoader(NullCacheProvider.Instance,
-                LocalTempStorage.Default,
-                logger,
-                false);
-            composition.RegisterUnique(pluginManager);
+            composition.RegisterUnique(typeLoader);
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
-                .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
+                .Add(() => composition.TypeLoader.GetAssignedMapperTypes());
 
             var factory = Current.Factory = composition.CreateFactory();
 

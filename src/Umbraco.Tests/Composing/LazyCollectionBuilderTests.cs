@@ -129,12 +129,10 @@ namespace Umbraco.Tests.Composing
                 // legal so far...
                 .Add(() => new[] { typeof(TransientObject4)  });
 
-            var factory = composition.CreateFactory();
-
             Assert.Throws<InvalidOperationException>(() =>
             {
-                // but throws here when trying to register the types
-                var values = factory.GetInstance<TestCollection>();
+                // but throws here when trying to register the types, right before creating the factory
+                var factory = composition.CreateFactory();
             });
         }
 

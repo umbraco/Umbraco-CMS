@@ -6,9 +6,9 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         protected override MapperCollectionBuilder This => this;
 
-        public override void Initialize(IRegister container)
+        public override void RegisterWith(IRegister register)
         {
-            base.Initialize(container);
+            base.RegisterWith(register);
 
             // default initializer registers
             // - service MapperCollectionBuilder, returns MapperCollectionBuilder
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Mappers
             // we want to register extra
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
-            Container.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
+            register.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
         }
 
         public MapperCollectionBuilder AddCoreMappers()

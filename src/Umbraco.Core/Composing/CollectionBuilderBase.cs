@@ -19,28 +19,21 @@ namespace Umbraco.Core.Composing
         private Type[] _registeredTypes;
 
         /// <summary>
-        /// Gets the container.
-        /// </summary>
-        protected IRegister Container { get; private set; }
-
-        /// <summary>
         /// Gets the internal list of types as an IEnumerable (immutable).
         /// </summary>
         public IEnumerable<Type> GetTypes() => _types;
 
-        /// <summary>
-        /// Initializes a new instance of the builder.
-        /// </summary>
-        /// <remarks>By default, this registers the collection automatically.</remarks>
-        public virtual void Initialize(IRegister container)
+        /// <inheritdoc />
+        public virtual void RegisterWith(IRegister register)
         {
-            if (Container != null)
-                throw new InvalidOperationException("This builder has already been initialized.");
-
-            Container = container;
+            if (_registeredTypes != null)
+                throw new InvalidOperationException("This builder has already been registered.");
 
             // register the collection
-            Container.Register(CreateCollection, CollectionLifetime);
+            register.Register(CreateCollection, CollectionLifetime);
+
+            // register the types
+            RegisterTypes(register);
         }
 
         /// <summary>
@@ -58,7 +51,7 @@ namespace Umbraco.Core.Composing
             lock (_locker)
             {
                 if (_registeredTypes != null)
-                    throw new InvalidOperationException("Cannot configure a collection builder after its types have been resolved.");
+                    throw new InvalidOperationException("Cannot configure a collection builder after it has been registered.");
                 action(_types);
             }
         }
@@ -74,7 +67,7 @@ namespace Umbraco.Core.Composing
             return types;
         }
 
-        private void RegisterTypes()
+        private void RegisterTypes(IRegister register)
         {
             lock (_locker)
             {
@@ -88,7 +81,7 @@ namespace Umbraco.Core.Composing
 
                 // register them
                 foreach (var type in types)
-                    Container.Register(type);
+                    register.Register(type);
 
                 _registeredTypes = types;
             }
@@ -100,7 +93,8 @@ namespace Umbraco.Core.Composing
         /// <returns>The collection items.</returns>
         protected virtual IEnumerable<TItem> CreateItems(IFactory factory)
         {
-            RegisterTypes(); // will do it only once
+            if (_registeredTypes == null)
+                throw new InvalidOperationException("Cannot create items before the collection builder has been registered.");
 
             return _registeredTypes // respect order
                 .Select(x => CreateItem(factory, x))

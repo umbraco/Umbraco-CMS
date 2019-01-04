@@ -6,9 +6,10 @@
     public interface ICollectionBuilder
     {
         /// <summary>
-        /// Initializes a new instance of the builder, and registers the collection.
+        /// Registers the builder so it can build the collection, by
+        /// registering the collection and the types.
         /// </summary>
-        void Initialize(IRegister container);
+        void RegisterWith(IRegister register);
     }
 
     /// <summary>

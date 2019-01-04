@@ -89,7 +89,10 @@ namespace Umbraco.Core.Components
                 onCreating();
 
             foreach (var unique in _uniques.Values)
-                unique.RegisterTo(_register);
+                unique.RegisterWith(_register);
+
+            foreach (var builder in _builders.Values)
+                builder.RegisterWith(_register);
 
             return _register.CreateFactory();
         }
@@ -147,7 +150,7 @@ namespace Umbraco.Core.Components
                 _instance = instance;
             }
 
-            public virtual void RegisterTo(IRegister register)
+            public virtual void RegisterWith(IRegister register)
             {
                 if (_implementingType != null)
                     register.Register(_serviceType, _implementingType, Lifetime.Singleton);
@@ -166,7 +169,7 @@ namespace Umbraco.Core.Components
                 _factory = factory;
             }
 
-            public override void RegisterTo(IRegister register)
+            public override void RegisterWith(IRegister register)
             {
                 register.Register(_factory, Lifetime.Singleton);
             }
@@ -190,10 +193,7 @@ namespace Umbraco.Core.Components
                 return (TBuilder) o;
 
             var builder = new TBuilder();
-            builder.Initialize(_register);
-
             _builders[typeOfBuilder] = builder;
-
             return builder;
         }
 

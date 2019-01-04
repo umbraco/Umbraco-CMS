@@ -184,7 +184,9 @@ namespace Umbraco.Tests.Components
             Composed.Clear();
             Initialized.Clear();
             composers.Compose();
-            var components = composition.WithCollectionBuilder<ComponentCollectionBuilder>().CreateCollection(factory);
+            var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            builder.RegisterWith(register);
+            var components = builder.CreateCollection(factory);
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Composer1), Composed[0]);
             Assert.AreEqual(typeof(Composer5), Composed[1]);
@@ -234,7 +236,9 @@ namespace Umbraco.Tests.Components
             var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             composers.Compose();
-            var components = composition.WithCollectionBuilder<ComponentCollectionBuilder>().CreateCollection(factory);
+            var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            builder.RegisterWith(register);
+            var components = builder.CreateCollection(factory);
             Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Composer4), Composed[0]);
             Assert.AreEqual(typeof(Composer2), Composed[1]);
