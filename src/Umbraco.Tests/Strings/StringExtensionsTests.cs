@@ -61,10 +61,10 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(stripped, result);
         }
 
-        [TestCase("'+alert(1234)+'", "alert1234")]
-        [TestCase("'+alert(56+78)+'", "alert5678")]
+        [TestCase("'+alert(1234)+'", "+alert1234+")]
+        [TestCase("'+alert(56+78)+'", "+alert56+78+")]
         [TestCase("{{file}}", "file")]
-        [TestCase("'+alert('hello')+'", "alerthello")]
+        [TestCase("'+alert('hello')+'", "+alerthello+")]
         [TestCase("Test", "Test")]
         public void Clean_From_XSS(string input, string result)
         {
