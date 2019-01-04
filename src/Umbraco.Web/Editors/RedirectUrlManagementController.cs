@@ -51,12 +51,6 @@ namespace Umbraco.Web.Editors
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
             searchResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
-            //now map the Content/published url
-            foreach (var result in searchResult.SearchResults)
-            {
-                result.DestinationUrl = result.ContentId > 0 ? Umbraco.Url(result.ContentId) : "#";
-            }
-
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
