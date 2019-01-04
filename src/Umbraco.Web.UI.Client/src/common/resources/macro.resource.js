@@ -24,7 +24,7 @@ function macroResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
-                       "macroApiBaseUrl",
+                       "macroRenderingApiBaseUrl",
                        "GetMacroParameters",
                        [{ macroId: macroId }])),
                'Failed to retrieve macro parameters for macro with id  ' + macroId);
@@ -48,7 +48,7 @@ function macroResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
-                        "macroApiBaseUrl",
+                        "macroRenderingApiBaseUrl",
                         "GetMacroResultAsHtmlForEditor"), {
                         macroAlias: macroAlias,
                         pageId: pageId,
@@ -67,7 +67,7 @@ function macroResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
-                        "macroApiBaseUrl",
+                        "macroRenderingApiBaseUrl",
                         "CreatePartialViewMacroWithFile"), {
                             virtualPath: virtualPath,
                             filename: filename
