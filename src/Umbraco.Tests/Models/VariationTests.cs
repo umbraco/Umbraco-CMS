@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => dataType);
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 dataTypeService: dataTypeService,
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 

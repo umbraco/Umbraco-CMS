@@ -58,7 +58,7 @@ namespace Umbraco.Tests.TestHelpers
             // fixme - else some tests break - figure it out
             container = null;
 
-            return new ServiceContext(
+            return ServiceContext.CreatePartial(
                 MockService<IContentService>(container),
                 MockService<IMediaService>(container),
                 MockService<IContentTypeService>(container),

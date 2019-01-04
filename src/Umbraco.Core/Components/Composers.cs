@@ -4,10 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Components
 {
@@ -16,7 +13,7 @@ namespace Umbraco.Core.Components
     /// <summary>
     /// Handles the composers.
     /// </summary>
-    internal class Composers
+    public class Composers
     {
         private readonly Composition _composition;
         private readonly IProfilingLogger _logger;

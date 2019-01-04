@@ -51,7 +51,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             var mockedDataTypeService = Mock.Of<IDataTypeService>();
             var mockedContentTypeService = Mock.Of<IContentTypeService>();
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 userService: mockedUserService,
                 contentService: mockedContentService,
                 mediaService: mockedMediaService,

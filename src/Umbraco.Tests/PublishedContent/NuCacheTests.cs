@@ -102,7 +102,7 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
 
             // create a service context
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 dataTypeService : dataTypeService,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),

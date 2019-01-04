@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Web
             // should not depend on more than IdkMap maybe - fix this!
             var entityService = new Mock<IEntityService>();
             entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
-            var serviceContext = new ServiceContext(entityService: entityService.Object);
+            var serviceContext = ServiceContext.CreatePartial(entityService: entityService.Object);
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
