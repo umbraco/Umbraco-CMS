@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            CreateMap<EntitySlim, SearchResultItem>()
+            CreateMap<EntitySlim, SearchResultEntity>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src=> GetContentTypeIcon(src)))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            CreateMap<SearchResult, SearchResultItem>()
+            CreateMap<ISearchResult, SearchResultEntity>()
                 //default to document icon
                   .ForMember(dest => dest.Score, opt => opt.MapFrom(result => result.Score))
                   .ForMember(dest => dest.Udi, opt => opt.Ignore())
@@ -122,23 +122,25 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                   .AfterMap((src, dest) =>
                       {
+                          //TODO: Properly map this (not aftermap)
+
                           //get the icon if there is one
-                          dest.Icon = src.Fields.ContainsKey(UmbracoExamineIndexer.IconFieldName)
-                              ? src.Fields[UmbracoExamineIndexer.IconFieldName]
+                          dest.Icon = src.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
+                              ? src.Values[UmbracoExamineIndex.IconFieldName]
                               : "icon-document";
 
-                          dest.Name = src.Fields.ContainsKey("nodeName") ? src.Fields["nodeName"] : "[no name]";
-                          if (src.Fields.ContainsKey(UmbracoExamineIndexer.NodeKeyFieldName))
+                          dest.Name = src.Values.ContainsKey("nodeName") ? src.Values["nodeName"] : "[no name]";
+                          if (src.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
                           {
                               Guid key;
-                              if (Guid.TryParse(src.Fields[UmbracoExamineIndexer.NodeKeyFieldName], out key))
+                              if (Guid.TryParse(src.Values[UmbracoExamineIndex.NodeKeyFieldName], out key))
                               {
                                   dest.Key = key;
 
                                   //need to set the UDI
-                                  if (src.Fields.ContainsKey(LuceneIndexer.CategoryFieldName))
+                                  if (src.Values.ContainsKey(LuceneIndex.CategoryFieldName))
                                   {
-                                      switch (src.Fields[LuceneIndexer.CategoryFieldName])
+                                      switch (src.Values[LuceneIndex.CategoryFieldName])
                                       {
                                           case IndexTypes.Member:
                                               dest.Udi = new GuidUdi(Constants.UdiEntityType.Member, dest.Key);
@@ -154,10 +156,10 @@ namespace Umbraco.Web.Models.Mapping
                               }
                           }
 
-                          if (src.Fields.ContainsKey("parentID"))
+                          if (src.Values.ContainsKey("parentID"))
                           {
                               int parentId;
-                              if (int.TryParse(src.Fields["parentID"], out parentId))
+                              if (int.TryParse(src.Values["parentID"], out parentId))
                               {
                                   dest.ParentId = parentId;
                               }
@@ -166,19 +168,19 @@ namespace Umbraco.Web.Models.Mapping
                                   dest.ParentId = -1;
                               }
                           }
-                          dest.Path = src.Fields.ContainsKey(UmbracoExamineIndexer.IndexPathFieldName) ? src.Fields[UmbracoExamineIndexer.IndexPathFieldName] : "";
+                          dest.Path = src.Values.ContainsKey(UmbracoExamineIndex.IndexPathFieldName) ? src.Values[UmbracoExamineIndex.IndexPathFieldName] : "";
 
-                          if (src.Fields.ContainsKey(LuceneIndexer.ItemTypeFieldName))
+                          if (src.Values.ContainsKey(LuceneIndex.ItemTypeFieldName))
                           {
-                              dest.AdditionalData.Add("contentType", src.Fields[LuceneIndexer.ItemTypeFieldName]);
+                              dest.AdditionalData.Add("contentType", src.Values[LuceneIndex.ItemTypeFieldName]);
                           }
                       });
 
-            CreateMap<ISearchResults, IEnumerable<SearchResultItem>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
+            CreateMap<ISearchResults, IEnumerable<SearchResultEntity>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultEntity>).ToList());
 
-            CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
+            CreateMap<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultEntity>).ToList());
         }
 
         /// <summary>

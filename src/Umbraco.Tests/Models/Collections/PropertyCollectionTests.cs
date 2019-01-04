@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Models.Collections
         [Test]
         public void PropertyGroups_Collection_FirstOrDefault_Returns_Null()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
 
             Assert.That(contentType.PropertyGroups, Is.Not.Null);
             Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Content")) == null, Is.False);

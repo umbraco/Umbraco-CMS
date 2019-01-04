@@ -1,8 +1,9 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.DocumentTypes.MoveController",
     function ($scope, contentTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
-        var dialogOptions = $scope.dialogOptions;
+
         $scope.dialogTreeApi = {};
+        $scope.source = _.clone($scope.currentNode);
 
         function nodeSelectHandler(args) {
             args.event.preventDefault();
@@ -22,7 +23,7 @@ angular.module("umbraco")
             $scope.busy = true;
             $scope.error = false;
 
-            contentTypeResource.move({ parentId: $scope.target.id, id: dialogOptions.currentNode.id })
+            contentTypeResource.move({ parentId: $scope.target.id, id: $scope.source.id })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
@@ -57,7 +58,10 @@ angular.module("umbraco")
 
         $scope.onTreeInit = function () {
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
-        }
-        
+        };
+
+        $scope.close = function() {
+            navigationService.hideDialog();
+        };
         
     });

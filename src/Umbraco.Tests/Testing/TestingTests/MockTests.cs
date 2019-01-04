@@ -60,14 +60,11 @@ namespace Umbraco.Tests.Testing.TestingTests
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<IDataTypeService>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 new MembershipHelper(umbracoContext, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()),
-                new ServiceContext(),
-                CacheHelper.CreateDisabledCacheHelper());
+                new ServiceContext());
             Assert.Pass();
         }
 
@@ -78,7 +75,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
             var urlProviderMock = new Mock<IUrlProvider>();
             urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
-                .Returns("/hello/world/1234");
+                .Returns(UrlInfo.Url("/hello/world/1234"));
             var urlProvider = urlProviderMock.Object;
 
             var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider }, umbracoContext.VariationContextAccessor);

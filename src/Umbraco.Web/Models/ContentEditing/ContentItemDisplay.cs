@@ -117,14 +117,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
-
-        //TODO: These will need to be moved once we have scheduled publishing in per culture
-        [DataMember(Name = "releaseDate")]
-        public DateTime? ReleaseDate { get; set; }
-
-        [DataMember(Name = "removeDate")]
-        public DateTime? ExpireDate { get; set; }
-                
+        
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 

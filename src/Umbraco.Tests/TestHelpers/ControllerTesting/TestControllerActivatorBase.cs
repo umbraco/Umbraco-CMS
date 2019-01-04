@@ -159,22 +159,17 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var urlHelper = new Mock<IUrlProvider>();
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
-                .Returns("/hello/world/1234");
+                .Returns(UrlInfo.Url("/hello/world/1234"));
 
             var membershipHelper = new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>());
 
-            var mockedTypedContent = Mock.Of<IPublishedContentQuery>();
-
             var umbHelper = new UmbracoHelper(umbCtx,
                 Mock.Of<IPublishedContent>(),
-                mockedTypedContent,
                 Mock.Of<ITagQuery>(),
-                Mock.Of<IDataTypeService>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 membershipHelper,
-                serviceContext,
-                CacheHelper.NoCache);
+                serviceContext);
 
             return CreateController(controllerType, request, umbHelper);
         }

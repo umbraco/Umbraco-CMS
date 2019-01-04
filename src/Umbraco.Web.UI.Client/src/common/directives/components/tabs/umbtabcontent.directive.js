@@ -5,7 +5,7 @@
 @scope
 
 @description
-Use this directive to render tab content. For an example see: {@link umbraco.directives.directive:umbTabsContent umbTabsContent}
+Use this directive to render tab content. For an example see: {@link umbraco.directives.directive:umbTabContent umbTabContent}
 
 @param {string=} tab The tab.
 

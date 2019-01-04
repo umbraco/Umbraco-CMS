@@ -6,12 +6,11 @@
         </div>
 
         <div style="margin-bottom: 15px;">
-            <label> 
-                <input 
-                    type="checkbox"
-                    ng-model="vm.includeUnpublished"
-                    style="margin-right: 8px;" />
-                    <localize key="content_includeUnpublished"></localize>
+            <label>
+                <input type="checkbox"
+                       ng-model="model.includeUnpublished"
+                       style="margin-right: 8px;" />
+                <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
 
@@ -24,12 +23,11 @@
         </div>
 
         <div style="margin-bottom: 15px;">
-            <label> 
-                <input 
-                    type="checkbox"
-                    ng-model="vm.includeUnpublished"
-                    style="margin-right: 8px;" />
-                    <localize key="content_includeUnpublished"></localize>
+            <label>
+                <input type="checkbox"
+                       ng-model="model.includeUnpublished"
+                       style="margin-right: 8px;" />
+                <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
 
@@ -43,12 +41,12 @@
                 <ng-form name="publishVariantSelectorForm">
                     <div class="flex">
                         <input id="{{variant.htmlId}}"
-                            name="publishVariantSelector"
-                            type="checkbox"
-                            ng-model="variant.publishDescendants"
-                            ng-change="vm.changeSelection(variant)"
-                            style="margin-right: 8px;"
-                            val-server-field="{{variant.htmlId}}" />
+                               name="publishVariantSelector"
+                               type="checkbox"
+                               ng-model="variant.publish"
+                               ng-change="vm.changeSelection(variant)"
+                               style="margin-right: 8px;"
+                               val-server-field="{{variant.htmlId}}" />
                         <div>
                             <label for="{{variant.htmlId}}" style="margin-bottom: 0;">
                                 <span>{{ variant.language.name }}</span>

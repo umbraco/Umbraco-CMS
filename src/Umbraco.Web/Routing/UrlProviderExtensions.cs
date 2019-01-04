@@ -5,7 +5,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using LightInject;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Web.Routing
         /// <para>Use when displaying Urls. If errors occur when generating the Urls, they will show in the list.</para>
         /// <para>Contains all the Urls that we can figure out (based upon domains, etc).</para>
         /// </remarks>
-        public static IEnumerable<UrlInfo> GetContentUrls(this IContent content, 
+        public static IEnumerable<UrlInfo> GetContentUrls(this IContent content,
             PublishedRouter publishedRouter,
             UmbracoContext umbracoContext,
             ILocalizationService localizationService,
@@ -34,25 +33,71 @@ namespace Umbraco.Web.Routing
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            var urls = new List<UrlInfo>();
-
             if (content.Published == false)
             {
-                urls.Add(UrlInfo.Message(textService.Localize("content/itemNotPublished")));
-                return urls;
+                yield return UrlInfo.Message(textService.Localize("content/itemNotPublished"));
+                yield break;
             }
-            
+
             // build a list of urls, for the back-office
             // which will contain
             // - the 'main' urls, which is what .Url would return, for each culture
             // - the 'other' urls we know (based upon domains, etc)
             //
-            // need to work on each culture.
-            // on invariant trees, each culture return the same thing
-            // but, we don't know if the tree to this content is invariant
+            // need to work through each installed culture:
+            // on invariant nodes, each culture returns the same url segment but,
+            // we don't know if the branch to this content is invariant, so we need to ask
+            // for URLs for all cultures.
+            // and, not only for those assigned to domains in the branch, because we want
+            // to show what GetUrl() would return, for every culture.
 
+            var urls = new HashSet<UrlInfo>();
             var cultures = localizationService.GetAllLanguages().Select(x => x.IsoCode).ToList();
 
+            //get all URLs for all cultures
+            //in a HashSet, so de-duplicates too
+            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, logger))
+            {
+                urls.Add(cultureUrl);
+            }
+
+            //return the real urls first, then the messages
+            foreach (var urlGroup in urls.GroupBy(x => x.IsUrl).OrderByDescending(x => x.Key))
+            {
+                //in some cases there will be the same URL for multiple cultures:
+                // * The entire branch is invariant
+                // * If there are less domain/cultures assigned to the branch than the number of cultures/languages installed
+
+                foreach (var dUrl in urlGroup.DistinctBy(x => x.Text.ToUpperInvariant()).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+                    yield return dUrl;
+            }
+
+            // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
+            // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
+            foreach (var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+                if (urls.Add(otherUrl)) //avoid duplicates
+                    yield return otherUrl;
+        }
+        
+        /// <summary>
+        /// Tries to return a <see cref="UrlInfo"/> for each culture for the content while detecting collisions/errors
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="cultures"></param>
+        /// <param name="publishedRouter"></param>
+        /// <param name="umbracoContext"></param>
+        /// <param name="contentService"></param>
+        /// <param name="textService"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        private static IEnumerable<UrlInfo> GetContentUrlsByCulture(IContent content,
+            IEnumerable<string> cultures,
+            PublishedRouter publishedRouter,
+            UmbracoContext umbracoContext,
+            IContentService contentService,
+            ILocalizedTextService textService,
+            ILogger logger)
+        {
             foreach (var culture in cultures)
             {
                 // if content is variant, and culture is not published, skip
@@ -76,53 +121,26 @@ namespace Umbraco.Web.Routing
                 {
                     // deal with 'could not get the url'
                     case "#":
-                        HandleCouldNotGetUrl(content, culture, urls, contentService, textService);
+                        yield return HandleCouldNotGetUrl(content, culture, contentService, textService);
                         break;
 
                     // deal with exceptions
                     case "#ex":
-                        urls.Add(UrlInfo.Message(textService.Localize("content/getUrlException"), culture));
+                        yield return UrlInfo.Message(textService.Localize("content/getUrlException"), culture);
                         break;
 
                     // got a url, deal with collisions, add url
                     default:
-                        if (!DetectCollision(content, url, urls, culture, umbracoContext, publishedRouter, textService)) // detect collisions, etc
-                            urls.Add(UrlInfo.Url(url, culture));
+                        if (DetectCollision(content, url, culture, umbracoContext, publishedRouter, textService, out var urlInfo)) // detect collisions, etc
+                            yield return urlInfo;
+                        else
+                            yield return UrlInfo.Url(url, culture);
                         break;
                 }
             }
-
-            // prepare for de-duplication
-            var durl = new Dictionary<string, List<UrlInfo>>();
-            var dmsg = new Dictionary<string, List<UrlInfo>>();
-            foreach (var url in urls)
-            {
-                var d = url.IsUrl ? durl : dmsg;
-                if (!d.TryGetValue(url.Text, out var l))
-                    d[url.Text] = l = new List<UrlInfo>();
-                l.Add(url);
-            }
-
-            // deduplicate, order urls first then messages, concatenate cultures (hide if 'all')
-            var ret = new List<UrlInfo>();
-            foreach (var (text, infos) in durl)
-                ret.Add(UrlInfo.Url(text, infos.Count == cultures.Count ?  null : string.Join(", ", infos.Select(x => x.Culture))));
-            foreach (var (text, infos) in dmsg)
-                ret.Add(UrlInfo.Message(text, infos.Count == cultures.Count ?  null : string.Join(", ", infos.Select(x => x.Culture))));
-
-            // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
-            // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
-            // also, we are not dealing with cultures at all - that will have to wait
-            foreach(var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id))
-            {
-                if (urls.Any(x => x.IsUrl && x.Text == otherUrl)) continue;
-                ret.Add(UrlInfo.Url(otherUrl));
-            }
-
-            return ret;
         }
 
-        private static void HandleCouldNotGetUrl(IContent content, string culture, List<UrlInfo> urls, IContentService contentService, ILocalizedTextService textService)
+        private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
         {
             // document has a published version yet its url is "#" => a parent must be
             // unpublished, walk up the tree until we find it, and report.
@@ -134,16 +152,16 @@ namespace Umbraco.Web.Routing
             while (parent != null && parent.Published && (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
 
             if (parent == null) // oops, internal error
-                urls.Add(UrlInfo.Message(textService.Localize("content/parentNotPublishedAnomaly"), culture));
+                return UrlInfo.Message(textService.Localize("content/parentNotPublishedAnomaly"), culture);
 
             else if (!parent.Published) // totally not published
-                urls.Add(UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] { parent.Name }), culture));
+                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] {parent.Name}), culture);
 
             else // culture not published
-                urls.Add(UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] { parent.Name }), culture));
+                return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
         }
 
-        private static bool DetectCollision(IContent content, string url, List<UrlInfo> urls, string culture, UmbracoContext umbracoContext, PublishedRouter publishedRouter, ILocalizedTextService textService)
+        private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, PublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
         {
             // test for collisions on the 'main' url
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
@@ -152,9 +170,11 @@ namespace Umbraco.Web.Routing
             var pcr = publishedRouter.CreateRequest(umbracoContext, uri);
             publishedRouter.TryRouteRequest(pcr);
 
+            urlInfo = null;
+
             if (pcr.HasPublishedContent == false)
             {
-                urls.Add(UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture));
+                urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
                 return true;
             }
 
@@ -173,7 +193,7 @@ namespace Umbraco.Web.Routing
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                urls.Add(UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture));
+                 urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
                 return true;
             }
 

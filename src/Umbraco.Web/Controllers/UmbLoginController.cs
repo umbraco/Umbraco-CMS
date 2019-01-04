@@ -8,6 +8,7 @@ namespace Umbraco.Web.Controllers
     public class UmbLoginController : SurfaceController
     {
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)
@@ -37,7 +38,6 @@ namespace Umbraco.Web.Controllers
             //redirect to current page by default
 
             return RedirectToCurrentUmbracoPage();
-            //return RedirectToCurrentUmbracoUrl();
         }
     }
 }

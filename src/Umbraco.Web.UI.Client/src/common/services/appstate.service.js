@@ -70,6 +70,10 @@ function appState(eventsService) {
         currentNode: null,
         //Whether the menu's dialog is being shown or not
         showMenuDialog: null,
+        //Whether the menu's dialog can be hidden or not
+        allowHideMenuDialog: true,
+        // The dialogs template
+        dialogTemplateUrl: null,
         //Whether the context menu is being shown or not
         showMenu: null
     };

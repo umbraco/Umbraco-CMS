@@ -16,7 +16,7 @@
     <key alias="createPackage">Créer un package</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyTrashcan">Vider la corbeille</key>
+    <key alias="emptyRecycleBin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
     <key alias="importDocumentType">Importer un type de document</key>
@@ -310,7 +310,6 @@
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
     <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
     <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
-    <key alias="confirmEmptyTrashcan">Cochez cette case pour confirmer la suppression de %0% élément(s)</key>
     <key alias="confirmlogout">Êtes-vous certain(e)?</key>
     <key alias="confirmSure">Êtes-vous certain(e)?</key>
     <key alias="cut">Couper</key>
@@ -1135,7 +1134,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   <area alias="imagecropper">
     <key alias="reset">Réinitialiser</key>
     <key alias="defineCrop">Définir le recadrage</key>
-    <key alias="defineCropDescription">Donnez un alias au recadrage ainsi que sa largeur et sa hauteur par défaut</key>
     <key alias="saveCrop">Sauvegarder le recadrage</key>
     <key alias="addCrop">Ajouter un nouveau recadrage</key>
   </area>
@@ -1791,9 +1789,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="configurationServiceFileNotFound">Le fichier n'existe pas : '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Impossible de trouver <strong>'%0%'</strong> dans le fichier config <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Une erreur est survenue, consultez le log pour voir l'erreur complète : %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Total XML : %0%, Total : %1%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Total XML : %0%, Total : %1%</key>
-    <key alias="xmlDataIntegrityCheckContent">Total XML : %0%, Total publié : %1%</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Base de données - Le schéma de la base de données est correct pour cette version de Umbraco</key>
     <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problèmes ont été détectés avec le schéma de votre base de données (Voyez le fichier log pour les détails)</key>
     <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Des erreurs ont été détectées lors de la validation du schéma de la base de données par rapport à la version actuelle de Umbraco.</key>
@@ -1862,7 +1857,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Un email de notification a été envoyé à <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[L'adresse email de notification est toujours à sa valeur par défaut : <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Les résultats de l'exécution du Umbraco Health Checks planifiée le %0% à %1% sont les suivants :</p>%2%</body></html>]]></key>
-    <key alias="scheduledHealthCheckEmailSubject">Statut du Umbraco Health Check</key>
+    <key alias="scheduledHealthCheckEmailSubject">Statut du Umbraco Health Check: %0%</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Désactiver URL tracker</key>

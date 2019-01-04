@@ -18,10 +18,20 @@
         vm.firstSelectedDates = {};
         vm.currentUser = null;
 
+        //used to track the original values so if the user doesn't save the schedule and they close the dialog we reset the dates back to what they were.
+        var origDates = [];
+
         function onInit() {
 
             vm.variants = $scope.model.variants;
             vm.hasPristineVariants = false;
+
+            for (let i = 0; i < vm.variants.length; i++) {
+                origDates.push({
+                    releaseDate: vm.variants[i].releaseDate,
+                    expireDate: vm.variants[i].expireDate
+                });
+            }
 
             if(!$scope.model.title) {
                 localizationService.localize("general_scheduledPublishing").then(function(value){
@@ -55,7 +65,6 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.schedule = true;
                     active.save = true;
                 }
 
@@ -85,7 +94,7 @@
                     variant.datePickerConfig = datePickerConfig;
                     
                     // format all dates to local
-                    if(variant.releaseDate || variant.removeDate) {
+                    if(variant.releaseDate || variant.expireDate) {
                         formatDatesToLocal(variant);
                     }
                 });
@@ -106,8 +115,9 @@
             if (type === 'publish') {
                 variant.releaseDatePickerInstance = datePickerInstance;
             } else if (type === 'unpublish') {
-                variant.removeDatePickerInstance = datePickerInstance;
+                variant.expireDatePickerInstance = datePickerInstance;
             }
+            $scope.model.disableSubmitButton = !canSchedule();
         };
 
         /**
@@ -122,6 +132,7 @@
             } else if (type === 'unpublish') {
                 setUnpublishDate(variant, dateStr);
             }
+            $scope.model.disableSubmitButton = !canSchedule();
         }
 
         /**
@@ -133,9 +144,10 @@
             if (type === 'publish') {
                 variant.releaseDatePickerOpen = true;
             } else if (type === 'unpublish') {
-                variant.removeDatePickerOpen = true;
+                variant.expireDatePickerOpen = true;
             }
             checkForBackdropClick();
+            $scope.model.disableSubmitButton = !canSchedule();
         }
 
         /**
@@ -148,10 +160,12 @@
                 if (type === 'publish') {
                     variant.releaseDatePickerOpen = false;
                 } else if (type === 'unpublish') {
-                    variant.removeDatePickerOpen = false;
+                    variant.expireDatePickerOpen = false;
                 }
                 checkForBackdropClick();
+                $scope.model.disableSubmitButton = !canSchedule();
             }, 200);
+
         }
 
         /**
@@ -160,7 +174,7 @@
         function checkForBackdropClick() {
 
             var open = _.find(vm.variants, function (variant) {
-                return variant.releaseDatePickerOpen || variant.removeDatePickerOpen;
+                return variant.releaseDatePickerOpen || variant.expireDatePickerOpen;
             });
 
             if(open) {
@@ -192,7 +206,7 @@
             formatDatesToLocal(variant);
 
             // make sure the unpublish date can't be before the publish date
-            variant.removeDatePickerInstance.set("minDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
+            variant.expireDatePickerInstance.set("minDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
 
         }
 
@@ -212,13 +226,13 @@
             var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
 
             // update publish value
-            variant.removeDate = serverTime;
+            variant.expireDate = serverTime;
 
             // make sure dates are formatted to the user's locale
             formatDatesToLocal(variant);
 
             // make sure the publish date can't be after the publish date
-            variant.releaseDatePickerInstance.set("maxDate", moment(variant.removeDate).format("YYYY-MM-DD HH:mm"));
+            variant.releaseDatePickerInstance.set("maxDate", moment(variant.expireDate).format("YYYY-MM-DD HH:mm"));
 
         }
 
@@ -232,8 +246,9 @@
                 // we don't have a publish date anymore so we can clear the min date for unpublish
                 var now = new Date();
                 var nowFormatted = moment(now).format("YYYY-MM-DD HH:mm");
-                variant.removeDatePickerInstance.set("minDate", nowFormatted);
+                variant.expireDatePickerInstance.set("minDate", nowFormatted);
             }
+            $scope.model.disableSubmitButton = !canSchedule();
         }
 
         /**
@@ -241,11 +256,12 @@
          * @param {any} variant 
          */
         function clearUnpublishDate(variant) {
-            if(variant && variant.removeDate) {
-                variant.removeDate = null;
+            if(variant && variant.expireDate) {
+                variant.expireDate = null;
                 // we don't have a unpublish date anymore so we can clear the max date for publish
                 variant.releaseDatePickerInstance.set("maxDate", null);
             }
+            $scope.model.disableSubmitButton = !canSchedule();
         }
 
         /**
@@ -256,8 +272,8 @@
             if(variant && variant.releaseDate) {
                 variant.releaseDateFormatted = dateHelper.getLocalDate(variant.releaseDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
-            if(variant && variant.removeDate) {
-                variant.removeDateFormatted = dateHelper.getLocalDate(variant.removeDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
+            if(variant && variant.expireDate) {
+                variant.expireDateFormatted = dateHelper.getLocalDate(variant.expireDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
         }
         
@@ -268,7 +284,7 @@
         function changeSelection(variant) {
             $scope.model.disableSubmitButton = !canSchedule();
             //need to set the Save state to true if publish is true
-            variant.save = variant.schedule;
+            variant.save = variant.save;
         }
 
         function dirtyVariantFilter(variant) {
@@ -287,44 +303,61 @@
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canSchedule() {
-            var selected = [];
+
+            // sched is enabled if
+            //  1) when mandatory langs are not published AND all mandatory langs are selected AND all mandatory langs have a release date
+            //  2) OR all mandatory langs are published
+            //  3) OR all mandatory langs are are scheduled for publishing
+            //  4) OR there has been a persisted schedule for a variant and it has now been changed
+
+            var selectedWithDates = [];
             for (var i = 0; i < vm.variants.length; i++) {
                 var variant = vm.variants[i];
 
+                //if the sched dates for this variant have been removed then we must allow the schedule button to be used to save the changes
+                var schedCleared = (origDates[i].releaseDate && origDates[i].releaseDate !== variant.releaseDate)
+                    || (origDates[i].expireDate && origDates[i].expireDate !== variant.expireDate);
+                if (schedCleared) {
+                    return true;
+                }
+
+                var isMandatory = variant.language && variant.language.isMandatory;
+
                 //if this variant will show up in the publish-able list
                 var publishable = dirtyVariantFilter(variant);
+                var published = !(variant.state === "NotCreated" || variant.state === "Draft");
+                var isScheduledPublished = variant.releaseDate;
 
-                if ((variant.language.isMandatory && (variant.state === "NotCreated" || variant.state === "Draft"))
-                    && (!publishable || !variant.schedule)) {
-                    //if a mandatory variant isn't published and it's not publishable or not selected to be published
-                    //then we cannot publish anything
+                if (isMandatory && !published && !isScheduledPublished && (!publishable || !variant.save)) {
+                    //if a mandatory variant isn't published or scheduled published
+                    //and it's not publishable or not selected to be published
+                    //then we cannot continue
 
                     //TODO: Show a message when this occurs
                     return false;
                 }
 
-                if (variant.schedule) {
-                    selected.push(variant.schedule);
+                if (variant.save && (variant.releaseDate || variant.expireDate)) {
+                    selectedWithDates.push(variant.save);
                 }
             }
-            return selected.length > 0;
+            return selectedWithDates.length > 0;
         }
-
+        
         onInit();
 
         //when this dialog is closed, clean up
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
                 vm.variants[i].save = false;
-                vm.variants[i].schedule = false;
                 // remove properties only needed for this dialog
                 delete vm.variants[i].releaseDateFormatted;
-                delete vm.variants[i].removeDateFormatted;
+                delete vm.variants[i].expireDateFormatted;
                 delete vm.variants[i].datePickerConfig;
                 delete vm.variants[i].releaseDatePickerInstance;
-                delete vm.variants[i].removeDatePickerInstance;
+                delete vm.variants[i].expireDatePickerInstance;
                 delete vm.variants[i].releaseDatePickerOpen;
-                delete vm.variants[i].removeDatePickerOpen;
+                delete vm.variants[i].expireDatePickerOpen;
             } 
         });
 

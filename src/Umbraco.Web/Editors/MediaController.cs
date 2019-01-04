@@ -99,7 +99,7 @@ namespace Umbraco.Web.Editors
         public MediaItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
             apps[0].Active = true;
             var display = new MediaItemDisplay
             {
@@ -424,12 +424,25 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
+            var destinationParentID = move.ParentId;
+            var sourceParentID = toMove.ParentId;
+            
+            var moveResult = Services.MediaService.Move(toMove, move.ParentId);
 
-            Services.MediaService.Move(toMove, move.ParentId);
-
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
-            return response;
+            if (sourceParentID == destinationParentID)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),SpeechBubbleIcon.Error)));
+            }
+            if (moveResult == false)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
+                return response;
+            }
         }
 
         /// <summary>
@@ -470,8 +483,9 @@ namespace Umbraco.Web.Editors
             MapPropertyValuesForPersistence<IMedia, MediaItemSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
-                (save, property) => property.GetValue(),        //get prop val
-                (save, property, v) => property.SetValue(v));   //set prop val
+                (save, property) => property.GetValue(), //get prop val
+                (save, property, v) => property.SetValue(v), //set prop val
+                null); // media are all invariant
 
             //We need to manually check the validation results here because:
             // * We still need to save the entity even if there are validation value errors
@@ -720,8 +734,7 @@ namespace Umbraco.Web.Editors
                     if (saveResult == false)
                     {
                         AddCancelMessage(tempFiles,
-                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName,
-                            localizeMessage: false);
+                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName);
                     }
                     else
                     {

@@ -190,7 +190,7 @@ namespace Umbraco.Web.Macros
             var filename = GetMacroFileName(model);
             if (filename == null) return null;
 
-            var mapped = HostingEnvironment.MapPath(filename);
+            var mapped = IOHelper.MapPath(filename);
             if (mapped == null) return null;
 
             var file = new FileInfo(mapped);

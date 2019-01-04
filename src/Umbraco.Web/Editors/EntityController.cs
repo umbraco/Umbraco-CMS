@@ -15,7 +15,9 @@ using Umbraco.Core.Models;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
+using Examine;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Search;
@@ -53,12 +55,13 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly SearchableTreeCollection _searchableTreeCollection;
 
-        public EntityController(SearchableTreeCollection searchableTreeCollection)
+        public EntityController(SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
         {
             _searchableTreeCollection = searchableTreeCollection;
+            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -121,9 +124,8 @@ namespace Umbraco.Web.Editors
                 return result;
 
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
-            var searchableTrees = _searchableTreeCollection.AsReadOnlyDictionary();
 
-            foreach (var searchableTree in searchableTrees)
+            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees)
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
@@ -411,22 +413,18 @@ namespace Umbraco.Web.Editors
             Direction orderDirection = Direction.Ascending,
             string filter = "")
         {
-            int intId;
-
-            if (int.TryParse(id, out intId))
+            if (int.TryParse(id, out var intId))
             {
                 return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
             }
 
-            Guid guidId;
-            if (Guid.TryParse(id, out guidId))
+            if (Guid.TryParse(id, out _))
             {
                 //Not supported currently
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            Udi udiId;
-            if (Udi.TryParse(id, out udiId))
+            if (Udi.TryParse(id, out _))
             {
                 //Not supported currently
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -444,8 +442,7 @@ namespace Umbraco.Web.Editors
             //the EntityService cannot search members of a certain type, this is currently not supported and would require
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
-            long total;
-            var searchResult = _treeSearcher.ExamineSearch(Umbraco, filter ?? "", type, pageSize, pageNumber - 1, out total, id);
+            var searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out long total, id);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
             {
@@ -481,8 +478,11 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {
-                long totalRecords;
-                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                var entities = Services.EntityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize, out var totalRecords,
+                    filter.IsNullOrWhiteSpace()
+                        ? null
+                        : SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                    Ordering.By(orderBy, orderDirection));
 
                 if (totalRecords == 0)
                 {
@@ -491,7 +491,10 @@ namespace Umbraco.Web.Editors
 
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                    Items = entities.Select(entity => Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
+                            options.AfterMap((src, dest) => { dest.AdditionalData["hasChildren"] = src.HasChildren; })
+                        )
+                    )
                 };
 
                 return pagedResult;
@@ -547,12 +550,18 @@ namespace Umbraco.Web.Editors
                     }
 
                     entities = aids == null || aids.Contains(Constants.System.Root)
-                        ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
-                        : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                        ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords,
+                            SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                            Ordering.By(orderBy, orderDirection), includeTrashed: false)
+                        : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
+                            SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                            Ordering.By(orderBy, orderDirection));
                 }
                 else
                 {
-                    entities = Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
+                    entities = Services.EntityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize, out totalRecords,
+                        SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                        Ordering.By(orderBy, orderDirection));
                 }
 
                 if (totalRecords == 0)
@@ -595,14 +604,10 @@ namespace Umbraco.Web.Editors
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
         {
-            long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
+            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom);
         }
-
-
-
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {

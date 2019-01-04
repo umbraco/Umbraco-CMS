@@ -123,11 +123,14 @@
                         oldProperty.isObject = true;
                     }
 
-                    // create new property object used in the diff table
+                    // diff requires a string
+                    property.value = property.value ? property.value : "";
+                    oldProperty.value = oldProperty.value ? oldProperty.value : "";
+
                     var diffProperty = {
                         "alias": property.alias,
                         "label": property.label,
-                        "diff": (property.value || oldProperty.value) ? JsDiff.diffWords(property.value, oldProperty.value) : "",
+                        "diff": JsDiff.diffWords(property.value, oldProperty.value),
                         "isObject": (property.isObject || oldProperty.isObject) ? true : false
                     };
 

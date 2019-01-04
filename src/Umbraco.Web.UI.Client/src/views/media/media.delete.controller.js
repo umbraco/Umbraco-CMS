@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
+function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService) {
 
     $scope.performDelete = function() {
 
@@ -30,6 +30,10 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
                 var recycleBin = treeService.getDescendantNode(rootNode, -21);
                 if (recycleBin) {
                     recycleBin.hasChildren = true;
+                    //reload the recycle bin if it's already expanded so the deleted item is shown
+                    if (recycleBin.expanded) {
+                        treeService.loadNodeChildren({ node: recycleBin, section: "media" });
+                    }
                 }
             }
             
@@ -37,8 +41,10 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
             if (editorState.current && editorState.current.id == $scope.currentNode.id) {
 
             	//If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
-            	var location = "/media";
-            	if ($scope.currentNode.parentId.toString() !== "-1")
+                var location = "/media";
+                if ($scope.currentNode.parentId.toString() === "-21")
+                    location = "/media/media/recyclebin";
+            	else if ($scope.currentNode.parentId.toString() !== "-1")
             		location = "/media/media/edit/" + $scope.currentNode.parentId;
 
                 $location.path(location);
@@ -53,7 +59,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
 
             //check if response is ysod
             if (err.status && err.status >= 500) {
-                dialogService.ysodDialog(err);
+                overlayService.ysod(err);
             }
 
         });

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
 
             if (pageSize > 0)
             {
-                TotalPages = (long)Math.Ceiling(totalItems / (Decimal)pageSize);
+                TotalPages = (long)Math.Ceiling(totalItems / (decimal)pageSize);
             }
             else
             {

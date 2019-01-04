@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Logging;
@@ -50,6 +49,7 @@ namespace Umbraco.Core.Migrations
             if (_executed)
                 throw new InvalidOperationException("This expression has already been executed.");
             _executed = true;
+            Context.BuildingExpression = false;
 
             var sql = GetSql();
 
@@ -76,6 +76,31 @@ namespace Umbraco.Core.Migrations
                     if (stmtBuilder.Length > 0)
                         ExecuteStatement(stmtBuilder);
                 }
+            }
+
+            Context.Index++;
+
+            if (_expressions == null)
+                return;
+
+            foreach (var expression in _expressions)
+                expression.Execute();
+        }
+
+        protected void Execute(Sql<ISqlContext> sql)
+        {
+            if (_executed)
+                throw new InvalidOperationException("This expression has already been executed.");
+            _executed = true;
+
+            if (sql == null)
+            {
+                Logger.Info(GetType(), $"SQL [{Context.Index}]: <empty>");
+            }
+            else
+            {
+                Logger.Info(GetType(), $"SQL [{Context.Index}]: {sql.ToText()}");
+                Database.Execute(sql);
             }
 
             Context.Index++;

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Trees
 {
-    public interface ISearchableTree
+    public interface ISearchableTree : IDiscoverable
     {
         /// <summary>
         /// The alias of the tree that the <see cref="ISearchableTree"/> belongs to
@@ -21,6 +22,6 @@ namespace Umbraco.Web.Trees
         ///     A starting point for the search, generally a node id, but for members this is a member type alias
         /// </param>
         /// <returns></returns>
-        IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null);
+        IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null);
     }
 }

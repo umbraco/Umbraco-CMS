@@ -1,4 +1,4 @@
-_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/blob/temp8/docs/CONTRIBUTING.md) to go to the v8 branch_
+_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/blob/temp8/.github/V8_GETTING_STARTED.md) to go to the v8 branch_
 # Contributing to Umbraco CMS
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
@@ -16,9 +16,9 @@ This document gives you a quick overview on how to get started, we will link to 
 
 ## Guidelines for contributions we welcome
 
-Not all changes are wanted so on occassion we might close a PR without merging it. We will give you feedback why we can't accept your changes and we'll be nice about it, thanking you for spending your valueable time.
+Not all changes are wanted, so on occassion we might close a PR without merging it. We will give you feedback why we can't accept your changes and we'll be nice about it, thanking you for spending your valuable time.
 
-We have [documented what we consider small and large changes](CONTRIBUTION_GUIDELINES.md), make sure to talk to us before making large changes.
+We have [documented what we consider small and large changes](CONTRIBUTION_GUIDELINES.md). Make sure to talk to us before making large changes.
 
 Remember, if an issue is in the `Up for grabs` list or you've asked for some feedback before you sent us a PR, your PR will not be closed as unwanted.
 
@@ -36,7 +36,7 @@ Great question! The short version goes like this:
 
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
-  * **Commit** - done? Yay! 🎉 It is recommended to create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-U4-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `U4-12345`
+  * **Commit** - done? Yay! 🎉 It is recommended to create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`
   * **Push** - great, now you can push the changes up to your fork on GitHub
   * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
@@ -72,7 +72,6 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 - [Anders Bjerner](https://github.com/abjerner)
 - [Dave Woestenborghs](https://github.com/dawoe)
 - [Emma Burstow](https://github.com/emmaburstow)
-- [Kyle Weems](https://github.com/cssquirrel)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
 These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay. 
@@ -83,7 +82,6 @@ You can get in touch with [the PR team](#the-pr-team) in multiple ways, we love 
 
 - If there's an existing issue on the issue tracker then that's a good place to leave questions and discuss how to start or move forward
 - Unsure where to start? Did something not work as expected? Try leaving a note in the ["Contributing to Umbraco"](https://our.umbraco.com/forum/contributing-to-umbraco-cms/) forum, the team monitors that one closely
-- We're also [active in the Gitter chatroom](https://gitter.im/umbraco/Umbraco-CMS)
 
 ## Code of Conduct
 

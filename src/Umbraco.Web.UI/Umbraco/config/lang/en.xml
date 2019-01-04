@@ -16,7 +16,7 @@
     <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
-    <key alias="emptyTrashcan">Empty recycle bin</key>
+    <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
     <key alias="importDocumentType">Import Document Type</key>
@@ -33,15 +33,17 @@
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="wasMovedTo">was moved to</key>
+    <key alias="wasCopiedTo">was copied to</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
     <key alias="sendToTranslate">Send To Translation</key>
     <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
-    <key alias="toPublish">Send to publication</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="setPermissions">Set permissions</key>
@@ -95,8 +97,10 @@
         should be avoided. Better use the culture setting above.]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
-    <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
-      to the current node, unless a domain below applies too.]]></key>
+        <key alias="setLanguageHelp">
+            <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
+      to the current node, unless a domain below applies too.]]>
+        </key>
     <key alias="setDomains">Domains</key>
   </area>
   <area alias="buttons">
@@ -273,6 +277,10 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -345,7 +353,6 @@
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
-    <key alias="confirmEmptyTrashcan">Please check this box to confirm deletion of %0% item(s)</key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -619,7 +626,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-    <key alias="searchNoResult">Sorry, we cannot find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -699,9 +706,11 @@
     <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
     <key alias="databaseFound">Your database has been found and is identified as</key>
     <key alias="databaseHeader">Database configuration</key>
-    <key alias="databaseInstall"><![CDATA[
+        <key alias="databaseInstall">
+            <![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]></key>
+    ]]>
+        </key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
@@ -936,7 +945,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Edit your notification for %0%</key>
+    <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
 
@@ -1117,22 +1127,23 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="removeSpecialFormattering">Paste, but remove formatting (Recommended)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Role based protection</key>
-        <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
-    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
+    <key alias="paGroups">Group based protection</key>
+    <key alias="paGroupsHelp">If you want to grant access to all members of specific member groups</key>
+    <key alias="paGroupsNoGroups">You need to create a member group before you can use group based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
-    <key alias="paHowWould">Choose how to restrict access to this page</key>
-    <key alias="paIsProtected">%0% is now protected</key>
-    <key alias="paIsRemoved">Protection removed from %0%</key>
+    <key alias="paHowWould"><![CDATA[Choose how to restrict access to the page <strong>%0%</strong>]]></key>
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> is now protected]]></key>
+    <key alias="paIsRemoved"><![CDATA[Protection removed from <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Login Page</key>
     <key alias="paLoginPageHelp">Choose the page that contains the login form</key>
-    <key alias="paRemoveProtection">Remove Protection</key>
+    <key alias="paRemoveProtection">Remove protection...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Are you sure you want to remove the protection from the page <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Select the pages that contain login form and error messages</key>
-    <key alias="paSelectRoles">Pick the roles who have access to this page</key>
-    <key alias="paSetLogin">Set the login and password for this page</key>
-    <key alias="paSimple">Single user protection</key>
-    <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
+    <key alias="paSelectGroups"><![CDATA[Select the groups who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paSelectMembers"><![CDATA[Select the members who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paMembers">Specific members protection</key>
+    <key alias="paMembersHelp">If you wish to grant access to specific members</key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
@@ -1183,14 +1194,13 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="imagecropper">
         <key alias="reset">Reset crop</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
         <key alias="updateEditCrop">Done</key>
         <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
@@ -1469,8 +1479,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
-    <key alias="availableEditors">Available editors</key>
-    <key alias="reuse">Reuse</key>
+    <key alias="availableEditors">Create new</key>
+    <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
@@ -1702,7 +1712,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
     <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
-    <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
+        <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
     <key alias="writer">Writer</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
@@ -1811,6 +1821,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
+    <key alias="noValidation">No validation</key>
     <key alias="validateAsEmail">Validate as an email address</key>
     <key alias="validateAsNumber">Validate as a number</key>
     <key alias="validateAsUrl">Validate as a URL</key>
@@ -1858,9 +1869,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-    <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
     <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
     <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
@@ -1929,7 +1937,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
-    <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status</key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>
@@ -1962,5 +1970,19 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
     <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
     <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">Direction</key>
+    <key alias="parentToChild">Parent to child</key>
+    <key alias="bidirectional">Bidirectional</key>
+    <key alias="parent">Parent</key>
+    <key alias="child">Child</key>
+    <key alias="count">Count</key>
+    <key alias="relations">Relations</key>
+    <key alias="created">Created</key>
+    <key alias="comment">Comment</key>
+    <key alias="name">Name</key>
+    <key alias="tabRelationType">Relation Type</key>
+    <key alias="tabRelations">Relations</key>
   </area>
 </language>

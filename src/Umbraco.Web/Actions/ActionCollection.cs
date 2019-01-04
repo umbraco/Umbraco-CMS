@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -22,19 +21,21 @@ namespace Umbraco.Web.Actions
 
         internal IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)
         {
-            var all = this.ToArray();
-            return letters.Select(x => all.FirstOrDefault(y => y.Letter.ToString(CultureInfo.InvariantCulture) == x))
+            var actions = this.ToArray(); // no worry: internally, it's already an array
+            return letters
+                .Where(x => x.Length == 1)
+                .Select(x => actions.FirstOrDefault(y => y.Letter == x[0]))
                 .WhereNotNull()
-                .ToArray();
+                .ToList();
         }
 
         internal IReadOnlyList<IAction> FromEntityPermission(EntityPermission entityPermission)
         {
+            var actions = this.ToArray(); // no worry: internally, it's already an array
             return entityPermission.AssignedPermissions
                 .Where(x => x.Length == 1)
-                .Select(x => x.ToCharArray()[0])
-                .SelectMany(c => this.Where(x => x.Letter == c))
-                .Where(action => action != null)
+                .SelectMany(x => actions.Where(y => y.Letter == x[0]))
+                .WhereNotNull()
                 .ToList();
         }
     }

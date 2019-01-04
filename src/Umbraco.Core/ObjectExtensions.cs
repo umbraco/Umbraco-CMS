@@ -595,7 +595,6 @@ namespace Umbraco.Core
             return null;
         }
 
-
         /// <summary>
         /// Attempts to serialize the value to an XmlString using ToXmlString
         /// </summary>
@@ -724,8 +723,8 @@ namespace Umbraco.Core
             {
                 return typeConverter;
             }
-
-            TypeConverter converter = TypeDescriptor.GetConverter(target);
+            
+            var converter = TypeDescriptor.GetConverter(target);
             if (converter.CanConvertFrom(source))
             {
                 return DestinationTypeConverterCache[key] = converter;
@@ -788,5 +787,7 @@ namespace Umbraco.Core
 
             return BoolConvertCache[type] = false;
         }
+
+        
     }
 }

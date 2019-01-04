@@ -1,39 +1,46 @@
 ﻿using System;
 using System.Data;
+using Moq;
+using NUnit.Framework;
 using Semver;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Migrations
 {
+    [TestFixture]
     public class MigrationTests
     {
-        public class TestUpgrader : Upgrader
+        public class TestUpgraderWithPostMigrations : Upgrader
         {
-            private readonly MigrationPlan _plan;
+            private PostMigrationCollection _postMigrations;
 
-            public TestUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger, MigrationPlan plan)
-                : base(scopeProvider, migrationBuilder, keyValueService, postMigrations, logger)
+            public TestUpgraderWithPostMigrations(MigrationPlan plan)
+                : base(plan)
+            { }
+
+            public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, PostMigrationCollection postMigrations)
             {
-                _plan = plan;
+                _postMigrations = postMigrations;
+                Execute(scopeProvider, migrationBuilder, keyValueService, logger);
             }
 
-            protected override MigrationPlan GetPlan()
+            public override void AfterMigrations(IScope scope, ILogger logger)
             {
-                return _plan;
-            }
+                // run post-migrations
+                var originVersion = new SemVersion(0);
+                var targetVersion = new SemVersion(0);
 
-            protected override (SemVersion, SemVersion) GetVersions()
-            {
-                return (new SemVersion(0), new SemVersion(0));
+                // run post-migrations
+                foreach (var postMigration in _postMigrations)
+                    postMigration.Execute(Name, scope, originVersion, targetVersion, logger);
             }
         }
-
 
         public class TestScopeProvider : IScopeProvider
         {
@@ -66,6 +73,69 @@ namespace Umbraco.Tests.Migrations
 
             public IScopeContext Context { get; set; }
             public ISqlContext SqlContext { get; set;  }
+        }
+
+        [Test]
+        public void RunGoodMigration()
+        {
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            IMigration migration = new GoodMigration(migrationContext);
+            migration.Migrate();
+        }
+
+        [Test]
+        public void DetectBadMigration1()
+        {
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            IMigration migration = new BadMigration1(migrationContext);
+            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
+        }
+
+        [Test]
+        public void DetectBadMigration2()
+        {
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            IMigration migration = new BadMigration2(migrationContext);
+            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
+        }
+
+        public class GoodMigration : MigrationBase
+        {
+            public GoodMigration(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                Execute.Sql("").Do();
+            }
+        }
+
+        public class BadMigration1 : MigrationBase
+        {
+            public BadMigration1(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                Alter.Table("foo"); // stop here, don't Do it
+            }
+        }
+
+        public class BadMigration2 : MigrationBase
+        {
+            public BadMigration2(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                Alter.Table("foo"); // stop here, don't Do it
+
+                // and try to start another one
+                Alter.Table("bar");
+            }
         }
     }
 }

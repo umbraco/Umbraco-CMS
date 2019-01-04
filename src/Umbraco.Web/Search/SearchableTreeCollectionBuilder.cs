@@ -21,5 +21,8 @@ namespace Umbraco.Web.Search
         {
             return new SearchableTreeCollection(CreateItems(), _treeService);
         }
+
+        //per request because generally an instance of ISearchableTree is a controller
+        protected override ILifetime CollectionLifetime => new PerRequestLifeTime();
     }
 }

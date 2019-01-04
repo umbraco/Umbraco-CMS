@@ -23,7 +23,7 @@
   * </pre>
   **/
 
-function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHelper) {
+function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files, restApiUrl, showNotifications) {
@@ -607,10 +607,7 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            if (!options.cultureName) {
-                // must send a culture to the content API to handle variant data correctly
-                options.cultureName = $routeParams.mculture;
-            }
+            
             //converts the value to a js bool
             function toBool(v) {
                 if (angular.isNumber(v)) {
@@ -732,6 +729,18 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
+        publishWithDescendants: function (content, isNew, force, files, showNotifications) {
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+
+            var action = "publishWithDescendants";
+            if (force === true) {
+                action += "Force";
+            }
+
+            return saveContentItem(content, action + (isNew ? "New" : ""), files, endpoint, showNotifications);
+        },
 
         /**
           * @ngdoc method
@@ -764,6 +773,27 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
                 "contentApiBaseUrl",
                 "PostSave");
             return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#saveSchedule
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Saves changes made to a content item, and saves the publishing schedule
+          *
+          * @param {Object} content The content item object with changes applied
+          * @param {Bool} isNew set to true to create a new item or to update an existing
+          * @param {Array} files collection of files for the document
+          * @returns {Promise} resourcePromise object containing the saved content item.
+          *
+          */
+        saveSchedule: function (content, isNew, files, showNotifications) {
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+            return saveContentItem(content, "schedule" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
         /**
@@ -910,8 +940,116 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
                 ),
                 "Failed to roll back content item with id " + contentId
             );
-        }
+        },
 
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getPublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getPublicAccess(contentId)
+          *    .then(function(publicAccess) {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @returns {Promise} resourcePromise object containing the public access protection
+          *
+          */
+        getPublicAccess: function (contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPublicAccess", {
+                        contentId: contentId
+                    })
+                ),
+                "Failed to get public access for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#updatePublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Sets or updates the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.updatePublicAccess(contentId, userName, password, roles, loginPageId, errorPageId)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @param {Array} groups The names of the groups that should have access (if using group based protection)
+          * @param {Array} usernames The usernames of the members that should have access (if using member based protection)
+          * @param {Int} loginPageId The Id of the login page
+          * @param {Int} errorPageId The Id of the error page
+          * @returns {Promise} resourcePromise object containing the public access protection
+          *
+          */
+        updatePublicAccess: function (contentId, groups, usernames, loginPageId, errorPageId) {
+            var publicAccess = {
+                contentId: contentId,
+                loginPageId: loginPageId,
+                errorPageId: errorPageId
+            };
+            if (angular.isArray(groups) && groups.length) {
+                publicAccess.groups = groups;
+            }
+            else if (angular.isArray(usernames) && usernames.length) {
+                publicAccess.usernames = usernames;
+            }
+            else {
+                throw "must supply either userName/password or roles";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess)
+                ),
+                "Failed to update public access for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#removePublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Removes the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.removePublicAccess(contentId)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @returns {Promise} resourcePromise object that's resolved once the public access has been removed
+          *
+          */
+        removePublicAccess: function (contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "RemovePublicAccess", {
+                        contentId: contentId
+                    })
+                ),
+                "Failed to remove public access for content item with id " + contentId
+            );
+        }
     };
 }
 

@@ -5,6 +5,7 @@ using System.Net.Http.Formatting;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -142,10 +143,11 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound, filter: query);
-            return Mapper.Map<IEnumerable<SearchResultItem>>(results);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound,
+                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
+            return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
         }
     }
 }

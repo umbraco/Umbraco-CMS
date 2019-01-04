@@ -48,8 +48,8 @@ namespace Umbraco.Tests.Testing
         /// Gets or sets a value indicating the required plugin manager support.
         /// </summary>
         /// <remarks>Default is to use the global tests plugin manager.</remarks>
-        public UmbracoTestOptions.PluginManager PluginManager { get => _pluginManager.ValueOrDefault(UmbracoTestOptions.PluginManager.Default); set => _pluginManager.Set(value); }
-        private readonly Settable<UmbracoTestOptions.PluginManager> _pluginManager = new Settable<UmbracoTestOptions.PluginManager>();
+        public UmbracoTestOptions.TypeLoader TypeLoader { get => _typeLoader.ValueOrDefault(UmbracoTestOptions.TypeLoader.Default); set => _typeLoader.Set(value); }
+        private readonly Settable<UmbracoTestOptions.TypeLoader> _typeLoader = new Settable<UmbracoTestOptions.TypeLoader>();
 
         protected override TestOptionAttributeBase Merge(TestOptionAttributeBase other)
         {
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Testing
             _publishedRepositoryEvents.Set(attr._publishedRepositoryEvents);
             _logger.Set(attr._logger);
             _database.Set(attr._database);
-            _pluginManager.Set(attr._pluginManager);
+            _typeLoader.Set(attr._typeLoader);
 
             return this;
         }

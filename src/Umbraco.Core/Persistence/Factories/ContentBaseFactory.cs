@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -45,8 +48,6 @@ namespace Umbraco.Core.Persistence.Factories
 
                 content.Published = dto.Published;
                 content.Edited = dto.Edited;
-                content.ExpireDate = dto.ExpiresDate;
-                content.ReleaseDate = dto.ReleaseDate;
 
                 // fixme - shall we get published infos or not?
                 //if (dto.Published)
@@ -142,7 +143,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
-                content.ProviderUserKey = content.Key; // fixme explain
+                content.ProviderUserKey = content.Key; // The `ProviderUserKey` is a membership provider thing
 
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
@@ -155,7 +156,7 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         /// <summary>
-        /// Buils a dto from an IContent item.
+        /// Builds a dto from an IContent item.
         /// </summary>
         public static DocumentDto BuildDto(IContent entity, Guid objectType)
         {
@@ -165,14 +166,24 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 Published = entity.Published,
-                ReleaseDate = entity.ReleaseDate,
-                ExpiresDate = entity.ExpireDate,
-
                 ContentDto = contentDto,
                 DocumentVersionDto = BuildDocumentVersionDto(entity, contentDto)
             };
 
             return dto;
+        }
+
+        public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
+        {
+            return entity.ContentSchedule.FullSchedule.Select(x =>
+                (x, new ContentScheduleDto
+                {
+                    Action = x.Action.ToString(),
+                    Date = x.Date,
+                    NodeId = entity.Id,
+                    LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
+                    Id = x.Id
+                }));
         }
 
         /// <summary>
@@ -302,6 +313,9 @@ namespace Umbraco.Core.Persistence.Factories
         // more dark magic ;-(
         internal static bool TryMatch(string text, out string path)
         {
+            //fixme: In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
+            // can tell us directly what any URL is for a given property if it contains an asset
+
             path = null;
             if (string.IsNullOrWhiteSpace(text)) return false;
 

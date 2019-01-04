@@ -17,7 +17,7 @@
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
-    <key alias="emptyTrashcan">Очистить корзину</key>
+    <key alias="emptyRecycleBin">Очистить корзину</key>
     <key alias="enable">Включить</key>
     <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
@@ -346,7 +346,6 @@
     <key alias="closeThisWindow">Закрыть это окно</key>
     <key alias="confirmdelete">Вы уверены, что хотите удалить</key>
     <key alias="confirmdisable">Вы уверены, что хотите запретить</key>
-    <key alias="confirmEmptyTrashcan">Пожалуйста, подтвердите удаление из корзины %0% элементов</key>
     <key alias="confirmlogout">Вы уверены?</key>
     <key alias="confirmSure">Вы уверены?</key>
     <key alias="cut">Вырезать</key>
@@ -715,9 +714,6 @@
     <key alias="configurationServiceFileNotFound">Файл не существует: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Не найден параметр <strong>'%0%'</strong> в файле конфигурации <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Обнаружена ошибка, для получения полной информации обратитесь к журналу: %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Участники - всего в XML: %0%, всего: %1%, с ошибками: %2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Медиа - всего в XML: %0%, всего: %1%Б с ошибками: %2%</key>
-    <key alias="xmlDataIntegrityCheckContent">Содержимое - всего в XML: %0%, всего опубликовано: %1%, с ошибками: %2%</key>
     <key alias="healthCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
     <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
@@ -781,15 +777,13 @@
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Адрес для отправки уведомлений установлен в <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Зафиксированы следующие результаты автоматической проверки состояния Umbraco по расписанию, запущенной на %0% в %1%:</p>%2%</body></html>]]></key>
-    <key alias="scheduledHealthCheckEmailSubject">Результат проверки состояния Umbraco</key>
+    <key alias="scheduledHealthCheckEmailSubject">Результат проверки состояния Umbraco: %0%</key>
   </area>
   <area alias="help">
     <key alias="theBestUmbracoVideoTutorials">Лучшие обучающие видео-курсы по Umbraco</key>
   </area>
   <area alias="imagecropper">
     <key alias="reset">Сбросить</key>
-    <key alias="defineCrop">Задать рамку</key>
-    <key alias="defineCropDescription">Задайте рамке имя (алиас), а также ширину и высоту по-умолчанию</key>
     <key alias="saveCrop">Сохранить рамку</key>
     <key alias="addCrop">Добавить новую рамку</key>
   </area>

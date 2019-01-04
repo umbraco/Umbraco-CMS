@@ -21,13 +21,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ServiceContext _services;
-        private readonly CacheHelper _appCache;
 
-        public MacroContainerValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
+        public MacroContainerValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _services = services ?? throw new ArgumentNullException(nameof(services));
-            _appCache = appCache ?? throw new ArgumentNullException(nameof(appCache));
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -50,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var sb = new StringBuilder();
 
-                var umbracoHelper = new UmbracoHelper(umbracoContext, _services, _appCache);
+                var umbracoHelper = new UmbracoHelper(umbracoContext, _services);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found

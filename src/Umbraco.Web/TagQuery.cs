@@ -9,195 +9,92 @@ using Umbraco.Web.Models;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// A class that exposes methods used to query tag data in views
+    /// Implements <see cref="ITagQuery"/>.
     /// </summary>
     public class TagQuery : ITagQuery
     {
-
-        //TODO: This class also acts as a wrapper for ITagQuery due to breaking changes, need to fix in
-        // version 8: http://issues.umbraco.org/issue/U4-6899
-        private readonly ITagQuery _wrappedQuery;
-
         private readonly ITagService _tagService;
         private readonly IPublishedContentQuery _contentQuery;
 
-
         /// <summary>
-        /// Constructor for wrapping ITagQuery, see http://issues.umbraco.org/issue/U4-6899
+        /// Initializes a new instance of the <see cref="TagQuery"/> class.
         /// </summary>
-        /// <param name="wrappedQuery"></param>
-        internal TagQuery(ITagQuery wrappedQuery)
-        {
-            if (wrappedQuery == null) throw new ArgumentNullException("wrappedQuery");
-            _wrappedQuery = wrappedQuery;
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="tagService"></param>
-        /// <param name="contentQuery"></param>
         public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery)
         {
-            if (tagService == null) throw new ArgumentNullException("tagService");
-            if (contentQuery == null) throw new ArgumentNullException("contentQuery");
-            _tagService = tagService;
-            _contentQuery = contentQuery;
+            _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
+            _contentQuery = contentQuery ?? throw new ArgumentNullException(nameof(contentQuery));
         }
 
-        /// <summary>
-        /// Returns all content that is tagged with the specified tag value and optional tag group
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> GetContentByTag(string tag, string tagGroup = null)
+        /// <inheritdoc />
+        public IEnumerable<IPublishedContent> GetContentByTag(string tag, string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetContentByTag(tag, tagGroup);
-
-            var ids = _tagService.GetTaggedContentByTag(tag, tagGroup)
+            var ids = _tagService.GetTaggedContentByTag(tag, group, culture)
                 .Select(x => x.EntityId);
             return _contentQuery.Content(ids)
                 .Where(x => x != null);
         }
 
-        /// <summary>
-        /// Returns all content that has been tagged with any tag in the specified group
-        /// </summary>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> GetContentByTagGroup(string tagGroup)
+        /// <inheritdoc />
+        public IEnumerable<IPublishedContent> GetContentByTagGroup(string group, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetContentByTagGroup(tagGroup);
-
-            var ids = _tagService.GetTaggedContentByTagGroup(tagGroup)
+            var ids = _tagService.GetTaggedContentByTagGroup(group, culture)
                 .Select(x => x.EntityId);
             return _contentQuery.Content(ids)
                 .Where(x => x != null);
         }
 
-        /// <summary>
-        /// Returns all Media that is tagged with the specified tag value and optional tag group
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string tagGroup = null)
+        /// <inheritdoc />
+        public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetMediaByTag(tag, tagGroup);
-
-            var ids = _tagService.GetTaggedMediaByTag(tag, tagGroup)
+            var ids = _tagService.GetTaggedMediaByTag(tag, group, culture)
                 .Select(x => x.EntityId);
             return _contentQuery.Media(ids)
                 .Where(x => x != null);
         }
 
-        /// <summary>
-        /// Returns all Media that has been tagged with any tag in the specified group
-        /// </summary>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> GetMediaByTagGroup(string tagGroup)
+        /// <inheritdoc />
+        public IEnumerable<IPublishedContent> GetMediaByTagGroup(string group, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetMediaByTagGroup(tagGroup);
-
-            var ids = _tagService.GetTaggedMediaByTagGroup(tagGroup)
+            var ids = _tagService.GetTaggedMediaByTagGroup(group, culture)
                 .Select(x => x.EntityId);
             return _contentQuery.Media(ids)
                 .Where(x => x != null);
         }
 
-        //TODO: Should prob implement these, requires a bit of work on the member service to do this,
-        // also not sure if its necessary ?
-        //public IEnumerable<IPublishedContent> GetMembersByTag(string tag, string tagGroup = null)
-        //{
-        //}
-
-        //public IEnumerable<IPublishedContent> GetMembersByTagGroup(string tagGroup)
-        //{
-        //}
-
-        /// <summary>
-        /// Get every tag stored in the database (with optional group)
-        /// </summary>
-        public IEnumerable<TagModel> GetAllTags(string group = null)
+        /// <inheritdoc />
+        public IEnumerable<TagModel> GetAllTags(string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetAllTags(group);
-
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group));
+            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group, culture));
         }
 
-        /// <summary>
-        /// Get all tags for content items (with optional group)
-        /// </summary>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        public IEnumerable<TagModel> GetAllContentTags(string group = null)
+        /// <inheritdoc />
+        public IEnumerable<TagModel> GetAllContentTags(string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetAllContentTags(group);
-
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group));
+            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group, culture));
         }
 
-        /// <summary>
-        /// Get all tags for media items (with optional group)
-        /// </summary>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        public IEnumerable<TagModel> GetAllMediaTags(string group = null)
+        /// <inheritdoc />
+        public IEnumerable<TagModel> GetAllMediaTags(string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetAllMediaTags(group);
-
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group));
+            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group, culture));
         }
 
-        /// <summary>
-        /// Get all tags for member items (with optional group)
-        /// </summary>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        public IEnumerable<TagModel> GetAllMemberTags(string group = null)
+        /// <inheritdoc />
+        public IEnumerable<TagModel> GetAllMemberTags(string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetAllMemberTags(group);
-
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group));
+            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group, culture));
         }
 
-        /// <summary>
-        /// Returns all tags attached to a property by entity id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null)
+        /// <inheritdoc />
+        public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
-
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup));
+            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
         }
 
-        /// <summary>
-        /// Returns all tags attached to an entity (content, media or member) by entity id
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        public IEnumerable<TagModel> GetTagsForEntity(int contentId, string tagGroup = null)
+        /// <inheritdoc />
+        public IEnumerable<TagModel> GetTagsForEntity(int contentId, string group = null, string culture = null)
         {
-            //TODO: http://issues.umbraco.org/issue/U4-6899
-            if (_wrappedQuery != null) return _wrappedQuery.GetTagsForEntity(contentId, tagGroup);
-
-            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, tagGroup));
+            return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, group, culture));
         }
     }
 }

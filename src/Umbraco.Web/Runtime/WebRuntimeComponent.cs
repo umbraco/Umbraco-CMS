@@ -122,12 +122,15 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 
-            composition.Container.RegisterMvcControllers(typeLoader, GetType().Assembly);
+            composition.Container.RegisterSingleton<Dashboards>();
+
+            composition.Container.RegisterUmbracoControllers(typeLoader, GetType().Assembly);
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
-            composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
 
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
+                .Add(() => typeLoader.GetTypes<ISearchableTree>());
+
+            composition.Container.Register<UmbracoTreeSearcher>(new PerRequestLifeTime());
 
             composition.Container.RegisterCollectionBuilder<EditorValidatorCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<IEditorValidator>());
@@ -181,7 +184,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-            
+
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
@@ -205,10 +208,10 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             // register known content apps
-            composition.Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>()
-                .Append<ListViewContentAppDefinition>()
-                .Append<ContentEditorContentAppDefinition>()
-                .Append<ContentInfoContentAppDefinition>();
+            composition.Container.RegisterCollectionBuilder<ContentAppFactoryCollectionBuilder>()
+                .Append<ListViewContentAppFactory>()
+                .Append<ContentEditorContentAppFactory>()
+                .Append<ContentInfoContentAppFactory>();
         }
 
         internal void Initialize(
