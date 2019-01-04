@@ -4,14 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using Lucene.Net.Index;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
@@ -22,26 +19,21 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
-using Examine.LuceneEngine.Indexing;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
     public sealed class ExamineComponent : IComponent
     {
-        private IExamineManager _examineManager;
-        private IContentValueSetBuilder _contentValueSetBuilder;
-        private IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
-        private IValueSetBuilder<IMedia> _mediaValueSetBuilder;
-        private IValueSetBuilder<IMember> _memberValueSetBuilder;
+        private readonly IExamineManager _examineManager;
+        private readonly IContentValueSetBuilder _contentValueSetBuilder;
+        public IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
+        private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
+        private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private static bool _disableExamineIndexing = false;
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
-        private IScopeProvider _scopeProvider;
-        private ServiceContext _services;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly ServiceContext _services;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
         private static readonly object RebuildLocker = new object();
 
@@ -50,7 +42,7 @@ namespace Umbraco.Web.Search
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        internal ExamineComponent(IMainDom mainDom,
+        public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             IndexRebuilder indexRebuilder, ServiceContext services,

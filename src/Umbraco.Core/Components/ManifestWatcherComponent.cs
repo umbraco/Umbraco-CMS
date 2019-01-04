@@ -6,7 +6,7 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.Components
 {
-    public class ManifestWatcherComponent : IComponent, IDisposable
+    public sealed class ManifestWatcherComponent : IComponent, IDisposable
     {
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change

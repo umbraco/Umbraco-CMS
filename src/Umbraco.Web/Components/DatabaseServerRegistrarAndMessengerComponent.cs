@@ -93,13 +93,13 @@ namespace Umbraco.Web.Components
     public sealed class DatabaseServerRegistrarAndMessengerComponent : IComponent
     {
         private object _locker = new object();
-        private DatabaseServerRegistrar _registrar;
-        private BatchedDatabaseServerMessenger _messenger;
-        private IRuntimeState _runtime;
-        private ILogger _logger;
-        private IServerRegistrationService _registrationService;
-        private BackgroundTaskRunner<IBackgroundTask> _touchTaskRunner;
-        private BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
+        private readonly DatabaseServerRegistrar _registrar;
+        private readonly BatchedDatabaseServerMessenger _messenger;
+        private readonly IRuntimeState _runtime;
+        private readonly ILogger _logger;
+        private readonly IServerRegistrationService _registrationService;
+        private readonly BackgroundTaskRunner<IBackgroundTask> _touchTaskRunner;
+        private readonly BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
         private bool _started;
         private IBackgroundTask[] _tasks;
         private IndexRebuilder _indexRebuilder;

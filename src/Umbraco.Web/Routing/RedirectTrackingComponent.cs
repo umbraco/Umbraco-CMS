@@ -12,13 +12,13 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Redirects
 {
-    public class RedirectTrackingComponent : IComponent
+    public sealed class RedirectTrackingComponent : IComponent
     {
         private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";
         private const string ContextKey2 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.2";
         private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
 
-        protected RedirectTrackingComponent()
+        public RedirectTrackingComponent()
         {
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order

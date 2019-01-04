@@ -7,7 +7,7 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class PropertyEditorsComponent : IComponent
+    internal sealed class PropertyEditorsComponent : IComponent
     {
         public PropertyEditorsComponent(PropertyEditorCollection propertyEditors)
         {
