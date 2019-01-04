@@ -120,7 +120,9 @@ namespace Umbraco.Web.Redirects
             {
                 return;
             }
-            if (args.MessageObject is ContentCacheRefresher.JsonPayload[])
+
+            var payloads = args.MessageObject as ContentCacheRefresher.JsonPayload[];
+            if (payloads == null)
             {
                 throw new InvalidOperationException("ContentCacheRefresher MessageObject should be JsonPayload[].");
             }
