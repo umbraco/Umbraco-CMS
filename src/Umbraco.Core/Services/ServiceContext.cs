@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
         /// Initializes a new instance of the <see cref="ServiceContext"/> class with services.
         /// </summary>
         /// <remarks>Used in tests. All items are optional and remain null if not specified.</remarks>
-        public ServiceContext(IContentService contentService = null,
+        internal ServiceContext(IContentService contentService = null,
             IMediaService mediaService = null,
             IContentTypeService contentTypeService = null,
             IMediaTypeService mediaTypeService = null,

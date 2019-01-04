@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void ScopeBuilderCreatesScopedCollection()
         {
-            _composition.WithCollectionBuilder<TestCollectionBuilder>()
+            _composition.WithCollectionBuilder<TestCollectionBuilderScope>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -313,13 +313,17 @@ namespace Umbraco.Tests.Composing
 
             var factory = _composition.CreateFactory();
 
-            var col1 = factory.GetInstance<TestCollection>();
-            AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
+            using (factory.BeginScope())
+            { 
+                var col1 = factory.GetInstance<TestCollection>();
+                AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = factory.GetInstance<TestCollection>();
-            AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
+                var col2 = factory.GetInstance<TestCollection>();
+                AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
-            AssertSameCollection(col1, col2);
+                AssertSameCollection(col1, col2);
+            }
+
         }
 
         [Test]
