@@ -15,10 +15,12 @@ namespace Umbraco.Web.Search
     /// Configures and installs Examine.
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class ExamineComposer : ICoreComposer
+    public sealed class ExamineComposer : ComponentComposer<ExamineComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
             // populators are not a collection: once cannot remove ours, and can only add more
             // the container can inject IEnumerable<IIndexPopulator> and get them all
             composition.Register<IIndexPopulator, MemberIndexPopulator>(Lifetime.Singleton);
@@ -47,8 +49,6 @@ namespace Umbraco.Web.Search
             //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
             //is instantiated, as the value is used during instantiation
             ExamineManager.DisableDefaultHostingEnvironmentRegistration();
-
-            composition.Components().Append<ExamineComponent>();
         }
     }
 }

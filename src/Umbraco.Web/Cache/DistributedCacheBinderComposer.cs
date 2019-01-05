@@ -9,12 +9,13 @@ namespace Umbraco.Web.Cache
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     [ComposeBefore(typeof(ICoreComposer))] // runs before every other IUmbracoCoreComponent!
-    public sealed class DistributedCacheBinderComposer : ICoreComposer
+    public sealed class DistributedCacheBinderComposer : ComponentComposer<DistributedCacheBinderComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
-            composition.Components().Append<DistributedCacheBinderComponent>();
         }
     }
 }

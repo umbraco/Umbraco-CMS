@@ -12,11 +12,6 @@ namespace Umbraco.Web.Redirects
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class RedirectTrackingComposer : ICoreComposer
-    {
-        public void Compose(Composition composition)
-        {
-            composition.Components().Append<RedirectTrackingComponent>();
-        }
-    }
+    public class RedirectTrackingComposer : ComponentComposer<RelateOnCopyComponent>, ICoreComposer
+    { }
 }

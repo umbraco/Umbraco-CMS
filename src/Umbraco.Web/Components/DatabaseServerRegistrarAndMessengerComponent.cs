@@ -37,11 +37,11 @@ namespace Umbraco.Web.Components
     // todo - should not be a strong dependency on "examine" but on an "indexing component"
     [ComposeAfter(typeof(ExamineComposer))]
 
-    public sealed class DatabaseServerRegistrarAndMessengerComposer : ICoreComposer
+    public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            composition.Components().Append<DatabaseServerRegistrarAndMessengerComponent>();
+            base.Compose(composition);
 
             composition.SetServerMessenger(factory =>
             {

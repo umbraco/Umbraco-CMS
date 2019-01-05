@@ -36,11 +36,11 @@ using Current = Umbraco.Web.Composing.Current;
 namespace Umbraco.Web.Runtime
 {
     [ComposeAfter(typeof(CoreRuntimeComposer))]
-    public sealed class WebRuntimeComposer : IRuntimeComposer
+    public sealed class WebRuntimeComposer : ComponentComposer<WebRuntimeComponent>, IRuntimeComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            composition.Components().Append<WebRuntimeComponent>();
+            base.Compose(composition);
 
             composition.Register<UmbracoInjectedModule>();
 

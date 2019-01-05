@@ -5,11 +5,12 @@ using Umbraco.Core.Composing;
 namespace Umbraco.Web.Components
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class NotificationsComposer : ICoreComposer
+    public sealed class NotificationsComposer : ComponentComposer<NotificationsComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            composition.Components().Append<NotificationsComponent>();
+            base.Compose(composition);
+
             composition.RegisterUnique<NotificationsComponent.Notifier>();
         }
     }
