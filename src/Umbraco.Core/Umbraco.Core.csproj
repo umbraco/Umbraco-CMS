@@ -155,6 +155,7 @@
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Collections\TypeList.cs" />
     <Compile Include="Components\AuditEventsComposer.cs" />
+    <Compile Include="Components\ComponentComposer.cs" />
     <Compile Include="Components\Composers.cs" />
     <Compile Include="Components\Composition.cs" />
     <Compile Include="Components\CompositionExtensions.cs" />
