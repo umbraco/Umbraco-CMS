@@ -301,8 +301,6 @@
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\TemplateElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\TemplateElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />

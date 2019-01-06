@@ -304,7 +304,6 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(factory => umbracoSettings);
             Composition.RegisterUnique(factory => globalSettings);
             Composition.RegisterUnique(factory => umbracoSettings.Content);
-            Composition.RegisterUnique(factory => umbracoSettings.Templates);
             Composition.RegisterUnique(factory => umbracoSettings.WebRouting);
 
             Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
