@@ -348,7 +348,6 @@
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
-    <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
