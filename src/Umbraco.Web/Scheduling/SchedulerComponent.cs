@@ -4,6 +4,7 @@ using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -50,7 +51,7 @@ namespace Umbraco.Web.Scheduling
         }
 
         public void Initialize()
-        { 
+        {
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
             _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger);
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger);
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Scheduling
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
                 _logger.Debug<SchedulerComponent>("Initializing the scheduler");
-                var settings = Current.Config.Umbraco();
+                var settings = Current.Configs.Settings();
 
                 var tasks = new List<IBackgroundTask>();
 
@@ -93,7 +94,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterTaskRunner(settings));
                 tasks.Add(RegisterLogScrubber(settings));
 
-                var healthCheckConfig = Current.Config.HealthChecks();
+                var healthCheckConfig = Current.Configs.HealthChecks();
                 if (healthCheckConfig.NotificationSettings.Enabled)
                     tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _logger));
 

@@ -31,7 +31,7 @@ namespace Umbraco.Web.Trees
             {
                 case ActionDelete actionDelete:
                     return Attempt.Succeed(
-                        Current.Config.Global().Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
+                        Current.Configs.Global().Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
             }
 
             return Attempt<string>.Fail();

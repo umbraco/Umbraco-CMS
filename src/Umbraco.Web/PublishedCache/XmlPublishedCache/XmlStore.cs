@@ -110,7 +110,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _xmlFileEnabled = false;
-            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Config.Global()));
+            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _memberRepository = memberRepository;
             GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
-            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Config.Global()));
+            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -253,16 +253,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly bool _xmlFileEnabled = true;
 
         // whether the disk cache is enabled
-        private bool XmlFileEnabled => _xmlFileEnabled && Current.Config.Umbraco().Content.XmlCacheEnabled;
+        private bool XmlFileEnabled => _xmlFileEnabled && Current.Configs.Settings().Content.XmlCacheEnabled;
 
         // whether the disk cache is enabled and to update the disk cache when xml changes
-        private bool SyncToXmlFile => XmlFileEnabled && Current.Config.Umbraco().Content.ContinouslyUpdateXmlDiskCache;
+        private bool SyncToXmlFile => XmlFileEnabled && Current.Configs.Settings().Content.ContinouslyUpdateXmlDiskCache;
 
         // whether the disk cache is enabled and to reload from disk cache if it changes
-        private bool SyncFromXmlFile => XmlFileEnabled && Current.Config.Umbraco().Content.XmlContentCheckForDiskChanges;
+        private bool SyncFromXmlFile => XmlFileEnabled && Current.Configs.Settings().Content.XmlContentCheckForDiskChanges;
 
         // whether _xml is immutable or not (achieved by cloning before changing anything)
-        private static bool XmlIsImmutable => Current.Config.Umbraco().Content.CloneXmlContent;
+        private static bool XmlIsImmutable => Current.Configs.Settings().Content.CloneXmlContent;
 
         // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
         // for audit purposes - false by default, not in umbracoSettings.config

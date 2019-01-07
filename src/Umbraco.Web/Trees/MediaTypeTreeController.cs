@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedMediaTypes = Current.Config.Umbraco().Content.EnableInheritedMediaTypes;
+            var enableInheritedMediaTypes = Current.Configs.Settings().Content.EnableInheritedMediaTypes;
 
             if (id == Constants.System.Root.ToInvariantString())
             {

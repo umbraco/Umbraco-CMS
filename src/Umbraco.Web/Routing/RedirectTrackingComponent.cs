@@ -28,6 +28,13 @@ namespace Umbraco.Web.Redirects
         private const string ContextKey2 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.2";
         private const string ContextKey3 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.3";
 
+        private readonly IUmbracoSettingsSection _umbracoSettings;
+
+        public RedirectTrackingComponent(IUmbracoSettingsSection umbracoSettings)
+        {
+            _umbracoSettings = umbracoSettings;
+        }
+
         private static Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute> OldRoutes
         {
             get
@@ -72,7 +79,7 @@ namespace Umbraco.Web.Redirects
         public void Initialize()
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
-            if (UmbracoConfig.GetConfig<IUmbracoSettingsSection>("umbracoConfiguration/settings").WebRouting.DisableRedirectUrlTracking) return;
+            if (_umbracoSettings.WebRouting.DisableRedirectUrlTracking) return;
 
             // events are weird
             // on 'published' we 'could' get the old or the new route depending on event handlers order

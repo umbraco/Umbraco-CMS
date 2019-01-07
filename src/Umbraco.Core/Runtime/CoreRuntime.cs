@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -106,16 +107,18 @@ namespace Umbraco.Core.Runtime
                 // database factory
                 var databaseFactory = GetDatabaseFactory();
 
+                // configs
+                var configs = GetConfigs();
+
                 // type loader
-                var globalSettings = Current.Config.Global();
-                var localTempStorage = globalSettings.LocalTempStorageLocation;
+                var localTempStorage = configs.Global().LocalTempStorageLocation;
                 var typeLoader = new TypeLoader(runtimeCache, localTempStorage, ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
                 // as the second one captures the current value (null) and therefore fails
                 _state = new RuntimeState(Logger,
-                    Current.Config.Umbraco(), Current.Config.Global(),
+                    configs.Settings(), configs.Global(),
                     new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
                     new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
                 {
@@ -126,7 +129,7 @@ namespace Umbraco.Core.Runtime
                 var mainDom = new MainDom(Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
 
                 // register runtime-level services
@@ -152,9 +155,14 @@ namespace Umbraco.Core.Runtime
             }
             catch (Exception e)
             {
-                _state.Level = RuntimeLevel.BootFailed;
                 var bfe = e as BootFailedException ?? new BootFailedException("Boot failed.", e);
-                _state.BootFailedException = bfe;
+
+                if (_state != null)
+                {
+                    _state.Level = RuntimeLevel.BootFailed;
+                    _state.BootFailedException = bfe;
+                }
+
                 timer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
 
                 // if something goes wrong above, we may end up with no factory
@@ -168,6 +176,8 @@ namespace Umbraco.Core.Runtime
                     }
                     catch { /* yea */ }
                 }
+
+                Debugger.Break();
 
                 // throwing here can cause w3wp to hard-crash and we want to avoid it.
                 // instead, we're logging the exception and setting level to BootFailed.
@@ -338,6 +348,16 @@ namespace Umbraco.Core.Runtime
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
             => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()));
+
+        /// <summary>
+        /// Gets the configurations.
+        /// </summary>
+        protected virtual Configs GetConfigs()
+        {
+            var configs = new Configs();
+            configs.AddCoreConfigs();
+            return configs;
+        }
 
         #endregion
     }

@@ -39,7 +39,7 @@ namespace Umbraco.Core.Composing
         private static IProfiler _profiler;
         private static IProfilingLogger _profilingLogger;
         private static IPublishedValueFallback _publishedValueFallback;
-        private static UmbracoConfig _config;
+        private static Configs _configs;
 
         /// <summary>
         /// Gets or sets the factory.
@@ -48,17 +48,18 @@ namespace Umbraco.Core.Composing
         {
             get
             {
-                if (_factory == null) throw new Exception("No factory has been set.");
+                if (_factory == null) throw new InvalidOperationException("No factory has been set.");
                 return _factory;
             }
             set
             {
-                if (_factory != null) throw new Exception("A factory has already been set.");
+                if (_factory != null) throw new InvalidOperationException("A factory has already been set.");
+                if (_configs != null) throw new InvalidOperationException("Configs are unlocked.");
                 _factory = value;
             }
         }
 
-        internal static bool HasContainer => _factory != null;
+        internal static bool HasFactory => _factory != null;
 
         // for UNIT TESTS exclusively!
         // resets *everything* that is 'current'
@@ -67,6 +68,7 @@ namespace Umbraco.Core.Composing
             _factory.DisposeIfDisposable();
             _factory = null;
 
+            _configs = null;
             _shortStringHelper = null;
             _logger = null;
             _profiler = null;
@@ -76,21 +78,31 @@ namespace Umbraco.Core.Composing
             Resetted?.Invoke(null, EventArgs.Empty);
         }
 
+        // for UNIT TESTS exclusively!
+        // unlocks configuration, so it is possible to add configurations
+        // to Current.Configs - without having to use composition.Configs
+        internal static void UnlockConfigs()
+        {
+            if (_factory != null)
+                throw new InvalidOperationException("Cannot unlock configs when a factory has been set.");
+            _configs = new Configs();
+        }
+
         internal static event EventHandler Resetted;
 
         #region Getters
 
         public static IShortStringHelper ShortStringHelper
             => _shortStringHelper ?? (_shortStringHelper = _factory?.TryGetInstance<IShortStringHelper>()
-                ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Config.Umbraco())));
+                                  ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Configs.Settings())));
 
         public static ILogger Logger
             => _logger ?? (_logger = _factory?.TryGetInstance<ILogger>()
-                ?? new DebugDiagnosticsLogger());
+                                     ?? new DebugDiagnosticsLogger());
 
         public static IProfiler Profiler
             => _profiler ?? (_profiler = _factory?.TryGetInstance<IProfiler>()
-                ?? new LogProfiler(Logger));
+                                         ?? new LogProfiler(Logger));
 
         public static IProfilingLogger ProfilingLogger
             => _profilingLogger ?? (_profilingLogger = _factory?.TryGetInstance<IProfilingLogger>())
@@ -102,9 +114,15 @@ namespace Umbraco.Core.Composing
         public static TypeLoader TypeLoader
             => Factory.GetInstance<TypeLoader>();
 
-        public static UmbracoConfig Config
-            => _config ?? (_config = _factory?.TryGetInstance<UmbracoConfig>()
-               ?? new UmbracoConfig(Logger, _factory?.TryGetInstance<IRuntimeCacheProvider>(), _factory?.TryGetInstance<IRuntimeState>()));
+        public static Configs Configs
+        {
+            get
+            {
+                if (_configs != null) return _configs;
+                if (_factory == null) throw new InvalidOperationException("Can not get Current.Config during composition. Use composition.Config.");
+                return _factory.GetInstance<Configs>();
+            }
+        }
 
         public static IFileSystems FileSystems
             => Factory.GetInstance<IFileSystems>();

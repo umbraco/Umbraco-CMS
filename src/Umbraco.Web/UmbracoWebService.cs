@@ -29,7 +29,7 @@ namespace Umbraco.Web
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;
-            GlobalSettings = Current.Config.Global();
+            GlobalSettings = Current.Configs.Global();
         }
 
         /// <summary>

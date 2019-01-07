@@ -75,7 +75,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedDocumentTypes = Current.Config.Umbraco().Content.EnableInheritedDocumentTypes;
+            var enableInheritedDocumentTypes = Current.Configs.Settings().Content.EnableInheritedDocumentTypes;
 
             if (id == Constants.System.Root.ToInvariantString())
             {

@@ -2,9 +2,10 @@
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
@@ -12,6 +13,15 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class MemberTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+        }
+
         [Test]
         public void Can_Deep_Clone()
         {
