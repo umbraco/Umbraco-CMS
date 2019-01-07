@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                var macro = new Macro { Alias = alias, Name = name };
+                var macro = new Macro { Alias = alias, Name = name, MacroSource = string.Empty};
 
                 this.Services.MacroService.Save(macro, this.Security.CurrentUser.Id);
 

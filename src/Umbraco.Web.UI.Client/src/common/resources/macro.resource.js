@@ -83,9 +83,7 @@ function macroResource($q, $http, umbRequestHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "macroApiBaseUrl",
-                        "Create"), {
-                        name : name,
-                    }
+                        "Create?name=" + name)
                 ),
                 'Failed to create macro "' + name + '"'
             );
