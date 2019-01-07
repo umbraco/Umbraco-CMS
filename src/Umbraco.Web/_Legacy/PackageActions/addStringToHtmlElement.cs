@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
@@ -42,8 +39,6 @@ namespace Umbraco.Web._Legacy.PackageActions
             string value = XmlHelper.GetNodeValue(xmlData);
             var tmp = Current.Services.FileService.GetTemplate(templateAlias);
 
-            value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
-
             _addStringToHtmlElement(tmp, value, htmlElementId, position);
 
             return true;
@@ -62,8 +57,6 @@ namespace Umbraco.Web._Legacy.PackageActions
             string htmlElementId = xmlData.Attributes["htmlElementId"].Value;
             string value = XmlHelper.GetNodeValue(xmlData);
             var tmp = Current.Services.FileService.GetTemplate(templateAlias);
-
-            value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
 
             _removeStringFromHtmlElement(tmp, value, htmlElementId);
             return true;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.IO;
+﻿using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 
@@ -53,12 +50,6 @@ namespace Umbraco.Web._Legacy.PackageActions
                 retVal = retVal.Replace("<root>", "");
                 retVal = retVal.Replace("<root xmlns:asp=\"http://microsoft.com\">", "");
                 retVal = retVal.Replace("</root>", "");
-
-                // add asp content element
-                if (hasAspNetContentBeginning)
-                {
-                    retVal = MasterPageHelper.GetMasterContentElement(templateObj/*templateObj.MasterTemplate*/) + retVal + "</asp:content>";
-                }
             }
 
             return retVal;
