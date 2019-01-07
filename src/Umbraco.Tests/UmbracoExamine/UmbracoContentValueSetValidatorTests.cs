@@ -237,7 +237,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = 1,
+                    [UmbracoContentIndex.VariesByCultureFieldName] = "y",
                     [UmbracoExamineIndex.PublishedFieldName] = 0
                 }));
             Assert.AreEqual(ValueSetValidationResult.Failed, result);
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = 1,
+                    [UmbracoContentIndex.VariesByCultureFieldName] = "y",
                     [UmbracoExamineIndex.PublishedFieldName] = 1
                 }));
             Assert.AreEqual(ValueSetValidationResult.Valid, result);
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = 1,
+                    [UmbracoContentIndex.VariesByCultureFieldName] = "y",
                     [$"{UmbracoExamineIndex.PublishedFieldName}_en-us"] = 1,
                     ["hello_en-us"] = "world",
                     ["title_en-us"] = "my title",

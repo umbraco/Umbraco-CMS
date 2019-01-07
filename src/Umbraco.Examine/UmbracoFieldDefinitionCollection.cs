@@ -30,7 +30,7 @@ namespace Umbraco.Examine
             new FieldDefinition("createDate", FieldDefinitionTypes.DateTime),
             new FieldDefinition("updateDate", FieldDefinitionTypes.DateTime),
 
-            new FieldDefinition("key", FieldDefinitionTypes.InvariantCultureIgnoreCase),
+            new FieldDefinition(UmbracoExamineIndex.NodeKeyFieldName, FieldDefinitionTypes.InvariantCultureIgnoreCase),
             new FieldDefinition("version", FieldDefinitionTypes.Raw),
             new FieldDefinition("nodeType", FieldDefinitionTypes.InvariantCultureIgnoreCase),
             new FieldDefinition("template", FieldDefinitionTypes.Raw),
@@ -40,9 +40,9 @@ namespace Umbraco.Examine
             new FieldDefinition("email", FieldDefinitionTypes.EmailAddress),
 
             new FieldDefinition(UmbracoExamineIndex.PublishedFieldName, FieldDefinitionTypes.Raw),
-            new FieldDefinition(UmbracoExamineIndex.NodeKeyFieldName, FieldDefinitionTypes.Raw),
             new FieldDefinition(UmbracoExamineIndex.IndexPathFieldName, FieldDefinitionTypes.Raw),
-            new FieldDefinition(UmbracoExamineIndex.IconFieldName, FieldDefinitionTypes.Raw)
+            new FieldDefinition(UmbracoExamineIndex.IconFieldName, FieldDefinitionTypes.Raw),
+            new FieldDefinition(UmbracoContentIndex.VariesByCultureFieldName, FieldDefinitionTypes.Raw),
         };
 
         ///// <summary>

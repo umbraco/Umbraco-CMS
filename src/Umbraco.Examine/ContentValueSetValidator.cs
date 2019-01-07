@@ -100,7 +100,7 @@ namespace Umbraco.Examine
 
                 //deal with variants, if there are unpublished variants than we need to remove them from the value set
                 if (valueSet.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var variesByCulture)
-                    && variesByCulture.Count > 0 && variesByCulture[0].Equals(1))
+                    && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
                 {
                     //so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
                     foreach(var publishField in valueSet.Values.Where(x => x.Key.StartsWith($"{UmbracoExamineIndex.PublishedFieldName}_")).ToList())

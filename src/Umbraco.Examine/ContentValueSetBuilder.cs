@@ -44,7 +44,7 @@ namespace Umbraco.Examine
                     {"icon", c.ContentType.Icon.Yield()},
                     {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
-                    {"key", new object[] {c.Key}},
+                    {UmbracoExamineIndex.NodeKeyFieldName, new object[] {c.Key}},
                     {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
                     {"level", new object[] {c.Level}},
                     {"creatorID", new object[] {c.CreatorId}},
@@ -61,12 +61,12 @@ namespace Umbraco.Examine
                     {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
                     {"template", new object[] {c.Template?.Id ?? 0}},
-                    {UmbracoContentIndex.VariesByCultureFieldName, new object[] {0}},
+                    {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},
                 };
 
                 if (isVariant)
                 {
-                    values[UmbracoContentIndex.VariesByCultureFieldName] = new object[] { 1 };
+                    values[UmbracoContentIndex.VariesByCultureFieldName] = new object[] { "y" };
 
                     foreach (var culture in c.AvailableCultures)
                     {
