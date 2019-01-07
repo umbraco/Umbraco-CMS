@@ -93,7 +93,8 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures)
+        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties,
+            ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures, IEnumerable<string> availableCultures = null)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
             edited = false;
@@ -103,7 +104,8 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 if (property.PropertyType.IsPublishing)
                 {
-                    var editingCultures = property.PropertyType.VariesByCulture();
+                    var editingCultures = availableCultures?.Any() ?? property.PropertyType.VariesByCulture();
+
                     if (editingCultures && editedCultures == null) editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     // publishing = deal with edit and published values
@@ -131,6 +133,15 @@ namespace Umbraco.Core.Persistence.Factories
                         {
                             editedCultures.Add(propertyValue.Culture); // report culture as edited
                         }
+
+                        // flag culture as edited if it contains an edited invariant property 
+                        if (propertyValue.Culture == null &&
+                            availableCultures !=null && !sameValues&&
+                            editingCultures)
+                        {
+                            editedCultures.Add(availableCultures.FirstOrDefault());
+                        }
+                        
                     }
                 }
                 else
