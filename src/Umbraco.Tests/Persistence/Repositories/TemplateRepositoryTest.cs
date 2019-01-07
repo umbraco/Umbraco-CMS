@@ -25,11 +25,9 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private IFileSystems _fileSystems;
 
-        private ITemplateRepository CreateRepository(IScopeProvider provider, ITemplatesSection templatesSection = null)
+        private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger,
-                templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc),
-                _fileSystems);
+            return new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, _fileSystems);
         }
 
         public override void SetUp()

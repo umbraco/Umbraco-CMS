@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -25,16 +24,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IFileSystem _masterpagesFileSystem;
         private readonly IFileSystem _viewsFileSystem;
-        private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplatesSection templateConfig, IFileSystems fileSystems)
+        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
         {
             _masterpagesFileSystem = fileSystems.MasterPagesFileSystem;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
-            _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
