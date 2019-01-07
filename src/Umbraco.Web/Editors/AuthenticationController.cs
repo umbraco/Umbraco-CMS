@@ -11,8 +11,8 @@ using System.Web.Mvc;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
@@ -25,6 +25,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
@@ -39,18 +40,27 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
-
-        //fixme inject these
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-        {
-            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
-        }
-        protected BackOfficeSignInManager SignInManager
-        {
-            get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
-        }
+
+        /// <summary>
+        /// Initializes a new instance of the new <see cref="AuthenticationController"/> class with auto dependencies.
+        /// </summary>
+        public AuthenticationController()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationController"/> class with all its dependencies.
+        /// </summary>
+        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        { }
+
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
+            ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
+
+        protected BackOfficeSignInManager SignInManager => _signInManager
+            ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());
 
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog
@@ -290,7 +300,7 @@ namespace Umbraco.Web.Editors
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
             // So this is just a server-side secondary check.
-            if (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset == false)
+            if (Current.Config.Umbraco().Security.AllowPasswordReset == false)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
@@ -437,7 +447,7 @@ namespace Umbraco.Web.Editors
                 if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
                     return UserState.Invited;
                 */
-                if (identityUser != null && !identityUser.IsApproved) 
+                if (identityUser != null && !identityUser.IsApproved)
                 {
                     var user = Services.UserService.GetByUsername(identityUser.UserName);
                     //also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password

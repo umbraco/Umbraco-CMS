@@ -5,9 +5,12 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Moq;
+using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -38,10 +41,11 @@ namespace Umbraco.Tests.Models
         {
             base.Compose();
 
-            Container.Register(_ => Mock.Of<ILogger>());
-            Container.Register<FileSystems>();
-            Container.Register(_ => Mock.Of<IDataTypeService>());
-            Container.Register(_ => Mock.Of<IContentSection>());
+            Composition.Register(_ => Mock.Of<ILogger>());
+            Composition.ComposeFileSystems();
+
+            Composition.Register(_ => Mock.Of<IDataTypeService>());
+            Composition.Register(_ => Mock.Of<IContentSection>());
         }
 
         [Test]
@@ -51,7 +55,7 @@ namespace Umbraco.Tests.Models
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             const string langFr = "fr-FR";
-            
+
             contentType.Variations = ContentVariation.Culture;
 
             Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //hasn't been changed
@@ -69,7 +73,7 @@ namespace Umbraco.Tests.Models
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
             Assert.IsTrue(content.IsPropertyDirty("CultureInfos"));     //it's true now since we've updated a name
         }
 
@@ -100,7 +104,7 @@ namespace Umbraco.Tests.Models
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
             content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
-            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
             Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //it's true now since we've updated a name
         }
 
@@ -206,7 +210,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(content.Properties, clone.Properties);
         }
 
-        private static ProfilingLogger GetTestProfilingLogger()
+        private static IProfilingLogger GetTestProfilingLogger()
         {
             var logger = new DebugDiagnosticsLogger();
             var profiler = new TestProfiler();
@@ -305,7 +309,7 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            
+
 
             // Act
             var clone = (Content)content.DeepClone();
@@ -402,7 +406,7 @@ namespace Umbraco.Tests.Models
             content.SetCultureName("Hello", "en-US");
             content.SetCultureName("World", "es-ES");
             content.PublishCulture("en-US");
-            
+
             var i = 200;
             foreach (var property in content.Properties)
             {
@@ -420,7 +424,7 @@ namespace Umbraco.Tests.Models
             {
                 Id = 88
             };
-            
+
             content.Trashed = true;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;

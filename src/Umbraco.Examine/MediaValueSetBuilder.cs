@@ -14,7 +14,7 @@ namespace Umbraco.Examine
         private readonly IUserService _userService;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             IUserService userService)
             : base(propertyEditors, false)
         {

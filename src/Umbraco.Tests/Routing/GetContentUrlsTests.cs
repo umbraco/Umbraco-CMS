@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Routing
             content.Path = "-1,1046";
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
-            var publishedRouter = CreatePublishedRouter(Container,
+            var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
@@ -79,10 +79,10 @@ namespace Umbraco.Tests.Routing
             content.Id = 1046; //fixme: we are using this ID only because it's built into the test XML published cache
             content.Path = "-1,1046";
             content.Published = true;
-            
+
             var umbContext = GetUmbracoContext("http://localhost:8000",
                 urlProviders: new []{ new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
-            var publishedRouter = CreatePublishedRouter(Container,
+            var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Routing
 
             var umbContext = GetUmbracoContext("http://localhost:8000",
                 urlProviders: new[] { new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
-            var publishedRouter = CreatePublishedRouter(Container,
+            var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = child.GetContentUrls(publishedRouter,
                 umbContext,

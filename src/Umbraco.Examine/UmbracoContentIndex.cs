@@ -40,7 +40,7 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
@@ -130,7 +130,7 @@ namespace Umbraco.Examine
             var filtered = c.NativeQuery(rawQuery);
             var results = filtered.Execute();
 
-            ProfilingLogger.Logger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+            ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
             //need to queue a delete item for each one found
             QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));

@@ -81,14 +81,14 @@ namespace Umbraco.Tests.Web.Controllers
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("text");
 
-            Container.RegisterSingleton(f => Mock.Of<IContentService>());
-            Container.RegisterSingleton(f => userServiceMock.Object);
-            Container.RegisterSingleton(f => entityService.Object);
-            Container.RegisterSingleton(f => dataTypeService.Object);
-            Container.RegisterSingleton(f => langService.Object);
-            Container.RegisterSingleton(f => textService.Object);
-            Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
-            Container.RegisterSingleton(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
+            Composition.RegisterUnique(f => Mock.Of<IContentService>());
+            Composition.RegisterUnique(f => userServiceMock.Object);
+            Composition.RegisterUnique(f => entityService.Object);
+            Composition.RegisterUnique(f => dataTypeService.Object);
+            Composition.RegisterUnique(f => langService.Object);
+            Composition.RegisterUnique(f => textService.Object);
+            Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
+            Composition.RegisterUnique(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
         }
 
         private MultipartFormDataContent GetMultiPartRequestContent(string json)
@@ -213,7 +213,6 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -240,7 +239,6 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -272,7 +270,6 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -310,7 +307,6 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -342,7 +338,6 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -378,7 +373,6 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 

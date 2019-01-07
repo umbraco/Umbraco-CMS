@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services.Implement
             IEntityService entityService,
             IUserService userService,
             IScopeProvider scopeProvider,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository,
             PropertyEditorCollection propertyEditors)
         {

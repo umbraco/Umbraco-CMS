@@ -55,7 +55,7 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
@@ -66,14 +66,12 @@ namespace Umbraco.Examine
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
 
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger);
         }
 
         private readonly bool _configBased = false;
 
-        
-
-        protected ProfilingLogger ProfilingLogger { get; }
+        protected IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -124,7 +122,7 @@ namespace Umbraco.Examine
         /// <param name="ex"></param>
         protected override void OnIndexingError(IndexingErrorEventArgs ex)
         {
-            ProfilingLogger.Logger.Error(GetType(), ex.InnerException, ex.Message);
+            ProfilingLogger.Error(GetType(), ex.InnerException, ex.Message);
             base.OnIndexingError(ex);
         }
 
@@ -160,7 +158,7 @@ namespace Umbraco.Examine
         /// </summary>
         protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
-            ProfilingLogger.Logger.Debug(GetType(),
+            ProfilingLogger.Debug(GetType(),
                 "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
                 valueSet.Id,
                 valueSet.Category,

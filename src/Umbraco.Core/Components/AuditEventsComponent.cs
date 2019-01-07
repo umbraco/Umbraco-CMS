@@ -12,11 +12,30 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Components
 {
-    public sealed class AuditEventsComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class AuditEventsComponent : IComponent
     {
-        private IAuditService _auditService;
-        private IUserService _userService;
-        private IEntityService _entityService;
+        private readonly IAuditService _auditService;
+        private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
+
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService)
+        {
+            _auditService = auditService;
+            _userService = userService;
+            _entityService = entityService;
+
+            UserService.SavedUserGroup += OnSavedUserGroupWithUsers;
+
+            UserService.SavedUser += OnSavedUser;
+            UserService.DeletedUser += OnDeletedUser;
+            UserService.UserGroupPermissionsAssigned += UserGroupPermissionAssigned;
+
+            MemberService.Saved += OnSavedMember;
+            MemberService.Deleted += OnDeletedMember;
+            MemberService.AssignedRoles += OnAssignedRoles;
+            MemberService.RemovedRoles += OnRemovedRoles;
+            MemberService.Exported += OnMemberExported;
+        }
 
         private IUser CurrentPerformingUser
         {
@@ -44,25 +63,6 @@ namespace Umbraco.Core.Components
                 if (ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
                 return ip;
             }
-        }
-
-        public void Initialize(IAuditService auditService, IUserService userService, IEntityService entityService)
-        {
-            _auditService = auditService;
-            _userService = userService;
-            _entityService = entityService;
-
-            UserService.SavedUserGroup += OnSavedUserGroupWithUsers;
-
-            UserService.SavedUser += OnSavedUser;
-            UserService.DeletedUser += OnDeletedUser;
-            UserService.UserGroupPermissionsAssigned += UserGroupPermissionAssigned;
-
-            MemberService.Saved += OnSavedMember;
-            MemberService.Deleted += OnDeletedMember;
-            MemberService.AssignedRoles += OnAssignedRoles;
-            MemberService.RemovedRoles += OnRemovedRoles;
-            MemberService.Exported += OnMemberExported;
         }
 
         private string FormatEmail(IMember member)

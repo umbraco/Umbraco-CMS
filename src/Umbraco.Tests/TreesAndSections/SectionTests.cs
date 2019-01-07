@@ -3,8 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
-using System.Linq;
-using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 
@@ -21,7 +20,7 @@ namespace Umbraco.Tests.TreesAndSections
         protected override void Compose()
         {
             base.Compose();
-            Container.Register<ISectionService, SectionService>();
+            Composition.RegisterUnique<ISectionService, SectionService>();
         }
 
         public override void SetUp()

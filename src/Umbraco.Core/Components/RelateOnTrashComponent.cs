@@ -7,10 +7,9 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Components
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class RelateOnTrashComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class RelateOnTrashComponent : IComponent
     {
-        public void Initialize()
+        public RelateOnTrashComponent()
         {
             ContentService.Moved += ContentService_Moved;
             ContentService.Trashed += ContentService_Trashed;

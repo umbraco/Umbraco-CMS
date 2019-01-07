@@ -3,7 +3,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.CoreThings
@@ -18,7 +17,7 @@ namespace Umbraco.Tests.CoreThings
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
 
             // fixme - base should do it!
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
         }
 
         [Test]

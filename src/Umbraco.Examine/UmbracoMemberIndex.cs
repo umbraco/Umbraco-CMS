@@ -27,7 +27,7 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Directory luceneDirectory,
             Analyzer analyzer,
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             IValueSetValidator validator = null) :
             base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, validator)
         {

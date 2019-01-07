@@ -4,12 +4,25 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Controllers
 {
     [MemberAuthorize]
     public class UmbProfileController : SurfaceController
     {
+        // fixme - delete?
+        public UmbProfileController()
+        {
+        }
+
+        public UmbProfileController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger) : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+        {
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)

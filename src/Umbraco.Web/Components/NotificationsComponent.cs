@@ -7,7 +7,6 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Actions;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using System.Linq;
@@ -17,16 +16,9 @@ using System.Globalization;
 
 namespace Umbraco.Web.Components
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class NotificationsComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class NotificationsComponent : IComponent
     {
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-            composition.Container.RegisterSingleton<Notifier>();
-        }
-
-        public void Initialize(INotificationService notificationService, Notifier notifier, ActionCollection actions)
+        public NotificationsComponent(INotificationService notificationService, Notifier notifier, ActionCollection actions)
         {
             //Send notifications for the send to publish action
             ContentService.SentToPublish += (sender, args) => notifier.Notify(actions.GetAction<ActionToPublish>(), args.Entity);
@@ -42,7 +34,7 @@ namespace Umbraco.Web.Components
 
             //Send notifications for the delete action
             ContentService.Deleted += (sender, args) => notifier.Notify(actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
-            
+
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) => notifier.Notify(actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
         }
@@ -54,7 +46,7 @@ namespace Umbraco.Web.Components
 
             // in this case there's nothing to report since if the root is sorted we can't report on a fake entity.
             // this is how it was in v7, we can't report on root changes because you can't subscribe to root changes.
-            if (parentId[0] <= 0) return; 
+            if (parentId[0] <= 0) return;
 
             var parent = sender.GetById(parentId[0]);
             if (parent == null) return; // this shouldn't happen
@@ -191,5 +183,5 @@ namespace Umbraco.Web.Components
         }
     }
 
-    
+
 }

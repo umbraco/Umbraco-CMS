@@ -4,15 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Examine;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Providers;
-using Lucene.Net.Index;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
@@ -23,31 +19,21 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
-using Examine.LuceneEngine.Indexing;
-using LightInject;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
 {
-    /// <summary>
-    /// Configures and installs Examine.
-    /// </summary>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class ExamineComponent : IComponent
     {
-        private IExamineManager _examineManager;
-        private IContentValueSetBuilder _contentValueSetBuilder;
-        private IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
-        private IValueSetBuilder<IMedia> _mediaValueSetBuilder;
-        private IValueSetBuilder<IMember> _memberValueSetBuilder;
+        private readonly IExamineManager _examineManager;
+        private readonly IContentValueSetBuilder _contentValueSetBuilder;
+        public IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
+        private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
+        private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private static bool _disableExamineIndexing = false;
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
-        private IScopeProvider _scopeProvider;
-        private ServiceContext _services;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly ServiceContext _services;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
         private static readonly object RebuildLocker = new object();
 
@@ -56,52 +42,8 @@ namespace Umbraco.Web.Search
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-
-            //fixme: I cannot do this since RegisterSingleton acts like TryRegisterSingleton and only allows one
-            //composition.Container.RegisterSingleton<IIndexPopulator, MemberIndexPopulator>();
-            //composition.Container.RegisterSingleton<IIndexPopulator, ContentIndexPopulator>();
-            //composition.Container.RegisterSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
-            //composition.Container.RegisterSingleton<IIndexPopulator, MediaIndexPopulator>();
-
-            // fixme -- CHANGE THIS WHEN THE DI PR IS MERGED
-            //fixme: Instead i have to do this, but this means that developers adding their own will also need to do this which isn't ideal
-            composition.Container.RegisterMany<IIndexPopulator, PerContainerLifetime>(new[]
-            {
-                typeof(MemberIndexPopulator),
-                typeof(ContentIndexPopulator),
-                typeof(PublishedContentIndexPopulator),
-                typeof(MediaIndexPopulator),
-            });
-
-            composition.Container.RegisterSingleton<IndexRebuilder>();
-            composition.Container.RegisterSingleton<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
-            composition.Container.Register<IPublishedContentValueSetBuilder, PerContainerLifetime>(factory =>
-                new ContentValueSetBuilder(
-                    factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
-                    factory.GetInstance<IUserService>(),
-                    true));
-            composition.Container.Register<IContentValueSetBuilder, PerContainerLifetime>(factory =>
-                new ContentValueSetBuilder(
-                    factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
-                    factory.GetInstance<IUserService>(),
-                    false));
-            composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
-            composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-
-            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
-            //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
-            //is instantiated, as the value is used during instantiation
-            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
-        }
-
-        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
-            IExamineManager examineManager, ProfilingLogger profilingLogger,
+        public ExamineComponent(IMainDom mainDom,
+            IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             IndexRebuilder indexRebuilder, ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
@@ -137,10 +79,10 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
+                profilingLogger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-                Suspendable.ExamineEvents.SuspendIndexers(profilingLogger.Logger);
+                Suspendable.ExamineEvents.SuspendIndexers(profilingLogger);
                 _disableExamineIndexing = true;
                 return; //exit, do not continue
             }
@@ -149,11 +91,11 @@ namespace Umbraco.Web.Search
             foreach(var index in indexCreator.Create())
                 _examineManager.AddIndex(index);
 
-            profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+            profilingLogger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
             var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            profilingLogger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -166,10 +108,10 @@ namespace Umbraco.Web.Search
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
 
-            EnsureUnlocked(profilingLogger.Logger, examineManager);
+            EnsureUnlocked(profilingLogger, examineManager);
 
             //TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
-            RebuildIndexes(indexRebuilder, profilingLogger.Logger, true, 5000);
+            RebuildIndexes(indexRebuilder, profilingLogger, true, 5000);
         }
 
         /// <summary>
@@ -582,7 +524,6 @@ namespace Umbraco.Web.Search
             }
         }
 
-
         #endregion
 
         #region ReIndex/Delete for entity
@@ -783,7 +724,6 @@ namespace Umbraco.Web.Search
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-
                     .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {

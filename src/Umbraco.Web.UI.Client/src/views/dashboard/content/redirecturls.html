@@ -54,9 +54,10 @@
 
         <div class="umb-table-head">
             <div class="umb-table-row">
-                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4"><localize key="redirectUrls_originalUrl">Original URL</localize></div>
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b1"><localize key="redirectUrls_culture">Culture</localize></div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b4"><localize key="redirectUrls_originalUrl">Original URL</localize></div>
                 <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;"></div>
-                <div class="umb-table-cell flx-s1 flx-g1 flx-b6"><localize key="redirectUrls_redirectedTo">Redirected To</localize></div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b5"><localize key="redirectUrls_redirectedTo">Redirected To</localize></div>
             </div>
         </div>
 
@@ -64,8 +65,10 @@
 
             <div class="umb-table-row -solid" ng-repeat="redirectUrl in vm.redirectUrls">
 
-
-                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4">
+                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b1">
+                   {{redirectUrl.culture ||'*'}}
+                </div>
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b4">
                     <a class="umb-table-body__link" href="{{redirectUrl.originalUrl}}" target="_blank" title="{{redirectUrl.originalUrl}}">{{redirectUrl.originalUrl}}</a>
                 </div>
 
@@ -73,7 +76,7 @@
                     <i class="umb-table-body__icon umb-table-body__fileicon icon-arrow-right" style="font-size: 12px; line-height: 1;"></i>
                 </div>
 
-                <div class="umb-table-cell flx-s1 flx-g1 flx-b6 items-center">
+                <div class="umb-table-cell flx-s1 flx-g1 flx-b5 items-center">
                     <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
                         <a class="umb-table-body__link" href="{{redirectUrl.destinationUrl}}" target="_blank" title="{{redirectUrl.destinationUrl}}">{{redirectUrl.destinationUrl}}</a>
                     </div>

@@ -14,8 +14,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="url">The Umbraco redirect url route.</param>
         /// <param name="contentKey">The content unique key.</param>
+        /// <param name="culture">The culture.</param>
         /// <returns></returns>
-        IRedirectUrl Get(string url, Guid contentKey);
+        IRedirectUrl Get(string url, Guid contentKey, string culture);
 
         /// <summary>
         /// Deletes a redirect url.

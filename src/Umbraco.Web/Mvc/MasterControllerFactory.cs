@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -11,7 +12,7 @@ namespace Umbraco.Web.Mvc
     /// request. Allows circumvention of MVC3's singly registered IControllerFactory.
     /// </summary>
     /// <remarks></remarks>
-    internal class MasterControllerFactory : DefaultControllerFactory
+    internal class MasterControllerFactory : ContainerControllerFactory
     {
         private readonly Func<FilteredControllerFactoryCollection> _factoriesAccessor;
         private FilteredControllerFactoryCollection _factories;
@@ -21,6 +22,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="factoriesAccessor">The factories accessor.</param>
         public MasterControllerFactory(Func<FilteredControllerFactoryCollection> factoriesAccessor)
+            : base(Current.Factory)
         {
             // note
             // because the MasterControllerFactory needs to be ctored to be assigned to
@@ -52,8 +54,8 @@ namespace Umbraco.Web.Mvc
         {
             var factory = FactoryForRequest(requestContext);
             return factory != null
-                       ? factory.CreateController(requestContext, controllerName)
-                       : base.CreateController(requestContext, controllerName);
+               ? factory.CreateController(requestContext, controllerName)
+               : base.CreateController(requestContext, controllerName);
         }
 
         /// <summary>
@@ -74,11 +76,9 @@ namespace Umbraco.Web.Mvc
                 // an instance of the controller to figure out what it is. This is a work around for not having a breaking change for:
                 // http://issues.umbraco.org/issue/U4-1726
 
-                var umbFactory = factory as UmbracoControllerFactory;
-                if (umbFactory != null)
-                {
+                if (factory is UmbracoControllerFactory umbFactory)
                     return umbFactory.GetControllerType(requestContext, controllerName);
-                }
+
                 //we have no choice but to instantiate the controller
                 var instance = factory.CreateController(requestContext, controllerName);
                 return instance?.GetType();
@@ -95,8 +95,8 @@ namespace Umbraco.Web.Mvc
         public override void ReleaseController(IController icontroller)
         {
             var released = false;
-            var controller = icontroller as Controller;
-            if (controller != null)
+
+            if (icontroller is Controller controller)
             {
                 var requestContext = controller.ControllerContext.RequestContext;
                 var factory = FactoryForRequest(requestContext);
@@ -106,6 +106,7 @@ namespace Umbraco.Web.Mvc
                     released = true;
                 }
             }
+
             if (released == false)
                 base.ReleaseController(icontroller);
         }

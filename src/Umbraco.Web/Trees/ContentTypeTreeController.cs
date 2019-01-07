@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -74,7 +75,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedDocumentTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes;
+            var enableInheritedDocumentTypes = Current.Config.Umbraco().Content.EnableInheritedDocumentTypes;
 
             if (id == Constants.System.Root.ToInvariantString())
             {

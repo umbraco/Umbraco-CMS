@@ -7,188 +7,130 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
     /// <summary>
-    /// The gateway to all umbraco configuration
+    /// The gateway to all umbraco configuration.
     /// </summary>
+    /// <remarks>This should be registered as a unique service in the container.</remarks>
     public class UmbracoConfig
     {
-        #region Singleton
-
-        private static readonly Lazy<UmbracoConfig> Lazy = new Lazy<UmbracoConfig>(() => new UmbracoConfig());
-
-        public static UmbracoConfig For => Lazy.Value;
-
-        #endregion
+        private IGlobalSettings _global;
+        private Lazy<IUmbracoSettingsSection> _umbraco;
+        private Lazy<IHealthChecks> _healthChecks;
+        private Lazy<IDashboardSection> _dashboards;
+        private Lazy<IGridConfig> _grids;
 
         /// <summary>
-        /// Default constructor
+        /// Initializes a new instance of the <see cref="UmbracoConfig"/> class.
         /// </summary>
-        private UmbracoConfig()
+        public UmbracoConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, IRuntimeState runtimeState)
+        {
+            _global = new GlobalSettings();
+
+            var appPluginsDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+            var configDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config));
+
+            _umbraco = new Lazy<IUmbracoSettingsSection>(() => GetConfig<IUmbracoSettingsSection>("umbracoConfiguration/settings"));
+            _dashboards = new Lazy<IDashboardSection>(() =>GetConfig<IDashboardSection>("umbracoConfiguration/dashBoard"));
+            _healthChecks = new Lazy<IHealthChecks>(() => GetConfig<IHealthChecks>("umbracoConfiguration/HealthChecks"));
+            _grids = new Lazy<IGridConfig>(() => new GridConfig(logger, runtimeCache, appPluginsDir, configDir, runtimeState.Debug));
+        }
+
+        /// <summary>
+        /// Gets a typed and named config section.
+        /// </summary>
+        /// <typeparam name="TConfig">The type of the configuration section.</typeparam>
+        /// <param name="sectionName">The name of the configuration section.</param>
+        /// <returns>The configuration section.</returns>
+        public static TConfig GetConfig<TConfig>(string sectionName)
+            where TConfig : class
         {
             // note: need to use SafeCallContext here because ConfigurationManager.GetSection ends up getting AppDomain.Evidence
             // which will want to serialize the call context including anything that is in there - what a mess!
 
-            if (_umbracoSettings == null)
+            using (new SafeCallContext())
             {
-                IUmbracoSettingsSection umbracoSettings;
-                using (new SafeCallContext())
-                {
-                    umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
-                }
-                SetUmbracoSettings(umbracoSettings);
-            }
-
-            if (_dashboardSection == null)
-            {
-                IDashboardSection dashboardConfig;
-                using (new SafeCallContext())
-                {
-                    dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;
-                }
-                SetDashboardSettings(dashboardConfig);
-            }
-
-            if (_healthChecks == null)
-            {
-                var healthCheckConfig = ConfigurationManager.GetSection("umbracoConfiguration/HealthChecks") as IHealthChecks;
-                SetHealthCheckSettings(healthCheckConfig);
-            }
-        }
-
-        /// <summary>
-        /// Constructor - can be used for testing
-        /// </summary>
-        /// <param name="umbracoSettings"></param>
-        /// <param name="dashboardSettings"></param>
-        /// <param name="healthChecks"></param>
-        /// <param name="globalSettings"></param>
-        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IDashboardSection dashboardSettings, IHealthChecks healthChecks, IGlobalSettings globalSettings)
-        {
-            SetHealthCheckSettings(healthChecks);
-            SetUmbracoSettings(umbracoSettings);
-            SetDashboardSettings(dashboardSettings);
-            SetGlobalConfig(globalSettings);
-        }
-
-        private IHealthChecks _healthChecks;
-        private IDashboardSection _dashboardSection;
-        private IUmbracoSettingsSection _umbracoSettings;
-        private IGridConfig _gridConfig;
-        private IGlobalSettings _globalSettings;
-
-        /// <summary>
-        /// Gets the IHealthCheck config
-        /// </summary>
-        public IHealthChecks HealthCheck()
-        {
-            if (_healthChecks == null)
-            {
-                var ex = new ConfigurationErrorsException("Could not load the " + typeof(IHealthChecks) + " from config file, ensure the web.config and healthchecks.config files are formatted correctly");
+                if ((ConfigurationManager.GetSection(sectionName) is TConfig config))
+                    return config;
+                var ex = new ConfigurationErrorsException($"Could not get configuration section \"{sectionName}\" from config files.");
                 Current.Logger.Error<UmbracoConfig>(ex, "Config error");
                 throw ex;
             }
-
-            return _healthChecks;
         }
 
         /// <summary>
-        /// Gets the IDashboardSection
+        /// Gets the global configuration.
         /// </summary>
-        public IDashboardSection DashboardSettings()
-        {
-            if (_dashboardSection == null)
-            {
-                var ex = new ConfigurationErrorsException("Could not load the " + typeof(IDashboardSection) + " from config file, ensure the web.config and Dashboard.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
-                throw ex;
-            }
-
-            return _dashboardSection;
-        }
+        public IGlobalSettings Global()
+            => _global;
 
         /// <summary>
-        /// Only for testing
+        /// Gets the Umbraco configuration.
         /// </summary>
-        /// <param name="value"></param>
-        public void SetDashboardSettings(IDashboardSection value)
-        {
-            _dashboardSection = value;
-        }
+        public IUmbracoSettingsSection Umbraco()
+            => _umbraco.Value;
 
         /// <summary>
-        /// Only for testing
+        /// Gets the dashboards configuration.
         /// </summary>
-        /// <param name="value"></param>
-        public void SetHealthCheckSettings(IHealthChecks value)
-        {
-            _healthChecks = value;
-        }
+        public IDashboardSection Dashboards()
+            => _dashboards.Value;
 
         /// <summary>
-        /// Only for testing
+        /// Gets the health checks configuration.
         /// </summary>
-        /// <param name="value"></param>
-        public void SetUmbracoSettings(IUmbracoSettingsSection value)
-        {
-            _umbracoSettings = value;
-        }
+        public IHealthChecks HealthChecks()
+            => _healthChecks.Value;
 
         /// <summary>
-        /// Only for testing
+        /// Gets the grids configuration.
         /// </summary>
-        /// <param name="value"></param>
+        public IGridConfig Grids()
+            => _grids.Value;
+
+        /// <summary>
+        /// Sets the global configuration, for tests only.
+        /// </summary>
         public void SetGlobalConfig(IGlobalSettings value)
         {
-            _globalSettings = value;
+            _global = value;
         }
 
         /// <summary>
-        /// Gets the IGlobalSettings
+        /// Sets the Umbraco configuration, for tests only.
         /// </summary>
-        public IGlobalSettings GlobalSettings()
+        public void SetUmbracoConfig(IUmbracoSettingsSection value)
         {
-            return _globalSettings ?? (_globalSettings = new GlobalSettings());
+            _umbraco = new Lazy<IUmbracoSettingsSection>(() => value);
         }
 
         /// <summary>
-        /// Gets the IUmbracoSettings
-        /// </summary>
-        public IUmbracoSettingsSection UmbracoSettings()
-        {
-            if (_umbracoSettings == null)
-            {
-                var ex = new ConfigurationErrorsException("Could not load the " + typeof (IUmbracoSettingsSection) + " from config file, ensure the web.config and umbracoSettings.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
-                throw ex;
-            }
-
-            return _umbracoSettings;
-        }
-
-        /// <summary>
-        /// Only for testing
+        /// Sets the dashboards configuration, for tests only.
         /// </summary>
         /// <param name="value"></param>
-        public void SetGridConfig(IGridConfig value)
+        public void SetDashboardsConfig(IDashboardSection value)
         {
-            _gridConfig = value;
+            _dashboards = new Lazy<IDashboardSection>(() => value);
         }
 
         /// <summary>
-        /// Gets the IGridConfig
+        /// Sets the health checks configuration, for tests only.
         /// </summary>
-        public IGridConfig GridConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
+        public void SetHealthChecksConfig(IHealthChecks value)
         {
-            if (_gridConfig == null)
-            {
-                _gridConfig = new GridConfig(logger, runtimeCache, appPlugins, configFolder, isDebug);
-            }
+            _healthChecks = new Lazy<IHealthChecks>(() => value);
+        }
 
-            return _gridConfig;
+        /// <summary>
+        /// Sets the grids configuration, for tests only.
+        /// </summary>
+        public void SetGridsConfig(IGridConfig value)
+        {
+            _grids = new Lazy<IGridConfig>(() => value);
         }
 
         //TODO: Add other configurations here !

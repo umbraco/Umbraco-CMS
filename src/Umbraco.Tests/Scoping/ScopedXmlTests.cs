@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Xml;
 using Moq;
 using NUnit.Framework;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -34,10 +33,10 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // fixme - and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
         [TearDown]
@@ -65,7 +64,7 @@ namespace Umbraco.Tests.Scoping
         //  xmlStore.Xml - the actual main xml document
         //  publishedContentCache.GetXml() - the captured xml
 
-        private static XmlStore XmlStore => (Current.Container.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
+        private static XmlStore XmlStore => (Current.Factory.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
         private static XmlDocument XmlMaster => XmlStore.Xml;
         private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
 

@@ -90,7 +90,7 @@ namespace Umbraco.Web.UI.Pages
             //If this is not a back office request, then the module won't have authenticated it, in this case we
             // need to do the auth manually and since this is an UmbracoEnsuredPage, this is the anticipated behavior
             // TODO: When we implement Identity, this process might not work anymore, will be an interesting challenge
-            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, UmbracoConfig.For.GlobalSettings()) == false)
+            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, Current.Config.Global()) == false)
             {
                 var http = new HttpContextWrapper(Context);
                 var ticket = http.GetUmbracoAuthTicket();
