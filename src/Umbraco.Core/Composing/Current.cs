@@ -61,9 +61,14 @@ namespace Umbraco.Core.Composing
 
         internal static bool HasFactory => _factory != null;
 
-        // for UNIT TESTS exclusively!
-        // resets *everything* that is 'current'
-        internal static void Reset()
+        /// <summary>
+        /// Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.
+        /// </summary>
+        /// <remarks>
+        /// <para>For UNIT TESTS exclusively.</para>
+        /// <para>Resets everything that is 'current'.</para>
+        /// </remarks>
+        public static void Reset()
         {
             _factory.DisposeIfDisposable();
             _factory = null;
@@ -78,10 +83,15 @@ namespace Umbraco.Core.Composing
             Resetted?.Invoke(null, EventArgs.Empty);
         }
 
-        // for UNIT TESTS exclusively!
-        // unlocks configuration, so it is possible to add configurations
-        // to Current.Configs - without having to use composition.Configs
-        internal static void UnlockConfigs()
+        /// <summary>
+        /// Unlocks <see cref="Configs"/>. Intended for testing only, and not supported in production code.
+        /// </summary>
+        /// <remarks>
+        /// <para>For UNIT TESTS exclusively.</para>
+        /// <para>Unlocks <see cref="Configs"/> so that it is possible to add configurations
+        /// directly to <see cref="Current"/> without having to wire composition.</para>
+        /// </remarks>
+        public static void UnlockConfigs()
         {
             if (_factory != null)
                 throw new InvalidOperationException("Cannot unlock configs when a factory has been set.");
