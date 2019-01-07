@@ -1553,8 +1553,7 @@ namespace Umbraco.Core.Services.Implement
                 var design = templateElement.Element("Design").Value;
                 var masterElement = templateElement.Element("Master");
 
-                var isMasterPage = IsMasterPageSyntax(design);
-                var path = isMasterPage ? MasterpagePath(alias) : ViewPath(alias);
+                var path = ViewPath(alias);
 
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
                 var template = existingTemplate ?? new Template(templateName, alias);
@@ -1598,14 +1597,6 @@ namespace Umbraco.Core.Services.Implement
                 ImportingStylesheets.RaiseEvent(new ImportEventArgs<IFile>(styleSheets, element, false), this);
 
             return styleSheets;
-
-        }
-
-
-        private bool IsMasterPageSyntax(string code)
-        {
-            return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
-                code.InvariantContains("<umbraco:Item") || code.InvariantContains("<asp:") || code.InvariantContains("<umbraco:Macro");
         }
 
         private string ViewPath(string alias)

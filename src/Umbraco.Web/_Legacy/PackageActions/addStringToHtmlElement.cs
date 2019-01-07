@@ -92,9 +92,9 @@ namespace Umbraco.Web._Legacy.PackageActions
 
                     //making sure that the template xml has a root node...
                     if (string.IsNullOrWhiteSpace(tmp.MasterTemplateAlias) == false)
-                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, "<root>" + design + "</root>", true));
+                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, "<root>" + design + "</root>", true));
                     else
-                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, design, true));
+                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, design, true));
 
                     XmlNode xmlElement = templateXml.SelectSingleNode("//* [@id = '" + htmlElementId + "']");
 
@@ -103,15 +103,15 @@ namespace Umbraco.Web._Legacy.PackageActions
 
                         if (position == "beginning")
                         {
-                            xmlElement.InnerXml = "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, value, true) + "\n" + xmlElement.InnerXml;
+                            xmlElement.InnerXml = "\n" + PackageHelper.ParseToValidXml(tmp, value, true) + "\n" + xmlElement.InnerXml;
                         }
                         else
                         {
-                            xmlElement.InnerXml = xmlElement.InnerXml + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, value, true) + "\n";
+                            xmlElement.InnerXml = xmlElement.InnerXml + "\n" + PackageHelper.ParseToValidXml(tmp, value, true) + "\n";
                         }
                     }
 
-                    tmp.Content = directive + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, templateXml.OuterXml, false);
+                    tmp.Content = directive + "\n" + PackageHelper.ParseToValidXml(tmp, templateXml.OuterXml, false);
                     Current.Services.FileService.SaveTemplate(tmp);
                 }
                 catch (Exception ex)
@@ -145,9 +145,9 @@ namespace Umbraco.Web._Legacy.PackageActions
 
                     //making sure that the template xml has a root node...
                     if (string.IsNullOrWhiteSpace(tmp.MasterTemplateAlias) == false)
-                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, "<root>" + design + "</root>", true));
+                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, "<root>" + design + "</root>", true));
                     else
-                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, design, true));
+                        templateXml.LoadXml(PackageHelper.ParseToValidXml(tmp, design, true));
 
                     XmlNode xmlElement = templateXml.SelectSingleNode("//* [@id = '" + htmlElementId + "']");
 
@@ -155,11 +155,11 @@ namespace Umbraco.Web._Legacy.PackageActions
 
                     if (xmlElement != null)
                     {
-                        string repValue = PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, value, true);
+                        string repValue = PackageHelper.ParseToValidXml(tmp, value, true);
                         xmlElement.InnerXml = xmlElement.InnerXml.Replace(repValue, "");
                     }
 
-                    tmp.Content = directive + "\n" + PackageHelper.ParseToValidXml(tmp, ref hasAspNetContentBeginning, templateXml.OuterXml, false);
+                    tmp.Content = directive + "\n" + PackageHelper.ParseToValidXml(tmp, templateXml.OuterXml, false);
                     Current.Services.FileService.SaveTemplate(tmp);
                 }
                 catch (Exception ex)
