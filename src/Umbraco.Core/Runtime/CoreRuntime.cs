@@ -146,8 +146,9 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
-                // create the components
+                // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
+                _components.Initialize();
             }
             catch (Exception e)
             {

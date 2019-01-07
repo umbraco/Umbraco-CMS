@@ -24,11 +24,11 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
 
-        private readonly BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
-        private readonly BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
 
         private bool _started;
         private object _locker = new object();
@@ -47,16 +47,24 @@ namespace Umbraco.Web.Scheduling
 
             _healthChecks = healthChecks;
             _notifications = notifications;
+        }
 
+        public void Initialize()
+        { 
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", logger);
-            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", logger);
-            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", logger);
-            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", logger);
-            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", logger);
+            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger);
+            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger);
+            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", _logger);
+            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger);
+            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger);
 
             // we will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
+        }
+
+        public void Terminate()
+        {
+            // the appdomain / maindom / whatever takes care of stopping background task runners
         }
 
         private void RegisterBackgroundTasksOnce(object sender, RoutableAttemptEventArgs e)

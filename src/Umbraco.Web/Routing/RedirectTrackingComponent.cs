@@ -69,8 +69,7 @@ namespace Umbraco.Web.Redirects
             }
         }
 
-        public RedirectTrackingComponent()
-        //protected void Initialize(ContentFinderCollectionBuilder contentFinderCollectionBuilder)
+        public void Initialize()
         {
             // don't let the event handlers kick in if Redirect Tracking is turned off in the config
             if (UmbracoConfig.GetConfig<IUmbracoSettingsSection>("umbracoConfiguration/settings").WebRouting.DisableRedirectUrlTracking) return;
@@ -102,6 +101,9 @@ namespace Umbraco.Web.Redirects
 
             // rolled back items have to be published, so publishing will take care of that
         }
+
+        public void Terminate()
+        { }
 
         private static void ContentCacheRefresher_CacheUpdated(ContentCacheRefresher sender,
             CacheRefresherEventArgs args)

@@ -191,8 +191,7 @@ namespace Umbraco.Tests.Runtimes
         {
             // test flags
             public static bool Ctored;
-            public static bool Initialized1;
-            public static bool Initialized2;
+            public static bool Initialized;
             public static bool Terminated;
             public static IProfilingLogger ProfilingLogger;
 
@@ -200,7 +199,7 @@ namespace Umbraco.Tests.Runtimes
 
             public static void Reset()
             {
-                Ctored = Initialized1 = Initialized2 = Terminated = false;
+                Ctored = Initialized = Terminated = false;
                 ProfilingLogger = null;
             }
 
@@ -210,10 +209,19 @@ namespace Umbraco.Tests.Runtimes
                 ProfilingLogger = proflog;
             }
 
+            public void Initialize()
+            {
+                Initialized = true;
+            }
+
+            public void Terminate()
+            {
+                Terminated = true;
+            }
+
             public void Dispose()
             {
                 Disposed = true;
-                Terminated = true;
             }
         }
     }
