@@ -5,12 +5,9 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
