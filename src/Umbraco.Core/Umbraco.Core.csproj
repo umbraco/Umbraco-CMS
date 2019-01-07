@@ -606,7 +606,6 @@
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />
-    <Compile Include="IO\MasterPageHelper.cs" />
     <Compile Include="IO\MediaFileSystem.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
