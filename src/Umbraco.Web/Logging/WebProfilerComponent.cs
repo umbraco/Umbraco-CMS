@@ -6,20 +6,11 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Logging
 {
-    internal class WebProfilerComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    internal sealed class WebProfilerComponent : IComponent
     {
-        // the profiler is too important to be composed in a component,
-        // it is composed first thing in WebRuntime.Compose - this component
-        // only initializes it if needed.
-        //
-        //public override void Compose(Composition Composition)
-        //{
-        //    composition.Container.RegisterSingleton<IProfiler, WebProfiler>();
-        //}
+        private readonly WebProfiler _profiler;
 
-        private WebProfiler _profiler;
-
-        public void Initialize(IProfiler profiler, ILogger logger, IRuntimeState runtime)
+        public WebProfilerComponent(IProfiler profiler, ILogger logger, IRuntimeState runtime)
         {
             // although registered in WebRuntime.Compose, ensure that we have not
             // been replaced by another component, and we are still "the" profiler

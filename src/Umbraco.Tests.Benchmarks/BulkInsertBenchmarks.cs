@@ -4,18 +4,12 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Tests.TestHelpers;
@@ -34,13 +28,11 @@ namespace Umbraco.Tests.Benchmarks
         {
             IScopeProvider f = null;
             var l = new Lazy<IScopeProvider>(() => f);
-            var p = new SqlServerSyntaxProvider(l);
             var factory = new UmbracoDatabaseFactory(
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
                 Constants.DatabaseProviders.SqlServer,
-                new [] { p },
                 logger,
-                new MapperCollection(Enumerable.Empty<BaseMapper>()));
+                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             return factory.CreateDatabase();
         }
 
@@ -49,9 +41,8 @@ namespace Umbraco.Tests.Benchmarks
             var f = new UmbracoDatabaseFactory(
                 cstr,
                 Constants.DatabaseProviders.SqlCe,
-                new[] { new SqlCeSyntaxProvider() },
                 logger,
-                new MapperCollection(Enumerable.Empty<BaseMapper>()));
+                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             return f.CreateDatabase();
         }
 

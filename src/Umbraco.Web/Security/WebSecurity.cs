@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Security;
 using System.Web;
-using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Web.Composing;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Security
 {
@@ -57,7 +53,7 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            var helper = new MembershipHelper(Current.UmbracoContext);
+            var helper = Current.Factory.GetInstance<MembershipHelper>();
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 
@@ -288,7 +284,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsAuthenticated()
         {
-            return _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
+            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
         }
 
         protected override void DisposeResources()

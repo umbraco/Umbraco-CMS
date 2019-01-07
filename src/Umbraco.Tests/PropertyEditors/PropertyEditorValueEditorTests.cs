@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Threading;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -22,10 +24,13 @@ namespace Umbraco.Tests.PropertyEditors
             //normalize culture
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-            container.Register<IShortStringHelper>(_
+            var register = RegisterFactory.Create();
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+
+            register.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));
+
+            Current.Factory = composition.CreateFactory();
         }
 
         [TearDown]

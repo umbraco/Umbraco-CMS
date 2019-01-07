@@ -1,20 +1,20 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.Components
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class ManifestWatcherComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class ManifestWatcherComponent : IComponent, IDisposable
     {
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public void Initialize(IRuntimeState runtime, ILogger logger)
+        public ManifestWatcherComponent(IRuntimeState runtimeState, ILogger logger)
         {
-            if (runtime.Debug == false) return;
+            if (runtimeState.Debug == false) return;
 
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
             //    return;
@@ -26,9 +26,11 @@ namespace Umbraco.Core.Components
             _mw.Start(Directory.GetDirectories(appPlugins));
         }
 
-        public override void Terminate()
+        public void Dispose()
         {
-            _mw?.Dispose();
+            if (_mw == null) return;
+
+            _mw.Dispose();
             _mw = null;
         }
     }

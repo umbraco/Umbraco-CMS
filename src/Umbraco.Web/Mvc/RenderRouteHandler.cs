@@ -12,7 +12,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using Current = Umbraco.Web.Composing.Current;
-using LightInject;
 using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Mvc
@@ -31,17 +30,12 @@ namespace Umbraco.Web.Mvc
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UmbracoContext _umbracoContext;
 
-        // fixme - that one could / should accept a PublishedRouter (engine) to work on the PublishedRequest (published content request)
         public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
         }
 
-        // fixme - what about that one?
-        // called by TemplateRenderer - which is created in
-        //   library - could get an engine without problem it's all ugly anyways
-        //   UmbracoComponentRenderer - ?? that one is not so obvious
         public RenderRouteHandler(UmbracoContext umbracoContext, IControllerFactory controllerFactory)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
@@ -50,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
-        private UmbracoFeatures Features => Current.Container.GetInstance<UmbracoFeatures>(); // fixme inject
+        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // fixme inject
 
         #region IRouteHandler Members
 
@@ -397,8 +391,6 @@ namespace Umbraco.Web.Mvc
             if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
                 && routeDef.HasHijackedRoute == false)
             {
-                // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
-                var engine = Core.Composing.Current.Container.GetInstance<PublishedRouter>();
                 request.UpdateOnMissingTemplate(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
@@ -427,7 +419,7 @@ namespace Umbraco.Web.Mvc
                 routeDef = GetUmbracoRouteDefinition(requestContext, request);
             }
 
-            //no post values, just route to the controller/action requried (local)
+            //no post values, just route to the controller/action required (local)
 
             requestContext.RouteData.Values["controller"] = routeDef.ControllerName;
             if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)
@@ -449,7 +441,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         internal static IHttpHandler GetWebFormsHandler()
         {
-            return (global::umbraco.UmbracoDefault)BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+            return (umbraco.UmbracoDefault) BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(umbraco.UmbracoDefault));
         }
 
         private SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext, string controllerName)

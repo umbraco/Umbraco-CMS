@@ -5,14 +5,13 @@ using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using Umbraco.Web.Security;
-using LightInject;
 
 namespace Umbraco.Web
 {
@@ -102,21 +101,21 @@ namespace Umbraco.Web
         /// <para>If an actual current UmbracoContext is already present, the disposable object is null and this method does nothing.</para>
         /// <para>Otherwise, a temporary, dummy UmbracoContext is created and registered in the accessor. And disposed and removed from the accessor.</para>
         /// </remarks>
-        internal static IDisposable EnsureContext() // keep this internal for now!
+        internal static IDisposable EnsureContext(HttpContextBase httpContext = null) // keep this internal for now!
         {
             if (Composing.Current.UmbracoContext != null) return null;
 
-            var httpContext = new HttpContextWrapper(System.Web.HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
+            httpContext = httpContext ?? new HttpContextWrapper(System.Web.HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
 
             return EnsureContext(
                 Composing.Current.UmbracoContextAccessor,
                 httpContext,
                 Composing.Current.PublishedSnapshotService,
-                new WebSecurity(httpContext, Composing.Current.Services.UserService, UmbracoConfig.For.GlobalSettings()),
-                UmbracoConfig.For.UmbracoSettings(),
+                new WebSecurity(httpContext, Composing.Current.Services.UserService, Composing.Current.Config.Global()),
+                Composing.Current.Config.Umbraco(),
                 Composing.Current.UrlProviders,
-                UmbracoConfig.For.GlobalSettings(),
-                Composing.Current.Container.GetInstance<IVariationContextAccessor>(),
+                Composing.Current.Config.Global(),
+                Composing.Current.Factory.GetInstance<IVariationContextAccessor>(),
                 true);
 
             // when the context will be disposed, it will be removed from the accessor

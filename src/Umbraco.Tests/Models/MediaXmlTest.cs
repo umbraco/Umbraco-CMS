@@ -29,7 +29,12 @@ namespace Umbraco.Tests.Models
 
             // reference, so static ctor runs, so event handlers register
             // and then, this will reset the width, height... because the file does not exist, of course ;-(
-            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), new MediaFileSystem(Mock.Of<IFileSystem>()), Mock.Of<IContentSection>());
+            var logger = Mock.Of<ILogger>();
+            var scheme = Mock.Of<IMediaPathScheme>();
+            var config = Mock.Of<IContentSection>();
+
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, config);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests

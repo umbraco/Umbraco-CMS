@@ -2,6 +2,10 @@
 using System.Web.Mvc;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -9,6 +13,15 @@ namespace Umbraco.Web.Controllers
 {
     public class UmbRegisterController : SurfaceController
     {
+        // fixme - delete?
+        public UmbRegisterController()
+        {
+        }
+
+        public UmbRegisterController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger) : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+        {
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)

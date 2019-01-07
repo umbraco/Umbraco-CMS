@@ -7,10 +7,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using LightInject;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
@@ -22,6 +20,8 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using System.Reflection;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Services
 {
@@ -31,6 +31,7 @@ namespace Umbraco.Tests.Services
     /// as well as configuration.
     /// </summary>
     [TestFixture]
+    [Category("Slow")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
         PublishedRepositoryEvents = true,
         WithApplication = true,
@@ -56,8 +57,7 @@ namespace Umbraco.Tests.Services
         {
             base.Compose();
 
-            // fixme - do it differently
-            Container.Register(factory => factory.GetInstance<ServiceContext>().TextService);
+            Composition.RegisterUnique(factory => Mock.Of<ILocalizedTextService>());
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Services
                     c.ContentSchedule.Add(now.AddSeconds(5), null); //release in 5 seconds
                     var r = ServiceContext.ContentService.Save(c);
                     Assert.IsTrue(r.Success, r.Result.ToString());
-                }   
+                }
                 else
                 {
                     c.ContentSchedule.Add(null, now.AddSeconds(5)); //expire in 5 seconds
@@ -258,7 +258,7 @@ namespace Umbraco.Tests.Services
                 variant.Add(c);
             }
 
-            
+
             var runSched = ServiceContext.ContentService.PerformScheduledPublish(
                 now.AddMinutes(1)).ToList(); //process anything scheduled before a minute from now
 
@@ -742,7 +742,7 @@ namespace Umbraco.Tests.Services
         public void Can_Unpublish_Content_Variation()
         {
             // Arrange
-            
+
             var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
@@ -1066,7 +1066,7 @@ namespace Umbraco.Tests.Services
                 foreach (var x in descendants)
                     Console.WriteLine("          ".Substring(0, x.Level) + x.Id);
             }
-            
+
             Console.WriteLine();
 
             // publish parent & its branch
@@ -1420,7 +1420,7 @@ namespace Umbraco.Tests.Services
             var descendants = new List<IContent>();
             while(page * pageSize < total)
                 descendants.AddRange(contentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
-            
+
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
             Assert.AreEqual(3, descendants.Count);
@@ -2989,11 +2989,11 @@ namespace Umbraco.Tests.Services
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
-            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(accessor, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, CacheHelper.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper.Disabled, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, CacheHelper.Disabled, Logger);
+            var repository = new DocumentRepository(accessor, CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

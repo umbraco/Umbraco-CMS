@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Examine;
 using Examine.Search;
 using NUnit.Framework;
@@ -11,6 +10,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Composing;
 using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
-            var propertyEditors = Container.GetInstance<PropertyEditorCollection>();
+            var propertyEditors = Factory.GetInstance<PropertyEditorCollection>();
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider.SqlContext, true);
 
             using (var luceneDir = new RandomIdRamDirectory())
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.UmbracoExamine
             {
                 indexer.CreateIndex();
                 rebuilder.Populate(indexer);
-                
+
                 var searcher = indexer.GetSearcher();
 
                 var numberSortedCriteria = searcher.CreateQuery()

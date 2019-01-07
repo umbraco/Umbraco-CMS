@@ -112,7 +112,7 @@ namespace Umbraco.Core.Models.PublishedContent
             if (ctor != null) return ctor();
 
             var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
-            ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstuctor<Func<IList>>(declaring: listType);
+            ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
             return ctor();
         }
 

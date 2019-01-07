@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Globalization;
-using LightInject;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
 using Umbraco.Web;
@@ -68,14 +70,18 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                var container = new ServiceContainer();
-                container.ConfigureUmbracoCore();
-                container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+                var container = RegisterFactory.Create();
+                var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
-                container.Register<ILogger, PerContainerLifetime>(f => Mock.Of<ILogger>());
-                container.Register<IContentSection, PerContainerLifetime>(f => Mock.Of<IContentSection>());
-                container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
-                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
+                composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+
+                Current.Factory = composition.CreateFactory();
+
+                var logger = Mock.Of<ILogger>();
+                var scheme = Mock.Of<IMediaPathScheme>();
+                var config = Mock.Of<IContentSection>();
+
+                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
                     new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>())) { Id = 1 });

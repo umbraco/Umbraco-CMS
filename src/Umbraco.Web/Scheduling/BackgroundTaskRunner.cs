@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using LightInject;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Scheduling
 
             public static MainDomHook Create(Action install, Action release)
             {
-                return new MainDomHook(Core.Composing.Current.Container.GetInstance<MainDom>(), install, release);
+                return new MainDomHook(Core.Composing.Current.Factory.GetInstance<MainDom>(), install, release);
             }
 
             public static MainDomHook CreateForTest(Action install, Action release)

@@ -318,25 +318,25 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
+                            string.Join(",", Current.Config.Umbraco().Content.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            string.Join(",", Current.Config.Umbraco().Content.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles)
+                            string.Join(",", Current.Config.Umbraco().Content.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", Current.Config.Umbraco().Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", Current.Config.Umbraco().Security.UsernameIsEmail},
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
-                        {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
+                        {"allowPasswordReset", Current.Config.Umbraco().Security.AllowPasswordReset},
+                        {"loginBackgroundImage",  Current.Config.Umbraco().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                     }

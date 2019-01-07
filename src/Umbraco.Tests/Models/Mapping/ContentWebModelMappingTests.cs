@@ -12,7 +12,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -26,7 +25,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             base.Compose();
 
-            Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
+            Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
         }
 
         [DataEditor("Test.Test", "Test", "~/Test.html")]
@@ -158,7 +157,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertBasicProperty(invariantContent, p);
                 AssertDisplayProperty(invariantContent, p);
             }
-            
+
             Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count());
         }
 

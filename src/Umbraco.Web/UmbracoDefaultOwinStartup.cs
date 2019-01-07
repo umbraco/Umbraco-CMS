@@ -24,8 +24,8 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected IGlobalSettings GlobalSettings => UmbracoConfig.For.GlobalSettings();
-        protected IUmbracoSettingsSection UmbracoSettings => UmbracoConfig.For.UmbracoSettings();
+        protected IGlobalSettings GlobalSettings => Current.Config.Global();
+        protected IUmbracoSettingsSection UmbracoSettings => Current.Config.Umbraco();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
 
@@ -63,7 +63,7 @@ namespace Umbraco.Web
         protected virtual void ConfigureMiddleware(IAppBuilder app)
         {
 
-            // Configure OWIN for authentication. 
+            // Configure OWIN for authentication.
             ConfigureUmbracoAuthentication(app);
 
             app

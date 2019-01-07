@@ -105,7 +105,7 @@ namespace Umbraco.Core.Models
             }
 
             //use the custom avatar
-            var avatarUrl = Current.FileSystems.MediaFileSystem.GetUrl(user.Avatar);
+            var avatarUrl = Current.MediaFileSystem.GetUrl(user.Avatar);
             return new[]
             {
                 avatarUrl  + "?width=30&height=30&mode=crop",

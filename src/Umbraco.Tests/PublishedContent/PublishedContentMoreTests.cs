@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Core;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent

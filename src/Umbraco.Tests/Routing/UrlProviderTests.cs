@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -23,7 +25,7 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         private IUmbracoSettingsSection _umbracoSettings;

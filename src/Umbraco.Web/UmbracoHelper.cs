@@ -10,9 +10,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
@@ -124,7 +125,7 @@ namespace Umbraco.Web
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
+            ?? (_membershipHelper = Current.Factory.GetInstance<MembershipHelper>());
 
         /// <summary>
         /// Gets the url provider.

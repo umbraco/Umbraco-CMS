@@ -1,9 +1,10 @@
-﻿using System;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Routing
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         private void SetDomains1()
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.ConfigureSettings(globalSettings.Object);
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
-            var publishedRouter = CreatePublishedRouter(Container);
+            var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // lookup domain
@@ -319,7 +320,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.ConfigureSettings(globalSettings.Object);
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
-            var publishedRouter = CreatePublishedRouter(Container);
+            var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // lookup domain
@@ -374,7 +375,7 @@ namespace Umbraco.Tests.Routing
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
             SettingsForTests.ConfigureSettings(globalSettings.Object);
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
-            var publishedRouter = CreatePublishedRouter(Container);
+            var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // lookup domain

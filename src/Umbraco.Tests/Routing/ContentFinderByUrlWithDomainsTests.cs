@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
             
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettingsMock.Object);
-            var publishedRouter = CreatePublishedRouter(Container);
+            var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // must lookup domain else lookup by url fails
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettingsMock.Object);
-            var publishedRouter = CreatePublishedRouter(Container);
+            var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // must lookup domain else lookup by url fails

@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Membership
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = UmbracoConfig.For.GlobalSettings().DefaultUILanguage; //fixme inject somehow?
+            _language = Current.Config.Global().DefaultUILanguage; //fixme inject somehow?
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -453,7 +453,7 @@ namespace Umbraco.Core.Models.Membership
             base.PerformDeepClone(clone);
 
             var clonedEntity = (User)clone;
-            
+
             //manually clone the start node props
             clonedEntity._startContentIds = _startContentIds.ToArray();
             clonedEntity._startMediaIds = _startMediaIds.ToArray();
@@ -483,7 +483,7 @@ namespace Umbraco.Core.Models.Membership
             //need to create new collections otherwise they'll get copied by ref
             clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
             clonedEntity._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
-            
+
         }
 
         /// <summary>
