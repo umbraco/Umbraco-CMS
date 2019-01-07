@@ -55,77 +55,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Add_MasterPage_Detect_Content()
-        {
-            // Arrange
-            using (ScopeProvider.CreateScope())
-            {
-                var repository = CreateRepository(ScopeProvider);
-
-                // Act
-                var template = new Template("test", "test")
-                {
-                    Content = @"<%@ Master Language=""C#"" %>"
-                };
-                repository.Save(template);
-
-                //Assert
-                Assert.That(repository.Get("test"), Is.Not.Null);
-                Assert.That(_fileSystems.MasterPagesFileSystem.FileExists("test.master"), Is.True);
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Add_MasterPage_With_Default_Content()
-        {
-            // Arrange
-            using (ScopeProvider.CreateScope())
-            {
-                var repository = CreateRepository(ScopeProvider, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
-
-                // Act
-                var template = new Template("test", "test");
-                repository.Save(template);
-
-                //Assert
-                Assert.That(repository.Get("test"), Is.Not.Null);
-                Assert.That(_fileSystems.MasterPagesFileSystem.FileExists("test.master"), Is.True);
-                Assert.AreEqual(@"<%@ Master Language=""C#"" MasterPageFile=""~/umbraco/masterpages/default.master"" AutoEventWireup=""true"" %>
-
-<asp:Content ContentPlaceHolderID=""ContentPlaceHolderDefault"" runat=""server"">
-
-</asp:Content>
-".StripWhitespace(), template.Content.StripWhitespace());
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Add_MasterPage_With_Default_Content_With_Parent()
-        {
-            // Arrange
-            using (ScopeProvider.CreateScope())
-            {
-                var repository = CreateRepository(ScopeProvider, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
-
-                //NOTE: This has to be persisted first
-                var template = new Template("test", "test");
-                repository.Save(template);
-
-                // Act
-                var template2 = new Template("test2", "test2");
-                template2.SetMasterTemplate(template);
-                repository.Save(template2);
-
-                //Assert
-                Assert.That(repository.Get("test2"), Is.Not.Null);
-                Assert.That(_fileSystems.MasterPagesFileSystem.FileExists("test2.master"), Is.True);
-                Assert.AreEqual(@"<%@ Master Language=""C#"" MasterPageFile=""~/masterpages/test.master"" AutoEventWireup=""true"" %>
-
-".StripWhitespace(), template2.Content.StripWhitespace());
-            }
-        }
-
-        [Test]
         public void Can_Perform_Add_View()
         {
             // Arrange
@@ -252,32 +181,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Update_MasterPage()
-        {
-            // Arrange
-            using (ScopeProvider.CreateScope())
-            {
-                var repository = CreateRepository(ScopeProvider);
-
-                // Act
-                var template = new Template("test", "test")
-                {
-                    Content = @"<%@ Master Language=""C#"" %>"
-                };
-                repository.Save(template);
-
-                template.Content = @"<%@ Master Language=""VB"" %>";
-                repository.Save(template);
-
-                var updated = repository.Get("test");
-
-                // Assert
-                Assert.That(_fileSystems.MasterPagesFileSystem.FileExists("test.master"), Is.True);
-                Assert.That(updated.Content, Is.EqualTo(@"<%@ Master Language=""VB"" %>"));
-            }
-        }
-
-        [Test]
         public void Can_Perform_Update_View()
         {
             // Arrange
@@ -300,31 +203,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.That(updated.Content, Is.EqualTo(ViewHelper.GetDefaultFileContent() + "<html></html>"));
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Delete_MasterPage()
-        {
-            // Arrange
-            using (ScopeProvider.CreateScope())
-            {
-                var repository = CreateRepository(ScopeProvider);
-
-                var template = new Template("test", "test")
-                {
-                    Content = @"<%@ Master Language=""C#"" %>"
-                };
-                repository.Save(template);
-
-                // Act
-                var templates = repository.Get("test");
-                Assert.That(_fileSystems.MasterPagesFileSystem.FileExists("test.master"), Is.True);
-                repository.Delete(templates);
-
-                // Assert
-                Assert.IsNull(repository.Get("test"));
-                Assert.That(_fileSystems.MasterPagesFileSystem.FileExists("test.master"), Is.False);
             }
         }
 
@@ -649,11 +527,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             _fileSystems  = null;
 
             //Delete all files
-            var fsMaster = new PhysicalFileSystem(SystemDirectories.Masterpages);
-            var masterPages = fsMaster.GetFiles("", "*.master");
-            foreach (var file in masterPages)
-                fsMaster.DeleteFile(file);
-
             var fsViews = new PhysicalFileSystem(SystemDirectories.MvcViews);
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)

@@ -387,10 +387,6 @@ namespace Umbraco.Web.Routing
                     alias, new[] { ".cshtml", ".vbhtml" }))
                 return RenderingEngine.Mvc;
 
-            if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages)),
-                    alias, new[] { ".master" }))
-                return RenderingEngine.WebForms;
-
             return RenderingEngine.Unknown;
         }
 

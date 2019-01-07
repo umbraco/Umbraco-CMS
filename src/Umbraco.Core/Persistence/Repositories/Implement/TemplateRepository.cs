@@ -25,7 +25,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IFileSystem _masterpagesFileSystem;
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
-        private readonly MasterPageHelper _masterPageHelper;
 
         public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
@@ -33,7 +32,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _masterpagesFileSystem = fileSystems.MasterPagesFileSystem;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
             _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
         protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy()
@@ -368,27 +366,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     template.VirtualPath = _viewsFileSystem.GetUrl(path);
                     return;
                 }
-                path = string.Concat(template.Alias, ".master");
-                if (_masterpagesFileSystem.FileExists(path))
-                {
-                    template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
-                    return;
-                }
             }
             else
             {
                 // we know the path already
-                var ext = Path.GetExtension(path);
-                switch (ext)
-                {
-                    case ".cshtml":
-                    case ".vbhtml":
-                        template.VirtualPath = _viewsFileSystem.GetUrl(path);
-                        return;
-                    case ".master":
-                        template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
-                        return;
-                }
+                template.VirtualPath = _viewsFileSystem.GetUrl(path);
             }
 
             template.VirtualPath = string.Empty; // file not found...
@@ -406,25 +388,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 path = string.Concat(template.Alias, ".vbhtml");
                 if (_viewsFileSystem.FileExists(path))
                     return GetFileContent(template, _viewsFileSystem, path, init);
-                path = string.Concat(template.Alias, ".master");
-                if (_masterpagesFileSystem.FileExists(path))
-                    return GetFileContent(template, _masterpagesFileSystem, path, init);
             }
             else
             {
                 // we know the path already
-                var ext = Path.GetExtension(path);
-                switch (ext)
-                {
-                    case ".cshtml":
-                    case ".vbhtml":
-                        return GetFileContent(template, _viewsFileSystem, path, init);
-                    case ".master":
-                        return GetFileContent(template, _masterpagesFileSystem, path, init);
-                }
+                return GetFileContent(template, _viewsFileSystem, path, init);
             }
 
             template.VirtualPath = string.Empty; // file not found...
+
             return string.Empty;
         }
 
@@ -493,9 +465,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 case ".cshtml":
                 case ".vbhtml":
                     fs = _viewsFileSystem;
-                    break;
-                case ".master":
-                    fs = _masterpagesFileSystem;
                     break;
                 default:
                     throw new Exception("Unsupported extension " + ext + ".");
