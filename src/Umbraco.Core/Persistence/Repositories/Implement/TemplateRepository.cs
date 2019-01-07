@@ -22,14 +22,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
-        private readonly IFileSystem _masterpagesFileSystem;
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
 
         public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
         {
-            _masterpagesFileSystem = fileSystems.MasterPagesFileSystem;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
             _viewHelper = new ViewHelper(_viewsFileSystem);
         }

@@ -14,10 +14,6 @@ namespace Umbraco.Core.IO
 
         public static string Install => "~/install";
 
-        //fixme: remove this
-        [Obsolete("Master pages are obsolete and code should be removed")]
-        public static string Masterpages => "~/masterpages";
-
         public static string AppCode => "~/App_Code";
 
         public static string AppPlugins => "~/App_Plugins";

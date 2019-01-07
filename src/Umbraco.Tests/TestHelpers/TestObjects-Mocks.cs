@@ -145,8 +145,7 @@ namespace Umbraco.Tests.TestHelpers
         public IFileSystems GetFileSystemsMock()
         {
             var fileSystems = Mock.Of<IFileSystems>();
-
-            MockFs(fileSystems, x => x.MasterPagesFileSystem);
+            
             MockFs(fileSystems, x => x.MacroPartialsFileSystem);
             MockFs(fileSystems, x => x.MvcViewsFileSystem);
             MockFs(fileSystems, x => x.PartialViewsFileSystem);

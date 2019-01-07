@@ -35,8 +35,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            var masterPageFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
-            Mock.Get(_fileSystems).Setup(x => x.MasterPagesFileSystem).Returns(masterPageFileSystem);
             var viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
             Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
         }
