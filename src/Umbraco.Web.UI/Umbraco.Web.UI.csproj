@@ -95,8 +95,8 @@
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
-    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.10.0">
       <PrivateAssets>all</PrivateAssets>
       <!-- development dependency -->
     </PackageReference>
