@@ -19,4 +19,4 @@ using System.Resources;
 
 // these are FYI and changed automatically
 [assembly: AssemblyFileVersion("8.0.0")]
-[assembly: AssemblyInformationalVersion("8.0.0-alpha.56")]
+[assembly: AssemblyInformationalVersion("8.0.0-alpha.57")]
