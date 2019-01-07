@@ -94,13 +94,13 @@ namespace Umbraco.Examine
         /// <remarks>
         /// This check is required since the base examine lib will try to rebuild on startup
         /// </remarks>
-        protected override void PerformDeleteFromIndex(string nodeId, Action<IndexOperationEventArgs> onComplete)
+        protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs> onComplete)
         {
             if (CanInitialize())
             {
                 using (new SafeCallContext())
                 {
-                    base.PerformDeleteFromIndex(nodeId, onComplete);
+                    base.PerformDeleteFromIndex(itemIds, onComplete);
                 }
             }
         }

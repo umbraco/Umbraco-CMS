@@ -92,8 +92,8 @@ namespace Umbraco.Examine
                     //these are the invalid items so we'll delete them
                     //since the path is not valid we need to delete this item in case it exists in the index already and has now
                     //been moved to an invalid parent.
-                    foreach (var i in group)
-                        base.PerformDeleteFromIndex(i.Id, args => { /*noop*/ });
+
+                    base.PerformDeleteFromIndex(group.Select(x => x.Id), args => { /*noop*/ });
                 }
                 else
                 {
@@ -118,24 +118,28 @@ namespace Umbraco.Examine
         /// When a content node is deleted, we also need to delete it's children from the index so we need to perform a
         /// custom Lucene search to find all decendents and create Delete item queues for them too.
         /// </remarks>
-        /// <param name="nodeId">ID of the node to delete</param>
+        /// <param name="itemIds">ID of the node to delete</param>
         /// <param name="onComplete"></param>
-        protected override void PerformDeleteFromIndex(string nodeId, Action<IndexOperationEventArgs> onComplete)
+        protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs> onComplete)
         {
-            //find all descendants based on path
-            var descendantPath = $@"\-1\,*{nodeId}\,*";
-            var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
-            var searcher = GetSearcher();
-            var c = searcher.CreateQuery();
-            var filtered = c.NativeQuery(rawQuery);
-            var results = filtered.Execute();
+            var idsAsList = itemIds.ToList();
+            foreach (var nodeId in idsAsList)
+            {
+                //find all descendants based on path
+                var descendantPath = $@"\-1\,*{nodeId}\,*";
+                var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
+                var searcher = GetSearcher();
+                var c = searcher.CreateQuery();
+                var filtered = c.NativeQuery(rawQuery);
+                var results = filtered.Execute();
 
-            ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+                ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
-            //need to queue a delete item for each one found
-            QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));
+                //need to queue a delete item for each one found
+                QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));
+            }
 
-            base.PerformDeleteFromIndex(nodeId, onComplete);
+            base.PerformDeleteFromIndex(idsAsList, onComplete);
         }
         
     }
