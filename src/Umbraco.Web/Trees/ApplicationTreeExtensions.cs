@@ -14,7 +14,6 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Services;
 using Current = Umbraco.Web.Composing.Current;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 
