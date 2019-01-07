@@ -1604,11 +1604,6 @@ namespace Umbraco.Core.Services.Implement
             return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
-        private string MasterpagePath(string alias)
-        {
-            return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
-        }
-
         /// <summary>
         /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
         /// </summary>
