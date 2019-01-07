@@ -3,7 +3,7 @@
     <div class="umb-packages-view-wrapper" ng-if="vm.state === 'upload'">
 
         <!-- Upload -->
-        <div class="flex items-center justify-center">
+        <div class="flex flex-column items-center justify-center">
             <form novalidate name="localPackageForm" class="flex flex-column justify-center items-center tc">
 
                 <!-- Drag and drop files area -->
@@ -18,7 +18,6 @@
                      ngf-pattern="*.zip"
                      ngf-max-size="{{ maxFileSize }}"
                      ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
-
 
                     <div class="content">
 
