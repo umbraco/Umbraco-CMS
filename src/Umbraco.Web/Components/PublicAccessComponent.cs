@@ -8,10 +8,13 @@ namespace Umbraco.Web.Components
 {
     public sealed class PublicAccessComponent : IComponent
     {
-        public PublicAccessComponent()
+        public void Initialize()
         {
             MemberGroupService.Saved += MemberGroupService_Saved;
         }
+
+        public void Terminate()
+        { }
 
         static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<Core.Models.IMemberGroup> e)
         {

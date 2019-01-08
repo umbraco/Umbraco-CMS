@@ -14,15 +14,13 @@ namespace Umbraco.Core.Configuration.Grid
     {
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly DirectoryInfo _appPlugins;
         private readonly DirectoryInfo _configFolder;
         private readonly bool _isDebug;
 
-        public GridEditorsConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
+        public GridEditorsConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo configFolder, bool isDebug)
         {
             _logger = logger;
             _runtimeCache = runtimeCache;
-            _appPlugins = appPlugins;
             _configFolder = configFolder;
             _isDebug = isDebug;
         }
@@ -31,7 +29,7 @@ namespace Umbraco.Core.Configuration.Grid
         {
             get
             {
-                Func<List<GridEditor>> getResult = () =>
+                List<GridEditor> GetResult()
                 {
                     // fixme - should use the common one somehow! + ignoring _appPlugins here!
                     var parser = new ManifestParser(_runtimeCache, Current.ManifestValidators, _logger);
@@ -55,20 +53,16 @@ namespace Umbraco.Core.Configuration.Grid
                     // add manifest editors, skip duplicates
                     foreach (var gridEditor in parser.Manifest.GridEditors)
                     {
-                        if (editors.Contains(gridEditor) == false)
-                            editors.Add(gridEditor);
+                        if (editors.Contains(gridEditor) == false) editors.Add(gridEditor);
                     }
 
                     return editors;
-                };
+                }
 
                 //cache the result if debugging is disabled
                 var result = _isDebug
-                    ? getResult()
-                    : _runtimeCache.GetCacheItem<List<GridEditor>>(
-                        typeof(GridEditorsConfig) + "Editors",
-                        () => getResult(),
-                        TimeSpan.FromMinutes(10));
+                    ? GetResult()
+                    : _runtimeCache.GetCacheItem<List<GridEditor>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
 
                 return result;
             }

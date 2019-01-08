@@ -18,7 +18,8 @@ namespace Umbraco.Tests.Components
     public class ComponentTests
     {
         private static readonly List<Type> Composed = new List<Type>();
-        private static readonly List<string> Initialized = new List<string>();
+        private static readonly List<Type> Initialized = new List<Type>();
+        private static readonly List<Type> Terminated = new List<Type>();
 
         private static IFactory MockFactory(Action<Mock<IFactory>> setup = null)
         {
@@ -64,13 +65,36 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - goes away with RuntimeLevel.Unknown
             // => reorder components accordingly
-            components.Compose();
+            composers.Compose();
             AssertTypeArray(TypeArray<Composer1, Composer4, Composer2>(), Composed);
+
+            var factory = MockFactory(m =>
+            {
+                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof(ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                {
+                    if (type == typeof(Composer1)) return new Composer1();
+                    if (type == typeof(Composer5)) return new Composer5();
+                    if (type == typeof(Component5)) return new Component5(new SomeResource());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    throw new NotSupportedException(type.FullName);
+                });
+            });
+
+            var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            builder.RegisterWith(register);
+            var components = builder.CreateCollection(factory);
+
+            Assert.IsEmpty(components);
+            components.Initialize();
+            Assert.IsEmpty(Initialized);
+            components.Terminate();
+            Assert.IsEmpty(Terminated);
         }
 
         [Test]
@@ -164,6 +188,10 @@ namespace Umbraco.Tests.Components
         [Test]
         public void Initialize()
         {
+            Composed.Clear();
+            Initialized.Clear();
+            Terminated.Clear();
+
             var register = MockRegister();
             var factory = MockFactory(m =>
             {
@@ -181,17 +209,22 @@ namespace Umbraco.Tests.Components
 
             var types = new[] { typeof(Composer1), typeof(Composer5) };
             var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
-            Composed.Clear();
-            Initialized.Clear();
+
+            Assert.IsEmpty(Composed);
             composers.Compose();
+            AssertTypeArray(TypeArray<Composer1, Composer5>(), Composed);
+
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
             builder.RegisterWith(register);
             var components = builder.CreateCollection(factory);
-            Assert.AreEqual(2, Composed.Count);
-            Assert.AreEqual(typeof(Composer1), Composed[0]);
-            Assert.AreEqual(typeof(Composer5), Composed[1]);
-            Assert.AreEqual(1, Initialized.Count);
-            Assert.AreEqual("Umbraco.Tests.Components.ComponentTests+SomeResource", Initialized[0]);
+
+            Assert.IsEmpty(Initialized);
+            components.Initialize();
+            AssertTypeArray(TypeArray<Component5>(), Initialized);
+
+            Assert.IsEmpty(Terminated);
+            components.Terminate();
+            AssertTypeArray(TypeArray<Component5>(), Terminated);
         }
 
         [Test]
@@ -301,9 +334,6 @@ namespace Umbraco.Tests.Components
             }
         }
 
-        public class TestComponentBase : IComponent
-        { }
-
         public class Composer1 : TestComposerBase
         { }
 
@@ -326,11 +356,26 @@ namespace Umbraco.Tests.Components
             }
         }
 
-        public class Component5 : IComponent
+        public class TestComponentBase : IComponent
         {
+            public virtual void Initialize()
+            {
+                Initialized.Add(GetType());
+            }
+
+            public virtual void Terminate()
+            {
+                Terminated.Add(GetType());
+            }
+        }
+
+        public class Component5 : TestComponentBase
+        {
+            private readonly ISomeResource _resource;
+
             public Component5(ISomeResource resource)
             {
-                Initialized.Add(resource.GetType().FullName);
+                _resource = resource;
             }
         }
 

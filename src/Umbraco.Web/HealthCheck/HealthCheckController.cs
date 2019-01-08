@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.Web.Http;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.HealthCheck
             _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var healthCheckConfig = Current.Config.HealthChecks();
+            var healthCheckConfig = Current.Configs.HealthChecks();
             _disabledCheckIds = healthCheckConfig.DisabledChecks
                 .Select(x => x.Id)
                 .ToList();

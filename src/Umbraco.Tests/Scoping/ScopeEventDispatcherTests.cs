@@ -3,7 +3,6 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -13,7 +12,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
@@ -41,6 +39,9 @@ namespace Umbraco.Tests.Scoping
 
             composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
+
+            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 
             Current.Reset();
             Current.Factory = composition.CreateFactory();

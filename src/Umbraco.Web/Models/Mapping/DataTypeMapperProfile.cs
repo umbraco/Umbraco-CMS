@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
         public DataTypeMapperProfile(PropertyEditorCollection propertyEditors, ILogger logger)
         {
             // create, capture, cache
-            var availablePropertyEditorsResolver = new AvailablePropertyEditorsResolver(Current.Config.Umbraco().Content);
+            var availablePropertyEditorsResolver = new AvailablePropertyEditorsResolver(Current.Configs.Settings().Content);
             var configurationDisplayResolver = new DataTypeConfigurationFieldDisplayResolver(logger);
             var databaseTypeResolver = new DatabaseTypeResolver();
 

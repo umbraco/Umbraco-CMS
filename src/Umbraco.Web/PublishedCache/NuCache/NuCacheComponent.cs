@@ -8,5 +8,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // nothing - this just ensures that the service is created at boot time
         }
+
+        public void Initialize()
+        { }
+
+        public void Terminate()
+        { }
     }
 }

@@ -1114,7 +1114,7 @@ namespace Umbraco.Core
         /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
         public static string ToSafeAliasWithForcingCheck(this string alias)
         {
-            return Current.Config.Umbraco().Content.ForceSafeAliases ? alias.ToSafeAlias() : alias;
+            return Current.Configs.Settings().Content.ForceSafeAliases ? alias.ToSafeAlias() : alias;
         }
 
         /// <summary>
@@ -1126,7 +1126,7 @@ namespace Umbraco.Core
         /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
         public static string ToSafeAliasWithForcingCheck(this string alias, string culture)
         {
-            return Current.Config.Umbraco().Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
+            return Current.Configs.Settings().Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
         }
 
         // the new methods to get a url segment

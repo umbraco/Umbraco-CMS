@@ -12,8 +12,6 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Search;
-
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -91,7 +89,6 @@ namespace Umbraco.Web.Trees
                 Constants.DataTypes.DefaultContentListView,
                 Constants.DataTypes.DefaultMediaListView,
                 Constants.DataTypes.DefaultMembersListView
-
             };
         }
 

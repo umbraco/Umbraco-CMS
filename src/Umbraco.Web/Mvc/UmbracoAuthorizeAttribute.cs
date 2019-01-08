@@ -57,7 +57,7 @@ namespace Umbraco.Web.Mvc
         {
             if (redirectToUmbracoLogin)
             {
-                _redirectUrl = Current.Config.Global().Path.EnsureStartsWith("~");
+                _redirectUrl = Current.Configs.Global().Path.EnsureStartsWith("~");
             }
         }
 

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Helpers;
 using System.Web.Http.Filters;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
@@ -44,14 +45,14 @@ namespace Umbraco.Web.WebApi.Filters
                     Path = "/",
                     //must be js readable
                     HttpOnly = false,
-                    Secure = Current.Config.Global().UseHttps
+                    Secure = Current.Configs.Global().UseHttps
                 };
 
             var validationCookie = new CookieHeaderValue(AngularAntiForgeryHelper.CsrfValidationCookieName, cookieToken)
             {
                 Path = "/",
                 HttpOnly = true,
-                Secure = Current.Config.Global().UseHttps
+                Secure = Current.Configs.Global().UseHttps
             };
 
             context.Response.Headers.AddCookies(new[] { angularCookie, validationCookie });

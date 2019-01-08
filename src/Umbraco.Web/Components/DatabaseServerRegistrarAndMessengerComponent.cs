@@ -121,13 +121,19 @@ namespace Umbraco.Web.Components
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
             _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+        }
 
+        public void Initialize()
+        { 
             //We will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
 
             // must come last, as it references some _variables
             _messenger.Startup();
         }
+
+        public void Terminate()
+        { }
 
         /// <summary>
         /// Handle when a request is made

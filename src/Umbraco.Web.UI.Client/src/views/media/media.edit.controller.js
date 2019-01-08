@@ -95,8 +95,11 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
     function init() {
 
-        // set first app to active
-        $scope.content.apps[0].active = true;
+        if (!$scope.app) {
+            // set first app to active
+            $scope.content.apps[0].active = true;
+            $scope.app = $scope.content.apps[0];
+        }
 
         // setup infinite mode
         if(infiniteMode) {
@@ -206,6 +209,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
             $scope.model.close($scope.model);
         }
     };
+
+    $scope.appChanged = function (app) {
+        $scope.app = app;
+    }
 
     evts.push(eventsService.on("editors.mediaType.saved", function(name, args) {
         // if this media item uses the updated media type we need to reload the media item

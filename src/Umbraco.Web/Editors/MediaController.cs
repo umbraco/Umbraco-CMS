@@ -703,13 +703,13 @@ namespace Umbraco.Web.Editors
                 var safeFileName = fileName.ToSafeFileName();
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (Current.Config.Umbraco().Content.IsFileAllowedForUpload(ext))
+                if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext))
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (Current.Config.Umbraco().Content.ImageFileTypes.Contains(ext))
+                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
