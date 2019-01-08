@@ -45,7 +45,12 @@ angular.module("umbraco")
 
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
-                    maxImageSize: editorConfig.maxImageSize
+                    maxImageSize: editorConfig.maxImageSize,
+                    init_instance_callback: function (editor) {
+                        editor.on('Change', function (e) {
+                            $scope.model.value = editor.getContent();
+                        });
+                    }
                 };
 
                 angular.extend(baseLineConfigObj, standardConfig);
