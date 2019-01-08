@@ -365,7 +365,8 @@ namespace Umbraco.Core.IO
             {
                 var jpgInfo = ImageFile.FromStream(stream);
 
-                if (jpgInfo.Format != ImageFileFormat.Unknown
+                if (jpgInfo != null
+                    && jpgInfo.Format != ImageFileFormat.Unknown
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
                 {
