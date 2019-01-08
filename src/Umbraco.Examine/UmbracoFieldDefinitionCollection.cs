@@ -61,6 +61,11 @@ namespace Umbraco.Examine
         /// For example, we have things like `nodeName` and `__Published` which are also used for culture fields like `nodeName_en-us`
         /// and we don't want to have a full static list of all of these definitions when we can just define the one definition and then
         /// dynamically apply that to culture specific fields.
+        ///
+        /// There is a caveat to this however, when a field definition is found for a non-culture field we will create and store a new field
+        /// definition for that culture so that the next time it needs to be looked up and used we are not allocating more objects. This does mean
+        /// however that if a language is deleted, the field definitions for that language will still exist in memory. This isn't going to cause any
+        /// problems and the mem will be cleared on next site restart but it's worth pointing out.
         /// </remarks>
         public override bool TryGetValue(string fieldName, out FieldDefinition fieldDefinition)
         {
@@ -68,9 +73,7 @@ namespace Umbraco.Examine
                 return true;
 
             //before we use regex to match do some faster simple matching since this is going to execute quite a lot
-            if (!fieldName.Contains("_"))
-                return false;
-            if (!fieldName.Contains("-"))
+            if (!fieldName.Contains("_") || !fieldName.Contains("-"))
                 return false;
 
             var match = ExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
@@ -78,8 +81,12 @@ namespace Umbraco.Examine
             {
                 var nonCultureFieldName = match.Groups[1].Value;
                 //check if there's a definition for this and if so return the field definition for the culture field based on the non-culture field
-                if (base.TryGetValue(nonCultureFieldName, out fieldDefinition))
+                if (base.TryGetValue(nonCultureFieldName, out var existingFieldDefinition))
+                {
+                    //now add a new field def
+                    fieldDefinition = GetOrAdd(fieldName, s => new FieldDefinition(s, existingFieldDefinition.Type));
                     return true;
+                }
             }
             return false;
         }
