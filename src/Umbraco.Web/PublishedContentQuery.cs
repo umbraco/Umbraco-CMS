@@ -216,17 +216,8 @@ namespace Umbraco.Web
             else
             {
                 //get all index fields suffixed with the culture name supplied
-                var cultureFields = new List<string>();
-                var fields = umbIndex.GetFields();
+                var cultureFields = umbIndex.GetCultureFields(culture);
                 var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "y"); //must vary by culture
-                // ReSharper disable once LoopCanBeConvertedToQuery
-                foreach (var field in fields)
-                {
-                    var match = CultureIsoCodeFieldName.Match(field);
-                    if (match.Success && match.Groups.Count == 2 && culture.InvariantEquals(match.Groups[1].Value))
-                        cultureFields.Add(field);
-                }
-
                 qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
                 results = qry.Execute(count);
             }
@@ -323,13 +314,7 @@ namespace Umbraco.Web
             }
         }
 
-        /// <summary>
-        /// Matches a culture iso name suffix
-        /// </summary>
-        /// <remarks>
-        /// myFieldName_en-us will match the "en-us"
-        /// </remarks>
-        private static readonly Regex CultureIsoCodeFieldName = new Regex("^[_\\w]+_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
+        
 
 
         #endregion

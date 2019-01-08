@@ -1,4 +1,7 @@
-﻿using Examine;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Examine;
+using Umbraco.Core;
 
 namespace Umbraco.Examine
 {
@@ -45,31 +48,42 @@ namespace Umbraco.Examine
             new FieldDefinition(UmbracoContentIndex.VariesByCultureFieldName, FieldDefinitionTypes.Raw),
         };
 
-        ///// <summary>
-        ///// Overridden to dynamically add field definitions for culture variations
-        ///// </summary>
-        ///// <param name="fieldName"></param>
-        ///// <param name="fieldDefinition"></param>
-        ///// <returns></returns>
-        //public override bool TryGetValue(string fieldName, out FieldDefinition fieldDefinition)
-        //{
-        //    var result = base.TryGetValue(fieldName, out fieldDefinition);
-        //    if (result) return true;
 
-        //    //if the fieldName is not suffixed with _iso-Code
-        //    var underscoreIndex = fieldName.LastIndexOf('_');
-        //    if (underscoreIndex == -1) return false;
+        /// <summary>
+        /// Overridden to dynamically add field definitions for culture variations
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldDefinition"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We need to do this so that we don't have to maintain a huge static list of all field names and their definitions
+        /// otherwise we'd have to dynamically add/remove definitions anytime languages are added/removed, etc...
+        /// For example, we have things like `nodeName` and `__Published` which are also used for culture fields like `nodeName_en-us`
+        /// and we don't want to have a full static list of all of these definitions when we can just define the one definition and then
+        /// dynamically apply that to culture specific fields.
+        /// </remarks>
+        public override bool TryGetValue(string fieldName, out FieldDefinition fieldDefinition)
+        {
+            if (base.TryGetValue(fieldName, out fieldDefinition))
+                return true;
 
+            //before we use regex to match do some faster simple matching since this is going to execute quite a lot
+            if (!fieldName.Contains("_"))
+                return false;
+            if (!fieldName.Contains("-"))
+                return false;
 
+            var match = ExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
+            if (match.Success && match.Groups.Count == 3)
+            {
+                var nonCultureFieldName = match.Groups[1].Value;
+                //check if there's a definition for this and if so return the field definition for the culture field based on the non-culture field
+                if (base.TryGetValue(nonCultureFieldName, out fieldDefinition))
+                    return true;
+            }
+            return false;
+        }
 
-        //    var isoCode = fieldName.Substring(underscoreIndex);
-        //    if (isoCode.Length < 6) return false; //invalid isoCode
-
-        //    var hyphenIndex = isoCode.IndexOf('-');
-        //    if (hyphenIndex != 3) return false; //invalid isoCode
-
-        //    //we'll assume this is a valid isoCode
-
-        //}
+        
     }
 }
