@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -1168,7 +1169,11 @@ namespace Umbraco.Core.Services
 
         private void ObfuscateTrashedMedia(IMedia media)
         {
-            var umbracoFile = media.GetValue<string>("umbracoFile");
+            var umbracoFile = new UmbracoFileProperty(media).Src;
+            if (umbracoFile == null)
+            {
+                return;
+            }
             var filename = Path.GetFileName(umbracoFile);
             var newUmbracoFile = MediaPath(umbracoFile) + ObfuscateFilename(filename);
             MoveFile(umbracoFile, newUmbracoFile);
@@ -1177,13 +1182,14 @@ namespace Umbraco.Core.Services
 
         private void UnobfuscateTrashedMedia(IMedia media)
         {
-            var umbracoFile = media.GetValue<string>("umbracoFile");
-            var filename = Path.GetFileName(umbracoFile);
+            var umbracoFile = new UmbracoFileProperty(media);
+            var path = umbracoFile.Src;
+            var filename = Path.GetFileName(path);
             if (HasBeenObfuscated(filename)) 
             {
-                var newUmbracoFile = MediaPath(umbracoFile) + UnobfuscateFilename(filename);
-                MoveFile(umbracoFile, newUmbracoFile);
-                media.SetValue("umbracoFile", newUmbracoFile);
+                var newUmbracoFile = MediaPath(path) + UnobfuscateFilename(filename);
+                MoveFile(path, newUmbracoFile);
+                umbracoFile.Src = newUmbracoFile;
             }
         }
 
@@ -1200,17 +1206,17 @@ namespace Umbraco.Core.Services
 
         private string ObfuscateFilename(string filename)
         {
-            return Guid.NewGuid() + "$" + filename;
+            return Guid.NewGuid().ToString("D") + "---" + filename;
         }
 
         private string UnobfuscateFilename(string filename)
         {
-            return filename.Split(new[] {'$'}, 2)[1];
+            return filename.Split(new[] {"---"}, 2, StringSplitOptions.RemoveEmptyEntries)[1];
         }
 
         private bool HasBeenObfuscated(string filename)
         {
-            return Regex.IsMatch(filename, @"^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?\\$");
+            return Regex.IsMatch(filename, @"^[0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}---");
         }
 
 

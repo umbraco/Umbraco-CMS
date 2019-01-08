@@ -370,6 +370,7 @@
     <Compile Include="Media\TypeDetector\RasterizedTypeDetector.cs" />
     <Compile Include="Media\TypeDetector\SVGDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
+    <Compile Include="Media\UmbracoFileProperty.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
