@@ -309,13 +309,12 @@
         }
 
         function ensureDirtyIsSetIfAnyVariantIsDirty() {
-            var currentForm = angularHelper.getCurrentForm($scope);
-
-            currentForm.$dirty = false;
+            
+            $scope.contentForm.$dirty = false;
 
             for (var i = 0; i < $scope.content.variants.length; i++) {
                 if($scope.content.variants[i].isDirty){
-                    currentForm.$dirty = true;
+                    $scope.contentForm.$dirty = true;
                     return;
                 }
             }
