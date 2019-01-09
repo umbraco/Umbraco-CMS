@@ -4,9 +4,9 @@ using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.packager;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees

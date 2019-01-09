@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -11,7 +10,7 @@ using Umbraco.Core.Services;
 using File = System.IO.File;
 
 
-namespace umbraco.cms.businesslogic.packager
+namespace Umbraco.Web._Legacy.Packager.PackageInstance
 {
     public class CreatedPackage
     {
