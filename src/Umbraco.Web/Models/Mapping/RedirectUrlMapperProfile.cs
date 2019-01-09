@@ -8,18 +8,12 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class RedirectUrlMapperProfile : Profile
     {
-        private readonly UrlProvider _urlProvider;
-
-        public RedirectUrlMapperProfile(UrlProvider urlProvider)
-        {
-            _urlProvider = urlProvider;
-        }
 
         public RedirectUrlMapperProfile()
         {
             CreateMap<IRedirectUrl, ContentRedirectUrl>()
-                .ForMember(x => x.OriginalUrl, expression => expression.MapFrom(item => _urlProvider.GetUrlFromRoute(item.ContentId, item.Url, null)))
-                .ForMember(x => x.DestinationUrl, expression => expression.Ignore())
+                .ForMember(x => x.OriginalUrl, expression => expression.MapFrom(item => Current.UmbracoContext.UrlProvider.GetUrlFromRoute(item.ContentId, item.Url, item.Culture)))
+                .ForMember(x => x.DestinationUrl, expression => expression.MapFrom(item => item.ContentId > 0 ? new UmbracoHelper(Current.UmbracoContext, Current.Services).Url(item.ContentId, item.Culture) : "#"))
                 .ForMember(x => x.RedirectId, expression => expression.MapFrom(item => item.Key));
         }
     }

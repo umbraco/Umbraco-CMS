@@ -3,12 +3,13 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Core;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
+    [UmbracoTest(TypeLoader = UmbracoTestOptions.TypeLoader.PerFixture)]
     public class PublishedContentMoreTests : PublishedContentSnapshotTestBase
     {
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)

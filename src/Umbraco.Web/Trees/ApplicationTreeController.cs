@@ -9,7 +9,6 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -78,10 +77,20 @@ namespace Umbraco.Web.Trees
                     }
                 }
 
-                var multiTree = TreeRootNode.CreateMultiTreeRoot(collection);
-                multiTree.Name = Services.TextService.Localize("sections/" + application);
+                if(collection.Count > 0)
+                {
+                    var multiTree = TreeRootNode.CreateMultiTreeRoot(collection);
+                    multiTree.Name = Services.TextService.Localize("sections/" + application);
 
-                return multiTree;
+                    return multiTree;
+                }
+
+                //Otherwise its a application/section with no trees (aka a full screen app)
+                //For example we do not have a Forms tree definied in C# & can not attribute with [Tree(isSingleNodeTree:true0]
+                var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+                var section = Services.TextService.Localize("sections/" + application);
+
+                return TreeRootNode.CreateSingleTreeRoot(rootId, null, null, section, TreeNodeCollection.Empty, true);
             }
 
             var rootNodeGroups = new List<TreeRootNode>();

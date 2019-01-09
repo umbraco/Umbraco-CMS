@@ -38,13 +38,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Assign default tags.
+        /// Assign tags.
         /// </summary>
         /// <param name="property">The property.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
-        /// <remarks>Tags do not support variants.</remarks>
-        public static void AssignTags(this Property property, IEnumerable<string> tags, bool merge = false)
+        /// <param name="culture">A culture, for multi-lingual properties.</param>
+        public static void AssignTags(this Property property, IEnumerable<string> tags, bool merge = false, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -52,11 +52,11 @@ namespace Umbraco.Core.Models
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
-            property.AssignTags(tags, merge, configuration.StorageType, configuration.Delimiter);
+            property.AssignTags(tags, merge, configuration.StorageType, configuration.Delimiter, culture);
         }
 
         // assumes that parameters are consistent with the datatype configuration
-        internal static void AssignTags(this Property property, IEnumerable<string> tags, bool merge, TagsStorageType storageType, char delimiter)
+        private static void AssignTags(this Property property, IEnumerable<string> tags, bool merge, TagsStorageType storageType, char delimiter, string culture)
         {
             // set the property value
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
@@ -68,11 +68,11 @@ namespace Umbraco.Core.Models
                 switch (storageType)
                 {
                     case TagsStorageType.Csv:
-                        property.SetValue(string.Join(delimiter.ToString(), currentTags.Union(trimmedTags))); // csv string
+                        property.SetValue(string.Join(delimiter.ToString(), currentTags.Union(trimmedTags)), culture); // csv string
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray())); // json array
+                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray()), culture); // json array
                         break;
                 }
             }
@@ -81,23 +81,23 @@ namespace Umbraco.Core.Models
                 switch (storageType)
                 {
                     case TagsStorageType.Csv:
-                        property.SetValue(string.Join(delimiter.ToString(), trimmedTags)); // csv string
+                        property.SetValue(string.Join(delimiter.ToString(), trimmedTags), culture); // csv string
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(trimmedTags)); // json array
+                        property.SetValue(JsonConvert.SerializeObject(trimmedTags), culture); // json array
                         break;
                 }
             }
         }
 
         /// <summary>
-        /// Removes default tags.
+        /// Removes tags.
         /// </summary>
         /// <param name="property">The property.</param>
         /// <param name="tags">The tags.</param>
-        /// <remarks>Tags do not support variants.</remarks>
-        public static void RemoveTags(this Property property, IEnumerable<string> tags)
+        /// <param name="culture">A culture, for multi-lingual properties.</param>
+        public static void RemoveTags(this Property property, IEnumerable<string> tags, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -105,33 +105,33 @@ namespace Umbraco.Core.Models
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
-            property.RemoveTags(tags, configuration.StorageType, configuration.Delimiter);
+            property.RemoveTags(tags, configuration.StorageType, configuration.Delimiter, culture);
         }
 
         // assumes that parameters are consistent with the datatype configuration
-        private static void RemoveTags(this Property property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter)
+        private static void RemoveTags(this Property property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter, string culture)
         {
             // already empty = nothing to do
-            //fixme doesn't take into account variants
-            var value = property.GetValue()?.ToString();
+            var value = property.GetValue(culture)?.ToString();
             if (string.IsNullOrWhiteSpace(value)) return;
 
             // set the property value
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
-            var currentTags = property.GetTagsValue(storageType, delimiter);
+            var currentTags = property.GetTagsValue(storageType, delimiter, culture);
             switch (storageType)
             {
                 case TagsStorageType.Csv:
-                    property.SetValue(string.Join(delimiter.ToString(), currentTags.Except(trimmedTags))); // csv string
+                    property.SetValue(string.Join(delimiter.ToString(), currentTags.Except(trimmedTags)), culture); // csv string
                     break;
 
                 case TagsStorageType.Json:
-                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray())); // json array
+                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray()), culture); // json array
                     break;
             }
         }
 
-        internal static IEnumerable<string> GetTagsValue(this Property property)
+        // used by ContentRepositoryBase
+        internal static IEnumerable<string> GetTagsValue(this Property property, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -139,15 +139,14 @@ namespace Umbraco.Core.Models
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
-            return property.GetTagsValue(configuration.StorageType, configuration.Delimiter);
+            return property.GetTagsValue(configuration.StorageType, configuration.Delimiter, culture);
         }
 
-        internal static IEnumerable<string> GetTagsValue(this Property property, TagsStorageType storageType, char delimiter)
+        private static IEnumerable<string> GetTagsValue(this Property property, TagsStorageType storageType, char delimiter, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            //fixme doesn't take into account variants
-            var value = property.GetValue()?.ToString();
+            var value = property.GetValue(culture)?.ToString();
             if (string.IsNullOrWhiteSpace(value)) return Enumerable.Empty<string>();
 
             switch (storageType)
@@ -158,7 +157,6 @@ namespace Umbraco.Core.Models
                 case TagsStorageType.Json:
                     try
                     {
-                        //fixme doesn't take into account variants
                         return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString().Trim());
                     }
                     catch (JsonException)
@@ -178,34 +176,33 @@ namespace Umbraco.Core.Models
         /// <param name="property">The property.</param>
         /// <param name="value">The property value.</param>
         /// <param name="tagConfiguration">The datatype configuration.</param>
-        /// <remarks>        
+        /// <param name="culture">A culture, for multi-lingual properties.</param>
+        /// <remarks>
         /// <para>The value is either a string (delimited string) or an enumeration of strings (tag list).</para>
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>
         /// </remarks>
-        internal static void SetTagsValue(this Property property, object value, TagConfiguration tagConfiguration)
+        internal static void SetTagsValue(this Property property, object value, TagConfiguration tagConfiguration, string culture)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
             if (tagConfiguration == null) throw new ArgumentNullException(nameof(tagConfiguration));
 
-            var merge = false; // fixme always!
             var storageType = tagConfiguration.StorageType;
             var delimiter = tagConfiguration.Delimiter;
 
-            SetTagsValue(property, value, merge, storageType, delimiter);
+            SetTagsValue(property, value, storageType, delimiter, culture);
         }
 
         // assumes that parameters are consistent with the datatype configuration
         // value can be an enumeration of string, or a serialized value using storageType format
-        // fixme merge always false here?!
-        private static void SetTagsValue(Property property, object value, bool merge, TagsStorageType storageType, char delimiter)
+        private static void SetTagsValue(Property property, object value, TagsStorageType storageType, char delimiter, string culture)
         {
             if (value == null) value = Enumerable.Empty<string>();
 
             // if value is already an enumeration of strings, just use it
             if (value is IEnumerable<string> tags1)
             {
-                property.AssignTags(tags1, merge, storageType, delimiter);
+                property.AssignTags(tags1, false, storageType, delimiter, culture);
                 return;
             }
 
@@ -214,14 +211,14 @@ namespace Umbraco.Core.Models
             {
                 case TagsStorageType.Csv:
                     var tags2 = value.ToString().Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
-                    property.AssignTags(tags2, merge, storageType, delimiter);
+                    property.AssignTags(tags2, false, storageType, delimiter, culture);
                     break;
 
                 case TagsStorageType.Json:
                     try
                     {
                         var tags3 = JsonConvert.DeserializeObject<IEnumerable<string>>(value.ToString());
-                        property.AssignTags(tags3 ?? Enumerable.Empty<string>(), merge, storageType, delimiter);
+                        property.AssignTags(tags3 ?? Enumerable.Empty<string>(), false, storageType, delimiter, culture);
                     }
                     catch (Exception ex)
                     {

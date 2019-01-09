@@ -38,6 +38,27 @@ namespace Umbraco.Web.Routing
 
             var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
 
+            if (redirectUrl == null)
+            {
+                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: {Route}", route);
+                return false;
+            }
+
+            var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
+            var url = content == null ? "#" : content.GetUrl(redirectUrl.Culture);
+            if (url.StartsWith("#"))
+            {
+                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
+                return false;
+            }
+
+            // Apending any querystring from the incoming request to the redirect url.
+            url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
+
+            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
+            frequest.SetRedirectPermanent(url);
+
+
             // From: http://stackoverflow.com/a/22468386/5018
             // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
             // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
@@ -46,22 +67,6 @@ namespace Umbraco.Web.Routing
             frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
             frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
 
-            if (redirectUrl == null)
-            {
-                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: {Route}", route);
-                return false;
-            }
-
-            var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.Url;
-            if (url.StartsWith("#"))
-            {
-                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
-                return false;
-            }
-
-            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
-            frequest.SetRedirectPermanent(url);
             return true;
         }
     }

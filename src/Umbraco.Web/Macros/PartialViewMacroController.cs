@@ -2,14 +2,16 @@
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {
     /// <summary>
-    /// Controller to render macro content for Parital View Macros
+    /// Controller to render macro content for Partial View Macros
     /// </summary>
     [MergeParentContextViewData]
+    [HideFromTypeFinder] // explicitly used: do *not* find and register it!
     internal class PartialViewMacroController : Controller
     {
         private readonly MacroModel _macro;

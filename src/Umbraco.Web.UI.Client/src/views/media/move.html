@@ -11,30 +11,51 @@
 
 		    <div ng-show="success">
 			    <div class="alert alert-success">
-				    <strong>{{currentNode.name}}</strong> was moved underneath <strong>{{target.name}}</strong>
+			        <strong>{{source.name}}</strong>
+			        <localize key="actions_wasMovedTo">was moved to</localize>
+			        <strong>{{target.name}}</strong>
 			    </div>
-			    <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+			    <button class="btn btn-primary" ng-click="close()">Ok</button>
 		    </div>
 
 		    <p class="abstract" ng-hide="success">
                 <localize key="actions_chooseWhereToMove">Choose where to move</localize>
-                <strong>{{currentNode.name}}</strong>
+                <strong>{{source.name}}</strong>
                 <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
             </p>
 
 		    <div ng-hide="success">
             
 			    <div ng-hide="miniListView">
-				    <umb-tree
-					    section="media"
-				            hideheader="{{treeModel.hideHeader}}"
-					    hideoptions="true"
-					    isdialog="true"
+                    <umb-tree-search-box 
+                        hide-search-callback="hideSearch"
+                        search-callback="onSearchResults"
+                        search-from-id="{{searchInfo.searchFromId}}"
+                        search-from-name="{{searchInfo.searchFromName}}"
+                        show-search="{{searchInfo.showSearch}}"
+                        section="media">
+                    </umb-tree-search-box>
+
+                    <br />
+
+                    <umb-tree-search-results
+                        ng-if="searchInfo.showSearch"
+                        results="searchInfo.results"
+                        select-result-callback="selectResult">
+                    </umb-tree-search-results>
+
+                    <div ng-hide="searchInfo.showSearch">
+                        <umb-tree
+                            section="media"
+                            hideheader="{{treeModel.hideHeader}}"
+                            hideoptions="true"
+                            isdialog="true"
 					    api="dialogTreeApi"
                                             on-init="onTreeInit()"
-					    enablelistviewexpand="true"
-					    enablecheckboxes="true">
-				    </umb-tree>
+                            enablelistviewexpand="true"
+                            enablecheckboxes="true">
+                        </umb-tree>
+                    </div>
 			    </div>
 
 			    <umb-mini-list-view

@@ -14,7 +14,7 @@
     <key alias="createPackage">创建扩展包</key>
     <key alias="delete">删除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyTrashcan">清空回收站</key>
+    <key alias="emptyRecycleBin">清空回收站</key>
     <key alias="exportDocumentType">导出文档类型</key>
     <key alias="importDocumentType">导入文档类型</key>
     <key alias="importPackage">导入扩展包</key>
@@ -237,7 +237,6 @@
     <key alias="closeThisWindow">关闭窗口</key>
     <key alias="confirmdelete">您确定要删除吗</key>
     <key alias="confirmdisable">您确定要禁用吗</key>
-    <key alias="confirmEmptyTrashcan">单击此框确定删除%0%项</key>
     <key alias="confirmlogout">您确定吗?</key>
     <key alias="confirmSure">您确定吗？</key>
     <key alias="cut">剪切</key>
@@ -1221,9 +1220,6 @@
     <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
-    <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-    <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-    <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
     <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>

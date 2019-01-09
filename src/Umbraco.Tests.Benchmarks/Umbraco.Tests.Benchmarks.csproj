@@ -46,10 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BulkInsertBenchmarks.cs" />
+    <Compile Include="CombineGuidBenchmarks.cs" />
     <Compile Include="ConcurrentDictionaryBenchmarks.cs" />
     <Compile Include="Config\QuickRunConfigAttribute.cs" />
     <Compile Include="Config\QuickRunWithMemoryDiagnoserConfigAttribute.cs" />
     <Compile Include="CtorInvokeBenchmarks.cs" />
+    <Compile Include="HexStringBenchmarks.cs" />
+    <Compile Include="EnumeratorBenchmarks.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="Program.cs" />
@@ -87,7 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet">
-      <Version>0.11.2</Version>
+      <Version>0.11.3</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -34,22 +34,25 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
             toggleDeleting(false);
 
             if (rootNode) {
-                $timeout(function () {
-                    //ensure the recycle bin has child nodes now            
-                    var recycleBin = treeService.getDescendantNode(rootNode, -20);
-                    if (recycleBin) {
-                        //TODO: This seems to return a rejection and we end up with "Possibly unhanded rejection"
-                        treeService.syncTree({ node: recycleBin, path: treeService.getPath(recycleBin), forceReload: true });
+                //ensure the recycle bin has child nodes now            
+                var recycleBin = treeService.getDescendantNode(rootNode, -20);
+                if (recycleBin) {
+                    recycleBin.hasChildren = true;
+                    //reload the recycle bin if it's already expanded so the deleted item is shown
+                    if (recycleBin.expanded) {
+                        treeService.loadNodeChildren({ node: recycleBin, section: "content" });
                     }
-                }, 500);
+                }
             }
-            
+
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
             if (editorState.current && editorState.current.id == $scope.currentNode.id) {
 
                 //If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
                 var location = "/content";
-                if ($scope.currentNode.parentId.toString() !== "-1")
+                if ($scope.currentNode.parentId.toString() === "-20")
+                    location = "/content/content/recyclebin";
+                else if ($scope.currentNode.parentId.toString() !== "-1")
                     location = "/content/content/edit/" + $scope.currentNode.parentId;
 
                 $location.path(location);

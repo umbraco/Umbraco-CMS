@@ -79,7 +79,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
+        public PublishedSnapshotService(Options options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             ILogger logger, IScopeProvider scopeProvider,
@@ -1206,7 +1206,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 foreach (var (culture, info) in infos)
                 {
-                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
+                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(culture);
+                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
                 }
             }
 

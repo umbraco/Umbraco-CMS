@@ -15,9 +15,9 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public class UmbracoPageResult : ActionResult
     {
-        private readonly ProfilingLogger _profilingLogger;
+        private readonly IProfilingLogger _profilingLogger;
 
-        public UmbracoPageResult(ProfilingLogger profilingLogger)
+        public UmbracoPageResult(IProfilingLogger profilingLogger)
         {
             _profilingLogger = profilingLogger;
         }

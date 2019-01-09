@@ -16,103 +16,103 @@ namespace Umbraco.Core.IO
     /// </remarks>
     public abstract class FileSystemWrapper : IFileSystem
     {
-        protected FileSystemWrapper(IFileSystem wrapped)
+        protected FileSystemWrapper(IFileSystem innerFileSystem)
         {
-            Wrapped = wrapped;
+            InnerFileSystem = innerFileSystem;
         }
 
-        internal IFileSystem Wrapped { get; set; }
+        internal IFileSystem InnerFileSystem { get; set; }
 
         public IEnumerable<string> GetDirectories(string path)
         {
-            return Wrapped.GetDirectories(path);
+            return InnerFileSystem.GetDirectories(path);
         }
 
         public void DeleteDirectory(string path)
         {
-            Wrapped.DeleteDirectory(path);
+            InnerFileSystem.DeleteDirectory(path);
         }
 
         public void DeleteDirectory(string path, bool recursive)
         {
-            Wrapped.DeleteDirectory(path, recursive);
+            InnerFileSystem.DeleteDirectory(path, recursive);
         }
 
         public bool DirectoryExists(string path)
         {
-            return Wrapped.DirectoryExists(path);
+            return InnerFileSystem.DirectoryExists(path);
         }
 
         public void AddFile(string path, Stream stream)
         {
-            Wrapped.AddFile(path, stream);
+            InnerFileSystem.AddFile(path, stream);
         }
 
         public void AddFile(string path, Stream stream, bool overrideExisting)
         {
-            Wrapped.AddFile(path, stream, overrideExisting);
+            InnerFileSystem.AddFile(path, stream, overrideExisting);
         }
 
         public IEnumerable<string> GetFiles(string path)
         {
-            return Wrapped.GetFiles(path);
+            return InnerFileSystem.GetFiles(path);
         }
 
         public IEnumerable<string> GetFiles(string path, string filter)
         {
-            return Wrapped.GetFiles(path, filter);
+            return InnerFileSystem.GetFiles(path, filter);
         }
 
         public Stream OpenFile(string path)
         {
-            return Wrapped.OpenFile(path);
+            return InnerFileSystem.OpenFile(path);
         }
 
         public void DeleteFile(string path)
         {
-            Wrapped.DeleteFile(path);
+            InnerFileSystem.DeleteFile(path);
         }
 
         public bool FileExists(string path)
         {
-            return Wrapped.FileExists(path);
+            return InnerFileSystem.FileExists(path);
         }
 
         public string GetRelativePath(string fullPathOrUrl)
         {
-            return Wrapped.GetRelativePath(fullPathOrUrl);
+            return InnerFileSystem.GetRelativePath(fullPathOrUrl);
         }
 
         public string GetFullPath(string path)
         {
-            return Wrapped.GetFullPath(path);
+            return InnerFileSystem.GetFullPath(path);
         }
 
         public string GetUrl(string path)
         {
-            return Wrapped.GetUrl(path);
+            return InnerFileSystem.GetUrl(path);
         }
 
         public DateTimeOffset GetLastModified(string path)
         {
-            return Wrapped.GetLastModified(path);
+            return InnerFileSystem.GetLastModified(path);
         }
 
         public DateTimeOffset GetCreated(string path)
         {
-            return Wrapped.GetCreated(path);
+            return InnerFileSystem.GetCreated(path);
         }
 
         public long GetSize(string path)
         {
-            return Wrapped.GetSize(path);
+            return InnerFileSystem.GetSize(path);
         }
 
-        public bool CanAddPhysical => Wrapped.CanAddPhysical;
+        public bool CanAddPhysical => InnerFileSystem.CanAddPhysical;
 
         public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
         {
-            Wrapped.AddFile(path, physicalPath, overrideIfExists, copy);
+            InnerFileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
         }
     }
 }

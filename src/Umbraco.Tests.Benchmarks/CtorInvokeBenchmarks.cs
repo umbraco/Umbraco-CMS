@@ -11,7 +11,13 @@ using Umbraco.Core;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    // some conclusions
+    // - ActivatorCreateInstance is slow
+    // - it's faster to get+invoke the ctor
+    // - emitting the ctor is unless if invoked only 1
+
+    //[Config(typeof(Config))]
+    [MemoryDiagnoser]
     public class CtorInvokeBenchmarks
     {
         private class Config : ManualConfig
@@ -25,7 +31,7 @@ namespace Umbraco.Tests.Benchmarks
                 // see benchmarkdotnet FAQ
                 Add(Job.Default
                     .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(TimeInterval.FromMilliseconds(400)) 
+                    .WithIterationTime(TimeInterval.FromMilliseconds(400))
                     .WithWarmupCount(3)
                     .WithIterationCount(6));
             }
@@ -144,7 +150,7 @@ namespace Umbraco.Tests.Benchmarks
 
             // however, unfortunately, the generated "compiled to delegate" code cannot access private stuff :(
 
-            _emittedCtor = ReflectionUtilities.EmitConstuctor<Func<IFoo, Foo>>();
+            _emittedCtor = ReflectionUtilities.EmitConstructor<Func<IFoo, Foo>>();
         }
 
         public IFoo IlCtor(IFoo foo)
@@ -156,6 +162,28 @@ namespace Umbraco.Tests.Benchmarks
         public void DirectCtor()
         {
             var foo = new Foo(_foo);
+        }
+
+        [Benchmark]
+        public void EmitCtor()
+        {
+            var ctor = ReflectionUtilities.EmitConstructor<Func<IFoo, Foo>>();
+            var foo = ctor(_foo);
+        }
+
+        [Benchmark]
+        public void ActivatorCreateInstance()
+        {
+            var foo = Activator.CreateInstance(typeof(Foo), _foo);
+        }
+
+        [Benchmark]
+        public void GetAndInvokeCtor()
+        {
+            var ctorArgTypes = new[] { typeof(IFoo) };
+            var type = typeof(Foo);
+            var ctorInfo = type.GetConstructor(ctorArgTypes);
+            var foo = ctorInfo.Invoke(new object[] { _foo });
         }
 
         [Benchmark]

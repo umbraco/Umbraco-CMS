@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 
-namespace umbraco.cms.businesslogic.packager {
+namespace Umbraco.Web._Legacy.Packager.PackageInstance
+{
     public class InstalledPackage
     {
 
         private int _saveHitCount = 0;
 
-        public static InstalledPackage GetById(int id) {
+        public static InstalledPackage GetById(int id)
+        {
             InstalledPackage pack = new InstalledPackage();
             pack.Data = data.Package(id, IOHelper.MapPath(Settings.InstalledPackagesSettings));
             return pack;
         }
 
-        public static InstalledPackage GetByGuid(string packageGuid) {
+        public static InstalledPackage GetByGuid(string packageGuid)
+        {
             InstalledPackage pack = new InstalledPackage();
             pack.Data = data.Package(packageGuid, IOHelper.MapPath(Settings.InstalledPackagesSettings));
             return pack;
         }
 
-        public static InstalledPackage MakeNew(string name) {
+        public static InstalledPackage MakeNew(string name)
+        {
             InstalledPackage pack = new InstalledPackage();
             pack.Data = data.MakeNew(name, IOHelper.MapPath(Settings.InstalledPackagesSettings));
             pack.OnNew(EventArgs.Empty);
@@ -45,7 +48,8 @@ namespace umbraco.cms.businesslogic.packager {
             this.FireAfterSave(EventArgs.Empty);
         }
 
-        public static List<InstalledPackage> GetAllInstalledPackages() {
+        public static List<InstalledPackage> GetAllInstalledPackages()
+        {
 
             List<InstalledPackage> val = new List<InstalledPackage>();
 
@@ -60,7 +64,8 @@ namespace umbraco.cms.businesslogic.packager {
         }
 
         private PackageInstance m_data;
-        public PackageInstance Data {
+        public PackageInstance Data
+        {
             get { return m_data; }
             set { m_data = value; }
         }
@@ -71,13 +76,15 @@ namespace umbraco.cms.businesslogic.packager {
             Delete();
         }
 
-        public void Delete() {
+        public void Delete()
+        {
             this.FireBeforeDelete(EventArgs.Empty);
             data.Delete(this.Data.Id, IOHelper.MapPath(Settings.InstalledPackagesSettings));
             this.FireAfterDelete(EventArgs.Empty);
         }
 
-        public static bool isPackageInstalled(string packageGuid) {
+        public static bool isPackageInstalled(string packageGuid)
+        {
             try
             {
                 if (data.GetFromGuid(packageGuid, IOHelper.MapPath(Settings.InstalledPackagesSettings), true) == null)
@@ -101,31 +108,36 @@ namespace umbraco.cms.businesslogic.packager {
         /// Occurs when a macro is saved.
         /// </summary>
         public static event SaveEventHandler BeforeSave;
-        protected virtual void FireBeforeSave(EventArgs e) {
+        protected virtual void FireBeforeSave(EventArgs e)
+        {
             if (BeforeSave != null)
                 BeforeSave(this, e);
         }
 
         public static event SaveEventHandler AfterSave;
-        protected virtual void FireAfterSave(EventArgs e) {
+        protected virtual void FireAfterSave(EventArgs e)
+        {
             if (AfterSave != null)
                 AfterSave(this, e);
         }
 
         public static event NewEventHandler New;
-        protected virtual void OnNew(EventArgs e) {
+        protected virtual void OnNew(EventArgs e)
+        {
             if (New != null)
                 New(this, e);
         }
 
         public static event DeleteEventHandler BeforeDelete;
-        protected virtual void FireBeforeDelete(EventArgs e) {
+        protected virtual void FireBeforeDelete(EventArgs e)
+        {
             if (BeforeDelete != null)
                 BeforeDelete(this, e);
         }
 
         public static event DeleteEventHandler AfterDelete;
-        protected virtual void FireAfterDelete(EventArgs e) {
+        protected virtual void FireAfterDelete(EventArgs e)
+        {
             if (AfterDelete != null)
                 AfterDelete(this, e);
         }

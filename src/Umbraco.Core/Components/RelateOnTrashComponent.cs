@@ -7,8 +7,7 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Components
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class RelateOnTrashComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class RelateOnTrashComponent : IComponent
     {
         public void Initialize()
         {
@@ -17,6 +16,9 @@ namespace Umbraco.Core.Components
             MediaService.Moved += MediaService_Moved;
             MediaService.Trashed += MediaService_Trashed;
         }
+
+        public void Terminate()
+        { }
 
         private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
         {

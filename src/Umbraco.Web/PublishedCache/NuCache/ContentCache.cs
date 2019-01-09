@@ -29,6 +29,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructor
 
+        // fixme ISSUE
+        // after the current snapshot has been resync-ed
+        // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
+        // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
+
         public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
             : base(previewDefault)
         {
@@ -147,7 +152,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var urlSegment = n.GetUrlSegment(culture);
             var hasDomains = _domainHelper.NodeHasDomains(n.Id);
             while (hasDomains == false && n != null) // n is null at root
-            {   
+            {
                 // no segment indicates this is not published when this is a variant
                 if (urlSegment.IsNullOrWhiteSpace()) return null;
 
@@ -173,7 +178,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
             //prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
             //and is done so that we know the ID of the domain node for the path
-            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path; 
+            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
 
             return route;
         }
@@ -223,24 +228,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IPublishedContent GetById(bool preview, int contentId)
         {
-            var n = _snapshot.Get(contentId);
-            if (n == null) return null;
-
-            // both .Draft and .Published cannot be null at the same time
-            return preview
-                ? n.Draft ?? GetPublishedContentAsPreviewing(n.Published)
-                : n.Published;
+            var node = _snapshot.Get(contentId);
+            return GetNodePublishedContent(node, preview);
         }
 
         public override IPublishedContent GetById(bool preview, Guid contentId)
         {
-            var n = _snapshot.Get(contentId);
-            if (n == null) return null;
-
-            // both .Draft and .Published cannot be null at the same time
-            return preview
-                ? n.Draft ?? GetPublishedContentAsPreviewing(n.Published)
-                : n.Published;
+            var node = _snapshot.Get(contentId);
+            return GetNodePublishedContent(node, preview);
         }
 
         public override bool HasById(bool preview, int contentId)
@@ -274,14 +269,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var c = _snapshot.GetAtRoot();
 
             // both .Draft and .Published cannot be null at the same time
-            return c.Select(n => preview
-                ? n.Draft ?? GetPublishedContentAsPreviewing(n.Published)
-                : n.Published).WhereNotNull().OrderBy(x => x.SortOrder);
+            return c.Select(n => GetNodePublishedContent(n, preview)).WhereNotNull().OrderBy(x => x.SortOrder);
+        }
+
+        private static IPublishedContent GetNodePublishedContent(ContentNode node, bool preview)
+        {
+            if (node == null)
+                return null;
+
+            // both .Draft and .Published cannot be null at the same time
+
+            return preview
+                ? node.Draft ?? GetPublishedContentAsDraft(node.Published)
+                : node.Published;
         }
 
         // gets a published content as a previewing draft, if preview is true
         // this is for published content when previewing
-        internal static IPublishedContent GetPublishedContentAsPreviewing(IPublishedContent content /*, bool preview*/)
+        private static IPublishedContent GetPublishedContentAsDraft(IPublishedContent content /*, bool preview*/)
         {
             if (content == null /*|| preview == false*/) return null; //content;
 
@@ -290,7 +295,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // case we need to unwrap to get to the original IPublishedContentOrMedia.
 
             var inner = PublishedContent.UnwrapIPublishedContent(content);
-            return inner.AsPreviewingModel();
+            return inner.AsDraft();
         }
 
         public override bool HasContent(bool preview)

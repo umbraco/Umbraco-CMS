@@ -17,7 +17,7 @@
         vm.showValidationPattern = false;
         vm.focusOnPatternField = false;
         vm.focusOnMandatoryField = false;
-        vm.selectedValidationType = {};
+        vm.selectedValidationType = null;
         vm.validationTypes = [];
         vm.labels = {};
 

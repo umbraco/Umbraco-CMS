@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,7 +8,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using System.Web.Http.ValueProviders;
+using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -23,16 +22,11 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebServices;
-
 using Constants = Umbraco.Core.Constants;
-using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
@@ -55,16 +49,13 @@ namespace Umbraco.Web.Editors
     [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
 
         public object Domains { get; private set; }
 
-        public ContentController(IPublishedSnapshotService publishedSnapshotService, PropertyEditorCollection propertyEditors)
+        public ContentController(PropertyEditorCollection propertyEditors)
         {
-            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
-            _publishedSnapshotService = publishedSnapshotService;
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
         }
@@ -234,7 +225,7 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content", Core.Constants.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content", Core.Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
             var display = new ContentItemDisplay
             {
@@ -352,7 +343,7 @@ namespace Umbraco.Web.Editors
         /// Gets an empty content item for the
         /// </summary>
         /// <param name="contentTypeAlias"></param>
-        /// <param name="parentId"></param>        
+        /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
@@ -364,6 +355,9 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
+            // translate the content type name if applicable
+            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
@@ -1072,7 +1066,7 @@ namespace Umbraco.Web.Editors
                 var descendants = Services.EntityService.GetPagedDescendants(contentItem.Id, UmbracoObjectTypes.Document, page++, pageSize, out total,
                                 //order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
                                 //early if a permission higher up fails
-                                "path", Direction.Ascending);
+                                ordering: Ordering.By("path", Direction.Ascending));
 
                 foreach (var c in descendants)
                 {
@@ -1083,7 +1077,7 @@ namespace Umbraco.Web.Editors
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);
-                    }   
+                    }
                 }
             }
             noAccess = denied;
@@ -1100,6 +1094,7 @@ namespace Umbraco.Web.Editors
                 //TODO: Deal with multiple cancelations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = Array.Empty<string>();
+                return publishStatus;
             }
 
             //All variants in this collection should have a culture if we get here! but we'll double check and filter here
@@ -1241,11 +1236,11 @@ namespace Umbraco.Web.Editors
                 //Check if a mandatory language is missing from being published
 
                 var mandatoryVariant = cultureVariants.First(x => x.Culture.InvariantEquals(culture));
-                
+
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
                 result.Add((mandatoryVariant, isPublished));
 
-                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant); 
+                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant);
 
                 if (isPublished || isPublishing) continue;
 
@@ -1778,7 +1773,8 @@ namespace Umbraco.Web.Editors
                     contentSave,
                     propertyCollection,
                     (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
+                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    variant.Culture);
 
                 variantIndex++;
             }
@@ -1880,7 +1876,7 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.SuccessPublish:
                     case PublishResultType.SuccessPublishCulture:
                         //these 2 belong to a single group
-                        return PublishResultType.SuccessPublish;                    
+                        return PublishResultType.SuccessPublish;
                     case PublishResultType.FailedPublishAwaitingRelease:
                     case PublishResultType.FailedPublishCultureAwaitingRelease:
                         //these 2 belong to a single group
@@ -1903,11 +1899,15 @@ namespace Umbraco.Web.Editors
             });
 
             foreach (var status in statusGroup)
-            {   
+            {
                 switch (status.Key)
                 {
                     case PublishResultType.SuccessPublishAlready:
                         {
+                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
+                            // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
+
                             //special case, we will only show messages for this if:
                             // * it's not a bulk publish operation
                             // * it's a bulk publish operation and all successful statuses are this one
@@ -1935,6 +1935,10 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.SuccessPublish:
                         {
+                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
+                            // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
+
                             var itemCount = status.Count();
                             if (successfulCultures == null)
                             {
@@ -2152,6 +2156,160 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateValidationErrorResponse(notificationModel);
+        }
+
+        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [HttpGet]
+        public HttpResponseMessage GetPublicAccess(int contentId)
+        {
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            var loginPageEntity = Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document);
+            var errorPageEntity = Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
+
+            // unwrap the current public access setup for the client
+            // - this API method is the single point of entry for both "modes" of public access (single user and role based)
+            var usernames = entry.Rules
+                .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType)
+                .Select(rule => rule.RuleValue).ToArray();
+
+            MemberDisplay[] members;
+            switch (Services.MemberService.GetMembershipScenario())
+            {
+                case MembershipScenario.NativeUmbraco:
+                    members = usernames
+                        .Select(username => Services.MemberService.GetByUsername(username))
+                        .Where(member => member != null)
+                        .Select(Mapper.Map<MemberDisplay>)
+                        .ToArray();
+                    break;
+                // TODO: test support custom membership providers
+                case MembershipScenario.CustomProviderWithUmbracoLink:
+                case MembershipScenario.StandaloneCustomProvider:
+                default:
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    members = usernames
+                        .Select(username => provider.GetUser(username, false))
+                        .Where(membershipUser => membershipUser != null)
+                        .Select(Mapper.Map<MembershipUser, MemberDisplay>)
+                        .ToArray();
+                    break;
+            }
+
+            var allGroups = Services.MemberGroupService.GetAll().ToArray();
+            var groups = entry.Rules
+                .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
+                .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
+                .Where(memberGroup => memberGroup != null)
+                .Select(Mapper.Map<MemberGroupDisplay>)
+                .ToArray();
+
+            return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
+            {
+                Members = members,
+                Groups = groups,
+                LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
+                ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
+            });
+        }
+
+        // set up public access using role based access
+        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [HttpPost]
+        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] groups, [FromUri]string[] usernames, int loginPageId, int errorPageId)
+        {
+            if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
+            }
+
+            var content = Services.ContentService.GetById(contentId);
+            var loginPage = Services.ContentService.GetById(loginPageId);
+            var errorPage = Services.ContentService.GetById(errorPageId);
+            if (content == null || loginPage == null || errorPage == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
+            }
+
+            var isGroupBased = groups != null && groups.Any();
+            var candidateRuleValues = isGroupBased
+                ? groups
+                : usernames;
+            var newRuleType = isGroupBased
+                ? Constants.Conventions.PublicAccess.MemberRoleRuleType
+                : Constants.Conventions.PublicAccess.MemberUsernameRuleType;
+
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+
+            if (entry == null)
+            {
+                entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
+
+                foreach (var ruleValue in candidateRuleValues)
+                {
+                    entry.AddRule(ruleValue, newRuleType);
+                }
+            }
+            else
+            {
+                entry.LoginNodeId = loginPage.Id;
+                entry.NoAccessNodeId = errorPage.Id;
+
+                var currentRules = entry.Rules.ToArray();
+                var obsoleteRules = currentRules.Where(rule =>
+                    rule.RuleType != newRuleType
+                    || candidateRuleValues.Contains(rule.RuleValue) == false
+                );
+                var newRuleValues = candidateRuleValues.Where(group =>
+                    currentRules.Any(rule =>
+                        rule.RuleType == newRuleType
+                        && rule.RuleValue == group
+                    ) == false
+                );
+                foreach (var rule in obsoleteRules)
+                {
+                    entry.RemoveRule(rule);
+                }
+                foreach (var ruleValue in newRuleValues)
+                {
+                    entry.AddRule(ruleValue, newRuleType);
+                }
+            }
+
+            return Services.PublicAccessService.Save(entry).Success
+                ? Request.CreateResponse(HttpStatusCode.OK)
+                : Request.CreateResponse(HttpStatusCode.InternalServerError);
+        }
+
+        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [HttpPost]
+        public HttpResponseMessage RemovePublicAccess(int contentId)
+        {
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            return Services.PublicAccessService.Delete(entry).Success
+                ? Request.CreateResponse(HttpStatusCode.OK)
+                : Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
     }
 }

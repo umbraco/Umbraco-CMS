@@ -305,12 +305,10 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 .From<UserLoginDto>()
                 .Where<UserLoginDto>(x => x.SessionId == sessionId);
 
-            sql.WriteToConsole();
             Assert.AreEqual("SELECT * FROM [umbracoUserLogin] WHERE (([umbracoUserLogin].[sessionId] = @0))", sql.SQL.NoCrLf());
 
             sql = sql.ForUpdate();
 
-            sql.WriteToConsole();
             Assert.AreEqual("SELECT * FROM [umbracoUserLogin] WITH (UPDLOCK) WHERE (([umbracoUserLogin].[sessionId] = @0))", sql.SQL.NoCrLf());
         }
     }

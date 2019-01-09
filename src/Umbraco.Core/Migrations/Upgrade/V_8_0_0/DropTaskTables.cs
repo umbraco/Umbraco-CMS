@@ -9,10 +9,10 @@
 
         public override void Migrate()
         {
-            if (TableExists("cmsTaskType"))
-                Delete.Table("cmsTaskType");
             if (TableExists("cmsTask"))
-                Delete.Table("cmsTask");
+                Delete.Table("cmsTask").Do();
+            if (TableExists("cmsTaskType"))
+                Delete.Table("cmsTaskType").Do();
         }
     }
 }

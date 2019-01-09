@@ -7,6 +7,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Upgrade;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
@@ -17,76 +20,64 @@ namespace Umbraco.Core
     internal class RuntimeState : IRuntimeState
     {
         private readonly ILogger _logger;
-        private readonly Lazy<IServerRegistrar> _serverRegistrar;
-        private readonly Lazy<MainDom> _mainDom;
         private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
-        private RuntimeLevel _level;
+        private readonly Lazy<IMainDom> _mainDom;
+        private readonly Lazy<IServerRegistrar> _serverRegistrar;
+        private RuntimeLevel _level = RuntimeLevel.Unknown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        /// <param name="logger">A logger.</param>
-        /// <param name="serverRegistrar">A (lazy) server registrar.</param>
-        /// <param name="mainDom">A (lazy) MainDom.</param>
-        public RuntimeState(ILogger logger, Lazy<IServerRegistrar> serverRegistrar, Lazy<MainDom> mainDom, IUmbracoSettingsSection settings, IGlobalSettings globalSettings)
+        public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
+            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar)
         {
             _logger = logger;
-            _serverRegistrar = serverRegistrar;
-            _mainDom = mainDom;
             _settings = settings;
             _globalSettings = globalSettings;
+            _mainDom = mainDom;
+            _serverRegistrar = serverRegistrar;
         }
 
+        /// <summary>
+        /// Gets the server registrar.
+        /// </summary>
+        /// <remarks>
+        /// <para>This is NOT exposed in the interface.</para>
+        /// </remarks>
         private IServerRegistrar ServerRegistrar => _serverRegistrar.Value;
 
         /// <summary>
         /// Gets the application MainDom.
         /// </summary>
-        /// <remarks>This is NOT exposed in the interface as MainDom is internal.</remarks>
-        public MainDom MainDom => _mainDom.Value;
+        /// <remarks>
+        /// <para>This is NOT exposed in the interface as MainDom is internal.</para>
+        /// </remarks>
+        public IMainDom MainDom => _mainDom.Value;
 
-        /// <summary>
-        /// Gets the version of the executing code.
-        /// </summary>
+        /// <inheritdoc />
         public Version Version => UmbracoVersion.Current;
 
-        /// <summary>
-        /// Gets the version comment of the executing code.
-        /// </summary>
+        /// <inheritdoc />
         public string VersionComment => UmbracoVersion.Comment;
 
-        /// <summary>
-        /// Gets the semantic version of the executing code.
-        /// </summary>
+        /// <inheritdoc />
         public SemVersion SemanticVersion => UmbracoVersion.SemanticVersion;
 
-        /// <summary>
-        /// Gets a value indicating whether the application is running in debug mode.
-        /// </summary>
+        /// <inheritdoc />
         public bool Debug { get; } = GlobalSettings.DebugMode;
 
-        /// <summary>
-        /// Gets a value indicating whether the runtime is the current main domain.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsMainDom => MainDom.IsMainDom;
 
-        /// <summary>
-        /// Get the server's current role.
-        /// </summary>
+        /// <inheritdoc />
         public ServerRole ServerRole => ServerRegistrar.GetCurrentServerRole();
 
-        /// <summary>
-        /// Gets the Umbraco application url.
-        /// </summary>
-        /// <remarks>This is eg "http://www.example.com".</remarks>
+        /// <inheritdoc />
         public Uri ApplicationUrl { get; private set; }
 
-        /// <summary>
-        /// Gets the Umbraco application virtual path.
-        /// </summary>
-        /// <remarks>This is either "/" or eg "/virtual".</remarks>
+        /// <inheritdoc />
         public string ApplicationVirtualPath { get; } = HttpRuntime.AppDomainAppVirtualPath;
 
         /// <inheritdoc />
@@ -95,9 +86,7 @@ namespace Umbraco.Core
         /// <inheritdoc />
         public string FinalMigrationState { get; internal set; }
 
-        /// <summary>
-        /// Gets the runtime level of execution.
-        /// </summary>
+        /// <inheritdoc />
         public RuntimeLevel Level
         {
             get => _level;
@@ -137,9 +126,123 @@ namespace Umbraco.Core
             return _runLevel.WaitHandle.WaitOne(timeout);
         }
 
-        /// <summary>
-        /// Gets the exception that caused the boot to fail.
-        /// </summary>
+        /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
+
+        /// <summary>
+        /// Determines the runtime level.
+        /// </summary>
+        public void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        {
+            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
+            var codeVersion = SemanticVersion; // the executing code version
+            var connect = false;
+
+            if (localVersion == null)
+            {
+                // there is no local version, we are not installed
+                logger.Debug<RuntimeState>("No local version, need to install Umbraco.");
+                Level = RuntimeLevel.Install;
+                return;
+            }
+
+            if (localVersion < codeVersion)
+            {
+                // there *is* a local version, but it does not match the code version
+                // need to upgrade
+                logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
+                Level = RuntimeLevel.Upgrade;
+            }
+            else if (localVersion > codeVersion)
+            {
+                logger.Warn<RuntimeState>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
+
+                // in fact, this is bad enough that we want to throw
+                throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
+            }
+            else if (databaseFactory.Configured == false)
+            {
+                // local version *does* match code version, but the database is not configured
+                // install (again? this is a weird situation...)
+                logger.Debug<RuntimeState>("Database is not configured, need to install Umbraco.");
+                Level = RuntimeLevel.Install;
+                return;
+            }
+
+            // else, keep going,
+            // anything other than install wants a database - see if we can connect
+            // (since this is an already existing database, assume localdb is ready)
+            for (var i = 0; i < 5; i++)
+            {
+                connect = databaseFactory.CanConnect;
+                if (connect) break;
+                logger.Debug<RuntimeState>("Could not immediately connect to database, trying again.");
+                Thread.Sleep(1000);
+            }
+
+            if (connect == false)
+            {
+                // cannot connect to configured database, this is bad, fail
+                logger.Debug<RuntimeState>("Could not connect to database.");
+
+                // in fact, this is bad enough that we want to throw
+                throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+            }
+
+            // if we already know we want to upgrade,
+            // still run EnsureUmbracoUpgradeState to get the states
+            // (v7 will just get a null state, that's ok)
+
+            // else
+            // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
+            // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
+            bool noUpgrade;
+            try
+            {
+                noUpgrade = EnsureUmbracoUpgradeState(databaseFactory, logger);
+            }
+            catch (Exception e)
+            {
+                // can connect to the database but cannot check the upgrade state... oops
+                logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
+                throw new BootFailedException("Could not check the upgrade state.", e);
+            }
+
+            // if we already know we want to upgrade, exit here
+            if (Level == RuntimeLevel.Upgrade)
+                return;
+
+            if (noUpgrade)
+            {
+                // the database version matches the code & files version, all clear, can run
+                Level = RuntimeLevel.Run;
+                return;
+            }
+
+            // the db version does not match... but we do have a migration table
+            // so, at least one valid table, so we quite probably are installed & need to upgrade
+
+            // although the files version matches the code version, the database version does not
+            // which means the local files have been upgraded but not the database - need to upgrade
+            logger.Debug<RuntimeState>("Has not reached the final upgrade step, need to upgrade Umbraco.");
+            Level = RuntimeLevel.Upgrade;
+        }
+
+        protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        {
+            var upgrader = new UmbracoUpgrader();
+            var stateValueKey = upgrader.StateValueKey;
+
+            // no scope, no service - just directly accessing the database
+            using (var database = databaseFactory.CreateDatabase())
+            {
+                CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
+                FinalMigrationState = upgrader.Plan.FinalState;
+            }
+
+            logger.Debug<RuntimeState>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", CurrentMigrationState, FinalMigrationState ?? "<null>");
+
+            return CurrentMigrationState == FinalMigrationState;
+        }
     }
 }

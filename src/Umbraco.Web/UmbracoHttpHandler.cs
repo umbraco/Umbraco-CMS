@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
@@ -17,14 +14,14 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+            : this(Current.UmbracoContext, Current.Services)
         { }
 
-        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            Umbraco = new UmbracoHelper(umbracoContext, services);
 
             // fixme inject somehow
             Logger = Current.Logger;
@@ -44,7 +41,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the ProfilingLogger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the Umbraco context.

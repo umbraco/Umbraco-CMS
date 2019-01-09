@@ -9,6 +9,7 @@ using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -22,11 +23,12 @@ namespace Umbraco.Tests.Composing
     public class TypeLoaderTests
     {
         private TypeLoader _typeLoader;
+
         [SetUp]
         public void Initialize()
         {
             // this ensures it's reset
-            _typeLoader = new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            _typeLoader = new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             foreach (var file in Directory.GetFiles(IOHelper.MapPath("~/App_Data/TEMP/TypesCache")))
                 File.Delete(file);
@@ -53,16 +55,21 @@ namespace Umbraco.Tests.Composing
         public void TearDown()
         {
             _typeLoader = null;
+
+
+            // cleanup
+            var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+            var tlDir = Path.Combine(assDir.FullName, "TypeLoader");
+            if (!Directory.Exists(tlDir))
+                return;
+            Directory.Delete(tlDir, true);
         }
 
         private DirectoryInfo PrepareFolder()
         {
             var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
-            var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "TypeLoader", Guid.NewGuid().ToString("N")));
-            foreach (var f in dir.GetFiles())
-            {
-                f.Delete();
-            }
+            var tlDir = Path.Combine(assDir.FullName, "TypeLoader");
+            var dir = Directory.CreateDirectory(Path.Combine(tlDir, Guid.NewGuid().ToString("N")));
             return dir;
         }
 

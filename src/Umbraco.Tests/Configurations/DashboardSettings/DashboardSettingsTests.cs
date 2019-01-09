@@ -56,11 +56,11 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
             Assert.AreEqual(3, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.Count());
 
             Assert.AreEqual("translator", SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(0).Value);
-            Assert.AreEqual(AccessType.Deny, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(0).Action);
+            Assert.AreEqual(AccessRuleType.Deny, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(0).Type);
             Assert.AreEqual("hello", SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(1).Value);
-            Assert.AreEqual(AccessType.Grant, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(1).Action);
+            Assert.AreEqual(AccessRuleType.Grant, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(1).Type);
             Assert.AreEqual("world", SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(2).Value);
-            Assert.AreEqual(AccessType.GrantBySection, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(2).Action);
+            Assert.AreEqual(AccessRuleType.GrantBySection, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(2).Type);
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         public void Test_Tab_Access()
         {
             Assert.AreEqual(1, SettingsSection.Sections.ElementAt(2).Tabs.ElementAt(1).AccessRights.Rules.Count());
-            Assert.AreEqual(AccessType.Grant, SettingsSection.Sections.ElementAt(2).Tabs.ElementAt(1).AccessRights.Rules.ElementAt(0).Action);
+            Assert.AreEqual(AccessRuleType.Grant, SettingsSection.Sections.ElementAt(2).Tabs.ElementAt(1).AccessRights.Rules.ElementAt(0).Type);
             Assert.AreEqual("admin", SettingsSection.Sections.ElementAt(2).Tabs.ElementAt(1).AccessRights.Rules.ElementAt(0).Value);
         }
 
@@ -114,9 +114,9 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         public void Test_Control_Access()
         {
             Assert.AreEqual(2, SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.Count());
-            Assert.AreEqual(AccessType.Deny, SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.ElementAt(0).Action);
+            Assert.AreEqual(AccessRuleType.Deny, SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.ElementAt(0).Type);
             Assert.AreEqual("editor", SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.ElementAt(0).Value);
-            Assert.AreEqual(AccessType.Deny, SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.ElementAt(1).Action);
+            Assert.AreEqual(AccessRuleType.Deny, SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.ElementAt(1).Type);
             Assert.AreEqual("writer", SettingsSection.Sections.ElementAt(3).Tabs.ElementAt(0).Controls.ElementAt(1).AccessRights.Rules.ElementAt(1).Value);
         }
     }

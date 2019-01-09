@@ -28,14 +28,14 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
 
         private readonly IMemberGroupService _memberGroupService;
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
 
         //only for unit tests!
         internal MembershipProviderBase MembershipProvider { get; set; }
 
         #region Constructor
 
-        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,  MediaFileSystem mediaFileSystem,
+        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,  IMediaFileSystem mediaFileSystem,
             IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
             : base(provider, logger, eventMessagesFactory)
         {
@@ -929,10 +929,7 @@ namespace Umbraco.Core.Services.Implement
                 args.CanCancel = false;
             scope.Events.Dispatch(Deleted, this, args);
 
-            // fixme - this is MOOT because the event will not trigger immediately
-            // it's been refactored already (think it's the dispatcher that deals with it?)
-            _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                (file, e) => Logger.Error<MemberService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
+            // media files deleted by QueuingEventDispatcher
         }
 
         #endregion
@@ -1033,7 +1030,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 var ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames));
+                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames), nameof(AssignedRoles));
                 scope.Complete();
             }
         }
@@ -1050,7 +1047,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 var ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames));
+                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames), nameof(RemovedRoles));
                 scope.Complete();
             }
         }
@@ -1066,7 +1063,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames));
+                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(AssignedRoles));
                 scope.Complete();
             }
         }
@@ -1082,7 +1079,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames));
+                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(RemovedRoles));
                 scope.Complete();
             }
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -7,13 +6,13 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
-using LightInject;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.PublishedContent;
@@ -30,7 +29,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         {
             base.Compose();
 
-            Container.GetInstance<UrlSegmentProviderCollectionBuilder>()
+            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
         }
@@ -111,7 +110,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         [TestCase("id")]
-        [TestCase("nodeId")]
         [TestCase("__NodeId")]
         public void DictionaryDocument_Id_Keys(string key)
         {
@@ -128,7 +126,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         [TestCase("nodeName")]
-        [TestCase("__nodeName")]
         public void DictionaryDocument_NodeName_Keys(string key)
         {
             var dicDoc = GetDictionaryDocument(nodeNameKey: key);

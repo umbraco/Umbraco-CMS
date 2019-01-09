@@ -75,7 +75,7 @@ Use this directive to render a tabs navigation.
 
 <h3>Use in combination with</h3>
 <ul>
-    <li>{@link umbraco.directives.directive:umbTabsContent umbTabsContent}</li>
+    <li>{@link umbraco.directives.directive:umbTabContent umbTabContent}</li>
 </ul>
 
 @param {string=} tabs A collection of tabs.

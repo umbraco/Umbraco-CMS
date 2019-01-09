@@ -18,8 +18,8 @@ namespace Umbraco.Tests.UmbracoExamine
             _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 
-        private ProfilingLogger _profilingLogger;
-        protected override ProfilingLogger ProfilingLogger => _profilingLogger;
+        private IProfilingLogger _profilingLogger;
+        protected override IProfilingLogger ProfilingLogger => _profilingLogger;
 
         /// <summary>
         /// sets up resolvers before resolution is frozen
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
 
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
         }
     }
 }

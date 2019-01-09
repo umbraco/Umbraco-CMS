@@ -34,3 +34,4 @@ dotnet_naming_style.prefix_underscore.required_prefix = _
 csharp_style_var_for_built_in_types = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_var_elsewhere = true:suggestion
+csharp_prefer_braces = false : none

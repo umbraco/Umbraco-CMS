@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Collections;
+using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.IO;
@@ -15,6 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -31,12 +31,20 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            Current.Container = new ServiceContainer();
+            var register = RegisterFactory.Create();
 
-            _testObjects = new TestObjects(Current.Container);
-            Current.Container.RegisterSingleton(f => Current.Container);
-            Current.Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
-            Current.Container.RegisterCollectionBuilder<MapperCollectionBuilder>();
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+
+            _testObjects = new TestObjects(register);
+
+            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>()));
+            composition.WithCollectionBuilder<MapperCollectionBuilder>();
+
+            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+
+            Current.Reset();
+            Current.Factory = composition.CreateFactory();
 
             SettingsForTests.Reset(); // ensure we have configuration
         }

@@ -18,6 +18,7 @@
 
         <umb-toggle
             checked="vm.checked"
+            disabled="vm.disabled"
             on-click="vm.toggle()"
             show-labels="true"
             label-on="Start"
@@ -38,6 +39,7 @@
 
             var vm = this;
             vm.checked = false;
+            vm.disabled = false;
 
             vm.toggle = toggle;
 
@@ -52,6 +54,7 @@
 </pre>
 
 @param {boolean} checked Set to <code>true</code> or <code>false</code> to toggle the switch.
+@param {boolean} disabled Set to <code>true</code> or <code>false</code> to disable the switch.
 @param {callback} onClick The function which should be called when the toggle is clicked.
 @param {string=} showLabels Set to <code>true</code> or <code>false</code> to show a "On" or "Off" label next to the switch.
 @param {string=} labelOn Set a custom label for when the switched is turned on. It will default to "On".
@@ -115,6 +118,7 @@
             templateUrl: 'views/components/buttons/umb-toggle.html',
             scope: {
                 checked: "=",
+                disabled: "=",
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",

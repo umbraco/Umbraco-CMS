@@ -19,16 +19,17 @@ namespace Umbraco.Web.WebApi.Filters
             var user = UmbracoContext.Current.Security.CurrentUser;
             if (user == null) return;
 
-            var objectContent = actionExecutedContext.Response.Content as ObjectContent;
-            if (objectContent != null)
+            if (actionExecutedContext.Response.Content is ObjectContent objectContent)
             {
                 var model = objectContent.Value;
 
                 if (model != null)
                 {
-                    EditorModelEventManager.EmitEvent(actionExecutedContext, new EditorModelEventArgs(
-                        (dynamic)model,
-                        UmbracoContext.Current));
+                    var args = new EditorModelEventArgs(
+                        model,
+                        UmbracoContext.Current);
+                    EditorModelEventManager.EmitEvent(actionExecutedContext, args);
+                    objectContent.Value = args.Model;
                 }
             }
 

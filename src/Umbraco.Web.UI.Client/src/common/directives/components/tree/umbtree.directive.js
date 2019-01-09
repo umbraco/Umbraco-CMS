@@ -278,7 +278,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 if (forceReload || (node.hasChildren && node.children.length === 0)) {
                     //get the children from the tree service
-                    return treeService.loadNodeChildren({ node: node, section: $scope.section })
+                    return treeService.loadNodeChildren({ node: node, section: $scope.section, isDialog: $scope.isdialog })
                         .then(function(data) {
                             //emit expanded event
                             emitEvent("treeNodeExpanded", { tree: $scope.tree, node: node, children: data });

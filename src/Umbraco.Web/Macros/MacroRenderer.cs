@@ -27,11 +27,11 @@ namespace Umbraco.Web.Macros
 {
     public class MacroRenderer
     {
-        private readonly ProfilingLogger _plogger;
+        private readonly IProfilingLogger _plogger;
 
         // todo: there are many more things that would need to be injected in here
 
-        public MacroRenderer(ProfilingLogger plogger)
+        public MacroRenderer(IProfilingLogger plogger)
         {
             _plogger = plogger;
         }
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Macros
                 var key = member?.ProviderUserKey;
                 if (key == null) return;
             }
-            
+
             // this is legacy and I'm not sure what exactly it is supposed to do
             if (macroContent.Control != null)
                 macroContent.ControlId = macroContent.Control.ID;
@@ -304,7 +304,7 @@ namespace Umbraco.Web.Macros
             {
                 Exceptions.Add(e);
 
-                _plogger.Logger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
+                _plogger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {
@@ -312,7 +312,7 @@ namespace Umbraco.Web.Macros
                     Alias = macro.Alias,
                     MacroSource = macro.MacroSource,
                     Exception = e,
-                    Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
+                    Behaviour = Current.Configs.Settings().Content.MacroErrorBehaviour
                 };
 
                 OnError(macroErrorEventArgs);
@@ -362,7 +362,7 @@ namespace Umbraco.Web.Macros
                         "Executed PartialView.",
                         () => ExecutePartialView(model),
                         () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
-                    
+
                 case MacroTypes.UserControl:
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Loading UserControl: MacroSource=\"{model.MacroSource}\".",
@@ -567,7 +567,7 @@ namespace Umbraco.Web.Macros
         private static readonly Regex HrefRegex = new Regex("href=\"([^\"]*)\"",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public static string GetRenderedMacro(int macroId, Hashtable elements, Hashtable attributes, int pageId, IMacroService macroService, ProfilingLogger plogger)
+        public static string GetRenderedMacro(int macroId, Hashtable elements, Hashtable attributes, int pageId, IMacroService macroService, IProfilingLogger plogger)
         {
             var m = macroService.GetById(macroId);
             if (m == null) return string.Empty;
@@ -604,7 +604,7 @@ namespace Umbraco.Web.Macros
                 querystring += $"&umb_{ide.Key}={HttpContext.Current.Server.UrlEncode((ide.Value ?? String.Empty).ToString())}";
 
             // create a new 'HttpWebRequest' object to the mentioned URL.
-            var useSsl = UmbracoConfig.For.GlobalSettings().UseHttps;
+            var useSsl = Current.Configs.Global().UseHttps;
             var protocol = useSsl ? "https" : "http";
             var currentRequest = HttpContext.Current.Request;
             var serverVars = currentRequest.ServerVariables;
@@ -619,7 +619,7 @@ namespace Umbraco.Web.Macros
             // propagate the user's context
             // TODO: this is the worst thing ever.
             // also will not work if people decide to put their own custom auth system in place.
-            var inCookie = currentRequest.Cookies[UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName];
+            var inCookie = currentRequest.Cookies[Current.Configs.Settings().Security.AuthCookieName];
             if (inCookie == null) throw new NullReferenceException("No auth cookie found");
             var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path, serverVars["SERVER_NAME"]);
             myHttpWebRequest.CookieContainer = new CookieContainer();

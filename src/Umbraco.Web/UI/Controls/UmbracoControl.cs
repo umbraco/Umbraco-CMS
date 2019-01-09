@@ -3,7 +3,6 @@ using System.Web.Mvc;
 using System.Web.UI;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 
@@ -16,10 +15,10 @@ namespace Umbraco.Web.UI.Controls
     {
         private UrlHelper _url;
 
-        protected UmbracoControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        protected UmbracoControl(UmbracoContext umbracoContext, ServiceContext services)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            Umbraco = new UmbracoHelper(umbracoContext, services);
 
             // fixme inject somehow
             Logger = Current.Logger;
@@ -31,7 +30,7 @@ namespace Umbraco.Web.UI.Controls
         /// Empty constructor, uses Singleton to resolve the UmbracoContext.
         /// </summary>
         protected UmbracoControl()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+            : this(Current.UmbracoContext, Current.Services)
         { }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace Umbraco.Web.UI.Controls
         /// <summary>
         /// Gets the profiling logger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the Umbraco context.

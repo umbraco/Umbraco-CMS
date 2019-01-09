@@ -92,7 +92,7 @@ namespace Umbraco.Web
             }
 
             //DO NOT assign to _umbracoHelper variable, this is a singleton class and we cannot assign this based on an UmbracoHelper which is request based
-            return new UmbracoHelper(UmbracoContext.Current, Current.Services, Current.ApplicationCache);
+            return new UmbracoHelper(UmbracoContext.Current, Current.Services);
         }
     }
 }
