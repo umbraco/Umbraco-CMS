@@ -189,7 +189,7 @@
          */
         function validateMandatory() {
             return {
-                isValid: !vm.validation.mandatory || (vm.viewModel != null && vm.viewModel.length > 0),
+                isValid: !vm.validation.mandatory || (vm.viewModel != null && vm.viewModel.length > 0) || (vm.value != null && vm.value.length > 0),
                 errorMsg: "Value cannot be empty",
                 errorKey: "required"
             };
