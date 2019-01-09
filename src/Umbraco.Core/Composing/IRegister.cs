@@ -34,14 +34,33 @@ namespace Umbraco.Core.Composing
         void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient);
 
         /// <summary>
+        /// Registers a service with an implementation type, for a target.
+        /// </summary>
+        void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
+            where TService : class;
+
+        /// <summary>
         /// Registers a service with an implementation factory.
         /// </summary>
-        void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient);
+        void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class;
+
+        /// <summary>
+        /// Registers a service with an implementation factory, for a target.
+        /// </summary>
+        void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class;
 
         /// <summary>
         /// Registers a service with an implementing instance.
         /// </summary>
         void RegisterInstance(Type serviceType, object instance);
+
+        /// <summary>
+        /// Registers a service with an implementing instance, for a target.
+        /// </summary>
+        void RegisterInstanceFor<TService, TTarget>(TService instance)
+            where TService : class;
 
         /// <summary>
         /// Registers a base type for auto-registration.

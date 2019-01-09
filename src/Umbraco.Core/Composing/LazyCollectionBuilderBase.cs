@@ -12,7 +12,7 @@ namespace Umbraco.Core.Composing
     /// <typeparam name="TItem">The type of the items.</typeparam>
     public abstract class LazyCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TBuilder : LazyCollectionBuilderBase<TBuilder, TCollection, TItem>
-        where TCollection : IBuilderCollection<TItem>
+        where TCollection : class, IBuilderCollection<TItem>
     {
         private readonly List<Func<IEnumerable<Type>>> _producers = new List<Func<IEnumerable<Type>>>();
         private readonly List<Type> _excluded = new List<Type>();

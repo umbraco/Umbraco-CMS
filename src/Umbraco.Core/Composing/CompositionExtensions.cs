@@ -52,10 +52,17 @@ namespace Umbraco.Core.Composing
             => composition.RegisterUnique(typeof(TService), typeof(TImplementing));
 
         /// <summary>
+        /// Registers a unique service with an implementation type, for a target.
+        /// </summary>
+        public static void RegisterUniqueFor<TService, TTarget, TImplementing>(this Composition composition)
+            where TService : class
+            => composition.RegisterUniqueFor<TService, TTarget>(typeof(TImplementing));
+
+        /// <summary>
         /// Registers a unique service with an implementing instance.
         /// </summary>
         public static void RegisterUnique<TService>(this Composition composition, TService instance)
-            => composition.RegisterUnique(typeof(TService), instance);
+            => composition.RegisterUniqueInstance(typeof(TService), instance);
 
         #endregion
     }

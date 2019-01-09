@@ -17,7 +17,7 @@ namespace Umbraco.Core.Components
     public class Composition : IRegister
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
-        private readonly Dictionary<Type, Unique> _uniques = new Dictionary<Type, Unique>();
+        private readonly Dictionary<string, Action<IRegister>> _uniques = new Dictionary<string, Action<IRegister>>();
         private readonly IRegister _register;
 
         /// <summary>
@@ -82,12 +82,28 @@ namespace Umbraco.Core.Components
             => _register.Register(serviceType, implementingType, lifetime);
 
         /// <inheritdoc />
+        public void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+            => _register.RegisterFor<TService, TTarget>(implementingType, lifetime);
+
+        /// <inheritdoc />
         public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
             => _register.Register(factory, lifetime);
+
+        /// <inheritdoc />
+        public void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+            => _register.RegisterFor<TService, TTarget>(factory, lifetime);
 
         /// <inheritdoc />
         public void RegisterInstance(Type serviceType, object instance)
             => _register.RegisterInstance(serviceType, instance);
+
+        /// <inheritdoc />
+        public void RegisterInstanceFor<TService, TTarget>(TService instance)
+            where TService : class
+            => _register.RegisterInstanceFor<TService, TTarget>(instance);
 
         /// <inheritdoc />
         public void RegisterAuto(Type serviceBaseType)
@@ -104,10 +120,12 @@ namespace Umbraco.Core.Components
                 onCreating();
 
             foreach (var unique in _uniques.Values)
-                unique.RegisterWith(_register);
+                unique(_register);
+            _uniques.Clear(); // no point keep them around
 
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(_register);
+            _builders.Clear(); // no point keep them around
 
             Configs.RegisterWith(_register);
 
@@ -123,74 +141,63 @@ namespace Umbraco.Core.Components
 
         #region Unique
 
-        /// <summary>
-        /// Registers a unique service.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType, Type implementingType)
-            => _uniques[serviceType] = new Unique(serviceType, implementingType);
+        private string GetUniqueName<TService>()
+            => GetUniqueName(typeof(TService));
+
+        private string GetUniqueName(Type serviceType)
+            => serviceType.FullName;
+
+        private string GetUniqueName<TService, TTarget>()
+            => GetUniqueName(typeof(TService), typeof(TTarget));
+
+        private string GetUniqueName(Type serviceType, Type targetType)
+            => serviceType.FullName + "::" + targetType.FullName;
 
         /// <summary>
         /// Registers a unique service.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType, object instance)
-            => _uniques[serviceType] = new Unique(serviceType, instance);
+        public void RegisterUnique(Type serviceType, Type implementingType)
+            => _uniques[GetUniqueName(serviceType)] = register => register.Register(serviceType, implementingType, Lifetime.Singleton);
+
+        /// <summary>
+        /// Registers a unique service, for a target.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUniqueFor<TService, TTarget>(Type implementingType)
+            where TService : class
+            => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterFor<TService, TTarget>(implementingType, Lifetime.Singleton);
+
+        /// <summary>
+        /// Registers a unique service.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUniqueInstance(Type serviceType, object instance)
+            => _uniques[GetUniqueName(serviceType)] = register => register.RegisterInstance(serviceType, instance);
+
+        /// <summary>
+        /// Registers a unique service, for a target.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUniqueInstanceFor<TService, TTarget>(TService instance)
+            where TService : class
+            => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterInstanceFor<TService, TTarget>(instance);
 
         /// <summary>
         /// Registers a unique service.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
         public void RegisterUnique<TService>(Func<IFactory, TService> factory)
-            => _uniques[typeof(TService)] = new Unique<TService>(factory);
+            where TService : class
+            => _uniques[GetUniqueName<TService>()] = register => register.Register<TService>(factory, Lifetime.Singleton);
 
-        private class Unique
-        {
-            private readonly Type _serviceType;
-            private readonly Type _implementingType;
-            private readonly object _instance;
-
-            protected Unique(Type serviceType)
-            {
-                _serviceType = serviceType;
-            }
-
-            public Unique(Type serviceType, Type implementingType)
-                : this(serviceType)
-            {
-                _implementingType = implementingType;
-            }
-
-            public Unique(Type serviceType, object instance)
-                : this(serviceType)
-            {
-                _instance = instance;
-            }
-
-            public virtual void RegisterWith(IRegister register)
-            {
-                if (_implementingType != null)
-                    register.Register(_serviceType, _implementingType, Lifetime.Singleton);
-                else if (_instance != null)
-                    register.RegisterInstance(_serviceType, _instance);
-            }
-        }
-
-        private class Unique<TService> : Unique
-        {
-            private readonly Func<IFactory, TService> _factory;
-
-            public Unique(Func<IFactory, TService> factory)
-                : base(typeof(TService))
-            {
-                _factory = factory;
-            }
-
-            public override void RegisterWith(IRegister register)
-            {
-                register.Register(_factory, Lifetime.Singleton);
-            }
-        }
+        /// <summary>
+        /// Registers a unique service, for a target.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUniqueFor<TService, TTarget>(Func<IFactory, TService> factory)
+            where TService : class
+            => _uniques[GetUniqueName<TService, TTarget>()] = register => register.RegisterFor<TService, TTarget>(factory, Lifetime.Singleton);
 
         #endregion
 

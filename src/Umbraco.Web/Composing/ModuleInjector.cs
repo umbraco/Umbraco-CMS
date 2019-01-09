@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web;
+﻿using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
@@ -11,7 +10,7 @@ namespace Umbraco.Web.Composing
     /// </summary>
     /// <typeparam name="TModule">The type of the injected module.</typeparam>
     public abstract class ModuleInjector<TModule> : IHttpModule
-        where TModule : IHttpModule
+        where TModule : class, IHttpModule
     {
         protected TModule Module { get; private set; }
 
