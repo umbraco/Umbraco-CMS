@@ -151,7 +151,7 @@ namespace Umbraco.Core.Persistence.Factories
                         }
 
                         // flag culture as edited if it contains an edited invariant property 
-                        if (!property.PropertyType.VariesByCulture() 
+                        if (propertyValue.Culture == null //invariant property
                             && !sameValues // and edited and published are different
                             && entityVariesByCulture) //only when the entity is variant
                         {
