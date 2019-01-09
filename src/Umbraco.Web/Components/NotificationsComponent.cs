@@ -18,26 +18,38 @@ namespace Umbraco.Web.Components
 {
     public sealed class NotificationsComponent : IComponent
     {
-        public NotificationsComponent(INotificationService notificationService, Notifier notifier, ActionCollection actions)
+        private readonly Notifier _notifier;
+        private readonly ActionCollection _actions;
+
+        public NotificationsComponent(Notifier notifier, ActionCollection actions)
+        {
+            _notifier = notifier;
+            _actions = actions;
+        }
+
+        public void Initialize()
         {
             //Send notifications for the send to publish action
-            ContentService.SentToPublish += (sender, args) => notifier.Notify(actions.GetAction<ActionToPublish>(), args.Entity);
+            ContentService.SentToPublish += (sender, args) => _notifier.Notify(_actions.GetAction<ActionToPublish>(), args.Entity);
 
             //Send notifications for the published action
-            ContentService.Published += (sender, args) => notifier.Notify(actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
+            ContentService.Published += (sender, args) => _notifier.Notify(_actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
 
             //Send notifications for the saved action
-            ContentService.Sorted += (sender, args) => ContentServiceSorted(notifier, sender, args, actions);
+            ContentService.Sorted += (sender, args) => ContentServiceSorted(_notifier, sender, args, _actions);
 
             //Send notifications for the update and created actions
-            ContentService.Saved += (sender, args) => ContentServiceSaved(notifier, sender, args, actions);
+            ContentService.Saved += (sender, args) => ContentServiceSaved(_notifier, sender, args, _actions);
 
             //Send notifications for the delete action
-            ContentService.Deleted += (sender, args) => notifier.Notify(actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
+            ContentService.Deleted += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
 
             //Send notifications for the unpublish action
-            ContentService.Unpublished += (sender, args) => notifier.Notify(actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
+            ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
         }
+
+        public void Terminate()
+        { }
 
         private void ContentServiceSorted(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
         {

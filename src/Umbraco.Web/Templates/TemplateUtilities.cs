@@ -86,7 +86,7 @@ namespace Umbraco.Web.Templates
         /// </remarks>
         public static string ResolveUrlsFromTextString(string text)
         {
-            if (Current.Config.Umbraco().Content.ResolveUrlsFromTextString == false) return text;
+            if (Current.Configs.Settings().Content.ResolveUrlsFromTextString == false) return text;
 
             using (var timer = Current.ProfilingLogger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
             {

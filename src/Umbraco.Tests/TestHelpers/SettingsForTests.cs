@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Configuration;
 using Moq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -12,22 +10,6 @@ namespace Umbraco.Tests.TestHelpers
 {
     public class SettingsForTests
     {
-        public static void ConfigureSettings(IGlobalSettings settings)
-        {
-            Current.Config.SetGlobalConfig(settings);
-        }
-
-        // umbracoSettings
-
-        /// <summary>
-        /// Sets the umbraco settings singleton to the object specified
-        /// </summary>
-        /// <param name="settings"></param>
-        public static void ConfigureSettings(IUmbracoSettingsSection settings)
-        {
-            Current.Config.SetUmbracoConfig(settings);
-        }
-
         public static IGlobalSettings GenerateMockGlobalSettings()
         {
             var config = Mock.Of<IGlobalSettings>(
@@ -132,8 +114,6 @@ namespace Umbraco.Tests.TestHelpers
         private static void ResetSettings()
         {
             _defaultGlobalSettings = null;
-            ConfigureSettings(GetDefaultUmbracoSettings());
-            ConfigureSettings(GetDefaultGlobalSettings());
         }
 
         private static IUmbracoSettingsSection _defaultUmbracoSettings;

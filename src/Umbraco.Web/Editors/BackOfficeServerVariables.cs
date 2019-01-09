@@ -318,25 +318,25 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", Current.Config.Umbraco().Content.ImageFileTypes)
+                            string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", Current.Config.Umbraco().Content.DisallowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", Current.Config.Umbraco().Content.AllowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", Current.Config.Umbraco().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", Current.Config.Umbraco().Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
-                        {"allowPasswordReset", Current.Config.Umbraco().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  Current.Config.Umbraco().Content.LoginBackgroundImage},
+                        {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
+                        {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                     }

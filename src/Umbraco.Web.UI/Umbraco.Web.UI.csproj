@@ -107,7 +107,7 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.26</Version>
+      <Version>8.0.0-alpha.29</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -163,13 +163,6 @@
     </Compile>
     <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.designer.cs">
       <DependentUpon>directoryBrowser.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
-      <DependentUpon>ChangeDocType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
-      <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
@@ -302,15 +295,6 @@
     <Content Include="Umbraco\Config\Lang\pt.xml" />
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
-    <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
-    <Content Include="Umbraco\Developer\RelationTypes\Images\Bidirectional.png" />
-    <Content Include="Umbraco\Developer\RelationTypes\Images\ParentToChild.png" />
-    <Content Include="Umbraco\Developer\RelationTypes\Images\Refresh.gif" />
-    <Content Include="Umbraco\Developer\RelationTypes\NewRelationType.aspx" />
-    <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="default.aspx" />
@@ -324,7 +308,6 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />

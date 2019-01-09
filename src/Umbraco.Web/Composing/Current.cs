@@ -201,7 +201,7 @@ namespace Umbraco.Web.Composing
 
         public static TypeLoader TypeLoader => CoreCurrent.TypeLoader;
 
-        public static UmbracoConfig Config => CoreCurrent.Config;
+        public static Configs Configs => CoreCurrent.Configs;
 
         public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
 

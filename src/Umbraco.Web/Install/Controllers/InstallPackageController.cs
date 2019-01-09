@@ -56,7 +56,7 @@ namespace Umbraco.Web.Install.Controllers
                 UmbracoVersion.Current,
                 UmbracoContext.Current.Security.CurrentUser.Id);
 
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Install.Controllers
         public HttpResponseMessage InstallPackageFiles(InstallPackageModel model)
         {
             model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
             installer.LoadConfig(model.PackageFile);
             installer.InstallFiles(model.ManifestId, model.PackageFile);
             return Json(new
@@ -135,7 +135,7 @@ namespace Umbraco.Web.Install.Controllers
         public HttpResponseMessage InstallBusinessLogic(InstallPackageModel model)
         {
             model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
             installer.LoadConfig(model.PackageFile);
             installer.InstallBusinessLogic(model.ManifestId, model.PackageFile);
             return Json(new
@@ -156,7 +156,7 @@ namespace Umbraco.Web.Install.Controllers
         public HttpResponseMessage CleanupInstallation(InstallPackageModel model)
         {
             model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
             installer.LoadConfig(model.PackageFile);
             installer.InstallCleanUp(model.ManifestId, model.PackageFile);
 

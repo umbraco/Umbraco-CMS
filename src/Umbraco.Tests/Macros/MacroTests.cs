@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Macros;
@@ -27,7 +28,9 @@ namespace Umbraco.Tests.Macros
                 new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            Current.Config.SetUmbracoConfig(SettingsForTests.GetDefaultUmbracoSettings());
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
         }
 
         [TestCase("123", "IntProp", typeof(int))]

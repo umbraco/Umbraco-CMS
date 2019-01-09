@@ -123,7 +123,6 @@ namespace Umbraco.Tests.Strings
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
             const string input2 = "ÆØÅ and æøå and größer БбДдЖж page";

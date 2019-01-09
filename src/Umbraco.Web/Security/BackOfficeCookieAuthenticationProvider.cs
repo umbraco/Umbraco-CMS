@@ -67,7 +67,7 @@ namespace Umbraco.Web.Security
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(Current.Config.Umbraco().Security.AuthCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(Current.Configs.Settings().Security.AuthCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"

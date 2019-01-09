@@ -300,7 +300,7 @@ namespace Umbraco.Web.Editors
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
             // So this is just a server-side secondary check.
-            if (Current.Config.Umbraco().Security.AllowPasswordReset == false)
+            if (Current.Configs.Settings().Security.AllowPasswordReset == false)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }

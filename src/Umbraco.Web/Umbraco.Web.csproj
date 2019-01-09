@@ -1126,27 +1126,16 @@
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
     <Compile Include="_Legacy\Controls\BaseTreePicker.cs" />
-    <Compile Include="_Legacy\Controls\DataAttributes.cs" />
-    <Compile Include="_Legacy\Controls\feedback.cs" />
-    <Compile Include="_Legacy\Controls\FieldDropDownList.cs" />
-    <Compile Include="_Legacy\Controls\MenuButton.cs" />
-    <Compile Include="_Legacy\Controls\MenuButtonI.cs" />
-    <Compile Include="_Legacy\Controls\MenuIcon.cs" />
-    <Compile Include="_Legacy\Controls\MenuIconI.cs" />
     <Compile Include="_Legacy\Controls\pane.cs" />
     <Compile Include="_Legacy\Controls\Panel.cs" />
-    <Compile Include="_Legacy\Controls\ProgressBar.cs" />
     <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
-    <Compile Include="_Legacy\Controls\Splitter.cs" />
     <Compile Include="_Legacy\Controls\TabPage.cs" />
     <Compile Include="_Legacy\Controls\TabView.cs" />
     <Compile Include="_Legacy\PackageActions\addApplication.cs" />
-    <Compile Include="_Legacy\PackageActions\addApplicationTree.cs" />
     <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
     <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
     <Compile Include="_Legacy\PackageActions\addStringToHtmlElement.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
-    <Compile Include="_Legacy\PackageActions\moveRootDocument.cs" />
     <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
     <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
@@ -1183,9 +1172,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoPage.master.cs">
@@ -1244,7 +1230,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
@@ -1253,26 +1238,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
-      <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.designer.cs">
-      <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx.cs">
-      <DependentUpon>insertMasterpagePlaceholder.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx.designer.cs">
-      <DependentUpon>insertMasterpagePlaceholder.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.cs">
-      <DependentUpon>republish.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.designer.cs">
-      <DependentUpon>republish.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
@@ -1326,15 +1291,6 @@
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

@@ -145,7 +145,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
-            _http.ExpireCookie(Current.Config.Umbraco().Security.AuthCookieName);
+            _http.ExpireCookie(Current.Configs.Settings().Security.AuthCookieName);
 
                 return true;
         }

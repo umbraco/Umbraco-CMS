@@ -9,15 +9,6 @@ namespace Umbraco.Tests.Strings
     [TestFixture]
     public class CmsHelperCasingTests : UmbracoTestBase
     {
-        [SetUp]
-        public void Setup()
-        {
-            //set default config
-            var config = SettingsForTests.GetDefaultUmbracoSettings();
-            SettingsForTests.ConfigureSettings(config);
-
-        }
-
         [TestCase("thisIsTheEnd", "This Is The End")]
         [TestCase("th", "Th")]
         [TestCase("t", "t")]

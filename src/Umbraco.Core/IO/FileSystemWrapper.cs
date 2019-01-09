@@ -21,7 +21,7 @@ namespace Umbraco.Core.IO
             InnerFileSystem = innerFileSystem;
         }
 
-        public IFileSystem InnerFileSystem { get; internal set; }
+        internal IFileSystem InnerFileSystem { get; set; }
 
         public IEnumerable<string> GetDirectories(string path)
         {
