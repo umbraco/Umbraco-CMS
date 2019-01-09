@@ -45,12 +45,7 @@ angular.module("umbraco")
 
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
-                    maxImageSize: editorConfig.maxImageSize,
-                    init_instance_callback: function (editor) {
-                        editor.on('Change', function (e) {
-                            $scope.model.value = editor.getContent();
-                        });
-                    }
+                    maxImageSize: editorConfig.maxImageSize
                 };
 
                 angular.extend(baseLineConfigObj, standardConfig);
@@ -63,7 +58,7 @@ angular.module("umbraco")
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
                         editor: editor,
-                        value: $scope.model.value,
+                        model: $scope.model,
                         currentForm: angularHelper.getCurrentForm($scope)
                     });
 

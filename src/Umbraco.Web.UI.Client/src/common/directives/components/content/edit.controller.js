@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, relationResource, overlayService, angularHelper) {
+        editorState, $http, eventsService, relationResource, overlayService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -309,7 +309,7 @@
         }
 
         function ensureDirtyIsSetIfAnyVariantIsDirty() {
-            
+
             $scope.contentForm.$dirty = false;
 
             for (var i = 0; i < $scope.content.variants.length; i++) {
