@@ -162,7 +162,7 @@ When building a custom infinite editor view you can use the same components as a
 (function () {
     "use strict";
 
-    function editorService(eventsService, keyboardService) {
+    function editorService(eventsService, keyboardService, $timeout) {
 
         let editorsKeyboardShorcuts = [];
         var editors = [];
@@ -246,9 +246,11 @@ When building a custom infinite editor view you can use the same components as a
             // emit event to let components know an editor has been removed
             eventsService.emit("appState.editors.close", args);
 
-            // rebind keyboard shortcuts for the new editor in focus
-            rebindKeyboardShortcuts();
-            
+            $timeout(function() {
+                // rebind keyboard shortcuts for the new editor in focus
+                rebindKeyboardShortcuts();
+            }, 0);
+
         }
 
         /**
