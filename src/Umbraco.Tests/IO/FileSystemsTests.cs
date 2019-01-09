@@ -87,6 +87,16 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
+        public void Can_Unwrap_MediaFileSystem()
+        {
+            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var unwrapped = fileSystem.Unwrap();
+            Assert.IsNotNull(unwrapped);
+            var physical = unwrapped as PhysicalFileSystem;
+            Assert.IsNotNull(physical);
+        }
+
+        [Test]
         public void Can_Delete_MediaFiles()
         {
             var fs = _factory.GetInstance<IMediaFileSystem>();
