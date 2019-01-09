@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using Serilog;
 using Serilog.Events;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 
@@ -165,7 +166,7 @@ namespace Umbraco.Core.Logging.Serilog
                 messageTemplate += "\r\nThe thread has been aborted, because the request has timed out.";
 
                 // dump if configured, or if stacktrace contains Monitor.ReliableEnter
-                dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+                dump = Current.Configs.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
 
                 // dump if it is ok to dump (might have a cap on number of dump...)
                 dump &= MiniDump.OkToDump();
@@ -216,9 +217,9 @@ namespace Umbraco.Core.Logging.Serilog
         /// <inheritdoc/>
         public void Warn(Type reporting, string message)
         {
-            LoggerFor(reporting).Warning(message);            
+            LoggerFor(reporting).Warning(message);
         }
-        
+
         /// <inheritdoc/>
         public void Warn(Type reporting, string message, params object[] propertyValues)
         {
@@ -230,7 +231,7 @@ namespace Umbraco.Core.Logging.Serilog
         {
             LoggerFor(reporting).Warning(exception, message);
         }
-        
+
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
@@ -254,7 +255,7 @@ namespace Umbraco.Core.Logging.Serilog
         {
             LoggerFor(reporting).Debug(message);
         }
-        
+
         /// <inheritdoc/>
         public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
         {

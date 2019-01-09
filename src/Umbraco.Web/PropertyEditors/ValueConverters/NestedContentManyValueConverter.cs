@@ -16,12 +16,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// </summary>
     public class NestedContentManyValueConverter : NestedContentValueConverterBase
     {
-        private readonly ProfilingLogger _proflog;
+        private readonly IProfilingLogger _proflog;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentManyValueConverter"/> class.
         /// </summary>
-        public NestedContentManyValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
+        public NestedContentManyValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
             : base(publishedSnapshotAccessor, publishedModelFactory)
         {
             _proflog = proflog;

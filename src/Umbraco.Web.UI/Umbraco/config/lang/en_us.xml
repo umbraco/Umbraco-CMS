@@ -33,8 +33,11 @@
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="wasMovedTo">was moved to</key>
+    <key alias="wasCopiedTo">was copied to</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -967,7 +970,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Edit your notification for %0%</key>
+    <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
 
@@ -1148,22 +1152,23 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="removeSpecialFormattering">Paste, but remove formatting (Recommended)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Role based protection</key>
-    <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
-    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
+    <key alias="paGroups">Group based protection</key>
+    <key alias="paGroupsHelp">If you want to grant access to all members of specific member groups</key>
+    <key alias="paGroupsNoGroups">You need to create a member group before you can use group based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
-    <key alias="paHowWould">Choose how to restrict access to this page</key>
-    <key alias="paIsProtected">%0% is now protected</key>
-    <key alias="paIsRemoved">Protection removed from %0%</key>
+    <key alias="paHowWould"><![CDATA[Choose how to restrict access to the page <strong>%0%</strong>]]></key>
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> is now protected]]></key>
+    <key alias="paIsRemoved"><![CDATA[Protection removed from <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Login Page</key>
     <key alias="paLoginPageHelp">Choose the page that contains the login form</key>
-    <key alias="paRemoveProtection">Remove Protection</key>
+    <key alias="paRemoveProtection">Remove protection...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Are you sure you want to remove the protection from the page <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Select the pages that contain login form and error messages</key>
-    <key alias="paSelectRoles">Pick the roles who have access to this page</key>
-    <key alias="paSetLogin">Set the login and password for this page</key>
-    <key alias="paSimple">Single user protection</key>
-    <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
+    <key alias="paSelectGroups"><![CDATA[Select the groups who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paSelectMembers"><![CDATA[Select the members who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paMembers">Specific members protection</key>
+    <key alias="paMembersHelp">If you wish to grant access to specific members</key>
   </area>
   <area alias="publish">
     <key alias="invalidPublishBranchPermissions">Insufficient user permissions to publish all descendant documents</key>
@@ -1223,6 +1228,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
@@ -1496,7 +1502,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
     <key alias="noTabs">You have not added any tabs</key>
-    <key alias="addGroup">Add Group</key>
+    <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
     <key alias="addProperty">Add property</key>
     <key alias="requiredLabel">Required label</key>
@@ -1989,6 +1995,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>
     <key alias="enableUrlTracker">Enable URL tracker</key>
+    <key alias="culture">Culture</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Redirected To</key>
     <key alias="redirectUrlManagement">Redirect Url Management</key>
@@ -2017,10 +2024,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
     <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
     <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
-  </area>
-  <area alias="notify">
-    <key alias="notifySet">Select your notifications for</key>
-    <key alias="notificationsSavedFor">Notification settings saved for </key>
   </area>
   <area alias="relationType">
     <key alias="direction">Direction</key>

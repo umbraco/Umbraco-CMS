@@ -7,7 +7,7 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {
-    public class PackageHelper
+    internal class PackageHelper
     {
         //Helper method to replace umbraco tags that breaks the xml format..
         public static string ParseToValidXml(ITemplate templateObj, ref bool hasAspNetContentBeginning, string template, bool toValid)

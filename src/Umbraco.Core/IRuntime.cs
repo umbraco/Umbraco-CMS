@@ -1,4 +1,4 @@
-﻿using LightInject;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core
 {
@@ -10,8 +10,14 @@ namespace Umbraco.Core
         /// <summary>
         /// Boots the runtime.
         /// </summary>
-        /// <param name="container">The application service container.</param>
-        void Boot(ServiceContainer container);
+        /// <param name="register">The application register.</param>
+        /// <returns>The application factory.</returns>
+        IFactory Boot(IRegister register);
+
+        /// <summary>
+        /// Gets the runtime state.
+        /// </summary>
+        IRuntimeState State { get; }
 
         /// <summary>
         /// Terminates the runtime.

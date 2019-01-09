@@ -1,31 +1,25 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Components;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Components
 {
-    public sealed class BackOfficeUserAuditEventsComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class BackOfficeUserAuditEventsComponent : IComponent
     {
-        private IAuditService _auditService;
-        private IUserService _userService;
-        
-        private IUser GetPerformingUser(int userId)
-        {
-            var found = userId >= 0 ? _userService.GetUserById(userId) : null;
-            return found ?? new User {Id = 0, Name = "SYSTEM", Email = ""};
-        }
+        private readonly IAuditService _auditService;
+        private readonly IUserService _userService;
 
-
-        public void Initialize(IAuditService auditService, IUserService userService)
+        public BackOfficeUserAuditEventsComponent(IAuditService auditService, IUserService userService)
         {
             _auditService = auditService;
             _userService = userService;
-            
+        }
+
+        public void Initialize()
+        { 
             //BackOfficeUserManager.AccountLocked += ;
             //BackOfficeUserManager.AccountUnlocked += ;
             BackOfficeUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
@@ -37,14 +31,21 @@ namespace Umbraco.Web.Components
             BackOfficeUserManager.PasswordChanged += OnPasswordChanged;
             BackOfficeUserManager.PasswordReset += OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount += ;
-
         }
-        
+
+        public void Terminate()
+        { }
+
+        private IUser GetPerformingUser(int userId)
+        {
+            var found = userId >= 0 ? _userService.GetUserById(userId) : null;
+            return found ?? new User { Id = 0, Name = "SYSTEM", Email = "" };
+        }
+
         private static string FormatEmail(IMembershipUser user)
         {
             return user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
         }
-
 
         private void OnLoginSuccess(object sender, EventArgs args)
         {

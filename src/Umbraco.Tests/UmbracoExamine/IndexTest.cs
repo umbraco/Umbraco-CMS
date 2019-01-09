@@ -4,12 +4,11 @@ using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
+using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
-using LightInject;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Models;
 using Newtonsoft.Json;
@@ -26,11 +25,10 @@ namespace Umbraco.Tests.UmbracoExamine
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class IndexTest : ExamineBaseTest
     {
-
         [Test]
         public void Index_Property_Data_With_Value_Indexer()
         {
-            var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Container.GetInstance<PropertyEditorCollection>(), false);
+            var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Factory.GetInstance<PropertyEditorCollection>(), false);
 
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
@@ -122,8 +120,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Rebuild_Index()
         {
-            var contentRebuilder = IndexInitializer.GetContentIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
-            var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
+            var contentRebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+            var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
@@ -150,7 +148,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Protected_Content_Not_Indexed()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
 
 
             using (var luceneDir = new RandomIdRamDirectory())
@@ -275,7 +273,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Reindex_Content()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 validator: new ContentValueSetValidator(false)))
@@ -316,7 +314,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
         {
 
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
 
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))

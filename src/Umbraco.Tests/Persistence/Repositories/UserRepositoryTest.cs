@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateContentRepository(IScopeProvider provider, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            templateRepository = new TemplateRepository(accessor, CacheHelper, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            templateRepository = new TemplateRepository(accessor, CacheHelper, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(accessor, CacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper, Logger, templateRepository);
             var languageRepository = new LanguageRepository(accessor, CacheHelper, Logger);
@@ -52,14 +52,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Logger, Mappers, TestObjects.GetGlobalSettings());
+            var repository = new UserRepository(accessor, CacheHelper.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Logger);
+            return new UserGroupRepository(accessor, CacheHelper.Disabled, Logger);
         }
 
         [Test]
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
+                var repository2 = new UserRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
 
                 repository2.Delete(user);
                 

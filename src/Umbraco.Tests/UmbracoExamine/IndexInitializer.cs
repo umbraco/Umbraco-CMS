@@ -44,7 +44,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, GetMockUserService());
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService());
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
@@ -147,7 +147,7 @@ namespace Umbraco.Tests.UmbracoExamine
         }
 
         public static UmbracoContentIndex GetUmbracoIndexer(
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             Directory luceneDir,
             Analyzer analyzer = null,
             ILocalizationService languageService = null,
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
             if (validator == null)
                 validator = new ContentValueSetValidator(true);
-            
+
             var i = new UmbracoContentIndex(
                 "testIndexer",
                 new UmbracoFieldDefinitionCollection(), 

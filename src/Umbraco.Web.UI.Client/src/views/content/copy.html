@@ -12,13 +12,16 @@
             <div ng-show="success">
                 <div class="alert alert-success">
                     <strong>{{source.name}}</strong> was copied to
+                    <localize key="actions_wasCopiedTo">was copied to</localize>
                     <strong>{{target.name}}</strong>
                 </div>
                 <button class="btn btn-primary" ng-click="closeDialog()">Ok</button>
             </div>
 
             <p class="abstract" ng-hide="success">
-                Choose where to copy <strong>{{source.name}}</strong> to in the tree structure below
+                <localize key="actions_chooseWhereToCopy">Choose where to copy</localize>
+                <strong>{{source.name}}</strong>
+                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
             </p>
 
             <div class="umb-loader-wrapper" ng-show="busy">

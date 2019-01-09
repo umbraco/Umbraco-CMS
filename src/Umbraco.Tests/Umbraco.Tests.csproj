@@ -111,11 +111,13 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\CacheRefresherComponentTests.cs" />
+    <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
+    <Compile Include="Composing\LightInjectValidation.cs" />
+    <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreThings\GuidUtilsTests.cs" />
@@ -132,6 +134,7 @@
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
+    <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentServiceTagsTests.cs" />
@@ -278,7 +281,7 @@
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
-    <Compile Include="Runtimes\WebRuntimeTests.cs" />
+    <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
     <Compile Include="Cache\CacheProviderTests.cs" />
     <Compile Include="Cache\HttpRequestCacheProviderTests.cs" />

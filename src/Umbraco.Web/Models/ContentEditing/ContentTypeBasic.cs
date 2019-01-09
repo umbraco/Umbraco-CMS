@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Validation;
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Models.ContentEditing
             {
                 return IconIsClass
                     ? string.Empty
-                    : string.Format("{0}images/umbraco/{1}", UmbracoConfig.For.GlobalSettings().Path.EnsureEndsWith("/"), Icon);
+                    : string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
             }
         }
 

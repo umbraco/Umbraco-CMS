@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -10,29 +9,25 @@ namespace Umbraco.Web.ContentApps
 {
     public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<ContentAppFactoryCollectionBuilder, ContentAppFactoryCollection, IContentAppFactory>
     {
-        public ContentAppFactoryCollectionBuilder(IServiceContainer container)
-            : base(container)
-        { }
-
         protected override ContentAppFactoryCollectionBuilder This => this;
 
         // need to inject dependencies in the collection, so override creation
-        public override ContentAppFactoryCollection CreateCollection()
+        public override ContentAppFactoryCollection CreateCollection(IFactory factory)
         {
             // get the logger just-in-time - see note below for manifest parser
-            var logger = Container.GetInstance<ILogger>();
+            var logger = factory.GetInstance<ILogger>();
 
-            return new ContentAppFactoryCollection(CreateItems(), logger);
+            return new ContentAppFactoryCollection(CreateItems(factory), logger);
         }
 
-        protected override IEnumerable<IContentAppFactory> CreateItems(params object[] args)
+        protected override IEnumerable<IContentAppFactory> CreateItems(IFactory factory)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
-            var manifestParser = Container.GetInstance<ManifestParser>();
+            var manifestParser = factory.GetInstance<ManifestParser>();
 
-            return base.CreateItems(args).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x)));
+            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x)));
         }
     }
 }

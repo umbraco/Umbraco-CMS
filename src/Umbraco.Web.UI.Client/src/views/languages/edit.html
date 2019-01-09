@@ -39,7 +39,8 @@
                             <div class="umb-permission" ng-click="vm.toggleDefault()" ng-class="{'umb-permission--disabled': vm.initIsDefault}">
                                 <umb-toggle
                                     class="umb-permission__toggle"
-                                    checked="vm.language.isDefault">
+                                    checked="vm.language.isDefault"
+                                    disabled="vm.initIsDefault">
                                 </umb-toggle>
                                 <div class="umb-permission__content" >
                                     <div>{{vm.labels.defaultLanguage}}</div>

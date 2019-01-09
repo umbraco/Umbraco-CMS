@@ -22,12 +22,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DomainRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository, out DocumentRepository documentRepository, out LanguageRepository languageRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
-            documentRepository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
-            var domainRepository = new DomainRepository(accessor, DisabledCache, Logger);
+            var templateRepository = new TemplateRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger, templateRepository);
+            languageRepository = new LanguageRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger);
+            documentRepository = new DocumentRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var domainRepository = new DomainRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger);
             return domainRepository;
         }
 
