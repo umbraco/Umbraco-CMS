@@ -88,7 +88,10 @@ namespace umbraco.presentation.umbraco.translation {
             foreach (PropertyType pt in page.ContentType.PropertyTypes) {
                 pageRow = pageTable.NewRow();
                 pageRow[ui.Text("name")] = pt.Name;
-                pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
+                if (page.getProperty(pt.Alias) != null && page.getProperty(pt.Alias).Value != null)
+                {
+                    pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
+                }
                 pageTable.Rows.Add(pageRow);
             }
             
