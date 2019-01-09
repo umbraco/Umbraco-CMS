@@ -16,19 +16,16 @@ namespace Umbraco.Web.Scheduling
     public abstract class BackgroundTaskRunner
     {
         /// <summary>
-        /// Creates a hook, to hook the task runner into the main domain.
+        /// Represents a MainDom hook.
         /// </summary>
-        /// <param name="mainDom">The <see cref="IMainDom"/> object.</param>
-        /// <param name="install">A method to execute when hooking into the main domain.</param>
-        /// <param name="release">A method to execute when the main domain releases.</param>
-        /// <returns></returns>
-        public MainDomHook CreateMainDomHook(IMainDom mainDom, Action install, Action release)
-        {
-            return new MainDomHook(mainDom, install, release);
-        }
-
         public class MainDomHook
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MainDomHook"/> class.
+            /// </summary>
+            /// <param name="mainDom">The <see cref="IMainDom"/> object.</param>
+            /// <param name="install">A method to execute when hooking into the main domain.</param>
+            /// <param name="release">A method to execute when the main domain releases.</param>
             public MainDomHook(IMainDom mainDom, Action install, Action release)
             {
                 MainDom = mainDom;
@@ -36,8 +33,19 @@ namespace Umbraco.Web.Scheduling
                 Release = release;
             }
 
+            /// <summary>
+            /// Gets the <see cref="IMainDom"/> object.
+            /// </summary>
             public IMainDom MainDom { get; }
+
+            /// <summary>
+            /// Gets the method to execute when hooking into the main domain.
+            /// </summary>
             public Action Install { get; }
+
+            /// <summary>
+            /// Gets the method to execute when the main domain releases.
+            /// </summary>
             public Action Release { get; }
 
             internal bool Register()
