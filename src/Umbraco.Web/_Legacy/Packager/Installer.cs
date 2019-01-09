@@ -37,13 +37,11 @@ namespace umbraco.cms.businesslogic.packager
     {
         private const string PackageServer = "packages.umbraco.org";
 
-        private readonly List<string> _unsecureFiles = new List<string>();
         private readonly Dictionary<string, string> _conflictingMacroAliases = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _conflictingTemplateAliases = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _conflictingStyleSheetNames = new Dictionary<string, string>();
 
-        private readonly List<string> _binaryFileErrors = new List<string>();
-        private int _currentUserId = -1;
+        private readonly int _currentUserId = -1;
         private static WebClient _webClient;
 
 
@@ -58,13 +56,13 @@ namespace umbraco.cms.businesslogic.packager
         public string Control { get; private set; }
 
         public bool ContainsMacroConflict { get; private set; }
-        public IDictionary<string, string> ConflictingMacroAliases { get { return _conflictingMacroAliases; } }
+        public IDictionary<string, string> ConflictingMacroAliases => _conflictingMacroAliases;
 
         public bool ContainsUnsecureFiles { get; private set; }
-        public List<string> UnsecureFiles { get { return _unsecureFiles; } }
+        public List<string> UnsecureFiles { get; } = new List<string>();
 
         public bool ContainsTemplateConflicts { get; private set; }
-        public IDictionary<string, string> ConflictingTemplateAliases { get { return _conflictingTemplateAliases; } }
+        public IDictionary<string, string> ConflictingTemplateAliases => _conflictingTemplateAliases;
 
         /// <summary>
         /// Indicates that the package contains assembly reference errors
@@ -74,10 +72,10 @@ namespace umbraco.cms.businesslogic.packager
         /// <summary>
         /// List each assembly reference error
         /// </summary>
-        public List<string> BinaryFileErrors { get { return _binaryFileErrors; } }
+        public List<string> BinaryFileErrors { get; } = new List<string>();
 
         public bool ContainsStyleSheeConflicts { get; private set; }
-        public IDictionary<string, string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
+        public IDictionary<string, string> ConflictingStyleSheetNames => _conflictingStyleSheetNames;
 
         public int RequirementsMajor { get; private set; }
         public int RequirementsMinor { get; private set; }
@@ -603,7 +601,7 @@ namespace umbraco.cms.businesslogic.packager
                 if (badFile)
                 {
                     ContainsUnsecureFiles = true;
-                    _unsecureFiles.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                    UnsecureFiles.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
                 }
             }
 
@@ -816,8 +814,8 @@ namespace umbraco.cms.businesslogic.packager
 
         private static void OnPackageBusinessLogicInstalled(InstalledPackage e)
         {
-            EventHandler<InstalledPackage> handler = PackageBusinessLogicInstalled;
-            if (handler != null) handler(null, e);
+            var handler = PackageBusinessLogicInstalled;
+            handler?.Invoke(null, e);
         }
 
         private void OnPackageInstalled(InstalledPackage insPack)
@@ -832,7 +830,9 @@ namespace umbraco.cms.businesslogic.packager
             var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
             installationSummary.PackageInstalled = true;
 
-            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, false);
+            var meta = insPack.GetMetaData();
+
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, meta, false);
             PackagingService.OnImportedPackage(args);
         }
     }
