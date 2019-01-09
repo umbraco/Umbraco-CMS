@@ -1,24 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Xml;
 using System.Linq;
+using System.Net;
+using System.Xml;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using System.Diagnostics;
 using Umbraco.Core.Models;
-using Umbraco.Core.Composing;
-using System.Net;
-using Umbraco.Core.Events;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Xml;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 using File = System.IO.File;
+using PackageAction = Umbraco.Web._Legacy.Packager.PackageInstance.PackageAction;
 
-namespace umbraco.cms.businesslogic.packager
+namespace Umbraco.Web._Legacy.Packager
 {
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
