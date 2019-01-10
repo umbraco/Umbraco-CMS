@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Packaging
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class PackageBuilderTests : TestWithDatabaseBase
+    public class CreatedPackagesRepositoryTests : TestWithDatabaseBase
     {
         private Guid _testBaseFolder;
 
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Packaging
             Directory.Delete(IOHelper.MapPath("~/" + _testBaseFolder), true);
         }
 
-        public IPackageBuilder PackageBuilder => new PackageBuilder(
+        public ICreatedPackagesRepository PackageBuilder => new CreatedPackagesRepository(
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,

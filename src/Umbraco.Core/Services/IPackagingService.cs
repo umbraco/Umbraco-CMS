@@ -9,23 +9,23 @@ namespace Umbraco.Core.Services
 {
     public interface IPackagingService : IService
     {
-        #region Package Building
+        #region Created Packages
 
-        IEnumerable<PackageDefinition> GetAll();
-        PackageDefinition GetById(int id);
-        void Delete(int id);
+        IEnumerable<PackageDefinition> GetAllCreatedPackages();
+        PackageDefinition GetCreatedPackageById(int id);
+        void DeleteCreatedPackage(int id);
 
         /// <summary>
         /// Persists a package definition to storage
         /// </summary>
         /// <returns></returns>
-        bool SavePackage(PackageDefinition definition);
+        bool SaveCreatedPackage(PackageDefinition definition);
 
         /// <summary>
         /// Creates the package file and returns it's physical path
         /// </summary>
         /// <param name="definition"></param>
-        string ExportPackage(PackageDefinition definition);
+        string ExportCreatedPackage(PackageDefinition definition);
 
         #endregion
 

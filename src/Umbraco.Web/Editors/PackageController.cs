@@ -1,23 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Packager.PackageInstance;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO: Packager stuff still lives in business logic - YUK
-
     /// <summary>
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
@@ -28,12 +22,12 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<PackageDefinition> GetCreatedPackages()
         {
-            return Services.PackagingService.GetAll();
+            return Services.PackagingService.GetAllCreatedPackages();
         }
 
         public PackageDefinition GetCreatedPackageById(int id)
         {
-            var package = Services.PackagingService.GetById(id);
+            var package = Services.PackagingService.GetCreatedPackageById(id);
             if (package == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -56,14 +50,14 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
 
             //save it
-            if (!Services.PackagingService.SavePackage(model))
+            if (!Services.PackagingService.SaveCreatedPackage(model))
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse(
                         model.Id == default
                             ? $"A package with the name {model.Name} already exists"
                             : $"The package with id {model.Id} was not found"));
 
-            Services.PackagingService.ExportPackage(model);
+            Services.PackagingService.ExportCreatedPackage(model);
 
             //the packagePath will be on the model 
             return model;
@@ -78,7 +72,7 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         public IHttpActionResult DeleteCreatedPackage(int packageId)
         {
-            Services.PackagingService.Delete(packageId);
+            Services.PackagingService.DeleteCreatedPackage(packageId);
 
             return Ok();
         }
@@ -86,7 +80,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public HttpResponseMessage DownloadCreatedPackage(int id)
         {
-            var package = Services.PackagingService.GetById(id);
+            var package = Services.PackagingService.GetCreatedPackageById(id);
             if (package == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 

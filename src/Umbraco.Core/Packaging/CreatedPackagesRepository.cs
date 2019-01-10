@@ -15,7 +15,7 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging
 {
-    internal class PackageBuilder : IPackageBuilder
+    internal class CreatedPackagesRepository : ICreatedPackagesRepository
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Packaging
         private readonly string _packagesFolderPath;
         private readonly string _tempFolderPath;
         
-        public PackageBuilder(IContentService contentService, IContentTypeService contentTypeService,
+        public CreatedPackagesRepository(IContentService contentService, IContentTypeService contentTypeService,
             IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
             ILocalizationService languageService,
             IEntityXmlSerializer serializer, ILogger logger,
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Packaging
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<PackageBuilder>(e, "Could not add package actions to the package manifest, the xml did not parse");
+                        _logger.Warn<CreatedPackagesRepository>(e, "Could not add package actions to the package manifest, the xml did not parse");
                     }
                 }
 
@@ -629,7 +629,7 @@ namespace Umbraco.Core.Packaging
             }
             catch (Exception e)
             {
-                _logger.Warn<PackageBuilder>(e, "Could not add package actions to the package xml definition, the xml did not parse");
+                _logger.Warn<CreatedPackagesRepository>(e, "Could not add package actions to the package xml definition, the xml did not parse");
             }
 
             var packageXml = new XElement("package",

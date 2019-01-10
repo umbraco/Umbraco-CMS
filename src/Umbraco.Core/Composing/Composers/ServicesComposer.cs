@@ -60,8 +60,8 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
             composition.RegisterUnique<PackageActionRunner>();
-            composition.RegisterUnique<IPackageBuilder>(factory =>
-                new PackageBuilder( //we are using a factory because there are optional ctor args
+            composition.RegisterUnique<ICreatedPackagesRepository>(factory =>
+                new CreatedPackagesRepository( //we are using a factory because there are optional ctor args
                     factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(),
                     factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(),
                     factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>()));

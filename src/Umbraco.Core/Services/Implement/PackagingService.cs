@@ -46,7 +46,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IPackageBuilder _packageBuilder;
+        private readonly ICreatedPackagesRepository _createdPackages;
         private static HttpClient _httpClient;
 
         public PackagingService(
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services.Implement
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
             PropertyEditorCollection propertyEditors,
-            IPackageBuilder packageBuilder)
+            ICreatedPackagesRepository createdPackages)
         {
             _logger = logger;
             _contentService = contentService;
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _propertyEditors = propertyEditors;
-            _packageBuilder = packageBuilder;
+            _createdPackages = createdPackages;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
 
@@ -1402,15 +1402,15 @@ namespace Umbraco.Core.Services.Implement
 
         #region Package Building
 
-        public void Delete(int id) => _packageBuilder.Delete(id);
+        public void DeleteCreatedPackage(int id) => _createdPackages.Delete(id);
 
-        public IEnumerable<PackageDefinition> GetAll() => _packageBuilder.GetAll();
+        public IEnumerable<PackageDefinition> GetAllCreatedPackages() => _createdPackages.GetAll();
 
-        public PackageDefinition GetById(int id) => _packageBuilder.GetById(id);
+        public PackageDefinition GetCreatedPackageById(int id) => _createdPackages.GetById(id);
 
-        public bool SavePackage(PackageDefinition definition) => _packageBuilder.SavePackage(definition);
+        public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
 
-        public string ExportPackage(PackageDefinition definition) => _packageBuilder.ExportPackage(definition);
+        public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
         #endregion
 

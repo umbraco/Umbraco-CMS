@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Packaging
 {
     /// <summary>
-    /// Creates packages
+    /// Defines methods for persisting package definitions to storage
     /// </summary>
-    public interface IPackageBuilder
+    public interface IPackageDefinitionRepository
     {
         IEnumerable<PackageDefinition> GetAll();
         PackageDefinition GetById(int id);
@@ -20,11 +19,5 @@ namespace Umbraco.Core.Packaging
         /// true if creating/updating the package was successful, otherwise false
         /// </returns>
         bool SavePackage(PackageDefinition definition);
-
-        /// <summary>
-        /// Creates the package file and returns it's physical path
-        /// </summary>
-        /// <param name="definition"></param>
-        string ExportPackage(PackageDefinition definition);
     }
 }

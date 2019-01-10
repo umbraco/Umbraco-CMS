@@ -1126,7 +1126,6 @@
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="_Legacy\Controls\BaseTreePicker.cs" />
     <Compile Include="_Legacy\Controls\pane.cs" />
     <Compile Include="_Legacy\Controls\Panel.cs" />
     <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
@@ -1224,7 +1223,6 @@
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>

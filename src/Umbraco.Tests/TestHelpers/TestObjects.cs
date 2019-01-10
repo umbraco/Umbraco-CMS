@@ -170,7 +170,7 @@ namespace Umbraco.Tests.TestHelpers
             var macroService = GetLazyService<IMacroService>(factory, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
             var packagingService = GetLazyService<IPackagingService>(factory, c => new PackagingService(
                 logger, contentService.Value, contentTypeService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, scopeProvider, GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>())),
-                new PackageBuilder(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                new CreatedPackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
                     new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger)));
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
             var treeService = GetLazyService<IApplicationTreeService>(factory, c => new ApplicationTreeService(logger, cache, typeLoader));
