@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($scope, $location, $routeParams, entityResource, packageResource, contentTypeResource, templateResource, stylesheetResource, languageResource, dictionaryResource, dataTypeResource, editorService, formHelper) {
+    function EditController($scope, $location, $routeParams, entityResource, stylesheetResource, languageResource, packageResource, dictionaryResource, editorService, formHelper) {
 
         const vm = this;
 
@@ -12,10 +12,9 @@
         vm.contentOpen = true;
         vm.filesOpen = true;
         vm.actionsOpen = true;
-
+        vm.loading = true;
         vm.back = back;
-        vm.createPackage = createPackage;
-        vm.save = save;
+        vm.createOrUpdatePackage = createOrUpdatePackage;
         vm.removeContentItem = removeContentItem;
         vm.openContentPicker = openContentPicker;
         vm.openFilePicker = openFilePicker;
@@ -23,24 +22,23 @@
         vm.openControlPicker = openControlPicker;
         vm.removeControl = removeControl;
 
-        function onInit() {
+        const packageId = $routeParams.id;
+        const create = $routeParams.create;
 
-            const packageId = $routeParams.id;
-            const create = $routeParams.create;
+        function onInit() {
 
             if(create) {
                 //pre populate package with some values
-                vm.package = {
-                    "version": "0.0.1",
-                    "license": "MIT License",
-                    "licenseUrl": "http://opensource.org/licenses/MIT",
-                    "umbracoVersion": Umbraco.Sys.ServerVariables.application.version
-                };
+                packageResource.getEmpty().then(scaffold => {
+                    vm.package = scaffold;
+                    vm.loading = false;
+                });
+                vm.buttonLabel = "Create";
             } else {
                 // load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
-
+                    vm.loading = false;
                     // get render model for content node
                     if(vm.package.contentNodeId) {
                         entityResource.getById(vm.package.contentNodeId, "Document")
@@ -49,11 +47,12 @@
                             });
                     }
 
-                }, angular.noop);
+                });
+                vm.buttonLabel = "Save";
             }
 
             // get all doc types
-            contentTypeResource.getAll().then(documentTypes => {
+            entityResource.getAll("DocumentType").then(documentTypes => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 documentTypes.forEach(documentType => {
@@ -63,7 +62,7 @@
             });
 
             // get all templates
-            templateResource.getAll().then(templates => {
+            entityResource.getAll("Template").then(templates => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 templates.forEach(template => {
@@ -101,7 +100,7 @@
             });
 
             // get all data types items
-            dataTypeResource.getAll().then(dataTypes => {
+            entityResource.getAll("DataType").then(dataTypes => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 dataTypes.forEach(dataType => {
@@ -116,24 +115,29 @@
             $location.path("packages/packages/overview").search('create', null);;
         }
 
-        function createPackage(editPackageForm) {
+        function createOrUpdatePackage(editPackageForm) {
 
             if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
 
-                vm.createPackageButtonState = "busy";
+                vm.buttonState = "busy";
 
-                packageResource.createPackage(vm.package).then((updatedPackage) => {
+                packageResource.savePackage(vm.package).then((updatedPackage) => {
+
                     vm.package = updatedPackage;
-                    vm.createPackageButtonState = "success";
+                    vm.buttonState = "success";
+
+                    if (create) {
+                        //if we are creating, then redirect to the correct url and reload
+                        $location.path("packages/packages/overview/" + vm.package.id).search("subview", "created");
+                        //don't add a browser history for this
+                        $location.replace();
+                    }
+                    
                 }, function(err){
                     formHelper.handleError(err);
-                    vm.createPackageButtonState = "error";
+                    vm.buttonState = "error";
                 });
             }
-        }
-
-        function save() {
-            console.log("save package");
         }
 
         function removeContentItem() {

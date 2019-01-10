@@ -1142,10 +1142,7 @@
     <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="_Legacy\Packager\data.cs" />
     <Compile Include="_Legacy\Packager\Installer.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\PackagerUtility.cs" />
-    <Compile Include="_Legacy\Packager\RequirementsType.cs" />
     <Compile Include="_Legacy\Packager\Settings.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
@@ -1236,13 +1233,6 @@
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
-      <DependentUpon>editPackage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.designer.cs">
-      <DependentUpon>editPackage.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
@@ -1288,9 +1278,6 @@
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />

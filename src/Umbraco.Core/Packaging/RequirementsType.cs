@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web._Legacy.Packager
+﻿namespace Umbraco.Core.Packaging
 {
     public enum RequirementsType
     {

@@ -11,15 +11,8 @@ namespace Umbraco.Core.Models.Packaging
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
-        //TODO: I don't see why this is necessary
-        [DataMember(Name = "repositoryGuid")]
-        public string RepositoryGuid { get; set; }
-
         [DataMember(Name = "packageGuid")]
-        public string PackageGuid { get; set; }
-
-        [DataMember(Name = "hasUpdate")]
-        public bool HasUpdate { get; set; }
+        public Guid PackageId { get; set; }
 
         [DataMember(Name = "name")]
         [Required]
@@ -30,21 +23,24 @@ namespace Umbraco.Core.Models.Packaging
         [Url]
         public string Url { get; set; } = string.Empty;
 
+        /// <summary>
+        /// This is a generated GUID which is used to determine a temporary folder name for processing the package
+        /// </summary>
         [DataMember(Name = "folder")]
-        public string Folder { get; set; } = string.Empty;
+        public Guid FolderId { get; set; }
 
         [DataMember(Name = "packagePath")]
         public string PackagePath { get; set; } = string.Empty;
 
         [DataMember(Name = "version")]
         [Required]
-        public string Version { get; set; } = string.Empty;
+        public string Version { get; set; } = "1.0.0";
 
         /// <summary>
         /// The minimum umbraco version that this package requires
         /// </summary>
         [DataMember(Name = "umbracoVersion")]
-        public Version UmbracoVersion { get; set; }
+        public Version UmbracoVersion { get; set; } = Configuration.UmbracoVersion.Current;
         
         [DataMember(Name = "author")]
         [Required]
@@ -65,31 +61,31 @@ namespace Umbraco.Core.Models.Packaging
         public string Readme { get; set; } = string.Empty;
 
         [DataMember(Name = "contentLoadChildNodes")]
-        public bool ContentLoadChildNodes { get; set; } = false;
+        public bool ContentLoadChildNodes { get; set; }
 
         [DataMember(Name = "contentNodeId")]
         public string ContentNodeId { get; set; } = string.Empty;
 
         [DataMember(Name = "macros")]
-        public List<string> Macros { get; set; } = new List<string>();
+        public IList<string> Macros { get; set; } = new List<string>();
 
         [DataMember(Name = "languages")]
-        public List<string> Languages { get; set; } = new List<string>();
+        public IList<string> Languages { get; set; } = new List<string>();
 
         [DataMember(Name = "dictionaryItems")]
-        public List<string> DictionaryItems { get; set; } = new List<string>();
+        public IList<string> DictionaryItems { get; set; } = new List<string>();
 
         [DataMember(Name = "templates")]
-        public List<string> Templates { get; set; } = new List<string>();
+        public IList<string> Templates { get; set; } = new List<string>();
 
         [DataMember(Name = "documentTypes")]
-        public List<string> DocumentTypes { get; set; } = new List<string>();
+        public IList<string> DocumentTypes { get; set; } = new List<string>();
 
         [DataMember(Name = "stylesheets")]
-        public List<string> Stylesheets { get; set; } = new List<string>();
+        public IList<string> Stylesheets { get; set; } = new List<string>();
 
         [DataMember(Name = "files")]
-        public List<string> Files { get; set; } = new List<string>();
+        public IList<string> Files { get; set; } = new List<string>();
 
         //TODO: Change this to angular view
         [DataMember(Name = "loadControl")]
@@ -99,7 +95,7 @@ namespace Umbraco.Core.Models.Packaging
         public string Actions { get; set; }
 
         [DataMember(Name = "dataTypes")]
-        public List<string> DataTypes { get; set; } = new List<string>();
+        public IList<string> DataTypes { get; set; } = new List<string>();
 
         [DataMember(Name = "iconUrl")]
         public string IconUrl { get; set; } = string.Empty;

@@ -9,14 +9,27 @@ namespace Umbraco.Core.Services
 {
     public interface IPackagingService : IService
     {
-        #region Package Creation
+        #region Package Building
+
+        IEnumerable<PackageDefinition> GetAll();
+        PackageDefinition GetById(int id);
+        void Delete(int id);
+
         /// <summary>
         /// Persists a package definition to storage
         /// </summary>
         /// <returns></returns>
-        void SavePackageDefinition(PackageDefinition definition); 
+        bool SavePackage(PackageDefinition definition);
+
+        /// <summary>
+        /// Creates the package file and returns it's physical path
+        /// </summary>
+        /// <param name="definition"></param>
+        string ExportPackage(PackageDefinition definition);
+
         #endregion
 
+        #region Importing
         /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
         /// </summary>
@@ -88,7 +101,8 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true); 
+        #endregion
 
         /// <summary>
         /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file

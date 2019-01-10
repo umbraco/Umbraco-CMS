@@ -23,57 +23,42 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
-        public List<PackageDefinition> GetCreatedPackages()
+        public IEnumerable<PackageDefinition> GetCreatedPackages()
         {
-            return CreatedPackage.GetAllCreatedPackages().Select(x => x.Data).ToList();
+            return Services.PackagingService.GetAll();
         }
 
         public PackageDefinition GetCreatedPackageById(int id)
         {
-            var package = CreatedPackage.GetById(id);
+            var package = Services.PackagingService.GetById(id);
             if (package == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             
-            return package.Data;
+            return package;
         }
 
-        public PackageDefinition PostUpdatePackage(PackageDefinition model)
+        public PackageDefinition GetEmpty()
         {
-            var package = CreatedPackage.GetById(model.Id);
-            if (package == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            if (ModelState.IsValid == false)
-            {
-                //Throw/bubble up errors
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
-            }
-
-            package.Data = model;
-
-            //We should have packagepath populated now
-            return package.Data;
+            return new PackageDefinition();
         }
 
-        public PackageDefinition PostCreatePackage(PackageDefinition model)
+        /// <summary>
+        /// Creates or updates a package
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public PackageDefinition PostSavePackage(PackageDefinition model)
         {
-            //creating requires an empty model/package id
-            if (model.Id != 0 || model.PackageGuid != null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
             if (ModelState.IsValid == false)
-            {
-                //Throw/bubble up errors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
-            }
 
             //save it
-            Services.PackagingService.SavePackageDefinition(model);
+            if (!Services.PackagingService.SavePackage(model))
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("The package with id {definition.Id} was not found"));
 
-            //then publish to get the file
-            //package.Publish();
-            //TODO: We need a link to the downloadable zip file, in packagepath ?
-            
+            Services.PackagingService.ExportPackage(model);
+
+            //the packagePath will be on the model 
             return model;
         }
 
@@ -86,11 +71,7 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         public IHttpActionResult DeleteCreatedPackage(int packageId)
         {
-            var package = CreatedPackage.GetById(packageId);
-            if (package == null)
-                return NotFound();
-
-            package.Delete();
+            Services.PackagingService.Delete(packageId);
 
             return Ok();
         }

@@ -300,14 +300,15 @@
             <umb-editor-footer>
 
                 <umb-editor-footer-content-right>
-                    <umb-button
-                        type="button"
-                        action="vm.createPackage(editPackageForm)"
-                        state="vm.createPackageButtonState"
-                        button-style="success"
-                        label="Create"
-                        disabled="vm.loading">
+
+                    <umb-button type="button"
+                                action="vm.createOrUpdatePackage(editPackageForm)"
+                                state="vm.buttonState"
+                                button-style="success"
+                                label="{{vm.buttonLabel}}"
+                                disabled="vm.loading">
                     </umb-button>
+
                 </umb-editor-footer-content-right>
 
             </umb-editor-footer>

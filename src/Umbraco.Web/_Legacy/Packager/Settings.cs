@@ -8,10 +8,6 @@ namespace Umbraco.Web._Legacy.Packager
     {
         public static string InstalledPackagesSettings => SystemDirectories.Packages + IOHelper.DirSepChar + "installedPackages.config";
 
-        public static string CreatedPackagesSettings => SystemDirectories.Packages + IOHelper.DirSepChar + "createdPackages.config";
-
-        public static string PackageFileExtension => "zip";
-
     }
 
 }

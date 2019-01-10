@@ -68,7 +68,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(tempFile, kitGuid.ToString(), RepoGuid);
+            var pId = installer.CreateManifest(tempFile, kitGuid, RepoGuid);
 
             InstallPackageFiles(pId, tempFile);
 

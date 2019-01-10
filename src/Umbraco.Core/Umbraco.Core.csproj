@@ -444,9 +444,10 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Packaging\UninstallationSummaryExtentions.cs" />
-    <Compile Include="Packaging\IPackageCreation.cs" />
+    <Compile Include="Packaging\IPackageBuilder.cs" />
     <Compile Include="Packaging\PackageActionRunner.cs" />
-    <Compile Include="Packaging\PackageCreation.cs" />
+    <Compile Include="Packaging\PackageBuilder.cs" />
+    <Compile Include="Packaging\RequirementsType.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentScheduleDto.cs" />

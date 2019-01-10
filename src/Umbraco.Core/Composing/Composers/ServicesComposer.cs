@@ -60,8 +60,11 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
             composition.RegisterUnique<PackageActionRunner>();
-            composition.RegisterUnique<IPackageCreation, PackageCreation>();
-            
+            composition.RegisterUnique<IPackageBuilder>(factory =>
+                new PackageBuilder( //we are using a factory because there are optional ctor args
+                    factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(),
+                    factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(),
+                    factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>()));
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.

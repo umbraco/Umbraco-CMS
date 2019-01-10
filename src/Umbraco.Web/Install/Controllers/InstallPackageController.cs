@@ -60,7 +60,7 @@ namespace Umbraco.Web.Install.Controllers
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(tempFile, model.KitGuid.ToString(), RepoGuid);
+            var pId = installer.CreateManifest(tempFile, model.KitGuid, RepoGuid);
             return Json(new
                 {
                     success = true,

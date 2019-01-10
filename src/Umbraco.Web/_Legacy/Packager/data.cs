@@ -95,7 +95,7 @@ namespace Umbraco.Web._Legacy.Packager
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "url", ""));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "name", name));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "folder", Guid.NewGuid().ToString()));
-            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packagepath", ""));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packagePath", ""));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "repositoryGuid", ""));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "iconUrl", ""));
             //set to current version
@@ -187,13 +187,11 @@ namespace Umbraco.Web._Legacy.Packager
             {
                 retVal.Id = int.Parse(SafeAttribute("id", n));
                 retVal.Name = SafeAttribute("name", n);
-                retVal.Folder = SafeAttribute("folder", n);
-                retVal.PackagePath = SafeAttribute("packagepath", n);
+                retVal.FolderId = Guid.Parse(SafeAttribute("folder", n));
+                retVal.PackagePath = SafeAttribute("packagePath", n);
                 retVal.Version = SafeAttribute("version", n);
                 retVal.Url = SafeAttribute("url", n);
-                retVal.RepositoryGuid = SafeAttribute("repositoryGuid", n);
-                retVal.PackageGuid = SafeAttribute("packageGuid", n);
-                retVal.HasUpdate = bool.Parse(SafeAttribute("hasUpdate", n));
+                retVal.PackageId = Guid.Parse(SafeAttribute("packageGuid", n));
 
                 retVal.IconUrl = SafeAttribute("iconUrl", n);
                 var umbVersion = SafeAttribute("umbVersion", n);
@@ -262,10 +260,8 @@ namespace Umbraco.Web._Legacy.Packager
             XmlHelper.SetAttribute(Source, xmlDef, "name", package.Name);
             XmlHelper.SetAttribute(Source, xmlDef, "version", package.Version);
             XmlHelper.SetAttribute(Source, xmlDef, "url", package.Url);
-            XmlHelper.SetAttribute(Source, xmlDef, "packagepath", package.PackagePath);
-            XmlHelper.SetAttribute(Source, xmlDef, "repositoryGuid", package.RepositoryGuid);
-            XmlHelper.SetAttribute(Source, xmlDef, "packageGuid", package.PackageGuid);
-            XmlHelper.SetAttribute(Source, xmlDef, "hasUpdate", package.HasUpdate.ToString());
+            XmlHelper.SetAttribute(Source, xmlDef, "packagePath", package.PackagePath);
+            XmlHelper.SetAttribute(Source, xmlDef, "packageGuid", package.PackageId.ToString());
             XmlHelper.SetAttribute(Source, xmlDef, "iconUrl", package.IconUrl);
             if (package.UmbracoVersion != null)
                 XmlHelper.SetAttribute(Source, xmlDef, "umbVersion", package.UmbracoVersion.ToString(3));
@@ -359,7 +355,7 @@ namespace Umbraco.Web._Legacy.Packager
         }
 
 
-        private static string JoinList(List<string> list, char seperator)
+        private static string JoinList(IList<string> list, char seperator)
         {
             string retVal = "";
             foreach (string str in list)

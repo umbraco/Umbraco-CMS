@@ -46,7 +46,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IPackageCreation _packageCreation;
+        private readonly IPackageBuilder _packageBuilder;
         private static HttpClient _httpClient;
 
         public PackagingService(
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services.Implement
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
             PropertyEditorCollection propertyEditors,
-            IPackageCreation packageCreation)
+            IPackageBuilder packageBuilder)
         {
             _logger = logger;
             _contentService = contentService;
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _propertyEditors = propertyEditors;
-            _packageCreation = packageCreation;
+            _packageBuilder = packageBuilder;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
 
@@ -1402,7 +1402,15 @@ namespace Umbraco.Core.Services.Implement
 
         #region Package Building
 
-        public void SavePackageDefinition(PackageDefinition definition) => _packageCreation.SavePackageDefinition(definition);
+        public void Delete(int id) => _packageBuilder.Delete(id);
+
+        public IEnumerable<PackageDefinition> GetAll() => _packageBuilder.GetAll();
+
+        public PackageDefinition GetById(int id) => _packageBuilder.GetById(id);
+
+        public bool SavePackage(PackageDefinition definition) => _packageBuilder.SavePackage(definition);
+
+        public string ExportPackage(PackageDefinition definition) => _packageBuilder.ExportPackage(definition);
 
         #endregion
 

@@ -179,20 +179,29 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to get package');
         },
 
+        getEmpty: function () {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "packageApiBaseUrl",
+                        "getEmpty")),
+                'Failed to get scaffold');
+        },
+
         /**
          * @ngdoc method
-         * @name umbraco.resources.packageInstallResource#createPackage
+         * @name umbraco.resources.packageInstallResource#savePackage
          * @methodOf umbraco.resources.packageInstallResource
          *
          * @description
-         * Creates a new package
+         * Creates or updates a package
          */
-        createPackage: function (umbPackage) {
+        savePackage: function (umbPackage) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "packageApiBaseUrl",
-                        "PostCreatePackage"), umbPackage),
+                        "PostSavePackage"), umbPackage),
                 'Failed to create package');
         },
 

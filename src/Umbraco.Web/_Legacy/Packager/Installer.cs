@@ -209,7 +209,7 @@ namespace Umbraco.Web._Legacy.Packager
             return Import(inputFile, true);
         }
 
-        public int CreateManifest(string tempDir, string guid, string repoGuid)
+        public int CreateManifest(string tempDir, Guid guid, string repoGuid)
         {
             //This is the new improved install rutine, which chops up the process into 3 steps, creating the manifest, moving files, and finally handling umb objects
             var packName = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/name"));
@@ -243,8 +243,7 @@ namespace Umbraco.Web._Legacy.Packager
             insPack.Data.Url = packUrl;
             insPack.Data.IconUrl = iconUrl;
 
-            insPack.Data.PackageGuid = guid; //the package unique key.
-            insPack.Data.RepositoryGuid = repoGuid; //the repository unique key, if the package is a file install, the repository will not get logged.
+            insPack.Data.PackageId = guid; //the package unique key.
             insPack.Save();
 
             return insPack.Data.Id;
@@ -324,7 +323,7 @@ namespace Umbraco.Web._Legacy.Packager
                 {
                     Current.Services.AuditService.Add(AuditType.PackagerInstall,
                         _currentUserId,
-                        -1, "Package", string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid));
+                        -1, "Package", string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageId));
                 }
 
                 insPack.Save();
@@ -373,7 +372,8 @@ namespace Umbraco.Web._Legacy.Packager
                     if (languageItemsElement != null)
                     {
                         var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
-                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString(CultureInfo.InvariantCulture)));
+                        foreach(var x in insertedLanguages.Select(l => l.Id.ToString(CultureInfo.InvariantCulture)))
+                            insPack.Data.Languages.Add(x);
                     }
 
                     #endregion
@@ -383,7 +383,8 @@ namespace Umbraco.Web._Legacy.Packager
                     if (dictionaryItemsElement != null)
                     {
                         var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
-                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString(CultureInfo.InvariantCulture)));
+                        foreach (var x in insertedDictionaryItems.Select(d => d.Id.ToString(CultureInfo.InvariantCulture)))
+                            insPack.Data.DictionaryItems.Add(x);
                     }
                     #endregion
 
@@ -392,7 +393,9 @@ namespace Umbraco.Web._Legacy.Packager
                     if (macroItemsElement != null)
                     {
                         var insertedMacros = packagingService.ImportMacros(macroItemsElement);
-                        insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)));
+                        foreach (var x in insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)))
+                            insPack.Data.Macros.Add(x);
+
                     }
                     #endregion
 

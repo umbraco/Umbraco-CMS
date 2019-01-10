@@ -510,7 +510,7 @@ namespace Umbraco.Web.Editors
             }
 
             model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempPath);
-            model.Id = ins.CreateManifest(IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid.ToString(), model.RepositoryGuid.ToString());
+            model.Id = ins.CreateManifest(IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid, model.RepositoryGuid.ToString());
 
             return model;
         }
@@ -584,6 +584,7 @@ namespace Umbraco.Web.Editors
             var redirectUrl = "";
             if (ins.Control.IsNullOrWhiteSpace() == false)
             {
+                //fixme: this needs to be replaced with an angular view the installer.aspx no longer exists.
                 redirectUrl = string.Format("/developer/framed/{0}",
                     Uri.EscapeDataString(
                         string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));

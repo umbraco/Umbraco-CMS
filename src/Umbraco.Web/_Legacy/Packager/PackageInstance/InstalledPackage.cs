@@ -72,7 +72,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
 
         public void Delete(int userId)
         {
-            Current.Services.AuditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid));
+            Current.Services.AuditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageId));
             Delete();
         }
 
