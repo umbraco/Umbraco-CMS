@@ -613,7 +613,7 @@ namespace Umbraco.Web.Editors
                 var msKey = $"Variants[{variantCount}].Name";
                 if (ModelState.ContainsKey(msKey))
                 {
-                    if (!variant.Save)
+                    if (!variant.Save || IsCreatingAction(contentItem.Action))
                         ModelState.Remove(msKey);
                     else
                         variantNameErrors.Add(variant.Culture);
@@ -1742,7 +1742,7 @@ namespace Umbraco.Web.Editors
             foreach (var variant in contentSave.Variants)
             {
                 //Don't update anything for this variant if Save is not true
-                if (!variant.Save && !IsCreatingAction(contentSave.Action)) continue;
+                if (!variant.Save) continue;
 
                 //Don't update the name if it is empty
                 if (!variant.Name.IsNullOrWhiteSpace())
