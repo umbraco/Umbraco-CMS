@@ -60,12 +60,17 @@
   font-weight: bold;
   padding: 2px;
   line-height: 16px;
+  display: block;
 
   &.-type-alert {
     background-color: @red-l1;
   }
   &.-type-warning {
     background-color: @yellow-d2;
+  }
+  &:empty {
+    height: 12px;
+    min-width: 12px;
   }
 }
 

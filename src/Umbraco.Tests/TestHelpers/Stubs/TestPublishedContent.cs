@@ -15,7 +15,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         }
 
         public int Id { get; }
-        public int TemplateId { get; set; }
+        public int? TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
         public IVariationContextAccessor VariationContextAccessor { get; set; }

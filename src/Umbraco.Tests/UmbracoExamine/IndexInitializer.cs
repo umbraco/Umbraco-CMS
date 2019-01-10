@@ -164,8 +164,8 @@ namespace Umbraco.Tests.UmbracoExamine
 
             var i = new UmbracoContentIndex(
                 "testIndexer",
-                new UmbracoFieldDefinitionCollection(), 
                 luceneDir,
+                new UmbracoFieldDefinitionCollection(),
                 analyzer,
                 profilingLogger,
                 languageService,
