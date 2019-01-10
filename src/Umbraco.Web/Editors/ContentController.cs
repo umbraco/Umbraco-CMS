@@ -516,17 +516,13 @@ namespace Umbraco.Web.Editors
         public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", "name");
-            }
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
 
             var content = Services.ContentService.GetById(contentId);
             if (content == null)
-            {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
 
-            EnsureUniqueName(name, content, "name");
+            EnsureUniqueName(name, content, nameof(name));
 
             var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId().ResultOr(0));
 
