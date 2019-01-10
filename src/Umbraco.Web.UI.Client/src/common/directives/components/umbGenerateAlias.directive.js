@@ -130,7 +130,6 @@ angular.module("umbraco.directives")
                         }
                         else {
                             generateAlias(scope.alias);
-                            //scope.placeholderText = scope.labels.idle;
                         }
                     }
                }));
