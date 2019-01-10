@@ -1780,22 +1780,25 @@ namespace Umbraco.Web.Editors
                 variantIndex++;
             }
 
-            //only set the template if it didn't change
-            var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.TemplateAlias.IsNullOrWhiteSpace());
-            if (templateChanged)
+            // handle template
+            if (string.IsNullOrWhiteSpace(contentSave.TemplateAlias)) // cleared: clear if not already null
+            {
+                if (contentSave.PersistedContent.TemplateId != null)
+                {
+                    contentSave.PersistedContent.TemplateId = null;
+                }
+            }
+            else // set: update if different
             {
                 var template = Services.FileService.GetTemplate(contentSave.TemplateAlias);
-                if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
+                if (template == null)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
                     Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
-                else
+                else if (template.Id != contentSave.PersistedContent.TemplateId)
                 {
-                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentSave.PersistedContent.Template = template;
+                    contentSave.PersistedContent.TemplateId = template.Id;
                 }
             }
         }

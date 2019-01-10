@@ -18,9 +18,9 @@ namespace Umbraco.Core.Models
         ContentScheduleCollection ContentSchedule { get; set; }
 
         /// <summary>
-        /// Gets or sets the template used to render the content.
+        /// Gets or sets the template id used to render the content.
         /// </summary>
-        ITemplate Template { get; set; }
+        int? TemplateId { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content is published.
@@ -45,10 +45,10 @@ namespace Umbraco.Core.Models
         bool Blueprint { get; }
 
         /// <summary>
-        /// Gets the template used to render the published version of the content.
+        /// Gets the template id used to render the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the template can change, but this will not until the content is published.</remarks>
-        ITemplate PublishTemplate { get; }
+        int? PublishTemplateId { get; }
 
         /// <summary>
         /// Gets the name of the published version of the content.
