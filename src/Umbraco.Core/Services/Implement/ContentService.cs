@@ -2754,7 +2754,10 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 content.Name = blueprint.Name;
-                content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
+                }
             }
 
 
