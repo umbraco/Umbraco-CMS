@@ -129,9 +129,6 @@ angular.module("umbraco.directives")
                                 }
                             }));
                         }
-                        else {
-                            generateAlias(scope.alias);
-                        }
                     }
                }));
 
