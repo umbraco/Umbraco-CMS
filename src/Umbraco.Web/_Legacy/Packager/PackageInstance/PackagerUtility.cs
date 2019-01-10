@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web._Legacy.Packager.PackageInstance
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
         /// <param name="pack">The packinstance.</param>
         /// <param name="doc">The xml document.</param>
         /// <returns></returns>
-        public static XmlNode PackageInfo(PackageInstance pack, XmlDocument doc)
+        public static XmlNode PackageInfo(Core.Models.Packaging.PackageDefinition pack, XmlDocument doc)
         {
             XmlNode info = doc.CreateElement("info");
 
@@ -60,31 +61,6 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
             return info;
         }
 
-
-        /// <summary>
-        /// Converts an umbraco template to a package xml node
-        /// </summary>
-        /// <param name="templateId">The template id.</param>
-        /// <param name="doc">The xml doc.</param>
-        /// <returns></returns>
-        public static XmlNode Template(int templateId, XmlDocument doc)
-        {
-            var tmpl = Current.Services.FileService.GetTemplate(templateId);
-            //Template tmpl = new Template(templateId);
-
-            XmlNode template = doc.CreateElement("Template");
-            template.AppendChild(CreateNode("Name", tmpl.Name, doc));
-            template.AppendChild(CreateNode("Alias", tmpl.Alias, doc));
-
-            //if (tmpl.MasterTemplate != 0)
-            if (string.IsNullOrWhiteSpace(tmpl.MasterTemplateAlias) == false)
-                template.AppendChild(CreateNode("Master", tmpl.MasterTemplateAlias, doc));
-
-            template.AppendChild(CreateNode("Design", "<![CDATA[" + tmpl.Content + "]]>", doc));
-
-            return template;
-        }
-
         /// <summary>
         /// Converts a umbraco stylesheet to a package xml node
         /// </summary>
@@ -116,29 +92,6 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                 stylesheet.AppendChild(properties);
             }
             return stylesheet;
-        }
-
-        /// <summary>
-        /// Converts a macro to a package xml node
-        /// </summary>
-        /// <param name="macroId">The macro id.</param>
-        /// <param name="appendFile">if set to <c>true</c> [append file].</param>
-        /// <param name="packageDirectory">The package directory.</param>
-        /// <param name="doc">The doc.</param>
-        /// <returns></returns>
-        public static XmlNode Macro(int macroId, bool appendFile, string packageDirectory, XmlDocument doc)
-        {
-            var mcr = Current.Services.MacroService.GetById(macroId);
-
-            if (appendFile)
-            {
-                if (!string.IsNullOrEmpty(mcr.MacroSource))
-                    AppendFileToManifest(mcr.MacroSource, packageDirectory, doc);
-            }
-
-            var serializer = new EntityXmlSerializer();
-            var xml = serializer.Serialize(mcr);
-            return xml.GetXmlNode(doc);
         }
 
 

@@ -4,10 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
-using umbraco.cms.businesslogic.packager;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 
 namespace Umbraco.Web.Editors
 {
@@ -21,14 +23,12 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
-        [HttpGet]
-        public List<PackageInstance> GetCreatedPackages()
+        public List<PackageDefinition> GetCreatedPackages()
         {
             return CreatedPackage.GetAllCreatedPackages().Select(x => x.Data).ToList();
         }
 
-        [HttpGet]
-        public PackageInstance GetCreatedPackageById(int id)
+        public PackageDefinition GetCreatedPackageById(int id)
         {
             var package = CreatedPackage.GetById(id);
             if (package == null)
@@ -37,42 +37,44 @@ namespace Umbraco.Web.Editors
             return package.Data;
         }
 
-        [HttpPost]
-        public PackageInstance PostCreatePackage(PackageInstance model)
+        public PackageDefinition PostUpdatePackage(PackageDefinition model)
         {
+            var package = CreatedPackage.GetById(model.Id);
+            if (package == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
             if (ModelState.IsValid == false)
             {
                 //Throw/bubble up errors
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
-            
-            var package = new CreatedPackage
-            {
-                Data = model
-            };
 
-            //If ID is 0 & PackageGuid is null - its brand new
-            if(model.Id == 0 && model.PackageGuid == null)
-            {
-                //Brand new
-                package = CreatedPackage.MakeNew(model.Name);
-
-                var packageId = package.Data.Id;
-                var packageGuid = package.Data.PackageGuid;
-
-                //Need to reset the package ID - as the posted model the package ID is always 0
-                //MakeNew will init create the XML & update the file and give us an ID to use
-                package.Data = model;
-                package.Data.Id = packageId;
-                package.Data.PackageGuid = packageGuid;
-            }
-            
-            //Save then publish
-            package.Save();
-            package.Publish();
+            package.Data = model;
 
             //We should have packagepath populated now
             return package.Data;
+        }
+
+        public PackageDefinition PostCreatePackage(PackageDefinition model)
+        {
+            //creating requires an empty model/package id
+            if (model.Id != 0 || model.PackageGuid != null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (ModelState.IsValid == false)
+            {
+                //Throw/bubble up errors
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+
+            //save it
+            Services.PackagingService.SavePackageDefinition(model);
+
+            //then publish to get the file
+            //package.Publish();
+            //TODO: We need a link to the downloadable zip file, in packagepath ?
+            
+            return model;
         }
 
         /// <summary>

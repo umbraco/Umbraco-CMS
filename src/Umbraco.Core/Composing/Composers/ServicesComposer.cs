@@ -6,6 +6,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -55,6 +56,12 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetInstance<ILogger>()));
+
+            composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
+
+            composition.RegisterUnique<PackageActionRunner>();
+            composition.RegisterUnique<IPackageCreation, PackageCreation>();
+            
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.

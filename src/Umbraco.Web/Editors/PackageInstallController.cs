@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
@@ -40,6 +43,16 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+        private readonly PackageActionRunner _packageActionRunner;
+
+        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
+            IProfilingLogger logger, IRuntimeState runtimeState, PackageActionRunner packageActionRunner)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+            _packageActionRunner = packageActionRunner;
+        }
+
         /// <summary>
         /// This checks if this package & version is alraedy installed
         /// </summary>
@@ -128,14 +141,14 @@ namespace Umbraco.Web.Editors
             //Remove Document Types
             var contentTypes = new List<IContentType>();
             var contentTypeService = Services.ContentTypeService;
-            foreach (var item in pack.Data.Documenttypes.ToArray())
+            foreach (var item in pack.Data.DocumentTypes.ToArray())
             {
                 int nId;
                 if (int.TryParse(item, out nId) == false) continue;
                 var contentType = contentTypeService.Get(nId);
                 if (contentType == null) continue;
                 contentTypes.Add(contentType);
-                pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
+                pack.Data.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
             }
 
             //Order the DocumentTypes before removing them
@@ -195,8 +208,7 @@ namespace Umbraco.Web.Editors
                     {
                         try
                         {
-                            global::Umbraco.Web._Legacy.Packager.PackageInstance.PackageAction
-                                .UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
+                            _packageActionRunner.UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
                         }
                         catch (Exception ex)
                         {

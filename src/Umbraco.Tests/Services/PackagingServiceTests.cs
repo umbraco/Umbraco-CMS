@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -20,59 +13,7 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PackagingServiceTests : TestWithSomeContentBase
     {
-        [Test]
-        public void PackagingService_Can_Export_Macro()
-        {
-            // Arrange
-            var macro = new Macro("test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
-            ServiceContext.MacroService.Save(macro);
-
-            // Act
-            var element = ServiceContext.PackagingService.Export(macro);
-
-            // Assert
-            Assert.That(element, Is.Not.Null);
-            Assert.That(element.Element("name").Value, Is.EqualTo("Test"));
-            Assert.That(element.Element("alias").Value, Is.EqualTo("test1"));
-            Debug.Print(element.ToString());
-        }
-
-        [Test]
-        public void PackagingService_Can_Export_DictionaryItems()
-        {
-            // Arrange
-            CreateDictionaryData();
-            var dictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey("Parent");
-
-            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
-
-            // Act
-            var xml = ServiceContext.PackagingService.Export(new []{dictionaryItem});
-
-            // Assert
-            Assert.That(xml.ToString(), Is.EqualTo(dictionaryItemsElement.ToString()));
-        }
-
-        [Test]
-        public void PackagingService_Can_Export_Languages()
-        {
-            // Arrange
-            var languageNbNo = new Language("nb-NO") { CultureName = "Norwegian" };
-            ServiceContext.LocalizationService.Save(languageNbNo);
-
-            var languageEnGb = new Language("en-GB") { CultureName = "English (United Kingdom)" };
-            ServiceContext.LocalizationService.Save(languageEnGb);
-
-            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
-            var languageItemsElement = newPackageXml.Elements("Languages").First();
-
-            // Act
-            var xml = ServiceContext.PackagingService.Export(new[] { languageNbNo, languageEnGb });
-
-            // Assert
-            Assert.That(xml.ToString(), Is.EqualTo(languageItemsElement.ToString()));
-        }
+        
 
         private static string GetTestPackagePath(string packageName)
         {
@@ -123,31 +64,6 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(preInstallWarnings);
         }
 
-        private void CreateDictionaryData()
-        {
-            var languageNbNo = new Language("nb-NO") { CultureName = "nb-NO" };
-            ServiceContext.LocalizationService.Save(languageNbNo);
-
-            var languageEnGb = new Language("en-GB") { CultureName = "en-GB" };
-            ServiceContext.LocalizationService.Save(languageEnGb);
-
-            var parentItem = new DictionaryItem("Parent");
-            var parentTranslations = new List<IDictionaryTranslation>
-                                   {
-                                       new DictionaryTranslation(languageNbNo, "ForelderVerdi"),
-                                       new DictionaryTranslation(languageEnGb, "ParentValue")
-                                   };
-            parentItem.Translations = parentTranslations;
-            ServiceContext.LocalizationService.Save(parentItem);
-
-            var childItem = new DictionaryItem(parentItem.Key, "Child");
-            var childTranslations = new List<IDictionaryTranslation>
-                                   {
-                                       new DictionaryTranslation(languageNbNo, "BarnVerdi"),
-                                       new DictionaryTranslation(languageEnGb, "ChildValue")
-                                   };
-            childItem.Translations = childTranslations;
-            ServiceContext.LocalizationService.Save(childItem);
-        }
+        
     }
 }

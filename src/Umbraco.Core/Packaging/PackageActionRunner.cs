@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Xml;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Web._Legacy.Packager.PackageInstance
+namespace Umbraco.Core.Packaging
 {
 
     /// <summary>
     /// Package actions are executed on packge install / uninstall.
     /// </summary>
-    public class PackageAction
+    public sealed class PackageActionRunner
     {
+        private readonly ILogger _logger;
+        private readonly PackageActionCollection _packageActions;
+
+        public PackageActionRunner(ILogger logger, PackageActionCollection packageActions)
+        {
+            _logger = logger;
+            _packageActions = packageActions;
+        }
 
         /// <summary>
         /// Runs the package action with the specified action alias.
@@ -19,22 +26,19 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
         /// <param name="packageName">Name of the package.</param>
         /// <param name="actionAlias">The action alias.</param>
         /// <param name="actionXml">The action XML.</param>
-        public static void RunPackageAction(string packageName, string actionAlias, XmlNode actionXml)
+        public void RunPackageAction(string packageName, string actionAlias, XmlNode actionXml)
         {
 
-            foreach (var ipa in Current.PackageActions)
+            foreach (var ipa in _packageActions)
             {
                 try
                 {
                     if (ipa.Alias() == actionAlias)
-                    {
-
                         ipa.Execute(packageName, actionXml);
-                    }
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<PackageAction>(ex, "Error loading package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
+                    _logger.Error<PackageActionRunner>(ex, "Error loading package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
                 }
             }
         }
@@ -45,22 +49,18 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
         /// <param name="packageName">Name of the package.</param>
         /// <param name="actionAlias">The action alias.</param>
         /// <param name="actionXml">The action XML.</param>
-        public static void UndoPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
+        public void UndoPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
         {
-
-            foreach (IPackageAction ipa in Current.PackageActions)
+            foreach (var ipa in _packageActions)
             {
                 try
                 {
                     if (ipa.Alias() == actionAlias)
-                    {
-
                         ipa.Undo(packageName, actionXml);
-                    }
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<PackageAction>(ex, "Error undoing package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
+                    _logger.Error<PackageActionRunner>(ex, "Error undoing package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
                 }
             }
         }

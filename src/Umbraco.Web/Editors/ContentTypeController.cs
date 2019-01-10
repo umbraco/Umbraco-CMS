@@ -11,10 +11,15 @@ using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -40,6 +45,13 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
+        private readonly IEntityXmlSerializer _serializer;
+
+        public ContentTypeController(IEntityXmlSerializer serializer, ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+            _serializer = serializer;
+        }
+
         public int GetCount()
         {
             return Services.ContentTypeService.Count();
@@ -444,11 +456,7 @@ namespace Umbraco.Web.Editors
             var contentType = Services.ContentTypeService.Get(id);
             if (contentType == null) throw new NullReferenceException("No content type found with id " + id);
 
-            var serializer = new EntityXmlSerializer();
-            var xml = serializer.Serialize(
-                Services.DataTypeService,
-                Services.ContentTypeService,
-                contentType);
+            var xml = _serializer.Serialize(contentType);
 
             var response = new HttpResponseMessage
             {
@@ -559,5 +567,7 @@ namespace Umbraco.Web.Editors
             return model;
 
         }
+
+        
     }
 }

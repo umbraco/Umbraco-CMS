@@ -14,18 +14,18 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Xml;
 using Umbraco.Web._Legacy.Packager.PackageInstance;
 using File = System.IO.File;
-using PackageAction = Umbraco.Web._Legacy.Packager.PackageInstance.PackageAction;
 
 namespace Umbraco.Web._Legacy.Packager
 {
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
     ///
-    /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macroes/documenttypes (etc.)
+    /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macroes/documentTypes (etc.)
     /// in a Xml document, along with the physical files used (images/usercontrols/xsl documents etc.)
     ///
     /// Partly implemented, import of packages is done, the export is *under construction*.
@@ -420,7 +420,7 @@ namespace Umbraco.Web._Legacy.Packager
                         var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
                         foreach (var contentType in contentTypes)
                         {
-                            insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
+                            insPack.Data.DocumentTypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
                             //saveNeeded = true;
                         }
                     }
@@ -510,7 +510,7 @@ namespace Umbraco.Web._Legacy.Packager
 
                             if (alias.IsNullOrWhiteSpace() == false)
                             {
-                                PackageAction.RunPackageAction(insPack.Data.Name, alias, n);
+                                Current.PackageActionRunner.RunPackageAction(insPack.Data.Name, alias, n);
                             }
                         }
                     }

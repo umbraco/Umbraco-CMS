@@ -429,6 +429,9 @@
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\NotificationEmailBodyParams.cs" />
     <Compile Include="Models\NotificationEmailSubjectParams.cs" />
+    <Compile Include="Models\Packaging\ActionRunAt.cs" />
+    <Compile Include="Models\Packaging\InstallationSummaryExtentions.cs" />
+    <Compile Include="Models\Packaging\PackageDefinition.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
@@ -440,6 +443,10 @@
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
+    <Compile Include="Models\Packaging\UninstallationSummaryExtentions.cs" />
+    <Compile Include="Packaging\IPackageCreation.cs" />
+    <Compile Include="Packaging\PackageActionRunner.cs" />
+    <Compile Include="Packaging\PackageCreation.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentScheduleDto.cs" />
@@ -554,7 +561,6 @@
     <Compile Include="Events\EventNameExtractor.cs" />
     <Compile Include="Events\EventNameExtractorError.cs" />
     <Compile Include="Events\EventNameExtractorResult.cs" />
-    <Compile Include="Events\ExportEventArgs.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
     <Compile Include="Events\IEventDefinition.cs" />
     <Compile Include="Events\IEventDispatcher.cs" />
@@ -883,7 +889,7 @@
     <Compile Include="Packaging\IConflictingPackageData.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
-    <Compile Include="Packaging\Models\UninstallationSummary.cs" />
+    <Compile Include="Models\Packaging\UninstallationSummary.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
@@ -1351,6 +1357,7 @@
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="Services\IConsentService.cs" />
+    <Compile Include="Services\IEntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
@@ -1370,7 +1377,7 @@
     <Compile Include="Services\Implement\DataTypeService.cs" />
     <Compile Include="Services\Implement\DomainService.cs" />
     <Compile Include="Services\Implement\EntityService.cs" />
-    <Compile Include="Services\EntityXmlSerializer.cs" />
+    <Compile Include="Services\Implement\EntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\ExternalLoginService.cs" />
     <Compile Include="Services\Implement\FileService.cs" />
     <Compile Include="Services\IApplicationTreeService.cs" />
@@ -1525,6 +1532,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
+    <Folder Include="Packaging\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

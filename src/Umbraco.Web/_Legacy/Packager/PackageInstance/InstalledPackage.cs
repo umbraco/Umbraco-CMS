@@ -53,7 +53,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
 
             List<InstalledPackage> val = new List<InstalledPackage>();
 
-            foreach (PackageInstance pack in data.GetAllPackages(IOHelper.MapPath(Settings.InstalledPackagesSettings)))
+            foreach (Core.Models.Packaging.PackageDefinition pack in data.GetAllPackages(IOHelper.MapPath(Settings.InstalledPackagesSettings)))
             {
                 InstalledPackage insPackage = new InstalledPackage();
                 insPackage.Data = pack;
@@ -63,8 +63,8 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
             return val;
         }
 
-        private PackageInstance m_data;
-        public PackageInstance Data
+        private Core.Models.Packaging.PackageDefinition m_data;
+        public Core.Models.Packaging.PackageDefinition Data
         {
             get { return m_data; }
             set { m_data = value; }
@@ -156,7 +156,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
         {
             var macros = TryGetIntegerIds(Data.Macros).Select(macroService.GetById).ToList();
             var templates = TryGetIntegerIds(Data.Templates).Select(fileService.GetTemplate).ToList();
-            var contentTypes = TryGetIntegerIds(Data.Documenttypes).Select(contentTypeService.Get).ToList(); // fixme - media types?
+            var contentTypes = TryGetIntegerIds(Data.DocumentTypes).Select(contentTypeService.Get).ToList(); // fixme - media types?
             var dataTypes = TryGetIntegerIds(Data.DataTypes).Select(dataTypeService.GetDataType).ToList();
             var dictionaryItems = TryGetIntegerIds(Data.DictionaryItems).Select(localizationService.GetDictionaryItemById).ToList();
             var languages = TryGetIntegerIds(Data.Languages).Select(localizationService.GetLanguageById).ToList();

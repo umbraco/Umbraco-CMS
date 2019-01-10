@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -8,8 +7,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -18,8 +15,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Packaging.Models;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
@@ -35,56 +30,53 @@ namespace Umbraco.Core.Services.Implement
     /// </summary>
     public class PackagingService : IPackagingService
     {
+        //fixme: inject when ready to use this
+        private IPackageInstallation _packageInstallation;
+
         private readonly ILogger _logger;
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
-        private readonly IMediaService _mediaService;
         private readonly IMacroService _macroService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private Dictionary<string, IContentType> _importedContentTypes;
-        private IPackageInstallation _packageInstallation;
-        private readonly IUserService _userService;
         private readonly IAuditRepository _auditRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IPackageCreation _packageCreation;
         private static HttpClient _httpClient;
 
         public PackagingService(
             ILogger logger,
             IContentService contentService,
             IContentTypeService contentTypeService,
-            IMediaService mediaService,
             IMacroService macroService,
             IDataTypeService dataTypeService,
             IFileService fileService,
             ILocalizationService localizationService,
             IEntityService entityService,
-            IUserService userService,
             IScopeProvider scopeProvider,
-            UrlSegmentProviderCollection urlSegmentProviders,
-            IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository,
-            PropertyEditorCollection propertyEditors)
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            PropertyEditorCollection propertyEditors,
+            IPackageCreation packageCreation)
         {
             _logger = logger;
             _contentService = contentService;
             _contentTypeService = contentTypeService;
-            _mediaService = mediaService;
             _macroService = macroService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
             _localizationService = localizationService;
             _entityService = entityService;
             _scopeProvider = scopeProvider;
-            _urlSegmentProviders = urlSegmentProviders;
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _propertyEditors = propertyEditors;
-            _userService = userService;
+            _packageCreation = packageCreation;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
 
@@ -92,31 +84,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Content
 
-        /// <summary>
-        /// Exports an <see cref="IContent"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="content">Content to export</param>
-        /// <param name="deep">Optional parameter indicating whether to include descendents</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
-        {
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            if (raiseEvents)
-            {
-                if (ExportingContent.IsRaisedEventCancelled(new ExportEventArgs<IContent>(content, nodeName), this))
-                    return new XElement(nodeName);
-            }
-
-            const bool published = false; // fixme - what shall we export?
-            var xml = EntityXmlSerializer.Serialize(_contentService, _dataTypeService, _userService, _localizationService, _urlSegmentProviders, content, published, deep);
-
-            if (raiseEvents)
-                ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
-
-            return xml;
-        }
+        
 
 
 
@@ -308,28 +276,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region ContentTypes
 
-        /// <summary>
-        /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="contentType">ContentType to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ContentType item.</returns>
-        public XElement Export(IContentType contentType, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (ExportingContentType.IsRaisedEventCancelled(new ExportEventArgs<IContentType>(contentType, "DocumentType"), this))
-                    return new XElement("DocumentType");
-            }
-
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_dataTypeService, _contentTypeService, contentType);
-
-            if (raiseEvents)
-                ExportedContentType.RaiseEvent(new ExportEventArgs<IContentType>(contentType, xml, false), this);
-
-            return xml;
-        }
+        
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -804,44 +751,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region DataTypes
 
-        /// <summary>
-        /// Exports a list of Data Types
-        /// </summary>
-        /// <param name="dataTypeDefinitions">List of data types to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
-        public XElement Export(IEnumerable<IDataType> dataTypeDefinitions, bool raiseEvents = true)
-        {
-            var container = new XElement("DataTypes");
-            foreach (var dataTypeDefinition in dataTypeDefinitions)
-            {
-                container.Add(Export(dataTypeDefinition, raiseEvents));
-            }
-            return container;
-        }
+        
 
-        /// <summary>
-        /// Exports a single Data Type
-        /// </summary>
-        /// <param name="dataType">Data type to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
-        public XElement Export(IDataType dataType, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (ExportingDataType.IsRaisedEventCancelled(new ExportEventArgs<IDataType>(dataType, "DataType"), this))
-                    return new XElement("DataType");
-            }
-
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_dataTypeService, dataType);
-
-            if (raiseEvents)
-                ExportedDataType.RaiseEvent(new ExportEventArgs<IDataType>(dataType, xml, false), this);
-
-            return xml;
-        }
+        
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IDataType"/>
@@ -993,55 +905,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Dictionary Items
 
-        /// <summary>
-        /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="dictionaryItem">List of dictionary items to export</param>
-        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem objects</returns>
-        public XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true, bool raiseEvents = true)
-        {
-            var xml = new XElement("DictionaryItems");
-            foreach (var item in dictionaryItem)
-            {
-                xml.Add(Export(item, includeChildren, raiseEvents));
-            }
-            return xml;
-        }
+        
 
-        /// <summary>
-        /// Exports a single <see cref="IDictionaryItem"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="dictionaryItem">Dictionary Item to export</param>
-        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
-        public XElement Export(IDictionaryItem dictionaryItem, bool includeChildren, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (ExportingDictionaryItem.IsRaisedEventCancelled(new ExportEventArgs<IDictionaryItem>(dictionaryItem, "DictionaryItem"), this))
-                    return new XElement("DictionaryItem");
-            }
-
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(dictionaryItem);
-
-            if (includeChildren)
-            {
-                var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
-                foreach (var child in children)
-                {
-                    xml.Add(Export(child, true));
-                }
-            }
-
-            if (raiseEvents)
-                ExportedDictionaryItem.RaiseEvent(new ExportEventArgs<IDictionaryItem>(dictionaryItem, xml, false), this);
-
-            return xml;
-        }
+        
 
         /// <summary>
         /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
@@ -1138,44 +1004,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Languages
 
-        /// <summary>
-        /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="languages">List of Languages to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage objects</returns>
-        public XElement Export(IEnumerable<ILanguage> languages, bool raiseEvents = true)
-        {
-            var xml = new XElement("Languages");
-            foreach (var language in languages)
-            {
-                xml.Add(Export(language, raiseEvents));
-            }
-            return xml;
-        }
+        
 
-        /// <summary>
-        /// Exports a single <see cref="ILanguage"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="language">Language to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage object</returns>
-        public XElement Export(ILanguage language, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (ExportingLanguage.IsRaisedEventCancelled(new ExportEventArgs<ILanguage>(language, "Language"), this))
-                    return new XElement("Language");
-            }
-
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(language);
-
-            if (raiseEvents)
-                ExportedLanguage.RaiseEvent(new ExportEventArgs<ILanguage>(language, xml, false), this);
-
-            return xml;
-        }
+        
 
         /// <summary>
         /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
@@ -1326,109 +1157,10 @@ namespace Umbraco.Core.Services.Implement
             return macro;
         }
 
-        /// <summary>
-        /// Exports a list of <see cref="IMacro"/> items to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="macros">Macros to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro objects</returns>
-        public XElement Export(IEnumerable<IMacro> macros, bool raiseEvents = true)
-        {
-            var xml = new XElement("Macros");
-            foreach (var item in macros)
-            {
-                xml.Add(Export(item, raiseEvents));
-            }
-            return xml;
-        }
+        
 
-        /// <summary>
-        /// Exports a single <see cref="IMacro"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="macro">Macro to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
-        public XElement Export(IMacro macro, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (ExportingMacro.IsRaisedEventCancelled(new ExportEventArgs<IMacro>(macro, "macro"), this))
-                    return new XElement("macro");
-            }
+        
 
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(macro);
-
-            if (raiseEvents)
-                ExportedMacro.RaiseEvent(new ExportEventArgs<IMacro>(macro, xml, false), this);
-
-            return xml;
-        }
-
-        #endregion
-
-        #region Members
-
-        /// <summary>
-        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="member">Member to export</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
-        public XElement Export(IMember member)
-        {
-            return EntityXmlSerializer.Serialize(_dataTypeService, _localizationService, member);
-        }
-
-        #endregion
-
-        #region Media
-
-        /// <summary>
-        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="media">Media to export</param>
-        /// <param name="deep">Optional parameter indicating whether to include descendents</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
-        {
-            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            if (raiseEvents)
-            {
-                if (ExportingMedia.IsRaisedEventCancelled(new ExportEventArgs<IMedia>(media, nodeName), this))
-                    return new XElement(nodeName);
-            }
-
-            var xml = EntityXmlSerializer.Serialize(_mediaService, _dataTypeService, _userService, _localizationService, _urlSegmentProviders, media, deep);
-
-            if (raiseEvents)
-                ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);
-
-            return xml;
-        }
-
-
-        #endregion
-
-        #region MediaTypes
-
-        /// <summary>
-        /// Exports an <see cref="IMediaType"/> to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="mediaType">MediaType to export</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the MediaType item.</returns>
-        internal XElement Export(IMediaType mediaType)
-        {
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_dataTypeService, mediaType);
-
-            return xml;
-        }
-
-        #endregion
-
-        #region Package Manifest
         #endregion
 
         #region Package Files
@@ -1579,6 +1311,26 @@ namespace Umbraco.Core.Services.Implement
         }
 
 
+        private bool IsMasterPageSyntax(string code)
+        {
+            return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
+                code.InvariantContains("<umbraco:Item") || code.InvariantContains("<asp:") || code.InvariantContains("<umbraco:Macro");
+        }
+
+        private string ViewPath(string alias)
+        {
+            return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+        }
+
+        private string MasterpagePath(string alias)
+        {
+            return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
+        }
+
+        #endregion
+
+        #region Stylesheets
+
         public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
         {
 
@@ -1601,68 +1353,11 @@ namespace Umbraco.Core.Services.Implement
 
         }
 
-
-        private bool IsMasterPageSyntax(string code)
-        {
-            return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
-                code.InvariantContains("<umbraco:Item") || code.InvariantContains("<asp:") || code.InvariantContains("<umbraco:Macro");
-        }
-
-        private string ViewPath(string alias)
-        {
-            return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
-        }
-
-        private string MasterpagePath(string alias)
-        {
-            return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
-        }
-
-        /// <summary>
-        /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="templates">List of Templates to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate objects</returns>
-        public XElement Export(IEnumerable<ITemplate> templates, bool raiseEvents = true)
-        {
-            var xml = new XElement("Templates");
-            foreach (var item in templates)
-            {
-                xml.Add(Export(item, raiseEvents));
-            }
-            return xml;
-        }
-
-        /// <summary>
-        /// Exports a single <see cref="ITemplate"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="template">Template to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate object</returns>
-        public XElement Export(ITemplate template, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (ExportingTemplate.IsRaisedEventCancelled(new ExportEventArgs<ITemplate>(template, "Template"), this))
-                    return new XElement("Template");
-            }
-
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(template);
-
-            if (raiseEvents)
-                ExportedTemplate.RaiseEvent(new ExportEventArgs<ITemplate>(template, xml, false), this);
-
-            return xml;
-        }
-
-        #endregion
-
-        #region Stylesheets
         #endregion
 
         #region Installation
+
+        //fixme: None of these methods are actually used! They have unit tests for them though, but we don't actively use this yet but we should!
 
         internal IPackageInstallation PackageInstallation
         {
@@ -1706,6 +1401,9 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Package Building
+
+        public void SavePackageDefinition(PackageDefinition definition) => _packageCreation.SavePackageDefinition(definition);
+
         #endregion
 
         /// <summary>
@@ -1737,24 +1435,6 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContent>> ImportedContent;
 
-
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContent>> ExportingContent;
-
-        /// <summary>
-        /// Occurs after Content is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContent>> ExportedContent;
-
-        /// <summary>
-        /// Occurs before Exporting Media
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMedia>> ExportingMedia;
-
-        /// <summary>
-        /// Occurs after Media is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMedia>> ExportedMedia;
-
         /// <summary>
         /// Occurs before Importing ContentType
         /// </summary>
@@ -1764,16 +1444,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after ContentType is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContentType>> ImportedContentType;
-
-        /// <summary>
-        /// Occurs before Exporting ContentType
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContentType>> ExportingContentType;
-
-        /// <summary>
-        /// Occurs after ContentType is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContentType>> ExportedContentType;
 
         /// <summary>
         /// Occurs before Importing DataType
@@ -1786,16 +1456,6 @@ namespace Umbraco.Core.Services.Implement
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataType>> ImportedDataType;
 
         /// <summary>
-        /// Occurs before Exporting DataType
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataType>> ExportingDataType;
-
-        /// <summary>
-        /// Occurs after DataType is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataType>> ExportedDataType;
-
-        /// <summary>
         /// Occurs before Importing DictionaryItem
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDictionaryItem>> ImportingDictionaryItem;
@@ -1804,16 +1464,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after DictionaryItem is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDictionaryItem>> ImportedDictionaryItem;
-
-        /// <summary>
-        /// Occurs before Exporting DictionaryItem
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDictionaryItem>> ExportingDictionaryItem;
-
-        /// <summary>
-        /// Occurs after DictionaryItem is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDictionaryItem>> ExportedDictionaryItem;
 
         /// <summary>
         /// Occurs before Importing Macro
@@ -1826,16 +1476,6 @@ namespace Umbraco.Core.Services.Implement
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<IMacro>> ImportedMacro;
 
         /// <summary>
-        /// Occurs before Exporting Macro
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMacro>> ExportingMacro;
-
-        /// <summary>
-        /// Occurs after Macro is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMacro>> ExportedMacro;
-
-        /// <summary>
         /// Occurs before Importing Language
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<ILanguage>> ImportingLanguage;
@@ -1844,16 +1484,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Language is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<ILanguage>> ImportedLanguage;
-
-        /// <summary>
-        /// Occurs before Exporting Language
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ILanguage>> ExportingLanguage;
-
-        /// <summary>
-        /// Occurs after Language is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ILanguage>> ExportedLanguage;
 
         /// <summary>
         /// Occurs before Importing Template
@@ -1871,16 +1501,6 @@ namespace Umbraco.Core.Services.Implement
         public static event TypedEventHandler<IPackagingService, ImportEventArgs<ITemplate>> ImportedTemplate;
 
         /// <summary>
-        /// Occurs before Exporting Template
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportingTemplate;
-
-        /// <summary>
-        /// Occurs after Template is Exported to Xml
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportedTemplate;
-
-        /// <summary>
         /// Occurs before Importing umbraco package
         /// </summary>
         internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
@@ -1896,5 +1516,7 @@ namespace Umbraco.Core.Services.Implement
         public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
 
         #endregion
+
+        
     }
 }

@@ -5,6 +5,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
@@ -160,6 +161,9 @@ namespace Umbraco.Core.Composing
 
         internal static PackageActionCollection PackageActions
             => Factory.GetInstance<PackageActionCollection>();
+
+        internal static PackageActionRunner PackageActionRunner
+            => Factory.GetInstance<PackageActionRunner>();
 
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Factory.GetInstance<PropertyValueConverterCollection>();

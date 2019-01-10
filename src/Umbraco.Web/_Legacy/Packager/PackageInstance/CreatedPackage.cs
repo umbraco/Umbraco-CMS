@@ -7,11 +7,13 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using File = System.IO.File;
 
 
 namespace Umbraco.Web._Legacy.Packager.PackageInstance
 {
+    //TODO: Fix this class , service + model + internal? 
     public class CreatedPackage
     {
 
@@ -22,13 +24,12 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
             return pack;
         }
 
-        public static CreatedPackage MakeNew(string name)
+        public static CreatedPackage MakeNew(string name, Core.Models.Packaging.PackageDefinition packageData = null)
         {
             var pack = new CreatedPackage
             {
-                Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings))
+                Data = packageData ?? data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings))
             };
-
 
             return pack;
         }
@@ -43,7 +44,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
             data.Delete(this.Data.Id, IOHelper.MapPath(Settings.CreatedPackagesSettings));
         }
 
-        public PackageInstance Data { get; set; }
+        public Core.Models.Packaging.PackageDefinition Data { get; set; }
 
         public static List<CreatedPackage> GetAllCreatedPackages()
         {
@@ -81,7 +82,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
         }
 
 
-        public void Publish()
+        public void Publish(IEntityXmlSerializer serializer)
         {
 
             var package = this;
@@ -118,7 +119,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                     //var umbDocument = new Document(contentNodeId);
                     //var x = umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes);
                     var udoc = Current.Services.ContentService.GetById(contentNodeId);
-                    var xe = pack.ContentLoadChildNodes ? udoc.ToDeepXml(Current.Services.PackagingService) : udoc.ToXml(Current.Services.PackagingService);
+                    var xe = pack.ContentLoadChildNodes ? udoc.ToDeepXml(serializer) : udoc.ToXml(serializer);
                     var x = xe.GetXmlNode(_packageManifest);
                     documentSet.AppendChild(x);
 
@@ -188,7 +189,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
             //Document types..
             var dtl = new List<IContentType>();
             var docTypes = _packageManifest.CreateElement("DocumentTypes");
-            foreach (var dtId in pack.Documenttypes)
+            foreach (var dtId in pack.DocumentTypes)
             {
                 if (int.TryParse(dtId, out outInt))
                 {
@@ -200,11 +201,9 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                 }
             }
 
-            var exporter = new EntityXmlSerializer();
-
             foreach (var d in dtl)
             {
-                var xml = exporter.Serialize(Current.Services.DataTypeService, Current.Services.ContentTypeService, d);
+                var xml = serializer.Serialize(d);
                 var xNode = xml.GetXmlNode();
                 var n = (XmlElement) _packageManifest.ImportNode(xNode, true);
                 docTypes.AppendChild(n);
@@ -220,7 +219,6 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                 {
                     var t = Current.Services.FileService.GetTemplate(outInt);
 
-                    var serializer = new EntityXmlSerializer();
                     var serialized = serializer.Serialize(t);
                     var n = serialized.GetXmlNode(_packageManifest);
 
@@ -241,16 +239,16 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
             }
             AppendElement(stylesheets);
 
-            //Macros
-            var macros = _packageManifest.CreateElement("Macros");
-            foreach (var macroId in pack.Macros)
-            {
-                if (int.TryParse(macroId, out outInt))
-                {
-                    macros.AppendChild(PackagerUtility.Macro(int.Parse(macroId), true, localPath, _packageManifest));
-                }
-            }
-            AppendElement(macros);
+            ////Macros
+            //var macros = _packageManifest.CreateElement("Macros");
+            //foreach (var macroId in pack.Macros)
+            //{
+            //    if (int.TryParse(macroId, out outInt))
+            //    {
+            //        macros.AppendChild(PackagerUtility.Macro(int.Parse(macroId), true, localPath, _packageManifest));
+            //    }
+            //}
+            //AppendElement(macros);
 
             //Dictionary Items
             var dictionaryItems = _packageManifest.CreateElement("DictionaryItems");
@@ -259,8 +257,7 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                 if (int.TryParse(dictionaryId, out outInt))
                 {
                     var di = Current.Services.LocalizationService.GetDictionaryItemById(outInt);
-                    var entitySerializer = new EntityXmlSerializer();
-                    var xmlNode = entitySerializer.Serialize(di).GetXmlNode(_packageManifest);
+                    var xmlNode = serializer.Serialize(di, false).GetXmlNode(_packageManifest);
                     dictionaryItems.AppendChild(xmlNode);
                 }
             }
@@ -274,7 +271,6 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                 {
                     var lang = Current.Services.LocalizationService.GetLanguageById(outInt);
 
-                    var serializer = new EntityXmlSerializer();
                     var xml = serializer.Serialize(lang);
                     var n = xml.GetXmlNode(_packageManifest);
 
@@ -328,7 +324,10 @@ namespace Umbraco.Web._Legacy.Packager.PackageInstance
                         AppendElement(actions);
                     }
                 }
-                catch { }
+                catch
+                {
+                    //TODO: Log!?
+                }
             }
 
             var manifestFileName = localPath + "/package.xml";

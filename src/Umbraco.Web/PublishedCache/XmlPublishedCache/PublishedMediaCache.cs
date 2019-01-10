@@ -17,6 +17,7 @@ using Umbraco.Core.Xml;
 using Umbraco.Examine;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
@@ -37,14 +38,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // method GetExamineManagerSafe().
         //
         private readonly ISearcher _searchProvider;
-        private readonly IIndex _indexProvider;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
+        private readonly IEntityXmlSerializer _entitySerializer;
 
         // must be specified by the ctor
         private readonly ICacheProvider _cacheProvider;
 
-        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
@@ -53,6 +54,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _cacheProvider = cacheProvider;
             _xmlStore = xmlStore;
             _contentTypeCache = contentTypeCache;
+            _entitySerializer = entitySerializer;
         }
 
         /// <summary>
@@ -61,18 +63,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="mediaService"></param>
         /// <param name="userService"></param>
         /// <param name="searchProvider"></param>
-        /// <param name="indexProvider"></param>
         /// <param name="cacheProvider"></param>
         /// <param name="contentTypeCache"></param>
-        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        /// <param name="entitySerializer"></param>
+        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _searchProvider = searchProvider ?? throw new ArgumentNullException(nameof(searchProvider));
-            _indexProvider = indexProvider ?? throw new ArgumentNullException(nameof(indexProvider));
             _cacheProvider = cacheProvider;
             _contentTypeCache = contentTypeCache;
+            _entitySerializer = entitySerializer;
         }
 
         static PublishedMediaCache()
@@ -555,14 +557,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return Enumerable.Empty<IPublishedContent>();
             }
 
-            var serialized = EntityXmlSerializer.Serialize(
-                                Current.Services.MediaService,
-                                Current.Services.DataTypeService,
-                                Current.Services.UserService,
-                                Current.Services.LocalizationService,
-                                Current.UrlSegmentProviders,
-                                media,
-                                true);
+            var serialized = _entitySerializer.Serialize(media, true);
 
             var mediaIterator = serialized.CreateNavigator().Select("/");
 

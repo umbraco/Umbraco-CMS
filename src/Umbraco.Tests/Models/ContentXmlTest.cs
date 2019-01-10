@@ -2,7 +2,9 @@
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -29,7 +31,7 @@ namespace Umbraco.Tests.Models
             var urlName = content.GetUrlSegment(new[]{new DefaultUrlSegmentProvider() });
 
             // Act
-            XElement element = content.ToXml();
+            XElement element = content.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);

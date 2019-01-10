@@ -10,6 +10,7 @@ using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services.Importing
@@ -416,11 +417,12 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
             var packagingService = ServiceContext.PackagingService;
+            var serializer = Factory.GetInstance<IEntityXmlSerializer>();
 
             // Act
             var contentTypes = packagingService.ImportContentTypes(docTypeElement);
             var contentType = contentTypes.FirstOrDefault();
-            var element = packagingService.Export(contentType);
+            var element = serializer.Serialize(contentType);
 
             // Assert
             Assert.That(element, Is.Not.Null);

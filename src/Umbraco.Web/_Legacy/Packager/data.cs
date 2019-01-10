@@ -23,20 +23,12 @@ namespace Umbraco.Web._Legacy.Packager
             //do some error checking and create the folders/files if they don't exist
             if (!File.Exists(dataSource))
             {
-                if (!Directory.Exists(IOHelper.MapPath(Settings.PackagerRoot)))
+                if (!Directory.Exists(IOHelper.MapPath(SystemDirectories.Packages)))
                 {
-                    Directory.CreateDirectory(IOHelper.MapPath(Settings.PackagerRoot));
-                }
-                if (!Directory.Exists(IOHelper.MapPath(Settings.PackagesStorage)))
-                {
-                    Directory.CreateDirectory(IOHelper.MapPath(Settings.PackagesStorage));
-                }
-                if (!Directory.Exists(IOHelper.MapPath(Settings.InstalledPackagesStorage)))
-                {
-                    Directory.CreateDirectory(IOHelper.MapPath(Settings.InstalledPackagesStorage));
+                    Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Packages));
                 }
 
-                using (StreamWriter sw = File.CreateText(dataSource))
+                using (var sw = File.CreateText(dataSource))
                 {
                     sw.Write($@"<?xml version=""1.0"" encoding=""utf-8""?>{Environment.NewLine}<packages></packages>{Environment.NewLine}");
                     sw.Flush();
@@ -85,7 +77,7 @@ namespace Umbraco.Web._Legacy.Packager
             return Source.SelectSingleNode("/packages/package [@packageGuid = '" + guid + "']");
         }
 
-        public static PackageInstance.PackageInstance MakeNew(string Name, string dataSource)
+        public static Core.Models.Packaging.PackageDefinition MakeNew(string name, string dataSource)
         {
             Reload(dataSource);
 
@@ -101,7 +93,7 @@ namespace Umbraco.Web._Legacy.Packager
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "id", maxId.ToString()));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "version", ""));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "url", ""));
-            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "name", Name));
+            instance.Attributes.Append(XmlHelper.AddAttribute(Source, "name", name));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "folder", Guid.NewGuid().ToString()));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packagepath", ""));
             instance.Attributes.Append(XmlHelper.AddAttribute(Source, "repositoryGuid", ""));
@@ -137,7 +129,7 @@ namespace Umbraco.Web._Legacy.Packager
 
             instance.AppendChild(XmlHelper.AddTextNode(Source, "templates", ""));
             instance.AppendChild(XmlHelper.AddTextNode(Source, "stylesheets", ""));
-            instance.AppendChild(XmlHelper.AddTextNode(Source, "documenttypes", ""));
+            instance.AppendChild(XmlHelper.AddTextNode(Source, "documentTypes", ""));
             instance.AppendChild(XmlHelper.AddTextNode(Source, "macros", ""));
             instance.AppendChild(XmlHelper.AddTextNode(Source, "files", ""));
             instance.AppendChild(XmlHelper.AddTextNode(Source, "languages", ""));
@@ -151,26 +143,26 @@ namespace Umbraco.Web._Legacy.Packager
             return retVal;
         }
 
-        public static PackageInstance.PackageInstance Package(int id, string datasource)
+        public static Core.Models.Packaging.PackageDefinition Package(int id, string datasource)
         {
             return ConvertXmlToPackage(GetFromId(id, datasource, true));
         }
 
-        public static PackageInstance.PackageInstance Package(string guid, string datasource)
+        public static Core.Models.Packaging.PackageDefinition Package(string guid, string datasource)
         {
             XmlNode node = GetFromGuid(guid, datasource, true);
             if (node != null)
                 return ConvertXmlToPackage(node);
             else
-                return new PackageInstance.PackageInstance();
+                return new Core.Models.Packaging.PackageDefinition();
         }
 
-        public static List<PackageInstance.PackageInstance> GetAllPackages(string dataSource)
+        public static List<Core.Models.Packaging.PackageDefinition> GetAllPackages(string dataSource)
         {
             Reload(dataSource);
             XmlNodeList nList = data.Source.SelectNodes("packages/package");
 
-            List<PackageInstance.PackageInstance> retVal = new List<PackageInstance.PackageInstance>();
+            List<Core.Models.Packaging.PackageDefinition> retVal = new List<Core.Models.Packaging.PackageDefinition>();
 
             for (int i = 0; i < nList.Count; i++)
             {
@@ -187,9 +179,9 @@ namespace Umbraco.Web._Legacy.Packager
             return retVal;
         }
 
-        private static PackageInstance.PackageInstance ConvertXmlToPackage(XmlNode n)
+        private static Core.Models.Packaging.PackageDefinition ConvertXmlToPackage(XmlNode n)
         {
-            PackageInstance.PackageInstance retVal = new PackageInstance.PackageInstance();
+            Core.Models.Packaging.PackageDefinition retVal = new Core.Models.Packaging.PackageDefinition();
 
             if (n != null)
             {
@@ -227,7 +219,7 @@ namespace Umbraco.Web._Legacy.Packager
                 retVal.Macros = new List<string>(SafeNodeValue(n.SelectSingleNode("macros")).Trim(',').Split(','));
                 retVal.Templates = new List<string>(SafeNodeValue(n.SelectSingleNode("templates")).Trim(',').Split(','));
                 retVal.Stylesheets = new List<string>(SafeNodeValue(n.SelectSingleNode("stylesheets")).Trim(',').Split(','));
-                retVal.Documenttypes = new List<string>(SafeNodeValue(n.SelectSingleNode("documenttypes")).Trim(',').Split(','));
+                retVal.DocumentTypes = new List<string>(SafeNodeValue(n.SelectSingleNode("documentTypes")).Trim(',').Split(','));
                 retVal.Languages = new List<string>(SafeNodeValue(n.SelectSingleNode("languages")).Trim(',').Split(','));
                 retVal.DictionaryItems = new List<string>(SafeNodeValue(n.SelectSingleNode("dictionaryitems")).Trim(',').Split(','));
                 retVal.DataTypes = new List<string>(SafeNodeValue(n.SelectSingleNode("datatypes")).Trim(',').Split(','));
@@ -263,7 +255,7 @@ namespace Umbraco.Web._Legacy.Packager
         }
 
 
-        public static void Save(PackageInstance.PackageInstance package, string dataSource)
+        public static void Save(Core.Models.Packaging.PackageDefinition package, string dataSource)
         {
             Reload(dataSource);
             var xmlDef = GetFromId(package.Id, dataSource, false);
@@ -311,7 +303,7 @@ namespace Umbraco.Web._Legacy.Packager
             XmlHelper.SetTextNode(Source, xmlDef, "macros", JoinList(package.Macros, ','));
             XmlHelper.SetTextNode(Source, xmlDef, "templates", JoinList(package.Templates, ','));
             XmlHelper.SetTextNode(Source, xmlDef, "stylesheets", JoinList(package.Stylesheets, ','));
-            XmlHelper.SetTextNode(Source, xmlDef, "documenttypes", JoinList(package.Documenttypes, ','));
+            XmlHelper.SetTextNode(Source, xmlDef, "documentTypes", JoinList(package.DocumentTypes, ','));
             XmlHelper.SetTextNode(Source, xmlDef, "languages", JoinList(package.Languages, ','));
             XmlHelper.SetTextNode(Source, xmlDef, "dictionaryitems", JoinList(package.DictionaryItems, ','));
             XmlHelper.SetTextNode(Source, xmlDef, "datatypes", JoinList(package.DataTypes, ','));

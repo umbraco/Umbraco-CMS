@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -214,6 +215,8 @@ namespace Umbraco.Web.Composing
         public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;
 
         internal static ManifestValueValidatorCollection ManifestValidators => CoreCurrent.ManifestValidators;
+
+        internal static PackageActionRunner PackageActionRunner => CoreCurrent.PackageActionRunner;
 
         internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
 

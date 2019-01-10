@@ -1144,9 +1144,6 @@
     <Compile Include="_Legacy\Packager\Installer.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\IPackageInstance.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\PackageActions.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\PackageInstance.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\PackagerUtility.cs" />
     <Compile Include="_Legacy\Packager\RequirementsType.cs" />
     <Compile Include="_Legacy\Packager\Settings.cs" />
@@ -1231,7 +1228,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>

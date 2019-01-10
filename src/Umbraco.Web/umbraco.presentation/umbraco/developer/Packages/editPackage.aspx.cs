@@ -10,6 +10,8 @@ using System.Xml;
 using umbraco.controls;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Packager.PackageInstance;
@@ -32,7 +34,7 @@ namespace umbraco.presentation.developer.packages
         public Umbraco.Web._Legacy.Controls.TabPage packageActions;
 
         protected ContentPicker cp;
-        private PackageInstance pack;
+        private PackageDefinition pack;
         private CreatedPackage createdPackage;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -102,7 +104,7 @@ namespace umbraco.presentation.developer.packages
                     foreach (var dc in nContentTypes)
                     {
                         ListItem li = new ListItem(dc.Name, dc.Id.ToString());
-                        if (pack.Documenttypes.Contains(dc.Id.ToString()))
+                        if (pack.DocumentTypes.Contains(dc.Id.ToString()))
                             li.Selected = true;
 
                         documentTypes.Items.Add(li);
@@ -223,41 +225,41 @@ namespace umbraco.presentation.developer.packages
                 e.IsValid = true;
         }
 
-        protected void saveOrPublish(object sender, CommandEventArgs e)
-        {
+        //protected void saveOrPublish(object sender, CommandEventArgs e)
+        //{
 
-            if (!Page.IsValid)
-            {
-                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Saved failed.", "Some fields have not been filled-out correctly");
-            }
-            else
-            {
-                if (e.CommandName == "save")
-                    SavePackage(true);
+        //    if (!Page.IsValid)
+        //    {
+        //        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Saved failed.", "Some fields have not been filled-out correctly");
+        //    }
+        //    else
+        //    {
+        //        if (e.CommandName == "save")
+        //            SavePackage(true);
 
-                if (e.CommandName == "publish")
-                {
-                    SavePackage(false);
-                    int packageID = int.Parse(Request.QueryString["id"]);
-                    //string packFileName = cms.businesslogic.packager. Publish.publishPackage(packageID);
+        //        if (e.CommandName == "publish")
+        //        {
+        //            SavePackage(false);
+        //            int packageID = int.Parse(Request.QueryString["id"]);
+        //            //string packFileName = cms.businesslogic.packager. Publish.publishPackage(packageID);
 
-                    createdPackage.Publish();
+        //            createdPackage.Publish();
 
 
-                    if (!string.IsNullOrEmpty(pack.PackagePath))
-                    {
+        //            if (!string.IsNullOrEmpty(pack.PackagePath))
+        //            {
 
-                        packageUmbFile.Text = " &nbsp; <a href='" + IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
+        //                packageUmbFile.Text = " &nbsp; <a href='" + IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
 
-                        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Success, "Package saved and published", "");
-                    }
-                    else
-                    {
-                        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Save failed", "check your umbraco log.");
-                    }
-                }
-            }
-        }
+        //                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Success, "Package saved and published", "");
+        //            }
+        //            else
+        //            {
+        //                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Save failed", "check your umbraco log.");
+        //            }
+        //        }
+        //    }
+        //}
 
 
         private void SavePackage(bool showNotification)
@@ -300,7 +302,7 @@ namespace umbraco.presentation.developer.packages
                 if (li.Selected)
                     tmpDoctypes += li.Value + ",";
             }
-            pack.Documenttypes = new List<string>(tmpDoctypes.Trim(',').Split(','));
+            pack.DocumentTypes = new List<string>(tmpDoctypes.Trim(',').Split(','));
 
 
             string tmpMacros = "";
@@ -361,7 +363,7 @@ namespace umbraco.presentation.developer.packages
             if (newPath.Trim() != "")
             {
                 CreatedPackage createdPackage = CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
-                PackageInstance pack = createdPackage.Data;
+                PackageDefinition pack = createdPackage.Data;
 
                 pack.Files.Add(newPath);
 
@@ -388,7 +390,7 @@ namespace umbraco.presentation.developer.packages
             }
 
             CreatedPackage createdPackage = CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
-            PackageInstance pack = createdPackage.Data;
+            PackageDefinition pack = createdPackage.Data;
 
             pack.Files = new List<string>(tmpFilePathString.Trim('�').Split('�'));
             pack.Files.TrimExcess();
