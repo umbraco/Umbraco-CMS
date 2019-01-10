@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
                 templateRepository.Save(template);
 
-                textpage.Template = template;
+                textpage.TemplateId = template.Id;
                 contentRepo.Save(textpage);
 
                 // Act
