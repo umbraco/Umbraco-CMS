@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services.Implement
             xml.Add(new XAttribute("writerName", content.GetWriterProfile(_userService)?.Name ?? "??"));
             xml.Add(new XAttribute("writerID", content.WriterId));
 
-            xml.Add(new XAttribute("template", content.Template?.Id.ToString(CultureInfo.InvariantCulture) ?? "0"));
+            xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? ""));
 
             xml.Add(new XAttribute("isPublished", content.Published));
 

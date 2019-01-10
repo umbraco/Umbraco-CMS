@@ -129,7 +129,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override Guid Key => _member.Key;
 
-        public override int TemplateId => throw new NotSupportedException();
+        public override int? TemplateId => throw new NotSupportedException();
 
         public override int SortOrder => 0;
 
