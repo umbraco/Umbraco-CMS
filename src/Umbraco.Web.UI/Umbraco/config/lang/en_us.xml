@@ -270,6 +270,7 @@
     <key alias="includeUnpublished">Include drafts: also publish unpublished content items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     <key alias="isSensitiveValue_short">This value is hidden.</key>
+    <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
     <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
