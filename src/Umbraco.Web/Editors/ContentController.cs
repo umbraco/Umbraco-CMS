@@ -1741,12 +1741,18 @@ namespace Umbraco.Web.Editors
             bool Varies(Property property) => property.PropertyType.VariesByCulture();
 
             var variantIndex = 0;
-
+            var newContent = (contentSave.Action == ContentSaveAction.SaveNew
+                              || contentSave.Action == ContentSaveAction.PublishNew
+                              || contentSave.Action == ContentSaveAction.ScheduleNew
+                              || contentSave.Action == ContentSaveAction.SendPublishNew
+                              || contentSave.Action == ContentSaveAction.PublishWithDescendantsNew
+                              || contentSave.Action == ContentSaveAction.PublishWithDescendantsForceNew
+                );
             //loop through each variant, set the correct name and property values
             foreach (var variant in contentSave.Variants)
             {
                 //Don't update anything for this variant if Save is not true
-                if (!variant.Save) continue;
+                if (!variant.Save && !newContent) continue;
 
                 //Don't update the name if it is empty
                 if (!variant.Name.IsNullOrWhiteSpace())
