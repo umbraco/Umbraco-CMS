@@ -7,18 +7,14 @@ using System.Threading;
 using Moq;
 using Umbraco.Core;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
@@ -29,14 +25,6 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests : UmbracoTestBase
     {
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            var config = SettingsForTests.GetDefaultUmbracoSettings();
-            SettingsForTests.ConfigureSettings(config);
-        }
-
         protected override void Compose()
         {
             base.Compose();

@@ -75,6 +75,8 @@ namespace Umbraco.Core.IO
             }
         }
 
+        public IFileSystem InnerFileSystem => _innerFileSystem;
+
         private IFileSystem FileSystem
         {
             get

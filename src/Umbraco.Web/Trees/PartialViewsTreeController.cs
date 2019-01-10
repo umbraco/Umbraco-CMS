@@ -1,5 +1,4 @@
-﻿using umbraco;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;

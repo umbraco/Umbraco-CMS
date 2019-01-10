@@ -53,7 +53,7 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = Current.Config.HealthChecks();
+                var healthCheckConfig = Current.Configs.HealthChecks();
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications

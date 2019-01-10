@@ -2,6 +2,7 @@
 using System.Globalization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -28,16 +29,15 @@ namespace Umbraco.Tests.Routing
         [TestCase("/test-page", 1172)]
         public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByUrl(Logger);
 
-            Assert.IsTrue(Current.Config.Global().HideTopLevelNodeFromPath);
+            Assert.IsTrue(Current.Configs.Global().HideTopLevelNodeFromPath);
 
             // fixme debugging - going further down, the routes cache is NOT empty?!
             if (urlString == "/home/sub1")
@@ -64,16 +64,15 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1.aspx", 1173)]
         public void Match_Document_By_Url(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByUrl(Logger);
 
-            Assert.IsFalse(Current.Config.Global().HideTopLevelNodeFromPath);
+            Assert.IsFalse(Current.Configs.Global().HideTopLevelNodeFromPath);
 
             var result = lookup.TryFindContent(frequest);
 
@@ -90,9 +89,8 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
         public void Match_Document_By_Url_With_Special_Characters(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
@@ -118,9 +116,8 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
         public void Match_Document_By_Url_With_Special_Characters_Using_Hostname(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
@@ -148,9 +145,8 @@ namespace Umbraco.Tests.Routing
         [TestCase("/æøå/home/sub1/custom-sub-4-with-æøå", 1180)]
         public void Match_Document_By_Url_With_Special_Characters_In_Hostname(string urlString, int expectedId)
         {
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();

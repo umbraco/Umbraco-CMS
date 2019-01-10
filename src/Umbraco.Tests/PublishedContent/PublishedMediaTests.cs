@@ -104,7 +104,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = publishedMedia.Value("Content");
-            Assert.IsInstanceOf<IHtmlString>(propVal3); 
+            Assert.IsInstanceOf<IHtmlString>(propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 
@@ -461,10 +461,6 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Convert_From_Standard_Xml()
         {
-            var config = SettingsForTests.GenerateMockUmbracoSettings();
-
-            SettingsForTests.ConfigureSettings(config);
-
             var nodeId = 2112;
 
             var xml = XElement.Parse(@"<Image id=""2112"" version=""5b3e46ab-3e37-4cfa-ab70-014234b5bd39"" parentID=""2222"" level=""3"" writerID=""0"" nodeType=""1032"" template=""0"" sortOrder=""1"" createDate=""2010-05-19T17:32:46"" updateDate=""2010-05-19T17:32:46"" nodeName=""Sam's Umbraco Image"" urlName=""acnestressscrub"" writerName=""Administrator"" nodeTypeAlias=""Image"" path=""-1,1111,2222,2112"" isDoc="""">

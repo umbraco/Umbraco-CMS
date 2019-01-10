@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.ContentType, opt => opt.ResolveUsing(mediaTypeBasicResolver))
-                .ForMember(dest => dest.MediaLink, opt => opt.ResolveUsing(content => string.Join(",", content.GetUrls(Current.Config.Umbraco().Content, logger))))
+                .ForMember(dest => dest.MediaLink, opt => opt.ResolveUsing(content => string.Join(",", content.GetUrls(Current.Configs.Settings().Content, logger))))
                 .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver))
                 .ForMember(dest => dest.VariesByCulture, opt => opt.MapFrom(src => src.ContentType.VariesByCulture()));
 

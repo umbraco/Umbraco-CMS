@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http.Filters;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -59,9 +60,9 @@ namespace Umbraco.Web.Editors
                 var cookie = new CookieHeaderValue("UMB_UPDCHK", "1")
                     {
                         Path = "/",
-                        Expires = DateTimeOffset.Now.AddDays(Current.Config.Global().VersionCheckPeriod),
+                        Expires = DateTimeOffset.Now.AddDays(Current.Configs.Global().VersionCheckPeriod),
                         HttpOnly = true,
-                        Secure = Current.Config.Global().UseHttps
+                        Secure = Current.Configs.Global().UseHttps
                     };
                 context.Response.Headers.AddCookies(new[] { cookie });
             }

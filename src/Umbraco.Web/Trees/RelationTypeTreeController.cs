@@ -44,9 +44,10 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.AddRange(Services.RelationService.GetAllRelationTypes()
-                                       .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,
-                                                                    "icon-trafic", false)));
+                    .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,
+                        "icon-trafic", false)));
             }
+
             return nodes;
         }
     }

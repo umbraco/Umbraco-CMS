@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 

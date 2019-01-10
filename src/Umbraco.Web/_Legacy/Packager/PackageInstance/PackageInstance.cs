@@ -1,10 +1,7 @@
 using System;
-
-using System.Xml;
-using System.Xml.XPath;
 using System.Collections.Generic;
 
-namespace umbraco.cms.businesslogic.packager
+namespace Umbraco.Web._Legacy.Packager.PackageInstance
 {
     public class PackageInstance
     {

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Web.WebApi.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var request = actionContext.Request;
-            if (Current.Config.Global().UseHttps && request.RequestUri.Scheme != Uri.UriSchemeHttps)
+            if (Current.Configs.Global().UseHttps && request.RequestUri.Scheme != Uri.UriSchemeHttps)
             {
                 HttpResponseMessage response;
                 var uri = new UriBuilder(request.RequestUri)

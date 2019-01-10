@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Components
@@ -26,12 +27,21 @@ namespace Umbraco.Core.Components
         /// <param name="typeLoader">A type loader.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="runtimeState">The runtime state.</param>
-        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState)
+        /// <param name="configs">Optional configs.</param>
+        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs = null)
         {
             _register = register;
             TypeLoader = typeLoader;
             Logger = logger;
             RuntimeState = runtimeState;
+
+            if (configs == null)
+            {
+                configs = new Configs();
+                configs.AddCoreConfigs();
+            }
+
+            Configs = configs;
         }
 
         #region Services
@@ -50,6 +60,11 @@ namespace Umbraco.Core.Components
         /// Gets the runtime state.
         /// </summary>
         public IRuntimeState RuntimeState { get; }
+
+        /// <summary>
+        /// Gets the configurations.
+        /// </summary>
+        public Configs Configs { get; }
 
         #endregion
 
@@ -93,6 +108,8 @@ namespace Umbraco.Core.Components
 
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(_register);
+
+            Configs.RegisterWith(_register);
 
             return _register.CreateFactory();
         }

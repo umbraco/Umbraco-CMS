@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using umbraco.cms.businesslogic.packager;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
+using Umbraco.Web._Legacy.Packager;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
