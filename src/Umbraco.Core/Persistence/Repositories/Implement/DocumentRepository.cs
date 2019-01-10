@@ -1078,19 +1078,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // assign templates and properties
                 foreach (var temp in temps)
                 {
-                    // complete the item
-                    // fixme - this makes no sense, no need to manage templates on TEMP anymore?!
+                    // set the template ID if it matches an existing template
                     if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
                         temp.Content.TemplateId = temp.Template1Id;
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
                         temp.Content.PublishTemplateId = temp.Template2Id;
 
+                    // set properties
                     if (properties.ContainsKey(temp.VersionId))
                         temp.Content.Properties = properties[temp.VersionId];
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
 
-                    //load in the schedule
+                    // load in the schedule
                     if (schedule.TryGetValue(temp.Content.Id, out var s))
                         temp.Content.ContentSchedule = s;
                 }
