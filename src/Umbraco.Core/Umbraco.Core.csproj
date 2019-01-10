@@ -490,6 +490,7 @@
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
+    <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
