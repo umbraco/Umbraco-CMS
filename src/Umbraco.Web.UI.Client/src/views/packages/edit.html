@@ -48,9 +48,10 @@
                             <input class="umb-property-editor" name="iconUrl" type="text" ng-model="vm.package.iconUrl" />
                         </umb-control-group>
 
+                        <!-- we don't really need to show this
                         <umb-control-group label="Package File">
-                            <input class="umb-property-editor" name="packagePath" type="text" ng-model="vm.package.packagePath" />
-                        </umb-control-group>
+                            <input disabled="disabled" class="umb-property-editor" name="packagePath" type="text" ng-model="vm.package.packagePath" />
+                        </umb-control-group>-->
 
                         <umb-control-group label="Umbraco version">
                             <input class="umb-property-editor" name="umbracoVersion" type="text" ng-model="vm.package.umbracoVersion" val-server-field="model.umbracoVersion" />
@@ -170,7 +171,15 @@
                         </umb-control-group>
 
                         <umb-control-group label="Macros">
-                            NOT IMPLEMENTED IN V8 YET
+                            <div ng-repeat="macro in vm.macros">
+                                <label>
+                                    <input type="checkbox"
+                                           checklist-model="vm.package.macros"
+                                           checklist-value="macro.id" />
+                                    {{macro.name}}
+                                </label>
+                            </div>
+
                         </umb-control-group>
 
                         <umb-control-group label="Languages">
@@ -301,6 +310,14 @@
 
                 <umb-editor-footer-content-right>
 
+                    <umb-button ng-if="vm.package.packagePath"
+                                type="button"
+                                action="vm.downloadFile(vm.package.id)"
+                                disabled="vm.loading || vm.buttonState=='busy'"
+                                button-style="info"
+                                label-key="general_download">
+                    </umb-button>
+
                     <umb-button type="button"
                                 action="vm.createOrUpdatePackage(editPackageForm)"
                                 state="vm.buttonState"
@@ -308,6 +325,8 @@
                                 label="{{vm.buttonLabel}}"
                                 disabled="vm.loading">
                     </umb-button>
+
+
 
                 </umb-editor-footer-content-right>
 

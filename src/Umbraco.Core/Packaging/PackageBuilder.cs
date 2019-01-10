@@ -162,7 +162,9 @@ namespace Umbraco.Core.Packaging
                     var actionsXml = new XElement("Actions");
                     try
                     {
-                        actionsXml.Add(XElement.Parse(definition.Actions));
+                        //this will be formatted like a full xml block like <actions>...</actions> and we want the child nodes
+                        var parsed = XElement.Parse(definition.Actions);
+                        actionsXml.Add(parsed.Elements());
                         manifestRoot.Add(actionsXml);
                     }
                     catch (Exception e)
@@ -596,7 +598,7 @@ namespace Umbraco.Core.Packaging
                 Author = xml.Element("author")?.Value ?? string.Empty,
                 AuthorUrl = xml.Element("author")?.AttributeValue<string>("url") ?? string.Empty,
                 Readme = xml.Element("readme")?.Value ?? string.Empty,
-                Actions = xml.Element("actions")?.ToString() ?? string.Empty,
+                Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? string.Empty, //take the entire outer xml value
                 ContentNodeId = xml.Element("content")?.AttributeValue<string>("nodeId") ?? string.Empty,
                 ContentLoadChildNodes = xml.Element("content")?.AttributeValue<bool>("loadChildNodes") ?? false,
                 Macros = xml.Element("macros")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
@@ -613,8 +615,18 @@ namespace Umbraco.Core.Packaging
             return retVal;
         }
 
-        private static XElement PackageDefinitionToXml(PackageDefinition def)
+        private XElement PackageDefinitionToXml(PackageDefinition def)
         {
+            var actionsXml = new XElement("actions");
+            try
+            {
+                actionsXml = XElement.Parse(def.Actions);
+            }
+            catch (Exception e)
+            {
+                _logger.Warn<PackageBuilder>(e, "Could not add package actions to the package xml definition, the xml did not parse");
+            }
+
             var packageXml = new XElement("package",
                 new XAttribute("id", def.Id),
                 new XAttribute("version", def.Version ?? string.Empty),
@@ -634,8 +646,8 @@ namespace Umbraco.Core.Packaging
                     new XCData(def.Author ?? string.Empty),
                     new XAttribute("url", def.AuthorUrl ?? string.Empty)),
 
-                new XElement("readme", def.Readme ?? string.Empty),
-                new XElement("actions", def.Actions ?? string.Empty),
+                new XElement("readme", new XCData(def.Readme ?? string.Empty)),
+                actionsXml,
                 new XElement("datatypes", string.Join(",", def.DataTypes ?? Array.Empty<string>())),
 
                 new XElement("content",

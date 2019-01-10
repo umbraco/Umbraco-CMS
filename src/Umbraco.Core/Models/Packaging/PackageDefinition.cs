@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -29,6 +30,7 @@ namespace Umbraco.Core.Models.Packaging
         [DataMember(Name = "folder")]
         public Guid FolderId { get; set; }
 
+        [ReadOnly(true)]
         [DataMember(Name = "packagePath")]
         public string PackagePath { get; set; } = string.Empty;
 

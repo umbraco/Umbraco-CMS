@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($scope, $location, $routeParams, entityResource, stylesheetResource, languageResource, packageResource, dictionaryResource, editorService, formHelper) {
+    function EditController($scope, $location, $routeParams, umbRequestHelper, entityResource, stylesheetResource, languageResource, packageResource, dictionaryResource, editorService, formHelper) {
 
         const vm = this;
 
@@ -21,6 +21,7 @@
         vm.removeFile = removeFile;
         vm.openControlPicker = openControlPicker;
         vm.removeControl = removeControl;
+        vm.downloadFile = downloadFile;
 
         const packageId = $routeParams.id;
         const create = $routeParams.create;
@@ -76,8 +77,14 @@
                 vm.stylesheets = stylesheets;
             });
 
-            // TODO: implement macros
-            vm.macros = [];
+            entityResource.getAll("Macro").then(macros => {
+                // a package stores the id as a string so we 
+                // need to convert all ids to string for comparison
+                macros.forEach(macro => {
+                    macro.id = macro.id.toString();
+                });
+                vm.macros = macros;
+            });
 
             // get all languages
             languageResource.getAll().then(languages => {
@@ -109,6 +116,17 @@
                 vm.dataTypes = dataTypes;
             });
 
+        }
+
+        function downloadFile(id) {
+            var url = umbRequestHelper.getApiUrl(
+                "packageApiBaseUrl",
+                "DownloadCreatedPackage",
+                { id: id });
+
+            umbRequestHelper.downloadFile(url).then(function () {
+
+            });
         }
 
         function back() {

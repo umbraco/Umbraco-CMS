@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
 using System.Web.Http;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -33,7 +36,7 @@ namespace Umbraco.Web.Editors
             var package = Services.PackagingService.GetById(id);
             if (package == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             return package;
         }
 
@@ -75,6 +78,40 @@ namespace Umbraco.Web.Editors
 
             return Ok();
         }
-        
+
+        [HttpGet]
+        public HttpResponseMessage DownloadCreatedPackage(int id)
+        {
+            var package = Services.PackagingService.GetById(id);
+            if (package == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+
+            var fullPath = IOHelper.MapPath(package.PackagePath);
+            if (!File.Exists(fullPath))
+                return Request.CreateNotificationValidationErrorResponse("No file found for path " + package.PackagePath);
+
+            var fileName = Path.GetFileName(package.PackagePath);
+
+            var response = new HttpResponseMessage
+            {
+                Content = new StreamContent(File.OpenRead(fullPath))
+                {
+                    Headers =
+                    {
+                        ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                        {
+                            FileName = fileName
+                        },
+                        ContentType = new MediaTypeHeaderValue( "application/octet-stream")
+                    }
+                }
+            };
+
+            // Set custom header so umbRequestHelper.downloadFile can save the correct filename
+            response.Headers.Add("x-filename", fileName);
+
+            return response;
+        }
+
     }
 }
