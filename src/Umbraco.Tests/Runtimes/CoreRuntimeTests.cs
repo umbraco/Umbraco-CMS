@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -27,12 +28,7 @@ namespace Umbraco.Tests.Runtimes
         public void SetUp()
         {
             TestComponent.Reset();
-
-            // cannot boot runtime without some configuration
-            var umbracoSettings = SettingsForTests.GenerateMockUmbracoSettings();
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            SettingsForTests.ConfigureSettings(umbracoSettings);
-            SettingsForTests.ConfigureSettings(globalSettings);
+            Current.Reset();
         }
 
         public void TearDown()
@@ -104,6 +100,14 @@ namespace Umbraco.Tests.Runtimes
                 mock.Setup(x => x.Configured).Returns(true);
                 mock.Setup(x => x.CanConnect).Returns(true);
                 return mock.Object;
+            }
+
+            protected override Configs GetConfigs()
+            {
+                var configs = new Configs();
+                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+                return configs;
             }
 
             // fixme so how the f* should we do it now?
@@ -191,8 +195,7 @@ namespace Umbraco.Tests.Runtimes
         {
             // test flags
             public static bool Ctored;
-            public static bool Initialized1;
-            public static bool Initialized2;
+            public static bool Initialized;
             public static bool Terminated;
             public static IProfilingLogger ProfilingLogger;
 
@@ -200,7 +203,7 @@ namespace Umbraco.Tests.Runtimes
 
             public static void Reset()
             {
-                Ctored = Initialized1 = Initialized2 = Terminated = false;
+                Ctored = Initialized = Terminated = false;
                 ProfilingLogger = null;
             }
 
@@ -210,10 +213,19 @@ namespace Umbraco.Tests.Runtimes
                 ProfilingLogger = proflog;
             }
 
+            public void Initialize()
+            {
+                Initialized = true;
+            }
+
+            public void Terminate()
+            {
+                Terminated = true;
+            }
+
             public void Dispose()
             {
                 Disposed = true;
-                Terminated = true;
             }
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -9,18 +8,26 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal sealed class PropertyEditorsComponent : IComponent
     {
+        private readonly PropertyEditorCollection _propertyEditors;
+
         public PropertyEditorsComponent(PropertyEditorCollection propertyEditors)
         {
-            var fileUpload = propertyEditors.OfType<FileUploadPropertyEditor>().FirstOrDefault();
+            _propertyEditors = propertyEditors;
+        }
+
+        public void Initialize()
+        {
+            var fileUpload = _propertyEditors.OfType<FileUploadPropertyEditor>().FirstOrDefault();
             if (fileUpload != null) Initialize(fileUpload);
 
-            var imageCropper = propertyEditors.OfType<ImageCropperPropertyEditor>().FirstOrDefault();
+            var imageCropper = _propertyEditors.OfType<ImageCropperPropertyEditor>().FirstOrDefault();
             if (imageCropper != null) Initialize(imageCropper);
 
             // grid/examine moved to ExamineComponent
         }
 
-        // as long as these methods are private+static they won't be executed by the boot loader
+        public void Terminate()
+        { }
 
         private static void Initialize(FileUploadPropertyEditor fileUpload)
         {

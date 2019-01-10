@@ -20,6 +20,21 @@ namespace Umbraco.Core.Components
             _logger = logger;
         }
 
+        public void Initialize()
+        {
+            using (_logger.DebugDuration<ComponentCollection>($"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
+            {
+                foreach (var component in this.Reverse()) // terminate components in reverse order
+                {
+                    var componentType = component.GetType();
+                    using (_logger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    {
+                        component.Initialize();
+                    }
+                }
+            }
+        }
+
         public void Terminate()
         {
             using (_logger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
@@ -29,6 +44,7 @@ namespace Umbraco.Core.Components
                     var componentType = component.GetType();
                     using (_logger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
+                        component.Terminate();
                         component.DisposeIfDisposable();
                     }
                 }

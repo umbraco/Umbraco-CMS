@@ -4,10 +4,12 @@ using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    public class NuCacheComposer : ICoreComposer
+    public class NuCacheComposer : ComponentComposer<NuCacheComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
             // register the NuCache database data source
             composition.Register<IDataSource, DatabaseDataSource>();
 
@@ -19,8 +21,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // add the NuCache health check (hidden from type finder)
             // todo - no NuCache health check yet
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
-
-            composition.Components().Append<NuCacheComponent>();
         }
     }
 }

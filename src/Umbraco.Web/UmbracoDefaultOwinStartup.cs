@@ -24,8 +24,8 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected IGlobalSettings GlobalSettings => Current.Config.Global();
-        protected IUmbracoSettingsSection UmbracoSettings => Current.Config.Umbraco();
+        protected IGlobalSettings GlobalSettings => Current.Configs.Global();
+        protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
 

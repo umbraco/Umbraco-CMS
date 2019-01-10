@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-
 using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees

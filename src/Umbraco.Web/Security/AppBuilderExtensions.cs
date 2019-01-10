@@ -211,8 +211,8 @@ namespace Umbraco.Web.Security
             //This is a custom middleware, we need to return the user's remaining logged in seconds
             app.Use<GetUserSecondsMiddleWare>(
                 cookieAuthOptions,
-                Current.Config.Global(),
-                Current.Config.Umbraco().Security,
+                Current.Configs.Global(),
+                Current.Configs.Settings().Security,
                 app.CreateLogger<GetUserSecondsMiddleWare>());
 
             //This is required so that we can read the auth ticket format outside of this pipeline
@@ -316,7 +316,7 @@ namespace Umbraco.Web.Security
                 CookiePath = "/",
                 CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
                 CookieHttpOnly = true,
-                CookieDomain = Current.Config.Umbraco().Security.AuthCookieDomain
+                CookieDomain = Current.Configs.Settings().Security.AuthCookieDomain
             }, stage);
 
             return app;
@@ -362,7 +362,7 @@ namespace Umbraco.Web.Security
             if (runtimeState.Level != RuntimeLevel.Run) return app;
 
             var authOptions = app.CreateUmbracoCookieAuthOptions(umbracoContextAccessor, globalSettings, runtimeState, securitySettings);
-            app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions, Current.Config.Global());
+            app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions, Current.Configs.Global());
 
             // This middleware must execute at least on PostAuthentication, by default it is on Authorize
             // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate,

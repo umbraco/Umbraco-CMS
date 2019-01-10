@@ -26,10 +26,6 @@ namespace Umbraco.Tests.IO
         [SetUp]
         public void Setup()
         {
-            //init the config singleton
-            var config = SettingsForTests.GetDefaultUmbracoSettings();
-            SettingsForTests.ConfigureSettings(config);
-
             _register = RegisterFactory.Create();
 
             var composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
@@ -39,9 +35,17 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<IContentSection>());
             composition.RegisterUnique<IMediaPathScheme, OriginalMediaPathScheme>();
 
+            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+
             composition.ComposeFileSystems();
 
+            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+
             _factory = composition.CreateFactory();
+
+            Current.Reset();
+            Current.Factory = _factory;
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
@@ -80,6 +84,16 @@ namespace Umbraco.Tests.IO
             var fileSystem1 = _factory.GetInstance<IMediaFileSystem>();
             var fileSystem2 = _factory.GetInstance<IMediaFileSystem>();
             Assert.AreSame(fileSystem1, fileSystem2);
+        }
+
+        [Test]
+        public void Can_Unwrap_MediaFileSystem()
+        {
+            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var unwrapped = fileSystem.Unwrap();
+            Assert.IsNotNull(unwrapped);
+            var physical = unwrapped as PhysicalFileSystem;
+            Assert.IsNotNull(physical);
         }
 
         [Test]

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using Umbraco.Core.Services;
-
-namespace Umbraco.Web.Trees
+﻿namespace Umbraco.Web.Trees
 {
     /// <summary>
     /// The base controller for all tree requests
@@ -22,8 +18,8 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public override string RootNodeDisplayName
             => _rootNodeDisplayName
-                    ?? (_rootNodeDisplayName = Services.ApplicationTreeService.GetByAlias(_attribute.Alias)
-                            ?.GetRootNodeDisplayName(Services.TextService));
+               ?? (_rootNodeDisplayName = Services.ApplicationTreeService.GetByAlias(_attribute.Alias)
+                   ?.GetRootNodeDisplayName(Services.TextService));
 
         /// <summary>
         /// Gets the current tree alias from the attribute assigned to it.

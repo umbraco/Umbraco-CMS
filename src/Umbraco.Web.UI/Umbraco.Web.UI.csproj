@@ -88,15 +88,15 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
-    <PackageReference Include="Examine" Version="1.0.0-beta067" />
+    <PackageReference Include="Examine" Version="1.0.0-beta072" />
     <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
-    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.10.0">
       <PrivateAssets>all</PrivateAssets>
       <!-- development dependency -->
     </PackageReference>
@@ -107,7 +107,7 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.26</Version>
+      <Version>8.0.0-alpha.31</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -163,13 +163,6 @@
     </Compile>
     <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.designer.cs">
       <DependentUpon>directoryBrowser.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
-      <DependentUpon>ChangeDocType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
-      <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
@@ -267,15 +260,8 @@
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
     </None>
-    <None Include="Config\ExamineSettings.Release.config">
-      <DependentUpon>ExamineSettings.config</DependentUpon>
-    </None>
     <None Include="Config\feedProxy.Release.config">
       <DependentUpon>feedProxy.config</DependentUpon>
-    </None>
-    <None Include="Config\ExamineIndex.Release.config">
-      <DependentUpon>ExamineIndex.config</DependentUpon>
-      <SubType>Designer</SubType>
     </None>
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
@@ -301,15 +287,6 @@
     <Content Include="Umbraco\Config\Lang\pt.xml" />
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
-    <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
-    <Content Include="Umbraco\Developer\RelationTypes\Images\Bidirectional.png" />
-    <Content Include="Umbraco\Developer\RelationTypes\Images\ParentToChild.png" />
-    <Content Include="Umbraco\Developer\RelationTypes\Images\Refresh.gif" />
-    <Content Include="Umbraco\Developer\RelationTypes\NewRelationType.aspx" />
-    <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="default.aspx" />
@@ -323,7 +300,6 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
@@ -332,10 +308,6 @@
     </Content>
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleBackEnd.js" />
     <Content Include="Config\ClientDependency.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Config\ExamineSettings.config" />
-    <Content Include="Config\ExamineIndex.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\scripting.config" />

@@ -24,11 +24,11 @@ using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidato
 
 namespace Umbraco.Core.Runtime
 {
-    public class CoreRuntimeComposer : IRuntimeComposer
+    public class CoreRuntimeComposer : ComponentComposer<CoreRuntimeComponent>, IRuntimeComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            composition.Components().Append<CoreRuntimeComponent>();
+            base.Compose(composition);
 
             // composers
             composition

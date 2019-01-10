@@ -111,10 +111,10 @@ namespace Umbraco.Web
                 Composing.Current.UmbracoContextAccessor,
                 httpContext,
                 Composing.Current.PublishedSnapshotService,
-                new WebSecurity(httpContext, Composing.Current.Services.UserService, Composing.Current.Config.Global()),
-                Composing.Current.Config.Umbraco(),
+                new WebSecurity(httpContext, Composing.Current.Services.UserService, Composing.Current.Configs.Global()),
+                Composing.Current.Configs.Settings(),
                 Composing.Current.UrlProviders,
-                Composing.Current.Config.Global(),
+                Composing.Current.Configs.Global(),
                 Composing.Current.Factory.GetInstance<IVariationContextAccessor>(),
                 true);
 

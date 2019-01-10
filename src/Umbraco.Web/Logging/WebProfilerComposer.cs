@@ -2,11 +2,6 @@
 
 namespace Umbraco.Web.Logging
 {
-    internal class WebProfilerComposer : ICoreComposer
-    {
-        public void Compose(Composition composition)
-        {
-            composition.Components().Append<WebProfilerComponent>();
-        }
-    }
+    internal class WebProfilerComposer : ComponentComposer<WebProfilerComponent>, ICoreComposer
+    { }
 }

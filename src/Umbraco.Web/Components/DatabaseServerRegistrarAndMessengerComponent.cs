@@ -37,11 +37,11 @@ namespace Umbraco.Web.Components
     // todo - should not be a strong dependency on "examine" but on an "indexing component"
     [ComposeAfter(typeof(ExamineComposer))]
 
-    public sealed class DatabaseServerRegistrarAndMessengerComposer : ICoreComposer
+    public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            composition.Components().Append<DatabaseServerRegistrarAndMessengerComponent>();
+            base.Compose(composition);
 
             composition.SetServerMessenger(factory =>
             {
@@ -121,13 +121,19 @@ namespace Umbraco.Web.Components
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
             _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+        }
 
+        public void Initialize()
+        { 
             //We will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
 
             // must come last, as it references some _variables
             _messenger.Startup();
         }
+
+        public void Terminate()
+        { }
 
         /// <summary>
         /// Handle when a request is made

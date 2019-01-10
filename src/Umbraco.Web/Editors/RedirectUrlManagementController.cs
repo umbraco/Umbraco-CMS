@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IHttpActionResult GetEnableState()
         {
-            var enabled = Current.Config.Umbraco().WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = Current.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false;
             var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }

@@ -5,11 +5,12 @@ using Umbraco.Core.Components;
 namespace Umbraco.Web.SignalR
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class PreviewHubComposer : ICoreComposer
+    public class PreviewHubComposer : ComponentComposer<PreviewHubComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            composition.Components().Append<PreviewHubComponent>();
+            base.Compose(composition);
+
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
         }
     }
