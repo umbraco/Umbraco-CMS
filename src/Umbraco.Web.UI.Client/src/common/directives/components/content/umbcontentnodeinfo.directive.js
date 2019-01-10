@@ -22,14 +22,7 @@
                 // set currentVariant
                 scope.currentVariant = _.find(scope.node.variants, (v) => v.active);
 
-                // find the urls for the currently selected language
-                if(scope.node.variants.length > 1) {
-                    // nodes with variants
-                    scope.currentUrls =  _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
-                } else {
-                    // invariant nodes
-                    scope.currentUrls =  scope.node.urls;
-                }
+                updateCurrentUrls();
 
                 // if there are any infinite editors open we are in infinite editing
                 scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
@@ -304,6 +297,17 @@
                 });
             }
 
+            function updateCurrentUrls() {
+                // find the urls for the currently selected language
+                if (scope.node.variants.length > 1) {
+                    // nodes with variants
+                    scope.currentUrls = _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
+                } else {
+                    // invariant nodes
+                    scope.currentUrls = scope.node.urls;
+                }
+            }
+
             // load audit trail and redirects when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
                 $timeout(function () {
@@ -328,6 +332,7 @@
                     loadAuditTrail();
                     loadRedirectUrls();
                     setNodePublishStatus();
+                    updateCurrentUrls();
                 }
             });
 
