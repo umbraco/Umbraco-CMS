@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -37,6 +38,12 @@ namespace Umbraco.Tests.Scoping
             Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
             Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
+        }
+
+        protected override void ComposeSettings()
+        {
+            Composition.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            Composition.Configs.Add(SettingsForTests.GenerateMockGlobalSettings);
         }
 
         [TearDown]
@@ -79,10 +86,8 @@ namespace Umbraco.Tests.Scoping
             Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
 
             // settings
-            var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var contentMock = Mock.Get(settings.Content);
+            var contentMock = Mock.Get(Factory.GetInstance<IUmbracoSettingsSection>().Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             // create document type, document
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
@@ -200,9 +205,8 @@ namespace Umbraco.Tests.Scoping
 
             // settings
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var contentMock = Mock.Get(settings.Content);
+            var contentMock = Mock.Get(Factory.GetInstance<IUmbracoSettingsSection>().Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             // create document type
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };

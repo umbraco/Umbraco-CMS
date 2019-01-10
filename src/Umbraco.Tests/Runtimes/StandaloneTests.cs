@@ -107,6 +107,10 @@ namespace Umbraco.Tests.Runtimes
                 .Clear()
                 .Append<DistributedCacheBinderComponent>();
 
+            // configure
+            composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();
 
@@ -149,11 +153,6 @@ namespace Umbraco.Tests.Runtimes
 
             // done installing
             runtimeState.Level = RuntimeLevel.Run;
-
-            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            SettingsForTests.ConfigureSettings(globalSettings);
-            var umbracoSettings = SettingsForTests.GetDefaultUmbracoSettings();
-            SettingsForTests.ConfigureSettings(umbracoSettings);
 
             // instantiate to register events
             // should be done by Initialize?
@@ -260,9 +259,9 @@ namespace Umbraco.Tests.Runtimes
             // get the components
             // all of them?
             var composerTypes = typeLoader.GetTypes<IComposer>();
-            // filtered?
-            //var componentTypes = typeLoader.GetTypes<IUmbracoComponent>()
-            //    .Where(x => !x.FullName.StartsWith("Umbraco.Web"));
+            // filtered
+            composerTypes = composerTypes
+                .Where(x => !x.FullName.StartsWith("Umbraco.Tests"));
             // single?
             //var componentTypes = new[] { typeof(CoreRuntimeComponent) };
             var composers = new Composers(composition, composerTypes, profilingLogger);

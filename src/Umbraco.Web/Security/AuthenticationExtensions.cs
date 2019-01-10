@@ -145,7 +145,7 @@ namespace Umbraco.Web.Security
         public static void UmbracoLogout(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            Logout(http, Current.Config.Umbraco().Security.AuthCookieName);
+            Logout(http, Current.Configs.Settings().Security.AuthCookieName);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
-            return GetAuthTicket(http, Current.Config.Umbraco().Security.AuthCookieName);
+            return GetAuthTicket(http, Current.Configs.Settings().Security.AuthCookieName);
         }
 
         internal static AuthenticationTicket GetUmbracoAuthTicket(this HttpContext http)
@@ -227,7 +227,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
-            return GetAuthTicket(ctx, Current.Config.Umbraco().Security.AuthCookieName);
+            return GetAuthTicket(ctx, Current.Configs.Settings().Security.AuthCookieName);
         }
 
         /// <summary>

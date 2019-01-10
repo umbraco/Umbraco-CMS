@@ -86,7 +86,7 @@ namespace Umbraco.Web.Templates
             //set the doc that was found by id
             contentRequest.PublishedContent = doc;
             //set the template, either based on the AltTemplate found or the standard template of the doc
-            contentRequest.TemplateModel = Current.Config.Umbraco().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
+            contentRequest.TemplateModel = Current.Configs.Settings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
                 ? FileService.GetTemplate(doc.TemplateId)
                 : FileService.GetTemplate(AltTemplate.Value);
 

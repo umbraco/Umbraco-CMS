@@ -1,15 +1,15 @@
 using System;
-using System.Xml;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Xml;
 
-namespace umbraco.cms.businesslogic.packager
+namespace Umbraco.Web._Legacy.Packager
 {
     /// <summary>
     /// This is the xml data for installed packages. This is not the same xml as a pckage format!
@@ -85,7 +85,7 @@ namespace umbraco.cms.businesslogic.packager
             return Source.SelectSingleNode("/packages/package [@packageGuid = '" + guid + "']");
         }
 
-        public static PackageInstance MakeNew(string Name, string dataSource)
+        public static PackageInstance.PackageInstance MakeNew(string Name, string dataSource)
         {
             Reload(dataSource);
 
@@ -151,26 +151,26 @@ namespace umbraco.cms.businesslogic.packager
             return retVal;
         }
 
-        public static PackageInstance Package(int id, string datasource)
+        public static PackageInstance.PackageInstance Package(int id, string datasource)
         {
             return ConvertXmlToPackage(GetFromId(id, datasource, true));
         }
 
-        public static PackageInstance Package(string guid, string datasource)
+        public static PackageInstance.PackageInstance Package(string guid, string datasource)
         {
             XmlNode node = GetFromGuid(guid, datasource, true);
             if (node != null)
                 return ConvertXmlToPackage(node);
             else
-                return new PackageInstance();
+                return new PackageInstance.PackageInstance();
         }
 
-        public static List<PackageInstance> GetAllPackages(string dataSource)
+        public static List<PackageInstance.PackageInstance> GetAllPackages(string dataSource)
         {
             Reload(dataSource);
             XmlNodeList nList = data.Source.SelectNodes("packages/package");
 
-            List<PackageInstance> retVal = new List<PackageInstance>();
+            List<PackageInstance.PackageInstance> retVal = new List<PackageInstance.PackageInstance>();
 
             for (int i = 0; i < nList.Count; i++)
             {
@@ -187,9 +187,9 @@ namespace umbraco.cms.businesslogic.packager
             return retVal;
         }
 
-        private static PackageInstance ConvertXmlToPackage(XmlNode n)
+        private static PackageInstance.PackageInstance ConvertXmlToPackage(XmlNode n)
         {
-            PackageInstance retVal = new PackageInstance();
+            PackageInstance.PackageInstance retVal = new PackageInstance.PackageInstance();
 
             if (n != null)
             {
@@ -263,7 +263,7 @@ namespace umbraco.cms.businesslogic.packager
         }
 
 
-        public static void Save(PackageInstance package, string dataSource)
+        public static void Save(PackageInstance.PackageInstance package, string dataSource)
         {
             Reload(dataSource);
             var xmlDef = GetFromId(package.Id, dataSource, false);

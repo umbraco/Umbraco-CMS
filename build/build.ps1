@@ -452,7 +452,20 @@
     if ($this.OnError()) { return }
     $this.PrepareAzureGallery()
     if ($this.OnError()) { return }
+    $this.PostPackageHook()
+    if ($this.OnError()) { return }
     Write-Host "Done"
+  })
+
+  $ubuild.DefineMethod("PostPackageHook",
+  {
+    # run hook
+    if ($this.HasMethod("PostPackage"))
+    {
+      Write-Host "Run PostPackage hook"
+      $this.PostPackage();
+      if (-not $?) { throw "Failed to run hook." }
+    }
   })
 
   # ################################################################

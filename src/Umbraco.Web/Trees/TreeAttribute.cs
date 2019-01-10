@@ -48,8 +48,6 @@ namespace Umbraco.Web.Trees
             IsSingleNodeTree = isSingleNodeTree;
         }
 
-
-
         public string ApplicationAlias { get; private set; }
         public string Alias { get; private set; }
         public string Title { get; private set; }

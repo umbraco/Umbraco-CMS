@@ -88,10 +88,10 @@ namespace Umbraco.Web
 
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
-            if (Current.Config.Umbraco().WebRouting.DisableAlternativeTemplates == true)
+            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates == true)
                 return content.TemplateId == templateId;
 
-            if (content.TemplateId != templateId && Current.Config.Umbraco().WebRouting.ValidateAlternativeTemplates == true)
+            if (content.TemplateId != templateId && Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates == true)
             {
                 // fixme - perfs? nothing cached here
                 var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);

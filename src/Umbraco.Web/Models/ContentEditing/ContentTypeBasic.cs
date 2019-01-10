@@ -76,7 +76,7 @@ namespace Umbraco.Web.Models.ContentEditing
             {
                 return IconIsClass
                     ? string.Empty
-                    : string.Format("{0}images/umbraco/{1}", Current.Config.Global().Path.EnsureEndsWith("/"), Icon);
+                    : string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
             }
         }
 

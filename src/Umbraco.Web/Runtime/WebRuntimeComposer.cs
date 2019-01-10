@@ -2,8 +2,10 @@
 using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
+using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
@@ -174,7 +176,7 @@ namespace Umbraco.Web.Runtime
 
             // register published router
             composition.RegisterUnique<PublishedRouter>();
-            composition.Register(_ => Current.Config.Umbraco().WebRouting);
+            composition.Register(_ => Current.Configs.Settings().WebRouting);
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());

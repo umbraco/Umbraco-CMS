@@ -7,12 +7,19 @@ namespace Umbraco.Core.Runtime
 {
     public class CoreRuntimeComponent : IComponent
     {
+        private readonly IEnumerable<Profile> _mapperProfiles;
+
         public CoreRuntimeComponent(IEnumerable<Profile> mapperProfiles)
+        {
+            _mapperProfiles = mapperProfiles;
+        }
+
+        public void Initialize()
         {
             // mapper profiles have been registered & are created by the container
             Mapper.Initialize(configuration =>
             {
-                foreach (var profile in mapperProfiles)
+                foreach (var profile in _mapperProfiles)
                     configuration.AddProfile(profile);
             });
 
@@ -24,5 +31,8 @@ namespace Umbraco.Core.Runtime
             IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
             IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
         }
+
+        public void Terminate()
+        { }
     }
 }

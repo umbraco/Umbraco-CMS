@@ -10,7 +10,6 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
