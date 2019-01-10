@@ -100,6 +100,7 @@ angular.module("umbraco.directives")
                             if (updateAlias) {
                                 scope.alias = safeAlias.alias;
                             }
+                            scope.placeholderText = scope.labels.idle;
                       });
                     }, 500);
 
