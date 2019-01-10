@@ -110,7 +110,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //Or, some strange server error
             if (err.status === 400) {
                 //now we need to look through all the validation errors
-                if (err.data && (err.data.ModelState)) {
+                if (err.data && err.data.ModelState) {
 
                     //wire up the server validation errs
                     this.handleServerValidation(err.data.ModelState);
@@ -118,11 +118,11 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                     //execute all server validation events and subscribers
                     serverValidationManager.notifyAndClearAllSubscriptions();                    
                 }
-                else {
+            }
+            else {
 
-                    //TODO: All YSOD handling should be done with an interceptor
-                    overlayService.ysod(err);
-                }
+                //TODO: All YSOD handling should be done with an interceptor
+                overlayService.ysod(err);
             }
             
         },

@@ -57,7 +57,11 @@ namespace Umbraco.Web.Editors
 
             //save it
             if (!Services.PackagingService.SavePackage(model))
-                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("The package with id {definition.Id} was not found"));
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse(
+                        model.Id == default
+                            ? $"A package with the name {model.Name} already exists"
+                            : $"The package with id {model.Id} was not found"));
 
             Services.PackagingService.ExportPackage(model);
 
