@@ -146,7 +146,6 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 var infiniteEditors = editorService.getEditors();
 
                 if (!formCtrl.$dirty && infiniteEditors.length === 0 || isSavingNewItem && infiniteEditors.length === 0) {
-                    confirmed = true;
                     return;
                 }
 
