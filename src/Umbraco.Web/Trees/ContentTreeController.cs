@@ -141,8 +141,6 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
-                //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;

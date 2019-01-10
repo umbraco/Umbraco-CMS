@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Web;
-using umbraco.cms.businesslogic.packager;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web._Legacy.Packager;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

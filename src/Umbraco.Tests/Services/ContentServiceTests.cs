@@ -793,6 +793,54 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Pending_Invariant_Property_Changes_Affect_Default_Language_Edited_State()
+        {
+            // Arrange
+
+            var langGB = new Language("en-GB") { IsDefault = true };
+            var langFr = new Language("fr-FR");
+
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langGB);
+
+            var contentType = MockedContentTypes.CreateMetaContentType();
+            contentType.Variations = ContentVariation.Culture;
+            foreach(var prop in contentType.PropertyTypes)
+                prop.Variations = ContentVariation.Culture;
+            var keywordsProp = contentType.PropertyTypes.Single(x => x.Alias == "metakeywords");
+            keywordsProp.Variations = ContentVariation.Nothing; // this one is invariant
+
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            IContent content = new Content("content", -1, contentType);
+            content.SetCultureName("content-en", langGB.IsoCode);
+            content.SetCultureName("content-fr", langFr.IsoCode);
+            content.PublishCulture(langGB.IsoCode);
+            content.PublishCulture(langFr.IsoCode);
+            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content).Success);
+           
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.AreEqual(PublishedState.Published, content.PublishedState);
+            Assert.IsTrue(content.IsCulturePublished(langGB.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsFalse(content.IsCultureEdited(langGB.IsoCode));
+            Assert.IsFalse(content.IsCultureEdited(langFr.IsoCode));
+
+            //update the invariant property and save a pending version
+            content.SetValue("metakeywords", "hello");
+            ServiceContext.ContentService.Save(content);
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.AreEqual(PublishedState.Published, content.PublishedState);
+            Assert.IsTrue(content.IsCulturePublished(langGB.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCultureEdited(langGB.IsoCode));
+            Assert.IsFalse(content.IsCultureEdited(langFr.IsoCode));
+        }
+
+        [Test]
         public void Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
         {
             // Arrange

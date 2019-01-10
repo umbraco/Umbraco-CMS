@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Xml;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
 
-
-namespace umbraco.cms.businesslogic.packager
+namespace Umbraco.Web._Legacy.Packager.PackageInstance
 {
 
     /// <summary>
