@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string Path => _content.Path;
 
         /// <inheritdoc />
-        public virtual int TemplateId => _content.TemplateId;
+        public virtual int? TemplateId => _content.TemplateId;
 
         /// <inheritdoc />
         public virtual int CreatorId => _content.CreatorId;

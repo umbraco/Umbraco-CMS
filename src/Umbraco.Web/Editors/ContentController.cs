@@ -1780,22 +1780,24 @@ namespace Umbraco.Web.Editors
                 variantIndex++;
             }
 
-            //only set the template if it didn't change
-            var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.TemplateAlias.IsNullOrWhiteSpace());
-            if (templateChanged)
+            // If the template was set.
+            // fixme review this - what if template has been cleared?
+            if (contentSave.TemplateAlias != null)
             {
+                //only set the template if it didn't change
                 var template = Services.FileService.GetTemplate(contentSave.TemplateAlias);
-                if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
+                if (contentSave.PersistedContent.TemplateId != template.Id)
                 {
-                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
-                }
-                else
-                {
-                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentSave.PersistedContent.Template = template;
+                    if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
+                    {
+                        //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
+                        Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
+                    }
+                    else
+                    {
+                        //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
+                        contentSave.PersistedContent.TemplateId = template.Id;
+                    }
                 }
             }
         }

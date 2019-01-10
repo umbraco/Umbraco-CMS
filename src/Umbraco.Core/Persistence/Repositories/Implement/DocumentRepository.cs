@@ -273,8 +273,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
 
             // ensure that the default template is assigned
-            if (entity.Template == null)
-                entity.Template = entity.ContentType.DefaultTemplate;
+            if (entity.TemplateId.HasValue == false)
+                entity.TemplateId = entity.ContentType.DefaultTemplate?.Id;
 
             // sanitize names
             SanitizeNames(content, publishing);
@@ -404,7 +404,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishedState == PublishedState.Publishing)
             {
                 content.Published = true;
-                content.PublishTemplate = content.Template;
+                content.PublishTemplateId = content.TemplateId;
                 content.PublisherId = content.WriterId;
                 content.PublishName = content.Name;
                 content.PublishDate = content.UpdateDate;
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishTemplate = null;
+                content.PublishTemplateId = null;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
@@ -609,7 +609,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishedState == PublishedState.Publishing)
             {
                 content.Published = true;
-                content.PublishTemplate = content.Template;
+                content.PublishTemplateId = content.TemplateId;
                 content.PublisherId = content.WriterId;
                 content.PublishName = content.Name;
                 content.PublishDate = content.UpdateDate;
@@ -619,7 +619,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishTemplate = null;
+                content.PublishTemplateId = null;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
@@ -1079,10 +1079,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var temp in temps)
                 {
                     // complete the item
-                    if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
-                        temp.Content.Template = template;
-                    if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
-                        temp.Content.PublishTemplate = template;
+                    // fixme - this makes no sense, no need to manage templates on TEMP anymore?!
+                    if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
+                        temp.Content.TemplateId = temp.Template1Id;
+                    if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
+                        temp.Content.PublishTemplateId = temp.Template2Id;
 
                     if (properties.ContainsKey(temp.VersionId))
                         temp.Content.Properties = properties[temp.VersionId];
@@ -1123,7 +1124,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // get template
                 if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-                    content.Template = _templateRepository.Get(dto.DocumentVersionDto.TemplateId.Value);
+                    content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
                 // get properties - indexed by version id
                 var versionId = dto.DocumentVersionDto.Id;
