@@ -146,7 +146,7 @@
 
                     if (create) {
                         //if we are creating, then redirect to the correct url and reload
-                        $location.path("packages/packages/overview/" + vm.package.id).search("subview", "created");
+                        $location.path("packages/packages/edit/" + vm.package.id).search("subview", "created").search("create", null);
                         //don't add a browser history for this
                         $location.replace();
                     }

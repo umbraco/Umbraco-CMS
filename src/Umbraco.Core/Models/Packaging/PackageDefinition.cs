@@ -94,7 +94,7 @@ namespace Umbraco.Core.Models.Packaging
         public string LoadControl { get; set; } = string.Empty;
 
         [DataMember(Name = "actions")]
-        public string Actions { get; set; }
+        public string Actions { get; set; } = "<actions></actions>";
 
         [DataMember(Name = "dataTypes")]
         public IList<string> DataTypes { get; set; } = new List<string>();

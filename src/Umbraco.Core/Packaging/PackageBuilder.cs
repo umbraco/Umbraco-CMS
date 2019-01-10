@@ -598,7 +598,7 @@ namespace Umbraco.Core.Packaging
                 Author = xml.Element("author")?.Value ?? string.Empty,
                 AuthorUrl = xml.Element("author")?.AttributeValue<string>("url") ?? string.Empty,
                 Readme = xml.Element("readme")?.Value ?? string.Empty,
-                Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? string.Empty, //take the entire outer xml value
+                Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? "<actions></actions>", //take the entire outer xml value
                 ContentNodeId = xml.Element("content")?.AttributeValue<string>("nodeId") ?? string.Empty,
                 ContentLoadChildNodes = xml.Element("content")?.AttributeValue<bool>("loadChildNodes") ?? false,
                 Macros = xml.Element("macros")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
