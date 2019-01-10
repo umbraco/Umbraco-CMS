@@ -515,13 +515,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
 
             var content = Services.ContentService.GetById(contentId);
             if (content == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            EnsureUniqueName(name, content, "name");
+            EnsureUniqueName(name, content, nameof(name));
 
             var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId().ResultOr(0));
 
@@ -612,7 +613,7 @@ namespace Umbraco.Web.Editors
                 var msKey = $"Variants[{variantCount}].Name";
                 if (ModelState.ContainsKey(msKey))
                 {
-                    if (!variant.Save)
+                    if (!variant.Save || IsCreatingAction(contentItem.Action))
                         ModelState.Remove(msKey);
                     else
                         variantNameErrors.Add(variant.Culture);

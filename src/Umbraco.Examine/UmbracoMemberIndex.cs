@@ -1,18 +1,7 @@
-﻿using System;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Services;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using Examine;
 using Examine.LuceneEngine;
-using Examine.LuceneEngine.Indexing;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -24,14 +13,6 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoMemberIndex : UmbracoExamineIndex
     {
-        /// <summary>
-        /// Constructor for config/provider based indexes
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public UmbracoMemberIndex()
-        {
-        }
-
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
@@ -48,15 +29,8 @@ namespace Umbraco.Examine
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
             IValueSetValidator validator = null) :
-            base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
+            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, validator)
         {
-        }
-
-        public override void Initialize(string name, NameValueCollection config)
-        {
-            base.Initialize(name, config);
-
-            ValueSetValidator = new MemberValueSetValidator(ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
         }
 
         /// <summary>
