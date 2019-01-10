@@ -272,6 +272,7 @@
     <key alias="isSensitiveValue_short">This value is hidden.</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
+    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>

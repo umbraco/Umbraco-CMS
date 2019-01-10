@@ -2744,8 +2744,23 @@ namespace Umbraco.Core.Services.Implement
             content.CreatorId = userId;
             content.WriterId = userId;
 
-            foreach (var property in blueprint.Properties)
-                content.SetValue(property.Alias, property.GetValue()); //fixme doesn't take into account variants
+            var now = DateTime.Now;
+            var cultures = blueprint.CultureInfos.Any() ? blueprint.CultureInfos.Select(x=>x.Key) : new[] {(string)null};
+            foreach (var culture in cultures)
+            {
+                foreach (var property in blueprint.Properties)
+                {
+                    content.SetValue(property.Alias, property.GetValue(culture), culture);
+                }
+
+                content.Name = blueprint.Name;
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
+                }
+            }
+
+
 
             return content;
         }
