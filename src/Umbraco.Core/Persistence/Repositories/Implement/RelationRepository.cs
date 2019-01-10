@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -22,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IScopeAccessor scopeAccessor, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
-            : base(scopeAccessor, cache, logger)
+        public RelationRepository(IScopeAccessor scopeAccessor, ILogger logger, IRelationTypeRepository relationTypeRepository)
+            : base(scopeAccessor, CacheHelper.NoCache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
         }

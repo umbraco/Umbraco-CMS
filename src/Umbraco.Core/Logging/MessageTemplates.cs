@@ -1,6 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Serilog;
+using Serilog.Events;
+using Serilog.Parsing;
 
 namespace Umbraco.Core.Logging
 {
@@ -29,7 +33,23 @@ namespace Umbraco.Core.Logging
             if (!bound)
                 throw new FormatException($"Could not format message \"{messageTemplate}\" with {args.Length} args.");
 
-            return parsedTemplate.Render(boundProperties.ToDictionary(x => x.Name, x => x.Value));
+            var values = boundProperties.ToDictionary(x => x.Name, x => x.Value);
+
+            // this ends up putting every string parameter between quotes
+            //return parsedTemplate.Render(values);
+
+            // this does not
+            var tw = new StringWriter();
+            foreach (var t in parsedTemplate.Tokens)
+            {
+                if (t is PropertyToken pt &&
+                    values.TryGetValue(pt.PropertyName, out var propVal) &&
+                    (propVal as ScalarValue)?.Value is string s)
+                    tw.Write(s);
+                else
+                    t.Render(values, tw);
+            }
+            return tw.ToString();
         }
     }
 }

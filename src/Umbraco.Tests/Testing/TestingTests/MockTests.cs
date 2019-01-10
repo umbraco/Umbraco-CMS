@@ -6,7 +6,9 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -51,23 +53,20 @@ namespace Umbraco.Tests.Testing.TestingTests
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
             // unless we can inject them in MembershipHelper, we need need this
-            Container.Register(_ => Mock.Of<IMemberService>());
-            Container.Register(_ => Mock.Of<IMemberTypeService>());
-            Container.Register(_ => Mock.Of<IUserService>());
-            Container.Register(_ => CacheHelper.CreateDisabledCacheHelper());
-            Container.Register<ServiceContext>();
+            Composition.Register(_ => Mock.Of<IMemberService>());
+            Composition.Register(_ => Mock.Of<IMemberTypeService>());
+            Composition.Register(_ => Mock.Of<IUserService>());
+            Composition.Register(_ => CacheHelper.Disabled);
+            Composition.Register<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,
                 Mock.Of<IPublishedContent>(),
-                Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<IDataTypeService>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(umbracoContext, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>()),
-                new ServiceContext(),
-                CacheHelper.CreateDisabledCacheHelper());
+                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>()),
+                ServiceContext.CreatePartial());
             Assert.Pass();
         }
 
@@ -78,7 +77,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
             var urlProviderMock = new Mock<IUrlProvider>();
             urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
-                .Returns("/hello/world/1234");
+                .Returns(UrlInfo.Url("/hello/world/1234"));
             var urlProvider = urlProviderMock.Object;
 
             var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider }, umbracoContext.VariationContextAccessor);

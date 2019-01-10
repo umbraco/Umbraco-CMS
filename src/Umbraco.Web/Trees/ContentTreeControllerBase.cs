@@ -14,7 +14,6 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using System.Globalization;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 
@@ -391,6 +390,11 @@ namespace Umbraco.Web.Trees
             foreach (var m in notAllowed)
             {
                 menuWithAllItems.Items.Remove(m);
+                // if the disallowed action is set as default action, make sure to reset the default action as well
+                if (menuWithAllItems.DefaultMenuAlias == m.Alias)
+                {
+                    menuWithAllItems.DefaultMenuAlias = null;
+                }
             }
         }
 

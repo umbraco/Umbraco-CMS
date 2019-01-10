@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
@@ -17,46 +15,35 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class SectionController : UmbracoAuthorizedJsonController
     {
-        private readonly DashboardHelper _dashboardHelper;
+        private readonly Dashboards _dashboards;
 
-        public SectionController(DashboardHelper dashboardHelper)
+        public SectionController(Dashboards dashboards)
         {
-            _dashboardHelper = dashboardHelper;
+            _dashboards = dashboards;
         }
 
         public IEnumerable<Section> GetSections()
         {
-
             var sections =  Services.SectionService.GetAllowedSections(Security.GetUserId().ResultOr(0));
 
             var sectionModels = sections.Select(Mapper.Map<Core.Models.Section, Section>).ToArray();
             
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
-            // since tree's by nature are controllers and require request contextual data - and then we have to
-            // remember to inject properties - nasty indeed
-            // fixme - this controller could/should be able to be created from the container and/or from webapi's IHttpControllerTypeResolver
-            var appTreeController = new ApplicationTreeController();
-            Current.Container.InjectProperties(appTreeController);
-            appTreeController.ControllerContext = ControllerContext;
+            // since tree's by nature are controllers and require request contextual data
+            var appTreeController = new ApplicationTreeController { ControllerContext = ControllerContext };
 
-            var dashboards = _dashboardHelper.GetDashboards(Security.CurrentUser);
+            var dashboards = _dashboards.GetDashboards(Security.CurrentUser);
+
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for
             //a dashboard for a given section, then the UI can deal with it accordingly (i.e. redirect to the first tree)
             foreach (var section in sectionModels)
             {
-                var hasDashboards = false;
-                if (dashboards.TryGetValue(section.Alias, out var dashboardsForSection))
-                {
-                    if (dashboardsForSection.Any())
-                        hasDashboards = true;
-                }
+                var hasDashboards = dashboards.TryGetValue(section.Alias, out var dashboardsForSection) && dashboardsForSection.Any();
+                if (hasDashboards) continue;
 
-                if (hasDashboards == false)
-                {
-                    //get the first tree in the section and get it's root node route path
-                    var sectionRoot = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
-                    section.RoutePath = GetRoutePathForFirstTree(sectionRoot);
-                }
+                // get the first tree in the section and get its root node route path
+                var sectionRoot = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
+                section.RoutePath = GetRoutePathForFirstTree(sectionRoot);
             }
 
             return sectionModels;

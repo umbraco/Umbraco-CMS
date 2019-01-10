@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LightInject;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -16,8 +15,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IContentSection _contentConfig;
 
-        public ScriptRepository([Inject("ScriptFileSystem")] IFileSystem fileSystem, IContentSection contentConfig)
-            : base(fileSystem)
+        public ScriptRepository(IFileSystems fileSystems, IContentSection contentConfig)
+            : base(fileSystems.ScriptsFileSystem)
         {
             _contentConfig = contentConfig ?? throw new ArgumentNullException(nameof(contentConfig));
         }

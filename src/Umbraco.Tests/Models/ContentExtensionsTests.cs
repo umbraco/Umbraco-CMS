@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_Reset_Clears_SavedPublishedState()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             content.PublishedState = PublishedState.Publishing;
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_OnlyIfActuallyChanged_Content()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // if you assign a content property with its value it is not dirty
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_OnlyIfActuallyChanged_User()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             var prop = content.Properties.First();
 
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_UpdateDate()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             var prop = content.Properties.First();
 
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_WasDirty_ContentProperty()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_WasDirty_ContentSortOrder()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void DirtyProperty_WasDirty_UserProperty()
         {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             var prop = content.Properties.First();
             content.ResetDirtyProperties(false);

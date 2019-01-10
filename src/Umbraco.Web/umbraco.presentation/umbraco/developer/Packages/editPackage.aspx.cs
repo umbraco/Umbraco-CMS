@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -31,14 +32,14 @@ namespace umbraco.presentation.developer.packages
         public Umbraco.Web._Legacy.Controls.TabPage packageActions;
 
         protected ContentPicker cp;
-        private cms.businesslogic.packager.PackageInstance pack;
-        private cms.businesslogic.packager.CreatedPackage createdPackage;
+        private PackageInstance pack;
+        private CreatedPackage createdPackage;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["id"] != null)
             {
-                createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
+                createdPackage = CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
                 pack = createdPackage.Data;
 
                 /* CONTENT */
@@ -359,8 +360,8 @@ namespace umbraco.presentation.developer.packages
 
             if (newPath.Trim() != "")
             {
-                cms.businesslogic.packager.CreatedPackage createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
-                cms.businesslogic.packager.PackageInstance pack = createdPackage.Data;
+                CreatedPackage createdPackage = CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
+                PackageInstance pack = createdPackage.Data;
 
                 pack.Files.Add(newPath);
 
@@ -386,8 +387,8 @@ namespace umbraco.presentation.developer.packages
                     tmpFilePathString += tmpFFFF + "�";
             }
 
-            cms.businesslogic.packager.CreatedPackage createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
-            cms.businesslogic.packager.PackageInstance pack = createdPackage.Data;
+            CreatedPackage createdPackage = CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
+            PackageInstance pack = createdPackage.Data;
 
             pack.Files = new List<string>(tmpFilePathString.Trim('�').Split('�'));
             pack.Files.TrimExcess();

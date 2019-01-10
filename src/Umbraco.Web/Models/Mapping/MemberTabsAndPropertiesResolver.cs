@@ -37,15 +37,6 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
         }
 
-        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties, IMemberService memberService, IUserService userService)
-            : base(localizedTextService, ignoreProperties)
-        {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
-            _localizedTextService = localizedTextService ?? throw new System.ArgumentNullException(nameof(localizedTextService));
-            _memberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
-            _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
-        }
-
         /// <inheritdoc />
         /// <remarks>Overriden to deal with custom member properties and permissions.</remarks>
         public override IEnumerable<Tab<ContentPropertyDisplay>> Resolve(IMember source, MemberDisplay destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)

@@ -1,4 +1,4 @@
-﻿function sliderController($scope) {
+﻿function sliderController($scope, angularHelper) {
 
     let sliderRef = null;
 
@@ -14,13 +14,14 @@
 
     function setModelValue(values) {
         $scope.model.value = values ? values.toString() : null;
+        angularHelper.getCurrentForm($scope).$setDirty();
     }
 
     $scope.setup = function(slider) {
         sliderRef = slider;
     };
 
-    $scope.end = function(values) {
+    $scope.change = function (values) {
         setModelValue(values);
     };
 

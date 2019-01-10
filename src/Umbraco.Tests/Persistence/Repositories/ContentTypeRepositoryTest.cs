@@ -35,8 +35,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)
         {
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-            var templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            var cacheHelper = CacheHelper.Disabled;
+            var templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, templateRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, cacheHelper, Logger);
@@ -46,20 +46,20 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
-            var templateRepository = new TemplateRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository);
+            var templateRepository = new TemplateRepository(scopeAccessor, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, CacheHelper.Disabled, Logger, templateRepository);
             return contentTypeRepository;
         }
 
         private MediaTypeRepository CreateMediaTypeRepository(IScopeAccessor scopeAccessor)
         {
-            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger);
+            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, CacheHelper.Disabled, Logger);
             return contentTypeRepository;
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor, Guid containerEntityType)
         {
-            return new EntityContainerRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, containerEntityType);
+            return new EntityContainerRepository(scopeAccessor, CacheHelper.Disabled, Logger, containerEntityType);
         }
 
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var templateRepo = new TemplateRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+                var templateRepo = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
                 var repository = CreateRepository((IScopeAccessor) provider);
                 var templates = new[]
                 {
@@ -964,7 +964,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ServiceContext.ContentTypeService.Save(simpleContentType);
 
             //Create and Save ContentType "textPage" -> (NodeDto.NodeIdSeed + 1)
-            ContentType textpageContentType = MockedContentTypes.CreateTextpageContentType();
+            ContentType textpageContentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.ContentTypeService.Save(textpageContentType);
         }
     }

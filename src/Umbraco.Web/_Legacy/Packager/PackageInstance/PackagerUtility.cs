@@ -8,7 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
-namespace umbraco.cms.businesslogic.packager
+namespace Umbraco.Web._Legacy.Packager.PackageInstance
 {
     /// <summary>
     /// A utillity class for working with packager data.

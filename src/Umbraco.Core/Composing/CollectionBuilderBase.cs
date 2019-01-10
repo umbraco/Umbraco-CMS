@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -18,65 +16,30 @@ namespace Umbraco.Core.Composing
     {
         private readonly List<Type> _types = new List<Type>();
         private readonly object _locker = new object();
-        private Func<IEnumerable<TItem>, TCollection> _collectionCtor;
-        private ServiceRegistration[] _registrations;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionBuilderBase{TBuilder, TCollection,TItem}"/>
-        /// class with a service container.
-        /// </summary>
-        /// <param name="container">A service container.</param>
-        protected CollectionBuilderBase(IServiceContainer container)
-        {
-            Container = container;
-            // ReSharper disable once DoNotCallOverridableMethodsInConstructor
-            Initialize();
-        }
-
-        /// <summary>
-        /// Gets the service container.
-        /// </summary>
-        protected IServiceContainer Container { get; }
+        private Type[] _registeredTypes;
 
         /// <summary>
         /// Gets the internal list of types as an IEnumerable (immutable).
         /// </summary>
         public IEnumerable<Type> GetTypes() => _types;
 
-        /// <summary>
-        /// Initializes a new instance of the builder.
-        /// </summary>
-        /// <remarks>This is called by the constructor and, by default, registers the
-        /// collection automatically.</remarks>
-        protected virtual void Initialize()
+        /// <inheritdoc />
+        public virtual void RegisterWith(IRegister register)
         {
-            // compile the auto-collection constructor
-            var argType = typeof(IEnumerable<TItem>);
-            var ctorArgTypes = new[] { argType };
-            var constructor = typeof(TCollection).GetConstructor(ctorArgTypes);
-            if (constructor != null)
-            {
-                var exprArg = Expression.Parameter(argType, "items");
-                var exprNew = Expression.New(constructor, exprArg);
-                var expr = Expression.Lambda<Func<IEnumerable<TItem>, TCollection>>(exprNew, exprArg);
-                _collectionCtor = expr.Compile();
-            }
-            // else _collectionCtor remains null, assuming CreateCollection has been overriden
-
-            // we just don't want to support re-registering collections here
-            var registration = Container.GetAvailableService<TCollection>();
-            if (registration != null)
-                throw new InvalidOperationException("Collection builders cannot be registered once the collection itself has been registered.");
+            if (_registeredTypes != null)
+                throw new InvalidOperationException("This builder has already been registered.");
 
             // register the collection
-            Container.Register(_ => CreateCollection(), CollectionLifetime);
+            register.Register(CreateCollection, CollectionLifetime);
+
+            // register the types
+            RegisterTypes(register);
         }
 
         /// <summary>
         /// Gets the collection lifetime.
         /// </summary>
-        /// <remarks>Return null for transient collections.</remarks>
-        protected virtual ILifetime CollectionLifetime => new PerContainerLifetime();
+        protected virtual Lifetime CollectionLifetime => Lifetime.Singleton;
 
         /// <summary>
         /// Configures the internal list of types.
@@ -87,8 +50,8 @@ namespace Umbraco.Core.Composing
         {
             lock (_locker)
             {
-                if (_registrations != null)
-                    throw new InvalidOperationException("Cannot configure a collection builder after its types have been resolved.");
+                if (_registeredTypes != null)
+                    throw new InvalidOperationException("Cannot configure a collection builder after it has been registered.");
                 action(_types);
             }
         }
@@ -104,55 +67,54 @@ namespace Umbraco.Core.Composing
             return types;
         }
 
-        private void RegisterTypes()
+        private void RegisterTypes(IRegister register)
         {
             lock (_locker)
             {
-                if (_registrations != null) return;
+                if (_registeredTypes != null) return;
 
                 var types = GetRegisteringTypes(_types).ToArray();
+
+                // ensure they are safe
                 foreach (var type in types)
                     EnsureType(type, "register");
 
-                var prefix = GetType().FullName + "_";
-                var i = 0;
+                // register them
                 foreach (var type in types)
-                {
-                    var name = $"{prefix}{i++:00000}";
-                    Container.Register(typeof(TItem), type, name);
-                }
+                    register.Register(type);
 
-                _registrations = Container.AvailableServices
-                    .Where(x => x.ServiceName.StartsWith(prefix))
-                    .OrderBy(x => x.ServiceName)
-                    .ToArray();
+                _registeredTypes = types;
             }
         }
 
         /// <summary>
         /// Creates the collection items.
         /// </summary>
-        /// <param name="args">The arguments.</param>
         /// <returns>The collection items.</returns>
-        protected virtual IEnumerable<TItem> CreateItems(params object[] args)
+        protected virtual IEnumerable<TItem> CreateItems(IFactory factory)
         {
-            RegisterTypes(); // will do it only once
+            if (_registeredTypes == null)
+                throw new InvalidOperationException("Cannot create items before the collection builder has been registered.");
 
-            var type = typeof (TItem);
-            return _registrations
-                .Select(x => (TItem) Container.GetInstanceOrThrow(type, x.ServiceName, x.ImplementingType, args))
+            return _registeredTypes // respect order
+                .Select(x => CreateItem(factory, x))
                 .ToArray(); // safe
         }
+
+        /// <summary>
+        /// Creates a collection item.
+        /// </summary>
+        protected virtual TItem CreateItem(IFactory factory, Type itemType)
+            => (TItem) factory.GetInstance(itemType);
 
         /// <summary>
         /// Creates a collection.
         /// </summary>
         /// <returns>A collection.</returns>
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
-        public virtual TCollection CreateCollection()
+        public virtual TCollection CreateCollection(IFactory factory)
         {
-            if (_collectionCtor == null) throw new InvalidOperationException("Collection auto-creation is not possible.");
-            return _collectionCtor(CreateItems());
+            return factory.CreateInstance<TCollection>(CreateItems(factory));
         }
 
         protected Type EnsureType(Type type, string action)

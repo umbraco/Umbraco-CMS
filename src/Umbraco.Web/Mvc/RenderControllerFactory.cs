@@ -10,7 +10,6 @@ namespace Umbraco.Web.Mvc
     /// <remarks></remarks>
     public class RenderControllerFactory : UmbracoControllerFactory
     {
-
         /// <summary>
         /// Determines whether this instance can handle the specified request.
         /// </summary>
@@ -34,16 +33,13 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         public override IController CreateController(RequestContext requestContext, string controllerName)
         {
-              var instance = base.CreateController(requestContext, controllerName);
-             var controllerInstance = instance as Controller;
-             if (controllerInstance != null)
-             {
-                 //set the action invoker!
-                 controllerInstance.ActionInvoker = new RenderActionInvoker();
-             }
-
-             return instance;
+            var instance = base.CreateController(requestContext, controllerName);
+            if (instance is Controller controllerInstance)
+            {
+                //set the action invoker!
+                controllerInstance.ActionInvoker = new RenderActionInvoker();
+            }
+            return instance;
         }
-
     }
 }

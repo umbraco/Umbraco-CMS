@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using System.Web.UI;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.UI.Pages;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.UI.Controls
 {
@@ -27,13 +24,12 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="services"></param>
-        /// <param name="appCache"></param>
-        protected UmbracoUserControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        protected UmbracoUserControl(UmbracoContext umbracoContext, ServiceContext services)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
-            Members = new MembershipHelper(umbracoContext);
+            Umbraco = new UmbracoHelper(umbracoContext, services);
+            Members = Current.Factory.GetInstance<MembershipHelper>();
 
             // fixme inject somehow
             Logger = Current.Logger;
@@ -45,7 +41,7 @@ namespace Umbraco.Web.UI.Controls
         /// Empty constructor, uses Singleton to resolve the UmbracoContext
         /// </summary>
         protected UmbracoUserControl()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+            : this(Current.UmbracoContext, Current.Services)
         { }
 
         // for debugging purposes
@@ -74,7 +70,7 @@ namespace Umbraco.Web.UI.Controls
         /// <summary>
         /// Gets the ProfilingLogger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the Umbraco context.

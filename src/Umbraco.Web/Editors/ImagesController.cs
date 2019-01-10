@@ -17,10 +17,10 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class ImagesController : UmbracoAuthorizedApiController
     {
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
 
-        public ImagesController(MediaFileSystem mediaFileSystem, IContentSection contentSection)
+        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSection = contentSection;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Services
             return hasChange;
         }
 
-        public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, IEnumerable<string> currentMemberRoles)
+        public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
         {
             var content = contentService.GetById(documentId);
             if (content == null) return true;
@@ -49,8 +50,7 @@ namespace Umbraco.Core.Services
             var entry = publicAccessService.GetEntryForContent(content);
             if (entry == null) return true;
 
-            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
-                                        && currentMemberRoles.Contains(x.RuleValue));
+            return HasAccess(entry, username, currentMemberRoles);
         }
 
         public static bool HasAccess(this IPublicAccessService publicAccessService, string path, MembershipUser member, RoleProvider roleProvider)
@@ -77,8 +77,15 @@ namespace Umbraco.Core.Services
 
             var roles = rolesCallback(username);
 
-            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
-                                        && roles.Contains(x.RuleValue));
+            return HasAccess(entry, username, roles);
+        }
+
+        private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles)
+        {
+            return entry.Rules.Any(x =>
+                (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType && username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase))
+                || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))
+            );
         }
     }
 }

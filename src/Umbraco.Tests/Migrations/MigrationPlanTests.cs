@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
@@ -46,13 +49,10 @@ namespace Umbraco.Tests.Migrations
                     }
                 });
 
-            // fixme - NOT a migration collection builder, just a migration builder
-            //  done, remove everywhere else, and delete migrationCollection stuff entirely
-
-            var plan = new MigrationPlan("default", migrationBuilder, logger)
+            var plan = new MigrationPlan("default")
                 .From(string.Empty)
-                .Chain<DeleteRedirectUrlTable>("{4A9A1A8F-0DA1-4BCF-AD06-C19D79152E35}")
-                .Chain<NoopMigration>("VERSION.33");
+                .To<DeleteRedirectUrlTable>("{4A9A1A8F-0DA1-4BCF-AD06-C19D79152E35}")
+                .To<NoopMigration>("VERSION.33");
 
             var kvs = Mock.Of<IKeyValueService>();
             Mock.Get(kvs).Setup(x => x.GetValue(It.IsAny<string>())).Returns<string>(k => k == "Umbraco.Tests.MigrationPlan" ? string.Empty : null);
@@ -64,12 +64,11 @@ namespace Umbraco.Tests.Migrations
                 var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
                 // execute plan
-                state = plan.Execute(s, sourceState);
+                state = plan.Execute(s, sourceState, migrationBuilder, logger);
 
                 // save new state
                 kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);
 
-                // fixme - what about post-migrations?
                 s.Complete();
             }
 
@@ -81,61 +80,133 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CanAddMigrations()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add(string.Empty, "aaa");
-            plan.Add("aaa", "bbb");
-            plan.Add("bbb", "ccc");
+            var plan = new MigrationPlan("default");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .To("bbb")
+                .To("ccc");
         }
 
         [Test]
         public void CannotTransitionToSameState()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new MigrationPlan("default");
             Assert.Throws<ArgumentException>(() =>
             {
-                plan.Add("aaa", "aaa");
+                plan.From("aaa").To("aaa");
             });
         }
 
         [Test]
         public void OnlyOneTransitionPerState()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add("aaa", "bbb");
+            var plan = new MigrationPlan("default");
+            plan.From("aaa").To("bbb");
             Assert.Throws<InvalidOperationException>(() =>
             {
-                plan.Add("aaa", "ccc");
+                plan.From("aaa").To("ccc");
             });
         }
 
         [Test]
         public void CannotContainTwoMoreHeads()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add(string.Empty, "aaa");
-            plan.Add("aaa", "bbb");
-            plan.Add("ccc", "ddd");
+            var plan = new MigrationPlan("default");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .To("bbb")
+                .From("ccc")
+                .To("ddd");
             Assert.Throws<Exception>(() => plan.Validate());
         }
 
         [Test]
         public void CannotContainLoops()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Add(string.Empty, "aaa");
-            plan.Add("aaa", "bbb");
-            plan.Add("bbb", "ccc");
-            plan.Add("ccc", "aaa");
+            var plan = new MigrationPlan("default");
+            plan
+                .From("aaa")
+                .To("bbb")
+                .To("ccc")
+                .To("aaa");
             Assert.Throws<Exception>(() => plan.Validate());
         }
 
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var plan = new UmbracoPlan(Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new UmbracoPlan();
             plan.Validate();
             Console.WriteLine(plan.FinalState);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(plan.FinalState));
+            Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());
+        }
+
+        [Test]
+        public void CanClone()
+        {
+            var plan = new MigrationPlan("default");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .To("bbb")
+                .To("ccc")
+                .To("ddd")
+                .To("eee");
+
+            plan
+                .From("xxx")
+                .ToWithClone("bbb", "ddd", "yyy")
+                .To("eee");
+
+            WritePlanToConsole(plan);
+
+            plan.Validate();
+            Assert.AreEqual("eee", plan.FollowPath("xxx").Last());
+            Assert.AreEqual("yyy", plan.FollowPath("xxx", "yyy").Last());
+        }
+
+        [Test]
+        public void CanMerge()
+        {
+            var plan = new MigrationPlan("default");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .Merge()
+                    .To("bbb")
+                    .To("ccc")
+                .With()
+                    .To("ddd")
+                    .To("eee")
+                .As("fff")
+                .To("ggg");
+
+            WritePlanToConsole(plan);
+
+            plan.Validate();
+            AssertList(plan.FollowPath(), "", "aaa", "bbb", "ccc", "*", "*", "fff", "ggg");
+            AssertList(plan.FollowPath("ccc"), "ccc", "*", "*", "fff", "ggg");
+            AssertList(plan.FollowPath("eee"), "eee", "*", "*", "fff", "ggg");
+        }
+
+        private void AssertList(IReadOnlyList<string> states, params string[] expected)
+        {
+            Assert.AreEqual(expected.Length, states.Count, string.Join(", ", states));
+            for (var i = 0; i < expected.Length; i++)
+                if (expected[i] != "*")
+                    Assert.AreEqual(expected[i], states[i], "at:" + i);
+        }
+
+        private void WritePlanToConsole(MigrationPlan plan)
+        {
+            var final = plan.Transitions.First(x => x.Value == null).Key;
+
+            Console.WriteLine("plan \"{0}\" to final state \"{1}\":", plan.Name, final);
+            foreach (var (_, transition) in plan.Transitions)
+                if (transition != null)
+                    Console.WriteLine(transition);
         }
 
         public class DeleteRedirectUrlTable : MigrationBase

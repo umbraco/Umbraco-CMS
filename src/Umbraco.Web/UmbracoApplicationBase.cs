@@ -3,11 +3,9 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
 
 namespace Umbraco.Web
 {
@@ -22,6 +20,14 @@ namespace Umbraco.Web
         /// Gets a runtime.
         /// </summary>
         protected abstract IRuntime GetRuntime();
+
+        /// <summary>
+        /// Gets the application register.
+        /// </summary>
+        protected virtual IRegister GetRegister()
+        {
+            return RegisterFactory.Create();
+        }
 
         // events - in the order they trigger
 
@@ -51,13 +57,11 @@ namespace Umbraco.Web
         {
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
-            // create the container for the application, and configure.
+            // create the register for the application, and boot
             // the boot manager is responsible for registrations
-            var container = new ServiceContainer();
-
-            // get runtime & boot
+            var register = GetRegister();
             _runtime = GetRuntime();
-            _runtime.Boot(container);
+            _runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

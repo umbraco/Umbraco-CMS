@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Globalization;
 using System.IO;
 using System.Web;
 using System.Web.UI;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
-using umbraco.presentation.templateControls;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 

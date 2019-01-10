@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models
 
         private string _group;
         private string _text;
+        private int? _languageId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tag"/> class.
@@ -26,11 +27,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="Tag"/> class.
         /// </summary>
-        public Tag(int id, string group, string text)
+        public Tag(int id, string group, string text, int? languageId = null)
         {
             Id = id;
             Text = text;
             Group = group;
+            LanguageId = languageId;
         }
 
         private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
@@ -39,6 +41,7 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo Group = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Group);
             public readonly PropertyInfo Text = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
+            public readonly PropertyInfo LanguageId = ExpressionHelper.GetPropertyInfo<Tag, int?>(x => x.LanguageId);
         }
 
         /// <inheritdoc />
@@ -53,6 +56,13 @@ namespace Umbraco.Core.Models
         {
             get => _text;
             set => SetPropertyValueAndDetectChanges(value, ref _text, Selectors.Text);
+        }
+
+        /// <inheritdoc />
+        public int? LanguageId
+        {
+            get => _languageId;
+            set => SetPropertyValueAndDetectChanges(value, ref _languageId, Selectors.LanguageId);
         }
 
         /// <inheritdoc />

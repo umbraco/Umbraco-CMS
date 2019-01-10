@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Linq;
 using Examine;
+using LightInject;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
+
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class EventsTest : ExamineBaseTest
@@ -16,13 +19,13 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Events_Ignoring_Node()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 999 so all are ignored
-                options: new UmbracoContentIndexerOptions(false, false, 999)))
+                validator: new ContentValueSetValidator(false, 999)))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
-                
+
                 var contentService = new ExamineDemoDataContentService();
                 //get a node from the data repo
                 var node = contentService.GetPublishedContentByXPath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -31,9 +34,9 @@ namespace Umbraco.Tests.UmbracoExamine
                                           .First();
 
                 var valueSet = node.ConvertToValueSet(IndexTypes.Content);
-                indexer.IndexItems(new[] {valueSet});
+                indexer.IndexItems(new[] { valueSet });
 
-                var found = searcher.Search(searcher.CreateCriteria().Id((string) node.Attribute("id")).Compile());
+                var found = searcher.CreateQuery().Id((string)node.Attribute("id")).Execute();
 
                 Assert.AreEqual(0, found.TotalItemCount);
             }

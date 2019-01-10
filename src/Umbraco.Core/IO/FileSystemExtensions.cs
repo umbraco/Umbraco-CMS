@@ -65,5 +65,33 @@ namespace Umbraco.Core.IO
             }
             fs.DeleteFile(tempFile);
         }
+
+        /// <summary>
+        /// Unwraps a filesystem.
+        /// </summary>
+        /// <remarks>
+        /// <para>A filesystem can be wrapped in a <see cref="FileSystemWrapper"/> (public) or a <see cref="ShadowWrapper"/> (internal),
+        /// and this method deals with the various wrappers and </para>
+        /// </remarks>
+        public static IFileSystem Unwrap(this IFileSystem filesystem)
+        {
+            var unwrapping = true;
+            while (unwrapping)
+            {
+                switch (filesystem)
+                {
+                    case FileSystemWrapper wrapper:
+                        filesystem = wrapper.InnerFileSystem;
+                        break;
+                    case ShadowWrapper shadow:
+                        filesystem = shadow.InnerFileSystem;
+                        break;
+                    default:
+                        unwrapping = false;
+                        break;
+                }
+            }
+            return filesystem;
+        }
     }
 }

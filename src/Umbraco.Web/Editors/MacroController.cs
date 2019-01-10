@@ -136,7 +136,7 @@ namespace Umbraco.Web.Editors
             var legacyPage = new global::umbraco.page(doc, _variationContextAccessor);
 
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
-            UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
+            UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
 
             var renderer = new UmbracoComponentRenderer(UmbracoContext);
 

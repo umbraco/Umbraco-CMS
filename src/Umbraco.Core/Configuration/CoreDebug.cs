@@ -2,16 +2,6 @@
 
 namespace Umbraco.Core.Configuration
 {
-    internal static class CoreDebugExtensions
-    {
-        private static CoreDebug _coreDebug;
-
-        public static CoreDebug CoreDebug(this UmbracoConfig config)
-        {
-            return _coreDebug ?? (_coreDebug = new CoreDebug());
-        }
-    }
-
     internal class CoreDebug
     {
         public CoreDebug()

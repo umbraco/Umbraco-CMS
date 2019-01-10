@@ -26,7 +26,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static ContentType CreateTextpageContentType(string alias = "textPage", string name = "Text Page")
+        public static ContentType CreateTextPageContentType(string alias = "textPage", string name = "Text Page")
         {
             var contentType = new ContentType(-1)
                                   {

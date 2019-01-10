@@ -1,5 +1,4 @@
-﻿using System;
-namespace umbraco.cms.businesslogic.packager{
+﻿namespace Umbraco.Web._Legacy.Packager.PackageInstance{
     public interface IPackageInstance {
         string Actions { get; set; }
         string Author { get; set; }

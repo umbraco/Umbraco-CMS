@@ -47,7 +47,17 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
-            currentRouteParams = angular.copy(current.params); //store this so we can reference it in $routeUpdate
+            var toRetain = currentRouteParams ? navigationService.retainQueryStrings(currentRouteParams, current.params) : null;
+
+            //if toRetain is not null it means that there are missing query strings and we need to update the current params
+            if (toRetain) {
+                $route.updateParams(toRetain);
+                currentRouteParams = toRetain;
+            }
+            else {
+                currentRouteParams = angular.copy(current.params); 
+            }
+
 
             var deployConfig = Umbraco.Sys.ServerVariables.deploy;
             var deployEnv, deployEnvTitle;
@@ -122,25 +132,33 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 $route.reload();
             }
             else {
-                
+
+                var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
+
+                //if toRetain is not null it means that there are missing query strings and we need to update the current params
+                if (toRetain) {
+                    $route.updateParams(toRetain);
+                }
+
                 //check if the location being changed is only due to global/state query strings which means the location change
                 //isn't actually going to cause a route change.
-                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
-                    //The location change will cause a route change. We need to ensure that the global/state
-                    //query strings have not been stripped out. If they have, we'll re-add them and re-route.
+                if (!toRetain && navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
 
-                    var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
-                    if (toRetain) {
-                        $route.updateParams(toRetain);
-                    }
-                    else {
-                        //continue the route
-                        $route.reload();
-                    }
+                    //The location change will cause a route change, continue the route if the query strings haven't been updated.
+                    $route.reload();
+
                 }
                 else {
+
                     //navigation is not changing but we should update the currentRouteParams to include all current parameters
-                    currentRouteParams = angular.copy(next.params); 
+
+                    if (toRetain) {
+                        currentRouteParams = toRetain;
+                    }
+                    else {
+                        currentRouteParams = angular.copy(next.params); 
+                    }
+                    
                 }
             }
         });

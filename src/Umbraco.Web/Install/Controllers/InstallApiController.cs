@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
@@ -18,18 +17,18 @@ namespace Umbraco.Web.Install.Controllers
     public class InstallApiController : ApiController
     {
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly ProfilingLogger _proflog;
+        private readonly IProfilingLogger _proflog;
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
 
-        public InstallApiController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, ProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps)
+        public InstallApiController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, IProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             InstallHelper = installHelper;
-            _logger = _proflog.Logger;
+            _logger = _proflog;
         }
 
         /// <summary>
@@ -41,7 +40,7 @@ namespace Umbraco.Web.Install.Controllers
 
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
-            var canConnect = _databaseBuilder.CheckConnection(model.DatabaseType.ToString(), model.ConnectionString, model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
+            var canConnect = _databaseBuilder.CanConnect(model.DatabaseType.ToString(), model.ConnectionString, model.Server, model.DatabaseName, model.Login, model.Password, model.IntegratedAuth);
             return canConnect;
         }
 

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Cache.DistributedCache
 {
@@ -20,14 +24,17 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [SetUp]
         public void Setup()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var register = RegisterFactory.Create();
 
-            container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
-            container.Register<IServerMessenger>(_ => new TestServerMessenger(), new PerContainerLifetime());
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
-            container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            composition.RegisterUnique<IServerRegistrar>(_ => new TestServerRegistrar());
+            composition.RegisterUnique<IServerMessenger>(_ => new TestServerMessenger());
+
+            composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
+
+            Current.Factory = composition.CreateFactory();
 
             _distributedCache = new Umbraco.Web.Cache.DistributedCache();
         }

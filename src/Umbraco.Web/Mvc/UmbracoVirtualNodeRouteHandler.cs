@@ -4,14 +4,15 @@ using System.Web.Routing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using LightInject;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
         // todo - try lazy property injection?
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Container.GetInstance<PublishedRouter>();
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
 
         /// <summary>
         /// Returns the UmbracoContext for this route handler

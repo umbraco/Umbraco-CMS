@@ -13,7 +13,7 @@
     <key alias="createPackage">צור חבילה</key>
     <key alias="delete">מחק</key>
     <key alias="disable">נטרל</key>
-    <key alias="emptyTrashcan">רוקן סל מיחזור</key>
+    <key alias="emptyRecycleBin">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
     <key alias="importDocumentType">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>
@@ -159,7 +159,6 @@
     <key alias="closeThisWindow">סגור חלון זה</key>
     <key alias="confirmdelete">האם הינך בטוח שברצונך למחוק זאת?</key>
     <key alias="confirmdisable">האם הינך בטוח שברצונך לכבות זאת?</key>
-    <key alias="confirmEmptyTrashcan">סמן תיבה זו לאשר מחיקה סופית של %0% פריט/ים</key>
     <key alias="confirmlogout">האם הינך בטוח?</key>
     <key alias="confirmSure">האם אתה בטוח?</key>
     <key alias="cut">גזור</key>

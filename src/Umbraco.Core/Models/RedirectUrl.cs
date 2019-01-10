@@ -28,12 +28,14 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo ContentIdSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, int>(x => x.ContentId);
             public readonly PropertyInfo ContentKeySelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, Guid>(x => x.ContentKey);
             public readonly PropertyInfo CreateDateUtcSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, DateTime>(x => x.CreateDateUtc);
+            public readonly PropertyInfo CultureSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, string>(x => x.Culture);
             public readonly PropertyInfo UrlSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, string>(x => x.Url);
         }
 
         private int _contentId;
         private Guid _contentKey;
         private DateTime _createDateUtc;
+        private string _culture;
         private string _url;
 
         /// <inheritdoc />
@@ -55,6 +57,13 @@ namespace Umbraco.Core.Models
         {
             get {  return _createDateUtc; }
             set { SetPropertyValueAndDetectChanges(value, ref _createDateUtc, Ps.Value.CreateDateUtcSelector); }
+        }
+
+        /// <inheritdoc />
+        public string Culture
+        {
+            get { return _culture; }
+            set { SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector); }
         }
 
         /// <inheritdoc />

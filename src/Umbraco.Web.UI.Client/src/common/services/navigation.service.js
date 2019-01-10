@@ -30,12 +30,6 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
     var nonRoutingQueryStrings = ["mculture", "cculture"];
     var retainedQueryStrings = ['mculture'];
 
-    //used to track the current dialog object
-    var currentDialog = null;
-        
-    //tracks the user profile dialog
-    var userDialog = null;
-
     function setMode(mode) {
         switch (mode) {
         case 'tree':
@@ -59,6 +53,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", true);
+            appState.setMenuState("allowHideMenuDialog", true);
             break;
         case 'search':
             appState.setGlobalState("navMode", "search");
@@ -72,6 +67,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
             appState.setGlobalState("navMode", "default");
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
+            appState.setMenuState("allowHideMenuDialog", true);
             appState.setSectionState("showSearchResults", false);
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
@@ -287,7 +283,7 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
             appState.setGlobalState("showTray", false);
         },
 
-        /**
+        /**     
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService
@@ -577,6 +573,22 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
         },
 
         /**
+          * @ngdoc method
+          * @name umbraco.services.navigationService#allowHideDialog
+          * @methodOf umbraco.services.navigationService
+          *
+          * @param {boolean} allow false if the navigation service should disregard instructions to hide the current dialog, true otherwise
+          * @description
+          * instructs the navigation service whether it's allowed to hide the current dialog
+          */
+        allowHideDialog: function (allow) {
+            if (appState.getGlobalState("navMode") !== "dialog") {
+                return;
+            }
+            appState.setMenuState("allowHideMenuDialog", allow);
+        },
+
+        /**
 	     * @ngdoc method
 	     * @name umbraco.services.navigationService#hideDialog
 	     * @methodOf umbraco.services.navigationService
@@ -585,7 +597,9 @@ function navigationService($routeParams, $location, $q, $timeout, $injector, eve
 	     * hides the currently open dialog
 	     */
         hideDialog: function (showMenu) {
-
+            if (appState.getMenuState("allowHideMenuDialog") === false) {
+                return;
+            }
             if (showMenu) {
                 this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             } else {

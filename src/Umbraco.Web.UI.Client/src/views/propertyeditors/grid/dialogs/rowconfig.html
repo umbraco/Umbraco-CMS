@@ -72,8 +72,7 @@
                       <label>
                           <input type="checkbox"
                               ng-model="currentCell.allowAll"
-                              ng-checked="currentCell.allowed === undefined"
-                              ng-change="toggleCollection(currentCell.allowed, currentCell.allowAll)" />
+                              ng-change="toggleAllowed(currentCell)" />
                               <localize key="grid_allowAllEditors"/>
                       </label>
                   </li>

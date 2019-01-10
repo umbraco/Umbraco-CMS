@@ -19,7 +19,7 @@
                                 <!-- Controls -->
                                 <div ng-repeat="control in area.controls" class="dash-control dash-control-{{control.alias}}">
                                     <div class="dash-inner-control">
-                                        <div ng-bind-html="control.html"></div>
+                                        <div ng-bind-html="control.html | safe_html"></div>
                                     </div>
                                 </div>
                                 <!-- Controls end -->
@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 
 </div>

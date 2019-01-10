@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -20,12 +21,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new MediaTypeRepository((IScopeAccessor) provider, DisabledCache, Logger);
+            return new MediaTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
         {
-            return new EntityContainerRepository((IScopeAccessor) provider, DisabledCache, Logger, Constants.ObjectTypes.MediaTypeContainer);
+            return new EntityContainerRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Constants.ObjectTypes.MediaTypeContainer);
 
         }
 

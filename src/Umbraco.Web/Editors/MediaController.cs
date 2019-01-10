@@ -23,6 +23,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
 using System.Web.Http.Controllers;
+using Umbraco.Core.Composing;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
@@ -99,7 +100,7 @@ namespace Umbraco.Web.Editors
         public MediaItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
             apps[0].Active = true;
             var display = new MediaItemDisplay
             {
@@ -426,7 +427,7 @@ namespace Umbraco.Web.Editors
             var toMove = ValidateMoveOrCopy(move);
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
-            
+
             var moveResult = Services.MediaService.Move(toMove, move.ParentId);
 
             if (sourceParentID == destinationParentID)
@@ -483,8 +484,9 @@ namespace Umbraco.Web.Editors
             MapPropertyValuesForPersistence<IMedia, MediaItemSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
-                (save, property) => property.GetValue(),        //get prop val
-                (save, property, v) => property.SetValue(v));   //set prop val
+                (save, property) => property.GetValue(), //get prop val
+                (save, property, v) => property.SetValue(v), //set prop val
+                null); // media are all invariant
 
             //We need to manually check the validation results here because:
             // * We still need to save the entity even if there are validation value errors
@@ -543,7 +545,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-        
+
         /// <summary>
         /// Empties the recycle bin
         /// </summary>
@@ -596,11 +598,11 @@ namespace Umbraco.Web.Editors
                 throw;
             }
         }
-        
+
         public MediaItemDisplay PostAddFolder(PostedFolder folder)
         {
             var intParentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
-            
+
             var mediaService = Services.MediaService;
 
             var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
@@ -640,10 +642,10 @@ namespace Umbraco.Web.Editors
             //get the string json from the request
             string currentFolderId = result.FormData["currentFolder"];
             int parentId = GetParentIdAsInt(currentFolderId, validatePermissions: true);
-           
+
             var tempFiles = new PostedFiles();
             var mediaService = Services.MediaService;
-            
+
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (result.FormData.ContainsKey("path"))
             {
@@ -701,13 +703,13 @@ namespace Umbraco.Web.Editors
                 var safeFileName = fileName.ToSafeFileName();
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (UmbracoConfig.For.UmbracoSettings().Content.IsFileAllowedForUpload(ext))
+                if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext))
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
+                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }

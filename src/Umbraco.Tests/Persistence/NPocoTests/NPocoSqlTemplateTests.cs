@@ -27,15 +27,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 .From("zbThing1")
                 .Where("id=@id", new { id = SqlTemplate.Arg("id") })).Sql(new { id = 1 });
 
-            sql.WriteToConsole();
-
             var sql2 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(1);
 
-            sql2.WriteToConsole();
-
             var sql3 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(new { id = 1 });
-
-            sql3.WriteToConsole();
         }
 
         [Test]
@@ -75,8 +69,8 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             Assert.AreEqual(1, sql.Arguments.Length);
             Assert.AreEqual(123, sql.Arguments[0]);
 
-            Assert.Throws<InvalidOperationException>(() => template.Sql(new { xvalue = 123 }).WriteToConsole());
-            Assert.Throws<InvalidOperationException>(() => template.Sql(new { value = 123, xvalue = 456 }).WriteToConsole());
+            Assert.Throws<InvalidOperationException>(() => template.Sql(new { xvalue = 123 }));
+            Assert.Throws<InvalidOperationException>(() => template.Sql(new { value = 123, xvalue = 456 }));
 
             var i = 666;
 
@@ -121,8 +115,8 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             Assert.AreEqual(1, sql.Arguments.Length);
             Assert.AreEqual(123, sql.Arguments[0]);
 
-            Assert.Throws<InvalidOperationException>(() => template.Sql(new { j = 123 }).WriteToConsole());
-            Assert.Throws<InvalidOperationException>(() => template.Sql(new { i = 123, j = 456 }).WriteToConsole());
+            Assert.Throws<InvalidOperationException>(() => template.Sql(new { j = 123 }));
+            Assert.Throws<InvalidOperationException>(() => template.Sql(new { i = 123, j = 456 }));
 
             // now with more arguments
 

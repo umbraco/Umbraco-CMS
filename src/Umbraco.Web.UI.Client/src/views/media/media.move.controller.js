@@ -3,8 +3,16 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
     function ($scope, userService, eventsService, mediaResource, appState, treeService, navigationService) {
 
 	    $scope.dialogTreeApi = {};
-	    var node = $scope.currentNode;
+        $scope.source = _.clone($scope.currentNode);
 
+        $scope.busy = false;
+        $scope.searchInfo = {
+            searchFromId: null,
+            searchFromName: null,
+            showSearch: false,
+            results: [],
+            selectedSearchResults: []
+        }
         $scope.treeModel = {
             hideHeader: false
         }
@@ -13,8 +21,8 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
         });
 
         function treeLoadedHandler(args) {
-            if (node && node.path) {
-                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
+            if ($scope.source && $scope.source.path) {
+                $scope.dialogTreeApi.syncTree({ path: $scope.source.path, activate: false });
             }
         }
 
@@ -52,10 +60,28 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
         $scope.close = function() {
             navigationService.hideDialog();
         };
+        $scope.hideSearch = function () {
+            $scope.searchInfo.showSearch = false;
+            $scope.searchInfo.searchFromId = null;
+            $scope.searchInfo.searchFromName = null;
+            $scope.searchInfo.results = [];
+        }
+
+        // method to select a search result 
+        $scope.selectResult = function (evt, result) {
+            result.selected = result.selected === true ? false : true;
+            nodeSelectHandler({ event: evt, node: result });
+        };
+
+        //callback when there are search results 
+        $scope.onSearchResults = function (results) {
+            $scope.searchInfo.results = results;
+            $scope.searchInfo.showSearch = true;
+        };
 
 	    $scope.move = function () {
 	        $scope.busy = true;
-	        mediaResource.move({ parentId: $scope.target.id, id: node.id })
+            mediaResource.move({ parentId: $scope.target.id, id: $scope.source.id })
                 .then(function (path) {
 	                $scope.busy = false;
                     $scope.error = false;
@@ -83,11 +109,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
                     $scope.error = err;
                 });
 	    };
-        
+
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
 			node.selected = node.selected === true ? false : true;
-			nodeSelectHandler({}, { node: node });
+			nodeSelectHandler({ node: node });
 		};
 
 		$scope.closeMiniListView = function () {
