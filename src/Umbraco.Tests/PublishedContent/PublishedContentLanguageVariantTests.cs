@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -59,9 +60,9 @@ namespace Umbraco.Tests.PublishedContent
 
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
-            var prop1Type = factory.CreatePropertyType("prop1", 1);
-            var welcomeType = factory.CreatePropertyType("welcomeText", 1);
-            var welcome2Type = factory.CreatePropertyType("welcomeText2", 1);
+            var prop1Type = factory.CreatePropertyType("prop1", 1, variations: ContentVariation.Culture);
+            var welcomeType = factory.CreatePropertyType("welcomeText", 1, variations: ContentVariation.Culture);
+            var welcome2Type = factory.CreatePropertyType("welcomeText2", 1, variations: ContentVariation.Culture);
             var props = new[]
                 {
                     prop1Type,
@@ -214,7 +215,9 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Can_Get_Content_With_Recursive_Priority()
         {
+            Current.VariationContextAccessor.VariationContext = new VariationContext("nl");
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+
             var value = content.Value("welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
             // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
