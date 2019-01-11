@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -117,6 +118,7 @@ namespace Umbraco.Web.Models.PublishedContent
             // looking at languages at each level - should someone need it... they'll have
             // to implement it.
 
+
             foreach (var f in fallback)
             {
                 switch (f)
@@ -131,13 +133,28 @@ namespace Umbraco.Web.Models.PublishedContent
                             return true;
                         break;
                     case Fallback.Ancestors:
-                        if (TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out value))
+                        IPublishedProperty noValueProperty;
+                        if (TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out value,
+                            out noValueProperty))
+                        {
                             return true;
+                        }
+
+                        // if we found a property, even though with no value, return that property value
+                        // because the converter may want to handle the missing value. ie if defaultValue is default,
+                        // either specified or by default, the converter may want to substitute something else.
+                        if (noValueProperty != null)
+                        {
+                            value = noValueProperty.Value<T>(culture, segment, fallback.Contains(Fallback.DefaultValue) ? Fallback.ToDefaultValue : Fallback.To(), defaultValue: defaultValue);
+                            return true;
+                        }
                         break;
                     default:
                         throw NotSupportedFallbackMethod(f, "content");
                 }
             }
+
+
 
             value = defaultValue;
             return false;
@@ -149,13 +166,23 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, recursing the tree
-        private static bool TryGetValueWithRecursiveFallback<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value)
+        private bool TryGetValueWithRecursiveFallback<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value, out IPublishedProperty noValueProperty)
         {
             IPublishedProperty property = null; // if we are here, content's property has no value
-            IPublishedProperty noValueProperty = null;
+            noValueProperty = null;
             do
             {
                 content = content.Parent;
+
+                var propertyType = content?.ContentType.GetPropertyType(alias);
+
+                if (propertyType != null)
+                {
+                    culture = null;
+                    segment = null;
+                    _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+                }
+
                 property = content?.GetProperty(alias);
                 if (property != null)
                 {
@@ -171,14 +198,6 @@ namespace Umbraco.Web.Models.PublishedContent
                 return true;
             }
 
-            // if we found a property, even though with no value, return that property value
-            // because the converter may want to handle the missing value. ie if defaultValue is default,
-            // either specified or by default, the converter may want to substitute something else.
-            if (noValueProperty != null)
-            {
-                value = noValueProperty.Value<T>(culture, segment, defaultValue: defaultValue);
-                return true;
-            }
 
             value = defaultValue;
             return false;
