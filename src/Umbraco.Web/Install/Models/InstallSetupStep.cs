@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Install.Models
@@ -14,17 +15,14 @@ namespace Umbraco.Web.Install.Models
         /// Defines the step model type on the server side so we can bind it
         /// </summary>
         [IgnoreDataMember]
-        public override Type StepType
-        {
-            get { return typeof(T); }
-        }
+        public override Type StepType => typeof(T);
 
         /// <summary>
         /// The step execution method
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public abstract InstallSetupResult Execute(T model);
+        public abstract Task<InstallSetupResult> ExecuteAsync(T model);
 
         /// <summary>
         /// Determines if this step needs to execute based on the current state of the application and/or install process
@@ -86,10 +84,6 @@ namespace Umbraco.Web.Install.Models
         public abstract Type StepType { get; }
 
         [IgnoreDataMember]
-        public bool HasUIElement
-        {
-            get { return View.IsNullOrWhiteSpace() == false; }
-        }
-
+        public bool HasUIElement => View.IsNullOrWhiteSpace() == false;
     }
 }

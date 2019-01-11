@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -16,8 +18,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Xml;
-using Umbraco.Web._Legacy.Packager.PackageInstance;
 using File = System.IO.File;
 
 namespace Umbraco.Web._Legacy.Packager
@@ -66,16 +66,6 @@ namespace Umbraco.Web._Legacy.Packager
         public bool ContainsTemplateConflicts { get; private set; }
         public IDictionary<string, string> ConflictingTemplateAliases => _conflictingTemplateAliases;
 
-        /// <summary>
-        /// Indicates that the package contains assembly reference errors
-        /// </summary>
-        public bool ContainsBinaryFileErrors { get; private set; }
-
-        /// <summary>
-        /// List each assembly reference error
-        /// </summary>
-        public List<string> BinaryFileErrors { get; } = new List<string>();
-
         public bool ContainsStyleSheeConflicts { get; private set; }
         public IDictionary<string, string> ConflictingStyleSheetNames => _conflictingStyleSheetNames;
 
@@ -88,9 +78,9 @@ namespace Umbraco.Web._Legacy.Packager
         public string IconUrl { get; private set; }
 
         /// <summary>
-        /// The xmldocument, describing the contents of a package.
+        /// The xml of the compiled package
         /// </summary>
-        public XmlDocument Config { get; private set; }
+        public XDocument Config { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -108,7 +98,6 @@ namespace Umbraco.Web._Legacy.Packager
 
         private void Initialize()
         {
-            ContainsBinaryFileErrors = false;
             ContainsTemplateConflicts = false;
             ContainsUnsecureFiles = false;
             ContainsMacroConflict = false;
@@ -136,7 +125,6 @@ namespace Umbraco.Web._Legacy.Packager
         /// <param name="iconUrl"></param>
         public Installer(string name, string version, string url, string license, string licenseUrl, string author, string authorUrl, int requirementsMajor, int requirementsMinor, int requirementsPatch, string readme, string control, RequirementsType requirementsType, string iconUrl)
         {
-            ContainsBinaryFileErrors = false;
             ContainsTemplateConflicts = false;
             ContainsUnsecureFiles = false;
             ContainsMacroConflict = false;
@@ -209,54 +197,46 @@ namespace Umbraco.Web._Legacy.Packager
             return Import(inputFile, true);
         }
 
-        public int CreateManifest(string tempDir, Guid guid, string repoGuid)
+        public int CreateManifest(Guid guid)
         {
             //This is the new improved install rutine, which chops up the process into 3 steps, creating the manifest, moving files, and finally handling umb objects
-            var packName = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/name"));
-            var packAuthor = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/name"));
-            var packAuthorUrl = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/website"));
-            var packVersion = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/version"));
-            var packReadme = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/readme"));
-            var packLicense = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
-            var packUrl = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/url "));
-            var iconUrl = XmlHelper.GetNodeValue(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl"));
 
-            var enableSkins = false;
-            var skinRepoGuid = "";
+            var parser = new CompiledPackageXmlParser();
+            var def = parser.ToCompiledPackage(Config);
 
-            if (Config.DocumentElement.SelectSingleNode("/umbPackage/enableSkins") != null)
+            //create a new entry in the installedPackages.config
+            var installedPackage = new PackageDefinition
             {
-                var skinNode = Config.DocumentElement.SelectSingleNode("/umbPackage/enableSkins");
-                enableSkins = bool.Parse(XmlHelper.GetNodeValue(skinNode));
-                if (skinNode.Attributes["repository"] != null && string.IsNullOrEmpty(skinNode.Attributes["repository"].Value) == false)
-                    skinRepoGuid = skinNode.Attributes["repository"].Value;
-            }
+                Author = def.Author,
+                AuthorUrl = def.AuthorUrl,
+                Control = def.Control,
+                IconUrl = def.IconUrl,
+                License = def.License,
+                LicenseUrl = def.LicenseUrl,
+                Name = def.Name,
+                Readme = def.Readme,
+                UmbracoVersion = def.UmbracoVersion,
+                Url = def.Url,
+                Version = def.Version,
+                PackageId = guid
+            };
 
-            //Create a new package instance to record all the installed package adds - this is the same format as the created packages has.
-            //save the package meta data
-            var insPack = InstalledPackage.MakeNew(packName);
-            insPack.Data.Author = packAuthor;
-            insPack.Data.AuthorUrl = packAuthorUrl;
-            insPack.Data.Version = packVersion;
-            insPack.Data.Readme = packReadme;
-            insPack.Data.License = packLicense;
-            insPack.Data.Url = packUrl;
-            insPack.Data.IconUrl = iconUrl;
+            if (!Current.Services.PackagingService.SaveInstalledPackage(installedPackage))
+                throw new InvalidOperationException("Could not save package definition");
 
-            insPack.Data.PackageId = guid; //the package unique key.
-            insPack.Save();
-
-            return insPack.Data.Id;
+            return installedPackage.Id;
         }
 
         public void InstallFiles(int packageId, string tempDir)
         {
+            var parser = new CompiledPackageXmlParser();
+
             using (Current.ProfilingLogger.DebugDuration<Installer>(
                 "Installing package files for package id " + packageId + " into temp folder " + tempDir,
                 "Package file installation complete for package id " + packageId))
             {
                 //retrieve the manifest to continue installation
-                var insPack = InstalledPackage.GetById(packageId);
+                var insPack = Current.Services.PackagingService.GetInstalledPackageById(packageId);
 
                 //TODO: Depending on some files, some files should be installed differently.
                 //i.e. if stylsheets should probably be installed via business logic, media items should probably use the media IFileSystem!
@@ -265,13 +245,15 @@ namespace Umbraco.Web._Legacy.Packager
                 //string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
                 string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
 
+                var def = parser.ToCompiledPackage(Config);
+
                 try
                 {
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+                    foreach (var f in def.Files)
                     {
-                        var destPath = GetFileName(basePath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
-                        var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
-                        var destFile = GetFileName(destPath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                        var destPath = GetFileName(basePath, f.OriginalPath);
+                        var sourceFile = GetFileName(tempDir, f.UniqueFileName);
+                        var destFile = GetFileName(destPath, f.OriginalName);
 
                         // Create the destination directory if it doesn't exist
                         if (Directory.Exists(destPath) == false)
@@ -300,14 +282,14 @@ namespace Umbraco.Web._Legacy.Packager
                         File.Copy(sourceFile, destFile);
 
                         //PPH log file install
-                        insPack.Data.Files.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                        insPack.Files.Add(f.OriginalPath.EnsureEndsWith('/') + f.OriginalName);
 
                     }
 
                     // Once we're done copying, remove all the files
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+                    foreach (var f in def.Files)
                     {
-                        var sourceFile = GetFileName(tempDir, XmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
+                        var sourceFile = GetFileName(tempDir, f.UniqueFileName);
                         if (File.Exists(sourceFile))
                             File.Delete(sourceFile);
                     }
@@ -323,10 +305,10 @@ namespace Umbraco.Web._Legacy.Packager
                 {
                     Current.Services.AuditService.Add(AuditType.PackagerInstall,
                         _currentUserId,
-                        -1, "Package", string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageId));
+                        -1, "Package", string.Format("Package '{0}' installed. Package guid: {1}", insPack.Name, insPack.PackageId));
                 }
 
-                insPack.Save();
+                Current.Services.PackagingService.SaveInstalledPackage(insPack);
             }
         }
 
@@ -336,11 +318,11 @@ namespace Umbraco.Web._Legacy.Packager
                 "Installing business logic for package id " + packageId + " into temp folder " + tempDir,
                 "Package business logic installation complete for package id " + packageId))
             {
-                InstalledPackage insPack;
+                PackageDefinition insPack;
                 try
                 {
                     //retrieve the manifest to continue installation
-                    insPack = InstalledPackage.GetById(packageId);
+                    insPack = Current.Services.PackagingService.GetInstalledPackageById(packageId);
                     //bool saveNeeded = false;
 
                     // Get current user, with a fallback
@@ -348,9 +330,7 @@ namespace Umbraco.Web._Legacy.Packager
 
                     //TODO: Get rid of this entire class! Until then all packages will be installed by the admin user
 
-
-                    //Xml as XElement which is used with the new PackagingService
-                    var rootElement = Config.DocumentElement.GetXElement();
+                    var rootElement = Config.Root;
                     var packagingService = Current.Services.PackagingService;
 
                     //Perhaps it would have been a good idea to put the following into methods eh?!?
@@ -362,7 +342,7 @@ namespace Umbraco.Web._Legacy.Packager
                         var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
                         foreach (var dataTypeDefinition in dataTypeDefinitions)
                         {
-                            insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                            insPack.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                     #endregion
@@ -373,7 +353,7 @@ namespace Umbraco.Web._Legacy.Packager
                     {
                         var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
                         foreach(var x in insertedLanguages.Select(l => l.Id.ToString(CultureInfo.InvariantCulture)))
-                            insPack.Data.Languages.Add(x);
+                            insPack.Languages.Add(x);
                     }
 
                     #endregion
@@ -384,7 +364,7 @@ namespace Umbraco.Web._Legacy.Packager
                     {
                         var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
                         foreach (var x in insertedDictionaryItems.Select(d => d.Id.ToString(CultureInfo.InvariantCulture)))
-                            insPack.Data.DictionaryItems.Add(x);
+                            insPack.DictionaryItems.Add(x);
                     }
                     #endregion
 
@@ -394,7 +374,7 @@ namespace Umbraco.Web._Legacy.Packager
                     {
                         var insertedMacros = packagingService.ImportMacros(macroItemsElement);
                         foreach (var x in insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)))
-                            insPack.Data.Macros.Add(x);
+                            insPack.Macros.Add(x);
 
                     }
                     #endregion
@@ -406,7 +386,7 @@ namespace Umbraco.Web._Legacy.Packager
                         var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
                         foreach (var template in templates)
                         {
-                            insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
+                            insPack.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                     #endregion
@@ -423,32 +403,35 @@ namespace Umbraco.Web._Legacy.Packager
                         var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
                         foreach (var contentType in contentTypes)
                         {
-                            insPack.Data.DocumentTypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
+                            insPack.DocumentTypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
                             //saveNeeded = true;
                         }
                     }
                     #endregion
 
                     #region Stylesheets
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
+                    foreach (var n in Config.Root.XPathSelectElements("Stylesheets/Stylesheet"))
                     {
-                        //StyleSheet s = StyleSheet.Import(n, currentUser);
+                        string stylesheetName = n.Element("Name")?.Value;
+                        if (stylesheetName.IsNullOrWhiteSpace()) continue;
 
-
-                        string stylesheetName = XmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
-                        //StyleSheet s = GetByName(stylesheetName);
                         var s = Current.Services.FileService.GetStylesheetByName(stylesheetName);
                         if (s == null)
                         {
-                            s = new Stylesheet(XmlHelper.GetNodeValue(n.SelectSingleNode("FileName"))) { Content = XmlHelper.GetNodeValue(n.SelectSingleNode("Content")) };
+                            var fileName = n.Element("FileName")?.Value;
+                            if (fileName == null) continue;
+                            var content = n.Element("Content")?.Value;
+                            if (content == null) continue;
+
+                            s = new Stylesheet(fileName) { Content = content };
                             Current.Services.FileService.SaveStylesheet(s);
                         }
 
-                        foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
+                        foreach (var prop in n.XPathSelectElements("Properties/Property"))
                         {
-                            string alias = XmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
+                            string alias = prop.Element("Alias")?.Value;
                             var sp = s.Properties.SingleOrDefault(p => p != null && p.Alias == alias);
-                            string name = XmlHelper.GetNodeValue(prop.SelectSingleNode("Name"));
+                            string name = prop.Element("Name")?.Value;
                             if (sp == null)
                             {
                                 //sp = StylesheetProperty.MakeNew(
@@ -472,7 +455,7 @@ namespace Umbraco.Web._Legacy.Packager
                                 }
                             }
                             sp.Alias = alias;
-                            sp.Value = XmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
+                            sp.Value = prop.Element("Value")?.Value;
                         }
                         //s.saveCssToFile();
                         Current.Services.FileService.SaveStylesheet(s);
@@ -480,7 +463,7 @@ namespace Umbraco.Web._Legacy.Packager
 
 
 
-                        insPack.Data.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
+                        insPack.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
                         //saveNeeded = true;
                     }
 
@@ -493,33 +476,34 @@ namespace Umbraco.Web._Legacy.Packager
                     {
                         var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
                         var firstContentItem = content.First();
-                        insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
+                        insPack.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
                     }
                     #endregion
 
                     #region Package Actions
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Actions/Action"))
+                    foreach (var n in Config.Root.XPathSelectElements("Actions/Action"))
                     {
-                        if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
+                        var undo = n.AttributeValue<string>("undo");
+                        if (undo == null || undo == "true")
                         {
-                            insPack.Data.Actions += n.OuterXml;
+                            insPack.Actions += n.ToString();
                         }
 
                         //Run the actions tagged only for 'install'
+                        var runat = n.AttributeValue<string>("runat");
 
-                        if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
+                        if (runat != null && runat == "install")
                         {
-                            var alias = n.Attributes["alias"] != null ? n.Attributes["alias"].Value : "";
-
+                            var alias = n.AttributeValue<string>("alias");
                             if (alias.IsNullOrWhiteSpace() == false)
                             {
-                                Current.PackageActionRunner.RunPackageAction(insPack.Data.Name, alias, n);
+                                Current.PackageActionRunner.RunPackageAction(insPack.Name, alias, n);
                             }
                         }
                     }
                     #endregion
 
-                    insPack.Save();
+                    Current.Services.PackagingService.SaveInstalledPackage(insPack);
                 }
                 catch (Exception ex)
                 {
@@ -527,7 +511,6 @@ namespace Umbraco.Web._Legacy.Packager
                     throw;
                 }
 
-                OnPackageBusinessLogicInstalled(insPack);
                 OnPackageInstalled(insPack);
             }
         }
@@ -551,40 +534,35 @@ namespace Umbraco.Web._Legacy.Packager
         /// <param name="tempDir">The folder to which the contents of the package is extracted</param>
         public void LoadConfig(string tempDir)
         {
-            Config = new XmlDocument();
-            Config.Load(tempDir + Path.DirectorySeparatorChar + "package.xml");
+            Config = XDocument.Load(tempDir + Path.DirectorySeparatorChar + "package.xml");
 
-            Name = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/name").FirstChild.Value;
-            Version = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/version").FirstChild.Value;
-            Url = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/url").FirstChild.Value;
-            License = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/license").FirstChild.Value;
-            LicenseUrl = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/license").Attributes.GetNamedItem("url").Value;
+            var parser = new CompiledPackageXmlParser();
+            var def = parser.ToCompiledPackage(Config);
 
-            RequirementsMajor = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/major").FirstChild.Value);
-            RequirementsMinor = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/minor").FirstChild.Value);
-            RequirementsPatch = int.Parse(Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/patch").FirstChild.Value);
+            Name = def.Name;
+            Version = def.Version;
+            Url = def.Url;
+            License = def.License;
+            LicenseUrl = def.LicenseUrl;
 
-            var reqNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements");
-            RequirementsType = reqNode != null && reqNode.Attributes != null && reqNode.Attributes["type"] != null
-                ? Enum<RequirementsType>.Parse(reqNode.Attributes["type"].Value, true)
-                : RequirementsType.Legacy;
-            var iconNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/package/iconUrl");
-            if (iconNode != null && iconNode.FirstChild != null)
-            {
-                IconUrl = iconNode.FirstChild.Value;
-            }
-
-            Author = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/name").FirstChild.Value;
-            AuthorUrl = Config.DocumentElement.SelectSingleNode("/umbPackage/info/author/website").FirstChild.Value;
+            RequirementsMajor = def.UmbracoVersion.Major;
+            RequirementsMinor = def.UmbracoVersion.Minor;
+            RequirementsPatch = def.UmbracoVersion.Build;
+            RequirementsType = def.UmbracoVersionRequirementsType;
+            IconUrl = def.IconUrl;
+            Author = def.Author;
+            AuthorUrl = def.AuthorUrl;
+            ReadMe = def.Readme;
+            Control = def.Control;
 
             var basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
             var dllBinFiles = new List<string>();
 
-            foreach (XmlNode n in Config.DocumentElement.SelectNodes("//file"))
+            foreach (var f in def.Files)
             {
                 var badFile = false;
-                var destPath = GetFileName(basePath, XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
-                var orgName = XmlHelper.GetNodeValue(n.SelectSingleNode("orgName"));
+                var destPath = GetFileName(basePath, f.OriginalPath);
+                var orgName = f.OriginalName;
                 var destFile = GetFileName(destPath, orgName);
 
                 if (destPath.ToLower().Contains(IOHelper.DirSepChar + "app_code"))
@@ -606,7 +584,7 @@ namespace Umbraco.Web._Legacy.Packager
                 if (badFile)
                 {
                     ContainsUnsecureFiles = true;
-                    UnsecureFiles.Add(XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+                    UnsecureFiles.Add(f.OriginalName);
                 }
             }
 
@@ -614,9 +592,9 @@ namespace Umbraco.Web._Legacy.Packager
 
             //this will check for existing macros with the same alias
             //since we will not overwrite on import it's a good idea to inform the user what will be overwritten
-            foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
+            foreach (var n in Config.Root.XPathSelectElements("//macro"))
             {
-                var alias = n.SelectSingleNode("alias").InnerText;
+                var alias = n.Element("alias")?.Value;
                 if (!string.IsNullOrEmpty(alias))
                 {
                     var m = Current.Services.MacroService.GetByAlias(alias);
@@ -631,9 +609,9 @@ namespace Umbraco.Web._Legacy.Packager
                 }
             }
 
-            foreach (XmlNode n in Config.DocumentElement.SelectNodes("Templates/Template"))
+            foreach (var n in Config.Root.XPathSelectElements("Templates/Template"))
             {
-                var alias = n.SelectSingleNode("Alias").InnerText;
+                var alias = n.Element("Alias")?.Value;
                 if (!string.IsNullOrEmpty(alias))
                 {
                     var t = Current.Services.FileService.GetTemplate(alias);
@@ -648,9 +626,9 @@ namespace Umbraco.Web._Legacy.Packager
                 }
             }
 
-            foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
+            foreach (var n in Config.Root.XPathSelectElements("Stylesheets/Stylesheet"))
             {
-                var alias = n.SelectSingleNode("Name").InnerText;
+                var alias = n.Element("Name")?.Value; 
                 if (!string.IsNullOrEmpty(alias))
                 {
                     var s = Current.Services.FileService.GetStylesheetByName(alias);
@@ -665,17 +643,7 @@ namespace Umbraco.Web._Legacy.Packager
                 }
             }
 
-            var readmeNode = Config.DocumentElement.SelectSingleNode("/umbPackage/info/readme");
-            if (readmeNode != null)
-            {
-                ReadMe = XmlHelper.GetNodeValue(readmeNode);
-            }
-
-            var controlNode = Config.DocumentElement.SelectSingleNode("/umbPackage/control");
-            if (controlNode != null)
-            {
-                Control = XmlHelper.GetNodeValue(controlNode);
-            }
+            
         }
 
         /// <summary>
@@ -815,15 +783,8 @@ namespace Umbraco.Web._Legacy.Packager
 
         #endregion
 
-        internal static event EventHandler<InstalledPackage> PackageBusinessLogicInstalled;
 
-        private static void OnPackageBusinessLogicInstalled(InstalledPackage e)
-        {
-            var handler = PackageBusinessLogicInstalled;
-            handler?.Invoke(null, e);
-        }
-
-        private void OnPackageInstalled(InstalledPackage insPack)
+        private void OnPackageInstalled(PackageDefinition insPack)
         {
             // getting an InstallationSummary for sending to the PackagingService.ImportedPackage event
             var fileService = Current.Services.FileService;
@@ -832,12 +793,10 @@ namespace Umbraco.Web._Legacy.Packager
             var dataTypeService = Current.Services.DataTypeService;
             var localizationService = Current.Services.LocalizationService;
 
-            var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
+            var installationSummary = InstallationSummary.FromPackageDefinition(insPack, contentTypeService, dataTypeService, fileService, localizationService, macroService);
             installationSummary.PackageInstalled = true;
 
-            var meta = insPack.GetMetaData();
-
-            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, meta, false);
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, insPack, false);
             PackagingService.OnImportedPackage(args);
         }
     }

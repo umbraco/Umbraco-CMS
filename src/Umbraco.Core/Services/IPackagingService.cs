@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -9,11 +10,25 @@ namespace Umbraco.Core.Services
 {
     public interface IPackagingService : IService
     {
+        #region Installed Packages
+
+        IEnumerable<PackageDefinition> GetAllInstalledPackages();
+        PackageDefinition GetInstalledPackageById(int id);
+        void DeleteInstalledPackage(int packageId, int userId = 0);
+
+        /// <summary>
+        /// Persists a package definition to storage
+        /// </summary>
+        /// <returns></returns>
+        bool SaveInstalledPackage(PackageDefinition definition);
+
+        #endregion
+
         #region Created Packages
 
         IEnumerable<PackageDefinition> GetAllCreatedPackages();
         PackageDefinition GetCreatedPackageById(int id);
-        void DeleteCreatedPackage(int id);
+        void DeleteCreatedPackage(int id, int userId = 0);
 
         /// <summary>
         /// Persists a package definition to storage
@@ -111,6 +126,6 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoVersion"></param>
         /// <param name="userId">The current user id performing the operation</param>
         /// <returns></returns>
-        string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId);
+        Task<string> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId);
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
@@ -10,6 +11,7 @@ using umbraco;
 using Umbraco.Core;
 using Umbraco.Web.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.WebApi;
@@ -28,8 +30,12 @@ namespace Umbraco.Web.Install.Controllers
     [Obsolete("This is only used for the legacy way of installing starter kits in the back office")]
     public class InstallPackageController : ApiController
     {
-        public InstallPackageController()
-        { }
+        private readonly IPackagingService _packagingService;
+
+        public InstallPackageController(IPackagingService packagingService)
+        {
+            _packagingService = packagingService;
+        }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
@@ -49,18 +55,18 @@ namespace Umbraco.Web.Install.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage DownloadPackageFiles(InstallPackageModel model)
+        public async Task<HttpResponseMessage> DownloadPackageFiles(InstallPackageModel model)
         {
-            var packageFile = Current.Services.PackagingService.FetchPackageFile(
+            var packageFile = await _packagingService.FetchPackageFileAsync(
                 model.KitGuid,
                 UmbracoVersion.Current,
                 UmbracoContext.Current.Security.CurrentUser.Id);
 
-            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+            var installer = new _Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(tempFile, model.KitGuid, RepoGuid);
+            var pId = installer.CreateManifest(model.KitGuid);
             return Json(new
                 {
                     success = true,

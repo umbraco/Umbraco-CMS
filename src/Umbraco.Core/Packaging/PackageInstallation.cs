@@ -78,7 +78,7 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        public MetaData GetMetaData(string packageFilePath)
+        public IPackageInfo GetMetaData(string packageFilePath)
         {
             try
             {
@@ -117,14 +117,14 @@ namespace Umbraco.Core.Packaging
             XElement documentSet;
             XElement documents;
             XElement actions;
-            MetaData metaData;
+            IPackageInfo metaData;
             InstallationSummary installationSummary;
 
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFile);
                 PackageSupportedCheck(rootElement);
-                PackageStructureSanetyCheck(packageFile, rootElement);
+                PackageStructureSanityCheck(packageFile, rootElement);
                 dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
                 languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
                 dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryItemsNodeName);
@@ -220,7 +220,7 @@ namespace Umbraco.Core.Packaging
 
         public XElement GetConfigXmlElement(string packageFilePath)
         {
-            XDocument document = GetConfigXmlDoc(packageFilePath);
+            var document = GetConfigXmlDoc(packageFilePath);
             if (document.Root == null ||
                 document.Root.Name.LocalName.Equals(Constants.Packaging.UmbPackageNodeName) == false)
             {
@@ -229,13 +229,7 @@ namespace Umbraco.Core.Packaging
             return document.Root;
         }
 
-        internal void PackageStructureSanetyCheck(string packageFilePath)
-        {
-            XElement rootElement = GetConfigXmlElement(packageFilePath);
-            PackageStructureSanetyCheck(packageFilePath, rootElement);
-        }
-
-        private void PackageStructureSanetyCheck(string packageFilePath, XElement rootElement)
+        private void PackageStructureSanityCheck(string packageFilePath, XElement rootElement)
         {
             XElement filesElement = rootElement.Element(Constants.Packaging.FilesNodeName);
             if (filesElement != null)
@@ -513,7 +507,7 @@ namespace Umbraco.Core.Packaging
             return pathElement.TrimStart(new[] {'\\', '/', '~'}).Replace("/", "\\");
         }
 
-        private MetaData GetMetaData(XElement xRootElement)
+        private IPackageInfo GetMetaData(XElement xRootElement)
         {
             XElement infoElement = xRootElement.Element(Constants.Packaging.InfoNodeName);
 
@@ -535,21 +529,19 @@ namespace Umbraco.Core.Packaging
             var readmeElement = infoElement.XPathSelectElement(Constants.Packaging.ReadmeXpath);
 
             XElement controlElement = xRootElement.Element(Constants.Packaging.ControlNodeName);
-
-            return new MetaData
+            
+            return new PackageDefinition
                    {
                        Name = StringValue(nameElement),
                        Version = StringValue(versionElement),
                        Url = StringValue(urlElement),
                        License = StringValue(licenseElement),
                        LicenseUrl = StringAttribute(licenseElement, Constants.Packaging.PackageLicenseXpathUrlAttribute),
-                       AuthorName = StringValue(authorNameElement),
+                       Author = StringValue(authorNameElement),
                        AuthorUrl = StringValue(authorUrlElement),
                        Readme = StringValue(readmeElement),
                        Control = StringValue(controlElement),
-                       ReqMajor = IntValue(majorElement),
-                       ReqMinor = IntValue(minorElement),
-                       ReqPatch = IntValue(patchElement)
+                       UmbracoVersion = new Version(IntValue(majorElement), IntValue(minorElement), IntValue(patchElement))
                    };
         }
 

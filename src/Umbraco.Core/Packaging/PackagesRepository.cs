@@ -15,7 +15,10 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Packaging
 {
-    internal class CreatedPackagesRepository : ICreatedPackagesRepository
+    /// <summary>
+    /// Manages the storage of installed/created package definitions
+    /// </summary>
+    internal class PackagesRepository : ICreatedPackagesRepository, IInstalledPackagesRepository
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -25,16 +28,37 @@ namespace Umbraco.Core.Packaging
         private readonly ILocalizationService _languageService;
         private readonly IEntityXmlSerializer _serializer;
         private readonly ILogger _logger;
+        private readonly string _packageRepositoryFileName;
         private readonly string _mediaFolderPath;
         private readonly string _packagesFolderPath;
         private readonly string _tempFolderPath;
-        
-        public CreatedPackagesRepository(IContentService contentService, IContentTypeService contentTypeService,
+        private readonly PackageDefinitionXmlParser _parser;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="contentService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="fileService"></param>
+        /// <param name="macroService"></param>
+        /// <param name="languageService"></param>
+        /// <param name="serializer"></param>
+        /// <param name="logger"></param>
+        /// <param name="packageRepositoryFileName">
+        /// The file name for storing the package definitions (i.e. "createdPackages.config")
+        /// </param>
+        /// <param name="tempFolderPath"></param>
+        /// <param name="packagesFolderPath"></param>
+        /// <param name="mediaFolderPath"></param>
+        public PackagesRepository(IContentService contentService, IContentTypeService contentTypeService,
             IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
             ILocalizationService languageService,
             IEntityXmlSerializer serializer, ILogger logger,
+            string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
         {
+            if (string.IsNullOrWhiteSpace(packageRepositoryFileName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageRepositoryFileName));
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _dataTypeService = dataTypeService;
@@ -43,32 +67,38 @@ namespace Umbraco.Core.Packaging
             _languageService = languageService;
             _serializer = serializer;
             _logger = logger;
-            
+            _packageRepositoryFileName = packageRepositoryFileName;
+
             _tempFolderPath = tempFolderPath ?? SystemDirectories.Data + "/TEMP/PackageFiles";
             _packagesFolderPath = packagesFolderPath ?? SystemDirectories.Packages;
             _mediaFolderPath = mediaFolderPath ?? SystemDirectories.Media + "/created-packages";
+
+            _parser = new PackageDefinitionXmlParser(logger);
         }
 
-        private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + "createdPackages.config";
+        private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
 
         public IEnumerable<PackageDefinition> GetAll()
         {
             var packagesXml = EnsureStorage(out _);
+            if (packagesXml?.Root == null)
+                yield break;;
+
             foreach (var packageXml in packagesXml.Root.Elements("package"))
-                yield return XmlToPackageDefinition(packageXml);
+                yield return _parser.ToPackageDefinition(packageXml);
         }
 
         public PackageDefinition GetById(int id)
         {
             var packagesXml = EnsureStorage(out _);
-            var packageXml = packagesXml.Root.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
-            return packageXml == null ? null : XmlToPackageDefinition(packageXml);
+            var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
+            return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
         }
 
         public void Delete(int id)
         {
             var packagesXml = EnsureStorage(out var packagesFile);
-            var packageXml = packagesXml.Root.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
+            var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
             if (packageXml == null) return;
 
             packageXml.Remove();
@@ -81,6 +111,9 @@ namespace Umbraco.Core.Packaging
             if (definition == null) throw new ArgumentNullException(nameof(definition));
 
             var packagesXml = EnsureStorage(out var packagesFile);
+
+            if (packagesXml?.Root == null)
+                return false;
 
             //ensure it's valid
             ValidatePackage(definition);
@@ -97,9 +130,9 @@ namespace Umbraco.Core.Packaging
                 var maxId = packagesXml.Root.Elements("package").Max(x => x.AttributeValue<int?>("id")) ?? 0;
                 var newId = maxId + 1;
                 definition.Id = newId;
-                definition.PackageId = Guid.NewGuid();
+                definition.PackageId = definition.PackageId == default ? Guid.NewGuid() : definition.PackageId;
                 definition.FolderId = Guid.NewGuid();
-                var packageXml = PackageDefinitionToXml(definition);
+                var packageXml = _parser.ToXml(definition);
                 packagesXml.Root.Add(packageXml);
             }
             else
@@ -109,7 +142,7 @@ namespace Umbraco.Core.Packaging
                 if (packageXml == null)
                     return false;
 
-                var updatedXml = PackageDefinitionToXml(definition);
+                var updatedXml = _parser.ToXml(definition);
                 packageXml.ReplaceWith(updatedXml);
             }
             
@@ -154,10 +187,10 @@ namespace Umbraco.Core.Packaging
                     AppendFileToManifest(fileName, temporaryPath, filesXml);
 
                 //Load control on install...
-                if (!string.IsNullOrEmpty(definition.LoadControl))
+                if (!string.IsNullOrEmpty(definition.Control))
                 {
-                    var control = new XElement("control", definition.LoadControl);
-                    AppendFileToManifest(definition.LoadControl, temporaryPath, filesXml);
+                    var control = new XElement("control", definition.Control);
+                    AppendFileToManifest(definition.Control, temporaryPath, filesXml);
                     manifestRoot.Add(control);
                 }
 
@@ -174,7 +207,7 @@ namespace Umbraco.Core.Packaging
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<CreatedPackagesRepository>(e, "Could not add package actions to the package manifest, the xml did not parse");
+                        _logger.Warn<PackagesRepository>(e, "Could not add package actions to the package manifest, the xml did not parse");
                     }
                 }
 
@@ -583,93 +616,9 @@ namespace Umbraco.Core.Packaging
             return packagesXml;
         }
 
-        private static PackageDefinition XmlToPackageDefinition(XElement xml)
-        {
-            if (xml == null) return null;
+        
 
-            var retVal = new PackageDefinition
-            {
-                Id = xml.AttributeValue<int>("id"),
-                Name = xml.AttributeValue<string>("name") ?? string.Empty,
-                FolderId = xml.AttributeValue<Guid>("folder"),
-                PackagePath = xml.AttributeValue<string>("packagePath") ?? string.Empty,
-                Version = xml.AttributeValue<string>("version") ?? string.Empty,
-                Url = xml.AttributeValue<string>("url") ?? string.Empty,
-                PackageId = xml.AttributeValue<Guid>("packageGuid"),
-                IconUrl = xml.AttributeValue<string>("iconUrl") ?? string.Empty,
-                UmbracoVersion = xml.AttributeValue<Version>("umbVersion"),
-                License = xml.Element("license")?.Value ?? string.Empty,
-                LicenseUrl = xml.Element("license")?.AttributeValue<string>("url") ?? string.Empty,
-                Author = xml.Element("author")?.Value ?? string.Empty,
-                AuthorUrl = xml.Element("author")?.AttributeValue<string>("url") ?? string.Empty,
-                Readme = xml.Element("readme")?.Value ?? string.Empty,
-                Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? "<actions></actions>", //take the entire outer xml value
-                ContentNodeId = xml.Element("content")?.AttributeValue<string>("nodeId") ?? string.Empty,
-                ContentLoadChildNodes = xml.Element("content")?.AttributeValue<bool>("loadChildNodes") ?? false,
-                Macros = xml.Element("macros")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Templates = xml.Element("templates")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Stylesheets = xml.Element("stylesheets")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                DocumentTypes = xml.Element("documentTypes")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Languages = xml.Element("languages")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                DictionaryItems = xml.Element("dictionaryitems")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                DataTypes = xml.Element("datatypes")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Files = xml.Element("files")?.Elements("file").Select(x => x.Value).ToList() ?? new List<string>(),
-                LoadControl = xml.Element("loadcontrol")?.Value ?? string.Empty
-            };
-
-            return retVal;
-        }
-
-        private XElement PackageDefinitionToXml(PackageDefinition def)
-        {
-            var actionsXml = new XElement("actions");
-            try
-            {
-                actionsXml = XElement.Parse(def.Actions);
-            }
-            catch (Exception e)
-            {
-                _logger.Warn<CreatedPackagesRepository>(e, "Could not add package actions to the package xml definition, the xml did not parse");
-            }
-
-            var packageXml = new XElement("package",
-                new XAttribute("id", def.Id),
-                new XAttribute("version", def.Version ?? string.Empty),
-                new XAttribute("url", def.Url ?? string.Empty),
-                new XAttribute("name", def.Name ?? string.Empty),
-                new XAttribute("folder", def.FolderId), 
-                new XAttribute("packagePath", def.PackagePath ?? string.Empty),
-                new XAttribute("iconUrl", def.IconUrl ?? string.Empty),
-                new XAttribute("umbVersion", def.UmbracoVersion),
-                new XAttribute("packageGuid", def.PackageId),
-
-                new XElement("license",
-                    new XCData(def.License ?? string.Empty),
-                    new XAttribute("url", def.LicenseUrl ?? string.Empty)),
-
-                new XElement("author",
-                    new XCData(def.Author ?? string.Empty),
-                    new XAttribute("url", def.AuthorUrl ?? string.Empty)),
-
-                new XElement("readme", new XCData(def.Readme ?? string.Empty)),
-                actionsXml,
-                new XElement("datatypes", string.Join(",", def.DataTypes ?? Array.Empty<string>())),
-
-                new XElement("content",
-                    new XAttribute("nodeId", def.ContentNodeId),
-                    new XAttribute("loadChildNodes", def.ContentLoadChildNodes)),
-
-                new XElement("templates", string.Join(",", def.Templates ?? Array.Empty<string>())),
-                new XElement("stylesheets", string.Join(",", def.Stylesheets ?? Array.Empty<string>())),
-                new XElement("documentTypes", string.Join(",", def.DocumentTypes ?? Array.Empty<string>())),
-                new XElement("macros", string.Join(",", def.Macros ?? Array.Empty<string>())),
-                new XElement("files", (def.Files ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("file", x))),
-                new XElement("languages", string.Join(",", def.Languages ?? Array.Empty<string>())),
-                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())),
-                new XElement("loadcontrol", def.LoadControl ?? string.Empty)); //fixme: no more loadcontrol, needs to be an angular view
-
-            return packageXml;
-        }
+        
 
     }
 }

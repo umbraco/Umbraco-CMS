@@ -1134,14 +1134,9 @@
     <Compile Include="_Legacy\PackageActions\addApplication.cs" />
     <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
     <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
-    <Compile Include="_Legacy\PackageActions\addStringToHtmlElement.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
-    <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
-    <Compile Include="_Legacy\Packager\data.cs" />
     <Compile Include="_Legacy\Packager\Installer.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
     <Compile Include="_Legacy\Packager\Settings.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />

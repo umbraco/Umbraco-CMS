@@ -9,8 +9,7 @@ namespace Umbraco.Core.Packaging
         // there are app domain reboots involved so a single method cannot be used. This needs to either be split into several
         // methods or return an object with a callback to proceed to the next step.
         InstallationSummary InstallPackage(string packageFilePath, int userId);
-        MetaData GetMetaData(string packageFilePath);
+        IPackageInfo GetMetaData(string packageFilePath);
         PreInstallWarnings GetPreInstallWarnings(string packageFilePath);
-        XElement GetConfigXmlElement(string packageFilePath);
     }
 }

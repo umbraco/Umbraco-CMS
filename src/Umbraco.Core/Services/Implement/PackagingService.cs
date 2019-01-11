@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core.Collections;
@@ -41,12 +42,11 @@ namespace Umbraco.Core.Services.Implement
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
-        private readonly IScopeProvider _scopeProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
-        private readonly IAuditRepository _auditRepository;
-        private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly IAuditService _auditService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ICreatedPackagesRepository _createdPackages;
+        private readonly IInstalledPackagesRepository _installedPackages;
         private static HttpClient _httpClient;
 
         public PackagingService(
@@ -58,11 +58,10 @@ namespace Umbraco.Core.Services.Implement
             IFileService fileService,
             ILocalizationService localizationService,
             IEntityService entityService,
-            IScopeProvider scopeProvider,
-            IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
+            IAuditService auditService,
             PropertyEditorCollection propertyEditors,
-            ICreatedPackagesRepository createdPackages)
+            ICreatedPackagesRepository createdPackages,
+            IInstalledPackagesRepository installedPackages)
         {
             _logger = logger;
             _contentService = contentService;
@@ -72,20 +71,14 @@ namespace Umbraco.Core.Services.Implement
             _fileService = fileService;
             _localizationService = localizationService;
             _entityService = entityService;
-            _scopeProvider = scopeProvider;
-            _auditRepository = auditRepository;
-            _contentTypeRepository = contentTypeRepository;
+            _auditService = auditService;
             _propertyEditors = propertyEditors;
             _createdPackages = createdPackages;
+            _installedPackages = installedPackages;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
 
-        protected IQuery<T> Query<T>() => _scopeProvider.SqlContext.Query<T>();
-
         #region Content
-
-        
-
 
 
         /// <summary>
@@ -229,43 +222,17 @@ namespace Umbraco.Core.Services.Implement
                 content.Key = key;
             }
 
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            foreach (var property in properties)
             {
-                foreach (var property in properties)
+                string propertyTypeAlias = property.Name.LocalName;
+                if (content.HasProperty(propertyTypeAlias))
                 {
-                    string propertyTypeAlias = property.Name.LocalName;
-                    if (content.HasProperty(propertyTypeAlias))
-                    {
-                        var propertyValue = property.Value;
+                    var propertyValue = property.Value;
 
-                        var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
+                    var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
 
-                        //TODO: It would be heaps nicer if we didn't have to hard code references to specific property editors
-                        // we'd have to modify the packaging format to denote how to parse/store the value instead of relying on this
-
-                        if (propertyType != null)
-                        {
-                            // fixme - wtf is this very specific thing here?!
-                            //if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList)
-                            //{
-
-                            //    //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
-                            //    var database = scope.Database;
-                            //    var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeId });
-
-                            //    var propertyValueList = new List<string>();
-                            //    foreach (var preValue in propertyValue.Split(','))
-                            //    {
-                            //        propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
-                            //    }
-
-                            //    propertyValue = string.Join(",", propertyValueList.ToArray());
-
-                            //}
-                        }
-                        //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue);
-                    }
+                    //set property value
+                    content.SetValue(propertyTypeAlias, propertyValue);
                 }
             }
 
@@ -734,17 +701,12 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                var query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-                var contentType = _contentTypeRepository.Get(query).FirstOrDefault();
+            var contentType = _contentTypeService.Get(contentTypeAlias);
 
-                if (contentType == null)
-                    throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
+            if (contentType == null)
+                throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
 
-                scope.Complete();
-                return contentType;
-            }
+            return contentType;
         }
 
         #endregion
@@ -1165,59 +1127,45 @@ namespace Umbraco.Core.Services.Implement
 
         #region Package Files
 
-        /// <summary>
-        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
-        /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="umbracoVersion"></param>
-        /// /// <param name="userId">The current user id performing the operation</param>
-        /// <returns></returns>
-        public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
+        /// <inheritdoc />
+        public async Task<string> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId)
         {
-            using (var scope = _scopeProvider.CreateScope())
+            //includeHidden = true because we don't care if it's hidden we want to get the file regardless
+            var url = $"{Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
+            byte[] bytes;
+            try
             {
-                //includeHidden = true because we don't care if it's hidden we want to get the file regardless
-                var url = $"{Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
-                byte[] bytes;
-                try
+                if (_httpClient == null)
                 {
-                    if (_httpClient == null)
-                    {
-                        _httpClient = new HttpClient();
-                    }
-                    bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                    _httpClient = new HttpClient();
                 }
-                catch (HttpRequestException ex)
-                {
-                    throw new ConnectionException("An error occuring downloading the package from " + url, ex);
-                }
-
-                //successfull
-                if (bytes.Length > 0)
-                {
-                    var packagePath = IOHelper.MapPath(SystemDirectories.Packages);
-
-                    // Check for package directory
-                    if (Directory.Exists(packagePath) == false)
-                        Directory.CreateDirectory(packagePath);
-
-                    var packageFilePath = Path.Combine(packagePath, packageId + ".umb");
-
-                    using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
-                    {
-                        fs1.Write(bytes, 0, bytes.Length);
-                        return "packages\\" + packageId + ".umb";
-                    }
-                }
-
-                Audit(AuditType.PackagerInstall, $"Package {packageId} fetched from {Constants.PackageRepository.DefaultRepositoryId}", userId, -1);
-                return null;
+                bytes = await _httpClient.GetByteArrayAsync(url);
             }
-        }
+            catch (HttpRequestException ex)
+            {
+                throw new ConnectionException("An error occuring downloading the package from " + url, ex);
+            }
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
-        {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, "Package", message));
+            //successfull
+            if (bytes.Length > 0)
+            {
+                var packagePath = IOHelper.MapPath(SystemDirectories.Packages);
+
+                // Check for package directory
+                if (Directory.Exists(packagePath) == false)
+                    Directory.CreateDirectory(packagePath);
+
+                var packageFilePath = Path.Combine(packagePath, packageId + ".umb");
+
+                using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
+                {
+                    fs1.Write(bytes, 0, bytes.Length);
+                    return "packages\\" + packageId + ".umb";
+                }
+            }
+
+            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package {packageId} fetched from {Constants.PackageRepository.DefaultRepositoryId}");
+            return null;
         }
 
         #endregion
@@ -1369,21 +1317,13 @@ namespace Umbraco.Core.Services.Implement
         {
             var metaData = GetPackageMetaData(packageFilePath);
 
-            if (raiseEvents)
-            {
-                if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
-                {
-                    var initEmpty = new InstallationSummary().InitEmpty();
-                    initEmpty.MetaData = metaData;
-                    return initEmpty;
-                }
-            }
+            if (raiseEvents && ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
+                return new InstallationSummary { MetaData = metaData };
+
             var installationSummary = PackageInstallation.InstallPackage(packageFilePath, userId);
 
             if (raiseEvents)
-            {
                 ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, metaData, false), this);
-            }
 
             return installationSummary;
         }
@@ -1393,16 +1333,23 @@ namespace Umbraco.Core.Services.Implement
             return PackageInstallation.GetPreInstallWarnings(packageFilePath);
         }
 
-        internal MetaData GetPackageMetaData(string packageFilePath)
+        internal IPackageInfo GetPackageMetaData(string packageFilePath)
         {
             return PackageInstallation.GetMetaData(packageFilePath);
         }
 
         #endregion
 
-        #region Package Building
+        #region Created/Installed Package Repositories
 
-        public void DeleteCreatedPackage(int id) => _createdPackages.Delete(id);
+        public void DeleteCreatedPackage(int id, int userId = 0)
+        {
+            var package = GetCreatedPackageById(id);
+            if (package == null) return;
+
+            _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package id: {package.Id}");
+            _createdPackages.Delete(id);
+        }
 
         public IEnumerable<PackageDefinition> GetAllCreatedPackages() => _createdPackages.GetAll();
 
@@ -1411,6 +1358,22 @@ namespace Umbraco.Core.Services.Implement
         public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
 
         public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
+
+
+        public IEnumerable<PackageDefinition> GetAllInstalledPackages() => _installedPackages.GetAll();
+
+        public PackageDefinition GetInstalledPackageById(int id) => _installedPackages.GetById(id);
+
+        public bool SaveInstalledPackage(PackageDefinition definition) => _installedPackages.SavePackage(definition);
+
+        public void DeleteInstalledPackage(int packageId, int userId = 0)
+        {
+            var package = GetInstalledPackageById(packageId);
+            if (package == null) return;
+
+            _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Installed package '{package.Name}' deleted. Package id: {package.Id}");
+            _installedPackages.Delete(packageId);
+        }
 
         #endregion
 

@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Packaging
 {
     /// <summary>
-    /// Used to access an umbraco package file
+    /// Used to access an umbraco package (zip) file
     /// Remeber that filenames must be unique
     /// use "FindDubletFileNames" for sanitycheck
     /// </summary>

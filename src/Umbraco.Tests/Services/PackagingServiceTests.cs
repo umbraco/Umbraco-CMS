@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Services
 
             string testPackagePath = GetTestPackagePath(documentTypePickerUmb);
 
-            MetaData packageMetaData = packagingService.GetPackageMetaData(testPackagePath);
+            var packageMetaData = packagingService.GetPackageMetaData(testPackagePath);
             Assert.IsNotNull(packageMetaData);
         }
 

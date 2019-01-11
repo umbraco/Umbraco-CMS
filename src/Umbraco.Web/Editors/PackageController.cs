@@ -72,7 +72,7 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         public IHttpActionResult DeleteCreatedPackage(int packageId)
         {
-            Services.PackagingService.DeleteCreatedPackage(packageId);
+            Services.PackagingService.DeleteCreatedPackage(packageId, Security.GetUserId().ResultOr(0));
 
             return Ok();
         }

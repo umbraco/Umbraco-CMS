@@ -7,19 +7,19 @@ namespace Umbraco.Core.Events
 {
     public class ImportPackageEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportPackageEventArgs<TEntity>>
     {
-        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData, bool canCancel)
+        public ImportPackageEventArgs(TEntity eventObject, IPackageInfo packageMetaData, bool canCancel)
             : base(new[] { eventObject }, canCancel)
         {
             PackageMetaData = packageMetaData ?? throw new ArgumentNullException(nameof(packageMetaData));
         }
 
-        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData)
+        public ImportPackageEventArgs(TEntity eventObject, IPackageInfo packageMetaData)
             : this(eventObject, packageMetaData, true)
         {
             
         }
 
-        public MetaData PackageMetaData { get; }
+        public IPackageInfo PackageMetaData { get; }
 
         public IEnumerable<TEntity> InstallationSummary => EventObject;
 

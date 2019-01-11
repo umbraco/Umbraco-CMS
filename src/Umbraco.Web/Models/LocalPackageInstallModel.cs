@@ -55,9 +55,6 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "containsMacroConflict")]
         public bool ContainsMacroConflict { get; set; }
 
-        [DataMember(Name = "containsBinaryFileErrors")]
-        public bool ContainsBinaryFileErrors { get; set; }
-
         [DataMember(Name = "conflictingTemplateAliases")]
         public IDictionary<string, string> ConflictingTemplateAliases { get; set; }
 

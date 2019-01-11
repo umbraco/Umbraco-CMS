@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
@@ -20,7 +21,7 @@ namespace Umbraco.Web.Install.InstallSteps
         }
 
 
-        public override InstallSetupResult Execute(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             Current.RestartAppPool(_httContext);
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         private void InstallBusinessLogic(int manifestId, string packageFile)

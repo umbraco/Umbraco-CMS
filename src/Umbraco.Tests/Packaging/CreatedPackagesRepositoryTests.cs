@@ -37,10 +37,11 @@ namespace Umbraco.Tests.Packaging
             Directory.Delete(IOHelper.MapPath("~/" + _testBaseFolder), true);
         }
 
-        public ICreatedPackagesRepository PackageBuilder => new CreatedPackagesRepository(
+        public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
+            "createdPackages.config",
             //temp paths
             tempFolderPath: "~/" + _testBaseFolder + "/temp",
             packagesFolderPath: "~/" + _testBaseFolder + "/packages",

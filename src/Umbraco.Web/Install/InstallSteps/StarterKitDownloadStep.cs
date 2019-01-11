@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Security;
 using Umbraco.Web._Legacy.Packager;
-using Umbraco.Web._Legacy.Packager.PackageInstance;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -20,17 +19,19 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly InstallHelper _installHelper;
         private readonly UmbracoContext _umbracoContext;
         private readonly IContentService _contentService;
+        private readonly IPackagingService _packageService;
 
-        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper, UmbracoContext umbracoContext)
+        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, UmbracoContext umbracoContext)
         {
             _installHelper = installHelper;
             _umbracoContext = umbracoContext;
             _contentService = contentService;
+            _packageService = packageService;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-        public override InstallSetupResult Execute(Guid? starterKitId)
+        public override async Task<InstallSetupResult> ExecuteAsync(Guid? starterKitId)
         {
             //if there is no value assigned then use the default starter kit
             if (starterKitId.HasValue == false)
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return null;
             }
 
-            var result = DownloadPackageFiles(starterKitId.Value);
+            var result = await DownloadPackageFilesAsync(starterKitId.Value);
 
             Current.RestartAppPool();
 
@@ -59,16 +60,16 @@ namespace Umbraco.Web.Install.InstallSteps
             });
         }
 
-        private Tuple<string, int> DownloadPackageFiles(Guid kitGuid)
+        private async Task<Tuple<string, int>> DownloadPackageFilesAsync(Guid kitGuid)
         {
             var installer = new Installer();
 
             //Go get the package file from the package repo
-            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(tempFile, kitGuid, RepoGuid);
+            var pId = installer.CreateManifest(kitGuid);
 
             InstallPackageFiles(pId, tempFile);
 
@@ -84,10 +85,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         }
 
-        public override string View
-        {
-            get { return (InstalledPackage.GetAllInstalledPackages().Count > 0) ? string.Empty : base.View; }
-        }
+        public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;
 
         public override bool RequiresExecution(Guid? model)
         {
@@ -97,7 +95,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+            if (_packageService.GetAllInstalledPackages().Any())
                 return false;
 
             if (_contentService.GetRootContent().Any())

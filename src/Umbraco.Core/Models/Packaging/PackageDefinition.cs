@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace Umbraco.Core.Models.Packaging
 {
     [DataContract(Name = "packageInstance")]
-    public class PackageDefinition
+    public class PackageDefinition : IPackageInfo
     {
         [DataMember(Name = "id")]
         public int Id { get; set; }
@@ -89,9 +89,9 @@ namespace Umbraco.Core.Models.Packaging
         [DataMember(Name = "files")]
         public IList<string> Files { get; set; } = new List<string>();
 
-        //TODO: Change this to angular view
+        //fixme: Change this to angular view
         [DataMember(Name = "loadControl")]
-        public string LoadControl { get; set; } = string.Empty;
+        public string Control { get; set; } = string.Empty;
 
         [DataMember(Name = "actions")]
         public string Actions { get; set; } = "<actions></actions>";

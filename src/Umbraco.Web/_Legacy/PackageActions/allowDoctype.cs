@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Composing;
@@ -26,10 +28,10 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// <Action runat="install" alias="allowDocumenttype" documentTypeAlias="MyNewDocumentType" parentDocumentTypeAlias="HomePage"  />
         /// </code></example>
         /// <returns>Returns true on success</returns>
-        public bool Execute(string packageName, XmlNode xmlData)
+        public bool Execute(string packageName, XElement xmlData)
         {
-            string doctypeName = xmlData.Attributes["documentTypeAlias"].Value;
-            string parentDoctypeName = xmlData.Attributes["parentDocumentTypeAlias"].Value;
+            string doctypeName = xmlData.AttributeValue<string>("documentTypeAlias");
+            string parentDoctypeName = xmlData.AttributeValue<string>("parentDocumentTypeAlias");
 
             //global::umbraco.cms.businesslogic.ContentType ct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(doctypeName);
             //global::umbraco.cms.businesslogic.ContentType parentct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(parentDoctypeName);
@@ -73,7 +75,7 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// <param name="packageName">Name of the package.</param>
         /// <param name="xmlData">The XML data.</param>
         /// <returns></returns>
-        public bool Undo(string packageName, XmlNode xmlData)
+        public bool Undo(string packageName, XElement xmlData)
         {
             return true;
         }
@@ -88,11 +90,6 @@ namespace Umbraco.Web._Legacy.PackageActions
         }
 
         #endregion
-
-        public XmlNode SampleXml()
-        {
-            throw new NotImplementedException();
-        }
-
+        
     }
 }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Xml;
@@ -39,30 +42,23 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// </Action>
         /// </code>
         /// </example>
-        public bool Execute(string packageName, XmlNode xmlData)
+        public bool Execute(string packageName, XElement xmlData)
         {
             //this will need a complete section node to work...
 
-            if (xmlData.HasChildNodes)
+            if (xmlData.HasElements)
             {
-                string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
+                string sectionAlias = xmlData.AttributeValue<string>("dashboardAlias");
                 string dbConfig = SystemFiles.DashboardConfig;
 
-                XmlNode section = xmlData.SelectSingleNode("./section");
-                XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
+                var section = xmlData.Element("section");
+                var dashboardFile = XDocument.Load(IOHelper.MapPath(dbConfig));
 
                 //don't continue if it already exists
-                var found = dashboardFile.SelectNodes("//section[@alias='" + sectionAlias + "']");
-                if (found == null || found.Count <= 0)
+                var found = dashboardFile.XPathSelectElements("//section[@alias='" + sectionAlias + "']");
+                if (!found.Any())
                 {
-
-                    XmlNode importedSection = dashboardFile.ImportNode(section, true);
-
-                    XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
-                    importedSection.Attributes.Append(alias);
-
-                    dashboardFile.DocumentElement.AppendChild(importedSection);
-
+                    dashboardFile.Root.Add(section);
                     dashboardFile.Save(IOHelper.MapPath(dbConfig));
                 }
 
@@ -78,19 +74,18 @@ namespace Umbraco.Web._Legacy.PackageActions
             return "addDashboardSection";
         }
 
-        public bool Undo(string packageName, XmlNode xmlData)
+        public bool Undo(string packageName, XElement xmlData)
         {
 
-            string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
+            string sectionAlias = xmlData.AttributeValue<string>("dashboardAlias");
             string dbConfig = SystemFiles.DashboardConfig;
-            XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
+            var dashboardFile = XDocument.Load(IOHelper.MapPath(dbConfig));
 
-            XmlNode section = dashboardFile.SelectSingleNode("//section [@alias = '" + sectionAlias + "']");
+            var section = dashboardFile.XPathSelectElement("//section [@alias = '" + sectionAlias + "']");
 
             if (section != null)
             {
-
-                dashboardFile.SelectSingleNode("/dashBoard").RemoveChild(section);
+                section.Remove();
                 dashboardFile.Save(IOHelper.MapPath(dbConfig));
             }
 
@@ -98,11 +93,6 @@ namespace Umbraco.Web._Legacy.PackageActions
         }
 
         #endregion
-
-        public XmlNode SampleXml()
-        {
-            throw new NotImplementedException();
-        }
-
+        
     }
 }

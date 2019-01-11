@@ -60,11 +60,9 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
             composition.RegisterUnique<PackageActionRunner>();
-            composition.RegisterUnique<ICreatedPackagesRepository>(factory =>
-                new CreatedPackagesRepository( //we are using a factory because there are optional ctor args
-                    factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(),
-                    factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(),
-                    factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>()));
+
+            composition.RegisterUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
+            composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.
@@ -73,6 +71,17 @@ namespace Umbraco.Core.Composing.Composers
 
             return composition;
         }
+
+        /// <summary>
+        /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="packageRepoFileName"></param>
+        /// <returns></returns>
+        private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
+            => new PackagesRepository( 
+                factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(), factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(), factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>(),
+                packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {

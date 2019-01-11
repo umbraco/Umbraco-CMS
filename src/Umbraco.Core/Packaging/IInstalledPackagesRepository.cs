@@ -2,12 +2,9 @@
 
 namespace Umbraco.Core.Packaging
 {
-
-    //TODO: We need to figure out how we want to do this
-    // we have 2x repositories for saving created and installed packages
-    // created packages can also be exported
-    // maybe the below will work?
-
+    /// <summary>
+    /// Manages the storage of installed package definitions
+    /// </summary>
     public interface IInstalledPackagesRepository : IPackageDefinitionRepository
     {
     }

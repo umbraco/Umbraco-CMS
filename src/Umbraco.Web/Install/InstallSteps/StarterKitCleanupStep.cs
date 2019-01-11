@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web._Legacy.Packager;
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Install.InstallSteps
         "StarterKitCleanup", 32, "Almost done")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
-        public override InstallSetupResult Execute(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
@@ -19,7 +20,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             CleanupInstallation(manifestId, packageFile);
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         private void CleanupInstallation(int manifestId, string packageFile)

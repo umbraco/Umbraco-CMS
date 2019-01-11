@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
 
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageName">Name of the package.</param>
         /// <param name="actionAlias">The action alias.</param>
         /// <param name="actionXml">The action XML.</param>
-        public void RunPackageAction(string packageName, string actionAlias, XmlNode actionXml)
+        public void RunPackageAction(string packageName, string actionAlias, XElement actionXml)
         {
 
             foreach (var ipa in _packageActions)
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageName">Name of the package.</param>
         /// <param name="actionAlias">The action alias.</param>
         /// <param name="actionXml">The action XML.</param>
-        public void UndoPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
+        public void UndoPackageAction(string packageName, string actionAlias, XElement actionXml)
         {
             foreach (var ipa in _packageActions)
             {
