@@ -52,18 +52,18 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function startWatch() {
-       
+
         //due to the way angular-sortable works, it needs to update a model, we don't want it to update renderModel since renderModel
         //is updated based on changes to model.value so if we bound angular-sortable to that and put a watch on it we'd end up in a
         //infinite loop. Instead we have a custom array model for angular-sortable and we'll watch that which we'll use to sync the model.value
         //which in turn will sync the renderModel.
-        $scope.$watchCollection("sortableModel", function(newVal, oldVal) {
+        $scope.$watchCollection("sortableModel", function (newVal, oldVal) {
             $scope.model.value = newVal.join();
         });
 
         //if the underlying model changes, update the view model, this ensures that the view is always consistent with the underlying
         //model if it changes (i.e. based on server updates, or if used in split view, etc...)
-        $scope.$watch("model.value", function(newVal, oldVal) {
+        $scope.$watch("model.value", function (newVal, oldVal) {
             if (newVal !== oldVal) {
                 syncRenderModel();
             }
@@ -195,25 +195,38 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //dialog
-    $scope.openContentPicker = function () {
-        $scope.contentPicker = dialogOptions;
+    $scope.openCurrentPicker = function () {
+        $scope.currentPicker = dialogOptions;
 
-        $scope.contentPicker.submit = function (model) {
+        $scope.currentPicker.submit = function (model) {
             if (angular.isArray(model.selection)) {
                 _.each(model.selection, function (item, i) {
                     $scope.add(item);
                 });
-              angularHelper.getCurrentForm($scope).$setDirty();
+                angularHelper.getCurrentForm($scope).$setDirty();
             }
             angularHelper.getCurrentForm($scope).$setDirty();
             editorService.close();
         }
 
-        $scope.contentPicker.close = function () {
+        $scope.currentPicker.close = function () {
             editorService.close();
         }
 
-        editorService.contentPicker($scope.contentPicker);
+        //open the correct editor based on the entity type
+        switch (entityType) {
+            case "Document":
+                editorService.contentPicker($scope.currentPicker);
+                break;
+            case "Media":
+                editorService.mediaPicker($scope.currentPicker);
+                break;
+            case "Member":
+                editorService.memberGroupPicker($scope.currentPicker);
+                break;
+
+            default:
+        }
 
     };
 
@@ -256,7 +269,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.model.value = null;
     };
 
-    $scope.openContentEditor = function (node)  {
+    $scope.openContentEditor = function (node) {
         var contentEditor = {
             id: node.id,
             submit: function (model) {
@@ -296,7 +309,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         if (valueIds.length > 0) {
 
             //need to determine which items we already have loaded
-            var renderModelIds = _.map($scope.renderModel, function(d) {
+            var renderModelIds = _.map($scope.renderModel, function (d) {
                 return $scope.model.config.idType === "udi" ? d.udi : d.id;
             });
 
@@ -313,11 +326,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             var missingIds = _.difference(valueIds, renderModelIds);
 
             if (missingIds.length > 0) {
-                return entityResource.getByIds(missingIds, entityType).then(function(data) {
+                return entityResource.getByIds(missingIds, entityType).then(function (data) {
 
                     _.each(valueIds,
-                        function(id, i) {
-                            var entity = _.find(data, function(d) {
+                        function (id, i) {
+                            var entity = _.find(data, function (d) {
                                 return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
                             });
 
@@ -330,7 +343,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                     if (doValidation) {
                         validate();
                     }
-                    
+
                     setSortingState($scope.renderModel);
                     return $q.when(true);
                 });
@@ -342,7 +355,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 $scope.renderModel = [];
                 for (var k = 0; k < valueIds.length; k++) {
                     var id = valueIds[k];
-                    var found = _.find(current, function(d) {
+                    var found = _.find(current, function (d) {
                         return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
                     });
                     if (found) {
