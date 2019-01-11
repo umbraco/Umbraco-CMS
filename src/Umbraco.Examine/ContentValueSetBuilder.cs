@@ -53,14 +53,14 @@ namespace Umbraco.Examine
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
                     {"nodeName", PublishedValuesOnly               //Always add invariant nodeName
                         ? c.PublishName.Yield()
-                        : c.Name.Yield()},            
+                        : c.Name.Yield()},
                     {"urlName", urlValue.Yield()},                  //Always add invariant urlName
                     {"path", c.Path.Yield()},
                     {"nodeType", new object[] {c.ContentType.Id}},
                     {"creatorName", (c.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
-                    {"template", new object[] {c.Template?.Id ?? 0}},
+                    {"templateID", new object[] {c.TemplateId ?? 0}},
                     {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},
                 };
 

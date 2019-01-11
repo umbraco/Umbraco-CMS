@@ -201,7 +201,7 @@ namespace Umbraco.Tests.PublishedContent
             public IPublishedContent Parent { get; set; }
             public int Id { get; set; }
             public Guid Key { get; set; }
-            public int TemplateId { get; set; }
+            public int? TemplateId { get; set; }
             public int SortOrder { get; set; }
             public string Name { get; set; }
             public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();

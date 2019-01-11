@@ -33,7 +33,7 @@ namespace Umbraco.Web.Templates
         public TemplateRenderer(UmbracoContext umbracoContext, int pageId, int? altTemplateId)
         {
             PageId = pageId;
-            AltTemplate = altTemplateId;
+            AltTemplateId = altTemplateId;
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
         }
 
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Templates
         /// <summary>
         /// Gets/sets the alt template to render if there is one
         /// </summary>
-        public int? AltTemplate { get; }
+        public int? AltTemplateId { get; }
 
         public void Render(StringWriter writer)
         {
@@ -86,20 +86,22 @@ namespace Umbraco.Web.Templates
             //set the doc that was found by id
             contentRequest.PublishedContent = doc;
             //set the template, either based on the AltTemplate found or the standard template of the doc
-            contentRequest.TemplateModel = Current.Configs.Settings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
-                ? FileService.GetTemplate(doc.TemplateId)
-                : FileService.GetTemplate(AltTemplate.Value);
+            var templateId = Current.Configs.Settings().WebRouting.DisableAlternativeTemplates || !AltTemplateId.HasValue
+                ? doc.TemplateId
+                : AltTemplateId.Value;
+            if (templateId.HasValue)
+                contentRequest.TemplateModel = FileService.GetTemplate(templateId.Value);
 
             //if there is not template then exit
             if (contentRequest.HasTemplate == false)
             {
-                if (AltTemplate.HasValue == false)
+                if (AltTemplateId.HasValue == false)
                 {
                     writer.Write("<!-- Could not render template for Id {0}, the document's template was not found with id {0}-->", doc.TemplateId);
                 }
                 else
                 {
-                    writer.Write("<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->", AltTemplate);
+                    writer.Write("<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->", AltTemplateId);
                 }
                 return;
             }
