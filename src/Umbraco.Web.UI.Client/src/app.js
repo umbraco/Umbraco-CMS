@@ -14,7 +14,8 @@ var app = angular.module('umbraco', [
     'ngMessages',
     'tmh.dynamicLocale',
     'ngFileUpload',
-    'LocalStorageModule'
+    'LocalStorageModule',
+    'chart.js'
 ]);
 
 app.config(['$compileProvider', function ($compileProvider) {
@@ -76,7 +77,7 @@ angular.module("umbraco.viewcache", [])
                             var _op = (url.indexOf("?") > 0) ? "&" : "?";
                             url += _op + "umb__rnd=" + rnd;
                         }
-                        
+
                         return get(url, config);
                     };
                     return $delegate;

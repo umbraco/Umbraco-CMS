@@ -23,8 +23,11 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
+    'lib/chart.js/chart.min.js',
+    'lib/angular-chart.js/angular-chart.min.js',
+
     'lib/umbraco/Extensions.js',
-    
+
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacySpeechBubble.js',
 
