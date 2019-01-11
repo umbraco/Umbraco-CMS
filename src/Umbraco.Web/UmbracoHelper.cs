@@ -106,7 +106,7 @@ namespace Umbraco.Web
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery => _query ??
-            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache, UmbracoContext.VariationContextAccessor));
 
         /// <summary>
         /// Gets the Umbraco context.

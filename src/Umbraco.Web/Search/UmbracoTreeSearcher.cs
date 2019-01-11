@@ -367,9 +367,9 @@ namespace Umbraco.Web.Search
                 {
                     m.AdditionalData["Email"] = result.Values["email"];
                 }
-                if (result.Values.ContainsKey("__key") && result.Values["__key"] != null)
+                if (result.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName) && result.Values[UmbracoExamineIndex.NodeKeyFieldName] != null)
                 {
-                    if (Guid.TryParse(result.Values["__key"], out var key))
+                    if (Guid.TryParse(result.Values[UmbracoExamineIndex.NodeKeyFieldName], out var key))
                     {
                         m.Key = key;
                     }
@@ -416,7 +416,7 @@ namespace Umbraco.Web.Search
                 if (intId.Success)
                 {
                     //if it varies by culture, return the default language URL
-                    if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "1")
+                    if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "y")
                     {
                         entity.AdditionalData["Url"] = _umbracoHelper.Url(intId.Result, defaultLang);
                     }
