@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -18,8 +20,8 @@ namespace Umbraco.Core
     public static class ContentExtensions
     {
         // this ain't pretty
-        private static MediaFileSystem _mediaFileSystem;
-        private static MediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.FileSystems.MediaFileSystem);
+        private static IMediaFileSystem _mediaFileSystem;
+        private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
 
         #region IContent
 
@@ -178,8 +180,22 @@ namespace Umbraco.Core
 
         private static void SetUploadFile(this IContentBase content, IContentTypeService contentTypeService, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
-            var property = GetProperty(content, contentTypeService, propertyTypeAlias);
-            var oldpath = property.GetValue(culture, segment) is string svalue ? MediaFileSystem.GetRelativePath(svalue) : null;
+            var property = GetProperty(content, contentTypeService propertyTypeAlias);
+
+            // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
+            // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
+            string oldpath = null;
+            if (property.GetValue(culture, segment) is string svalue)
+            {
+                if (svalue.DetectIsJson())
+                {
+                    // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
+                    var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
+                    svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
+                }
+                oldpath = MediaFileSystem.GetRelativePath(svalue);
+            }
+
             var filepath = MediaFileSystem.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
             property.SetValue(MediaFileSystem.GetUrl(filepath), culture, segment);
         }

@@ -4,6 +4,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -48,16 +50,14 @@ namespace Umbraco.Tests.Cache.PublishedCache
 </root>";
         }
 
-        public override void SetUp()
+        protected override void Initialize()
         {
-            base.SetUp();
+            base.Initialize();
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
 
-            var umbracoSettings = SettingsForTests.GenerateMockUmbracoSettings();
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            SettingsForTests.ConfigureSettings(umbracoSettings);
-            SettingsForTests.ConfigureSettings(globalSettings);
+            var umbracoSettings = Factory.GetInstance<IUmbracoSettingsSection>();
+            var globalSettings = Factory.GetInstance<IGlobalSettings>();
 
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());

@@ -47,7 +47,8 @@ namespace Umbraco.Tests.TestHelpers.Stubs
                 var allParams = ctor.GetParameters().ToArray();
                 foreach (var parameter in allParams)
                 {
-                    var found = possibleParams.SingleOrDefault(x => x.GetType() == parameter.ParameterType);
+                    var found = possibleParams.SingleOrDefault(x => x.GetType() == parameter.ParameterType)
+                             ?? Current.Factory.GetInstance(parameter.ParameterType);
                     if (found != null) args.Add(found);
                 }
                 if (args.Count == allParams.Length)

@@ -1,17 +1,14 @@
 ﻿using System;
-using LightInject;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Macros;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.ContentApps;
-using Umbraco.Web.Features;
+using Umbraco.Web.Tour;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
@@ -33,7 +30,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         internal static ActionCollectionBuilder Actions(this Composition composition)
-            => composition.Container.GetInstance<ActionCollectionBuilder>();
+            => composition.WithCollectionBuilder<ActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the content apps collection builder.
@@ -41,7 +38,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static ContentAppFactoryCollectionBuilder ContentApps(this Composition composition)
-            => composition.Container.GetInstance<ContentAppFactoryCollectionBuilder>();
+            => composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.
@@ -49,7 +46,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static ContentFinderCollectionBuilder ContentFinders(this Composition composition)
-            => composition.Container.GetInstance<ContentFinderCollectionBuilder>();
+            => composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
         /// <summary>
         /// Gets the editor validators collection builder.
@@ -57,10 +54,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         internal static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
-            => composition.Container.GetInstance<EditorValidatorCollectionBuilder>();
-
-        public static UmbracoFeatures Features(this Composition composition)
-            => composition.Container.GetInstance<UmbracoFeatures>();
+            => composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the filtered controller factories collection builder.
@@ -68,25 +62,31 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static FilteredControllerFactoryCollectionBuilder FilderedControllerFactory(this Composition composition)
-            => composition.Container.GetInstance<FilteredControllerFactoryCollectionBuilder>();
+            => composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the health checks collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
-            => composition.Container.GetInstance<HealthCheckCollectionBuilder>();
+            => composition.WithCollectionBuilder<HealthCheckCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the TourFilters collection builder.
+        /// </summary>
+        public static TourFilterCollectionBuilder TourFilters(this Composition composition)
+            => composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
-            => composition.Container.GetInstance<UrlProviderCollectionBuilder>();
+            => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
 
         #endregion
 
-        #region Singletons
+        #region Uniques
 
         /// <summary>
         /// Sets the content last chance finder.
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Components
         public static void SetContentLastChanceFinder<T>(this Composition composition)
             where T : IContentLastChanceFinder
         {
-            composition.Container.RegisterSingleton<IContentLastChanceFinder, T>();
+            composition.RegisterUnique<IContentLastChanceFinder, T>();
         }
 
         /// <summary>
@@ -104,9 +104,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IServiceFactory, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this Composition composition, Func<IFactory, IContentLastChanceFinder> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterUnique(factory);
         }
 
         /// <summary>
@@ -116,17 +116,7 @@ namespace Umbraco.Core.Components
         /// <param name="finder">A last chance finder.</param>
         public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
         {
-            composition.Container.RegisterSingleton(_ => finder);
-        }
-
-        /// <summary>
-        /// Sets the type of the default rendering controller.
-        /// </summary>
-        /// <typeparam name="T">The type of the default rendering controller.</typeparam>
-        /// <param name="composition">The composition.</param>
-        public static void SetDefaultRenderMvcControllerType<T>(this Composition composition)
-        {
-            Current.DefaultRenderMvcControllerType = typeof(T);
+            composition.RegisterUnique(_ => finder);
         }
 
         /// <summary>
@@ -137,7 +127,7 @@ namespace Umbraco.Core.Components
         public static void SetPublishedSnapshotService<T>(this Composition composition)
             where T : IPublishedSnapshotService
         {
-            composition.Container.RegisterSingleton<IPublishedSnapshotService, T>();
+            composition.RegisterUnique<IPublishedSnapshotService, T>();
         }
 
         /// <summary>
@@ -145,9 +135,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, Func<IServiceFactory, IPublishedSnapshotService> factory)
+        public static void SetPublishedSnapshotService(this Composition composition, Func<IFactory, IPublishedSnapshotService> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterUnique(factory);
         }
 
         /// <summary>
@@ -157,7 +147,7 @@ namespace Umbraco.Core.Components
         /// <param name="service">A published snapshot service.</param>
         public static void SetPublishedSnapshotService(this Composition composition, IPublishedSnapshotService service)
         {
-            composition.Container.RegisterSingleton(_ => service);
+            composition.RegisterUnique(_ => service);
         }
 
         /// <summary>
@@ -168,7 +158,7 @@ namespace Umbraco.Core.Components
         public static void SetSiteDomainHelper<T>(this Composition composition)
             where T : ISiteDomainHelper
         {
-            composition.Container.RegisterSingleton<ISiteDomainHelper, T>();
+            composition.RegisterUnique<ISiteDomainHelper, T>();
         }
 
         /// <summary>
@@ -176,9 +166,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IServiceFactory, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterUnique(factory);
         }
 
         /// <summary>
@@ -188,7 +178,32 @@ namespace Umbraco.Core.Components
         /// <param name="helper">A helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
         {
-            composition.Container.RegisterSingleton(_ => helper);
+            composition.RegisterUnique(_ => helper);
+        }
+
+        /// <summary>
+        /// Sets the default controller for rendering template views.
+        /// </summary>
+        /// <typeparam name="TController">The type of the controller.</typeparam>
+        /// <param name="composition">The composition.</param>
+        /// <remarks>The controller type is registered to the container by the composition.</remarks>
+        public static void SetDefaultRenderMvcController<TController>(this Composition composition)
+            => composition.SetDefaultRenderMvcController(typeof(TController));
+
+        /// <summary>
+        /// Sets the default controller for rendering template views.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="controllerType">The type of the controller.</param>
+        /// <remarks>The controller type is registered to the container by the composition.</remarks>
+        public static void SetDefaultRenderMvcController(this Composition composition, Type controllerType)
+        {
+            composition.OnCreatingFactory["Umbraco.Core.DefaultRenderMvcController"] = () =>
+            {
+                // no need to register: all IRenderMvcController are registered
+                //composition.Register(controllerType, Lifetime.Request);
+                Current.DefaultRenderMvcControllerType = controllerType;
+            };
         }
 
         #endregion

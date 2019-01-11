@@ -29,7 +29,7 @@ namespace Umbraco.Web
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;
-            GlobalSettings = UmbracoConfig.For.GlobalSettings();
+            GlobalSettings = Current.Configs.Global();
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the ProfilingLogger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the Umbraco context.

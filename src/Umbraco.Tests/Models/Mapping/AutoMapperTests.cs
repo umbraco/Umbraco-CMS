@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using AutoMapper;
 using NUnit.Framework;
@@ -9,7 +8,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using LightInject;
 
 namespace Umbraco.Tests.Models.Mapping
 {
@@ -22,16 +20,16 @@ namespace Umbraco.Tests.Models.Mapping
             base.Compose();
 
             var manifestBuilder = new ManifestParser(
-                CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
+                CacheHelper.Disabled.RuntimeCache,
                 new ManifestValueValidatorCollection(Enumerable.Empty<IManifestValueValidator>()),
-                Logger)
+                Composition.Logger)
             {
                 Path = TestHelper.CurrentAssemblyDirectory
             };
-            Container.Register(_ => manifestBuilder);
+            Composition.RegisterUnique(_ => manifestBuilder);
 
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
-            Container.GetInstance<DataEditorCollectionBuilder>()
+            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(typeListProducerList);
         }
@@ -39,7 +37,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void AssertConfigurationIsValid()
         {
-            var profiles = Container.GetAllInstances<Profile>().ToArray();
+            var profiles = Factory.GetAllInstances<Profile>().ToArray();
 
             var config = new MapperConfiguration(cfg =>
             {

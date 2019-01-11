@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (fileName.IndexOf('.') <= 0) return false;
             var extension = Path.GetExtension(fileName).TrimStart(".");
-            return UmbracoConfig.For.UmbracoSettings().Content.IsFileAllowedForUpload(extension);
+            return Current.Configs.Settings().Content.IsFileAllowedForUpload(extension);
         }
     }
 }

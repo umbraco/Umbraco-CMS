@@ -88,10 +88,10 @@ namespace umbraco
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
                 doc.Path, doc.Parent == null ? -1 : doc.Parent.Id);
 
-            if (doc.TemplateId > 0)
+            if (doc.TemplateId.HasValue)
             {
                 //set the template to whatever is assigned to the doc
-                _template = doc.TemplateId;
+                _template = doc.TemplateId.Value;
                 _elements["template"] = _template.ToString();
             }
 
@@ -358,10 +358,7 @@ namespace umbraco
                 get { return _key; }
             }
 
-            public int TemplateId
-            {
-                get { return _inner.Template == null ? 0 : _inner.Template.Id; }
-            }
+            public int? TemplateId => _inner.TemplateId;
 
             public int SortOrder
             {

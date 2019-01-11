@@ -58,8 +58,10 @@ namespace Umbraco.Examine
             _parentId = parentId;
         }
 
-        protected override void PopulateIndexes(IEnumerable<IIndex> indexes)
+        protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
         {
+            if (indexes.Count == 0) return;
+
             const int pageSize = 10000;
             var pageIndex = 0;
 

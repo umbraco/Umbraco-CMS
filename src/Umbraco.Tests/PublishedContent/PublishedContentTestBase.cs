@@ -1,14 +1,12 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
-using LightInject;
 using Moq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent
@@ -25,10 +23,8 @@ namespace Umbraco.Tests.PublishedContent
             // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
 
-            var builder = Container.TryGetInstance<PropertyValueConverterCollectionBuilder>()
-                ?? Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-
-            builder.Clear()
+            Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+                .Clear()
                 .Append<DatePickerValueConverter>()
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
@@ -38,7 +34,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
 
-            var converters = Container.GetInstance<PropertyValueConverterCollection>();
+            var converters = Factory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>())) { Id = 1 });

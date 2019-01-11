@@ -109,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override int TemplateId
+        public override int? TemplateId
         {
             get
             {

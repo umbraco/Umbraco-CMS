@@ -6,8 +6,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using LightInject;
-using Umbraco.Core.Scoping;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IDictionaryRepository CreateRepository()
         {
-            return Container.GetInstance<IDictionaryRepository>();
+            return Factory.GetInstance<IDictionaryRepository>();
         }
 
         [Test]
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var languageRepository = Container.GetInstance<ILanguageRepository>();
+                var languageRepository = Factory.GetInstance<ILanguageRepository>();
                 var repository = CreateRepository();
 
                 var language = languageRepository.Get(1);

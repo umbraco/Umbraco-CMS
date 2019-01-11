@@ -2,7 +2,6 @@
 using System.Linq;
 using Moq;
 using System.Text;
-using LightInject;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,27 +13,25 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
-using Umbraco.Web.ContentApps;
 
 namespace Umbraco.Tests.Manifest
 {
     [TestFixture]
     public class ManifestParserTests
     {
-
         private ManifestParser _parser;
 
         [SetUp]
         public void Setup()
         {
             Current.Reset();
-            var container = Mock.Of<IServiceContainer>();
-            Current.Container = container;
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
-            Mock.Get(container)
+            Mock.Get(factory)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {

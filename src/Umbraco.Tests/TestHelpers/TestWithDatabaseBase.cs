@@ -26,9 +26,7 @@ using File = System.IO.File;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
-using LightInject;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
@@ -49,12 +47,8 @@ namespace Umbraco.Tests.TestHelpers
     [UmbracoTest(WithApplication = true)]
     public abstract class TestWithDatabaseBase : UmbracoTestBase
     {
-        private CacheHelper _disabledCacheHelper;
-
         private string _databasePath;
         private static byte[] _databaseBytes;
-
-        protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
 
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
@@ -64,7 +58,7 @@ namespace Umbraco.Tests.TestHelpers
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
 
-        protected ISqlContext SqlContext => Container.GetInstance<ISqlContext>();
+        protected ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
 
         public override void SetUp()
         {
@@ -78,23 +72,22 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
-            Container.Register(factory => PublishedSnapshotService);
-            Container.Register(factory => DefaultCultureAccessor);
+            Composition.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+            Composition.Register(factory => PublishedSnapshotService);
+            Composition.Register(factory => DefaultCultureAccessor);
 
-            Container.GetInstance<DataEditorCollectionBuilder>()
+            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
-                .Add(f => f.GetInstance<TypeLoader>().GetDataEditors());
+                .Add(() => Composition.TypeLoader.GetDataEditors());
 
-            Container.RegisterSingleton(f =>
+            Composition.RegisterUnique(f =>
             {
                 if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();
 
-                var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
                 var logger = f.GetInstance<ILogger>();
                 var mappers = f.GetInstance<IMapperCollection>();
-                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, mappers);
+                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), logger, new Lazy<IMapperCollection>(() => mappers));
                 factory.ResetForTests();
                 return factory;
             });
@@ -108,7 +101,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public override void TearDown()
         {
-            var profilingLogger = Container.TryGetInstance<ProfilingLogger>();
+            var profilingLogger = Factory.TryGetInstance<IProfilingLogger>();
             var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // fixme move that one up
             try
             {
@@ -138,9 +131,8 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             // ensure the configuration matches the current version for tests
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.ConfigurationStatus).Returns(UmbracoVersion.Current.ToString(3));
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Initialize database."))
             {
@@ -257,10 +249,10 @@ namespace Umbraco.Tests.TestHelpers
             var cache = NullCacheProvider.Instance;
 
             ContentTypesCache = new PublishedContentTypeCache(
-                Container.GetInstance<IContentTypeService>(),
-                Container.GetInstance<IMediaTypeService>(),
-                Container.GetInstance<IMemberTypeService>(),
-                Container.GetInstance<IPublishedContentTypeFactory>(),
+                Factory.GetInstance<IContentTypeService>(),
+                Factory.GetInstance<IMediaTypeService>(),
+                Factory.GetInstance<IMemberTypeService>(),
+                Factory.GetInstance<IPublishedContentTypeFactory>(),
                 Logger);
 
             // testing=true so XmlStore will not use the file nor the database
@@ -269,13 +261,13 @@ namespace Umbraco.Tests.TestHelpers
             var variationContextAccessor = new TestVariationContextAccessor();
             var service = new PublishedSnapshotService(
                 ServiceContext,
-                Container.GetInstance<IPublishedContentTypeFactory>(),
+                Factory.GetInstance<IPublishedContentTypeFactory>(),
                 ScopeProvider,
                 cache, publishedSnapshotAccessor, variationContextAccessor,
-                Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
+                Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
                 Logger,
-                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 
@@ -376,11 +368,11 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Container.GetInstance<IUserService>(),
-                Container.GetInstance<IGlobalSettings>()),
-                umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
+                new WebSecurity(httpContext, Factory.GetInstance<IUserService>(),
+                    Factory.GetInstance<IGlobalSettings>()),
+                umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                globalSettings ?? Container.GetInstance<IGlobalSettings>(),
+                globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor());
 
             if (setSingleton)

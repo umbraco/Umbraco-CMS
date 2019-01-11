@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 
-namespace umbraco.cms.businesslogic.packager {
+namespace Umbraco.Web._Legacy.Packager.PackageInstance
+{
     public class InstalledPackage
     {
 

@@ -4,15 +4,15 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Examine;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionRoots;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
@@ -22,7 +22,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
@@ -30,16 +29,15 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Services;
-using Umbraco.Examine;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing.CompositionRoots;
+using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
-
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
 
@@ -79,7 +77,9 @@ namespace Umbraco.Tests.Testing
         // test feature, and no test "base" class should be. only actual test feature classes
         // should be marked with that attribute.
 
-        protected ServiceContainer Container { get; private set; }
+        protected Composition Composition { get; private set; }
+
+        protected IFactory Factory { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
 
@@ -95,17 +95,17 @@ namespace Umbraco.Tests.Testing
 
         #region Accessors
 
-        protected ILogger Logger => Container.GetInstance<ILogger>();
+        protected ILogger Logger => Factory.GetInstance<ILogger>();
 
-        protected IProfiler Profiler => Container.GetInstance<IProfiler>();
+        protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
-        protected virtual ProfilingLogger ProfilingLogger => Container.GetInstance<ProfilingLogger>();
+        protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected CacheHelper CacheHelper => Container.GetInstance<CacheHelper>();
+        protected CacheHelper CacheHelper => Factory.GetInstance<CacheHelper>();
 
-        protected virtual ISqlSyntaxProvider SqlSyntax => Container.GetInstance<ISqlSyntaxProvider>();
+        protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();
 
-        protected IMapperCollection Mappers => Container.GetInstance<IMapperCollection>();
+        protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
         #endregion
 
@@ -118,24 +118,37 @@ namespace Umbraco.Tests.Testing
             // but hey, never know, better avoid garbage-in
             Reset();
 
-            Container = new ServiceContainer();
-            Container.ConfigureUmbracoCore();
-
-            TestObjects = new TestObjects(Container);
-
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
+            // fixme - align to runtimes & components - don't redo everything here
+
+            var (logger, profiler) = GetLoggers(Options.Logger);
+            var proflogger = new ProfilingLogger(logger, profiler);
+            var cacheHelper = GetCacheHelper();
+            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            var typeLoader = GetTypeLoader(cacheHelper.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
+
+            var register = RegisterFactory.Create();
+
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+
+            Composition.RegisterUnique(typeLoader);
+            Composition.RegisterUnique(logger);
+            Composition.RegisterUnique(profiler);
+            Composition.RegisterUnique<IProfilingLogger>(proflogger);
+            Composition.RegisterUnique(cacheHelper);
+            Composition.RegisterUnique(cacheHelper.RuntimeCache);
+
+            TestObjects = new TestObjects(register);
             Compose();
+            Current.Factory = Factory = Composition.CreateFactory();
             Initialize();
         }
 
         protected virtual void Compose()
         {
-            ComposeLogging(Options.Logger);
-            ComposeCacheHelper();
             ComposeAutoMapper(Options.AutoMapper);
-            ComposeTypeLoader(Options.TypeLoader);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
 
@@ -144,8 +157,7 @@ namespace Umbraco.Tests.Testing
             ComposeWtf();
 
             // not sure really
-            var composition = new Composition(Container, RuntimeLevel.Run);
-            Compose(composition);
+            Compose(Composition);
         }
 
         protected virtual void Compose(Composition composition)
@@ -161,41 +173,49 @@ namespace Umbraco.Tests.Testing
 
         #region Compose
 
-        protected virtual void ComposeLogging(UmbracoTestOptions.Logger option)
+        protected virtual (ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
         {
-            if (option == UmbracoTestOptions.Logger.Mock)
+            ILogger logger;
+            IProfiler profiler;
+
+            switch (option)
             {
-                Container.RegisterSingleton(f => Mock.Of<ILogger>());
-                Container.RegisterSingleton(f => Mock.Of<IProfiler>());
-            }
-            else if (option == UmbracoTestOptions.Logger.Serilog)
-            {
-                Container.RegisterSingleton<ILogger>(f => new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config"))));
-                Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
-            }
-            else if (option == UmbracoTestOptions.Logger.Console)
-            {
-                Container.RegisterSingleton<ILogger>(f => new ConsoleLogger());
-                Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
+                case UmbracoTestOptions.Logger.Mock:
+                    logger = Mock.Of<ILogger>();
+                    profiler = Mock.Of<IProfiler>();
+                    break;
+                case UmbracoTestOptions.Logger.Serilog:
+                    logger = new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+                    profiler = new LogProfiler(logger);
+                    break;
+                case UmbracoTestOptions.Logger.Console:
+                    logger = new ConsoleLogger();
+                    profiler = new LogProfiler(logger);
+                    break;
+                default:
+                    throw new NotSupportedException($"Logger option {option} is not supported.");
             }
 
-            Container.RegisterSingleton(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
+            return (logger, profiler);
+        }
+
+        protected virtual CacheHelper GetCacheHelper()
+        {
+            return CacheHelper.Disabled;
         }
 
         protected virtual void ComposeWeb()
         {
-            //TODO: Should we 'just' register the WebRuntimeComponent?
-
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             // web
-            Container.Register(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
-            Container.RegisterSingleton<PublishedRouter>();
-            Container.RegisterCollectionBuilder<ContentFinderCollectionBuilder>();
-            Container.Register<IContentLastChanceFinder, TestLastChanceFinder>();
-            Container.Register<IVariationContextAccessor, TestVariationContextAccessor>();
+            Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            Composition.RegisterUnique<PublishedRouter>();
+            Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+            Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
+            Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
         }
 
         protected virtual void ComposeWtf()
@@ -203,59 +223,52 @@ namespace Umbraco.Tests.Testing
             // what else?
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
-            Container.RegisterSingleton(f => runtimeStateMock.Object);
+            Composition.RegisterUnique(f => runtimeStateMock.Object);
 
             // ah...
-            Container.RegisterCollectionBuilder<ActionCollectionBuilder>();
-            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-            Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Composition.WithCollectionBuilder<ActionCollectionBuilder>();
+            Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            Container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
+            Composition.RegisterUnique<IMediaPathScheme, OriginalMediaPathScheme>();
 
             // register empty content apps collection
-            Container.RegisterCollectionBuilder<ContentAppFactoryCollectionBuilder>();
-        }
-
-        protected virtual void ComposeCacheHelper()
-        {
-            Container.RegisterSingleton(f => CacheHelper.CreateDisabledCacheHelper());
-            Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
+            Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
         }
 
         protected virtual void ComposeAutoMapper(bool configure)
         {
             if (configure == false) return;
 
-            Container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
-            Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
+            Composition
+                .ComposeCoreMappingProfiles()
+                .ComposeWebMappingProfiles();
         }
 
-        protected virtual void ComposeTypeLoader(UmbracoTestOptions.TypeLoader typeLoader)
+        protected virtual TypeLoader GetTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
         {
-            Container.RegisterSingleton(f =>
+            switch (option)
             {
-                switch (typeLoader)
-                {
-                    case UmbracoTestOptions.TypeLoader.Default:
-                        return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(f));
-                    case UmbracoTestOptions.TypeLoader.PerFixture:
-                        return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(f));
-                    case UmbracoTestOptions.TypeLoader.PerTest:
-                        return CreateTypeLoader(f);
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(typeLoader));
-                }
-            });
+                case UmbracoTestOptions.TypeLoader.Default:
+                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(runtimeCache, globalSettings, logger));
+                case UmbracoTestOptions.TypeLoader.PerFixture:
+                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(runtimeCache, globalSettings, logger));
+                case UmbracoTestOptions.TypeLoader.PerTest:
+                    return CreateTypeLoader(runtimeCache, globalSettings, logger);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(option));
+            }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IServiceFactory f)
+        protected virtual TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return CreateCommonTypeLoader(f);
+            return CreateCommonTypeLoader(runtimeCache, globalSettings, logger);
         }
 
-        private static TypeLoader CreateCommonTypeLoader(IServiceFactory f)
+        // common to all tests = cannot be overriden
+        private static TypeLoader CreateCommonTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>(), false)
+            return new TypeLoader(runtimeCache, globalSettings.LocalTempStorageLocation, logger, false)
             {
                 AssembliesToScan = new[]
                 {
@@ -272,80 +285,74 @@ namespace Umbraco.Tests.Testing
 
             // create the file
             // create the schema
+        }
 
+        protected virtual void ComposeSettings()
+        {
+            Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
         }
 
         protected virtual void ComposeApplication(bool withApplication)
         {
+            ComposeSettings();
+
             if (withApplication == false) return;
 
-            var umbracoSettings = SettingsForTests.GetDefaultUmbracoSettings();
-            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            //apply these globally
-            SettingsForTests.ConfigureSettings(umbracoSettings);
-            SettingsForTests.ConfigureSettings(globalSettings);
-
             // default Datalayer/Repositories/SQL/Database/etc...
-            Container.RegisterFrom<RepositoryCompositionRoot>();
+            Composition.ComposeRepositories();
 
             // register basic stuff that might need to be there for some container resolvers to work
-            Container.RegisterSingleton(factory => umbracoSettings);
-            Container.RegisterSingleton(factory => globalSettings);
-            Container.RegisterSingleton(factory => umbracoSettings.Content);
-            Container.RegisterSingleton(factory => umbracoSettings.Templates);
-            Container.RegisterSingleton(factory => umbracoSettings.WebRouting);
-            Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
-            Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
+            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
+            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
+            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
-            // replace some stuff
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem");
+            Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
-            // need real file systems here as templates content is on-disk only
-            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
-            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Xslt", "/xslt"), "XsltFileSystem");
+            // register filesystems
+            Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());
+
+            var logger = Mock.Of<ILogger>();
+            var scheme = Mock.Of<IMediaPathScheme>();
+            var config = Mock.Of<IContentSection>();
+
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+            Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)
-            Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
+            Composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // register application stuff (database factory & context, services...)
-            Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
-                .AddCore();
+            Composition.WithCollectionBuilder<MapperCollectionBuilder>()
+                .AddCoreMappers();
 
-            Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
-            var sqlSyntaxProviders = TestObjects.GetDefaultSqlSyntaxProviders(Logger);
-            Container.RegisterSingleton<ISqlSyntaxProvider>(_ => sqlSyntaxProviders.OfType<SqlCeSyntaxProvider>().First());
-            Container.RegisterSingleton<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
+            Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
+            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
-                sqlSyntaxProviders,
                 Logger,
-                Mock.Of<IMapperCollection>()));
-            Container.RegisterSingleton(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
+                new Lazy<IMapperCollection>(Mock.Of<IMapperCollection>)));
+            Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
-            Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
-            Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
-            Container.RegisterSingleton(factory
+            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
+
+            Composition.RegisterUnique(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
-            Container.RegisterSingleton(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
+            Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
-            Container.RegisterFrom<ServicesCompositionRoot>();
+            Composition.ComposeServices();
+
             // composition root is doing weird things, fix
-            Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
-            Container.RegisterSingleton<ISectionService, SectionService>();
+            Composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            Composition.RegisterUnique<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
-            Container.RegisterCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
-            Container.RegisterSingleton<ManifestParser>();
+            Composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+            Composition.RegisterUnique<ManifestParser>();
 
             // note - don't register collections, use builders
-            Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>();
-            Container.RegisterSingleton<PropertyEditorCollection>();
-            Container.RegisterSingleton<ParameterEditorCollection>();
+            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
+            Composition.RegisterUnique<PropertyEditorCollection>();
+            Composition.RegisterUnique<ParameterEditorCollection>();
         }
 
         #endregion
@@ -358,7 +365,7 @@ namespace Umbraco.Tests.Testing
 
             Mapper.Initialize(configuration =>
             {
-                var profiles = Container.GetAllInstances<Profile>();
+                var profiles = Factory.GetAllInstances<Profile>();
                 foreach (var profile in profiles)
                     configuration.AddProfile(profile);
             });
@@ -395,9 +402,9 @@ namespace Umbraco.Tests.Testing
             // reset and dispose scopes
             // ensures we don't leak an opened database connection
             // which would lock eg SqlCe .sdf files
-            if (Container?.TryGetInstance<IScopeProvider>() is ScopeProvider scopeProvider)
+            if (Factory?.TryGetInstance<IScopeProvider>() is ScopeProvider scopeProvider)
             {
-                Core.Scoping.Scope scope;
+                Scope scope;
                 while ((scope = scopeProvider.AmbientScope) != null)
                 {
                     scope.Reset();
@@ -405,10 +412,7 @@ namespace Umbraco.Tests.Testing
                 }
             }
 
-            Current.Reset();
-
-            Container?.Dispose();
-            Container = null;
+            Current.Reset(); // disposes the factory
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();

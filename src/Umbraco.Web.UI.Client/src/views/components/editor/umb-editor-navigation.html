@@ -12,6 +12,7 @@
                ng-class="{'is-active': item.active, '-has-error': item.hasError}">
                 <i class="icon {{ item.icon }}"></i>
                 <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+                <div ng-show="item.badge" class="badge -type-{{item.badge.type}}">{{item.badge.count}}</div>
             </a>
         </div>
     </li>

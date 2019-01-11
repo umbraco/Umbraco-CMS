@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
@@ -9,10 +10,29 @@ namespace Umbraco.Web.Install
         private readonly InstallHelper _installHelper;
         private readonly IEnumerable<InstallSetupStep> _orderedInstallerSteps;
 
-        public InstallStepCollection(InstallHelper installHelper, IEnumerable<InstallSetupStep> orderedInstallerSteps)
+        public InstallStepCollection(InstallHelper installHelper, IEnumerable<InstallSetupStep> installerSteps)
         {
             _installHelper = installHelper;
-            _orderedInstallerSteps = orderedInstallerSteps;
+
+            // fixme this is ugly but I have a branch where it's nicely refactored - for now we just want to manage ordering
+            var a = installerSteps.ToArray();
+            _orderedInstallerSteps = new InstallSetupStep[]
+            {
+                a.OfType<NewInstallStep>().First(),
+                a.OfType<UpgradeStep>().First(),
+                a.OfType<FilePermissionsStep>().First(),
+                a.OfType<ConfigureMachineKey>().First(),
+                a.OfType<DatabaseConfigureStep>().First(),
+                a.OfType<DatabaseInstallStep>().First(),
+                a.OfType<DatabaseUpgradeStep>().First(),
+
+                //TODO: Add these back once we have a compatible starter kit
+                //orderedInstallerSteps.OfType<StarterKitDownloadStep>().First(),
+                //orderedInstallerSteps.OfType<StarterKitInstallStep>().First(),
+                //orderedInstallerSteps.OfType<StarterKitCleanupStep>().First(),
+
+                a.OfType<SetUmbracoVersionStep>().First(),
+            };
         }
 
 

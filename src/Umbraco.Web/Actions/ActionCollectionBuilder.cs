@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Umbraco.Core.Composing;
-
 namespace Umbraco.Web.Actions
 {
     internal class ActionCollectionBuilder : LazyCollectionBuilderBase<ActionCollectionBuilder, ActionCollection, IAction>
     {
-        public ActionCollectionBuilder(IServiceContainer container)
-            : base(container)
-        { }
-
         protected override ActionCollectionBuilder This => this;
 
-        protected override IEnumerable<IAction> CreateItems(params object[] args)
+        protected override IEnumerable<IAction> CreateItems(IFactory factory)
         {
-            var items = base.CreateItems(args).ToList();
+            var items = base.CreateItems(factory).ToList();
 
             //validate the items, no actions should exist that do not either expose notifications or permissions
             var invalidItems = items.Where(x => !x.CanBePermissionAssigned && !x.ShowInNotifier).ToList();

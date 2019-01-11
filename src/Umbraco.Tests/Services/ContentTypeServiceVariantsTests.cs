@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -35,10 +34,10 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             // pfew - see note in ScopedNuCacheTests?
-            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService()
@@ -50,7 +49,7 @@ namespace Umbraco.Tests.Services
 
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeService>());
             //var documentRepository = Mock.Of<IDocumentRepository>();
-            var documentRepository = Container.GetInstance<IDocumentRepository>();
+            var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var contentTypeService = Current.Services.ContentTypeService;
@@ -69,7 +68,7 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeService);
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeService);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

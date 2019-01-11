@@ -1,9 +1,9 @@
 ﻿using System;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -27,8 +27,13 @@ namespace Umbraco.Tests.Models
             // need to be able to retrieve them all...
 
             Current.Reset();
-            var container = Mock.Of<IServiceContainer>();
-            Current.Container = container;
+
+            var configs = new Configs();
+            configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
@@ -46,20 +51,20 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => dataType);
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 dataTypeService: dataTypeService,
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
-            Mock.Get(container)
+            Mock.Get(factory)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
+                    if (x == typeof(Configs)) return configs;
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
                     if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
-                    throw new Exception("oops");
+                    throw new NotSupportedException(x.FullName);
                 });
-
         }
 
         [Test]
@@ -402,7 +407,6 @@ namespace Umbraco.Tests.Models
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             // change - now we vary by culture
-
             contentType.Variations |= ContentVariation.Culture;
             propertyType.Variations |= ContentVariation.Culture;
 

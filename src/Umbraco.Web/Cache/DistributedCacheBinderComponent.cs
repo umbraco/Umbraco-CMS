@@ -1,24 +1,22 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Components;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Components;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Installs listeners on service events in order to refresh our caches.
-    /// </summary>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    [RequiredComponent(typeof(IUmbracoCoreComponent))] // runs before every other IUmbracoCoreComponent!
-    public class DistributedCacheBinderComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public class DistributedCacheBinderComponent : IComponent
     {
-        public override void Compose(Composition composition)
+        private readonly IDistributedCacheBinder _binder;
+
+        public DistributedCacheBinderComponent(IDistributedCacheBinder distributedCacheBinder)
         {
-            composition.Container.RegisterSingleton<IDistributedCacheBinder, DistributedCacheBinder>();
+            _binder = distributedCacheBinder;
         }
 
-        public void Initialize(IDistributedCacheBinder distributedCacheBinder)
+        public void Initialize()
         {
-            distributedCacheBinder.BindEvents();
+            _binder.BindEvents();
         }
+
+        public void Terminate()
+        { }
     }
 }

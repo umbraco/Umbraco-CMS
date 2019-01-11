@@ -62,7 +62,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the identifier of the template to use to render the content item.
         /// </summary>
-        int TemplateId { get; }
+        int? TemplateId { get; }
 
         /// <summary>
         /// Gets the identifier of the user who created the content item.

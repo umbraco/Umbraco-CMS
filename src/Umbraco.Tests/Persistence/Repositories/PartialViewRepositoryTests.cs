@@ -1,12 +1,10 @@
 ﻿using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -29,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.Compose();
 
-            Container.RegisterSingleton(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+            Composition.RegisterUnique(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
         }
 
         [Test]
@@ -37,10 +35,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // unless noted otherwise, no changes / 7.2.8
 
+            var fileSystems = Mock.Of<IFileSystems>();
+            Mock.Get(fileSystems).Setup(x => x.PartialViewsFileSystem).Returns(_fileSystem);
+
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = new PartialViewRepository(_fileSystem);
+                var repository = new PartialViewRepository(fileSystems);
 
                 var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);

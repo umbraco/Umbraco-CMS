@@ -701,16 +701,23 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         }
 
         getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-            $scope.listViewAllowedTypes = listViewAllowedTypes;
+          $scope.listViewAllowedTypes = listViewAllowedTypes;
 
           var blueprints = false;
           _.each(listViewAllowedTypes, function (allowedType) {
               if (_.isEmpty(allowedType.blueprints)) {
-                  // this helps the view understand that there are no blueprints available
-                  allowedType.blueprints = null;
+                // this helps the view understand that there are no blueprints available
+                allowedType.blueprints = null;
               }
               else {
-                    blueprints = true;
+                blueprints = true;
+                // turn the content type blueprints object into an array of sortable objects for the view
+                allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
+                  return {
+                    id: pair[0],
+                    name: pair[1]
+                  };
+                });
               }
             });
 
@@ -776,17 +783,19 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         }
     }
 
-
     function createBlank(entityType, docTypeAlias) {
         $location
             .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
-            .search("doctype=" + docTypeAlias + "&create=true");
+            .search("doctype", docTypeAlias)
+            .search("create", "true");
     }
 
     function createFromBlueprint(entityType, docTypeAlias, blueprintId) {
         $location
             .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
-            .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+            .search("doctype", docTypeAlias)
+            .search("create", "true")
+            .search("blueprintId", blueprintId);
     }
 
     $scope.createBlank = createBlank;

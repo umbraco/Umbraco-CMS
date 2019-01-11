@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -20,6 +19,7 @@ using static Umbraco.Tests.Cache.DistributedCache.DistributedCacheTests;
 namespace Umbraco.Tests.Integration
 {
     [TestFixture]
+    [Category("Slow")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentEventsTests : TestWithSomeContentBase
     {
@@ -50,10 +50,10 @@ namespace Umbraco.Tests.Integration
         {
             base.Compose();
 
-            Container.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-            Container.Register<IServerMessenger, LocalServerMessenger>(new PerContainerLifetime());
+            Composition.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
 
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<ContentTypeCacheRefresher>()
                 .Add<ContentCacheRefresher>()
                 .Add<MacroCacheRefresher>();
