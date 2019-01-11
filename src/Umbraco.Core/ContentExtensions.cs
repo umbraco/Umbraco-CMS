@@ -180,7 +180,7 @@ namespace Umbraco.Core
 
         private static void SetUploadFile(this IContentBase content, IContentTypeService contentTypeService, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
-            var property = GetProperty(content, contentTypeService propertyTypeAlias);
+            var property = GetProperty(content, contentTypeService, propertyTypeAlias);
 
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
