@@ -52,6 +52,7 @@ angular.module('umbraco')
             });
             editedCrop.coordinates = $scope.currentCrop.coordinates;
             $scope.close();
+            angularHelper.getCurrentForm($scope).$setDirty();
         };
 
         //reset the current crop
@@ -97,6 +98,10 @@ angular.module('umbraco')
             $scope.isCroppable = isCroppable;
             $scope.hasDimensions = hasDimensions;
         };
+
+        $scope.focalPointChanged = function () {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
 
         //on image selected, update the cropper
         $scope.$on("filesSelected", function (ev, args) {
