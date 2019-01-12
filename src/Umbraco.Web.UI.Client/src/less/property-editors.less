@@ -1,3 +1,5 @@
+@checkered-background: url(../img/checkered-background.png);
+
 //
 // Container styles
 // --------------------------------------------------
@@ -386,7 +388,7 @@ div.umb-codeeditor .umb-btn-toolbar {
     max-height:100%;
     margin:auto;
     display:block;
-    background-image: url(../img/checkered-background.png);
+    background-image: @checkered-background;
 }
 
 .umb-sortable-thumbnails li .trashed {
@@ -599,12 +601,18 @@ div.umb-codeeditor .umb-btn-toolbar {
         vertical-align: top;
     }
 
-    .gravity-container .viewport {
-        max-width: 600px;
-    }
+    .gravity-container {
+        border: 1px solid @gray-8;
+        line-height: 0;
 
-    .gravity-container .viewport:hover {
-        cursor: pointer;
+        .viewport {
+            max-width: 600px;
+            background: @checkered-background;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .imagecropper {
@@ -884,6 +892,10 @@ div.umb-codeeditor .umb-btn-toolbar {
   list-style: none;
   vertical-align: middle;
   margin-bottom: 0;
+
+  img {
+    background: @checkered-background;
+  }
 }
 
 .umb-fileupload label {
