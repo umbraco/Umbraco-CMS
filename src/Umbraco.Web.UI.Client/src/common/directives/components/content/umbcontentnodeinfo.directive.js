@@ -97,9 +97,9 @@
                 }
 
                 //load in the audit trail if we are currently looking at the INFO tab
-                if (umbVariantContentCtrl) {
+                if (umbVariantContentCtrl && umbVariantContentCtrl.editor) {
                     var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
-                    if (activeApp.alias === "umbInfo") {
+                    if (activeApp && activeApp.alias === "umbInfo") {
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
