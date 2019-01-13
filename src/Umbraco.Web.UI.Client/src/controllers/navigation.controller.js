@@ -355,7 +355,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 if (!currCulture) {
                     // no culture in the request, let's look for one in the cookie that's set when changing language
                     var defaultCulture = $cookies.get("UMB_MCULTURE");
-                    if (!defaultCulture) {
+                    if (!defaultCulture || !_.find($scope.languages, function (l) {
+                            return l.culture.toLowerCase() === defaultCulture.toLowerCase();
+                        })) {
                         // no luck either, look for the default language
                         var defaultLang = _.find($scope.languages, function (l) {
                             return l.isDefault;
