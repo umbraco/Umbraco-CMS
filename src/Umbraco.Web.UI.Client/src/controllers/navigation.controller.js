@@ -401,9 +401,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     $scope.selectLanguage = function (language) {
 
         $location.search("mculture", language.culture);
-        // add the selected culture to a cookie so the user will log back into the same culture later on (cookie max age is one year = 31536000 seconds)
-        // NOTE: $cookies doesn't support max-age, so we need to go the good ol' JS way about setting the cookie
-        document.cookie = "UMB_MCULTURE=" +language.culture + ";path=/;max-age=31536000;";
+        // add the selected culture to a cookie so the user will log back into the same culture later on (cookie lifetime = one year)
+        var expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 365);
+        $cookies.put("UMB_MCULTURE", language.culture, {path: "/", expires: expireDate});
 
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
