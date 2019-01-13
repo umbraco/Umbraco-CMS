@@ -11,6 +11,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
     var vm = this;
 
     vm.selectIcon = selectIcon;
+    vm.submit = submit;
     vm.close = close;
 
     vm.colors = [
@@ -47,11 +48,10 @@ function IconPickerController($scope, iconHelper, localizationService) {
         });
 
         // set a default color if nothing is passed in
-        vm.color = $scope.model.color ? $scope.model.color :  vm.colors[0].value;
+        vm.color = $scope.model.color ? $scope.model.color : vm.colors[0].value;
 
         // if an icon is passed in - preselect it
         vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
-
     }
 
     function setTitle() {
