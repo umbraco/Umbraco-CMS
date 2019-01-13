@@ -11,6 +11,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
     var vm = this;
 
     vm.selectIcon = selectIcon;
+    vm.selectColor = selectColor;
     vm.submit = submit;
     vm.close = close;
 
@@ -69,6 +70,10 @@ function IconPickerController($scope, iconHelper, localizationService) {
         submit();
     }
 
+    function selectColor(color) {
+        $scope.model.color = color;
+    }
+
     function close() {
         if($scope.model && $scope.model.close) {
             $scope.model.close();
@@ -76,16 +81,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
     }
 
     function submit() {
-        if ($scope.model && $scope.model.submit) {
-
-            // if icon not match selected icon
-            if (!$scope.model.icon !== vm.icon)
-                $scope.model.icon = vm.icon;
-
-            // if color not match selected color
-            if ($scope.model.color !== vm.color)
-                $scope.model.color = vm.color;
-            
+        if ($scope.model && $scope.model.submit) {            
             $scope.model.submit($scope.model);
         }
     }
