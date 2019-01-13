@@ -50,7 +50,7 @@ Use this directive to generate color swatches to pick from.
                 colors: '=?',
                 size: '@',
                 selectedColor: '=',
-                onSelect: '<',
+                onSelect: '&',
                 useLabel: '=',
                 useColorClass: '=?'
             },
