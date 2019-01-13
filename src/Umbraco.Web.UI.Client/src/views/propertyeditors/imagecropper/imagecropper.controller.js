@@ -52,6 +52,7 @@ angular.module('umbraco')
             });
             editedCrop.coordinates = $scope.currentCrop.coordinates;
             $scope.close();
+            angularHelper.getCurrentForm($scope).$setDirty();
         };
 
         //reset the current crop
@@ -97,6 +98,10 @@ angular.module('umbraco')
             $scope.isCroppable = isCroppable;
             $scope.hasDimensions = hasDimensions;
         };
+
+        $scope.focalPointChanged = function () {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
 
         $scope.hasAutomaticCrops = function() {
             return $scope.isCroppable && _.find($scope.model.value.crops, function(crop) {

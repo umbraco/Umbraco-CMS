@@ -139,6 +139,11 @@ function ColorPickerController($scope) {
         if (!$scope.model.value)
             return;
 
+        // Backwards compatibility, the color used to be stored as a hex value only
+        if (typeof $scope.model.value === "string") {
+            $scope.model.value = { value: $scope.model.value, label: $scope.model.value };
+        }
+
         // Complex color (value and label)?
         if (!$scope.model.value.hasOwnProperty("value"))
             return;

@@ -32,8 +32,11 @@
     <key alias="rename" version="7.3.0">Omdøb</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+    <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
-    <key alias="toInTheTreeStructureBelow">I træstrukturen nedenfor</key>
+    <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="wasMovedTo">blev flyttet til</key>
+    <key alias="wasCopiedTo">blev kopieret til</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -179,6 +182,11 @@
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
     <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
   </area>
+  <area alias="codefile">
+    <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
+    <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
+      <key alias="deleteItemFailed">Sletning af filen/mappen fejlede: %0%</key>
+  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Udgivet</key>
     <key alias="about">Om siden</key>
@@ -279,6 +287,7 @@
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
+    <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
@@ -830,7 +839,8 @@
     <key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
+    <key alias="editNotifications"><![CDATA[Vælg dine notificeringer for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notificeringer er gemt for</key>
     <key alias="mailBody">
       <![CDATA[
 Hej %0%
@@ -1006,6 +1016,7 @@ Mange hilsner fra Umbraco robotten
 
 
   <area alias="rollback">
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
@@ -1155,6 +1166,7 @@ Mange hilsner fra Umbraco robotten
   </area>
 
   <area alias="template">
+    <key alias="deleteByIdFailed">Sletning af skabelonen med ID %0% fejlede</key>
     <key alias="edittemplate">Rediger skabelon</key>
 
     <key alias="insertSections">Sektioner</key>

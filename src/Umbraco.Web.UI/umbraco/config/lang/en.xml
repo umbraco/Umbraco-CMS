@@ -33,8 +33,11 @@
         <key alias="rename" version="7.3.0">Rename</key>
         <key alias="restore" version="7.3.0">Restore</key>
         <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+        <key alias="chooseWhereToCopy">Choose where to copy</key>
         <key alias="chooseWhereToMove">Choose where to move</key>
-        <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+        <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+        <key alias="wasMovedTo">was moved to</key>
+        <key alias="wasCopiedTo">was copied to</key>
         <key alias="rights">Permissions</key>
         <key alias="rollback">Rollback</key>
         <key alias="sendtopublish">Send To Publish</key>
@@ -185,6 +188,11 @@
         <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
         <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
     </area>
+    <area alias="codefile">
+        <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
+        <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+        <key alias="deleteItemFailed">Failed to delete item: %0%</key>
+    </area>
     <area alias="content">
         <key alias="isPublished" version="7.2">Is Published</key>
         <key alias="about">About this page</key>
@@ -287,6 +295,7 @@
         <key alias="chooseNode">Where do you want to create the new %0%</key>
         <key alias="createUnder">Create an item under</key>
         <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
+        <key alias="enterFolderName">Enter a folder name</key>
         <key alias="updateData">Choose a type and a title</key>
         <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
         <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
@@ -1038,7 +1047,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="relateToOriginal">Relate copied items to original</key>
     </area>
     <area alias="notifications">
-        <key alias="editNotifications">Edit your notification for %0%</key>
+        <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+        <key alias="notificationsSavedFor">Notification settings saved for</key>
         <key alias="mailBody">
             <![CDATA[
       Hi %0%
@@ -1312,6 +1322,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
     </area>
     <area alias="rollback">
+        <key alias="headline">Select a version to compare with the current version</key>
         <key alias="currentVersion">Current version</key>
         <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
         <key alias="documentRolledBack">Document has been rolled back</key>
@@ -1480,6 +1491,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
 
     <area alias="template">
+        <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
         <key alias="edittemplate">Edit template</key>
 
         <key alias="insertSections">Sections</key>

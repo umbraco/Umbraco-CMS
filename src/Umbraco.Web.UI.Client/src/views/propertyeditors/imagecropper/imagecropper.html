@@ -40,7 +40,8 @@
                 <umb-image-gravity
                     src="imageSrc"
                     center="model.value.focalPoint"
-                    on-image-loaded="imageLoaded(isCroppable, hasDimensions)">
+                    on-image-loaded="imageLoaded(isCroppable, hasDimensions)"
+                    on-gravity-changed="focalPointChanged()">
                 </umb-image-gravity>
                 <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
             </div>

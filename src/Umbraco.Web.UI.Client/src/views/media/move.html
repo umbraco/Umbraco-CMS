@@ -11,7 +11,9 @@
 
 		    <div ng-show="success">
 			    <div class="alert alert-success">
-				    <strong>{{currentNode.name}}</strong> was moved underneath <strong>{{target.name}}</strong>
+			        <strong>{{currentNode.name}}</strong>
+			        <localize key="actions_wasMovedTo">was moved to</localize>
+			        <strong>{{target.name}}</strong>
 			    </div>
 			    <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
 		    </div>
