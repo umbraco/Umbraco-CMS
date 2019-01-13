@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -26,6 +27,11 @@ namespace Umbraco.Tests.Models
             // need to be able to retrieve them all...
 
             Current.Reset();
+
+            var configs = new Configs();
+            configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
 
@@ -45,7 +51,7 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => dataType);
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 dataTypeService: dataTypeService,
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
@@ -53,12 +59,12 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
+                    if (x == typeof(Configs)) return configs;
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
                     if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
-                    throw new Exception("oops");
+                    throw new NotSupportedException(x.FullName);
                 });
-            
         }
 
         [Test]
@@ -429,7 +435,7 @@ namespace Umbraco.Tests.Models
             Assert.IsTrue(content.IsCultureAvailable(langUk));
             Assert.IsFalse(content.IsCulturePublished(langUk));
             Assert.IsNull(content.GetPublishName(langUk));
-            Assert.IsNull(content.GetPublishDate(langUk)); // not published            
+            Assert.IsNull(content.GetPublishDate(langUk)); // not published
 
             Assert.IsFalse(content.IsCultureAvailable(langEs));
             Assert.IsFalse(content.IsCultureEdited(langEs)); // not avail, so... not edited
@@ -437,7 +443,7 @@ namespace Umbraco.Tests.Models
 
             // not published!
             Assert.IsNull(content.GetPublishName(langEs));
-            Assert.IsNull(content.GetPublishDate(langEs)); 
+            Assert.IsNull(content.GetPublishDate(langEs));
 
             // cannot test IsCultureEdited here - as that requires the content service and repository
             // see: ContentServiceTests.Can_SaveRead_Variations

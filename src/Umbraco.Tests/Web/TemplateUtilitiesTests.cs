@@ -34,20 +34,22 @@ namespace Umbraco.Tests.Web
             // should not depend on more than IdkMap maybe - fix this!
             var entityService = new Mock<IEntityService>();
             entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
-            var serviceContext = new ServiceContext(entityService: entityService.Object);
+            var serviceContext = ServiceContext.CreatePartial(entityService: entityService.Object);
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IFactory>();
-            container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
+            var factory = new Mock<IFactory>();
+            factory.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
                 new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
-            container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
-            Current.Factory = container.Object;
+            factory.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
+
+            var settings = SettingsForTests.GetDefaultUmbracoSettings();
+            factory.Setup(x => x.GetInstance(typeof(IUmbracoSettingsSection))).Returns(settings);
+
+            Current.Factory = factory.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             Udi.ResetUdiTypes();
-
-            Current.Config.SetUmbracoConfig(SettingsForTests.GetDefaultUmbracoSettings());
         }
 
         [TearDown]

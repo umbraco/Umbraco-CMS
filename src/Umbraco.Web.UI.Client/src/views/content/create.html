@@ -25,13 +25,13 @@
                 </li>
 
             </ul>
-            <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint && docType.blueprints.length > 0">
+            <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
 
-                <li class="umb-action" ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
-                    <a class="umb-action-link" ng-click="createFromBlueprint(key)">
+                <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false">
+                    <a class="umb-action-link" ng-click="createFromBlueprint(blueprint.id)">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">
-                            {{value}}
+                            {{blueprint.name}}
                         </span>
                     </a>
                 </li>

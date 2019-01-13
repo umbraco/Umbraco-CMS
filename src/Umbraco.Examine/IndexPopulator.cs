@@ -38,9 +38,9 @@ namespace Umbraco.Examine
 
         public void Populate(params IIndex[] indexes)
         {
-            PopulateIndexes(indexes.Where(IsRegistered));
+            PopulateIndexes(indexes.Where(IsRegistered).ToList());
         }
 
-        protected abstract void PopulateIndexes(IEnumerable<IIndex> indexes);
+        protected abstract void PopulateIndexes(IReadOnlyList<IIndex> indexes);
     }
 }

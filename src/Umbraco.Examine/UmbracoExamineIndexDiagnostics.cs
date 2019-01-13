@@ -64,7 +64,7 @@ namespace Umbraco.Examine
                 {
                     [nameof(UmbracoExamineIndex.CommitCount)] = _index.CommitCount,
                     [nameof(UmbracoExamineIndex.DefaultAnalyzer)] = _index.DefaultAnalyzer.GetType().Name,
-                    [nameof(UmbracoExamineIndex.DirectoryFactory)] = _index.DirectoryFactory,
+                    ["LuceneDirectory"] = _index.GetLuceneDirectory().GetType().Name,
                     [nameof(UmbracoExamineIndex.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler,
                     [nameof(UmbracoExamineIndex.LuceneIndexFolder)] =
                         _index.LuceneIndexFolder == null

@@ -35,8 +35,11 @@ namespace Umbraco.Tests.PublishedContent
             // this test implements a full standalone NuCache (based upon a test IDataSource, does not
             // use any local db files, does not rely on any database) - and tests variations
 
-            SettingsForTests.ConfigureSettings(SettingsForTests.GenerateMockUmbracoSettings());
-            var globalSettings = Current.Config.Global();
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            Current.Configs.Add<IGlobalSettings>(() => new GlobalSettings());
+            var globalSettings = Current.Configs.Global();
 
             // create a content node kit
             var kit = new ContentNodeKit
@@ -102,7 +105,7 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
 
             // create a service context
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 dataTypeService : dataTypeService,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),

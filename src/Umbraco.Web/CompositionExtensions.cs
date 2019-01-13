@@ -8,6 +8,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Tour;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
@@ -69,6 +70,12 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
             => composition.WithCollectionBuilder<HealthCheckCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the TourFilters collection builder.
+        /// </summary>
+        public static TourFilterCollectionBuilder TourFilters(this Composition composition)
+            => composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.

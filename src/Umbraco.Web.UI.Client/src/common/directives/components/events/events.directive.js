@@ -136,7 +136,7 @@ angular.module('umbraco.directives')
                     return;
                 }
 
-            angularHelper.safeApply(scope, attrs.onOutsideClick);
+                scope.$apply(attrs.onOutsideClick);
         }
 
 

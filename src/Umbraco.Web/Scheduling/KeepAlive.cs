@@ -11,9 +11,8 @@ namespace Umbraco.Web.Scheduling
     internal class KeepAlive : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
-        private readonly ILogger _logger;
+        private readonly IProfilingLogger _logger;
         private static HttpClient _httpClient;
-        private readonly IProfilingLogger _proflog;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             IRuntimeState runtime, IProfilingLogger logger)
@@ -45,7 +44,7 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            using (_proflog.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
+            using (_logger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
                 string umbracoAppUrl = null;
 

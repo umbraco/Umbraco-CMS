@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using System.Web.UI;
+using Umbraco.Core;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Pages
@@ -72,7 +73,7 @@ namespace Umbraco.Web.UI.Pages
         {
             base.OnLoad(e);
 
-            if (Request.IsSecureConnection || Current.Config.Global().UseHttps == false) return;
+            if (Request.IsSecureConnection || Current.Configs.Global().UseHttps == false) return;
 
             var serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
             Response.Redirect($"https://{serverName}{Request.FilePath}");

@@ -239,9 +239,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                if (eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index))
-                    return index.GetSearcher();
-                throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.InternalIndexName}");
+                return eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
             }
             catch (FileNotFoundException)
             {

@@ -30,7 +30,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             PrimitiveSerializer.Int32.WriteTo(value.VersionId, stream);
             PrimitiveSerializer.DateTime.WriteTo(value.VersionDate, stream);
             PrimitiveSerializer.Int32.WriteTo(value.WriterId, stream);
-            PrimitiveSerializer.Int32.WriteTo(value.TemplateId, stream);
+            if (value.TemplateId.HasValue)
+            {
+                PrimitiveSerializer.Int32.WriteTo(value.TemplateId.Value, stream);
+            }
             PropertiesSerializer.WriteTo(value.Properties, stream);
             CultureVariationsSerializer.WriteTo(value.CultureInfos, stream);
         }

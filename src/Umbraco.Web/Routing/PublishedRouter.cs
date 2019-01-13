@@ -755,9 +755,9 @@ namespace Umbraco.Web.Routing
             }
         }
 
-        private ITemplate GetTemplateModel(int templateId)
+        private ITemplate GetTemplateModel(int? templateId)
         {
-            if (templateId <= 0)
+            if (templateId.HasValue == false)
             {
                 _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
                 return null;
@@ -765,7 +765,10 @@ namespace Umbraco.Web.Routing
 
             _logger.Debug<PublishedRouter>("GetTemplateModel: Get template id={TemplateId}", templateId);
 
-            var template = _services.FileService.GetTemplate(templateId);
+            if (templateId == null)
+                throw new InvalidOperationException("The template is not set, the page cannot render.");
+
+            var template = _services.FileService.GetTemplate(templateId.Value);
             if (template == null)
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
             _logger.Debug<PublishedRouter>("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);

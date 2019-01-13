@@ -63,7 +63,7 @@ namespace Umbraco.Web.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentConfigSection.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(frequest.UmbracoContext.ContentCache, frequest.UmbracoContext.MediaCache),
+                new PublishedContentQuery(frequest.UmbracoContext.ContentCache, frequest.UmbracoContext.MediaCache, frequest.UmbracoContext.VariationContextAccessor),
                 errorCulture);
 
             IPublishedContent content = null;

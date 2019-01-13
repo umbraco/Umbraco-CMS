@@ -33,8 +33,11 @@
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="wasMovedTo">was moved to</key>
+    <key alias="wasCopiedTo">was copied to</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -267,8 +270,10 @@
     <key alias="includeUnpublished">Include drafts: also publish unpublished content items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     <key alias="isSensitiveValue_short">This value is hidden.</key>
+    <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
     <key alias="languagesToSave">What languages would you like to save?</key>
+    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
@@ -967,7 +972,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Edit your notification for %0%</key>
+    <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
 
@@ -1224,6 +1230,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
@@ -1990,6 +1997,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>
     <key alias="enableUrlTracker">Enable URL tracker</key>
+    <key alias="culture">Culture</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Redirected To</key>
     <key alias="redirectUrlManagement">Redirect Url Management</key>
@@ -2018,10 +2026,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
     <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
     <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
-  </area>
-  <area alias="notify">
-    <key alias="notifySet">Select your notifications for</key>
-    <key alias="notificationsSavedFor">Notification settings saved for </key>
   </area>
   <area alias="relationType">
     <key alias="direction">Direction</key>

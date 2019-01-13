@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Formatting;
-using System.Web.Http.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -31,7 +25,7 @@ namespace Umbraco.Web.Trees
             {
                 case ActionDelete actionDelete:
                     return Attempt.Succeed(
-                        Current.Config.Global().Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
+                        Current.Configs.Global().Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
             }
 
             return Attempt<string>.Fail();
@@ -78,6 +72,5 @@ namespace Umbraco.Web.Trees
             public ActionUrlMethod ActionMethod { get; private set; }
             public string DialogTitle { get; private set; }
         }
-
     }
 }

@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Manifest
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
             Mock.Get(factory)

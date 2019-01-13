@@ -32,8 +32,11 @@
     <key alias="rename" version="7.3.0">Omdøb</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+    <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
-    <key alias="toInTheTreeStructureBelow">I træstrukturen nedenfor</key>
+    <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="wasMovedTo">blev flyttet til</key>
+    <key alias="wasCopiedTo">blev kopieret til</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -772,7 +775,8 @@
     <key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
+    <key alias="editNotifications"><![CDATA[Vælg dine notificeringer for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notificeringer er gemt for</key>
     <key alias="mailBody"><![CDATA[
 Hej %0%
 
@@ -932,6 +936,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="undoEditCrop">Fortryd</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>

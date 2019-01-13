@@ -3,10 +3,11 @@ using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Routing;
 
@@ -15,17 +16,6 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     public class GetContentUrlsTests : UrlRoutingTestBase
     {
-        private IUmbracoSettingsSection _umbracoSettings;
-
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            //generate new mock settings and assign so we can configure in individual tests
-            _umbracoSettings = SettingsForTests.GenerateMockUmbracoSettings();
-            SettingsForTests.ConfigureSettings(_umbracoSettings);
-        }
-
         private ILocalizedTextService GetTextService()
         {
             var textService = Mock.Of<ILocalizedTextService>(
@@ -80,8 +70,10 @@ namespace Umbraco.Tests.Routing
             content.Path = "-1,1046";
             content.Published = true;
 
+            var umbracoSettings = Current.Configs.Settings();
+
             var umbContext = GetUmbracoContext("http://localhost:8000",
-                urlProviders: new []{ new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
+                urlProviders: new []{ new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
@@ -110,8 +102,10 @@ namespace Umbraco.Tests.Routing
             child.Path = "-1,1046,1173";
             child.Published = true;
 
+            var umbracoSettings = Current.Configs.Settings();
+
             var umbContext = GetUmbracoContext("http://localhost:8000",
-                urlProviders: new[] { new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
+                urlProviders: new[] { new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper()) });
             var publishedRouter = CreatePublishedRouter(Factory,
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = child.GetContentUrls(publishedRouter,

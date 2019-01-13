@@ -1,8 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.CoreThings
@@ -10,14 +11,11 @@ namespace Umbraco.Tests.CoreThings
     [TestFixture]
     public class TryConvertToTests : UmbracoTestBase
     {
-        public override void SetUp()
+        protected void Compose()
         {
-            base.SetUp();
+            base.Compose();
 
-            var settings = SettingsForTests.GetDefaultUmbracoSettings();
-
-            // fixme - base should do it!
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
+            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IUmbracoSettingsSection>()));
         }
 
         [Test]

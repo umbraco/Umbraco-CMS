@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     public class Content : ContentBase, IContent
     {
         private IContentType _contentType;
-        private ITemplate _template;
+        private int? _templateId;
         private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Models
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
+            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, int?>(x => x.TemplateId);
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
             public readonly PropertyInfo ContentScheduleSelector = ExpressionHelper.GetPropertyInfo<Content, ContentScheduleCollection>(x => x.ContentSchedule);
             public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
@@ -131,10 +131,10 @@ namespace Umbraco.Core.Models
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
-        public ITemplate Template
+        public int? TemplateId
         {
-            get => _template ?? _contentType.DefaultTemplate;
-            set => SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector);
+            get => _templateId;
+            set => SetPropertyValueAndDetectChanges(value, ref _templateId, Ps.Value.TemplateSelector);
         }
 
 
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public ITemplate PublishTemplate { get; internal set; } // set by persistence
+        public int? PublishTemplateId { get; internal set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -457,9 +457,7 @@ namespace Umbraco.Core.Models
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
-
-            if (Template != null)
-                Template.ResetDirtyProperties(rememberDirty);
+            
             if (ContentType != null)
                 ContentType.ResetDirtyProperties(rememberDirty);
 

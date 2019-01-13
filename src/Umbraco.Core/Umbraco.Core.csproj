@@ -155,6 +155,7 @@
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Collections\TypeList.cs" />
     <Compile Include="Components\AuditEventsComposer.cs" />
+    <Compile Include="Components\ComponentComposer.cs" />
     <Compile Include="Components\Composers.cs" />
     <Compile Include="Components\Composition.cs" />
     <Compile Include="Components\CompositionExtensions.cs" />
@@ -168,8 +169,8 @@
     <Compile Include="Components\ManifestWatcherComposer.cs" />
     <Compile Include="Components\RelateOnCopyComposer.cs" />
     <Compile Include="Components\RelateOnTrashComposer.cs" />
-    <Compile Include="Components\RequireAttribute.cs" />
-    <Compile Include="Components\RequiredByAttribute.cs" />
+    <Compile Include="Components\ComposeAfterAttribute.cs" />
+    <Compile Include="Components\ComposeBeforeAttribute.cs" />
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\ComponentCollection.cs" />
     <Compile Include="Components\ComponentCollectionBuilder.cs" />
@@ -203,6 +204,8 @@
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
+    <Compile Include="ConfigsExtensions.cs" />
+    <Compile Include="Configuration\Configs.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessRule.cs" />
@@ -256,7 +259,6 @@
     <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
-    <Compile Include="Configuration\UmbracoConfig.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
@@ -384,6 +386,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTemplateDesignColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\MakeRedirectUrlVariant.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MakeTagsVariant.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />

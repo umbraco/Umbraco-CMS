@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading;
 using System.Web;
 using umbraco;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -181,7 +182,7 @@ namespace Umbraco.Web.Routing
             IsInternalRedirectPublishedContent = isInternalRedirect;
 
             // must restore the template if it's an internal redirect & the config option is set
-            if (isInternalRedirect && Current.Config.Umbraco().WebRouting.InternalRedirectPreservesTemplate)
+            if (isInternalRedirect && Current.Configs.Settings().WebRouting.InternalRedirectPreservesTemplate)
             {
                 // restore
                 _template = template;

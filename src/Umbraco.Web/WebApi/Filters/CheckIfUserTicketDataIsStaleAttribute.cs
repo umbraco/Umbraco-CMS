@@ -76,7 +76,7 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService, Current.Config.Global());
+                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService, Current.Configs.Global());
                     return culture != null && culture.ToString() != identity.Culture;
                 },
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,

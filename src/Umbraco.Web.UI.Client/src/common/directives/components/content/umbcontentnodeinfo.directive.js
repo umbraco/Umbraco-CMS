@@ -3,7 +3,7 @@
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
-        function link(scope, element, attrs, umbVariantContentCtrl) {
+        function link(scope, umbVariantContentCtrl) {
 
             var evts = [];
             var isInfoTab = false;
@@ -22,19 +22,12 @@
                 // set currentVariant
                 scope.currentVariant = _.find(scope.node.variants, (v) => v.active);
 
-                // find the urls for the currently selected language
-                if(scope.node.variants.length > 1) {
-                    // nodes with variants
-                    scope.currentUrls =  _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
-                } else {
-                    // invariant nodes
-                    scope.currentUrls =  scope.node.urls;
-                }
+                updateCurrentUrls();
 
                 // if there are any infinite editors open we are in infinite editing
                 scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
 
-                userService.getCurrentUser().then(function(user){
+                userService.getCurrentUser().then(function (user) {
                     // only allow change of media type if user has access to the settings sections
                     const hasAccessToSettings = user.allowedSections.indexOf("settings") !== -1 ? true : false;
                     scope.allowChangeDocumentType = hasAccessToSettings;
@@ -42,8 +35,8 @@
                 });
 
                 var keys = [
-                    "general_deleted", 
-                    "content_unpublished", 
+                    "general_deleted",
+                    "content_unpublished",
                     "content_published",
                     "content_publishedPendingChanges",
                     "content_notCreated",
@@ -55,7 +48,7 @@
                 ];
 
                 localizationService.localizeMany(keys)
-                    .then(function(data){
+                    .then(function (data) {
                         labels.deleted = data[0];
                         labels.unpublished = data[1]; //aka draft
                         labels.published = data[2];
@@ -64,9 +57,9 @@
                         labels.unsavedChanges = data[5];
                         labels.doctypeChangeWarning = data[6];
                         labels.notPublished = data[9];
-                        
+
                         scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
-                
+
                         setNodePublishStatus();
 
                         if (scope.currentUrls.length === 0) {
@@ -104,9 +97,9 @@
                 }
 
                 //load in the audit trail if we are currently looking at the INFO tab
-                if (umbVariantContentCtrl) {
+                if (umbVariantContentCtrl && umbVariantContentCtrl.editor) {
                     var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
-                    if (activeApp.alias === "umbInfo") {
+                    if (activeApp && activeApp.alias === "umbInfo") {
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
@@ -123,23 +116,23 @@
 
             scope.openDocumentType = function (documentType) {
 
-                const variantIsDirty = _.some(scope.node.variants, function(variant) {
+                const variantIsDirty = _.some(scope.node.variants, function (variant) {
                     return variant.isDirty;
                 });
 
                 // add confirmation dialog before opening the doc type editor
-                if(variantIsDirty) {
+                if (variantIsDirty) {
                     const confirm = {
                         title: labels.unsavedChanges,
                         view: "default",
                         content: labels.doctypeChangeWarning,
                         submitButtonLabelKey: "general_continue",
                         closeButtonLabelKey: "general_cancel",
-                        submit: function() {
+                        submit: function () {
                             openDocTypeEditor(documentType);
                             overlayService.close();
                         },
-                        close: function() {
+                        close: function () {
                             overlayService.close();
                         }
                     };
@@ -153,12 +146,12 @@
             function openDocTypeEditor(documentType) {
                 const editor = {
                     id: documentType.id,
-                    submit: function(model) {
+                    submit: function (model) {
                         const args = { node: scope.node };
                         eventsService.emit('editors.content.reload', args);
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
@@ -168,10 +161,10 @@
             scope.openTemplate = function () {
                 var templateEditor = {
                     id: scope.node.templateId,
-                    submit: function(model) {
+                    submit: function (model) {
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
@@ -183,16 +176,16 @@
                 scope.node.template = templateAlias;
             };
 
-            scope.openRollback = function() {
-                
+            scope.openRollback = function () {
+
                 var rollback = {
                     node: scope.node,
-                    submit: function(model) {
+                    submit: function (model) {
                         const args = { node: scope.node };
                         eventsService.emit("editors.content.reload", args);
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
@@ -304,6 +297,17 @@
                 });
             }
 
+            function updateCurrentUrls() {
+                // find the urls for the currently selected language
+                if (scope.node.variants.length > 1) {
+                    // nodes with variants
+                    scope.currentUrls = _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
+                } else {
+                    // invariant nodes
+                    scope.currentUrls = scope.node.urls;
+                }
+            }
+
             // load audit trail and redirects when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
                 $timeout(function () {
@@ -328,6 +332,7 @@
                     loadAuditTrail();
                     loadRedirectUrls();
                     setNodePublishStatus();
+                    updateCurrentUrls();
                 }
             });
 

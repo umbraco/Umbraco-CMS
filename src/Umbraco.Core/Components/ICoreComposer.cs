@@ -7,7 +7,7 @@
     /// <para>All core composers are required by (compose before) all user composers,
     /// and require (compose after) all runtime composers.</para>
     /// </remarks>
-    [Require(typeof(IRuntimeComposer))]
+    [ComposeAfter(typeof(IRuntimeComposer))]
     public interface ICoreComposer : IComposer
     { }
 }

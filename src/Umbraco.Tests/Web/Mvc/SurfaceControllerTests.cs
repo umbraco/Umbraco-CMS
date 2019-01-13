@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>()),
-                new ServiceContext());
+                ServiceContext.CreatePartial());
 
             var ctrl = new TestSurfaceController(umbracoContext, helper);
             var result = ctrl.GetContent(2) as PublishedContentResult;
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Web.Mvc
         public class TestSurfaceController : SurfaceController
         {
             public TestSurfaceController(UmbracoContext ctx, UmbracoHelper helper = null)
-                : base(ctx, null, new ServiceContext(), Mock.Of<CacheHelper>(), null, null)
+                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<CacheHelper>(), null, null)
             {
                 if (helper != null)
                 {

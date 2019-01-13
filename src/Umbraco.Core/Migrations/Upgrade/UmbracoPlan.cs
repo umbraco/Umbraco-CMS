@@ -120,6 +120,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<TablesForScheduledPublishing>("{7EB0254C-CB8B-4C75-B15B-D48C55B449EB}");
             To<DropTaskTables>("{648A2D5F-7467-48F8-B309-E99CEEE00E2A}"); // fixed version
             To<MakeTagsVariant>("{C39BF2A7-1454-4047-BBFE-89E40F66ED63}");
+            To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
 
             //FINAL
 

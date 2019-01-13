@@ -97,7 +97,7 @@ namespace Umbraco.Tests.TestHelpers
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
-                container?.TryGetInstance<ServiceContext>() ?? new ServiceContext(),
+                container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
         }
     }

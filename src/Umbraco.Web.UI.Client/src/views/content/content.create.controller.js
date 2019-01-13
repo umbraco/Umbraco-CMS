@@ -42,14 +42,21 @@ function contentCreateController($scope,
   }
 
   function createOrSelectBlueprintIfAny(docType) {
-    var blueprintIds = _.keys(docType.blueprints || {});
+    // map the blueprints into a collection that's sortable in the view
+    var blueprints = _.map(_.pairs(docType.blueprints || {}), function (pair) {
+      return {
+        id: pair[0],
+        name: pair[1]
+      };
+    });
     $scope.docType = docType;
-    if (blueprintIds.length) {
+    if (blueprints.length) {
       if (blueprintConfig.skipSelect) {
-        createFromBlueprint(blueprintIds[0]);
+        createFromBlueprint(blueprints[0].id);
       } else {
         $scope.selectContentType = false;
         $scope.selectBlueprint = true;
+        $scope.selectableBlueprints = blueprints;
       }
     } else {
       createBlank(docType);

@@ -23,7 +23,10 @@ namespace Umbraco.Core.Components
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
+        }
 
+        public void Initialize()
+        {
             UserService.SavedUserGroup += OnSavedUserGroupWithUsers;
 
             UserService.SavedUser += OnSavedUser;
@@ -36,6 +39,9 @@ namespace Umbraco.Core.Components
             MemberService.RemovedRoles += OnRemovedRoles;
             MemberService.Exported += OnMemberExported;
         }
+
+        public void Terminate()
+        { }
 
         private IUser CurrentPerformingUser
         {

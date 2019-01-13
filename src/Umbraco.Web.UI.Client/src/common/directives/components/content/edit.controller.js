@@ -109,7 +109,7 @@
                     });
                 }
             }));
-            
+
         }
 
         /**
@@ -308,6 +308,18 @@
             }
         }
 
+        function ensureDirtyIsSetIfAnyVariantIsDirty() {
+
+            $scope.contentForm.$dirty = false;
+
+            for (var i = 0; i < $scope.content.variants.length; i++) {
+                if($scope.content.variants[i].isDirty){
+                    $scope.contentForm.$dirty = true;
+                    return;
+                }
+            }
+        }
+
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
 
@@ -331,6 +343,7 @@
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
 
                 resetNestedFieldValiation(fieldsToRollback);
+                ensureDirtyIsSetIfAnyVariantIsDirty();
 
                 return $q.when(data);
             },

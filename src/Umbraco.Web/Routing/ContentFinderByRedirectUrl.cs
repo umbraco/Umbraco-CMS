@@ -45,7 +45,7 @@ namespace Umbraco.Web.Routing
             }
 
             var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.Url;
+            var url = content == null ? "#" : content.GetUrl(redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
                 _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
@@ -54,14 +54,14 @@ namespace Umbraco.Web.Routing
 
             // Apending any querystring from the incoming request to the redirect url.
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
-            
+
             _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
             frequest.SetRedirectPermanent(url);
 
-                
+
             // From: http://stackoverflow.com/a/22468386/5018
             // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
-            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads 
+            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
             // to problems if you rename a page back to it's original name or create a new page with the original name
             frequest.Cacheability = HttpCacheability.NoCache;
             frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };

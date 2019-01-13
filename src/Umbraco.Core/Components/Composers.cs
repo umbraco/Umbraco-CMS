@@ -4,10 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Components
 {
@@ -16,7 +13,7 @@ namespace Umbraco.Core.Components
     /// <summary>
     /// Handles the composers.
     /// </summary>
-    internal class Composers
+    public class Composers
     {
         private readonly Composition _composition;
         private readonly IProfilingLogger _logger;
@@ -136,20 +133,20 @@ namespace Umbraco.Core.Components
                 var type = kvp.Key;
 
                 text.AppendLine(type.FullName);
-                foreach (var attribute in type.GetCustomAttributes<RequireAttribute>())
+                foreach (var attribute in type.GetCustomAttributes<ComposeAfterAttribute>())
                     text.AppendLine("  -> " + attribute.RequiredType + (attribute.Weak.HasValue
                         ? (attribute.Weak.Value ? " (weak)" : (" (strong" + (requirements.ContainsKey(attribute.RequiredType) ? ", missing" : "") + ")"))
                         : ""));
-                foreach (var attribute in type.GetCustomAttributes<RequiredByAttribute>())
+                foreach (var attribute in type.GetCustomAttributes<ComposeBeforeAttribute>())
                     text.AppendLine("  -< " + attribute.RequiringType);
                 foreach (var i in type.GetInterfaces())
                 {
                     text.AppendLine("  : " + i.FullName);
-                    foreach (var attribute in i.GetCustomAttributes<RequireAttribute>())
+                    foreach (var attribute in i.GetCustomAttributes<ComposeAfterAttribute>())
                         text.AppendLine("    -> " + attribute.RequiredType + (attribute.Weak.HasValue
                             ? (attribute.Weak.Value ? " (weak)" : (" (strong" + (requirements.ContainsKey(attribute.RequiredType) ? ", missing" : "") + ")"))
                             : ""));
-                    foreach (var attribute in i.GetCustomAttributes<RequiredByAttribute>())
+                    foreach (var attribute in i.GetCustomAttributes<ComposeBeforeAttribute>())
                         text.AppendLine("    -< " + attribute.RequiringType);
                 }
                 if (kvp.Value != null)
@@ -208,8 +205,8 @@ namespace Umbraco.Core.Components
             // get 'require' attributes
             // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
             var requireAttributes = type
-                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequireAttribute>()) // those marking interfaces
-                .Concat(type.GetCustomAttributes<RequireAttribute>()); // those marking the composer
+                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<ComposeAfterAttribute>()) // those marking interfaces
+                .Concat(type.GetCustomAttributes<ComposeAfterAttribute>()); // those marking the composer
 
             // what happens in case of conflicting attributes (different strong/weak for same type) is not specified.
             foreach (var attr in requireAttributes)
@@ -249,8 +246,8 @@ namespace Umbraco.Core.Components
             // get 'required' attributes
             // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
             var requiredAttributes = type
-                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequiredByAttribute>()) // those marking interfaces
-                .Concat(type.GetCustomAttributes<RequiredByAttribute>()); // those marking the composer
+                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<ComposeBeforeAttribute>()) // those marking interfaces
+                .Concat(type.GetCustomAttributes<ComposeBeforeAttribute>()); // those marking the composer
 
             foreach (var attr in requiredAttributes)
             {

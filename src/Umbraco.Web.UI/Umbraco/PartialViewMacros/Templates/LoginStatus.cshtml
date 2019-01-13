@@ -1,5 +1,4 @@
 ﻿@using System.Web.Mvc.Html
-@using ClientDependency.Core.Mvc
 @using Umbraco.Web
 @using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
@@ -7,13 +6,6 @@
 
 @{
     var loginStatusModel = Members.GetCurrentLoginStatus();
-
-    Html.EnableClientValidation();
-    Html.EnableUnobtrusiveJavaScript();
-    Html.RequiresJs("/umbraco/lib/jquery/jquery.min.js");
-    Html.RequiresJs("/umbraco/lib/jquery-validate/jquery.validate.min.js");
-    Html.RequiresJs("/umbraco/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
-
     var logoutModel = new PostRedirectModel();
 
     @*
@@ -23,9 +15,6 @@
         logoutModel.RedirectUrl = "/";
     *@
 }
-
-@* NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed *@
-@Html.RenderJsHere()
 
 @if (loginStatusModel.IsLoggedIn)
 {
