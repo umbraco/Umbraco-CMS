@@ -289,7 +289,10 @@ namespace Umbraco.Web.Security
 
         protected override void DisposeResources()
         {
-            _httpContext = null;
+            // Review: This gets called way before controller actions with MS.DI
+            // There are new instances and all, so seems very very suspicious
+            // Need investigation
+            //_httpContext = null;
         }
     }
 }
