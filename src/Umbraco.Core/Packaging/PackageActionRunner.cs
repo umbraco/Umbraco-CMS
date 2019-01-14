@@ -5,11 +5,10 @@ using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core.Packaging
 {
-
     /// <summary>
     /// Package actions are executed on packge install / uninstall.
     /// </summary>
-    public sealed class PackageActionRunner
+    internal class PackageActionRunner : IPackageActionRunner
     {
         private readonly ILogger _logger;
         private readonly PackageActionCollection _packageActions;

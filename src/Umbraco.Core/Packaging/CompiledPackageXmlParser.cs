@@ -26,7 +26,7 @@ namespace Umbraco.Core.Packaging
         {
             if (xml == null) throw new ArgumentNullException(nameof(xml));
             if (xml.Root == null) throw new ArgumentException(nameof(xml), "The xml document is invalid");
-            if (xml.Root.Name != Constants.Packaging.UmbPackageNodeName) throw new FormatException("The xml document is invalid");
+            if (xml.Root.Name != "umbPackage") throw new FormatException("The xml document is invalid");
 
             var info = xml.Root.Element("info");
             if (info == null) throw new FormatException("The xml document is invalid");
@@ -53,7 +53,6 @@ namespace Umbraco.Core.Packaging
                 UmbracoVersionRequirementsType = requirements.AttributeValue<string>("type").IsNullOrWhiteSpace() ? RequirementsType.Legacy : Enum<RequirementsType>.Parse(requirements.AttributeValue<string>("type")),
                 Control = package.Element("control")?.Value,
                 Actions = xml.Element("Actions")?.ToString(SaveOptions.None) ?? "<Actions></Actions>", //take the entire outer xml value
-
                 Files = xml.Root.Element("files")?.Elements("file")?.Select(x => new CompiledPackageFile
                 {
                     UniqueFileName = x.Element("guid")?.Value,
@@ -64,7 +63,11 @@ namespace Umbraco.Core.Packaging
                 Macros = xml.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
                 Templates = xml.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
                 Stylesheets = xml.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),
-
+                DataTypes = xml.Element("DataTypes")?.Elements("DataType") ?? Enumerable.Empty<XElement>(),
+                Languages = xml.Element("Languages")?.Elements("Language") ?? Enumerable.Empty<XElement>(),
+                DictionaryItems = xml.Element("DictionaryItems")?.Elements("DictionaryItem") ?? Enumerable.Empty<XElement>(),
+                DocumentTypes = xml.Element("DocumentTypes")?.Elements("DocumentType") ?? Enumerable.Empty<XElement>(),
+                Documents = xml.Element("Documents")?.Elements("DocumentSet") ?? Enumerable.Empty<XElement>(),
             };
 
             def.Warnings = GetPreInstallWarnings(def, applicationRootFolder);
@@ -133,9 +136,8 @@ namespace Umbraco.Core.Packaging
         {
             return pathElement.TrimStart(new[] { '\\', '/', '~' }).Replace("/", "\\");
         }
-
-        //fixme: This is duplicated in the parser
-        public static string UpdatePathPlaceholders(string path)
+        
+        private static string UpdatePathPlaceholders(string path)
         {
             if (path.Contains("[$"))
             {
@@ -145,6 +147,41 @@ namespace Umbraco.Core.Packaging
                 path = path.Replace("[$DATA]", SystemDirectories.Data);
             }
             return path;
+        }
+
+        public IEnumerable<PackageAction> GetPackageActions(XElement actionsElement, string packageName)
+        {
+            if (actionsElement == null) { return new PackageAction[0]; }
+
+            if (string.Equals("Actions", actionsElement.Name.LocalName) == false)
+                throw new ArgumentException($"Must be \"Actions\" as root", nameof(actionsElement));
+
+            return actionsElement.Elements("Action")
+                .Select(elemet =>
+                {
+                    var aliasAttr = elemet.Attribute("Alias");
+                    if (aliasAttr == null)
+                        throw new ArgumentException("missing \"Alias\" atribute in alias element", nameof(actionsElement));
+
+                    var packageAction = new PackageAction
+                    {
+                        XmlData = elemet,
+                        Alias = aliasAttr.Value,
+                        PackageName = packageName,
+                    };
+
+
+                    var attr = elemet.Attribute("runat");
+
+                    if (attr != null && Enum.TryParse(attr.Value, true, out ActionRunAt runAt)) { packageAction.RunAt = runAt; }
+
+                    attr = elemet.Attribute("undo");
+
+                    if (attr != null && bool.TryParse(attr.Value, out var undo)) { packageAction.Undo = undo; }
+
+
+                    return packageAction;
+                }).ToArray();
         }
     }
 }

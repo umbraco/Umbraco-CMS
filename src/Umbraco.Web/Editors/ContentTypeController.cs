@@ -17,7 +17,9 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
@@ -46,10 +48,19 @@ namespace Umbraco.Web.Editors
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
+        private readonly PropertyEditorCollection _propertyEditors;
 
-        public ContentTypeController(IEntityXmlSerializer serializer, ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        public ContentTypeController(IEntityXmlSerializer serializer,
+            ICultureDictionaryFactory cultureDictionaryFactory,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
+            ServiceContext services, CacheHelper applicationCache,
+            IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         {
             _serializer = serializer;
+            _propertyEditors = propertyEditors;
         }
 
         public int GetCount()
@@ -162,8 +173,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var configuration = Current.Services.DataTypeService.GetDataType(id).Configuration;
-            var editor = Current.PropertyEditors[dataTypeDiff.EditorAlias];
+            var configuration = Services.DataTypeService.GetDataType(id).Configuration;
+            var editor = _propertyEditors[dataTypeDiff.EditorAlias];
 
             return new ContentPropertyDisplay()
             {
@@ -488,14 +499,16 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+            
+            var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors);
 
-            var xd = new XmlDocument();
-            xd.XmlResolver = null;
+            var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
-            var userId = Security.GetUserId();
+            var userId = Security.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
-            Current.Services.PackagingService.ImportContentTypes(element, userId);
+            dataInstaller.ImportDocumentType(element, userId);
 
             // Try to clean up the temporary file.
             try
@@ -504,7 +517,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                Logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);

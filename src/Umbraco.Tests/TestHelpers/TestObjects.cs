@@ -22,6 +22,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers
@@ -78,9 +79,11 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="globalSettings"></param>
+        /// <param name="umbracoSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
         /// <param name="urlSegmentProviders">Some url segment providers.</param>
-        /// <param name="container">A container.</param>
+        /// <param name="typeLoader"></param>
+        /// <param name="factory">A container.</param>
         /// <param name="scopeProvider"></param>
         /// <returns>A ServiceContext.</returns>
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
@@ -168,12 +171,22 @@ namespace Umbraco.Tests.TestHelpers
                     GetRepo<IEntityRepository>(c)));
 
             var macroService = GetLazyService<IMacroService>(factory, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
-            var packagingService = GetLazyService<IPackagingService>(factory, c => new PackagingService(
-                logger, contentService.Value, contentTypeService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, auditService.Value, new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>())),
-                createdPackages: new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
-                    new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
-                installedPackages: new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
-                    new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config")));
+            var packagingService = GetLazyService<IPackagingService>(factory, c =>
+            {
+                var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+                var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value));
+                return new PackagingService(
+                    auditService.Value, 
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config"),
+                    new PackageInstallation(
+                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection),
+                        new PackageFileInstallation(compiledPackageXmlParser, new ProfilingLogger(logger, new TestProfiler())),
+                        compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
+                        "", null, null));
+            });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
             var treeService = GetLazyService<IApplicationTreeService>(factory, c => new ApplicationTreeService(logger, cache, typeLoader));
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));

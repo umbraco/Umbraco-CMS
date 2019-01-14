@@ -320,7 +320,6 @@
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="Constants-ObjectTypes.cs" />
     <Compile Include="Constants-PackageRepository.cs" />
-    <Compile Include="Constants-Packaging.cs" />
     <Compile Include="Constants-PropertyEditors.cs" />
     <Compile Include="Constants-PropertyTypeGroups.cs" />
     <Compile Include="Constants-Security.cs" />
@@ -447,9 +446,11 @@
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
+    <Compile Include="Packaging\IPackageActionRunner.cs" />
     <Compile Include="Packaging\IPackageDefinitionRepository.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
     <Compile Include="Packaging\PackageActionRunner.cs" />
+    <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageDefinitionXmlParser.cs" />
     <Compile Include="Packaging\PackageFileInstallation.cs" />
     <Compile Include="Packaging\PackagesRepository.cs" />
@@ -573,7 +574,6 @@
     <Compile Include="Events\IEventDispatcher.cs" />
     <Compile Include="Events\IEventMessagesAccessor.cs" />
     <Compile Include="Events\IEventMessagesFactory.cs" />
-    <Compile Include="Events\ImportEventArgs.cs" />
     <Compile Include="Events\ImportPackageEventArgs.cs" />
     <Compile Include="Events\MacroErrorEventArgs.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />

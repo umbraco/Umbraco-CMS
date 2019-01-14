@@ -42,11 +42,11 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
-        private readonly PackageActionRunner _packageActionRunner;
+        private readonly IPackageActionRunner _packageActionRunner;
 
         public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
-            IProfilingLogger logger, IRuntimeState runtimeState, PackageActionRunner packageActionRunner)
+            IProfilingLogger logger, IRuntimeState runtimeState, IPackageActionRunner packageActionRunner)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         {
             _packageActionRunner = packageActionRunner;
@@ -259,6 +259,7 @@ namespace Umbraco.Web.Editors
             };
 
             // trigger the UninstalledPackage event
+            // fixme: This all needs to be part of the service!
             PackagingService.OnUninstalledPackage(new UninstallPackageEventArgs<UninstallationSummary>(summary, package, false));
 
         }

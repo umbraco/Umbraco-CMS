@@ -34,7 +34,11 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<XElement> Macros { get; set; } //fixme: make strongly typed
         public IEnumerable<XElement> Templates { get; set; } //fixme: make strongly typed
         public IEnumerable<XElement> Stylesheets { get; set; } //fixme: make strongly typed
-
+        public IEnumerable<XElement> DataTypes { get; set; } //fixme: make strongly typed
+        public IEnumerable<XElement> Languages { get; set; } //fixme: make strongly typed
+        public IEnumerable<XElement> DictionaryItems { get; set; } //fixme: make strongly typed
+        public IEnumerable<XElement> DocumentTypes { get; set; } //fixme: make strongly typed
+        public IEnumerable<XElement> Documents { get; set; } //fixme: make strongly typed
     }
     
     public class CompiledPackageFile

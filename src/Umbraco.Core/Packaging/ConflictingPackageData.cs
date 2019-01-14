@@ -23,9 +23,9 @@ namespace Umbraco.Core.Packaging
             return stylesheetNodes
                 .Select(n =>
                 {
-                    var xElement = n.Element(Constants.Packaging.NameNodeName);
+                    var xElement = n.Element("Name");
                     if (xElement == null)
-                        throw new FormatException($"Missing \"{Constants.Packaging.NameNodeName}\" element");
+                        throw new FormatException("Missing \"Name\" element");
 
                     return _fileService.GetStylesheetByName(xElement.Value) as IFile;
                 })
@@ -37,9 +37,9 @@ namespace Umbraco.Core.Packaging
             return templateNodes
                 .Select(n =>
                 {
-                    var xElement = n.Element(Constants.Packaging.AliasNodeNameCapital) ?? n.Element(Constants.Packaging.AliasNodeNameSmall);
+                    var xElement = n.Element("Alias") ?? n.Element("alias");
                     if (xElement == null)
-                        throw new FormatException($"missing a \"{Constants.Packaging.AliasNodeNameCapital}\" element");
+                        throw new FormatException("missing a \"Alias\" element");
 
                     return _fileService.GetTemplate(xElement.Value);
                 })
@@ -51,9 +51,9 @@ namespace Umbraco.Core.Packaging
             return macroNodes
                 .Select(n =>
                 {
-                    var xElement = n.Element(Constants.Packaging.AliasNodeNameSmall) ?? n.Element(Constants.Packaging.AliasNodeNameCapital);
+                    var xElement = n.Element("alias") ?? n.Element("Alias");
                     if (xElement == null)
-                        throw new FormatException($"missing a \"{Constants.Packaging.AliasNodeNameSmall}\" element in {Constants.Packaging.AliasNodeNameSmall} element");
+                        throw new FormatException("missing a \"alias\" element in alias element");
 
                     return _macroService.GetByAlias(xElement.Value);
                 })

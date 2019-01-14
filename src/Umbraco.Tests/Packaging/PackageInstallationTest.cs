@@ -4,9 +4,11 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
@@ -38,10 +40,16 @@ namespace Umbraco.Tests.Packaging
 
         private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService));
 
+        private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
+            Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            ServiceContext.DataTypeService, ServiceContext.EntityService,
+            ServiceContext.ContentTypeService, ServiceContext.ContentService,
+            Factory.GetInstance<PropertyEditorCollection>());
+
         private IPackageInstallation PackageInstallation => new PackageInstallation(
-            ServiceContext.PackagingService,
+            PackageDataInstallation,
             new PackageFileInstallation(Parser, ProfilingLogger),
-            Parser,
+            Parser, Mock.Of<IPackageActionRunner>(),
             packagesFolderPath: "~/Packaging/packages",//this is where our test zip file is 
             applicationRootFolder: new DirectoryInfo(IOHelper.GetRootDirectorySafe()),
             packageExtractionFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder

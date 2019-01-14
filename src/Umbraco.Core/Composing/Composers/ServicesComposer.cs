@@ -59,18 +59,19 @@ namespace Umbraco.Core.Composing.Composers
 
             composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
-            composition.RegisterUnique<PackageActionRunner>();
+            composition.RegisterUnique<IPackageActionRunner, PackageActionRunner>();
 
             composition.RegisterUnique<ConflictingPackageData>();
             composition.RegisterUnique<CompiledPackageXmlParser>();
             composition.RegisterUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
             composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
+            composition.RegisterUnique<PackageDataInstallation>();
             composition.RegisterUnique<PackageFileInstallation>();
             var appRoot = new DirectoryInfo(IOHelper.GetRootDirectorySafe());
             composition.RegisterUnique<IPackageInstallation>(factory => //factory required because we need to pass in a string path
                 new PackageInstallation(
-                    factory.GetInstance<IPackagingService>(), factory.GetInstance<PackageFileInstallation>(),
-                    factory.GetInstance<CompiledPackageXmlParser>(),
+                    factory.GetInstance<PackageDataInstallation>(), factory.GetInstance<PackageFileInstallation>(),
+                    factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
                     SystemDirectories.Packages,
                     appRoot, appRoot));
 

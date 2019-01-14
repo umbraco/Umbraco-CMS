@@ -216,7 +216,7 @@ namespace Umbraco.Web.Composing
 
         internal static ManifestValueValidatorCollection ManifestValidators => CoreCurrent.ManifestValidators;
 
-        internal static PackageActionRunner PackageActionRunner => CoreCurrent.PackageActionRunner;
+        internal static IPackageActionRunner PackageActionRunner => CoreCurrent.PackageActionRunner;
 
         internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
 

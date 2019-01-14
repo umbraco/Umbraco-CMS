@@ -1136,7 +1136,6 @@
     <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
-    <Compile Include="_Legacy\Packager\Installer.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
     <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />

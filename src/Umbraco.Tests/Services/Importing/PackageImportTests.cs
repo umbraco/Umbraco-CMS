@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -65,6 +66,8 @@ namespace Umbraco.Tests.Services.Importing
             Composition.ComposeFileSystems();
         }
 
+        private PackageDataInstallation PackagingService => Factory.GetInstance<PackageDataInstallation>();
+
         [Test]
         public void PackagingService_Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
         {
@@ -74,12 +77,11 @@ namespace Umbraco.Tests.Services.Importing
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            var packagingService = ServiceContext.PackagingService;
 
             // Act
-            var dataTypes = packagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var templates = packagingService.ImportTemplates(templateElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var dataTypes = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
 
             var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
@@ -122,12 +124,11 @@ namespace Umbraco.Tests.Services.Importing
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            var packagingService = ServiceContext.PackagingService;
 
             // Act
-            var dataTypes = packagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var templates = packagingService.ImportTemplates(templateElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var dataTypes = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
 
             // Assert
             var mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
@@ -148,12 +149,11 @@ namespace Umbraco.Tests.Services.Importing
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            var packagingService = ServiceContext.PackagingService;
 
             // Act
-            var dataTypes = packagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var templates = packagingService.ImportTemplates(templateElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var dataTypes = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
 
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
@@ -186,11 +186,11 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
             var element = xml.Descendants("Templates").First();
-            var packagingService = ServiceContext.PackagingService;
+            
             var init = ServiceContext.FileService.GetTemplates().Count();
 
             // Act
-            var templates = packagingService.ImportTemplates(element);
+            var templates = PackagingService.ImportTemplates(element.Elements("Template").ToList(), 0);
             var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
             var allTemplates = ServiceContext.FileService.GetTemplates();
 
@@ -209,11 +209,11 @@ namespace Umbraco.Tests.Services.Importing
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
-            var element = xml.Descendants("Templates").First().Element("Template");
-            var packagingService = ServiceContext.PackagingService;
+            var element = xml.Descendants("Templates").First();
+            
 
             // Act
-            var templates = packagingService.ImportTemplates(element);
+            var templates = PackagingService.ImportTemplate(element.Elements("Template").First(), 0);
 
             // Assert
             Assert.That(templates, Is.Not.Null);
@@ -230,12 +230,12 @@ namespace Umbraco.Tests.Services.Importing
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var templates = packagingService.ImportTemplates(templateElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var dataTypeDefinitions = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
@@ -268,13 +268,13 @@ namespace Umbraco.Tests.Services.Importing
             var docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypeDefinitions = ServiceContext.PackagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var templates = ServiceContext.PackagingService.ImportTemplates(templateElement);
-            var contentTypes = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
+            var dataTypeDefinitions = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             //Assert - Re-Import contenttypes doesn't throw
-            Assert.DoesNotThrow(() => ServiceContext.PackagingService.ImportContentTypes(docTypeElement));
+            Assert.DoesNotThrow(() => PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0));
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
@@ -292,13 +292,13 @@ namespace Umbraco.Tests.Services.Importing
             var docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            var dataTypeDefinitions = ServiceContext.PackagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var templates = ServiceContext.PackagingService.ImportTemplates(templateElement);
-            var contentTypes = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
+            var dataTypeDefinitions = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             //Assert - Re-Import contenttypes doesn't throw
-            Assert.DoesNotThrow(() => ServiceContext.PackagingService.ImportContentTypes(docTypeElement));
+            Assert.DoesNotThrow(() => PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0));
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
@@ -314,12 +314,13 @@ namespace Umbraco.Tests.Services.Importing
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
             var element = xml.Descendants("DocumentSet").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypesElement);
-            var contents = packagingService.ImportContent(element);
+            var dataTypeDefinitions = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
+            var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
+            var contents = PackagingService.ImportContent(element, -1, importedContentTypes, 0);
             var numberOfDocs = (from doc in element.Descendants()
                                 where (string) doc.Attribute("isDoc") == ""
                                 select doc).Count();
@@ -347,12 +348,13 @@ namespace Umbraco.Tests.Services.Importing
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
             var element = xml.Descendants("DocumentSet").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypesElement);
-            var contents = packagingService.ImportContent(element);
+            var dataTypeDefinitions = PackagingService.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
+            var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
+            var contents = PackagingService.ImportContent(element, -1, importedContentTypes, 0);
             var numberOfDocs = (from doc in element.Descendants()
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
@@ -382,10 +384,10 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.XsltSearch_Package;
             var xml = XElement.Parse(strXml);
             var templateElement = xml.Descendants("Templates").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var templates = packagingService.ImportTemplates(templateElement);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
             var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
 
             // Assert
@@ -399,10 +401,10 @@ namespace Umbraco.Tests.Services.Importing
             // Arrange
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentTypes = PackagingService.ImportDocumentType(docTypeElement, 0);
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);
@@ -416,11 +418,11 @@ namespace Umbraco.Tests.Services.Importing
             // Arrange
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
-            var packagingService = ServiceContext.PackagingService;
+            
             var serializer = Factory.GetInstance<IEntityXmlSerializer>();
 
             // Act
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentTypes = PackagingService.ImportDocumentType(docTypeElement, 0);
             var contentType = contentTypes.FirstOrDefault();
             var element = serializer.Serialize(contentType);
 
@@ -442,8 +444,8 @@ namespace Umbraco.Tests.Services.Importing
             var docTypeElement = XElement.Parse(strXml);
 
             // Act
-            var contentTypes = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
-            var contentTypesUpdated = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
+            var contentTypes = PackagingService.ImportDocumentType(docTypeElement, 0);
+            var contentTypesUpdated = PackagingService.ImportDocumentType(docTypeElement, 0);
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);
@@ -465,7 +467,7 @@ namespace Umbraco.Tests.Services.Importing
 
             var templateElement = newPackageXml.Descendants("Templates").First();
             var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
-            var packagingService = ServiceContext.PackagingService;
+            
             var fileService = ServiceContext.FileService;
 
             // kill default test data
@@ -473,8 +475,8 @@ namespace Umbraco.Tests.Services.Importing
 
             // Act
             var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
-            var templates = packagingService.ImportTemplates(templateElement);
-            var templatesAfterUpdate = packagingService.ImportTemplates(templateElementUpdated);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var templatesAfterUpdate = PackagingService.ImportTemplates(templateElementUpdated.Elements("Template").ToList(), 0);
             var allTemplates = fileService.GetTemplates();
 
             // Assert
@@ -500,7 +502,7 @@ namespace Umbraco.Tests.Services.Importing
             AddLanguages();
 
             // Act
-            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+            PackagingService.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
 
             // Assert
             AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
@@ -522,7 +524,7 @@ namespace Umbraco.Tests.Services.Importing
             AddLanguages();
 
             // Act
-            var dictionaryItems = ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+            var dictionaryItems = PackagingService.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
 
             // Assert
             Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(parentKey), "DictionaryItem parentKey does not exist");
@@ -551,7 +553,7 @@ namespace Umbraco.Tests.Services.Importing
             AddExistingEnglishAndNorwegianParentDictionaryItem(expectedEnglishParentValue, expectedNorwegianParentValue);
 
             // Act
-            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+            PackagingService.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
 
             // Assert
             AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
@@ -576,7 +578,7 @@ namespace Umbraco.Tests.Services.Importing
             AddExistingEnglishParentDictionaryItem(expectedEnglishParentValue);
 
             // Act
-            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+            PackagingService.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
 
             // Assert
             AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
@@ -593,7 +595,7 @@ namespace Umbraco.Tests.Services.Importing
             var LanguageItemsElement = newPackageXml.Elements("Languages").First();
 
             // Act
-            var languages = ServiceContext.PackagingService.ImportLanguages(LanguageItemsElement);
+            var languages = PackagingService.ImportLanguages(LanguageItemsElement.Elements("Language"), 0);
             var allLanguages = ServiceContext.LocalizationService.GetAllLanguages();
 
             // Assert
@@ -611,10 +613,10 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.uBlogsy_Package;
             var xml = XElement.Parse(strXml);
             var macrosElement = xml.Descendants("Macros").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var macros = packagingService.ImportMacros(macrosElement).ToList();
+            var macros = PackagingService.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
 
             // Assert
             Assert.That(macros.Any(), Is.True);
@@ -633,10 +635,10 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.XsltSearch_Package;
             var xml = XElement.Parse(strXml);
             var macrosElement = xml.Descendants("Macros").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var macros = packagingService.ImportMacros(macrosElement).ToList();
+            var macros = PackagingService.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
 
             // Assert
             Assert.That(macros.Any(), Is.True);
@@ -657,11 +659,11 @@ namespace Umbraco.Tests.Services.Importing
             var xml = XElement.Parse(strXml);
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var templates = packagingService.ImportTemplates(templateElement);
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var templates = PackagingService.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
@@ -685,10 +687,10 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.CompositionsTestPackage_Random;
             var xml = XElement.Parse(strXml);
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            var packagingService = ServiceContext.PackagingService;
+            
 
             // Act
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentTypes = PackagingService.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
             var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert

@@ -4,9 +4,8 @@ using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Packaging
 {
-    internal interface IPackageInstallation
+    public interface IPackageInstallation
     {
-
         /// <summary>
         /// Installs a packages data and entities
         /// </summary>

@@ -162,8 +162,8 @@ namespace Umbraco.Core.Composing
         internal static PackageActionCollection PackageActions
             => Factory.GetInstance<PackageActionCollection>();
 
-        internal static PackageActionRunner PackageActionRunner
-            => Factory.GetInstance<PackageActionRunner>();
+        internal static IPackageActionRunner PackageActionRunner
+            => Factory.GetInstance<IPackageActionRunner>();
 
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Factory.GetInstance<PropertyValueConverterCollection>();
