@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Packaging
             Assert.AreEqual("@tentonipete", package.Author);
             Assert.AreEqual("auros.co.uk", package.AuthorUrl);
             Assert.AreEqual("Document Type Picker datatype that enables back office user to select one or many document types.", package.Readme);
-
+            Assert.AreEqual(1, package.DataTypes.Count());
         }
 
         [Test]
@@ -114,6 +114,26 @@ namespace Umbraco.Tests.Packaging
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", result[0]);
             Assert.IsTrue(File.Exists(Path.Combine(IOHelper.MapPath("~/" + _testBaseFolder), result[0])));
+
+            //make sure the def is updated too
+            Assert.AreEqual(result.Count(), def.Files.Count);
+        }
+
+        [Test]
+        public void Install_Data()
+        {
+            var package = PackageInstallation.ReadPackage(documentTypePickerUmb);
+            var def = PackageDefinition.FromCompiledPackage(package);
+            def.Id = 1;
+            def.PackageId = Guid.NewGuid();
+
+            var summary = PackageInstallation.InstallPackageData(def, package, -1);
+
+            Assert.AreEqual(1, summary.DataTypesInstalled.Count());
+            
+
+            //make sure the def is updated too
+            Assert.AreEqual(summary.DataTypesInstalled.Count(), def.DataTypes.Count);
         }
 
 

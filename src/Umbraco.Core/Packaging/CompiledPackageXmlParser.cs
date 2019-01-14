@@ -52,7 +52,7 @@ namespace Umbraco.Core.Packaging
                 UmbracoVersion = new Version((int)requirements.Element("major"), (int)requirements.Element("minor"), (int)requirements.Element("patch")),
                 UmbracoVersionRequirementsType = requirements.AttributeValue<string>("type").IsNullOrWhiteSpace() ? RequirementsType.Legacy : Enum<RequirementsType>.Parse(requirements.AttributeValue<string>("type")),
                 Control = package.Element("control")?.Value,
-                Actions = xml.Element("Actions")?.ToString(SaveOptions.None) ?? "<Actions></Actions>", //take the entire outer xml value
+                Actions = xml.Root.Element("Actions")?.ToString(SaveOptions.None) ?? "<Actions></Actions>", //take the entire outer xml value
                 Files = xml.Root.Element("files")?.Elements("file")?.Select(x => new CompiledPackageFile
                 {
                     UniqueFileName = x.Element("guid")?.Value,
@@ -60,14 +60,14 @@ namespace Umbraco.Core.Packaging
                     OriginalPath = x.Element("orgPath")?.Value
                 }).ToList() ?? new List<CompiledPackageFile>(),
 
-                Macros = xml.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
-                Templates = xml.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
-                Stylesheets = xml.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),
-                DataTypes = xml.Element("DataTypes")?.Elements("DataType") ?? Enumerable.Empty<XElement>(),
-                Languages = xml.Element("Languages")?.Elements("Language") ?? Enumerable.Empty<XElement>(),
-                DictionaryItems = xml.Element("DictionaryItems")?.Elements("DictionaryItem") ?? Enumerable.Empty<XElement>(),
-                DocumentTypes = xml.Element("DocumentTypes")?.Elements("DocumentType") ?? Enumerable.Empty<XElement>(),
-                Documents = xml.Element("Documents")?.Elements("DocumentSet") ?? Enumerable.Empty<XElement>(),
+                Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
+                Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
+                Stylesheets = xml.Root.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),
+                DataTypes = xml.Root.Element("DataTypes")?.Elements("DataType") ?? Enumerable.Empty<XElement>(),
+                Languages = xml.Root.Element("Languages")?.Elements("Language") ?? Enumerable.Empty<XElement>(),
+                DictionaryItems = xml.Root.Element("DictionaryItems")?.Elements("DictionaryItem") ?? Enumerable.Empty<XElement>(),
+                DocumentTypes = xml.Root.Element("DocumentTypes")?.Elements("DocumentType") ?? Enumerable.Empty<XElement>(),
+                Documents = xml.Root.Element("Documents")?.Elements("DocumentSet") ?? Enumerable.Empty<XElement>(),
             };
 
             def.Warnings = GetPreInstallWarnings(def, applicationRootFolder);
