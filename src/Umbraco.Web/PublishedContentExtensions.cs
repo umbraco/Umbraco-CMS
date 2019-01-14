@@ -133,10 +133,15 @@ namespace Umbraco.Web
         /// Returns the current template Alias
         /// </summary>
         /// <param name="content"></param>
-        /// <returns></returns>
+        /// <returns>Empty string if none is set.</returns>
         public static string GetTemplateAlias(this IPublishedContent content)
         {
-            var template = Current.Services.FileService.GetTemplate(content.TemplateId);
+            if(content.TemplateId.HasValue == false)
+            {
+                return string.Empty;
+            }
+
+            var template = Current.Services.FileService.GetTemplate(content.TemplateId.Value);
             return template == null ? string.Empty : template.Alias;
         }
 
