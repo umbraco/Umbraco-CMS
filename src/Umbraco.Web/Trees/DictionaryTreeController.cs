@@ -9,8 +9,13 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    
-    [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
+
+    [UmbracoTreeAuthorize(
+        Constants.Trees.Dictionary,
+        Constants.Trees.Templates
+        // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
+        // dictionary items in templates, even when we dont have authorization to manage the dictionary items
+        )]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
     [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null)]
