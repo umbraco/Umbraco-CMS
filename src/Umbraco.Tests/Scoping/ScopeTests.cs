@@ -540,7 +540,7 @@ namespace Umbraco.Tests.Scoping
             var scopeProvider = ScopeProvider;
 
             bool? completed = null;
-            Exception exception = null;
+            bool? completed2 = null;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -551,15 +551,7 @@ namespace Umbraco.Tests.Scoping
 
                     // at that point the scope is gone, but the context is still there
                     var ambientContext = scopeProvider.AmbientContext;
-
-                    try
-                    {
-                        ambientContext.Enlist("another", c2 => { });
-                    }
-                    catch (Exception e)
-                    {
-                        exception = e;
-                    }
+                    ambientContext.Enlist("another", c2 => { completed2 = c2; });
                 });
                 if (complete)
                     scope.Complete();
@@ -567,8 +559,8 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNull(scopeProvider.AmbientScope);
             Assert.IsNull(scopeProvider.AmbientContext);
             Assert.IsNotNull(completed);
-            Assert.IsNotNull(exception);
-            Assert.IsInstanceOf<InvalidOperationException>(exception);
+            Assert.AreEqual(complete,completed.Value);
+            Assert.AreEqual(complete, completed2.Value);
         }
 
         [Test]

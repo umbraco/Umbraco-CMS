@@ -86,20 +86,21 @@ angular.module("umbraco.directives")
                 function generateAlias(value) {
 
                   if (generateAliasTimeout) {
-                    $timeout.cancel(generateAliasTimeout);
+                     $timeout.cancel(generateAliasTimeout);
                   }
 
-                  if( value !== undefined && value !== "" && value !== null) {
+                  if (value !== undefined && value !== "" && value !== null) {
 
-                      scope.alias = "";
+                    scope.alias = "";
                     scope.placeholderText = scope.labels.busy;
 
                     generateAliasTimeout = $timeout(function () {
                        updateAlias = true;
                         entityResource.getSafeAlias(value, true).then(function (safeAlias) {
                             if (updateAlias) {
-                              scope.alias = safeAlias.alias;
-                           }
+                                scope.alias = safeAlias.alias;
+                            }
+                            scope.placeholderText = scope.labels.idle;
                       });
                     }, 500);
 
@@ -108,7 +109,6 @@ angular.module("umbraco.directives")
                     scope.alias = "";
                     scope.placeholderText = scope.labels.idle;
                   }
-
                 }
 
                 // if alias gets unlocked - stop watching alias
@@ -119,17 +119,17 @@ angular.module("umbraco.directives")
                 }));
 
                 // validate custom entered alias
-                eventBindings.push(scope.$watch('alias', function(newValue, oldValue){
-
-                  if(scope.alias === "" && bindWatcher === true || scope.alias === null && bindWatcher === true) {
-                    // add watcher
-                    eventBindings.push(scope.$watch('aliasFrom', function(newValue, oldValue) {
-                       if(bindWatcher) {
-                          generateAlias(newValue);
-                       }
-                    }));
-                  }
-
+                eventBindings.push(scope.$watch('alias', function (newValue, oldValue) {
+                    if (scope.alias === "" || scope.alias === null || scope.alias === undefined) {
+                        if (bindWatcher === true) {
+                            // add watcher
+                            eventBindings.push(scope.$watch('aliasFrom', function (newValue, oldValue) {
+                                if (bindWatcher) {
+                                    generateAlias(newValue);
+                                }
+                            }));
+                        }
+                    }
                }));
 
                // clean up
