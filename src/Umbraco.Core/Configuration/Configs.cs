@@ -100,7 +100,7 @@ namespace Umbraco.Core.Configuration
             if (_registerings == null)
                 throw new InvalidOperationException("Configurations have already been registered.");
 
-            register.RegisterInstance(this);
+            register.Register(this);
 
             foreach (var registering in _registerings.Values)
                 registering(register);

@@ -14,7 +14,7 @@
         /// <summary>
         /// Registers a service with an implementation type, for a target.
         /// </summary>
-        public static void RegisterFor<TService, TTarget, TImplementing>(this IRegister register, Lifetime lifetime = Lifetime.Transient)
+        public static void RegisterFor<TService, TImplementing, TTarget>(this IRegister register, Lifetime lifetime = Lifetime.Transient)
             where TService : class
             => register.RegisterFor<TService, TTarget>(typeof(TImplementing), lifetime);
 
@@ -28,9 +28,9 @@
         /// <summary>
         /// Registers a service with an implementing instance.
         /// </summary>
-        public static void RegisterInstance<TService>(this IRegister register, TService instance)
+        public static void Register<TService>(this IRegister register, TService instance)
             where TService : class
-            => register.RegisterInstance(typeof(TService), instance);
+            => register.Register(typeof(TService), instance);
 
         /// <summary>
         /// Registers a base type for auto-registration.

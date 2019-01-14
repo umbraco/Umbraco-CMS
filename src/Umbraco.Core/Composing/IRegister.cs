@@ -2,17 +2,6 @@
 
 namespace Umbraco.Core.Composing
 {
-    // Implementing:
-    //
-    // The register
-    // - supports registering a service, even after some instances of other services have been created
-    // - supports re-registering a service, as long as no instance of that service has been created
-    // - throws when re-registering a service, and an instance of that service has been created
-    //
-    // - registers only one implementation of a nameless service, re-registering replaces the previous
-    //   registration - names are required to register multiple implementations - and getting an
-    //   IEnumerable of the service, nameless, returns them all
-
     /// <summary>
     /// Defines a service register for Umbraco.
     /// </summary>
@@ -34,32 +23,38 @@ namespace Umbraco.Core.Composing
         void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient);
 
         /// <summary>
-        /// Registers a service with an implementation type, for a target.
-        /// </summary>
-        void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
-            where TService : class;
-
-        /// <summary>
         /// Registers a service with an implementation factory.
         /// </summary>
         void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
-        /// Registers a service with an implementation factory, for a target.
+        /// Registers a service with an implementing instance.
+        /// </summary>
+        void Register(Type serviceType, object instance);
+
+        /// <summary>
+        /// Registers a service for a target, as its own implementation.
+        /// </summary>
+        void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
+            where TService : class;
+
+        /// <summary>
+        /// Registers a service for a target, with an implementation type.
+        /// </summary>
+        void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
+            where TService : class;
+
+        /// <summary>
+        /// Registers a service for a target, with an implementation factory.
         /// </summary>
         void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
-        /// Registers a service with an implementing instance.
+        /// Registers a service for a target, with an implementing instance.
         /// </summary>
-        void RegisterInstance(Type serviceType, object instance);
-
-        /// <summary>
-        /// Registers a service with an implementing instance, for a target.
-        /// </summary>
-        void RegisterInstanceFor<TService, TTarget>(TService instance)
+        void RegisterFor<TService, TTarget>(TService instance)
             where TService : class;
 
         /// <summary>

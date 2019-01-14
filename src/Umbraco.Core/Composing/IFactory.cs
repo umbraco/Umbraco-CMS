@@ -3,13 +3,6 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Composing
 {
-    // Implementing:
-    //
-    // The factory
-    // - always picks the constructor with the most parameters
-    // - supports Lazy parameters (and prefers them over non-Lazy) in constructors
-    // - what happens with 'releasing' is unclear
-
     /// <summary>
     /// Defines a service factory for Umbraco.
     /// </summary>
