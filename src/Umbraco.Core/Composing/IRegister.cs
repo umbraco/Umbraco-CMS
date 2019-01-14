@@ -36,24 +36,40 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Registers a service for a target, as its own implementation.
         /// </summary>
+        /// <remarks>
+        /// There can only be one implementation or instanced registered for a service and target;
+        /// what happens if many are registered is not specified.
+        /// </remarks>
         void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
         /// Registers a service for a target, with an implementation type.
         /// </summary>
+        /// <remarks>
+        /// There can only be one implementation or instanced registered for a service and target;
+        /// what happens if many are registered is not specified.
+        /// </remarks>
         void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
         /// Registers a service for a target, with an implementation factory.
         /// </summary>
+        /// <remarks>
+        /// There can only be one implementation or instanced registered for a service and target;
+        /// what happens if many are registered is not specified.
+        /// </remarks>
         void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
         /// Registers a service for a target, with an implementing instance.
         /// </summary>
+        /// <remarks>
+        /// There can only be one implementation or instanced registered for a service and target;
+        /// what happens if many are registered is not specified.
+        /// </remarks>
         void RegisterFor<TService, TTarget>(TService instance)
             where TService : class;
 

@@ -88,9 +88,9 @@ namespace Umbraco.Core.Composing.Composers
             composition.Register(factory => new SupportingFileSystems(factory), Lifetime.Singleton);
 
             // register the IFileSystem supporting the IMediaFileSystem
-            // this is the only thing that need to be overriden to change the supporting filesystem
+            // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
             // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
-            composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(_ => new PhysicalFileSystem("~/media"));
+            composition.SetMediaFileSystem(() => new PhysicalFileSystem("~/media"));
 
             return composition;
         }
