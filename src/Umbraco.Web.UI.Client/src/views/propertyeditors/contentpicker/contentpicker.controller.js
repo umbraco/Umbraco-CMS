@@ -222,7 +222,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 editorService.mediaPicker($scope.currentPicker);
                 break;
             case "Member":
-                editorService.treePicker($scope.currentPicker);
+                editorService.memberPicker($scope.currentPicker);
                 break;
 
             default:
