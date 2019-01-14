@@ -1,3 +1,5 @@
+@checkered-background: url(../img/checkered-background.png);
+
 //
 // Container styles
 // --------------------------------------------------
@@ -219,91 +221,41 @@ div.umb-codeeditor .umb-btn-toolbar {
 // --------------------------------------------------
 
 .umb-prevalues-multivalues.umb-cropsizes{
-    max-width: none;
-    width: 100%;
 
-    .umb-overlay__form &{
+    max-width: 500px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
         width: 100%;
     }
 }
 
-.umb-cropsizes{
-    float: left;
+.umb-cropsizes {
 
-    .control-group{
-        label{
-            display: block;
-        }
-   }
+    &__add {
+        display: inline-flex;
+        align-items: center;
+    }
 
-   &__add{
-       display: flex;
-       align-items: center;
-       flex-wrap: wrap;
-   }
-
-   &__sortable{
-       max-width: 500px;
-       width: 100%;
-       min-width: 66.6%;
-
-       @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px){
-           max-width: none;
-       }
-   }
-
-   &__controls{
-       margin: 24px 0 0;
-   }
-
-   &__input{
-       margin: 0 15px 0 0;
-       width: ~"calc(100% - 15px)";
-
-       @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px){
-           margin: 0;
-           width: 100%;
-           max-width: 220px;
-       }
-
-       &--narrow{
-           max-width: 95px;
-           width: 100%;
-       }
-
-       &-wrap{
-           position: relative;
-           max-width: 206px;
-           width: 100%;
-
-            @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px){
-                max-width: none;
-                flex: 1 1 100%;
-                margin: 0 0 20px;
+    &__controls {
+        margin: 24px 0 0;
+        display: flex;
+    }
+    
+    &__input {
+        width: 100%;
+        &-wrap{
+            flex: 1 1 auto;
+            margin-right: 10px;
+            &--narrow {
+                flex: 0 1 100px;
             }
-
-           &--narrow{
-               margin: 0 15px 0 0;
-               max-width: 95px;
-               width: 100%;
-           }
-
-           &--icon{
-            padding: 0 15px 0 0;
-            width: ~"calc(100% + 15px)"; // Use an escape string in order to make use of CSS native calc function instead of the one built into less
-
-               &:after{
-                   content:"\00D7";
-                   position: absolute;
-                   bottom: -9px;
-                   top: 0;
-                   margin: auto;
-                   right: 0;
-                   width: 5px;
-                   height: 5px;
-               }
-           }
-       }
+        }
    }
 }
 
@@ -436,7 +388,7 @@ div.umb-codeeditor .umb-btn-toolbar {
     max-height:100%;
     margin:auto;
     display:block;
-    background-image: url(../img/checkered-background.png);
+    background-image: @checkered-background;
 }
 
 .umb-sortable-thumbnails li .trashed {
@@ -649,12 +601,18 @@ div.umb-codeeditor .umb-btn-toolbar {
         vertical-align: top;
     }
 
-    .gravity-container .viewport {
-        max-width: 600px;
-    }
+    .gravity-container {
+        border: 1px solid @gray-8;
+        line-height: 0;
 
-    .gravity-container .viewport:hover {
-        cursor: pointer;
+        .viewport {
+            max-width: 600px;
+            background: @checkered-background;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .imagecropper {
@@ -666,6 +624,10 @@ div.umb-codeeditor .umb-btn-toolbar {
             flex-direction: column;
             float: left;
             max-width: 100%;
+        }
+
+        .viewport img {
+            background: @checkered-background;
         }
     }
 
@@ -934,6 +896,10 @@ div.umb-codeeditor .umb-btn-toolbar {
   list-style: none;
   vertical-align: middle;
   margin-bottom: 0;
+
+  img {
+    background: @checkered-background;
+  }
 }
 
 .umb-fileupload label {

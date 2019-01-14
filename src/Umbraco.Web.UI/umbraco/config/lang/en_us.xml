@@ -33,8 +33,11 @@
         <key alias="rename" version="7.3.0">Rename</key>
         <key alias="restore" version="7.3.0">Restore</key>
         <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+        <key alias="chooseWhereToCopy">Choose where to copy</key>
         <key alias="chooseWhereToMove">Choose where to move</key>
-        <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+        <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+        <key alias="wasMovedTo">was moved to</key>
+        <key alias="wasCopiedTo">was copied to</key>
         <key alias="rights">Permissions</key>
         <key alias="rollback">Rollback</key>
         <key alias="sendtopublish">Send To Publish</key>
@@ -186,6 +189,11 @@
         <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
         <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
     </area>
+    <area alias="codefile">
+        <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
+        <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+        <key alias="deleteItemFailed">Failed to delete item: %0%</key>
+    </area>
     <area alias="content">
         <key alias="isPublished" version="7.2">Is Published</key>
         <key alias="about">About this page</key>
@@ -289,6 +297,7 @@
         <key alias="chooseNode">Where do you want to create the new %0%</key>
         <key alias="createUnder">Create an item under</key>
         <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
+        <key alias="enterFolderName">Enter a folder name</key>
         <key alias="updateData">Choose a type and a title</key>
         <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
         <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
@@ -1037,7 +1046,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="relateToOriginal">Relate copied items to original</key>
     </area>
     <area alias="notifications">
-        <key alias="editNotifications">Edit your notification for %0%</key>
+        <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+        <key alias="notificationsSavedFor">Notification settings saved for</key>
         <key alias="mailBody">
             <![CDATA[
       Hi %0%
@@ -1309,6 +1319,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
     </area>
     <area alias="rollback">
+        <key alias="headline">Select a version to compare with the current version</key>
         <key alias="currentVersion">Current version</key>
         <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
         <key alias="documentRolledBack">Document has been rolled back</key>
@@ -1396,8 +1407,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
         <key alias="editContentPublishedHeader">Content published</key>
         <key alias="editContentPublishedText">and visible on the website</key>
+        <key alias="editContentPublishedWithExpireDateText">and visible on the website until %0% at %1%</key>
         <key alias="editContentSavedHeader">Content saved</key>
         <key alias="editContentSavedText">Remember to publish to make changes visible</key>
+        <key alias="editContentSavedWithReleaseDateText">Changes will be published on %0% at %1%</key>
         <key alias="editContentSendToPublish">Sent For Approval</key>
         <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
         <key alias="editMediaSaved">Media saved</key>
@@ -1474,6 +1487,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="styles">Styles</key>
     </area>
     <area alias="template">
+        <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
         <key alias="edittemplate">Edit template</key>
 
         <key alias="insertSections">Sections</key>
@@ -1934,7 +1948,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
         <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
         <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
-        <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
+        <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
         <key alias="writer">Writer</key>
         <key alias="translator">Translator</key>
         <key alias="change">Change</key>
@@ -2184,7 +2198,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
-        <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status</key>
+        <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Disable URL tracker</key>
@@ -2215,11 +2229,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
         <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
-        <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
-        <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
-    </area>
-    <area alias="notify">
-        <key alias="notifySet">Select your notifications for</key>
-        <key alias="notificationsSavedFor">Notification settings saved for </key>
+        <key alias="itemCannotBeRestoredHelpText">There is no location where this item can be automatically restored. You can move the item manually using the tree below.</key>
+        <key alias="wasRestored">was restored under</key>
     </area>
 </language>
