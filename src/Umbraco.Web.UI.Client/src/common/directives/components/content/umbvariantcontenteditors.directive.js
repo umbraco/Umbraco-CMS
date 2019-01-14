@@ -260,6 +260,8 @@
                 vm.editors.splice(editorIndex, 1);
                 //remove variant from open variants
                 vm.openVariants.splice(editorIndex, 1);
+                //update cculture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
+                $location.search("cculture", vm.openVariants[0]);
                 splitViewChanged();
             }, 400);
         }
@@ -270,7 +272,7 @@
          * @param {any} editorIndex The index of the editor being changed
          */
         function selectVariant(variant, editorIndex) {
-            
+
             // prevent variants already open in a split view to be opened
             if(vm.openVariants.indexOf(variant.language.culture) !== -1)  {
                 return;
