@@ -56,14 +56,20 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="LightInject" Version="5.1.2" />
+    <PackageReference Include="LightInject" Version="5.3.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+    <PackageReference Include="LightInject.Microsoft.DependencyInjection">
+      <Version>2.2.0</Version>
+    </PackageReference>
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core">
       <Version>2.2.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNet.WebApi.Client">
       <Version>5.2.6</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+      <Version>2.2.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Owin">
       <Version>4.0.0</Version>
@@ -183,6 +189,7 @@
     <Compile Include="Composing\Composers\ServicesComposer.cs" />
     <Compile Include="Composing\CompositionExtensions.cs" />
     <Compile Include="Composing\FactoryExtensions.cs" />
+    <Compile Include="Composing\MSDI\DefaultServiceCollection.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />

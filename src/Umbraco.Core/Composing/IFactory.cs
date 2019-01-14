@@ -13,7 +13,7 @@ namespace Umbraco.Core.Composing
     /// <summary>
     /// Defines a service factory for Umbraco.
     /// </summary>
-    public interface IFactory
+    public interface IFactory : IServiceProvider
     {
         /// <summary>
         /// Gets the concrete factory.

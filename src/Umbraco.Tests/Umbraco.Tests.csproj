@@ -81,8 +81,11 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.9</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="5.1.2" />
+    <PackageReference Include="LightInject" Version="5.3.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+    <PackageReference Include="LightInject.Microsoft.DependencyInjection">
+      <Version>2.2.0</Version>
+    </PackageReference>
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
@@ -92,6 +95,9 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+      <Version>2.2.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.0" />
@@ -118,6 +124,8 @@
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="Composing\LightInjectValidation.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
+    <Compile Include="Composing\MSDI\ServiceCollectionFactoryTests.cs" />
+    <Compile Include="Composing\MSDI\ServiceProviderFactoryTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreThings\GuidUtilsTests.cs" />

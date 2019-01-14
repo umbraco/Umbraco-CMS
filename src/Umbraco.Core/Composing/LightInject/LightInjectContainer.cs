@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Composing.MSDI;
 
 namespace Umbraco.Core.Composing.LightInject
 {
@@ -13,19 +16,26 @@ namespace Umbraco.Core.Composing.LightInject
     {
         private int _disposed;
 
+        private static IServiceCollection services = null;
+        private IServiceProvider serviceProvider;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LightInjectContainer"/> with a LightInject container.
         /// </summary>
-        protected LightInjectContainer(ServiceContainer container)
+        protected LightInjectContainer(ServiceContainer container, IServiceCollection services)
         {
             Container = container;
+            serviceProvider = container.CreateServiceProvider(services);
         }
 
         /// <summary>
         /// Creates a new instance of the <see cref="LightInjectContainer"/> class.
         /// </summary>
-        public static LightInjectContainer Create()
-            => new LightInjectContainer(CreateServiceContainer());
+        public static IServiceCollection Create()
+            => services ?? (services = new DefaultServiceCollection());
+
+        public static IFactory CreateFactory(IServiceCollection serviceCollection)
+            => new LightInjectContainer(CreateServiceContainer(), serviceCollection);
 
         /// <summary>
         /// Creates a new instance of the LightInject service container.
@@ -101,6 +111,15 @@ namespace Umbraco.Core.Composing.LightInject
 
         /// <inheritdoc />
         public IFactory CreateFactory() => this;
+
+        #region IServiceProvider
+
+        public object GetService(Type type)
+        {
+            return serviceProvider.GetService(type);
+        }
+
+        #endregion
 
         #region Factory
 

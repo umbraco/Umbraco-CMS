@@ -68,7 +68,7 @@
     <PackageReference Include="ImageProcessor">
       <Version>2.6.2.25</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="5.1.2" />
+    <PackageReference Include="LightInject" Version="5.3.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
