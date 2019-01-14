@@ -1,0 +1,150 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Packaging;
+using File = System.IO.File;
+
+namespace Umbraco.Core.Packaging
+{
+    /// <summary>
+    /// Parses the xml document contained in a compiled (zip) Umbraco package
+    /// </summary>
+    internal class CompiledPackageXmlParser
+    {
+        private readonly ConflictingPackageData _conflictingPackageData;
+
+        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData)
+        {
+            _conflictingPackageData = conflictingPackageData;
+        }
+
+        public CompiledPackage ToCompiledPackage(XDocument xml, string packageFileName, string applicationRootFolder)
+        {
+            if (xml == null) throw new ArgumentNullException(nameof(xml));
+            if (xml.Root == null) throw new ArgumentException(nameof(xml), "The xml document is invalid");
+            if (xml.Root.Name != Constants.Packaging.UmbPackageNodeName) throw new FormatException("The xml document is invalid");
+
+            var info = xml.Root.Element("info");
+            if (info == null) throw new FormatException("The xml document is invalid");
+            var package = info.Element("package");
+            if (package == null) throw new FormatException("The xml document is invalid");
+            var author = info.Element("author");
+            if (author == null) throw new FormatException("The xml document is invalid");
+            var requirements = package.Element("requirements");
+            if (requirements == null) throw new FormatException("The xml document is invalid");
+
+            var def = new CompiledPackage
+            {
+                PackageFileName = packageFileName,
+                Name = package.Element("name")?.Value,
+                Author = author.Element("name")?.Value,
+                AuthorUrl = author.Element("website")?.Value,
+                Version = package.Element("version")?.Value,
+                Readme = info.Element("readme")?.Value,
+                License = package.Element("license")?.Value,
+                LicenseUrl = package.Element("license")?.AttributeValue<string>("url"),
+                Url = package.Element("url")?.Value,
+                IconUrl = package.Element("iconUrl")?.Value,
+                UmbracoVersion = new Version((int)requirements.Element("major"), (int)requirements.Element("minor"), (int)requirements.Element("patch")),
+                UmbracoVersionRequirementsType = requirements.AttributeValue<string>("type").IsNullOrWhiteSpace() ? RequirementsType.Legacy : Enum<RequirementsType>.Parse(requirements.AttributeValue<string>("type")),
+                Control = package.Element("control")?.Value,
+                Actions = xml.Element("Actions")?.ToString(SaveOptions.None) ?? "<Actions></Actions>", //take the entire outer xml value
+
+                Files = xml.Root.Element("files")?.Elements("file")?.Select(x => new CompiledPackageFile
+                {
+                    UniqueFileName = x.Element("guid")?.Value,
+                    OriginalName = x.Element("orgName")?.Value,
+                    OriginalPath = x.Element("orgPath")?.Value
+                }).ToList() ?? new List<CompiledPackageFile>(),
+
+                Macros = xml.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
+                Templates = xml.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
+                Stylesheets = xml.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),
+
+            };
+
+            def.Warnings = GetPreInstallWarnings(def, applicationRootFolder);
+
+            return def;
+        }
+
+        private PreInstallWarnings GetPreInstallWarnings(CompiledPackage package, string applicationRootFolder)
+        {
+            var sourceDestination = ExtractSourceDestinationFileInformation(package.Files);
+
+            var installWarnings = new PreInstallWarnings
+            {
+                ConflictingMacros = _conflictingPackageData.FindConflictingMacros(package.Macros),
+                ConflictingTemplates = _conflictingPackageData.FindConflictingTemplates(package.Templates),
+                ConflictingStylesheets = _conflictingPackageData.FindConflictingStylesheets(package.Stylesheets),
+                UnsecureFiles = FindUnsecureFiles(sourceDestination),
+                FilesReplaced = FindFilesToBeReplaced(sourceDestination, applicationRootFolder)
+            };
+
+            return installWarnings;
+        }
+
+        /// <summary>
+        /// Returns a tuple of the zip file's unique file name and it's application relative path
+        /// </summary>
+        /// <param name="packageFiles"></param>
+        /// <returns></returns>
+        public (string packageUniqueFile, string appRelativePath)[] ExtractSourceDestinationFileInformation(IEnumerable<CompiledPackageFile> packageFiles)
+        {
+            return packageFiles
+                .Select(e =>
+                {
+                    var fileName = PrepareAsFilePathElement(e.OriginalName);
+                    var relativeDir = UpdatePathPlaceholders(PrepareAsFilePathElement(e.OriginalPath));
+                    var relativePath = Path.Combine(relativeDir, fileName);
+                    return (e.UniqueFileName, relativePath);
+                }).ToArray();
+        }
+
+        private IEnumerable<string> FindFilesToBeReplaced(IEnumerable<(string packageUniqueFile, string appRelativePath)> sourceDestination, string applicationRootFolder)
+        {
+            return sourceDestination.Where(sd => File.Exists(Path.Combine(applicationRootFolder, sd.appRelativePath)))
+                .Select(x => x.appRelativePath)
+                .ToArray();
+        }
+
+        private IEnumerable<string> FindUnsecureFiles(IEnumerable<(string packageUniqueFile, string appRelativePath)> sourceDestinationPair)
+        {
+            return sourceDestinationPair.Where(sd => IsFileDestinationUnsecure(sd.appRelativePath))
+                .Select(x => x.appRelativePath)
+                .ToList();
+        }
+
+        private bool IsFileDestinationUnsecure(string destination)
+        {
+            var unsecureDirNames = new[] { "bin", "app_code" };
+            if (unsecureDirNames.Any(ud => destination.StartsWith(ud, StringComparison.InvariantCultureIgnoreCase)))
+                return true;
+
+            string extension = Path.GetExtension(destination);
+            return extension != null && extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static string PrepareAsFilePathElement(string pathElement)
+        {
+            return pathElement.TrimStart(new[] { '\\', '/', '~' }).Replace("/", "\\");
+        }
+
+        //fixme: This is duplicated in the parser
+        public static string UpdatePathPlaceholders(string path)
+        {
+            if (path.Contains("[$"))
+            {
+                //this is experimental and undocumented...
+                path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
+                path = path.Replace("[$CONFIG]", SystemDirectories.Config);
+                path = path.Replace("[$DATA]", SystemDirectories.Data);
+            }
+            return path;
+        }
+    }
+}

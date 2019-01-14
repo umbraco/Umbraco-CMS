@@ -444,11 +444,14 @@
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
+    <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
     <Compile Include="Packaging\IPackageDefinitionRepository.cs" />
+    <Compile Include="Packaging\IPackageInstallation.cs" />
     <Compile Include="Packaging\PackageActionRunner.cs" />
     <Compile Include="Packaging\PackageDefinitionXmlParser.cs" />
+    <Compile Include="Packaging\PackageFileInstallation.cs" />
     <Compile Include="Packaging\PackagesRepository.cs" />
     <Compile Include="Models\Packaging\RequirementsType.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
@@ -889,9 +892,6 @@
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Collections\OrderedHashSet.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
-    <Compile Include="Packaging\IConflictingPackageData.cs" />
-    <Compile Include="Packaging\IPackageExtraction.cs" />
-    <Compile Include="Packaging\IPackageInstallation.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />

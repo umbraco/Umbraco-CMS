@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.Packaging
 {
-    [Serializable]
-    [DataContract(IsReference = true)]
-    internal class PreInstallWarnings
+    public class PreInstallWarnings
     {
-        public KeyValuePair<string, string>[] UnsecureFiles { get; set; }
-        public KeyValuePair<string, string>[] FilesReplaced { get; set; }
-        public IEnumerable<IMacro> ConflictingMacroAliases { get; set; }
-        public IEnumerable<ITemplate> ConflictingTemplateAliases { get; set; }
-        public IEnumerable<IFile> ConflictingStylesheetNames { get; set; }
+        public IEnumerable<string> UnsecureFiles { get; set; } = Enumerable.Empty<string>();
+        public IEnumerable<string> FilesReplaced { get; set; } = Enumerable.Empty<string>();
+        public IEnumerable<IMacro> ConflictingMacros { get; set; } = Enumerable.Empty<IMacro>();
+        public IEnumerable<ITemplate> ConflictingTemplates { get; set; } = Enumerable.Empty<ITemplate>();
+        public IEnumerable<IFile> ConflictingStylesheets { get; set; } = Enumerable.Empty<IFile>();
     }
 }

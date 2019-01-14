@@ -1,15 +1,35 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
 using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Packaging
 {
     internal interface IPackageInstallation
     {
-        //fixme: The reason why this isn't used currently is because package installation needs to be done in phases since
-        // there are app domain reboots involved so a single method cannot be used. This needs to either be split into several
-        // methods or return an object with a callback to proceed to the next step.
-        InstallationSummary InstallPackage(string packageFilePath, int userId);
-        IPackageInfo GetMetaData(string packageFilePath);
-        PreInstallWarnings GetPreInstallWarnings(string packageFilePath);
+
+        /// <summary>
+        /// Installs a packages data and entities
+        /// </summary>
+        /// <param name="packageDefinition"></param>
+        /// <param name="compiledPackage"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId);
+
+        /// <summary>
+        /// Installs a packages files
+        /// </summary>
+        /// <param name="packageDefinition"></param>
+        /// <param name="compiledPackage"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        IEnumerable<string> InstallPackageFiles(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId);
+
+        /// <summary>
+        /// Reads the package (zip) file and returns the <see cref="CompiledPackage"/> model
+        /// </summary>
+        /// <param name="packageFileName"></param>
+        /// <returns></returns>
+        CompiledPackage ReadPackage(string packageFileName);
     }
 }

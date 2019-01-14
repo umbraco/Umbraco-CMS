@@ -87,10 +87,10 @@ namespace Umbraco.Tests.Packaging
 
             var def2 = new PackageDefinition
             {
-                Name = "test",
-                Url = "http://test.com",
-                Author = "Someone",
-                AuthorUrl = "http://test.com"
+                Name = "test2",
+                Url = "http://test2.com",
+                Author = "Someone2",
+                AuthorUrl = "http://test2.com"
             };
 
             result = PackageBuilder.SavePackage(def2);

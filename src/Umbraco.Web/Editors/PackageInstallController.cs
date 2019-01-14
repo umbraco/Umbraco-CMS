@@ -29,7 +29,6 @@ using Umbraco.Web.UI;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Packager;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Version = System.Version;
@@ -302,37 +301,31 @@ namespace Umbraco.Web.Editors
         
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
-            //this will load in all the metadata too
-            var tempDir = ins.Import(model.ZipFilePath, false);
+            var ins = Services.PackagingService.GetCompiledPackageInfo(model.ZipFilePath);
 
-            model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempDir);
             model.Name = ins.Name;
             model.Author = ins.Author;
             model.AuthorUrl = ins.AuthorUrl;
             model.IconUrl = ins.IconUrl;
             model.License = ins.License;
             model.LicenseUrl = ins.LicenseUrl;
-            model.ReadMe = ins.ReadMe;
-            model.ConflictingMacroAliases = ins.ConflictingMacroAliases;
-            model.ConflictingStyleSheetNames = ins.ConflictingStyleSheetNames;
-            model.ConflictingTemplateAliases = ins.ConflictingTemplateAliases;
-            model.ContainsMacroConflict = ins.ContainsMacroConflict;
-            model.ContainsStyleSheetConflicts = ins.ContainsStyleSheeConflicts;
-            model.ContainsTemplateConflicts = ins.ContainsTemplateConflicts;
-            model.ContainsUnsecureFiles = ins.ContainsUnsecureFiles;
+            model.Readme = ins.Readme;
+            model.ConflictingMacroAliases = ins.Warnings.ConflictingMacros.ToDictionary(x => x.Name, x => x.Alias);
+            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ContainsUnsecureFiles = ins.Warnings.UnsecureFiles.Any();
             model.Url = ins.Url;
             model.Version = ins.Version;
 
-            model.UmbracoVersion = ins.RequirementsType == RequirementsType.Strict
-                ? string.Format("{0}.{1}.{2}", ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch)
+            model.UmbracoVersion = ins.UmbracoVersionRequirementsType == RequirementsType.Strict
+                ? ins.UmbracoVersion.ToString(3)
                 : string.Empty;
 
             //now we need to check for version comparison
             model.IsCompatible = true;
-            if (ins.RequirementsType == RequirementsType.Strict)
+            if (ins.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
-                var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
+                var packageMinVersion = ins.UmbracoVersion;
                 if (UmbracoVersion.Current < packageMinVersion)
                 {
                     model.IsCompatible = false;
@@ -489,13 +482,12 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var ins = new Installer(Security.CurrentUser.Id);
+            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(model.ZipFilePath);
 
-            var tempPath = ins.Import(model.ZipFilePath);
             //now we need to check for version comparison
-            if (ins.RequirementsType == RequirementsType.Strict)
+            if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
-                var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
+                var packageMinVersion = packageInfo.UmbracoVersion;
                 if (UmbracoVersion.Current < packageMinVersion)
                 {
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
@@ -503,8 +495,13 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempPath);
-            model.Id = ins.CreateManifest(model.PackageGuid);
+            var packageDefinition = PackageDefinition.FromCompiledPackage(packageInfo);
+
+            //save to the installedPackages.config
+            packageDefinition.PackageId = model.PackageGuid; //fixme: why are we doing this?
+            Services.PackagingService.SaveInstalledPackage(packageDefinition);
+
+            model.Id = packageDefinition.Id;
 
             return model;
         }
@@ -517,9 +514,10 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
-            var ins = new Installer(Security.CurrentUser.Id);
-            ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
-            ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
+
+            Services.PackagingService.InstallCompiledPackageFiles(definition, model.ZipFilePath, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
             Current.RestartAppPool(Request.TryGetHttpContext().Result);
@@ -551,9 +549,10 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
-            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
-            ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
-            ins.InstallBusinessLogic(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
+
+            Services.PackagingService.InstallCompiledPackageData(definition, model.ZipFilePath, Security.GetUserId().ResultOr(0));
             return model;
         }
 
@@ -565,23 +564,21 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallResult CleanUp(PackageInstallModel model)
         {
-            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
-            var tempDir = IOHelper.MapPath(model.TemporaryDirectoryPath);
-            ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
-            ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(model.ZipFilePath);
 
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
+            //fixme: when do we delete the zip file?
 
             var redirectUrl = "";
-            if (ins.Control.IsNullOrWhiteSpace() == false)
+            if (packageInfo.Control.IsNullOrWhiteSpace() == false)
             {
                 //fixme: this needs to be replaced with an angular view the installer.aspx no longer exists.
-                redirectUrl = string.Format("/developer/framed/{0}",
-                    Uri.EscapeDataString(
-                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
+                //redirectUrl = string.Format("/developer/framed/{0}",
+                //    Uri.EscapeDataString(
+                //        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
             }
 
             return new PackageInstallResult
@@ -590,7 +587,6 @@ namespace Umbraco.Web.Editors
                 ZipFilePath = model.ZipFilePath,
                 PackageGuid = model.PackageGuid,
                 RepositoryGuid = model.RepositoryGuid,
-                TemporaryDirectoryPath = model.TemporaryDirectoryPath,
                 PostInstallationPath = redirectUrl
             };
 

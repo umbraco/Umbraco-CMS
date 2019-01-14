@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web._Legacy.Packager;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _packageService = packageService;
         }
 
-        private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
+        //private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         public override async Task<InstallSetupResult> ExecuteAsync(Guid? starterKitId)
         {
@@ -55,34 +55,33 @@ namespace Umbraco.Web.Install.InstallSteps
 
             return new InstallSetupResult(new Dictionary<string, object>
             {
-                {"manifestId", result.Item2},
+                {"packageId", result.Item2},
                 {"packageFile", result.Item1}
             });
         }
 
         private async Task<Tuple<string, int>> DownloadPackageFilesAsync(Guid kitGuid)
         {
-            var installer = new Installer();
-
             //Go get the package file from the package repo
-            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
+            var packageFileName = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
+            if (packageFileName == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
-            var tempFile = installer.Import(packageFile);
-            installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(kitGuid);
+            //add an entry to the installedPackages.config
+            var compiledPackage = _packageService.GetCompiledPackageInfo(packageFileName);
+            var packageDefinition = PackageDefinition.FromCompiledPackage(compiledPackage);
+            _packageService.SaveInstalledPackage(packageDefinition);
 
-            InstallPackageFiles(pId, tempFile);
+            InstallPackageFiles(packageDefinition, compiledPackage.PackageFileName);
 
-            return new Tuple<string, int>(tempFile, pId);
+            return new Tuple<string, int>(compiledPackage.PackageFileName, packageDefinition.Id);
         }
 
-        private void InstallPackageFiles(int manifestId, string packageFile)
+        private void InstallPackageFiles(PackageDefinition packageDefinition, string packageFileName)
         {
-            packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new Installer();
-            installer.LoadConfig(packageFile);
-            installer.InstallFiles(manifestId, packageFile);
+            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
+            packageFileName = HttpUtility.UrlDecode(packageFileName);
 
+            _packageService.InstallCompiledPackageData(packageDefinition, packageFileName, _umbracoContext.Security.GetUserId().ResultOr(0));
         }
 
         public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;

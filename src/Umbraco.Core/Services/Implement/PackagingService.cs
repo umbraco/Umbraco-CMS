@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services.Implement
     public class PackagingService : IPackagingService
     {
         //fixme: inject when ready to use this
-        private IPackageInstallation _packageInstallation;
+        private readonly IPackageInstallation _packageInstallation;
 
         private readonly ILogger _logger;
         private readonly IContentService _contentService;
@@ -961,9 +961,6 @@ namespace Umbraco.Core.Services.Implement
 
         #endregion
 
-        #region Files
-        #endregion
-
         #region Languages
 
         
@@ -1160,7 +1157,7 @@ namespace Umbraco.Core.Services.Implement
                 using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
                 {
                     fs1.Write(bytes, 0, bytes.Length);
-                    return "packages\\" + packageId + ".umb";
+                    return packageId + ".umb";
                 }
             }
 
@@ -1305,37 +1302,46 @@ namespace Umbraco.Core.Services.Implement
 
         #region Installation
 
-        //fixme: None of these methods are actually used! They have unit tests for them though, but we don't actively use this yet but we should!
+        public CompiledPackage GetCompiledPackageInfo(string packageFileName) => _packageInstallation.ReadPackage(packageFileName);
 
-        internal IPackageInstallation PackageInstallation
+        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, string packageFileName, int userId = 0)
         {
-            private get { return _packageInstallation ?? new PackageInstallation(this, _macroService, _fileService, new PackageExtraction()); }
-            set { _packageInstallation = value; }
+            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
+            if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
+            if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
+
+            var compiledPackage = GetCompiledPackageInfo(packageFileName);
+            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFileName);
+
+            var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId);
+
+            SaveInstalledPackage(packageDefinition);
+
+            if (userId > -1)
+                _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package files installed for package '{compiledPackage.Name}'.");
+
+            return files;
         }
 
-        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
+        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, string packageFileName, int userId = 0)
         {
-            var metaData = GetPackageMetaData(packageFilePath);
+            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
+            if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
+            if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
 
-            if (raiseEvents && ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
-                return new InstallationSummary { MetaData = metaData };
+            var compiledPackage = GetCompiledPackageInfo(packageFileName);
+            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFileName);
 
-            var installationSummary = PackageInstallation.InstallPackage(packageFilePath, userId);
+            if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFileName, compiledPackage), this))
+                return new InstallationSummary { MetaData = compiledPackage };
 
-            if (raiseEvents)
-                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, metaData, false), this);
+            var summary = _packageInstallation.InstallPackageData(packageDefinition, compiledPackage, userId);
 
-            return installationSummary;
-        }
+            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
-        internal PreInstallWarnings GetPackageWarnings(string packageFilePath)
-        {
-            return PackageInstallation.GetPreInstallWarnings(packageFilePath);
-        }
+            ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(summary, compiledPackage, false), this);
 
-        internal IPackageInfo GetPackageMetaData(string packageFilePath)
-        {
-            return PackageInstallation.GetMetaData(packageFilePath);
+            return summary;
         }
 
         #endregion

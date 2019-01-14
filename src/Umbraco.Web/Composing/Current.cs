@@ -161,7 +161,7 @@ namespace Umbraco.Web.Composing
 
         #region Web Actions
 
-        public static void RestartAppPool()
+        internal static void RestartAppPool()
         {
             // see notes in overload
 
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Composing
             HttpRuntime.UnloadAppDomain();
         }
 
-        public static void RestartAppPool(HttpContextBase httpContext)
+        internal static void RestartAppPool(HttpContextBase httpContext)
         {
             // we're going to put an application wide flag to show that the application is about to restart.
             // we're doing this because if there is a script checking if the app pool is fully restarted, then

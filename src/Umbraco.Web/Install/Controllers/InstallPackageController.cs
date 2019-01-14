@@ -11,6 +11,7 @@ using umbraco;
 using Umbraco.Core;
 using Umbraco.Web.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
@@ -28,16 +29,17 @@ namespace Umbraco.Web.Install.Controllers
     [HttpInstallAuthorize]
     [AngularJsonOnlyConfiguration]
     [Obsolete("This is only used for the legacy way of installing starter kits in the back office")]
+    //fixme: Is this used anymore??
     public class InstallPackageController : ApiController
     {
         private readonly IPackagingService _packagingService;
+        private readonly UmbracoContext _umbracoContext;
 
-        public InstallPackageController(IPackagingService packagingService)
+        public InstallPackageController(IPackagingService packagingService, UmbracoContext umbracoContext)
         {
             _packagingService = packagingService;
+            _umbracoContext = umbracoContext;
         }
-
-        private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         /// <summary>
         /// Empty action, useful for retrieving the base url for this controller
@@ -50,7 +52,7 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         /// <summary>
-        /// Connects to the repo, downloads the package and creates the manifest
+        /// Connects to the repo, downloads the package and creates the definition
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -62,16 +64,19 @@ namespace Umbraco.Web.Install.Controllers
                 UmbracoVersion.Current,
                 UmbracoContext.Current.Security.CurrentUser.Id);
 
-            var installer = new _Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
+            
+            var packageInfo = _packagingService.GetCompiledPackageInfo(packageFile);
+            if (packageInfo == null) throw new InvalidOperationException("Could not read package file " + packageFile);
 
-            var tempFile = installer.Import(packageFile);
-            installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(model.KitGuid);
+            //save to the installedPackages.config
+            var packageDefinition = PackageDefinition.FromCompiledPackage(packageInfo);
+            _packagingService.SaveInstalledPackage(packageDefinition);
+
             return Json(new
                 {
                     success = true,
-                    manifestId = pId,
-                    packageFile = tempFile,
+                    packageId = packageDefinition.Id,
+                    packageFile = packageInfo.PackageFileName,
                     percentage = 10,
                     message = "Downloading starter kit files..."
                 }, HttpStatusCode.OK);
@@ -85,13 +90,16 @@ namespace Umbraco.Web.Install.Controllers
         public HttpResponseMessage InstallPackageFiles(InstallPackageModel model)
         {
             model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
-            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
-            installer.LoadConfig(model.PackageFile);
-            installer.InstallFiles(model.ManifestId, model.PackageFile);
+
+            var definition = _packagingService.GetInstalledPackageById(model.PackageId);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.PackageId);
+
+            _packagingService.InstallCompiledPackageFiles(definition, model.PackageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
+
             return Json(new
                 {
                     success = true,
-                    model.ManifestId,
+                    ManifestId = model.PackageId,
                     model.PackageFile,
                     percentage = 20,
                     message = "Installing starter kit files"
@@ -141,13 +149,16 @@ namespace Umbraco.Web.Install.Controllers
         public HttpResponseMessage InstallBusinessLogic(InstallPackageModel model)
         {
             model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
-            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
-            installer.LoadConfig(model.PackageFile);
-            installer.InstallBusinessLogic(model.ManifestId, model.PackageFile);
+
+            var definition = _packagingService.GetInstalledPackageById(model.PackageId);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.PackageId);
+
+            _packagingService.InstallCompiledPackageData(definition, model.PackageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
+
             return Json(new
             {
                 success = true,
-                model.ManifestId,
+                ManifestId = model.PackageId,
                 model.PackageFile,
                 percentage = 70,
                 message = "Installing starter kit files"
@@ -162,18 +173,11 @@ namespace Umbraco.Web.Install.Controllers
         public HttpResponseMessage CleanupInstallation(InstallPackageModel model)
         {
             model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
-            var installer = new global::Umbraco.Web._Legacy.Packager.Installer(UmbracoContext.Current.Security.CurrentUser.Id);
-            installer.LoadConfig(model.PackageFile);
-            installer.InstallCleanUp(model.ManifestId, model.PackageFile);
-
-            // library.RefreshContent is obsolete, would need to RefreshAll... snapshot,
-            // but it should be managed automatically by services and caches!
-            //DistributedCache.Instance.RefreshAll...();
-
+            
             return Json(new
             {
                 success = true,
-                model.ManifestId,
+                ManifestId = model.PackageId,
                 model.PackageFile,
                 percentage = 100,
                 message = "Starter kit has been installed"

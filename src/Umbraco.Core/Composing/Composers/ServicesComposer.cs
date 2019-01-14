@@ -61,8 +61,18 @@ namespace Umbraco.Core.Composing.Composers
 
             composition.RegisterUnique<PackageActionRunner>();
 
+            composition.RegisterUnique<ConflictingPackageData>();
+            composition.RegisterUnique<CompiledPackageXmlParser>();
             composition.RegisterUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
             composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
+            composition.RegisterUnique<PackageFileInstallation>();
+            var appRoot = new DirectoryInfo(IOHelper.GetRootDirectorySafe());
+            composition.RegisterUnique<IPackageInstallation>(factory => //factory required because we need to pass in a string path
+                new PackageInstallation(
+                    factory.GetInstance<IPackagingService>(), factory.GetInstance<PackageFileInstallation>(),
+                    factory.GetInstance<CompiledPackageXmlParser>(),
+                    SystemDirectories.Packages,
+                    appRoot, appRoot));
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.

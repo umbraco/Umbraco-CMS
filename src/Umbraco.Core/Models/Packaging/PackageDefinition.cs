@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.Packaging
@@ -9,6 +10,35 @@ namespace Umbraco.Core.Models.Packaging
     [DataContract(Name = "packageInstance")]
     public class PackageDefinition : IPackageInfo
     {
+        /// <summary>
+        /// Converts a <see cref="CompiledPackage"/> model to a <see cref="PackageDefinition"/> model
+        /// </summary>
+        /// <param name="compiled"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is used only for conversions and will not 'get' a PackageDefinition from the repository with a valid ID
+        /// </remarks>
+        internal static PackageDefinition FromCompiledPackage(CompiledPackage compiled)
+        {
+            return new PackageDefinition
+            {
+                Actions = compiled.Actions,
+                Author = compiled.Author,
+                AuthorUrl = compiled.AuthorUrl,
+                Control = compiled.Control,
+                IconUrl = compiled.IconUrl,
+                License = compiled.License,
+                LicenseUrl = compiled.LicenseUrl,
+                Name = compiled.Name,
+                Readme = compiled.Readme,
+                UmbracoVersion = compiled.UmbracoVersion,
+                Url = compiled.Url,
+                Version = compiled.Version,
+                //fixme: Is OriginalPath correct here?
+                Files = compiled.Files.Select(x => x.OriginalPath).ToList()
+            };
+        }
+
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
@@ -24,6 +54,7 @@ namespace Umbraco.Core.Models.Packaging
         [Url]
         public string Url { get; set; } = string.Empty;
 
+        //fixme: remove this
         /// <summary>
         /// This is a generated GUID which is used to determine a temporary folder name for processing the package
         /// </summary>

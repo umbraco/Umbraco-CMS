@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web._Legacy.Packager;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -14,10 +14,14 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly HttpContextBase _httContext;
+        private readonly UmbracoContext _umbracoContext;
+        private readonly IPackagingService _packagingService;
 
-        public StarterKitInstallStep(HttpContextBase httContext)
+        public StarterKitInstallStep(HttpContextBase httContext, UmbracoContext umbracoContext, IPackagingService packagingService)
         {
             _httContext = httContext;
+            _umbracoContext = umbracoContext;
+            _packagingService = packagingService;
         }
 
 
@@ -25,29 +29,31 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
-            var manifestId = Convert.ToInt32(previousStep.AdditionalData["manifestId"]);
+            var packageId = Convert.ToInt32(previousStep.AdditionalData["packageId"]);
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
 
-            InstallBusinessLogic(manifestId, packageFile);
+            InstallBusinessLogic(packageId, packageFile);
 
             Current.RestartAppPool(_httContext);
 
             return Task.FromResult<InstallSetupResult>(null);
         }
 
-        private void InstallBusinessLogic(int manifestId, string packageFile)
+        private void InstallBusinessLogic(int packageId, string packageFile)
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new Installer();
-            installer.LoadConfig(packageFile);
-            installer.InstallBusinessLogic(manifestId, packageFile);
+
+            var definition = _packagingService.GetInstalledPackageById(packageId);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + packageId);
+
+            _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
         }
 
         public override bool RequiresExecution(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("manifestId")) == false)
+            if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("packageId")) == false)
             {
                 return false;
             }

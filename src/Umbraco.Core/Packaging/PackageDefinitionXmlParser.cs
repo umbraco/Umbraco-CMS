@@ -9,60 +9,6 @@ using Umbraco.Core.Models.Packaging;
 namespace Umbraco.Core.Packaging
 {
     /// <summary>
-    /// Parses the xml document contained in a compiled (zip) Umbraco package
-    /// </summary>
-    public class CompiledPackageXmlParser
-    {
-        public CompiledPackageXmlParser()
-        {
-            
-        }
-
-        public CompiledPackage ToCompiledPackage(XDocument xml)
-        {
-            if (xml == null) throw new ArgumentNullException(nameof(xml));
-            if (xml.Root == null) throw new ArgumentException(nameof(xml), "The xml document is invalid");
-            if (xml.Root.Name != Constants.Packaging.UmbPackageNodeName) throw new FormatException("The xml document is invalid");
-
-            var info = xml.Root.Element("info");
-            if (info == null) throw new FormatException("The xml document is invalid");
-            var package = xml.Element("package");
-            if (package == null) throw new FormatException("The xml document is invalid");
-            var author = package.Element("author");
-            if (author == null) throw new FormatException("The xml document is invalid");
-            var requirements = package.Element("requirements");
-            if (requirements == null) throw new FormatException("The xml document is invalid");
-
-            var def = new CompiledPackage
-            {
-                Name = package.Element("name")?.Value,
-                Author = author.Element("name")?.Value,
-                AuthorUrl = author.Element("website")?.Value,
-                Version = package.Element("version")?.Value,
-                Readme = info.Element("readme")?.Value,
-                License = package.Element("license")?.Value,
-                LicenseUrl = package.Element("license")?.AttributeValue<string>("url"),
-                Url = package.Element("url")?.Value,
-                IconUrl = package.Element("iconUrl")?.Value,
-                UmbracoVersion = new Version((int)requirements.Element("major"), (int)requirements.Element("minor"), (int)requirements.Element("patch")),
-                UmbracoVersionRequirementsType = Enum<RequirementsType>.Parse(requirements.AttributeValue<string>("type")),
-                Control = package.Element("control")?.Value,
-
-                Files = xml.Root.Element("files")?.Elements("files")?.Select(x => new CompiledPackageFile
-                    {
-                        UniqueFileName = x.Element("guid")?.Value,
-                        OriginalName = x.Element("orgPath")?.Value,
-                        OriginalPath = x.Element("orgName")?.Value
-                    }).ToList() ?? new List<CompiledPackageFile>(),
-                
-            };
-
-            return def;
-        }
-
-    }
-
-    /// <summary>
     /// Converts a <see cref="PackageDefinition"/> to and from XML
     /// </summary>
     public class PackageDefinitionXmlParser

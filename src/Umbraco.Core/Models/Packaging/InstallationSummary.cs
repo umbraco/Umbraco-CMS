@@ -24,44 +24,44 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<PackageAction> Actions { get; set; } = Enumerable.Empty<PackageAction>();
         public bool PackageInstalled { get; set; }
 
-        public static InstallationSummary FromPackageDefinition(PackageDefinition def, IContentTypeService contentTypeService, IDataTypeService dataTypeService, IFileService fileService, ILocalizationService localizationService, IMacroService macroService)
-        {
-            var macros = TryGetIntegerIds(def.Macros).Select(macroService.GetById).ToList();
-            var templates = TryGetIntegerIds(def.Templates).Select(fileService.GetTemplate).ToList();
-            var contentTypes = TryGetIntegerIds(def.DocumentTypes).Select(contentTypeService.Get).ToList(); // fixme - media types?
-            var dataTypes = TryGetIntegerIds(def.DataTypes).Select(dataTypeService.GetDataType).ToList();
-            var dictionaryItems = TryGetIntegerIds(def.DictionaryItems).Select(localizationService.GetDictionaryItemById).ToList();
-            var languages = TryGetIntegerIds(def.Languages).Select(localizationService.GetLanguageById).ToList();
+        //public static InstallationSummary FromPackageDefinition(PackageDefinition def, IContentTypeService contentTypeService, IDataTypeService dataTypeService, IFileService fileService, ILocalizationService localizationService, IMacroService macroService)
+        //{
+        //    var macros = TryGetIntegerIds(def.Macros).Select(macroService.GetById).ToList();
+        //    var templates = TryGetIntegerIds(def.Templates).Select(fileService.GetTemplate).ToList();
+        //    var contentTypes = TryGetIntegerIds(def.DocumentTypes).Select(contentTypeService.Get).ToList(); // fixme - media types?
+        //    var dataTypes = TryGetIntegerIds(def.DataTypes).Select(dataTypeService.GetDataType).ToList();
+        //    var dictionaryItems = TryGetIntegerIds(def.DictionaryItems).Select(localizationService.GetDictionaryItemById).ToList();
+        //    var languages = TryGetIntegerIds(def.Languages).Select(localizationService.GetLanguageById).ToList();
 
-            for (var i = 0; i < def.Files.Count; i++)
-            {
-                var filePath = def.Files[i];
-                def.Files[i] = filePath.GetRelativePath();
-            }
+        //    for (var i = 0; i < def.Files.Count; i++)
+        //    {
+        //        var filePath = def.Files[i];
+        //        def.Files[i] = filePath.GetRelativePath();
+        //    }
 
-            return new InstallationSummary
-            {
-                ContentTypesInstalled = contentTypes,
-                DataTypesInstalled = dataTypes,
-                DictionaryItemsInstalled = dictionaryItems,
-                FilesInstalled = def.Files,
-                LanguagesInstalled = languages,
-                MacrosInstalled = macros,
-                MetaData = def,
-                TemplatesInstalled = templates,
-            };
-        }
+        //    return new InstallationSummary
+        //    {
+        //        ContentTypesInstalled = contentTypes,
+        //        DataTypesInstalled = dataTypes,
+        //        DictionaryItemsInstalled = dictionaryItems,
+        //        FilesInstalled = def.Files,
+        //        LanguagesInstalled = languages,
+        //        MacrosInstalled = macros,
+        //        MetaData = def,
+        //        TemplatesInstalled = templates,
+        //    };
+        //}
 
-        private static IEnumerable<int> TryGetIntegerIds(IEnumerable<string> ids)
-        {
-            var intIds = new List<int>();
-            foreach (var id in ids)
-            {
-                if (int.TryParse(id, out var parsed))
-                    intIds.Add(parsed);
-            }
-            return intIds;
-        }
+        //private static IEnumerable<int> TryGetIntegerIds(IEnumerable<string> ids)
+        //{
+        //    var intIds = new List<int>();
+        //    foreach (var id in ids)
+        //    {
+        //        if (int.TryParse(id, out var parsed))
+        //            intIds.Add(parsed);
+        //    }
+        //    return intIds;
+        //}
     }
 
 }

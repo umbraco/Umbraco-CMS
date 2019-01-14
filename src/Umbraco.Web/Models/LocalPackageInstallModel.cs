@@ -47,25 +47,34 @@ namespace Umbraco.Web.Models
         public bool ContainsUnsecureFiles { get; set; }
 
         [DataMember(Name = "containsTemplateConflicts")]
-        public bool ContainsTemplateConflicts { get; set; }
+        public bool ContainsTemplateConflicts => ConflictingTemplateAliases != null && ConflictingTemplateAliases.Count > 0;
 
         [DataMember(Name = "containsStyleSheetConflicts")]
-        public bool ContainsStyleSheetConflicts { get; set; }
+        public bool ContainsStyleSheetConflicts => ConflictingStyleSheetNames != null && ConflictingStyleSheetNames.Count > 0;
 
         [DataMember(Name = "containsMacroConflict")]
-        public bool ContainsMacroConflict { get; set; }
+        public bool ContainsMacroConflict => ConflictingMacroAliases != null && ConflictingMacroAliases.Count > 0;
 
+        /// <summary>
+        /// Key value of name + alias
+        /// </summary>
         [DataMember(Name = "conflictingTemplateAliases")]
         public IDictionary<string, string> ConflictingTemplateAliases { get; set; }
 
+        /// <summary>
+        /// Key value of name + alias
+        /// </summary>
         [DataMember(Name = "conflictingStyleSheetNames")]
         public IDictionary<string, string> ConflictingStyleSheetNames { get; set; }
 
+        /// <summary>
+        /// Key value of name + alias
+        /// </summary>
         [DataMember(Name = "conflictingMacroAliases")]
         public IDictionary<string, string> ConflictingMacroAliases { get; set; }
 
-        [DataMember(Name = "readMe")]
-        public string ReadMe { get; set; }
+        [DataMember(Name = "readme")]
+        public string Readme { get; set; }
 
         [DataMember(Name = "licenseUrl")]
         public string LicenseUrl { get; set; }

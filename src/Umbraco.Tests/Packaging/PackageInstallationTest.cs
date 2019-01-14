@@ -1,74 +1,113 @@
-﻿using Moq;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Packaging
 {
     [TestFixture]
-    public class PackageInstallationTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class PackageInstallationTest : TestWithDatabaseBase
     {
-        private const string Xml = @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?>
-<umbPackage>
-  <files>
-   <file><guid>095e064b-ba4d-442d-9006-3050983c13d8.dll</guid><orgPath>/bin</orgPath><orgName>Auros.DocumentTypePicker.dll</orgName></file></files>
-  <info>
-    <package>
-      <name>Document Type Picker</name>
-      <version>1.1</version>
-      <license url=""http://www.opensource.org/licenses/mit-license.php"">MIT</license>
-      <url>http://www.auros.co.uk</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
-    </package>
-    <author>
-      <name>@tentonipete</name>
-      <website>auros.co.uk</website>
-    </author>
-    <readme>
-      <![CDATA[Document Type Picker datatype that enables back office user to select one or many document types.]]>
-    </readme>
-  </info>
-  <DocumentTypes />
-  <Templates />
-  <Stylesheets />
-  <Macros />
-  <DictionaryItems />
-  <Languages />
-  <DataTypes>
-    <DataType Name=""Document Type Picker"" Id=""790aff36-7fed-47fb-8bcd-9c91ce43ba24"" Definition=""3593d8e7-8b35-47b9-beda-5e830ca8c93c"" />
-  </DataTypes>
-</umbPackage>";
+        private Guid _testBaseFolder;
+
+        public override void SetUp()
+        {
+            base.SetUp();
+            _testBaseFolder = Guid.NewGuid();
+        }
+
+        public override void TearDown()
+        {
+            base.TearDown();
+
+            //clear out files/folders
+            var path = IOHelper.MapPath("~/" + _testBaseFolder);
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+        }
+
+        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService));
+
+        private IPackageInstallation PackageInstallation => new PackageInstallation(
+            ServiceContext.PackagingService,
+            new PackageFileInstallation(Parser, ProfilingLogger),
+            Parser,
+            packagesFolderPath: "~/Packaging/packages",//this is where our test zip file is 
+            applicationRootFolder: new DirectoryInfo(IOHelper.GetRootDirectorySafe()),
+            packageExtractionFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
+
+        const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+
+        //[Test]
+        //public void PackagingService_Can_ImportPackage()
+        //{
+        //    const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+
+        //    string testPackagePath = GetTestPackagePath(documentTypePickerUmb);
+
+        //    InstallationSummary installationSummary = packagingService.InstallPackage(testPackagePath);
+
+        //    Assert.IsNotNull(installationSummary);
+        //}
+
 
         [Test]
-        public void Test()
+        public void Can_Read_Compiled_Package()
         {
-            // Arrange
-            const string pagePath = "Test.umb";
+            var package = PackageInstallation.ReadPackage(documentTypePickerUmb);
+            Assert.IsNotNull(package);
+            Assert.AreEqual(1, package.Files.Count);
+            Assert.AreEqual("095e064b-ba4d-442d-9006-3050983c13d8.dll", package.Files[0].UniqueFileName);
+            Assert.AreEqual("/bin", package.Files[0].OriginalPath);
+            Assert.AreEqual("Auros.DocumentTypePicker.dll", package.Files[0].OriginalName);
+            Assert.AreEqual("Document Type Picker", package.Name);
+            Assert.AreEqual("1.1", package.Version);
+            Assert.AreEqual("http://www.opensource.org/licenses/mit-license.php", package.LicenseUrl);
+            Assert.AreEqual("MIT", package.License);
+            Assert.AreEqual(3, package.UmbracoVersion.Major);
+            Assert.AreEqual(RequirementsType.Legacy, package.UmbracoVersionRequirementsType);
+            Assert.AreEqual("@tentonipete", package.Author);
+            Assert.AreEqual("auros.co.uk", package.AuthorUrl);
+            Assert.AreEqual("Document Type Picker datatype that enables back office user to select one or many document types.", package.Readme);
 
-            var packageExtraction = new Mock<IPackageExtraction>();
-
-            string test;
-            packageExtraction.Setup(a => a.ReadTextFileFromArchive(pagePath, Constants.Packaging.PackageXmlFileName, out test)).Returns(Xml);
-
-            var fileService = new Mock<IFileService>();
-            var macroService = new Mock<IMacroService>();
-            var packagingService = new Mock<IPackagingService>();
-
-            var sut = new PackageInstallation(packagingService.Object, macroService.Object, fileService.Object, packageExtraction.Object);
-
-            // Act
-            InstallationSummary installationSummary = sut.InstallPackage(pagePath, -1);
-
-            // Assert
-            Assert.IsNotNull(installationSummary);
-            //Assert.Inconclusive("Lots of more tests can be written");
         }
+
+        [Test]
+        public void Can_Read_Compiled_Package_Warnings()
+        {
+            
+
+            var preInstallWarnings = PackageInstallation.ReadPackage(documentTypePickerUmb).Warnings;
+            Assert.IsNotNull(preInstallWarnings);
+
+            //TODO: Assert!
+        }
+
+        [Test]
+        public void Install_Files()
+        {
+            var package = PackageInstallation.ReadPackage(documentTypePickerUmb);
+            var def = PackageDefinition.FromCompiledPackage(package);
+            def.Id = 1;
+            def.PackageId = Guid.NewGuid();
+
+            var result = PackageInstallation.InstallPackageFiles(def, package, -1).ToList();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", result[0]);
+            Assert.IsTrue(File.Exists(Path.Combine(IOHelper.MapPath("~/" + _testBaseFolder), result[0])));
+        }
+
 
     }
 }
