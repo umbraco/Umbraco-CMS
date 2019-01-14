@@ -137,7 +137,7 @@ namespace Umbraco.Web.Trees
 
                 if (menu.Items.Any())
                 {
-                    menu.Items.Last().SeperatorBefore = true;
+                    menu.Items.Last().SeparatorBefore = true;
                 }
 
                 // add default actions for *all* users
@@ -242,7 +242,7 @@ namespace Umbraco.Web.Trees
 	            menu.Items.Add(new MenuItem("notify", Services.TextService)
 	            {
 	                Icon = "megaphone",
-	                SeperatorBefore = true,
+	                SeparatorBefore = true,
 	                OpensDialog = true
 	            });
             }

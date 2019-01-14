@@ -421,7 +421,7 @@ gulp.task('dependencies', function () {
 
 
 /**************************
- * Copies all angular JS files into their seperate umbraco.*.js file
+ * Copies all angular JS files into their separate umbraco.*.js file
  **************************/
 gulp.task('js', function () {
 

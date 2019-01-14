@@ -11,24 +11,24 @@ angular.module('umbraco.mocks').
           var menu = [
               { name: "Create", cssclass: "plus", alias: "create", metaData: {} },
 
-              { seperator: true, name: "Delete", cssclass: "remove", alias: "delete", metaData: {} },
+              { separator: true, name: "Delete", cssclass: "remove", alias: "delete", metaData: {} },
               { name: "Move", cssclass: "move", alias: "move", metaData: {} },
               { name: "Copy", cssclass: "copy", alias: "copy", metaData: {} },
               { name: "Sort", cssclass: "sort", alias: "sort", metaData: {} },
 
-              { seperator: true, name: "Publish", cssclass: "globe", alias: "publish", metaData: {} },
+              { separator: true, name: "Publish", cssclass: "globe", alias: "publish", metaData: {} },
               { name: "Rollback", cssclass: "undo", alias: "rollback", metaData: {} },
 
-              { seperator: true, name: "Permissions", cssclass: "lock", alias: "permissions", metaData: {} },
+              { separator: true, name: "Permissions", cssclass: "lock", alias: "permissions", metaData: {} },
               { name: "Audit Trail", cssclass: "time", alias: "audittrail", metaData: {} },
               { name: "Notifications", cssclass: "envelope", alias: "notifications", metaData: {} },
 
-              { seperator: true, name: "Hostnames", cssclass: "home", alias: "hostnames", metaData: {} },
+              { separator: true, name: "Hostnames", cssclass: "home", alias: "hostnames", metaData: {} },
               { name: "Public Access", cssclass: "group", alias: "publicaccess", metaData: {} },
 
-              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} },
+              { separator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} },
           
-                { seperator: true, name: "Empty Recycle Bin", cssclass: "trash", alias: "emptyrecyclebin", metaData: {} }
+                { separator: true, name: "Empty Recycle Bin", cssclass: "trash", alias: "emptyrecyclebin", metaData: {} }
           ];
 
           var result = {
@@ -94,7 +94,7 @@ angular.module('umbraco.mocks').
                        jsAction: "umbracoMenuActions.CreateChildEntity"
                    }
               },              
-              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} }
+              { separator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} }
           ];
 
           return [200, menu, null];
