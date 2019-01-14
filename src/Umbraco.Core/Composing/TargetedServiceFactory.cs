@@ -4,11 +4,11 @@
     /// Provides a base class for targeted service factories.
     /// </summary>
     /// <typeparam name="TService"></typeparam>
-    public abstract class TargetedServiceProvider<TService>
+    public abstract class TargetedServiceFactory<TService>
     {
         private readonly IFactory _factory;
 
-        protected TargetedServiceProvider(IFactory factory)
+        protected TargetedServiceFactory(IFactory factory)
         {
             _factory = factory;
         }

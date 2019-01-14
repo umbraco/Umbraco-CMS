@@ -196,7 +196,7 @@
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
-    <Compile Include="Composing\TargetedServiceProvider.cs" />
+    <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
