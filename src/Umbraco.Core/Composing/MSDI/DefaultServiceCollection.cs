@@ -8,6 +8,7 @@ namespace Umbraco.Core.Composing.MSDI
     public class DefaultServiceCollection : List<ServiceDescriptor>, IServiceCollection, IRegister
     {
         public object Concrete => this;
+        private IFactory createdFactory = null;
 
         readonly Dictionary<Lifetime, ServiceLifetime> lifetimes = new Dictionary<Lifetime, ServiceLifetime>
         {
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Composing.MSDI
 
         public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
         {
-            Add(new ServiceDescriptor(typeof(TService), sp => factory((IFactory)sp), lifetimes[lifetime]));
+            Add(new ServiceDescriptor(typeof(TService), sp => factory(createdFactory), lifetimes[lifetime]));
         }
 
         public void RegisterInstance(Type serviceType, object instance)
@@ -57,7 +58,7 @@ namespace Umbraco.Core.Composing.MSDI
 
         public IFactory CreateFactory()
         {
-            return RegisterFactory.CreateFactory(this);
+            return createdFactory = RegisterFactory.CreateFactory(this);
         }
     }
 }

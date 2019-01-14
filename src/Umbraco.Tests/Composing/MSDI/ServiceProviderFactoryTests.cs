@@ -9,10 +9,22 @@ namespace Umbraco.Tests.Composing.MSDI
     public class ServiceProviderFactoryTests
     {
         [Test]
-        public void CreatesLightinjectContainer()
+        public void CreatesCoreLightinjectContainer()
         {
             var services = RegisterFactory.Create();
             var provider = services.CreateFactory();
+            Assert.That(provider, Is
+                .InstanceOf<Umbraco.Web.Composing.LightInject.LightInjectContainer>().And
+                .InstanceOf<IFactory>().And
+                .InstanceOf<IServiceProvider>()
+            );
+        }
+
+        [Test]
+        public void CreatesWebLightinjectContainer()
+        {
+            var services = LightInjectContainer.Create();
+            var provider = LightInjectContainer.CreateFactory(services);
             Assert.That(provider, Is
                 .InstanceOf<LightInjectContainer>().And
                 .InstanceOf<IFactory>().And
