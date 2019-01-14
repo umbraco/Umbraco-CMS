@@ -84,7 +84,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add(new MenuItem("importDocumentType", Services.TextService)
                 {
                     Icon = "page-up",
-                    SeperatorBefore = true,
+                    SeparatorBefore = true,
                     OpensDialog = true
                 });
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add(new MenuItem("export", Services.TextService)
                 {
                     Icon = "download-alt",
-                    SeperatorBefore = true,
+                    SeparatorBefore = true,
                     OpensDialog = true
                 });
                 menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
