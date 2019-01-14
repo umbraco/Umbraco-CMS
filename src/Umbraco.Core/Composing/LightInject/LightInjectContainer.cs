@@ -12,19 +12,20 @@ namespace Umbraco.Core.Composing.LightInject
     /// <summary>
     /// Implements DI with LightInject.
     /// </summary>
-    public class LightInjectContainer : IRegister, IFactory, IDisposable
+    public class LightInjectContainer : IFactory, IDisposable // IRegister, 
     {
         private int _disposed;
 
         private static IServiceCollection services = null;
-        private IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider;
+        private readonly ServiceContainer lightinjectContainer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LightInjectContainer"/> with a LightInject container.
         /// </summary>
         protected LightInjectContainer(ServiceContainer container, IServiceCollection services)
         {
-            Container = container;
+            lightinjectContainer = container;
             serviceProvider = container.CreateServiceProvider(services);
         }
 
@@ -94,11 +95,13 @@ namespace Umbraco.Core.Composing.LightInject
         /// <summary>
         /// Gets the LightInject container.
         /// </summary>
-        protected ServiceContainer Container { get; }
+        //protected ServiceContainer Container => serviceContainer;
 
         /// <inheritdoc cref="IRegister"/>
         /// <inheritdoc cref="IFactory"/>
-        public object Concrete => Container;
+        public object Concrete => lightinjectContainer;
+
+        protected ServiceContainer LightinjectContainer => lightinjectContainer;
 
         /// <inheritdoc />
         public void Dispose()
@@ -106,7 +109,7 @@ namespace Umbraco.Core.Composing.LightInject
             if (Interlocked.Exchange(ref _disposed, 1) == 1)
                 return;
 
-            Container.Dispose();
+            lightinjectContainer.Dispose();
         }
 
         /// <inheritdoc />
@@ -125,19 +128,19 @@ namespace Umbraco.Core.Composing.LightInject
 
         /// <inheritdoc />
         public object GetInstance(Type type)
-            => Container.GetInstance(type);
+            => this.GetService(type);
 
         /// <inheritdoc />
         public object TryGetInstance(Type type)
-            => Container.TryGetInstance(type);
+            => this.GetRequiredService(type);
 
         /// <inheritdoc />
         public IEnumerable<T> GetAllInstances<T>()
-            => Container.GetAllInstances<T>();
+            => this.GetServices<T>();
 
         /// <inheritdoc />
         public IEnumerable<object> GetAllInstances(Type type)
-            => Container.GetAllInstances(type);
+            => this.GetServices(type);
 
         /// <inheritdoc />
         public void Release(object instance)
@@ -153,113 +156,12 @@ namespace Umbraco.Core.Composing.LightInject
 
         #endregion
 
-        #region Registry
-
-        /// <inheritdoc />
-        public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
-        {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    Container.Register(serviceType);
-                    break;
-                case Lifetime.Request:
-                case Lifetime.Scope:
-                case Lifetime.Singleton:
-                    Container.Register(serviceType, GetLifetime(lifetime));
-                    break;
-                default:
-                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
-            }
-        }
-
-        /// <inheritdoc />
-        public void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient)
-        {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    Container.Register(serviceType, implementingType, implementingType.Name);
-                    break;
-                case Lifetime.Request:
-                case Lifetime.Scope:
-                case Lifetime.Singleton:
-                    Container.Register(serviceType, implementingType, GetLifetime(lifetime));
-                    break;
-                default:
-                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
-            }
-        }
-
-        /// <inheritdoc />
-        public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-        {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    Container.Register(f => factory(this));
-                    break;
-                case Lifetime.Request:
-                case Lifetime.Scope:
-                case Lifetime.Singleton:
-                    Container.Register(f => factory(this), GetLifetime(lifetime));
-                    break;
-                default:
-                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
-            }
-        }
-
-        private ILifetime GetLifetime(Lifetime lifetime)
-        {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    return null;
-                case Lifetime.Request:
-                    return new PerRequestLifeTime();
-                case Lifetime.Scope:
-                    return new PerScopeLifetime();
-                case Lifetime.Singleton:
-                    return new PerContainerLifetime();
-                default:
-                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
-            }
-        }
-
-        /// <inheritdoc />
-        public void RegisterInstance(Type serviceType, object instance)
-            => Container.RegisterInstance(serviceType, instance);
-
-        /// <inheritdoc />
-        public void RegisterAuto(Type serviceBaseType)
-        {
-            Container.RegisterFallback((serviceType, serviceName) =>
-            {
-                // https://github.com/seesharper/LightInject/issues/173
-                if (serviceBaseType.IsAssignableFromGtd(serviceType))
-                    Container.Register(serviceType);
-                return false;
-            }, null);
-        }
-
-        // was the Light-Inject specific way of dealing with args, but we've replaced it with our own
-        // beware! does NOT work on singletons, see https://github.com/seesharper/LightInject/issues/294
-        //
-        ///// <inheritdoc />
-        //public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory)
-        //    => Container.RegisterConstructorDependency((f, x) => factory(this, x));
-        //
-        ///// <inheritdoc />
-        //public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory)
-        //    => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
-
-        #endregion
 
         #region Control
 
         /// <inheritdoc />
         public IDisposable BeginScope()
-            => Container.BeginScope();
+            => lightinjectContainer.BeginScope();
 
         /// <inheritdoc />
         public virtual void ConfigureForWeb()
@@ -268,7 +170,7 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public void EnablePerWebRequestScope()
         {
-            if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
+            if (!(lightinjectContainer.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
                 throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             smp.EnablePerWebRequestScope();
         }
