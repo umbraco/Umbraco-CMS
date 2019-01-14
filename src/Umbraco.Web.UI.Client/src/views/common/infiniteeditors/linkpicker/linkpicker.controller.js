@@ -118,7 +118,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                     startNodeIsVirtual: userData.startMediaIds.length !== 1,
                     submit: function (model) {
-                        var media = model.selectedImages[0];
+                        var media = model.selection[0];
 
                         $scope.model.target.id = media.id;
                         $scope.model.target.udi = media.udi;
