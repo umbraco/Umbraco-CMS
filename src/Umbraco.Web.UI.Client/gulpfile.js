@@ -253,6 +253,17 @@ gulp.task('dependencies', function () {
             "src":  ["./node_modules/bootstrap-social/bootstrap-social.css"],
             "base": "./node_modules/bootstrap-social"
         },
+
+        {
+            "name": "angular-chart.js",
+            "src":  ["./node_modules/angular-chart.js/dist/angular-chart.min.js"],
+            "base": "./node_modules/angular-chart.js/dist"
+        },
+        {
+            "name": "chart.js",
+            "src":  ["./node_modules/chart.js/dist/chart.min.js"],
+            "base": "./node_modules/chart.js/dist"
+        },
         {
             "name": "chart.js",
             "src": ["./node_modules/chart.js/dist/Chart.min.js"],

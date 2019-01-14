@@ -27,7 +27,7 @@
     'lib/angular-chart.js/angular-chart.min.js',
 
     'lib/umbraco/Extensions.js',
-    
+
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacySpeechBubble.js',
 

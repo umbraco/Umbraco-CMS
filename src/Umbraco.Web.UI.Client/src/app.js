@@ -77,7 +77,7 @@ angular.module("umbraco.viewcache", [])
                             var _op = (url.indexOf("?") > 0) ? "&" : "?";
                             url += _op + "umb__rnd=" + rnd;
                         }
-                        
+
                         return get(url, config);
                     };
                     return $delegate;

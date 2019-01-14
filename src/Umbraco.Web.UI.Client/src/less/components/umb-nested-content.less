@@ -3,6 +3,13 @@
     position: relative;
 }
 
+.umb-nested-content-property-container {
+    position: relative;
+    &:not(:last-child){
+        margin-bottom: 12px;
+    }
+}
+
 .umb-nested-content--not-supported {
     opacity: 0.3;
     pointer-events: none;
