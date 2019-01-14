@@ -83,7 +83,6 @@ namespace Umbraco.Tests.Packaging
             Assert.IsTrue(result);
             Assert.AreEqual(1, def1.Id);
             Assert.AreNotEqual(default(Guid).ToString(), def1.PackageId);
-            Assert.AreNotEqual(default(Guid).ToString(), def1.FolderId);
 
             var def2 = new PackageDefinition
             {
@@ -98,7 +97,6 @@ namespace Umbraco.Tests.Packaging
             Assert.IsTrue(result);
             Assert.AreEqual(2, def2.Id);
             Assert.AreNotEqual(default(Guid).ToString(), def2.PackageId);
-            Assert.AreNotEqual(default(Guid).ToString(), def2.FolderId);
         }
 
         [Test]

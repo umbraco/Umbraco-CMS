@@ -131,7 +131,6 @@ namespace Umbraco.Core.Packaging
                 var newId = maxId + 1;
                 definition.Id = newId;
                 definition.PackageId = definition.PackageId == default ? Guid.NewGuid() : definition.PackageId;
-                definition.FolderId = Guid.NewGuid();
                 var packageXml = _parser.ToXml(definition);
                 packagesXml.Root.Add(packageXml);
             }
@@ -155,13 +154,12 @@ namespace Umbraco.Core.Packaging
         {
             if (definition.Id == default) throw new ArgumentException("The package definition does not have an ID, it must be saved before being exported");
             if (definition.PackageId == default) throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
-            if (definition.FolderId == default) throw new ArgumentException("the package definition does not have a folder GUID, it must be saved before being exported");
 
             //ensure it's valid
             ValidatePackage(definition);
 
             //Create a folder for building this package
-            var temporaryPath = IOHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + definition.FolderId);
+            var temporaryPath = IOHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
                 Directory.CreateDirectory(temporaryPath);
 

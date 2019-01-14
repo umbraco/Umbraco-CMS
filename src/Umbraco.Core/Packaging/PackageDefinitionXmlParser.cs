@@ -28,7 +28,6 @@ namespace Umbraco.Core.Packaging
             {
                 Id = xml.AttributeValue<int>("id"),
                 Name = xml.AttributeValue<string>("name") ?? string.Empty,
-                FolderId = xml.AttributeValue<Guid>("folder"),
                 PackagePath = xml.AttributeValue<string>("packagePath") ?? string.Empty,
                 Version = xml.AttributeValue<string>("version") ?? string.Empty,
                 Url = xml.AttributeValue<string>("url") ?? string.Empty,
@@ -74,7 +73,6 @@ namespace Umbraco.Core.Packaging
                 new XAttribute("version", def.Version ?? string.Empty),
                 new XAttribute("url", def.Url ?? string.Empty),
                 new XAttribute("name", def.Name ?? string.Empty),
-                new XAttribute("folder", def.FolderId),
                 new XAttribute("packagePath", def.PackagePath ?? string.Empty),
                 new XAttribute("iconUrl", def.IconUrl ?? string.Empty),
                 new XAttribute("umbVersion", def.UmbracoVersion),

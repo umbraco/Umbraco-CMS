@@ -34,7 +34,6 @@ namespace Umbraco.Core.Models.Packaging
                 UmbracoVersion = compiled.UmbracoVersion,
                 Url = compiled.Url,
                 Version = compiled.Version,
-                //fixme: Is OriginalPath correct here?
                 Files = compiled.Files.Select(x => x.OriginalPath).ToList()
             };
         }
@@ -53,13 +52,6 @@ namespace Umbraco.Core.Models.Packaging
         [Required]
         [Url]
         public string Url { get; set; } = string.Empty;
-
-        //fixme: remove this
-        /// <summary>
-        /// This is a generated GUID which is used to determine a temporary folder name for processing the package
-        /// </summary>
-        [DataMember(Name = "folder")]
-        public Guid FolderId { get; set; }
 
         [ReadOnly(true)]
         [DataMember(Name = "packagePath")]
