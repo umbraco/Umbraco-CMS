@@ -23,36 +23,6 @@ namespace Umbraco.Tests.Services
     public class ContentTypeServiceTests : TestWithSomeContentBase
     {
         [Test]
-        public void CanSaveAndGetIsElement()
-        {
-            //create content type with a property type that varies by culture
-            IContentType contentType = MockedContentTypes.CreateBasicContentType();
-            contentType.Variations = ContentVariation.Nothing;
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
-            {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = -88,
-                Variations = ContentVariation.Nothing
-            });
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            contentType = ServiceContext.ContentTypeService.Get(contentType.Id);
-            Assert.IsFalse(contentType.IsElement);
-
-            contentType.IsElement = true;
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            contentType = ServiceContext.ContentTypeService.Get(contentType.Id);
-            Assert.IsTrue(contentType.IsElement);
-        }
-
-        [Test]
         public void Change_Content_Type_Variation_Clears_Redirects()
         {
             //create content type with a property type that varies by culture

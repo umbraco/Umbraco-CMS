@@ -578,10 +578,6 @@ namespace Umbraco.Core.Services.Implement
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
 
-            var isElement = infoElement.Element("IsElement");
-            if (isListView != null)
-                contentType.IsElement = isElement.Value.InvariantEquals("true");
-
             //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
             var masterElement = infoElement.Element("Master");
             if (masterElement != null)
