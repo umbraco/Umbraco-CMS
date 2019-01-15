@@ -410,12 +410,12 @@ input.umb-group-builder__group-sort-value {
 
     .editor-placeholder {
         border: 1px dashed @gray-8;
+        border-radius: 5px;
         width: 100%;
         height: 80px;
         line-height: 80px;
         text-align: center;
         display: block;
-        border-radius: 5px;
         color: @gray-3;
         font-weight: bold;
         font-size: 14px;
@@ -435,17 +435,19 @@ input.umb-group-builder__group-sort-value {
 
         .editor-icon-wrapper {
             border: 1px solid @gray-8;
+            border-radius: 5px;
             width: 60px;
             height: 60px;
             text-align: center;
             line-height: 60px;
-            border-radius: 5px;
             float: left;
             margin-right: 20px;
             text-decoration: none;
 
             &:hover {
-                background: @gray-10;
+                color: @turquoise-d1;
+                border-color: @turquoise-d1;
+                border-style: dashed;
             }
 
             .icon {
@@ -454,13 +456,16 @@ input.umb-group-builder__group-sort-value {
         }
 
         .editor-details {
+            border: 1px solid transparent;
+            border-radius: 5px;
             flex: 1 1 auto;
             float: left;
             margin-right: 20px;
             padding: 10px 15px;
 
             &:hover {
-                background: @gray-10;
+                border-color: @turquoise-d1;
+                border-style: dashed;
             }
 
             .editor-name {
