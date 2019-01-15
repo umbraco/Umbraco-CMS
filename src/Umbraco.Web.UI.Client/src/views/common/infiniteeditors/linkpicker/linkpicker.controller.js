@@ -146,7 +146,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         // method to select a search result
         $scope.selectResult = function (evt, result) {
             result.selected = result.selected === true ? false : true;
-            nodeSelectHandler(evt, {
+            nodeSelectHandler({
                 event: evt,
                 node: result
             });
@@ -166,7 +166,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         // Mini list view
         $scope.selectListViewNode = function (node) {
             node.selected = node.selected === true ? false : true;
-            nodeSelectHandler({}, {
+            nodeSelectHandler({
                 node: node
             });
         };
