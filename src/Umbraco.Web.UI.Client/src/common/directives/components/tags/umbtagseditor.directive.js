@@ -130,8 +130,7 @@
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
                     configureViewModel();
-                    //this is required to re-validate
-                    vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+                    reValidate()
 
                 }
             }
@@ -182,6 +181,8 @@
             else {
                 vm.onValueChanged({ value: [] });
             }
+            
+            reValidate();
         }
 
         /**
@@ -270,8 +271,12 @@
                 return ($.inArray(suggestion.value, vm.viewModel) === -1);
             });
         }
-
-
+        
+        function reValidate() {
+            //this is required to re-validate
+            vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+        {
+            
     }
 
 })();
