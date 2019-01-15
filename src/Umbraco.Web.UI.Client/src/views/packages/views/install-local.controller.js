@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService, $q) {
+    function PackagesInstallLocalController($scope, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService, $q) {
 
         var vm = this;
         vm.state = "upload";

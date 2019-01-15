@@ -76,6 +76,7 @@ namespace Umbraco.Core.Packaging
         {
             //running this will update the PackageDefinition with the items being removed
             var summary = _packageDataInstallation.UninstallPackageData(package, userId);
+
             summary.Actions = _parser.GetPackageActions(XElement.Parse(package.Actions), package.Name);
 
             //run actions before files are removed

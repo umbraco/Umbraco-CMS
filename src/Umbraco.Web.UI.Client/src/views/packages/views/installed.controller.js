@@ -13,6 +13,8 @@
         };
         vm.package = {};
 
+        var labels = {};
+        
         function init() {
             packageResource.getInstalled()
                 .then(function (packs) {
@@ -20,6 +22,16 @@
                 });
             vm.installState.status = "";
             vm.state = "list";
+
+            var labelKeys = [
+                "packager_installStateUninstalling",
+                "packager_installStateComplete",
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                labels.installStateUninstalling = values[0];
+                labels.installStateComplete = values[1];
+            });
         }
 
         function confirmUninstall(pck) {
@@ -28,14 +40,14 @@
         }
 
         function uninstallPackage(installedPackage) {
-            vm.installState.status = localizationService.localize("packager_installStateUninstalling");
+            vm.installState.status = labels.installStateUninstalling;
             vm.installState.progress = "0";
 
             packageResource.uninstall(installedPackage.id)
                 .then(function () {
 
                     if (installedPackage.files.length > 0) {
-                        vm.installState.status = localizationService.localize("packager_installStateComplete");
+                        vm.installState.status = labels.installStateComplete;
                         vm.installState.progress = "100";
 
                         //set this flag so that on refresh it shows the installed packages list

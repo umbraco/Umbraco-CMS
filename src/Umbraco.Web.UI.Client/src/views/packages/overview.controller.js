@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesOverviewController($scope, $route, $location, navigationService, $timeout, localStorageService) {
+    function PackagesOverviewController($scope, $location, localStorageService) {
 
         //Hack!
         // if there is a cookie value for packageInstallUri then we need to redirect there,
@@ -9,12 +9,13 @@
         // because it will double load it.
         // we will refresh and then navigate there.
 
-        var installPackageUri = localStorageService.get("packageInstallUri");
-        const packageUri = $location.search().subview;
+        let installPackageUri = localStorageService.get("packageInstallUri");
+        let packageUri = $location.search().subview;
 
         if (installPackageUri) {            
             localStorageService.remove("packageInstallUri");                       
         }
+
         if (installPackageUri && installPackageUri !== "installed") {
             //navigate to the custom installer screen, if it is just "installed", then we'll 
             //show the installed view
@@ -23,6 +24,8 @@
         else {
             var vm = this;
 
+            packageUri = installPackageUri ? installPackageUri : packageUri; //use the path stored in storage over the one in the current path
+
             vm.page = {};
             vm.page.name = "Packages";
             vm.page.navigation = [
@@ -30,7 +33,7 @@
                     "name": "Packages",
                     "icon": "icon-cloud",
                     "view": "views/packages/views/repo.html",
-                    "active": !packageUri || installPackageUri === "navigation" || packageUri === "navigation",
+                    "active": !packageUri || packageUri === "navigation",
                     "alias": "umbPackages",
                     "action": function() {
                         $location.search("subview", "navigation");
@@ -40,7 +43,7 @@
                     "name": "Installed",
                     "icon": "icon-box",
                     "view": "views/packages/views/installed.html",
-                    "active": installPackageUri === "installed" || packageUri === "installed",
+                    "active": packageUri === "installed",
                     "alias": "umbInstalled",
                     "action": function() {
                         $location.search("subview", "installed");
@@ -50,7 +53,7 @@
                     "name": "Install local",
                     "icon": "icon-add",
                     "view": "views/packages/views/install-local.html",
-                    "active": installPackageUri === "local" || packageUri === "local",
+                    "active": packageUri === "local",
                     "alias": "umbInstallLocal",
                     "action": function() {
                         $location.search("subview", "local");

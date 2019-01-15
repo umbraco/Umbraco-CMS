@@ -149,36 +149,49 @@ namespace Umbraco.Core.Packaging
             return path;
         }
 
+        /// <summary>
+        /// Parses the package actions stored in the package definition
+        /// </summary>
+        /// <param name="actionsElement"></param>
+        /// <param name="packageName"></param>
+        /// <returns></returns>
         public IEnumerable<PackageAction> GetPackageActions(XElement actionsElement, string packageName)
         {
-            if (actionsElement == null) { return new PackageAction[0]; }
+            if (actionsElement == null) return Enumerable.Empty<PackageAction>();
 
-            if (string.Equals("Actions", actionsElement.Name.LocalName) == false)
-                throw new ArgumentException($"Must be \"Actions\" as root", nameof(actionsElement));
+            //invariant check ... because people can realy enter anything :/
+            if (!string.Equals("actions", actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase))
+                throw new FormatException("Must be \"<actions>\" as root");
 
-            return actionsElement.Elements("Action")
-                .Select(elemet =>
+            if (!actionsElement.HasElements) return Enumerable.Empty<PackageAction>();
+
+            var actionElementName = actionsElement.Elements().First().Name.LocalName;
+
+            //invariant check ... because people can realy enter anything :/
+            if (!string.Equals("action", actionElementName, StringComparison.InvariantCultureIgnoreCase))
+                throw new FormatException("Must be \"<action\" as element");
+
+            return actionsElement.Elements(actionElementName)
+                .Select(e =>
                 {
-                    var aliasAttr = elemet.Attribute("Alias");
+                    var aliasAttr = e.Attribute("alias") ?? e.Attribute("Alias"); //allow both ... because people can really enter anything :/
                     if (aliasAttr == null)
-                        throw new ArgumentException("missing \"Alias\" atribute in alias element", nameof(actionsElement));
+                        throw new ArgumentException("missing \"alias\" atribute in alias element", nameof(actionsElement));
 
                     var packageAction = new PackageAction
                     {
-                        XmlData = elemet,
+                        XmlData = e,
                         Alias = aliasAttr.Value,
                         PackageName = packageName,
                     };
 
-
-                    var attr = elemet.Attribute("runat");
+                    var attr = e.Attribute("runat") ?? e.Attribute("Runat"); //allow both ... because people can really enter anything :/
 
                     if (attr != null && Enum.TryParse(attr.Value, true, out ActionRunAt runAt)) { packageAction.RunAt = runAt; }
 
-                    attr = elemet.Attribute("undo");
+                    attr = e.Attribute("undo") ?? e.Attribute("Undo"); //allow both ... because people can really enter anything :/
 
                     if (attr != null && bool.TryParse(attr.Value, out var undo)) { packageAction.Undo = undo; }
-
 
                     return packageAction;
                 }).ToArray();
