@@ -122,6 +122,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MakeTagsVariant>("{C39BF2A7-1454-4047-BBFE-89E40F66ED63}");
             To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
 
+
             //FINAL
 
 
