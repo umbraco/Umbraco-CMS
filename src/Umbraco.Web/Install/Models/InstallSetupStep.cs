@@ -82,8 +82,6 @@ namespace Umbraco.Web.Install.Models
         /// </summary>
         [IgnoreDataMember]
         public abstract Type StepType { get; }
-
-        [IgnoreDataMember]
-        public bool HasUIElement => View.IsNullOrWhiteSpace() == false;
+        
     }
 }
