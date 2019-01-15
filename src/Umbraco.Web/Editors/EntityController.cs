@@ -769,7 +769,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
-                return Mapper.Map<EntityBasic>(found);
+                return Mapper.Map<IEntitySlim, EntityBasic>(found);
             }
             //now we need to convert the unknown ones
             switch (entityType)
