@@ -64,15 +64,15 @@
                                     <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
                                 </a>
                     
-                                <div class="editor-details">
-                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
-                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
-                                </div>
+                                <a href="" class="editor-details" ng-click="vm.openDataTypePicker(model.property)">
+                                    <span class="editor-name">{{ model.property.dataTypeName }}</span>
+                                    <span class="editor-editor">{{ model.property.editor }}</span>
+                                </a>
                     
                                 <a href class="editor-settings-icon pull-right"
-                                ng-click="vm.openDataTypeSettings(model.property)"
-                                hotkey="alt+shift+d"
-                                ng-if="model.property.editor">
+                                    ng-click="vm.openDataTypeSettings(model.property)"
+                                    hotkey="alt+shift+d"
+                                    ng-if="model.property.editor">
                                     <i class="icon icon-settings"></i>
                                 </a>
                     
