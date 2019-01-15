@@ -92,41 +92,7 @@ namespace Umbraco.Web.Editors
             return Ok();
         }
 
-        /// <summary>
-        /// Returns all installed packages - only shows their latest versions
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<InstalledPackageModel> GetInstalled()
-        {
-            return Services.PackagingService.GetAllInstalledPackages()
-                .GroupBy(
-                    //group by name
-                    x => x.Name,
-                    //select the package with a parsed version
-                    pck => Version.TryParse(pck.Version, out var pckVersion)
-                        ? new { package = pck, version = pckVersion }
-                        : new { package = pck, version = new Version(0, 0, 0) })
-                .Select(grouping =>
-                {
-                    //get the max version for the package
-                    var maxVersion = grouping.Max(x => x.version);
-                    //only return the first package with this version
-                    return grouping.First(x => x.version == maxVersion).package;
-                })
-                .Select(pack => new InstalledPackageModel
-                {
-                    Name = pack.Name,
-                    Id = pack.Id,
-                    Author = pack.Author,
-                    Version = pack.Version,
-                    Url = pack.Url,
-                    License = pack.License,
-                    LicenseUrl = pack.LicenseUrl,
-                    Files = pack.Files,
-                    IconUrl = pack.IconUrl
-                })
-                .ToList();
-        }
+        
         
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {

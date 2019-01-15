@@ -19,7 +19,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
-                       "packageInstallApiBaseUrl",
+                       "packageApiBaseUrl",
                        "GetInstalled")),
                'Failed to get installed packages');
         },

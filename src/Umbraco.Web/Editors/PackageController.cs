@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -111,5 +114,41 @@ namespace Umbraco.Web.Editors
             return response;
         }
 
+        /// <summary>
+        /// Returns all installed packages - only shows their latest versions
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<InstalledPackageModel> GetInstalled()
+        {
+            return Services.PackagingService.GetAllInstalledPackages()
+                .GroupBy(
+                    //group by name
+                    x => x.Name,
+                    //select the package with a parsed version
+                    pck => Version.TryParse(pck.Version, out var pckVersion)
+                        ? new { package = pck, version = pckVersion }
+                        : new { package = pck, version = new Version(0, 0, 0) })
+                .Select(grouping =>
+                {
+                    //get the max version for the package
+                    var maxVersion = grouping.Max(x => x.version);
+                    //only return the first package with this version
+                    return grouping.First(x => x.version == maxVersion).package;
+                })
+                .Select(pack => new InstalledPackageModel
+                {
+                    Name = pack.Name,
+                    Id = pack.Id,
+                    Author = pack.Author,
+                    Version = pack.Version,
+                    Url = pack.Url,
+                    License = pack.License,
+                    LicenseUrl = pack.LicenseUrl,
+                    Files = pack.Files,
+                    IconUrl = pack.IconUrl,
+                    Readme = pack.Readme
+                })
+                .ToList();
+        }
     }
 }
