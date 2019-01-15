@@ -25,7 +25,7 @@
 
             var labelKeys = [
                 "packager_installStateUninstalling",
-                "packager_installStateComplete",
+                "packager_installStateComplete"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {

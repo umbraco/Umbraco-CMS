@@ -23,7 +23,7 @@ namespace Umbraco.Core.Packaging
             return stylesheetNodes
                 .Select(n =>
                 {
-                    var xElement = n.Element("Name");
+                    var xElement = n.Element("Name") ?? n.Element("name"); ;
                     if (xElement == null)
                         throw new FormatException("Missing \"Name\" element");
 

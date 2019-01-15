@@ -6,11 +6,13 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using File = System.IO.File;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -79,7 +81,11 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Can_Read_Compiled_Package_Warnings()
         {
-            
+            //copy a file to the same path that the package will install so we can detect file conflicts
+            var path = IOHelper.MapPath("~/" + _testBaseFolder);
+            var filePath = Path.Combine(path, "bin", "Auros.DocumentTypePicker.dll");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            File.WriteAllText(filePath, "test");
 
             var preInstallWarnings = PackageInstallation.ReadPackage(
                 //this is where our test zip file is 
@@ -87,7 +93,10 @@ namespace Umbraco.Tests.Packaging
                 .Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
-            //TODO: Assert!
+            Assert.AreEqual(preInstallWarnings.FilesReplaced.Count(), 1);
+            Assert.AreEqual(preInstallWarnings.FilesReplaced.First(), "bin\\Auros.DocumentTypePicker.dll");
+
+            //TODO: More Asserts
         }
 
         [Test]
