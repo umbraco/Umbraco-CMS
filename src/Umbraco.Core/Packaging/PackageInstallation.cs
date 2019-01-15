@@ -69,7 +69,11 @@ namespace Umbraco.Core.Packaging
 
             var packageZipFile = compiledPackage.PackageFile;
 
-            return _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _packageExtractionFolder.FullName);
+            var files = _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _packageExtractionFolder.FullName).ToList();
+
+            packageDefinition.Files = files;
+
+            return files;
         }
 
         public UninstallationSummary UninstallPackage(PackageDefinition package, int userId)

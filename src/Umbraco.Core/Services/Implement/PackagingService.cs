@@ -109,8 +109,7 @@ namespace Umbraco.Core.Services.Implement
             if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
             var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId).ToList();
-            packageDefinition.Files = files;
-
+            
             SaveInstalledPackage(packageDefinition);
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package files installed for package '{compiledPackage.Name}'.");

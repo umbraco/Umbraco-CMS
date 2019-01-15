@@ -1,16 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -55,19 +53,6 @@ namespace Umbraco.Tests.Packaging
 
         private const string DocumentTypePickerUmb = "Document_Type_Picker_1.1.umb";
 
-        //[Test]
-        //public void PackagingService_Can_ImportPackage()
-        //{
-        //    const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
-
-        //    string testPackagePath = GetTestPackagePath(documentTypePickerUmb);
-
-        //    InstallationSummary installationSummary = packagingService.InstallPackage(testPackagePath);
-
-        //    Assert.IsNotNull(installationSummary);
-        //}
-
-
         [Test]
         public void Can_Read_Compiled_Package()
         {
@@ -111,9 +96,11 @@ namespace Umbraco.Tests.Packaging
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is 
                 new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
+
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();
+            def.Files = new List<string>(); //clear out the files of the def for testing, this should be populated by the install
 
             var result = PackageInstallation.InstallPackageFiles(def, package, -1).ToList();
 
@@ -122,7 +109,7 @@ namespace Umbraco.Tests.Packaging
             Assert.IsTrue(File.Exists(Path.Combine(IOHelper.MapPath("~/" + _testBaseFolder), result[0])));
 
             //make sure the def is updated too
-            Assert.AreEqual(result.Count(), def.Files.Count);
+            Assert.AreEqual(result.Count, def.Files.Count);
         }
 
         [Test]
