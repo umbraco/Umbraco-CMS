@@ -43,6 +43,10 @@ namespace Umbraco.Core.Services.Implement
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
             IPackageInstallation packageInstallation)
+            var isElement = infoElement.Element("IsElement");
+            if (isListView != null)
+                contentType.IsElement = isElement.Value.InvariantEquals("true");
+
         {   
             _auditService = auditService;
             _createdPackages = createdPackages;

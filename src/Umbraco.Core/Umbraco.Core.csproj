@@ -376,6 +376,7 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentTypeIsElementColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLogTableColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddTypedLabels.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables1A.cs" />

@@ -26,6 +26,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "isContainer")]
         public bool IsContainer { get; set; }
 
+        //Element
+        [DataMember(Name = "isElement")]
+        public bool IsElement { get; set; }
+
         [DataMember(Name = "listViewEditorName")]
         [ReadOnly(true)]
         public string ListViewEditorName { get; set; }
