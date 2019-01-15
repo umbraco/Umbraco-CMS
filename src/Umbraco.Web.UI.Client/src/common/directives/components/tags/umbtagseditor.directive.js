@@ -130,8 +130,7 @@
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
                     configureViewModel();
-                    //this is required to re-validate
-                    vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+                    reValidate()
 
                 }
             }
@@ -183,8 +182,7 @@
                 vm.onValueChanged({ value: [] });
             }
             
-            //this is required to re-validate
-            $scope.propertyForm.tagCount.$setViewValue($scope.model.value.length);
+            reValidate();
         }
 
         /**
@@ -273,8 +271,12 @@
                 return ($.inArray(suggestion.value, vm.viewModel) === -1);
             });
         }
-
-
+        
+        function reValidate() {
+            //this is required to re-validate
+            vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+        {
+            
     }
 
 })();
