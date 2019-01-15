@@ -25,6 +25,7 @@
         vm.removeChild = removeChild;
         vm.toggleAllowAsRoot = toggleAllowAsRoot;
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleIsElement = toggleIsElement;
 
         /* ---------- INIT ---------- */
 
@@ -84,25 +85,18 @@
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
         }
 
-        /**
-         * Toggle the $scope.model.allowAsRoot value to either true or false
-         */
-        function toggleAllowAsRoot(){
-            if($scope.model.allowAsRoot){
-                $scope.model.allowAsRoot = false;
-                return;
-            }
+        // note: "safe toggling" here ie handling cases where the value is undefined, etc
 
-            $scope.model.allowAsRoot = true;
+        function toggleAllowAsRoot() {
+            $scope.model.allowAsRoot = $scope.model.allowAsRoot ? false : true;
         }
 
         function toggleAllowCultureVariants() {
-            if ($scope.model.allowCultureVariant) {
-                $scope.model.allowCultureVariant = false;
-                return;
-            }
+            $scope.model.allowCultureVariant = $scope.model.allowCultureVariant ? false : true;
+        }
 
-            $scope.model.allowCultureVariant = true;
+        function toggleIsElement() {
+            $scope.model.isElement = $scope.model.isElement ? false : true;
         }
 
     }
