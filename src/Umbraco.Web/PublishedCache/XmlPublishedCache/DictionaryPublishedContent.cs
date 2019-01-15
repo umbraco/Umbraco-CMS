@@ -52,7 +52,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             LoadedFromExamine = fromExamine;
 
             ValidateAndSetProperty(valueDictionary, val => _id = Int32.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
-            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
+            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key", "__key", "__Key");
             //ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
             ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");

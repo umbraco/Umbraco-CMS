@@ -320,7 +320,7 @@ namespace Umbraco.Core.Runtime
         /// Gets a profiler.
         /// </summary>
         protected virtual IProfiler GetProfiler()
-            => new LogProfiler(ProfilingLogger);
+            => new LogProfiler(Logger);
 
         /// <summary>
         /// Gets the application caches.

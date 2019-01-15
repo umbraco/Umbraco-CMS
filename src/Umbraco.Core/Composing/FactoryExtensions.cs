@@ -17,6 +17,7 @@ namespace Umbraco.Core.Composing
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the factory failed to get an instance of the specified type.</remarks>
         public static T GetInstance<T>(this IFactory factory)
+            where T : class
             => (T)factory.GetInstance(typeof(T));
 
         /// <summary>
@@ -28,6 +29,7 @@ namespace Umbraco.Core.Composing
         /// of the specified type. Throws an exception if the factory does know how
         /// to get an instance of the specified type, but failed to do so.</remarks>
         public static T TryGetInstance<T>(this IFactory factory)
+            where T : class
             => (T)factory.TryGetInstance(typeof(T));
 
         /// <summary>
@@ -42,6 +44,7 @@ namespace Umbraco.Core.Composing
         /// <para>The arguments are used as dependencies by the factory.</para>
         /// </remarks>
         public static T CreateInstance<T>(this IFactory factory, params object[] args)
+            where T : class
             => (T)factory.CreateInstance(typeof(T), args);
 
         /// <summary>
