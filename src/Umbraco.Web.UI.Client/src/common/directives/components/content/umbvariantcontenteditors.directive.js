@@ -260,7 +260,7 @@
                 vm.editors.splice(editorIndex, 1);
                 //remove variant from open variants
                 vm.openVariants.splice(editorIndex, 1);
-                //update cculture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
+                //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
                 $location.search("cculture", vm.openVariants[0]);
                 splitViewChanged();
             }, 400);
