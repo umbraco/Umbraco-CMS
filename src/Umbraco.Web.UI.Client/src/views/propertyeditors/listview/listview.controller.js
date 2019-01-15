@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource) {
+function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -279,10 +279,12 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             $scope.listViewResultSet = data;
 
             //update all values for display
+            var section = appState.getSectionState("currentSection");
             if ($scope.listViewResultSet.items) {
                 _.each($scope.listViewResultSet.items, function (e, index) {
                     setPropertyValues(e);
-                    if (e.contentTypeAlias === 'Folder') {
+               // create the folders collection (only for media list views)
+               if (section === "media" && !mediaHelper.hasFilePropertyType(e)) {
                         $scope.folders.push(e);
                     }
                 });

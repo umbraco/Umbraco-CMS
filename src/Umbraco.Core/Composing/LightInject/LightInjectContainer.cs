@@ -102,6 +102,8 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public IFactory CreateFactory() => this;
 
+        private static string GetTargetedServiceName<TTarget>() => "TARGET:" + typeof(TTarget).FullName;
+
         #region Factory
 
         /// <inheritdoc />
@@ -109,11 +111,16 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.GetInstance(type);
 
         /// <inheritdoc />
+        public TService GetInstanceFor<TService, TTarget>()
+            => Container.GetInstance<TService>(GetTargetedServiceName<TTarget>());
+
+        /// <inheritdoc />
         public object TryGetInstance(Type type)
             => Container.TryGetInstance(type);
 
         /// <inheritdoc />
         public IEnumerable<T> GetAllInstances<T>()
+            where T : class
             => Container.GetAllInstances<T>();
 
         /// <inheritdoc />
@@ -138,21 +145,7 @@ namespace Umbraco.Core.Composing.LightInject
 
         /// <inheritdoc />
         public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
-        {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    Container.Register(serviceType);
-                    break;
-                case Lifetime.Request:
-                case Lifetime.Scope:
-                case Lifetime.Singleton:
-                    Container.Register(serviceType, GetLifetime(lifetime));
-                    break;
-                default:
-                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
-            }
-        }
+            => Container.Register(serviceType, GetLifetime(lifetime));
 
         /// <inheritdoc />
         public void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient)
@@ -174,21 +167,40 @@ namespace Umbraco.Core.Composing.LightInject
 
         /// <inheritdoc />
         public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
         {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    Container.Register(f => factory(this));
-                    break;
-                case Lifetime.Request:
-                case Lifetime.Scope:
-                case Lifetime.Singleton:
-                    Container.Register(f => factory(this), GetLifetime(lifetime));
-                    break;
-                default:
-                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
-            }
+            Container.Register(f => factory(this), GetLifetime(lifetime));
         }
+
+        /// <inheritdoc />
+        public void Register(Type serviceType, object instance)
+            => Container.RegisterInstance(serviceType, instance);
+
+        /// <inheritdoc />
+        public void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+            => RegisterFor<TService, TTarget>(typeof(TService), lifetime);
+
+        /// <inheritdoc />
+        public void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            // note that there can only be one implementation or instance registered "for" a service
+            Container.Register(typeof(TService), implementingType, GetTargetedServiceName<TTarget>(), GetLifetime(lifetime));
+        }
+
+        /// <inheritdoc />
+        public void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            // note that there can only be one implementation or instance registered "for" a service
+            Container.Register(f => factory(this), GetTargetedServiceName<TTarget>(), GetLifetime(lifetime));
+        }
+
+        /// <inheritdoc />
+        public void RegisterFor<TService, TTarget>(TService instance)
+            where TService : class
+            => Container.RegisterInstance(typeof(TService), instance, GetTargetedServiceName<TTarget>());
 
         private ILifetime GetLifetime(Lifetime lifetime)
         {
@@ -208,10 +220,6 @@ namespace Umbraco.Core.Composing.LightInject
         }
 
         /// <inheritdoc />
-        public void RegisterInstance(Type serviceType, object instance)
-            => Container.RegisterInstance(serviceType, instance);
-
-        /// <inheritdoc />
         public void RegisterAuto(Type serviceBaseType)
         {
             Container.RegisterFallback((serviceType, serviceName) =>
@@ -222,17 +230,6 @@ namespace Umbraco.Core.Composing.LightInject
                 return false;
             }, null);
         }
-
-        // was the Light-Inject specific way of dealing with args, but we've replaced it with our own
-        // beware! does NOT work on singletons, see https://github.com/seesharper/LightInject/issues/294
-        //
-        ///// <inheritdoc />
-        //public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory)
-        //    => Container.RegisterConstructorDependency((f, x) => factory(this, x));
-        //
-        ///// <inheritdoc />
-        //public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory)
-        //    => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
 
         #endregion
 
@@ -256,21 +253,14 @@ namespace Umbraco.Core.Composing.LightInject
 
         private class AssemblyScanner : IAssemblyScanner
         {
-            //private readonly IAssemblyScanner _scanner;
-
-            //public AssemblyScanner(IAssemblyScanner scanner)
-            //{
-            //    _scanner = scanner;
-            //}
-
             public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
             {
-                // nothing - we *could* scan non-Umbraco assemblies, though
+                // nothing - we don't want LightInject to scan
             }
 
             public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
             {
-                // nothing - we *could* scan non-Umbraco assemblies, though
+                // nothing - we don't want LightInject to scan
             }
         }
 

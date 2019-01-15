@@ -12,10 +12,9 @@ namespace Umbraco.Core.Composing.Composers
          *
          * Create a component and use it to modify the composition by adding something like:
          *
-         *   composition.Container.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
-         *       factory => new PhysicalFileSystem("~/somewhere"));
+         *   composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(...);
          *
-         * return whatever supporting filesystem you like.
+         * and register whatever supporting filesystem you like.
          *
          *
          * HOW TO IMPLEMENT MY OWN FILESYSTEM
@@ -30,12 +29,15 @@ namespace Umbraco.Core.Composing.Composers
          *       { }
          *   }
          *
-         * The ctor can have more parameters that will be resolved by the container.
+         * The ctor can have more parameters, that will be resolved by the container.
          *
          * Register your filesystem, in a component:
          *
-         *    composition.Container.RegisterFileSystem<MyFileSystem>(
-         *        factory => new PhysicalFileSystem("~/my"));
+         *   composition.RegisterFileSystem<MyFileSystem>();
+         *
+         * Register the underlying filesystem:
+         *
+         *   composition.RegisterUniqueFor<IFileSystem, MyFileSystem>(...);
          *
          * And that's it, you can inject MyFileSystem wherever it's needed.
          *
@@ -48,8 +50,8 @@ namespace Umbraco.Core.Composing.Composers
          * Make the class implement the interface, then
          * register your filesystem, in a component:
          *
-         *    composition.Container.RegisterFileSystem<IMyFileSystem, MyFileSystem>(
-         *        factory => new PhysicalFileSystem("~/my"));
+         *   composition.RegisterFileSystem<IMyFileSystem, MyFileSystem>();
+         *   composition.RegisterUniqueFor<IFileSystem, IMyFileSystem>(...);
          *
          * And that's it, you can inject IMyFileSystem wherever it's needed.
          *
@@ -79,9 +81,16 @@ namespace Umbraco.Core.Composing.Composers
             // register the scheme for media paths
             composition.RegisterUnique<IMediaPathScheme, TwoGuidsMediaPathScheme>();
 
-            // register the IMediaFileSystem implementation with a supporting filesystem
-            composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
-                factory => new PhysicalFileSystem("~/media"));
+            // register the IMediaFileSystem implementation
+            composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>();
+
+            // register the supporting filesystems provider
+            composition.Register(factory => new SupportingFileSystems(factory), Lifetime.Singleton);
+
+            // register the IFileSystem supporting the IMediaFileSystem
+            // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
+            // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
+            composition.SetMediaFileSystem(() => new PhysicalFileSystem("~/media"));
 
             return composition;
         }
