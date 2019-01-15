@@ -33,6 +33,24 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         $scope.showTarget = $scope.model.hideTarget !== true;
 
+        // this ensures that we only sync the tree once and only when it's ready
+        var oneTimeTreeSync = {
+            executed: false,
+            treeReady: false,
+            sync: function() {
+                if (this.executed || !this.treeReady || !($scope.model.target && $scope.model.target.path)) {
+                    return;
+                }
+
+                this.executed = true;
+                //now sync the tree to this path
+                $scope.dialogTreeApi.syncTree({
+                    path: $scope.model.target.path,
+                    tree: "content"
+                });
+            }
+        };
+
         if (dialogOptions.currentTarget) {
             $scope.model.target = dialogOptions.currentTarget;
             //if we have a node ID, we fetch the current node to build the form data
@@ -45,11 +63,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
                     entityResource.getPath(id, "Document").then(function (path) {
                         $scope.model.target.path = path;
-                        //now sync the tree to this path
-                        $scope.dialogTreeApi.syncTree({
-                            path: $scope.model.target.path,
-                            tree: "content"
-                        });
+                        oneTimeTreeSync.sync();
                     });
                 }
 
@@ -70,6 +84,11 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 }            }
         } else if (dialogOptions.anchors) {
             $scope.anchorValues = dialogOptions.anchors;
+        }
+
+        function treeLoadedHandler(args) {
+            oneTimeTreeSync.treeReady = true;
+            oneTimeTreeSync.sync();
         }
 
         function nodeSelectHandler(args) {
@@ -159,6 +178,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         };
 
         $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
             $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
         }
