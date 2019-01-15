@@ -37,13 +37,17 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         var oneTimeTreeSync = {
             executed: false,
             treeReady: false,
-            sync: function() {
+            sync: function () {
+                // don't run this if:
+                // - it was already run once
+                // - the tree isn't ready yet
+                // - the model path hasn't been loaded yet
                 if (this.executed || !this.treeReady || !($scope.model.target && $scope.model.target.path)) {
                     return;
                 }
 
                 this.executed = true;
-                //now sync the tree to this path
+                // sync the tree to the model path
                 $scope.dialogTreeApi.syncTree({
                     path: $scope.model.target.path,
                     tree: "content"
