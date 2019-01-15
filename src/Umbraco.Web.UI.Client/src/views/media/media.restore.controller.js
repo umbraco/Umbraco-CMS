@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
 		$scope.error = null;
 	    $scope.success = false;
 
-		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
+        relationResource.getByChildId(node.id, "relateParentMediaFolderOnDelete").then(function (data) {
 
             if (data.length == 0) {
                 $scope.success = false;
