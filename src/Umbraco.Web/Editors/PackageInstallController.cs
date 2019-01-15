@@ -287,7 +287,6 @@ namespace Umbraco.Web.Editors
             var model = new LocalPackageInstallModel
             {
                 PackageGuid = Guid.Parse(packageGuid),
-                //RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66"),
                 ZipFileName = fileName
             };
 
@@ -415,7 +414,7 @@ namespace Umbraco.Web.Editors
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
-            //fixme: when do we delete the zip file?
+            zipFile.Delete();
 
             var redirectUrl = "";
             if (packageInfo.Control.IsNullOrWhiteSpace() == false)
@@ -431,7 +430,6 @@ namespace Umbraco.Web.Editors
                 Id = model.Id,
                 ZipFileName = model.ZipFileName,
                 PackageGuid = model.PackageGuid,
-                //RepositoryGuid = model.RepositoryGuid,
                 PostInstallationPath = redirectUrl
             };
 
