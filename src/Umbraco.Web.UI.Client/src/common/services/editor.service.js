@@ -245,7 +245,9 @@ When building a custom infinite editor view you can use the same components as a
 
             // emit event to let components know an editor has been removed
             eventsService.emit("appState.editors.close", args);
-
+            
+            // delay required to map the properties to the correct editor due
+            // to another delay in the closing animation of the editor
             $timeout(function() {
                 // rebind keyboard shortcuts for the new editor in focus
                 rebindKeyboardShortcuts();
