@@ -12,7 +12,7 @@ namespace Umbraco.Core.Composing
     /// <typeparam name="TItem">The type of the items.</typeparam>
     public abstract class CollectionBuilderBase<TBuilder, TCollection, TItem> : ICollectionBuilder<TCollection, TItem>
         where TBuilder: CollectionBuilderBase<TBuilder, TCollection, TItem>
-        where TCollection : IBuilderCollection<TItem>
+        where TCollection : class, IBuilderCollection<TItem>
     {
         private readonly List<Type> _types = new List<Type>();
         private readonly object _locker = new object();

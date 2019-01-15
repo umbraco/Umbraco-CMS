@@ -3,13 +3,6 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Composing
 {
-    // Implementing:
-    //
-    // The factory
-    // - always picks the constructor with the most parameters
-    // - supports Lazy parameters (and prefers them over non-Lazy) in constructors
-    // - what happens with 'releasing' is unclear
-
     /// <summary>
     /// Defines a service factory for Umbraco.
     /// </summary>
@@ -27,6 +20,15 @@ namespace Umbraco.Core.Composing
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
         object GetInstance(Type type);
+
+        /// <summary>
+        /// Gets a targeted instance of a service.
+        /// </summary>
+        /// <typeparam name="TService">The type of the service.</typeparam>
+        /// <typeparam name="TTarget">The type of the target.</typeparam>
+        /// <returns>The instance of the specified type for the specified target.</returns>
+        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
+        TService GetInstanceFor<TService, TTarget>();
 
         /// <summary>
         /// Tries to get an instance of a service.
@@ -48,7 +50,8 @@ namespace Umbraco.Core.Composing
         /// Gets all instances of a service.
         /// </summary>
         /// <typeparam name="TService">The type of the service.</typeparam>
-        IEnumerable<TService> GetAllInstances<TService>();
+        IEnumerable<TService> GetAllInstances<TService>()
+            where TService : class;
 
         /// <summary>
         /// Releases an instance.
