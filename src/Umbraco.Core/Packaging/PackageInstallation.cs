@@ -111,7 +111,6 @@ namespace Umbraco.Core.Packaging
             installationSummary.ContentInstalled = _packageDataInstallation.ImportContent(compiledPackage.Documents, importedDocTypes, userId);
             installationSummary.Actions = _parser.GetPackageActions(XElement.Parse(compiledPackage.Actions), compiledPackage.Name);
             installationSummary.MetaData = compiledPackage;
-            //fixme: Verify that this will work!
             installationSummary.FilesInstalled = packageDefinition.Files;
             
             //make sure the definition is up to date with everything

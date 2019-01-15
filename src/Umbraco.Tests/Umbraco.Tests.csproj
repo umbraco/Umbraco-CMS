@@ -444,7 +444,7 @@
     <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Services\DataTypeServiceTests.cs" />
     <Compile Include="Services\EntityServiceTests.cs" />
-    <Compile Include="Services\Importing\PackageImportTests.cs" />
+    <Compile Include="Packaging\PackageDataInstallationTests.cs" />
     <Compile Include="Services\Importing\ImportResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

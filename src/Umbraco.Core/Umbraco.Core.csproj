@@ -432,6 +432,8 @@
     <Compile Include="Models\NotificationEmailSubjectParams.cs" />
     <Compile Include="Models\Packaging\ActionRunAt.cs" />
     <Compile Include="Models\Packaging\CompiledPackage.cs" />
+    <Compile Include="Models\Packaging\CompiledPackageDocument.cs" />
+    <Compile Include="Models\Packaging\CompiledPackageFile.cs" />
     <Compile Include="Models\Packaging\IPackageInfo.cs" />
     <Compile Include="Models\Packaging\PackageDefinition.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />

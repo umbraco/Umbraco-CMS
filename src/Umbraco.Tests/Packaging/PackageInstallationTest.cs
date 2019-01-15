@@ -53,14 +53,15 @@ namespace Umbraco.Tests.Packaging
             applicationRootFolder: new DirectoryInfo(IOHelper.GetRootDirectorySafe()),
             packageExtractionFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
 
-        private const string DocumentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+        private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
+        private const string HelloPackage = "Hello_1.0.0.zip";
 
         [Test]
-        public void Can_Read_Compiled_Package()
+        public void Can_Read_Compiled_Package_1()
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is 
-                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
             Assert.IsNotNull(package);
             Assert.AreEqual(1, package.Files.Count);
             Assert.AreEqual("095e064b-ba4d-442d-9006-3050983c13d8.dll", package.Files[0].UniqueFileName);
@@ -79,6 +80,32 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
+        public void Can_Read_Compiled_Package_2()
+        {
+            var package = PackageInstallation.ReadPackage(
+                //this is where our test zip file is 
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), HelloPackage)));
+            Assert.IsNotNull(package);
+            Assert.AreEqual(0, package.Files.Count);
+            Assert.AreEqual("Hello", package.Name);
+            Assert.AreEqual("1.0.0", package.Version);
+            Assert.AreEqual("http://opensource.org/licenses/MIT", package.LicenseUrl);
+            Assert.AreEqual("MIT License", package.License);
+            Assert.AreEqual(8, package.UmbracoVersion.Major);
+            Assert.AreEqual(0, package.UmbracoVersion.Minor);
+            Assert.AreEqual(0, package.UmbracoVersion.Build);
+            Assert.AreEqual(RequirementsType.Strict, package.UmbracoVersionRequirementsType);
+            Assert.AreEqual("asdf", package.Author);
+            Assert.AreEqual("http://hello.com", package.AuthorUrl);
+            Assert.AreEqual("asdf", package.Readme);
+            Assert.AreEqual(1, package.Documents.Count());
+            Assert.AreEqual("root", package.Documents.First().ImportMode);
+            Assert.AreEqual(1, package.DocumentTypes.Count());
+            Assert.AreEqual(1, package.Templates.Count());
+            Assert.AreEqual(1, package.DataTypes.Count());
+        }
+
+        [Test]
         public void Can_Read_Compiled_Package_Warnings()
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
@@ -89,7 +116,7 @@ namespace Umbraco.Tests.Packaging
 
             var preInstallWarnings = PackageInstallation.ReadPackage(
                 //this is where our test zip file is 
-                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)))
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)))
                 .Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
@@ -104,7 +131,7 @@ namespace Umbraco.Tests.Packaging
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is 
-                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
 
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
@@ -126,7 +153,7 @@ namespace Umbraco.Tests.Packaging
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is 
-                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();

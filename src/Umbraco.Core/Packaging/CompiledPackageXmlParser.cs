@@ -53,13 +53,7 @@ namespace Umbraco.Core.Packaging
                 UmbracoVersionRequirementsType = requirements.AttributeValue<string>("type").IsNullOrWhiteSpace() ? RequirementsType.Legacy : Enum<RequirementsType>.Parse(requirements.AttributeValue<string>("type")),
                 Control = package.Element("control")?.Value,
                 Actions = xml.Root.Element("Actions")?.ToString(SaveOptions.None) ?? "<Actions></Actions>", //take the entire outer xml value
-                Files = xml.Root.Element("files")?.Elements("file")?.Select(x => new CompiledPackageFile
-                {
-                    UniqueFileName = x.Element("guid")?.Value,
-                    OriginalName = x.Element("orgName")?.Value,
-                    OriginalPath = x.Element("orgPath")?.Value
-                }).ToList() ?? new List<CompiledPackageFile>(),
-
+                Files = xml.Root.Element("files")?.Elements("file")?.Select(CompiledPackageFile.Create).ToList() ?? new List<CompiledPackageFile>(),
                 Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
                 Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
                 Stylesheets = xml.Root.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),
@@ -67,7 +61,7 @@ namespace Umbraco.Core.Packaging
                 Languages = xml.Root.Element("Languages")?.Elements("Language") ?? Enumerable.Empty<XElement>(),
                 DictionaryItems = xml.Root.Element("DictionaryItems")?.Elements("DictionaryItem") ?? Enumerable.Empty<XElement>(),
                 DocumentTypes = xml.Root.Element("DocumentTypes")?.Elements("DocumentType") ?? Enumerable.Empty<XElement>(),
-                Documents = xml.Root.Element("Documents")?.Elements("DocumentSet") ?? Enumerable.Empty<XElement>(),
+                Documents = xml.Root.Element("Documents")?.Elements("DocumentSet")?.Select(CompiledPackageDocument.Create) ?? Enumerable.Empty<CompiledPackageDocument>(),
             };
 
             def.Warnings = GetPreInstallWarnings(def, applicationRootFolder);

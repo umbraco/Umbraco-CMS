@@ -170,51 +170,48 @@ namespace Umbraco.Core.Packaging
         #region Content
 
 
-        public IEnumerable<IContent> ImportContent(IEnumerable<XElement> element, IDictionary<string, IContentType> importedDocumentTypes, int userId)
+        public IEnumerable<IContent> ImportContent(IEnumerable<CompiledPackageDocument> docs, IDictionary<string, IContentType> importedDocumentTypes, int userId)
         {
-            return element.Elements("DocumentSet").SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId));
+            return docs.SelectMany(x => ImportContent(x, -1, importedDocumentTypes, userId));
         }
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
         /// </summary>
-        /// <param name="element">Xml to import</param>
+        /// <param name="packageDocument">Xml to import</param>
         /// <param name="parentId">Optional parent Id for the content being imported</param>
         /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int parentId, IDictionary<string, IContentType> importedDocumentTypes, int userId)
+        public IEnumerable<IContent> ImportContent(CompiledPackageDocument packageDocument, int parentId, IDictionary<string, IContentType> importedDocumentTypes, int userId)
         {
-            var name = element.Name.LocalName;
-            if (name.Equals("DocumentSet"))
-            {
-                //This is a regular deep-structured import
-                var roots = from doc in element.Elements()
-                            where (string)doc.Attribute("isDoc") == ""
-                            select doc;
+            var element = packageDocument.XmlData;
 
-                var contents = ParseDocumentRootXml(roots, parentId, importedDocumentTypes).ToList();
-                if (contents.Any())
-                    _contentService.Save(contents, userId);
-                
-                return contents;
-            }
+            var roots = from doc in element.Elements()
+                where (string)doc.Attribute("isDoc") == ""
+                select doc;
 
-            var attribute = element.Attribute("isDoc");
-            if (attribute != null)
-            {
-                //This is a single doc import
-                var elements = new List<XElement> { element };
-                var contents = ParseDocumentRootXml(elements, parentId, importedDocumentTypes).ToList();
-                if (contents.Any())
-                    _contentService.Save(contents, userId);
-                
-                return contents;
-            }
+            var contents = ParseDocumentRootXml(roots, parentId, importedDocumentTypes).ToList();
+            if (contents.Any())
+                _contentService.Save(contents, userId);
 
-            throw new ArgumentException(
-                "The passed in XElement is not valid! It does not contain a root element called " +
-                "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
+            return contents;
+
+            //var attribute = element.Attribute("isDoc");
+            //if (attribute != null)
+            //{
+            //    //This is a single doc import
+            //    var elements = new List<XElement> { element };
+            //    var contents = ParseDocumentRootXml(elements, parentId, importedDocumentTypes).ToList();
+            //    if (contents.Any())
+            //        _contentService.Save(contents, userId);
+
+            //    return contents;
+            //}
+
+            //throw new ArgumentException(
+            //    "The passed in XElement is not valid! It does not contain a root element called " +
+            //    "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
         }
 
         private IEnumerable<IContent> ParseDocumentRootXml(IEnumerable<XElement> roots, int parentId, IDictionary<string, IContentType> importedContentTypes)

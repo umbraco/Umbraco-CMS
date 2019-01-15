@@ -39,16 +39,6 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<XElement> Languages { get; set; } //fixme: make strongly typed
         public IEnumerable<XElement> DictionaryItems { get; set; } //fixme: make strongly typed
         public IEnumerable<XElement> DocumentTypes { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> Documents { get; set; } //fixme: make strongly typed
+        public IEnumerable<CompiledPackageDocument> Documents { get; set; }
     }
-    
-    public class CompiledPackageFile
-    {
-        public string OriginalPath { get; set; }
-        public string UniqueFileName { get; set; }
-        public string OriginalName { get; set; }
-
-    }
-
-
 }
