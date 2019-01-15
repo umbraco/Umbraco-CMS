@@ -91,7 +91,7 @@ namespace Umbraco.Core.Packaging
                 new XElement("datatypes", string.Join(",", def.DataTypes ?? Array.Empty<string>())),
 
                 new XElement("content",
-                    new XAttribute("nodeId", def.ContentNodeId),
+                    new XAttribute("nodeId", def.ContentNodeId ?? string.Empty),
                     new XAttribute("loadChildNodes", def.ContentLoadChildNodes)),
 
                 new XElement("templates", string.Join(",", def.Templates ?? Array.Empty<string>())),

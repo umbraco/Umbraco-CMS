@@ -17,6 +17,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
@@ -532,7 +533,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -545,26 +546,24 @@ namespace Umbraco.Web.Editors
             }
 
             var model = new ContentTypeImportModel();
+            
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
             if (ext.InvariantEquals("udt"))
             {
-                //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
-                var tempDir = IOHelper.MapPath(SystemDirectories.Data);
+                model.TempFileName = Path.Combine(root, model.TempFileName);
 
-                //ensure it's there
-                Directory.CreateDirectory(tempDir);
-
-                model.TempFileName = "justDelete_" + Guid.NewGuid() + ".udt";
-                var tempFileLocation = Path.Combine(tempDir, model.TempFileName);
-                System.IO.File.Copy(file.LocalFileName, tempFileLocation, true);
+                model.UploadedFiles.Add(new ContentPropertyFile
+                {
+                    TempFilePath = model.TempFileName
+                });
 
                 var xd = new XmlDocument
                 {
                     XmlResolver = null
                 };
-                xd.Load(tempFileLocation);
+                xd.Load(model.TempFileName);
 
                 model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
                 model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;

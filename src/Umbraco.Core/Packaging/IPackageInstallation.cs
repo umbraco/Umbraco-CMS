@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 using Umbraco.Core.Models.Packaging;
 
@@ -6,6 +7,14 @@ namespace Umbraco.Core.Packaging
 {
     public interface IPackageInstallation
     {
+        /// <summary>
+        /// Uninstalls a package including all data, entities and files
+        /// </summary>
+        /// <param name="packageDefinition"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        UninstallationSummary UninstallPackage(PackageDefinition packageDefinition, int userId);
+
         /// <summary>
         /// Installs a packages data and entities
         /// </summary>
@@ -27,8 +36,8 @@ namespace Umbraco.Core.Packaging
         /// <summary>
         /// Reads the package (zip) file and returns the <see cref="CompiledPackage"/> model
         /// </summary>
-        /// <param name="packageFileName"></param>
+        /// <param name="packageFile"></param>
         /// <returns></returns>
-        CompiledPackage ReadPackage(string packageFileName);
+        CompiledPackage ReadPackage(FileInfo packageFile);
     }
 }

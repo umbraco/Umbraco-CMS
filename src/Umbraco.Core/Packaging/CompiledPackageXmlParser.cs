@@ -22,7 +22,7 @@ namespace Umbraco.Core.Packaging
             _conflictingPackageData = conflictingPackageData;
         }
 
-        public CompiledPackage ToCompiledPackage(XDocument xml, string packageFileName, string applicationRootFolder)
+        public CompiledPackage ToCompiledPackage(XDocument xml, FileInfo packageFile, string applicationRootFolder)
         {
             if (xml == null) throw new ArgumentNullException(nameof(xml));
             if (xml.Root == null) throw new ArgumentException(nameof(xml), "The xml document is invalid");
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Packaging
 
             var def = new CompiledPackage
             {
-                PackageFileName = packageFileName,
+                PackageFile = packageFile,
                 Name = package.Element("name")?.Value,
                 Author = author.Element("name")?.Value,
                 AuthorUrl = author.Element("website")?.Value,

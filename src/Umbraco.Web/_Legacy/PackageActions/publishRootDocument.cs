@@ -11,7 +11,7 @@ namespace Umbraco.Web._Legacy.PackageActions
     /// This class implements the IPackageAction Interface, used to execute code when packages are installed.
     /// All IPackageActions only takes a PackageName and a XmlNode as input, and executes based on the data in the xmlnode.
     /// </summary>
-    public class publishRootDocument : IPackageAction
+    public class PublishRootDocument : IPackageAction
     {
         #region IPackageAction Members
 
@@ -29,7 +29,6 @@ namespace Umbraco.Web._Legacy.PackageActions
 
             string documentName = xmlData.AttributeValue<string>("documentName");
 
-            //global::umbraco.cms.businesslogic.web.Document[] rootDocs = global::umbraco.cms.businesslogic.web.Document.GetRootDocuments();
             var rootDocs = Current.Services.ContentService.GetRootContent();
 
             foreach (var rootDoc in rootDocs)
@@ -44,7 +43,6 @@ namespace Umbraco.Web._Legacy.PackageActions
             return true;
         }
 
-        //this has no undo.
         /// <summary>
         /// This action has no undo.
         /// </summary>

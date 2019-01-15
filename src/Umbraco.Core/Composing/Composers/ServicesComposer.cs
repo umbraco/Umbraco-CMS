@@ -72,7 +72,6 @@ namespace Umbraco.Core.Composing.Composers
                 new PackageInstallation(
                     factory.GetInstance<PackageDataInstallation>(), factory.GetInstance<PackageFileInstallation>(),
                     factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
-                    SystemDirectories.Packages,
                     appRoot, appRoot));
 
             //TODO: These are replaced in the web project - we need to declare them so that

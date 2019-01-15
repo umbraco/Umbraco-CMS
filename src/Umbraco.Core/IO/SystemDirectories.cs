@@ -12,6 +12,10 @@ namespace Umbraco.Core.IO
 
         public static string Data => "~/App_Data";
 
+        public static string TempData => Data + "/TEMP";
+
+        public static string TempFileUploads => TempData + "/FileUploads";
+
         public static string Install => "~/install";
 
         //fixme: remove this

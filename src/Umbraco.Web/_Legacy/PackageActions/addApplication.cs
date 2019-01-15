@@ -11,7 +11,7 @@ namespace Umbraco.Web._Legacy.PackageActions
     /// This class implements the IPackageAction Interface, used to execute code when packages are installed.
     /// All IPackageActions only takes a PackageName and a XmlNode as input, and executes based on the data in the xmlnode.
     /// </summary>
-    public class addApplication : IPackageAction
+    public class AddApplication : IPackageAction
     {
 
         #region IPackageAction Members

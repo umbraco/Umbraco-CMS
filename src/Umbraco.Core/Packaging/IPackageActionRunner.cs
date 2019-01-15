@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Umbraco.Core.Packaging
 {
@@ -10,7 +11,8 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageName">Name of the package.</param>
         /// <param name="actionAlias">The action alias.</param>
         /// <param name="actionXml">The action XML.</param>
-        void RunPackageAction(string packageName, string actionAlias, XElement actionXml);
+        /// <param name="errors"></param>
+        bool RunPackageAction(string packageName, string actionAlias, XElement actionXml, out IEnumerable<string> errors);
 
         /// <summary>
         /// Undos the package action with the specified action alias.
@@ -18,6 +20,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageName">Name of the package.</param>
         /// <param name="actionAlias">The action alias.</param>
         /// <param name="actionXml">The action XML.</param>
-        void UndoPackageAction(string packageName, string actionAlias, XElement actionXml);
+        /// <param name="errors"></param>
+        bool UndoPackageAction(string packageName, string actionAlias, XElement actionXml, out IEnumerable<string> errors);
     }
 }

@@ -50,11 +50,10 @@ namespace Umbraco.Tests.Packaging
             PackageDataInstallation,
             new PackageFileInstallation(Parser, ProfilingLogger),
             Parser, Mock.Of<IPackageActionRunner>(),
-            packagesFolderPath: "~/Packaging/packages",//this is where our test zip file is 
             applicationRootFolder: new DirectoryInfo(IOHelper.GetRootDirectorySafe()),
             packageExtractionFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
 
-        const string documentTypePickerUmb = "Document_Type_Picker_1.1.umb";
+        private const string DocumentTypePickerUmb = "Document_Type_Picker_1.1.umb";
 
         //[Test]
         //public void PackagingService_Can_ImportPackage()
@@ -72,7 +71,9 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Can_Read_Compiled_Package()
         {
-            var package = PackageInstallation.ReadPackage(documentTypePickerUmb);
+            var package = PackageInstallation.ReadPackage(
+                //this is where our test zip file is 
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
             Assert.IsNotNull(package);
             Assert.AreEqual(1, package.Files.Count);
             Assert.AreEqual("095e064b-ba4d-442d-9006-3050983c13d8.dll", package.Files[0].UniqueFileName);
@@ -95,7 +96,10 @@ namespace Umbraco.Tests.Packaging
         {
             
 
-            var preInstallWarnings = PackageInstallation.ReadPackage(documentTypePickerUmb).Warnings;
+            var preInstallWarnings = PackageInstallation.ReadPackage(
+                //this is where our test zip file is 
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)))
+                .Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
             //TODO: Assert!
@@ -104,7 +108,9 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Install_Files()
         {
-            var package = PackageInstallation.ReadPackage(documentTypePickerUmb);
+            var package = PackageInstallation.ReadPackage(
+                //this is where our test zip file is 
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();
@@ -122,7 +128,9 @@ namespace Umbraco.Tests.Packaging
         [Test]
         public void Install_Data()
         {
-            var package = PackageInstallation.ReadPackage(documentTypePickerUmb);
+            var package = PackageInstallation.ReadPackage(
+                //this is where our test zip file is 
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerUmb)));
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();

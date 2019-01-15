@@ -11,16 +11,10 @@ namespace Umbraco.Web.Models
     [DataContract(Name = "localPackageInstallModel")]
     public class LocalPackageInstallModel : PackageInstallModel, IHaveUploadedFiles, INotificationModel
     {
-        public LocalPackageInstallModel()
-        {
-            UploadedFiles = new List<ContentPropertyFile>();
-            Notifications = new List<Notification>();
-        }
-
-        public List<ContentPropertyFile> UploadedFiles { get; }
+        public List<ContentPropertyFile> UploadedFiles { get; } = new List<ContentPropertyFile>();
 
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; }
+        public List<Notification> Notifications { get; } = new List<Notification>();
 
         /// <summary>
         /// A flag to determine if this package is compatible to be installed

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -30,21 +31,20 @@ namespace Umbraco.Web.Install.InstallSteps
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
             var packageId = Convert.ToInt32(previousStep.AdditionalData["packageId"]);
-            var packageFile = (string)previousStep.AdditionalData["packageFile"];
 
-            InstallBusinessLogic(packageId, packageFile);
+            InstallBusinessLogic(packageId);
 
             Current.RestartAppPool(_httContext);
 
             return Task.FromResult<InstallSetupResult>(null);
         }
 
-        private void InstallBusinessLogic(int packageId, string packageFile)
+        private void InstallBusinessLogic(int packageId)
         {
-            packageFile = HttpUtility.UrlDecode(packageFile);
-
             var definition = _packagingService.GetInstalledPackageById(packageId);
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + packageId);
+
+            var packageFile = new FileInfo(definition.PackagePath);
 
             _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
         }

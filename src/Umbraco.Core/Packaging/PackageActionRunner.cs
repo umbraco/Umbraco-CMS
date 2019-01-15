@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
@@ -19,15 +20,10 @@ namespace Umbraco.Core.Packaging
             _packageActions = packageActions;
         }
 
-        /// <summary>
-        /// Runs the package action with the specified action alias.
-        /// </summary>
-        /// <param name="packageName">Name of the package.</param>
-        /// <param name="actionAlias">The action alias.</param>
-        /// <param name="actionXml">The action XML.</param>
-        public void RunPackageAction(string packageName, string actionAlias, XElement actionXml)
+        /// <inheritdoc />
+        public bool RunPackageAction(string packageName, string actionAlias, XElement actionXml, out IEnumerable<string> errors)
         {
-
+            var e = new List<string>();
             foreach (var ipa in _packageActions)
             {
                 try
@@ -37,19 +33,19 @@ namespace Umbraco.Core.Packaging
                 }
                 catch (Exception ex)
                 {
+                    e.Add($"{ipa.Alias()} - {ex.Message}");
                     _logger.Error<PackageActionRunner>(ex, "Error loading package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
                 }
             }
+
+            errors = e;
+            return e.Count == 0;
         }
 
-        /// <summary>
-        /// Undos the package action with the specified action alias.
-        /// </summary>
-        /// <param name="packageName">Name of the package.</param>
-        /// <param name="actionAlias">The action alias.</param>
-        /// <param name="actionXml">The action XML.</param>
-        public void UndoPackageAction(string packageName, string actionAlias, XElement actionXml)
+        /// <inheritdoc />
+        public bool UndoPackageAction(string packageName, string actionAlias, XElement actionXml, out IEnumerable<string> errors)
         {
+            var e = new List<string>();
             foreach (var ipa in _packageActions)
             {
                 try
@@ -59,9 +55,12 @@ namespace Umbraco.Core.Packaging
                 }
                 catch (Exception ex)
                 {
+                    e.Add($"{ipa.Alias()} - {ex.Message}");
                     _logger.Error<PackageActionRunner>(ex, "Error undoing package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
                 }
             }
+            errors = e;
+            return e.Count == 0;
         }
 
     }

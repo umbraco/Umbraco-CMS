@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<IFile> StylesheetsInstalled { get; set; } = Enumerable.Empty<IFile>();
         public IEnumerable<IContent> ContentInstalled { get; set; } = Enumerable.Empty<IContent>();
         public IEnumerable<PackageAction> Actions { get; set; } = Enumerable.Empty<PackageAction>();
-        public bool PackageInstalled { get; set; }
+        public IEnumerable<string> ActionErrors { get; set; } = Enumerable.Empty<string>();
         
     }
 

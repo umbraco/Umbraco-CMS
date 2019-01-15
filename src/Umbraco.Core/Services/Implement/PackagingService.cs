@@ -53,7 +53,7 @@ namespace Umbraco.Core.Services.Implement
         #region Package Files
 
         /// <inheritdoc />
-        public async Task<string> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId)
+        public async Task<FileInfo> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId)
         {
             //includeHidden = true because we don't care if it's hidden we want to get the file regardless
             var url = $"{Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Services.Implement
                 using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
                 {
                     fs1.Write(bytes, 0, bytes.Length);
-                    return packageId + ".umb";
+                    return new FileInfo(packageFilePath);
                 }
             }
 
@@ -97,18 +97,19 @@ namespace Umbraco.Core.Services.Implement
 
         #region Installation
 
-        public CompiledPackage GetCompiledPackageInfo(string packageFileName) => _packageInstallation.ReadPackage(packageFileName);
+        public CompiledPackage GetCompiledPackageInfo(FileInfo packageFile) => _packageInstallation.ReadPackage(packageFile);
 
-        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, string packageFileName, int userId = 0)
+        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
             if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
             if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
 
-            var compiledPackage = GetCompiledPackageInfo(packageFileName);
-            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFileName);
+            var compiledPackage = GetCompiledPackageInfo(packageFile);
+            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
-            var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId);
+            var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId).ToList();
+            packageDefinition.Files = files;
 
             SaveInstalledPackage(packageDefinition);
 
@@ -117,16 +118,16 @@ namespace Umbraco.Core.Services.Implement
             return files;
         }
 
-        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, string packageFileName, int userId = 0)
+        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
             if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
             if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
 
-            var compiledPackage = GetCompiledPackageInfo(packageFileName);
-            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFileName);
+            var compiledPackage = GetCompiledPackageInfo(packageFile);
+            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
-            if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFileName, compiledPackage), this))
+            if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFile.Name, compiledPackage), this))
                 return new InstallationSummary { MetaData = compiledPackage };
 
             var summary = _packageInstallation.InstallPackageData(packageDefinition, compiledPackage, userId);
@@ -136,6 +137,20 @@ namespace Umbraco.Core.Services.Implement
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
             ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(summary, compiledPackage, false), this);
+
+            return summary;
+        }
+
+        public UninstallationSummary UninstallPackage(PackageDefinition package, int userId = 0)
+        {
+            var summary = _packageInstallation.UninstallPackage(package, userId);
+            
+            SaveInstalledPackage(package);
+
+            DeleteInstalledPackage(package.Id, userId);
+
+            // trigger the UninstalledPackage event
+            UninstalledPackage.RaiseEvent(new UninstallPackageEventArgs<UninstallationSummary>(summary, package, false), this);
 
             return summary;
         }
@@ -179,21 +194,12 @@ namespace Umbraco.Core.Services.Implement
 
         #endregion
 
-        /// <summary>
-        /// This method can be used to trigger the 'UninstalledPackage' event when a package is uninstalled by something else but this service.
-        /// </summary>
-        /// <param name="args"></param>
-        internal static void OnUninstalledPackage(UninstallPackageEventArgs<UninstallationSummary> args)
-        {
-            UninstalledPackage.RaiseEvent(args, null);
-        }
-
         #region Event Handlers
 
         /// <summary>
         /// Occurs before Importing umbraco package
         /// </summary>
-        internal static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
+        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
 
         /// <summary>
         /// Occurs after a package is imported

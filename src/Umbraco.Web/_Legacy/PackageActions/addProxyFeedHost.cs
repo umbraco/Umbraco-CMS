@@ -7,7 +7,7 @@ using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {
-    public class addProxyFeedHost : IPackageAction
+    public class AddProxyFeedHost : IPackageAction
     {
         #region IPackageAction Members
 

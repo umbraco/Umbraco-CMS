@@ -13,7 +13,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
-    /// A controller used for installing packages and managing all of the data in the packages section in the back office
+    /// A controller used for managing packages in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
     [SerializeVersion]

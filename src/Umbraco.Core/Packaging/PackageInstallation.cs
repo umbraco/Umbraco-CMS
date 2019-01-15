@@ -18,7 +18,6 @@ namespace Umbraco.Core.Packaging
         private readonly PackageFileInstallation _packageFileInstallation;
         private readonly CompiledPackageXmlParser _parser;
         private readonly IPackageActionRunner _packageActionRunner;
-        private readonly string _packagesFolderPath;
         private readonly DirectoryInfo _packageExtractionFolder;
         private readonly DirectoryInfo _applicationRootFolder;
 
@@ -29,9 +28,6 @@ namespace Umbraco.Core.Packaging
         /// <param name="packageFileInstallation"></param>
         /// <param name="parser"></param>
         /// <param name="packageActionRunner"></param>
-        /// <param name="packagesFolderPath">
-        /// The relative path of the package storage folder (i.e. ~/App_Data/Packages )
-        /// </param>
         /// <param name="applicationRootFolder">
         /// The root folder of the application
         /// </param>
@@ -39,27 +35,25 @@ namespace Umbraco.Core.Packaging
         /// The destination root folder to extract the package files (generally the same as applicationRoot) but can be modified for testing
         /// </param>
         public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IPackageActionRunner packageActionRunner,
-            string packagesFolderPath, DirectoryInfo applicationRootFolder, DirectoryInfo packageExtractionFolder)
+            DirectoryInfo applicationRootFolder, DirectoryInfo packageExtractionFolder)
         {
             _packageExtraction = new PackageExtraction();
             _packageFileInstallation = packageFileInstallation ?? throw new ArgumentNullException(nameof(packageFileInstallation));
             _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
-            _parser = parser;
-            _packageActionRunner = packageActionRunner;
-            _packagesFolderPath = packagesFolderPath;
-            _applicationRootFolder = applicationRootFolder;
-            _packageExtractionFolder = packageExtractionFolder;
+            _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+            _packageActionRunner = packageActionRunner ?? throw new ArgumentNullException(nameof(packageActionRunner));
+            _applicationRootFolder = applicationRootFolder ?? throw new ArgumentNullException(nameof(applicationRootFolder));
+            _packageExtractionFolder = packageExtractionFolder ?? throw new ArgumentNullException(nameof(packageExtractionFolder));
         }
 
-        public CompiledPackage ReadPackage(string packageFileName)
+        public CompiledPackage ReadPackage(FileInfo packageFile)
         {
-            if (packageFileName == null) throw new ArgumentNullException(nameof(packageFileName));
-            var packageZipFile = GetPackageZipFile(packageFileName);
-            var doc = GetConfigXmlDoc(packageZipFile);
+            if (packageFile == null) throw new ArgumentNullException(nameof(packageFile));
+            var doc = GetConfigXmlDoc(packageFile);
 
-            var compiledPackage = _parser.ToCompiledPackage(doc, Path.GetFileName(packageZipFile.FullName), _applicationRootFolder.FullName);
+            var compiledPackage = _parser.ToCompiledPackage(doc, packageFile, _applicationRootFolder.FullName);
 
-            ValidatePackageFile(packageZipFile, compiledPackage);
+            ValidatePackageFile(packageFile, compiledPackage);
 
             return compiledPackage;
         }
@@ -73,15 +67,28 @@ namespace Umbraco.Core.Packaging
             if (packageDefinition.Name != compiledPackage.Name)
                 throw new InvalidOperationException("The package definition does not match the compiled package manifest");
 
-            var packageZipFile = GetPackageZipFile(compiledPackage.PackageFileName);
+            var packageZipFile = compiledPackage.PackageFile;
 
             return _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _packageExtractionFolder.FullName);
         }
 
+        public UninstallationSummary UninstallPackage(PackageDefinition package, int userId)
+        {
+            //running this will update the PackageDefinition with the items being removed
+            var summary = _packageDataInstallation.UninstallPackageData(package, userId);
+            summary.Actions = _parser.GetPackageActions(XElement.Parse(package.Actions), package.Name);
+
+            //run actions before files are removed
+            summary.ActionErrors = UndoPackageActions(package, summary.Actions).ToList();
+
+            var filesRemoved = _packageFileInstallation.UninstallFiles(package);
+            summary.FilesUninstalled = filesRemoved;
+
+            return summary;
+        }
+
         public InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId)
         {
-            //TODO: Update the PackageDefinition!
-
             var installationSummary = new InstallationSummary
             {
                 DataTypesInstalled = _packageDataInstallation.ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
@@ -101,10 +108,8 @@ namespace Umbraco.Core.Packaging
             installationSummary.MetaData = compiledPackage;
             //fixme: Verify that this will work!
             installationSummary.FilesInstalled = packageDefinition.Files;
-            installationSummary.PackageInstalled = true;
-
+            
             //make sure the definition is up to date with everything
-
             foreach (var x in installationSummary.DataTypesInstalled) packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
             foreach (var x in installationSummary.LanguagesInstalled) packageDefinition.Languages.Add(x.Id.ToInvariantString());
             foreach (var x in installationSummary.DictionaryItemsInstalled) packageDefinition.DictionaryItems.Add(x.Id.ToInvariantString());
@@ -115,15 +120,17 @@ namespace Umbraco.Core.Packaging
             var contentInstalled = installationSummary.ContentInstalled.ToList();
             packageDefinition.ContentNodeId = contentInstalled.Count > 0 ? contentInstalled[0].Id.ToInvariantString() : null;
 
-            RunPackageActions(packageDefinition, installationSummary.Actions);
+            //run package actions
+            installationSummary.ActionErrors = RunPackageActions(packageDefinition, installationSummary.Actions).ToList();
 
             return installationSummary;
         }
 
-        private void RunPackageActions(PackageDefinition packageDefinition, IEnumerable<PackageAction> actions)
+        private IEnumerable<string> RunPackageActions(PackageDefinition packageDefinition, IEnumerable<PackageAction> actions)
         {
             foreach (var n in actions)
             {
+                //if there is an undo section then save it to the definition so we can run it at uninstallation 
                 var undo = n.Undo;
                 if (undo)
                     packageDefinition.Actions += n.XmlData.ToString();
@@ -131,12 +138,28 @@ namespace Umbraco.Core.Packaging
                 //Run the actions tagged only for 'install'
                 if (n.RunAt != ActionRunAt.Install) continue;
 
-                if (n.Alias.IsNullOrWhiteSpace() == false)
-                    _packageActionRunner.RunPackageAction(packageDefinition.Name, n.Alias, n.XmlData);
+                if (n.Alias.IsNullOrWhiteSpace()) continue;
+
+                //run the actions and report errors
+                if (!_packageActionRunner.RunPackageAction(packageDefinition.Name, n.Alias, n.XmlData, out var err))
+                    foreach (var e in err) yield return e;
             }
         }
 
-        private FileInfo GetPackageZipFile(string packageFileName) => new FileInfo(IOHelper.MapPath(_packagesFolderPath).EnsureEndsWith('\\') + packageFileName);
+        private IEnumerable<string> UndoPackageActions(IPackageInfo packageDefinition, IEnumerable<PackageAction> actions)
+        {
+            foreach (var n in actions)
+            {
+                //Run the actions tagged only for 'uninstall'
+                if (n.RunAt != ActionRunAt.Uninstall) continue;
+
+                if (n.Alias.IsNullOrWhiteSpace()) continue;
+
+                //run the actions and report errors
+                if (!_packageActionRunner.UndoPackageAction(packageDefinition.Name, n.Alias, n.XmlData, out var err))
+                    foreach (var e in err) yield return e;
+            }
+        }
 
         private XDocument GetConfigXmlDoc(FileInfo packageFile)
         {

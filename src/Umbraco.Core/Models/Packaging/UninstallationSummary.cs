@@ -16,9 +16,9 @@ namespace Umbraco.Core.Models.Packaging
         public IEnumerable<IMacro> MacrosUninstalled { get; set; } = Enumerable.Empty<IMacro>();
         public IEnumerable<string> FilesUninstalled { get; set; } = Enumerable.Empty<string>();
         public IEnumerable<ITemplate> TemplatesUninstalled { get; set; } = Enumerable.Empty<ITemplate>();
-        public IEnumerable<IContentType> ContentTypesUninstalled { get; set; } = Enumerable.Empty<IContentType>();
+        public IEnumerable<IContentType> DocumentTypesUninstalled { get; set; } = Enumerable.Empty<IContentType>();
         public IEnumerable<IFile> StylesheetsUninstalled { get; set; } = Enumerable.Empty<IFile>();
-        public IEnumerable<IContent> ContentUninstalled { get; set; } = Enumerable.Empty<IContent>();
-        public bool PackageUninstalled { get; set; }
+        public IEnumerable<PackageAction> Actions { get; set; } = Enumerable.Empty<PackageAction>();
+        public IEnumerable<string> ActionErrors { get; set; } = Enumerable.Empty<string>();
     }
 }

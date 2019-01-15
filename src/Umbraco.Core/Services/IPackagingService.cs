@@ -16,25 +16,27 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Returns a <see cref="CompiledPackage"/> result from an umbraco package file (zip)
         /// </summary>
-        /// <param name="packageFileName"></param>
+        /// <param name="packageFile"></param>
         /// <returns></returns>
-        CompiledPackage GetCompiledPackageInfo(string packageFileName);
+        CompiledPackage GetCompiledPackageInfo(FileInfo packageFile);
 
         /// <summary>
         /// Installs the package files contained in an umbraco package file (zip)
         /// </summary>
         /// <param name="packageDefinition"></param>
-        /// <param name="packageFileName"></param>
+        /// <param name="packageFile"></param>
         /// <param name="userId"></param>
-        IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, string packageFileName, int userId = 0);
+        IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
 
         /// <summary>
         /// Installs the data, entities, objects contained in an umbraco package file (zip)
         /// </summary>
         /// <param name="packageDefinition"></param>
-        /// <param name="packageFileName"></param>
+        /// <param name="packageFile"></param>
         /// <param name="userId"></param>
-        InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, string packageFileName, int userId = 0);
+        InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
+
+        UninstallationSummary UninstallPackage(PackageDefinition packageDefinition, int userId = 0);
 
         #endregion
 
@@ -81,6 +83,6 @@ namespace Umbraco.Core.Services
         /// <returns>
         /// The file name of the downloaded package which will exist in ~/App_Data/packages
         /// </returns>
-        Task<string> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId);
+        Task<FileInfo> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId);
     }
 }

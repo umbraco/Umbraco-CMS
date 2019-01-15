@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Models.Packaging
     /// </summary>
     public class CompiledPackage : IPackageInfo
     {
-        public string PackageFileName { get; set; }
+        public FileInfo PackageFile { get; set; }
 
         public string Name { get; set; }
         public string Version { get; set; }

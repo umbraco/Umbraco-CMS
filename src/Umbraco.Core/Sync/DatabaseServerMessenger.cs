@@ -551,7 +551,7 @@ namespace Umbraco.Core.Sync
                     break;
                 case LocalTempStorage.Default:
                 default:
-                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/DistCache");
+                    var tempFolder = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "DistCache");
                     distCacheFilePath = Path.Combine(tempFolder, fileName);
                     break;
             }

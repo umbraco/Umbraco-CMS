@@ -16,6 +16,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
@@ -42,14 +43,11 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
-        private readonly IPackageActionRunner _packageActionRunner;
-
         public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
-            IProfilingLogger logger, IRuntimeState runtimeState, IPackageActionRunner packageActionRunner)
+            IProfilingLogger logger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         {
-            _packageActionRunner = packageActionRunner;
         }
 
         /// <summary>
@@ -75,7 +73,7 @@ namespace Umbraco.Web.Editors
                 var package = Services.PackagingService.GetInstalledPackageById(packageId);
                 if (package == null) return NotFound();
 
-                PerformUninstall(package);
+                var summary = Services.PackagingService.UninstallPackage(package);
 
                 //now get all other packages by this name since we'll uninstall all versions
                 foreach (var installed in Services.PackagingService.GetAllInstalledPackages()
@@ -92,176 +90,6 @@ namespace Umbraco.Web.Editors
             }
 
             return Ok();
-        }
-
-        /// <summary>
-        /// SORRY :( I didn't have time to put this in a service somewhere - the old packager did this all manually too
-        /// </summary>
-        /// <param name="package"></param>
-        protected void PerformUninstall(PackageDefinition package)
-        {
-            if (package == null) throw new ArgumentNullException("package");
-
-            var removedTemplates = new List<ITemplate>();
-            var removedMacros = new List<IMacro>();
-            var removedContentTypes = new List<IContentType>();
-            var removedDictionaryItems = new List<IDictionaryItem>();
-            var removedDataTypes = new List<IDataType>();
-            var removedFiles = new List<string>();
-
-            //Uninstall templates
-            foreach (var item in package.Templates.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var found = Services.FileService.GetTemplate(nId);
-                if (found != null)
-                {
-                    removedTemplates.Add(found);
-                    Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId().ResultOr(0));
-                }
-                package.Templates.Remove(nId.ToString());
-            }
-
-            //Uninstall macros
-            foreach (var item in package.Macros.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var macro = Services.MacroService.GetById(nId);
-                if (macro != null)
-                {
-                    removedMacros.Add(macro);
-                    Services.MacroService.Delete(macro);
-                }
-                package.Macros.Remove(nId.ToString());
-            }
-
-            //Remove Document Types
-            var contentTypes = new List<IContentType>();
-            var contentTypeService = Services.ContentTypeService;
-            foreach (var item in package.DocumentTypes.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var contentType = contentTypeService.Get(nId);
-                if (contentType == null) continue;
-                contentTypes.Add(contentType);
-                package.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
-            }
-
-            //Order the DocumentTypes before removing them
-            if (contentTypes.Any())
-            {
-                //TODO: I don't think this ordering is necessary
-                var orderedTypes = from contentType in contentTypes
-                                   orderby contentType.ParentId descending, contentType.Id descending
-                                   select contentType;
-                removedContentTypes.AddRange(orderedTypes);
-                contentTypeService.Delete(orderedTypes);
-            }
-
-            //Remove Dictionary items
-            foreach (var item in package.DictionaryItems.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var di = Services.LocalizationService.GetDictionaryItemById(nId);
-                if (di != null)
-                {
-                    removedDictionaryItems.Add(di);
-                    Services.LocalizationService.Delete(di);
-                }
-                package.DictionaryItems.Remove(nId.ToString());
-            }
-
-            //Remove Data types
-            foreach (var item in package.DataTypes.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var dtd = Services.DataTypeService.GetDataType(nId);
-                if (dtd != null)
-                {
-                    removedDataTypes.Add(dtd);
-                    Services.DataTypeService.Delete(dtd);
-                }
-                package.DataTypes.Remove(nId.ToString());
-            }
-
-            Services.PackagingService.SaveInstalledPackage(package);
-
-            // uninstall actions
-            //TODO: We should probably report errors to the UI!!
-            // This never happened before though, but we should do something now
-            if (package.Actions.IsNullOrWhiteSpace() == false)
-            {
-                try
-                {
-                    var actionsXml = XDocument.Parse("<Actions>" + package.Actions + "</Actions>");
-
-                    Logger.Debug<PackageInstallController>("Executing undo actions: {UndoActionsXml}", actionsXml.ToString(SaveOptions.DisableFormatting));
-
-                    foreach (var n in actionsXml.Root.Elements("Action"))
-                    {
-                        try
-                        {
-                            _packageActionRunner.UndoPackageAction(package.Name, n.AttributeValue<string>("alias"), n);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
-                }
-            }
-
-            //moved remove of files here so custom package actions can still undo
-            //Remove files
-            foreach (var item in package.Files.ToArray())
-            {
-                removedFiles.Add(item.GetRelativePath());
-
-                //here we need to try to find the file in question as most packages does not support the tilde char
-                var file = IOHelper.FindFile(item);
-                if (file != null)
-                {
-                    if (file.StartsWith("/") == false)
-                        file = string.Format("/{0}", file);
-                    var filePath = IOHelper.MapPath(file);
-
-                    if (File.Exists(filePath))
-                        File.Delete(filePath);
-
-                }
-                package.Files.Remove(file);
-            }
-
-            Services.PackagingService.SaveInstalledPackage(package);
-
-            Services.PackagingService.DeleteInstalledPackage(package.Id, Security.GetUserId().ResultOr(0));
-
-            // create a summary of what was actually removed, for PackagingService.UninstalledPackage
-            var summary = new UninstallationSummary
-            {
-                MetaData = package,
-                TemplatesUninstalled = removedTemplates,
-                MacrosUninstalled = removedMacros,
-                ContentTypesUninstalled = removedContentTypes,
-                DictionaryItemsUninstalled = removedDictionaryItems,
-                DataTypesUninstalled = removedDataTypes,
-                FilesUninstalled = removedFiles,
-                PackageUninstalled = true
-            };
-
-            // trigger the UninstalledPackage event
-            // fixme: This all needs to be part of the service!
-            PackagingService.OnUninstalledPackage(new UninstallPackageEventArgs<UninstallationSummary>(summary, package, false));
-
         }
 
         /// <summary>
@@ -302,7 +130,9 @@ namespace Umbraco.Web.Editors
         
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var ins = Services.PackagingService.GetCompiledPackageInfo(model.ZipFilePath);
+            var zipFile = new FileInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
+
+            var ins = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
             model.Name = ins.Name;
             model.Author = ins.Author;
@@ -365,11 +195,9 @@ namespace Umbraco.Web.Editors
         public async Task<LocalPackageInstallModel> UploadLocalPackage()
         {
             if (Request.Content.IsMimeMultipartContent() == false)
-            {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -378,38 +206,36 @@ namespace Umbraco.Web.Editors
 
             //must have a file
             if (result.FileData.Count == 0)
-            {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
 
-            //TODO: App/Tree Permissions?
             var model = new LocalPackageInstallModel
             {
+                //Generate a new package Id for this, we'll use this later for tracking, when persisting, saving the file, etc...
                 PackageGuid = Guid.NewGuid()
             };
 
             //get the files
             foreach (var file in result.FileData)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
+                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
-                //TODO: Only allow .zip
                 if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))
                 {
-                    //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
-                    var packageTempDir = IOHelper.MapPath(SystemDirectories.Data);
+                    //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
+                    
+                    var packagesFolder = IOHelper.MapPath(SystemDirectories.Packages);
+                    Directory.CreateDirectory(packagesFolder);
+                    var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
+                    File.Copy(file.LocalFileName, packageFile);
 
-                    //ensure it's there
-                    Directory.CreateDirectory(packageTempDir);
+                    model.ZipFileName = Path.GetFileName(packageFile);
 
-                    //copy it - must always be '.umb' for the installer thing to work
-                    //the file name must be a GUID - this is what the packager expects (strange yes)
-                    //because essentially this is creating a temporary package Id that will be used
-                    //for unpacking/installing/etc...
-                    model.ZipFilePath = model.PackageGuid + ".umb";
-                    var packageTempFileLocation = Path.Combine(packageTempDir, model.ZipFilePath);
-                    File.Copy(file.LocalFileName, packageTempFileLocation, true);
+                    //add to the outgoing model so that all temp files are cleaned up
+                    model.UploadedFiles.Add(new ContentPropertyFile
+                    {
+                        TempFilePath = file.LocalFileName
+                    });
 
                     //Populate the model from the metadata in the package file (zip file)
                     PopulateFromPackageData(model);
@@ -447,17 +273,22 @@ namespace Umbraco.Web.Editors
         public async Task<LocalPackageInstallModel> Fetch(string packageGuid)
         {
             //Default path
-            string path = Path.Combine("packages", packageGuid + ".umb");
-            if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
+            string fileName = packageGuid + ".umb";
+            if (File.Exists(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), fileName)) == false)
             {
-                path = await Services.PackagingService.FetchPackageFileAsync(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId().ResultOr(0));
+                var packageFile = await Services.PackagingService.FetchPackageFileAsync(
+                    Guid.Parse(packageGuid),
+                    UmbracoVersion.Current,
+                    Security.GetUserId().ResultOr(0));
+
+                fileName = packageFile.Name;
             }
 
             var model = new LocalPackageInstallModel
             {
                 PackageGuid = Guid.Parse(packageGuid),
-                RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66"),
-                ZipFilePath = path
+                //RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66"),
+                ZipFileName = fileName
             };
 
             //Populate the model from the metadata in the package file (zip file)
@@ -483,7 +314,9 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(model.ZipFilePath);
+            var zipFile = new FileInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
+
+            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
             //now we need to check for version comparison
             if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
@@ -497,9 +330,10 @@ namespace Umbraco.Web.Editors
             }
 
             var packageDefinition = PackageDefinition.FromCompiledPackage(packageInfo);
+            packageDefinition.PackageId = model.PackageGuid; //We must re-map the original package GUID that was generated
+            packageDefinition.PackagePath = zipFile.FullName;
 
             //save to the installedPackages.config
-            packageDefinition.PackageId = model.PackageGuid; //fixme: why are we doing this?
             Services.PackagingService.SaveInstalledPackage(packageDefinition);
 
             model.Id = packageDefinition.Id;
@@ -518,7 +352,9 @@ namespace Umbraco.Web.Editors
             var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
-            Services.PackagingService.InstallCompiledPackageFiles(definition, model.ZipFilePath, Security.GetUserId().ResultOr(0));
+            var zipFile = new FileInfo(definition.PackagePath);
+
+            var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
             Current.RestartAppPool(Request.TryGetHttpContext().Result);
@@ -553,7 +389,10 @@ namespace Umbraco.Web.Editors
             var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
             if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
 
-            Services.PackagingService.InstallCompiledPackageData(definition, model.ZipFilePath, Security.GetUserId().ResultOr(0));
+            var zipFile = new FileInfo(definition.PackagePath);
+
+            var installSummary = Services.PackagingService.InstallCompiledPackageData(definition, zipFile, Security.GetUserId().ResultOr(0));
+
             return model;
         }
 
@@ -565,7 +404,12 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallResult CleanUp(PackageInstallModel model)
         {
-            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(model.ZipFilePath);
+            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
+
+            var zipFile = new FileInfo(definition.PackagePath);
+
+            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
@@ -585,9 +429,9 @@ namespace Umbraco.Web.Editors
             return new PackageInstallResult
             {
                 Id = model.Id,
-                ZipFilePath = model.ZipFilePath,
+                ZipFileName = model.ZipFileName,
                 PackageGuid = model.PackageGuid,
-                RepositoryGuid = model.RepositoryGuid,
+                //RepositoryGuid = model.RepositoryGuid,
                 PostInstallationPath = redirectUrl
             };
 

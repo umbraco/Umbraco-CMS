@@ -53,6 +53,9 @@ namespace Umbraco.Core.Models.Packaging
         [Url]
         public string Url { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The full path to the package's zip file when it was installed (or is being installed)
+        /// </summary>
         [ReadOnly(true)]
         [DataMember(Name = "packagePath")]
         public string PackagePath { get; set; } = string.Empty;
