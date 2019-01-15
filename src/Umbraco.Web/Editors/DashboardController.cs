@@ -14,6 +14,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -27,13 +29,24 @@ namespace Umbraco.Web.Editors
     {
         private readonly Dashboards _dashboards;
 
-        public DashboardController(Dashboards dashboards)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
+        /// </summary>
+        public DashboardController()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
+        /// </summary>
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         {
             _dashboards = dashboards;
         }
 
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
+
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
@@ -100,7 +113,7 @@ namespace Umbraco.Web.Editors
                     result = content;
 
                     //save server content for 30 mins
-                        ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
+                    ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {

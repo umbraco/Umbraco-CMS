@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
-using Constants = Umbraco.Core.Constants;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
@@ -67,7 +66,7 @@ namespace Umbraco.Web
             if (UmbracoContext.Current.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
+                    String.Format(Current.Configs.Settings().Content.PreviewBadge,
                                   IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                   UmbracoContext.Current.HttpContext.Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
                 return new MvcHtmlString(htmlBadge);
@@ -97,7 +96,7 @@ namespace Umbraco.Web
             }
             if (cacheByMember)
             {
-                var helper = new MembershipHelper(Current.UmbracoContext);
+                var helper = Current.Factory.GetInstance<MembershipHelper>();
                 var currentMember = helper.GetCurrentMember();
                 cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
             }
@@ -222,6 +221,7 @@ namespace Umbraco.Web
             {
                 _viewContext = viewContext;
                 _method = method;
+			    _controllerName = controllerName;
                 _encryptedString = UmbracoHelper.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
             }
 
@@ -229,12 +229,23 @@ namespace Umbraco.Web
             private readonly FormMethod _method;
             private bool _disposed;
             private readonly string _encryptedString;
+		    private readonly string _controllerName;
 
             protected override void Dispose(bool disposing)
             {
                 if (this._disposed)
                     return;
                 this._disposed = true;
+
+                //Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
+                // We have a controllerName and area so we can match
+                if (_controllerName == "UmbRegister"
+                    || _controllerName == "UmbProfile"
+                    || _controllerName == "UmbLoginStatus"
+                    || _controllerName == "UmbLogin")
+			    {
+			        _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+			    }
 
                 //write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
@@ -819,7 +830,39 @@ namespace Umbraco.Web
         }
 
         #endregion
-        
 
+
+        #region RelatedLink
+
+        /// <summary>
+        /// Renders an anchor element for a RelatedLink instance.
+        /// Format: &lt;a href=&quot;relatedLink.Link&quot; target=&quot;_blank/_self&quot;&gt;relatedLink.Caption&lt;/a&gt;
+        /// </summary>
+        /// <param name="htmlHelper">The HTML helper instance that this method extends.</param>
+        /// <param name="relatedLink">The RelatedLink instance</param>
+        /// <returns>An anchor element </returns>
+        public static MvcHtmlString GetRelatedLinkHtml(this HtmlHelper htmlHelper, RelatedLink relatedLink)
+        {
+            return htmlHelper.GetRelatedLinkHtml(relatedLink, null);
+        }
+
+        /// <summary>
+        /// Renders an anchor element for a RelatedLink instance, accepting htmlAttributes.
+        /// Format: &lt;a href=&quot;relatedLink.Link&quot; target=&quot;_blank/_self&quot; htmlAttributes&gt;relatedLink.Caption&lt;/a&gt;
+        /// </summary>
+        /// <param name="htmlHelper">The HTML helper instance that this method extends.</param>
+        /// <param name="relatedLink">The RelatedLink instance</param>
+        /// <param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
+        /// <returns></returns>
+        public static MvcHtmlString GetRelatedLinkHtml(this HtmlHelper htmlHelper, RelatedLink relatedLink, object htmlAttributes)
+        {
+            var tagBuilder = new TagBuilder("a");
+            tagBuilder.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
+            tagBuilder.MergeAttribute("href", relatedLink.Link);
+            tagBuilder.MergeAttribute("target", relatedLink.NewWindow ? "_blank" : "_self");
+            tagBuilder.InnerHtml = HttpUtility.HtmlEncode(relatedLink.Caption);
+            return MvcHtmlString.Create(tagBuilder.ToString(TagRenderMode.Normal));
+        }
+        #endregion
     }
 }

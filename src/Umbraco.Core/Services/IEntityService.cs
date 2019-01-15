@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
@@ -227,25 +228,25 @@ namespace Umbraco.Core.Services
         /// Gets children of an entity.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendants of an entity.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendants of entities.
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
 
         /// <summary>
-        /// Gets descendants of root.
+        /// Gets descendants of root. fixme: Do we really need this? why not just pass in -1
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "", bool includeTrashed = true);
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null, bool includeTrashed = true);
 
         /// <summary>
         /// Gets the object type of an entity.

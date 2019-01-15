@@ -33,7 +33,7 @@ namespace Umbraco.Web.Search
             try
             {
                 var searcher = _index.GetSearcher();
-                var result = searcher.Search("test", false);
+                var result = searcher.Search("test");
                 return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)

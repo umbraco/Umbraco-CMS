@@ -36,7 +36,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 var valueSet = node.ConvertToValueSet(IndexTypes.Content);
                 indexer.IndexItems(new[] { valueSet });
 
-                var found = searcher.Search(searcher.CreateCriteria().Id((string)node.Attribute("id")).Compile());
+                var found = searcher.CreateQuery().Id((string)node.Attribute("id")).Execute();
 
                 Assert.AreEqual(0, found.TotalItemCount);
             }

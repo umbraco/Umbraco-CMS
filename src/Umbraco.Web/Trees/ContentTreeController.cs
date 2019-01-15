@@ -9,11 +9,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -143,8 +141,6 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
-                //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
@@ -263,6 +259,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));

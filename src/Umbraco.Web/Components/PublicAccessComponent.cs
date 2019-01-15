@@ -6,16 +6,15 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Components
 {
-    /// <summary>
-    /// Used to ensure that the public access data file is kept up to date properly
-    /// </summary>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class PublicAccessComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public sealed class PublicAccessComponent : IComponent
     {
         public void Initialize()
         {
             MemberGroupService.Saved += MemberGroupService_Saved;
         }
+
+        public void Terminate()
+        { }
 
         static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<Core.Models.IMemberGroup> e)
         {

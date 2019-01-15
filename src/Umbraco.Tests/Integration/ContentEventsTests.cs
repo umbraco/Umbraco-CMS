@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
 using static Umbraco.Tests.Cache.DistributedCache.DistributedCacheTests;
@@ -22,6 +19,7 @@ using static Umbraco.Tests.Cache.DistributedCache.DistributedCacheTests;
 namespace Umbraco.Tests.Integration
 {
     [TestFixture]
+    [Category("Slow")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentEventsTests : TestWithSomeContentBase
     {
@@ -34,8 +32,8 @@ namespace Umbraco.Tests.Integration
         {
             base.SetUp();
 
-            _h1 = new CacheRefresherComponent(true);
-            _h1.Initialize(new DistributedCache());
+            _h1 = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _h1.BindEvents(true);
 
             _events = new List<EventInstance>();
 
@@ -52,10 +50,10 @@ namespace Umbraco.Tests.Integration
         {
             base.Compose();
 
-            Container.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-            Container.Register<IServerMessenger, LocalServerMessenger>(new PerContainerLifetime());
+            Composition.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
 
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<ContentTypeCacheRefresher>()
                 .Add<ContentCacheRefresher>()
                 .Add<MacroCacheRefresher>();
@@ -76,7 +74,7 @@ namespace Umbraco.Tests.Integration
         {
             base.TearDown();
 
-            _h1?.Unbind();
+            _h1?.UnbindEvents();
 
             // clear ALL events
 
@@ -86,7 +84,7 @@ namespace Umbraco.Tests.Integration
             ContentCacheRefresher.CacheUpdated -= ContentCacheUpdated;
         }
 
-        private CacheRefresherComponent _h1;
+        private DistributedCacheBinder _h1;
         private IList<EventInstance> _events;
         private int _msgCount;
         private IContentType _contentType;

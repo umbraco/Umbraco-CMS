@@ -48,19 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine" Version="1.0.0-beta046" />
+    <PackageReference Include="Examine" Version="1.0.0-beta078" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseValueSetBuilder.cs" />
-    <Compile Include="Config\ConfigIndexCriteria.cs" />
-    <Compile Include="Config\ConfigIndexField.cs" />
-    <Compile Include="Config\IndexFieldCollection.cs" />
-    <Compile Include="Config\IndexFieldCollectionExtensions.cs" />
-    <Compile Include="Config\IndexSet.cs" />
-    <Compile Include="Config\IndexSetCollection.cs" />
-    <Compile Include="Config\IndexSets.cs" />
     <Compile Include="ContentIndexPopulator.cs" />
     <Compile Include="ContentValueSetBuilder.cs" />
     <Compile Include="ExamineExtensions.cs" />
@@ -72,7 +65,7 @@
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />
     <Compile Include="IPublishedContentValueSetBuilder.cs" />
-    <Compile Include="IUmbracoIndexer.cs" />
+    <Compile Include="IUmbracoIndex.cs" />
     <Compile Include="IValueSetBuilder.cs" />
     <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />
@@ -88,8 +81,8 @@
     <Compile Include="ContentValueSetValidator.cs" />
     <Compile Include="UmbracoExamineIndexDiagnostics.cs" />
     <Compile Include="UmbracoExamineIndex.cs" />
-    <Compile Include="UmbracoExamineSearcher.cs" />
     <Compile Include="LuceneIndexCreator.cs" />
+    <Compile Include="UmbracoFieldDefinitionCollection.cs" />
     <Compile Include="UmbracoMemberIndex.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

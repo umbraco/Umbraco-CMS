@@ -3,14 +3,23 @@
 namespace Umbraco.Core.Logging
 {
     /// <summary>
-    /// Provides debug or trace logging with duration management.
+    /// Provides logging and profiling services.
     /// </summary>
-    public sealed class ProfilingLogger
+    public sealed class ProfilingLogger : IProfilingLogger
     {
+        /// <summary>
+        /// Gets the underlying <see cref="ILogger"/> implementation.
+        /// </summary>
         public ILogger Logger { get; }
 
+        /// <summary>
+        /// Gets the underlying <see cref="IProfiler"/> implementation.
+        /// </summary>
         public IProfiler Profiler { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfilingLogger"/> class.
+        /// </summary>
         public ProfilingLogger(ILogger logger, IProfiler profiler)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -52,5 +61,72 @@ namespace Umbraco.Core.Logging
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, loggerType, startMessage, completeMessage, failMessage, thresholdMilliseconds)
                 : null;
         }
+
+        #region ILogger
+
+        public bool IsEnabled(Type reporting, LogLevel level)
+            => Logger.IsEnabled(reporting, level);
+
+        public void Fatal(Type reporting, Exception exception, string message)
+            => Logger.Fatal(reporting, exception, message);
+
+        public void Fatal(Type reporting, Exception exception)
+            => Logger.Fatal(reporting, exception);
+
+        public void Fatal(Type reporting, string message)
+            => Logger.Fatal(reporting, message);
+
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.Fatal(reporting, exception, messageTemplate, propertyValues);
+
+        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+            => Logger.Fatal(reporting, messageTemplate, propertyValues);
+
+        public void Error(Type reporting, Exception exception, string message)
+            => Logger.Error(reporting, exception, message);
+
+        public void Error(Type reporting, Exception exception)
+            => Logger.Error(reporting, exception);
+
+        public void Error(Type reporting, string message)
+            => Logger.Error(reporting, message);
+
+        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.Error(reporting, exception, messageTemplate, propertyValues);
+
+        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
+            => Logger.Error(reporting, messageTemplate, propertyValues);
+
+        public void Warn(Type reporting, string message)
+            => Logger.Warn(reporting, message);
+
+        public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
+            => Logger.Warn(reporting, messageTemplate, propertyValues);
+
+        public void Warn(Type reporting, Exception exception, string message)
+            => Logger.Warn(reporting, exception, message);
+
+        public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.Warn(reporting, exception, messageTemplate, propertyValues);
+
+        public void Info(Type reporting, string message)
+            => Logger.Info(reporting, message);
+
+        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
+            => Logger.Info(reporting, messageTemplate, propertyValues);
+
+        public void Debug(Type reporting, string message)
+            => Logger.Debug(reporting, message);
+
+        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
+            => Logger.Debug(reporting, messageTemplate, propertyValues);
+
+        public void Verbose(Type reporting, string message)
+            => Logger.Verbose(reporting, message);
+
+        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
+            => Logger.Verbose(reporting, messageTemplate, propertyValues);
+
+        #endregion
     }
 }

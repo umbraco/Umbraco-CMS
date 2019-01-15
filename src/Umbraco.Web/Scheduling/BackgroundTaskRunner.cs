@@ -6,7 +6,6 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using LightInject;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -15,7 +14,51 @@ namespace Umbraco.Web.Scheduling
     /// </summary>
     /// <remarks>This class exists for logging purposes - the one you want to use is BackgroundTaskRunner{T}.</remarks>
     public abstract class BackgroundTaskRunner
-    { }
+    {
+        /// <summary>
+        /// Represents a MainDom hook.
+        /// </summary>
+        public class MainDomHook
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MainDomHook"/> class.
+            /// </summary>
+            /// <param name="mainDom">The <see cref="IMainDom"/> object.</param>
+            /// <param name="install">A method to execute when hooking into the main domain.</param>
+            /// <param name="release">A method to execute when the main domain releases.</param>
+            public MainDomHook(IMainDom mainDom, Action install, Action release)
+            {
+                MainDom = mainDom;
+                Install = install;
+                Release = release;
+            }
+
+            /// <summary>
+            /// Gets the <see cref="IMainDom"/> object.
+            /// </summary>
+            public IMainDom MainDom { get; }
+
+            /// <summary>
+            /// Gets the method to execute when hooking into the main domain.
+            /// </summary>
+            public Action Install { get; }
+
+            /// <summary>
+            /// Gets the method to execute when the main domain releases.
+            /// </summary>
+            public Action Release { get; }
+
+            internal bool Register()
+            {
+                if (MainDom != null)
+                    return MainDom.Register(Install, Release);
+
+                // tests
+                Install?.Invoke();
+                return true;
+            }
+        }
+    }
 
     /// <summary>
     /// Manages a queue of tasks of type <typeparamref name="T"/> and runs them in the background.
@@ -55,42 +98,6 @@ namespace Umbraco.Web.Scheduling
         private bool _terminated; // remember we've terminated
         private readonly TaskCompletionSource<int> _terminatedSource = new TaskCompletionSource<int>(); // enable awaiting termination
 
-        // fixme - this is temp
-        // at the moment MainDom is internal so we have to find a way to hook into it - temp
-        public class MainDomHook
-        {
-            private MainDomHook(MainDom mainDom, Action install, Action release)
-            {
-                MainDom = mainDom;
-                Install = install;
-                Release = release;
-            }
-
-            internal MainDom MainDom { get; }
-            public Action Install { get; }
-            public Action Release { get; }
-
-            public static MainDomHook Create(Action install, Action release)
-            {
-                return new MainDomHook(Core.Composing.Current.Container.GetInstance<MainDom>(), install, release);
-            }
-
-            public static MainDomHook CreateForTest(Action install, Action release)
-            {
-                return new MainDomHook(null, install, release);
-            }
-
-            public bool Register()
-            {
-                if (MainDom != null)
-                    return MainDom.Register(Install, Release);
-
-                // tests
-                Install?.Invoke();
-                return true;
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
@@ -129,11 +136,9 @@ namespace Umbraco.Web.Scheduling
         /// <param name="hook">An optional main domain hook.</param>
         public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, MainDomHook hook = null)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            _options = options;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _logPrefix = "[" + name + "] ";
-            _logger = logger;
 
             if (options.Hosted)
                 HostingEnvironment.RegisterObject(this);
@@ -319,7 +324,7 @@ namespace Umbraco.Web.Scheduling
         }
 
         /// <summary>
-        /// Shuts the taks runner down.
+        /// Shuts the tasks runner down.
         /// </summary>
         /// <param name="force">True for force the runner to stop.</param>
         /// <param name="wait">True to wait until the runner has stopped.</param>
@@ -355,7 +360,7 @@ namespace Umbraco.Web.Scheduling
             // tasks in the queue will be executed...
             if (wait == false) return;
 
-            _runningTask?.Wait(); // wait for whatever is running to end...
+            _runningTask?.Wait(CancellationToken.None); // wait for whatever is running to end...
         }
 
         private async Task Pump()
@@ -648,13 +653,13 @@ namespace Umbraco.Web.Scheduling
         #endregion
 
         /// <summary>
-        /// Requests a registered object to unregister.
+        /// Requests a registered object to un-register.
         /// </summary>
-        /// <param name="immediate">true to indicate the registered object should unregister from the hosting
+        /// <param name="immediate">true to indicate the registered object should un-register from the hosting
         /// environment before returning; otherwise, false.</param>
         /// <remarks>
         /// <para>"When the application manager needs to stop a registered object, it will call the Stop method."</para>
-        /// <para>The application manager will call the Stop method to ask a registered object to unregister. During
+        /// <para>The application manager will call the Stop method to ask a registered object to un-register. During
         /// processing of the Stop method, the registered object must call the HostingEnvironment.UnregisterObject method.</para>
         /// </remarks>
         public void Stop(bool immediate)

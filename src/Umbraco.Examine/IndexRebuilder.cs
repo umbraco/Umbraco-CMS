@@ -20,9 +20,9 @@ namespace Umbraco.Examine
             ExamineManager = examineManager;
         }
 
-        public bool CanRebuild(string indexName)
+        public bool CanRebuild(IIndex index)
         {
-            return _populators.Any(x => x.IsRegistered(indexName));
+            return _populators.Any(x => x.IsRegistered(index));
         }
 
         public void RebuildIndex(string indexName)
@@ -41,6 +41,8 @@ namespace Umbraco.Examine
             var indexes = (onlyEmptyIndexes
                 ? ExamineManager.Indexes.Where(x => !x.IndexExists())
                 : ExamineManager.Indexes).ToArray();
+
+            if (indexes.Length == 0) return;
 
             foreach (var index in indexes)
             {

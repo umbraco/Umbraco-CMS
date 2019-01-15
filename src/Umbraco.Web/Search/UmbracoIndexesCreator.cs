@@ -1,20 +1,11 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Examine;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.IO;
-using System.IO;
-using Lucene.Net.Store;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Analysis;
 using Examine.LuceneEngine;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Search
 {
@@ -25,7 +16,7 @@ namespace Umbraco.Web.Search
     {
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
-        public UmbracoIndexesCreator(ProfilingLogger profilingLogger,
+        public UmbracoIndexesCreator(IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
             IMemberService memberService)
@@ -36,7 +27,7 @@ namespace Umbraco.Web.Search
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
         }
 
-        protected ProfilingLogger ProfilingLogger { get; }
+        protected IProfilingLogger ProfilingLogger { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
@@ -59,12 +50,11 @@ namespace Umbraco.Web.Search
         {
             var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.InternalIndexName,
-                //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
-                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
+                new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
-                LanguageService, 
+                LanguageService,
                 GetContentValueSetValidator());
             return index;
         }
@@ -73,9 +63,8 @@ namespace Umbraco.Web.Search
         {
             var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.ExternalIndexName,
-                //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
-                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
+                new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
                 LanguageService,
@@ -87,11 +76,10 @@ namespace Umbraco.Web.Search
         {
             var index = new UmbracoMemberIndex(
                 Constants.UmbracoIndexes.MembersIndexName,
-                //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
-                UmbracoExamineIndex.UmbracoIndexFieldDefinitions,
+                new UmbracoFieldDefinitionCollection(),
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
-                ProfilingLogger, 
+                ProfilingLogger,
                 GetMemberValueSetValidator());
             return index;
         }
@@ -114,6 +102,6 @@ namespace Umbraco.Web.Search
         {
             return new MemberValueSetValidator();
         }
-        
+
     }
 }

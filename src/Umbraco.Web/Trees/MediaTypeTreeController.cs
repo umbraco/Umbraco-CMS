@@ -4,15 +4,14 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
-
-using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
@@ -66,7 +65,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedMediaTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedMediaTypes;
+            var enableInheritedMediaTypes = Current.Configs.Settings().Content.EnableInheritedMediaTypes;
 
             if (id == Constants.System.Root.ToInvariantString())
             {
@@ -135,7 +134,8 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.MediaType, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.MediaType, pageIndex, pageSize, out totalFound,
+                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
             return Mapper.Map<IEnumerable<SearchResultEntity>>(results);
         }
     }

@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 
@@ -19,7 +21,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var healthCheckConfig = UmbracoConfig.For.HealthCheck();
+            var healthCheckConfig = Current.Configs.HealthChecks();
             var notificationMethods = healthCheckConfig.NotificationSettings.NotificationMethods;
             var notificationMethod = notificationMethods[attribute.Alias];
             if (notificationMethod == null)

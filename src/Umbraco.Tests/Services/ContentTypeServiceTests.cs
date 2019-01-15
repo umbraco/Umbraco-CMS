@@ -17,6 +17,7 @@ using Umbraco.Tests.Scoping;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
+    [Category("Slow")]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentTypeServiceTests : TestWithSomeContentBase

@@ -33,8 +33,11 @@
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
+    <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
+    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="wasMovedTo">was moved to</key>
+    <key alias="wasCopiedTo">was copied to</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -186,6 +189,11 @@
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
     <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
   </area>
+  <area alias="codefile">
+    <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
+    <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+    <key alias="deleteItemFailed">Failed to delete item: %0%</key>
+  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Is Published</key>
     <key alias="about">About this page</key>
@@ -288,6 +296,7 @@
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
     <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
+    <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
@@ -942,7 +951,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Edit your notification for %0%</key>
+    <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
 
@@ -1123,22 +1133,23 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="removeSpecialFormattering">Paste, but remove formatting (Recommended)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Role based protection</key>
-        <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
-    <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
+    <key alias="paGroups">Group based protection</key>
+    <key alias="paGroupsHelp">If you want to grant access to all members of specific member groups</key>
+    <key alias="paGroupsNoGroups">You need to create a member group before you can use group based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
-    <key alias="paHowWould">Choose how to restrict access to this page</key>
-    <key alias="paIsProtected">%0% is now protected</key>
-    <key alias="paIsRemoved">Protection removed from %0%</key>
+    <key alias="paHowWould"><![CDATA[Choose how to restrict access to the page <strong>%0%</strong>]]></key>
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> is now protected]]></key>
+    <key alias="paIsRemoved"><![CDATA[Protection removed from <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Login Page</key>
     <key alias="paLoginPageHelp">Choose the page that contains the login form</key>
-    <key alias="paRemoveProtection">Remove Protection</key>
+    <key alias="paRemoveProtection">Remove protection...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Are you sure you want to remove the protection from the page <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Select the pages that contain login form and error messages</key>
-    <key alias="paSelectRoles">Pick the roles who have access to this page</key>
-    <key alias="paSetLogin">Set the login and password for this page</key>
-    <key alias="paSimple">Single user protection</key>
-    <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
+    <key alias="paSelectGroups"><![CDATA[Select the groups who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paSelectMembers"><![CDATA[Select the members who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paMembers">Specific members protection</key>
+    <key alias="paMembersHelp">If you wish to grant access to specific members</key>
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
@@ -1195,6 +1206,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
+    <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
@@ -1242,6 +1254,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentTypeUses">This Content Type uses</key>
     <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
+    <key alias="createMatchingTemplate">Create matching template</key>
     <key alias="addIcon">Add icon</key>
   </area>
   <area alias="sort">
@@ -1341,6 +1354,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
+    <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
     <key alias="edittemplate">Edit template</key>
     <key alias="insertSections">Sections</key>
     <key alias="insertContentArea">Insert content area</key>
@@ -1706,7 +1720,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
     <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
-    <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
+        <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
     <key alias="writer">Writer</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
@@ -1962,8 +1976,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
     <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
     <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
-    <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
-    <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+    <key alias="itemCannotBeRestoredHelpText">There is no location where this item can be automatically restored. You can move the item manually using the tree below.</key>
+    <key alias="wasRestored">was restored under</key>
   </area>
   <area alias="relationType">
     <key alias="direction">Direction</key>

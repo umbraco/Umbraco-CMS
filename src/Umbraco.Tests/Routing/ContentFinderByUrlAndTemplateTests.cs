@@ -1,12 +1,12 @@
 ﻿using Moq;
 using NUnit.Framework;
-using LightInject;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.Routing
 {
@@ -29,10 +29,8 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1.aspx/blah")]
         public void Match_Document_By_Url_With_Template(string urlAsString)
         {
-
-            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
             var template1 = CreateTemplate("test");
             var template2 = CreateTemplate("blah");

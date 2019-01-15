@@ -10,9 +10,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
@@ -105,7 +106,7 @@ namespace Umbraco.Web
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery => _query ??
-            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache, UmbracoContext.VariationContextAccessor));
 
         /// <summary>
         /// Gets the Umbraco context.
@@ -124,7 +125,7 @@ namespace Umbraco.Web
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
+            ?? (_membershipHelper = Current.Factory.GetInstance<MembershipHelper>());
 
         /// <summary>
         /// Gets the url provider.
@@ -771,62 +772,6 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> MediaAtRoot()
         {
             return ContentQuery.MediaAtRoot();
-        }
-
-        #endregion
-
-        #region Search
-
-        /// <summary>
-        /// Searches content.
-        /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="indexName"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
-        {
-            return ContentQuery.Search(term, useWildCards, indexName);
-        }
-
-        /// <summary>
-        /// Searches content.
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="indexName"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
-        {
-            return ContentQuery.Search(skip, take, out totalRecords, term, useWildCards, indexName);
-        }
-
-        /// <summary>
-        /// Searhes content.
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-        {
-            return ContentQuery.Search(skip, take, out totalRecords, criteria, searchProvider);
-        }
-
-        /// <summary>
-        /// Searhes content.
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-        {
-            return ContentQuery.Search(criteria, searchProvider);
         }
 
         #endregion

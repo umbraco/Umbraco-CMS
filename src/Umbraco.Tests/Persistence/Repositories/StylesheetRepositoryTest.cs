@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -15,13 +16,16 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class StylesheetRepositoryTest : TestWithDatabaseBase
     {
+        private IFileSystems _fileSystems;
         private IFileSystem _fileSystem;
 
         public override void SetUp()
         {
             base.SetUp();
 
+            _fileSystems = Mock.Of<IFileSystems>();
             _fileSystem = new PhysicalFileSystem(SystemDirectories.Css);
+            Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
         }
@@ -30,11 +34,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
                 // Act
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
 
                 // Assert
@@ -46,15 +49,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 //Assert
                 Assert.That(_fileSystem.FileExists("test-add.css"), Is.True);
@@ -65,20 +67,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 var stylesheetUpdate = repository.Get("test-update.css");
                 stylesheetUpdate.Content = "body { color:#000; }";
                 repository.Save(stylesheetUpdate);
-                
+
 
                 var stylesheetUpdated = repository.Get("test-update.css");
 
@@ -93,20 +94,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_With_Property()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
 
                 repository.Save(stylesheet);
-                
+
 
                 //re-get
                 stylesheet = repository.Get(stylesheet.Name);
@@ -121,15 +121,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Throws_When_Adding_Duplicate_Properties()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
 
@@ -141,18 +140,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 repository.Delete(stylesheet);
-                
+
 
                 //Assert
                 Assert.That(_fileSystem.FileExists("test-delete.css"), Is.False);
@@ -163,10 +161,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = repository.Get("styles.css");
@@ -183,14 +180,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 // Act
                 var stylesheets = repository.GetMany();
@@ -207,14 +203,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
 
                 // Act
                 var stylesheets = repository.GetMany("styles-v2.css", "styles.css");
@@ -231,10 +226,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var exists = repository.Exists("styles.css");
@@ -249,21 +243,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 var stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
                 Assert.IsTrue(_fileSystem.FileExists("test-path-1.css"));
                 Assert.AreEqual("test-path-1.css", stylesheet.Path);
                 Assert.AreEqual("/css/test-path-1.css", stylesheet.VirtualPath);
 
                 stylesheet = new Stylesheet("path-2/test-path-2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
                 Assert.AreEqual("path-2\\test-path-2.css", stylesheet.Path); // fixed in 7.3 - 7.2.8 does not update the path
                 Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
@@ -275,7 +268,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 stylesheet = new Stylesheet("path-2\\test-path-3.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
-                
+
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.css"));
                 Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);

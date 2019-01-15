@@ -10,7 +10,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performs the data lookups required to rebuild a media index
     /// </summary>
-    public class MediaIndexPopulator : IndexPopulator
+    public class MediaIndexPopulator : IndexPopulator<UmbracoContentIndex>
     {
         private readonly int? _parentId;
         private readonly IMediaService _mediaService;
@@ -37,13 +37,12 @@ namespace Umbraco.Examine
             _parentId = parentId;
             _mediaService = mediaService;
             _mediaValueSetBuilder = mediaValueSetBuilder;
-
-            RegisterIndex(Constants.UmbracoIndexes.InternalIndexName);
-            RegisterIndex(Constants.UmbracoIndexes.ExternalIndexName);
         }
 
-        protected override void PopulateIndexes(IEnumerable<IIndex> indexes)
+        protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
         {
+            if (indexes.Count == 0) return;
+
             const int pageSize = 10000;
             var pageIndex = 0;
 

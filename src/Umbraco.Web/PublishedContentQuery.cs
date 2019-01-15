@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.XPath;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
+using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -24,16 +25,19 @@ namespace Umbraco.Web
     {
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         /// Constructor used to return results from the caches
         /// </summary>
         /// <param name="contentCache"></param>
         /// <param name="mediaCache"></param>
-        public PublishedContentQuery(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
+        /// <param name="variationContextAccessor"></param>
+        public PublishedContentQuery(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, IVariationContextAccessor variationContextAccessor)
         {
             _contentCache = contentCache ?? throw new ArgumentNullException(nameof(contentCache));
             _mediaCache = mediaCache ?? throw new ArgumentNullException(nameof(mediaCache));
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
         }
 
         #region Content
@@ -181,57 +185,136 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null)
         {
-            return Search(0, 0, out _, term, useWildCards, indexName);
+            return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, string term, bool useWildCards = true, string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null)
         {
-            //fixme: inject IExamineManager
-
             indexName = string.IsNullOrEmpty(indexName)
                 ? Constants.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
-                throw new InvalidOperationException($"No index found by name {indexName}");
+            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
 
-            var searcher = index.GetSearcher();
+            var searcher = umbIndex.GetSearcher();
 
-            var results = skip == 0 && take == 0
-                ? searcher.Search(term, true)
-                : searcher.Search(term, true, maxResults: skip + take);
+            // default to max 500 results
+            var count = skip == 0 && take == 0 ? 500 : skip + take;
 
-            totalRecords = results.TotalItemCount;
-            return results.ToPublishedSearchResults(_contentCache);
-        }
+            //set this to the specific culture or to the culture in the request
+            culture = culture ?? _variationContextAccessor.VariationContext.Culture;
 
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, ISearcher searchProvider = null)
-        {
-            return Search(0, 0, out _, criteria, searchProvider);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out long totalRecords, ISearchCriteria criteria, ISearcher searcher = null)
-        {
-            //fixme: inject IExamineManager
-            if (searcher == null)
+            ISearchResults results;
+            if (culture.IsNullOrWhiteSpace())
             {
-                if (!ExamineManager.Instance.TryGetIndex(Constants.UmbracoIndexes.ExternalIndexName, out var index))
-                    throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.ExternalIndexName}");
-                searcher = index.GetSearcher();
+                results = searcher.Search(term, count);
+            }
+            else
+            {
+                //get all index fields suffixed with the culture name supplied
+                var cultureFields = umbIndex.GetCultureFields(culture);
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "y"); //must vary by culture
+                qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
+                results = qry.Execute(count);
             }
 
+            totalRecords = results.TotalItemCount;
+
+            return new CultureContextualSearchResults(results.ToPublishedSearchResults(_contentCache), _variationContextAccessor, culture);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
+        {
+            return Search(query, 0, 0, out _);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
+        {
             var results = skip == 0 && take == 0
-                ? searcher.Search(criteria)
-                : searcher.Search(criteria, maxResults: skip + take);
+                ? query.Execute()
+                : query.Execute(maxResults: skip + take);
 
             totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
+
+        /// <summary>
+        /// This is used to contextualize the values in the search results when enumerating over them so that the correct culture values are used
+        /// </summary>
+        private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
+        {
+            private readonly IEnumerable<PublishedSearchResult> _wrapped;
+            private readonly IVariationContextAccessor _variationContextAccessor;
+            private readonly string _culture;
+
+            public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, string culture)
+            {
+                _wrapped = wrapped;
+                _variationContextAccessor = variationContextAccessor;
+                _culture = culture;
+            }
+
+            public IEnumerator<PublishedSearchResult> GetEnumerator()
+            {
+                //We need to change the current culture to what is requested and then change it back
+                var originalContext = _variationContextAccessor.VariationContext;
+                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext.Culture))
+                    _variationContextAccessor.VariationContext = new VariationContext(_culture);
+
+                //now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
+                return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor, originalContext);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            /// <summary>
+            /// Resets the variation context when this is disposed
+            /// </summary>
+            private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
+            {
+                private readonly IEnumerator<PublishedSearchResult> _wrapped;
+                private readonly IVariationContextAccessor _variationContextAccessor;
+                private readonly VariationContext _originalContext;
+
+                public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
+                {
+                    _wrapped = wrapped;
+                    _variationContextAccessor = variationContextAccessor;
+                    _originalContext = originalContext;
+                }
+
+                public void Dispose()
+                {
+                    _wrapped.Dispose();
+                    //reset
+                    _variationContextAccessor.VariationContext = _originalContext;
+                }
+
+                public bool MoveNext()
+                {
+                    return _wrapped.MoveNext();
+                }
+
+                public void Reset()
+                {
+                    _wrapped.Reset();
+                }
+
+                public PublishedSearchResult Current => _wrapped.Current;
+                object IEnumerator.Current => Current;
+            }
+        }
+
+        
 
 
         #endregion

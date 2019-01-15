@@ -4,13 +4,17 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
@@ -18,23 +22,34 @@ namespace Umbraco.Tests.Routing
     [Apartment(ApartmentState.STA)]
     public class UmbracoModuleTests : BaseWebTest
     {
-        private UmbracoModule _module;
+        private UmbracoInjectedModule _module;
 
         public override void SetUp()
         {
             base.SetUp();
 
+            // fixme - be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
-            _module = new UmbracoModule
-            {
-                GlobalSettings = TestObjects.GetGlobalSettings(),
-                Logger = Mock.Of<ILogger>()
-            };
-            var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>(), Mock.Of<IUmbracoSettingsSection>(), _module.GlobalSettings);
+            var logger = Mock.Of<ILogger>();
+            var globalSettings = TestObjects.GetGlobalSettings();
+            var runtime = new RuntimeState(logger, Mock.Of<IUmbracoSettingsSection>(), globalSettings,
+                new Lazy<IMainDom>(), new Lazy<IServerRegistrar>());
 
-            _module.Runtime = runtime;
+            _module = new UmbracoInjectedModule
+            (
+                globalSettings,
+                Mock.Of<IUmbracoContextAccessor>(),
+                Factory.GetInstance<IPublishedSnapshotService>(),
+                Factory.GetInstance<IUserService>(),
+                new UrlProviderCollection(new IUrlProvider[0]),
+                runtime,
+                logger,
+                null, // fixme - PublishedRouter complexities...
+                Mock.Of<IVariationContextAccessor>()
+            );
+
             runtime.Level = RuntimeLevel.Run;
-            
+
 
             //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
             //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";

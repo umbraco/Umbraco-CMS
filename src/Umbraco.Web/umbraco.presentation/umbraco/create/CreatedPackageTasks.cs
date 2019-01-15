@@ -3,8 +3,8 @@ using Umbraco.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 using Umbraco.Web._Legacy.UI;
-using umbraco.cms.businesslogic.packager;
 
 namespace Umbraco.Web
 {

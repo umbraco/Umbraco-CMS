@@ -1,19 +1,14 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     public class MapperCollectionBuilder : LazyCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
-        public MapperCollectionBuilder(IServiceContainer container)
-            : base(container)
-        { }
-
         protected override MapperCollectionBuilder This => this;
 
-        protected override void Initialize()
+        public override void RegisterWith(IRegister register)
         {
-            base.Initialize();
+            base.RegisterWith(register);
 
             // default initializer registers
             // - service MapperCollectionBuilder, returns MapperCollectionBuilder
@@ -21,10 +16,10 @@ namespace Umbraco.Core.Persistence.Mappers
             // we want to register extra
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
-            Container.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
+            register.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
         }
 
-        public MapperCollectionBuilder AddCore()
+        public MapperCollectionBuilder AddCoreMappers()
         {
             Add<AccessMapper>();
             Add<AuditItemMapper>();

@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
-using umbraco.cms.businesslogic.packager;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -26,6 +25,8 @@ using Umbraco.Web.UI;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Packager;
+using Umbraco.Web._Legacy.Packager.PackageInstance;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Version = System.Version;
@@ -194,7 +195,7 @@ namespace Umbraco.Web.Editors
                     {
                         try
                         {
-                            global::umbraco.cms.businesslogic.packager.PackageAction
+                            global::Umbraco.Web._Legacy.Packager.PackageInstance.PackageAction
                                 .UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
                         }
                         catch (Exception ex)
@@ -310,7 +311,7 @@ namespace Umbraco.Web.Editors
 
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
             //this will load in all the metadata too
             var tempDir = ins.Import(model.ZipFilePath, false);
 
@@ -500,7 +501,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
 
             var tempPath = ins.Import(model.ZipFilePath);
             //now we need to check for version comparison
@@ -528,7 +529,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
@@ -562,7 +563,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallBusinessLogic(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
             return model;
@@ -576,7 +577,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallResult CleanUp(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::Umbraco.Web._Legacy.Packager.Installer(Security.CurrentUser.Id);
             var tempDir = IOHelper.MapPath(model.TemporaryDirectoryPath);
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));

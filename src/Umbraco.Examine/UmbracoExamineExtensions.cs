@@ -1,10 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Web;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
+﻿using Examine.LuceneEngine.Search;
+using Examine.Search;
 using Umbraco.Core;
-using Umbraco.Examine.Config;
 
 namespace Umbraco.Examine
 {

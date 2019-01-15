@@ -9,11 +9,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -121,24 +119,27 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            //return a normal node menu:
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
-            menu.Items.Add<ActionSort>(Services.TextService);
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
-            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
+                menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
                 menu.DefaultMenuAlias = null;
-                menu.Items.Insert(2, new MenuItem(ActionRestore.ActionAlias, Services.TextService)
-                {
-                    OpensDialog = true
-                });
+                
             }
             else
             {
+                //return a normal node menu:
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionSort>(Services.TextService);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
             }
@@ -171,6 +172,6 @@ namespace Umbraco.Web.Trees
             // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
             // See this issue for details on why we need this:
             // https://github.com/umbraco/Umbraco-CMS/issues/3457
-            => ((EntityService)Services.EntityService).GetMediaChildrenWithoutPropertyData(entityId).ToList();
+            => ((EntityService)Services.EntityService).GetMediaChildrenWithoutPropertyData(entityId).ToList();        
     }
 }

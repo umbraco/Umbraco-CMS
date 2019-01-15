@@ -15,7 +15,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performs the data lookups required to rebuild a content index
     /// </summary>
-    public class ContentIndexPopulator : IndexPopulator
+    public class ContentIndexPopulator : IndexPopulator<UmbracoContentIndex>
     {
         private readonly IContentService _contentService;
         private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
@@ -56,13 +56,12 @@ namespace Umbraco.Examine
                 _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
             _publishedValuesOnly = publishedValuesOnly;
             _parentId = parentId;
-
-            RegisterIndex(Constants.UmbracoIndexes.InternalIndexName);
-            RegisterIndex(Constants.UmbracoIndexes.ExternalIndexName);
         }
 
-        protected override void PopulateIndexes(IEnumerable<IIndex> indexes)
+        protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
         {
+            if (indexes.Count == 0) return;
+
             const int pageSize = 10000;
             var pageIndex = 0;
 
