@@ -123,6 +123,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
             To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
 
+
             //FINAL
 
 
