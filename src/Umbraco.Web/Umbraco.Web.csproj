@@ -730,7 +730,6 @@
     <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
     <Compile Include="Install\InstallSteps\UpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
-    <Compile Include="Install\Controllers\InstallPackageController.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />
