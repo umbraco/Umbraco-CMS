@@ -171,7 +171,7 @@
                 },
                     installError)
                 .then(function (pack) {
-                    vm.installState.status = labels.installStateRestarting;
+                    vm.installState.status = labels.installStateInstalling;
                     vm.installState.progress = "75";
                     return packageResource.installData(pack);
                 },

@@ -453,6 +453,7 @@ namespace Umbraco.Web.Search
                             foreach (var item in paged)
                                 if (int.TryParse(item.Id, out var contentId))
                                     DeleteIndexForEntity(contentId, false);
+                            page++;
                         }
                     }
                 }
