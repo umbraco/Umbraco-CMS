@@ -427,6 +427,9 @@ input.umb-group-builder__group-sort-value {
     }
 
     .editor {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
         margin-bottom: 10px;
 
         .editor-icon-wrapper {
@@ -438,6 +441,11 @@ input.umb-group-builder__group-sort-value {
             border-radius: 5px;
             float: left;
             margin-right: 20px;
+            text-decoration: none;
+
+            &:hover {
+                background: @gray-10;
+            }
 
             .icon {
                 font-size: 26px;
@@ -445,8 +453,14 @@ input.umb-group-builder__group-sort-value {
         }
 
         .editor-details {
+            flex: 1 1 auto;
             float: left;
-            margin-top: 10px;
+            margin-right: 20px;
+            padding: 10px 15px;
+
+            &:hover {
+                background: @gray-10;
+            }
 
             .editor-name {
                 display: block;
@@ -460,8 +474,15 @@ input.umb-group-builder__group-sort-value {
         }
 
         .editor-settings-icon {
+            align-self: flex-start;
             font-size: 18px;
             margin-top: 8px;
+            margin-left: auto;
+            text-decoration: none;
+
+            &:hover {
+                color: @turquoise-d1;
+            }
         }
     }
 
@@ -479,7 +500,7 @@ input.umb-group-builder__group-sort-value {
         overflow: hidden;
     }
 
-    .editor-validation-pattern{
+    .editor-validation-pattern {
         border: 1px solid @gray-7;
         margin: 10px 0 0;
         padding: 6px;
