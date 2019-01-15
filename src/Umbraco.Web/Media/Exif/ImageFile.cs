@@ -137,7 +137,8 @@ namespace Umbraco.Web.Media.Exif
                 return new SvgFile(stream);
             }
 
-            throw new NotValidImageFileException();
+            // We don't know
+            return null;
         }
         #endregion
     }

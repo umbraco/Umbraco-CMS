@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 {"creatorName", "Shannon"}
             };
 
-            var result = new SearchResult("1234", 1, 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
+            var result = new SearchResult("1234", 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
 
             var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
             var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));

@@ -194,8 +194,8 @@ namespace Umbraco.Tests.Composing
             var register = GetRegister();
 
             // define two instances
-            register.RegisterInstance(typeof(Thing1), new Thing1());
-            register.RegisterInstance(typeof(Thing1), new Thing2());
+            register.Register(typeof(Thing1), new Thing1());
+            register.Register(typeof(Thing1), new Thing2());
 
             var factory = register.CreateFactory();
 
@@ -212,8 +212,8 @@ namespace Umbraco.Tests.Composing
             var register = GetRegister();
 
             // define two instances
-            register.RegisterInstance(typeof(IThing), new Thing1());
-            register.RegisterInstance(typeof(IThing), new Thing2());
+            register.Register(typeof(IThing), new Thing1());
+            register.Register(typeof(IThing), new Thing2());
 
             var factory = register.CreateFactory();
 

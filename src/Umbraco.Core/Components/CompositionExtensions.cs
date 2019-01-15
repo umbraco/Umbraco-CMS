@@ -26,15 +26,16 @@ namespace Umbraco.Core.Components
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
         /// <typeparam name="TImplementing">The implementing type.</typeparam>
         /// <param name="composition">The composition.</param>
-        /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
         /// <returns>The register.</returns>
-        public static void RegisterFileSystem<TFileSystem, TImplementing>(this Composition composition, Func<IFactory, IFileSystem> supportingFileSystemFactory)
+        public static void RegisterFileSystem<TFileSystem, TImplementing>(this Composition composition)
             where TImplementing : FileSystemWrapper, TFileSystem
+            where TFileSystem : class
         {
             composition.RegisterUnique<TFileSystem>(factory =>
             {
                 var fileSystems = factory.GetInstance<FileSystems>();
-                return fileSystems.GetFileSystem<TImplementing>(supportingFileSystemFactory(factory));
+                var supporting = factory.GetInstance<SupportingFileSystems>();
+                return fileSystems.GetFileSystem<TImplementing>(supporting.For<TFileSystem>());
             });
         }
 
@@ -43,15 +44,15 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
         /// <param name="composition">The composition.</param>
-        /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
         /// <returns>The register.</returns>
-        public static void RegisterFileSystem<TFileSystem>(this Composition composition, Func<IFactory, IFileSystem> supportingFileSystemFactory)
+        public static void RegisterFileSystem<TFileSystem>(this Composition composition)
             where TFileSystem : FileSystemWrapper
         {
             composition.RegisterUnique(factory =>
             {
                 var fileSystems = factory.GetInstance<FileSystems>();
-                return fileSystems.GetFileSystem<TFileSystem>(supportingFileSystemFactory(factory));
+                var supporting = factory.GetInstance<SupportingFileSystems>();
+                return fileSystems.GetFileSystem<TFileSystem>(supporting.For<TFileSystem>());
             });
         }
 
@@ -279,6 +280,22 @@ namespace Umbraco.Core.Components
         {
             composition.RegisterUnique(_ => helper);
         }
+
+        /// <summary>
+        /// Sets the underlying media filesystem.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="filesystemFactory">A filesystem factory.</param>
+        public static void SetMediaFileSystem(this Composition composition, Func<IFactory, IFileSystem> filesystemFactory)
+            => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(filesystemFactory);
+
+        /// <summary>
+        /// Sets the underlying media filesystem.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="filesystemFactory">A filesystem factory.</param>
+        public static void SetMediaFileSystem(this Composition composition, Func<IFileSystem> filesystemFactory)
+            => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(_ => filesystemFactory());
 
         #endregion
     }
