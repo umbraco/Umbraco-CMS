@@ -714,14 +714,12 @@
          按鈕並點選該檔案。Umbraco擴展包通常有「.zip」的副檔名。
       ]]></key>
     <key alias="packageAuthor">作者</key>
-    <key alias="packageDemonstration">演示</key>
     <key alias="packageDocumentation">文檔</key>
     <key alias="packageMetaData">中繼資料</key>
     <key alias="packageName">名稱</key>
     <key alias="packageNoItemsHeader">擴展包不含任何項</key>
     <key alias="packageNoItemsText"><![CDATA[這個擴展包檔案裡面沒有任何移除項目資訊。<br/><br/>
       您可以點選下方「移除擴展包」來安全地移除此項目。]]></key>
-    <key alias="packageNoUpgrades">無可用更新</key>
     <key alias="packageOptions">選項</key>
     <key alias="packageReadme">說明</key>
     <key alias="packageRepository">程式庫</key>
@@ -732,12 +730,7 @@
     <key alias="packageUninstallText"><![CDATA[您可以取消選取任何不想要現在移除的項目。當您點選「確認移除」按鈕後，所有點選項目將被移除。<br />
       <span style="color: Red; font-weight: bold;">注意：</span> 任何文檔，媒體或需要這些項目才能運作的物件將會停止運作，並可能使得系統不穩定，
       請小心移除。若有疑慮，請聯絡擴展包作者。]]></key>
-    <key alias="packageUpgradeDownload">從程式庫下載更新</key>
-    <key alias="packageUpgradeHeader">更新擴展包</key>
-    <key alias="packageUpgradeInstructions">更新說明</key>
-    <key alias="packageUpgradeText">擴展包有可用的更新，您可以從程式庫網站更新。</key>
     <key alias="packageVersion">版本</key>
-    <key alias="viewPackageWebsite">訪問擴展包網站</key>
     <key alias="packageAlreadyInstalled">擴展包已安裝</key>
     <key alias="targetVersionMismatch">這個擴展包無法安裝，它需要Umbraco至少是版本 %0%</key>
     <key alias="installStateUninstalling">移除中...</key>

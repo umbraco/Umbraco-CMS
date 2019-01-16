@@ -7,6 +7,7 @@
 
         vm.confirmUninstall = confirmUninstall;
         vm.uninstallPackage = uninstallPackage;
+        vm.packageOptions = packageOptions;
         vm.state = "list";
         vm.installState = {
             status: ""
@@ -32,6 +33,10 @@
                 labels.installStateUninstalling = values[0];
                 labels.installStateComplete = values[1];
             });
+        }
+
+        function packageOptions(pck) {
+            $location.path("packages/packages/options/" + pck.id);
         }
 
         function confirmUninstall(pck) {

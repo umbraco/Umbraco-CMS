@@ -34,6 +34,7 @@ namespace Umbraco.Core.Packaging
                 PackageId = xml.AttributeValue<Guid>("packageGuid"),
                 IconUrl = xml.AttributeValue<string>("iconUrl") ?? string.Empty,
                 UmbracoVersion = xml.AttributeValue<Version>("umbVersion"),
+                PackageView = xml.AttributeValue<string>("view") ?? string.Empty,
                 License = xml.Element("license")?.Value ?? string.Empty,
                 LicenseUrl = xml.Element("license")?.AttributeValue<string>("url") ?? string.Empty,
                 Author = xml.Element("author")?.Value ?? string.Empty,
@@ -49,8 +50,7 @@ namespace Umbraco.Core.Packaging
                 Languages = xml.Element("languages")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 DictionaryItems = xml.Element("dictionaryitems")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 DataTypes = xml.Element("datatypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Files = xml.Element("files")?.Elements("file").Select(x => x.Value).ToList() ?? new List<string>(),
-                PackageView = xml.Element("view")?.Value ?? string.Empty
+                Files = xml.Element("files")?.Elements("file").Select(x => x.Value).ToList() ?? new List<string>()
             };
 
             return retVal;
@@ -77,6 +77,7 @@ namespace Umbraco.Core.Packaging
                 new XAttribute("iconUrl", def.IconUrl ?? string.Empty),
                 new XAttribute("umbVersion", def.UmbracoVersion),
                 new XAttribute("packageGuid", def.PackageId),
+                new XAttribute("view", def.PackageView ?? string.Empty),
 
                 new XElement("license",
                     new XCData(def.License ?? string.Empty),
@@ -100,8 +101,7 @@ namespace Umbraco.Core.Packaging
                 new XElement("macros", string.Join(",", def.Macros ?? Array.Empty<string>())),
                 new XElement("files", (def.Files ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("file", x))),
                 new XElement("languages", string.Join(",", def.Languages ?? Array.Empty<string>())),
-                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())),
-                new XElement("view", def.PackageView ?? string.Empty)); 
+                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>()))); 
 
             return packageXml;
         }

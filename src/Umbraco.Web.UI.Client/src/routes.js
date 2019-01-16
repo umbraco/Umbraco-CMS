@@ -158,7 +158,8 @@ app.config(function ($routeProvider) {
                 }
 
                 //special case for the package section
-                if ($routeParams.section.toLowerCase() === "packages" && $routeParams.tree.toLowerCase() === "packages" && $routeParams.method !== "edit") {
+                var packagePages = ["edit", "options"];
+                if ($routeParams.section.toLowerCase() === "packages" && $routeParams.tree.toLowerCase() === "packages" && packagePages.indexOf($routeParams.method.toLowerCase()) === -1) {
                     $scope.templateUrl = "views/packages/overview.html";
                     return;
                 }

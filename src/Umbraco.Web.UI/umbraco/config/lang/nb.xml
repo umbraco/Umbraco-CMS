@@ -589,13 +589,11 @@ Vennlig hilsen Umbraco roboten
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[Klikk browse og velg pakke fra lokal disk.<br/> Umbraco-pakker har vanligvis endelsen ".umb" eller ".zip".]]></key>
     <key alias="packageAuthor">Utvikler</key>
-    <key alias="packageDemonstration">Demonstrasjon</key>
     <key alias="packageDocumentation">Dokumentasjon</key>
     <key alias="packageMetaData">Metadata</key>
     <key alias="packageName">Pakkenavn</key>
     <key alias="packageNoItemsHeader">Pakken inneholder ingen elementer</key>
     <key alias="packageNoItemsText"><![CDATA[Denne pakkefilen inneholder ingen elementer å avinstallere.<br/><br/>Du kan trygt fjerne pakken fra systemet ved å klikke "avinstaller pakke" nedenfor.]]></key>
-    <key alias="packageNoUpgrades">Ingen oppdateringer tilgjengelig</key>
     <key alias="packageOptions">Alternativer for pakke</key>
     <key alias="packageReadme">Lesmeg for pakke</key>
     <key alias="packageRepository">Pakkebrønn</key>
@@ -604,12 +602,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="packageUninstalledText">Pakken ble vellykket avinstallert</key>
     <key alias="packageUninstallHeader">Avinstaller pakke</key>
     <key alias="packageUninstallText"><![CDATA[Du kan velge bort elementer du ikke vil slette på dette tidspunkt, nedenfor. Når du klikker "bekreft avinstallering" vil alle elementer som er krysset av bli slettet.<br/> <span style="color:red;font-weight:bold;">Advarsel:</span> alle dokumenter, media, etc. som som er avhengig av elementene du sletter, vil slutte å virke, noe som kan føre til ustabilitet, så avinstaller med forsiktighet. Hvis du er i tvil, kontakt pakkeutvikleren.]]></key>
-    <key alias="packageUpgradeDownload">Last ned oppdatering fra pakkeregisteret</key>
-    <key alias="packageUpgradeHeader">Oppgrader pakke</key>
-    <key alias="packageUpgradeInstructions">Oppgraderingsinstrukser</key>
-    <key alias="packageUpgradeText">Det er en oppdatering tilgjengelig for denne pakken. Du kan laste den ned direkte fra pakkebrønnen.</key>
     <key alias="packageVersion">Pakkeversjon</key>
-    <key alias="viewPackageWebsite">Se pakkens nettsted</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Lim inn med full formattering (Anbefales ikke)</key>

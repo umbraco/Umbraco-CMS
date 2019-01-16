@@ -17,8 +17,7 @@
         }
 
         if (installPackageUri && installPackageUri !== "installed") {
-            //navigate to the custom installer screen, if it is just "installed", then we'll 
-            //show the installed view
+            //navigate to the custom installer screen, if it is just "installed" it means there is no custom installer screen
             $location.path(installPackageUri).search("");
         }
         else {

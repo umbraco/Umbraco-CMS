@@ -524,14 +524,12 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
          e selezionando il pacchetto. I pacchetti Umbraco generalmente hanno l'estensione ".umb" o ".zip".
       ]]></key>
     <key alias="packageAuthor">Autore</key>
-    <key alias="packageDemonstration">Dimostrazione</key>
     <key alias="packageDocumentation">Documentazione</key>
     <key alias="packageMetaData">Meta dati pacchetto</key>
     <key alias="packageName">Nome del pacchetto</key>
     <key alias="packageNoItemsHeader">Il pacchetto non contiene tutti gli elementi</key>
     <key alias="packageNoItemsText"><![CDATA[Questo pacchetto non contiene elementi da disinstallare.<br/><br/>
       E' possibile rimuovere questo pacchetto dal sistema cliccando "rimuovi pacchetto" in basso.]]></key>
-    <key alias="packageNoUpgrades">Non ci sono aggiornamenti disponibili</key>
     <key alias="packageOptions">Opzioni pacchetto</key>
     <key alias="packageReadme">Pacchetto leggimi</key>
     <key alias="packageRepository">Pacchetto repository</key>
@@ -542,12 +540,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="packageUninstallText"><![CDATA[È possibile deselezionare gli elementi che non si desidera rimuovere, in questo momento, in basso. Quando si fa click su "Conferma eliminazione" verranno rimossi tutti gli elementi selezionati.<br />
       <span style="color: Red; font-weight: bold;">Avviso:</span> tutti i documenti, i media, etc a seconda degli elementi che rimuoverai, smetteranno di funzionare, e potrebbero portare a un'instabilità del sistema,
       perciò disinstalla con cautela. In caso di dubbio contattare l'autore del pacchetto.]]></key>
-    <key alias="packageUpgradeDownload"><![CDATA[Scarica l'aggiornamento dal repository]]></key>
-    <key alias="packageUpgradeHeader">Aggiorna pacchetto</key>
-    <key alias="packageUpgradeInstructions"><![CDATA[Istruzioni per l'aggiornamento]]></key>
-    <key alias="packageUpgradeText"><![CDATA[C'è un aggiornamento disponibile per questo pacchetto. Potete scaricarlo direttamente dal repository dei pacchetti Umbraco.]]></key>
     <key alias="packageVersion">Versione del pacchetto</key>
-    <key alias="viewPackageWebsite">Vedi sito web pacchetto</key>
   </area>
   <area alias="paste">
     <key alias="doNothing"><![CDATA[Incolla con tutte le formattazioni (Non consigliato)]]></key>

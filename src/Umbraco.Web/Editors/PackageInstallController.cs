@@ -369,20 +369,17 @@ namespace Umbraco.Web.Editors
 
             var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
+            zipFile.Delete();
+
+            //bump cdf to be safe
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
-            zipFile.Delete();
-
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())
             {
-                //fixme!
-                throw new NotImplementedException();
-                //redirectUrl = string.Format("/packages/framed/{0}",
-                //    Uri.EscapeDataString(
-                //        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
+                redirectUrl = $"/packages/packages/options/{model.Id}";
             }
 
             return new PackageInstallResult
