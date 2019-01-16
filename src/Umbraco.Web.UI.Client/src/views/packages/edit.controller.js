@@ -130,7 +130,7 @@
         }
 
         function back() {
-            $location.path("packages/packages/overview").search('create', null);;
+            $location.path("packages/packages/created").search("create", null);
         }
 
         function createOrUpdatePackage(editPackageForm) {
@@ -148,7 +148,7 @@
 
                     if (create) {
                         //if we are creating, then redirect to the correct url and reload
-                        $location.path("packages/packages/edit/" + vm.package.id).search("subview", "created").search("create", null);
+                        $location.path("packages/packages/edit/" + vm.package.id).search("create", null);
                         //don't add a browser history for this
                         $location.replace();
                     }

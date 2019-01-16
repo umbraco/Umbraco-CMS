@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesOverviewController($scope, $location, localStorageService) {
+    function PackagesOverviewController($scope, $location, $routeParams, localStorageService) {
 
         //Hack!
         // if there is a cookie value for packageInstallUri then we need to redirect there,
@@ -10,7 +10,7 @@
         // we will refresh and then navigate there.
 
         let installPackageUri = localStorageService.get("packageInstallUri");
-        let packageUri = $location.search().subview;
+        let packageUri = $routeParams.method;
 
         if (installPackageUri) {            
             localStorageService.remove("packageInstallUri");                       
@@ -33,10 +33,10 @@
                     "name": "Packages",
                     "icon": "icon-cloud",
                     "view": "views/packages/views/repo.html",
-                    "active": !packageUri || packageUri === "navigation",
+                    "active": !packageUri || packageUri === "repo",
                     "alias": "umbPackages",
-                    "action": function() {
-                        $location.search("subview", "navigation");
+                    "action": function () {
+                        $location.path("/packages/packages/repo");
                     }
                 },
                 {
@@ -45,8 +45,8 @@
                     "view": "views/packages/views/installed.html",
                     "active": packageUri === "installed",
                     "alias": "umbInstalled",
-                    "action": function() {
-                        $location.search("subview", "installed");
+                    "action": function () {
+                        $location.path("/packages/packages/installed");
                     }
                 },
                 {
@@ -55,8 +55,8 @@
                     "view": "views/packages/views/install-local.html",
                     "active": packageUri === "local",
                     "alias": "umbInstallLocal",
-                    "action": function() {
-                        $location.search("subview", "local");
+                    "action": function () {
+                        $location.path("/packages/packages/local");
                     }
                 },
                 {
@@ -65,8 +65,8 @@
                     "view": "views/packages/views/created.html",
                     "active": packageUri === "created",
                     "alias": "umbCreatedPackages",
-                    "action": function() {
-                        $location.search("subview", "created");
+                    "action": function () {
+                        $location.path("/packages/packages/created");
                     }
                 }
             ];

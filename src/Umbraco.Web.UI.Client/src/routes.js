@@ -149,14 +149,21 @@ app.config(function ($routeProvider) {
         .when('/:section/:tree/:method?', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
-            //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
-            controller: function ($scope, $route, $routeParams, treeService) {
+            //This controller will execute for this route, then we replace the template dynamically based on the current tree.
+            controller: function ($scope, $routeParams, treeService) {
 
                 if (!$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
+                    return;
                 }
 
-                // Here we need to figure out if this route is for a package tree and if so then we need
+                //special case for the package section
+                if ($routeParams.section.toLowerCase() === "packages" && $routeParams.tree.toLowerCase() === "packages" && $routeParams.method !== "edit") {
+                    $scope.templateUrl = "views/packages/overview.html";
+                    return;
+                }
+
+                // Here we need to figure out if this route is for a user's package tree and if so then we need
                 // to change it's convention view path to:
                 // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
 
