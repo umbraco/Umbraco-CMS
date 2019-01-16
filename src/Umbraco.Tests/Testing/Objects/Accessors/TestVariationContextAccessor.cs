@@ -12,6 +12,6 @@ namespace Umbraco.Tests.Testing.Objects.Accessors
         {
             get;
             set;
-        }
+        } = new VariationContext();
     }
 }

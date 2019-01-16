@@ -138,7 +138,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
 
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => new Dictionary<string, PublishedCultureInfo>();
 
         public override string WriterName
         {
