@@ -27,6 +27,11 @@
                 overlay.position = "center";
             }
 
+            // use a default empty view if nothing is set
+            if(!overlay.view) {
+                overlay.view = "views/common/overlays/default/default.html";
+            }
+
             // option to disable backdrop clicks
             if(overlay.disableBackdropClick) {
                 backdropOptions.disableEventsOnClick = true;

@@ -751,7 +751,6 @@
     <key alias="packageUpgradeInstructions">更新说明</key>
     <key alias="packageUpgradeText">此软件包有一个可用的升级。您可以直接从 Umbraco 软件包存储库下载。</key>
     <key alias="packageVersion">版本</key>
-    <key alias="packageVersionHistory">版本历史</key>
     <key alias="viewPackageWebsite">访问扩展包网站</key>
     <key alias="packageAlreadyInstalled">已安装软件包</key>
     <key alias="targetVersionMismatch">此软件包无法安装, 它需要一个最小的 Umbraco 版本的%0%</key>

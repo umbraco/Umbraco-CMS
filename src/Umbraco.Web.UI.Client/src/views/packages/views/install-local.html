@@ -4,7 +4,7 @@
 
         <!-- Upload -->
         <div class="flex items-center justify-center">
-            <form novalidate name="localPackageForm" class="flex flex-column justify-center items-center tc">
+            <ng-form novalidate name="localPackageForm" class="flex flex-column justify-center items-center tc">
 
                 <!-- Drag and drop files area -->
                 <div ngf-drop
@@ -47,7 +47,7 @@
                     <localize key="packager_localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</localize>.
                 </p>
 
-            </form>
+            </ng-form>
         </div>
     </div>
 
@@ -118,6 +118,14 @@
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageVersion">Version</localize></strong>
                                 {{ vm.localPackage.version }}
+                                <p ng-if="vm.localPackage.originalVersion">
+                                    <small>
+                                        <em>
+                                            <localize key="packager_packageVersionUpgrade">Upgrading from version</localize>
+                                            {{ vm.localPackage.originalVersion }}
+                                        </em>
+                                    </small>
+                                </p>
                             </div>
 
                             <div class="umb-info-local-item">
@@ -128,7 +136,7 @@
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageReadme">Read me</localize></strong>
                                 <br>
-                                <small ng-bind-html="vm.localPackage.readMe"></small>
+                                <small ng-bind-html="vm.localPackage.readme"></small>
                             </div>
 
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
@@ -136,21 +144,19 @@
                                     <input type="checkbox" id="license-accepts" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
                                     <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </label>
-                                <umb-button
-                                    class="mt3" 
-                                    type="button"
-                                    disabled="localPackageForm.$invalid"
-                                    size="m"
-                                    button-style="success"
-                                    action="vm.installPackage()"
-                                    label-key="packager_packageInstall">
+                                <umb-button class="mt3"
+                                            type="button"
+                                            disabled="localPackageForm.$invalid"
+                                            size="m"
+                                            button-style="success"
+                                            action="vm.installPackage()"
+                                            label-key="packager_packageInstall">
                                 </umb-button>
                             </div>
 
                             <div class="umb-info-local-item">
-                                <umb-progress-bar
-                                    ng-if="vm.installState.status !== ''"
-                                    percentage="{{vm.installState.progress}}">
+                                <umb-progress-bar ng-if="vm.installState.status !== ''"
+                                                  percentage="{{vm.installState.progress}}">
                                 </umb-progress-bar>
                             </div>
 
@@ -165,9 +171,8 @@
 
                             <div class="umb-info-local-item text-info"
                                  ng-show="vm.installCompleted">
-                              
+
                                 <button type="button"
-                                       
                                         class="btn btn-success flex-inline mt3"
                                         ng-click="vm.reloadPage()">
                                     <localize key="packager_installFinish">Finish</localize>

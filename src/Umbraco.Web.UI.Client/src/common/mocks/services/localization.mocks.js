@@ -473,7 +473,6 @@ angular.module('umbraco.mocks').
                   "packager_packageUpgradeInstructions": "Upgrade instructions",
                   "packager_packageUpgradeText": " There's an upgrade available for this package. You can download it directly from the Umbraco package repository.",
                   "packager_packageVersion": "Package version",
-                  "packager_packageVersionHistory": "Package version history",
                   "packager_viewPackageWebsite": "View package website",
                   "paste_doNothing": "Paste with full formatting (Not recommended)",
                   "paste_errorMessage": "The text you're trying to paste contains special characters or formatting. This could be caused by copying text from Microsoft Word. Umbraco can remove special characters or formatting automatically, so the pasted content will be more suitable for the web.",

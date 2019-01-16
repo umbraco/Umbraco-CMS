@@ -25,10 +25,6 @@
 
             setPageName();
 
-            $timeout(function () {
-                navigationService.syncTree({ tree: "users", path: "-1" });
-            });
-
         }
 
         function loadNavigation() {

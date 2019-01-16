@@ -268,6 +268,7 @@ namespace Umbraco.Tests.TestHelpers
                 DefaultCultureAccessor,
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 
