@@ -37,6 +37,12 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "version")]
         public string Version { get; set; }
 
+        /// <summary>
+        /// If this is not null then it means the package is being from this version
+        /// </summary>
+        [DataMember(Name = "originalVersion")]
+        public string OriginalVersion { get; set; }
+
         [DataMember(Name = "containsUnsecureFiles")]
         public bool ContainsUnsecureFiles { get; set; }
 

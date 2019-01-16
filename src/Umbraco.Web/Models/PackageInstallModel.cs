@@ -23,5 +23,6 @@ namespace Umbraco.Web.Models
         /// </summary>
         [DataMember(Name = "isRestarting")]
         public bool IsRestarting { get; set; }
+
     }
 }

@@ -458,6 +458,7 @@
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageDefinitionXmlParser.cs" />
     <Compile Include="Packaging\PackageFileInstallation.cs" />
+    <Compile Include="Packaging\PackageInstallType.cs" />
     <Compile Include="Packaging\PackagesRepository.cs" />
     <Compile Include="Models\Packaging\RequirementsType.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />

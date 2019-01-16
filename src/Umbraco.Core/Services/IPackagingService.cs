@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Semver;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
@@ -44,7 +45,25 @@ namespace Umbraco.Core.Services
 
         IEnumerable<PackageDefinition> GetAllInstalledPackages();
         PackageDefinition GetInstalledPackageById(int id);
+        PackageDefinition GetInstalledPackageByName(string name);
+
+        /// <summary>
+        /// Returns a <see cref="PackageInstallType"/> for a given package name and version
+        /// </summary>
+        /// <param name="packageName"></param>
+        /// <param name="packageVersion"></param>
+        /// <param name="alreadyInstalled">If the package is an upgrade, the original/current PackageDefinition is returned</param>
+        /// <returns></returns>
+        PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled);
         void DeleteInstalledPackage(int packageId, int userId = 0);
+
+        /// <summary>
+        /// Merges the package definition information from the upgrade on to the original and returns the merged definition
+        /// </summary>
+        /// <param name="original"></param>
+        /// <param name="upgrade"></param>
+        /// <returns></returns>
+        PackageDefinition MergePackageDefinition(PackageDefinition original, PackageDefinition upgrade);
 
         /// <summary>
         /// Persists a package definition to storage

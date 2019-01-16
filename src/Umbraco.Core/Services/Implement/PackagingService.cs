@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
+using Semver;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -179,6 +180,86 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<PackageDefinition> GetAllInstalledPackages() => _installedPackages.GetAll();
 
         public PackageDefinition GetInstalledPackageById(int id) => _installedPackages.GetById(id);
+
+        public PackageDefinition GetInstalledPackageByName(string name)
+        {
+            var found = _installedPackages.GetAll().FirstOrDefault(x => x.Name.InvariantEquals(name));
+            return found;
+        }
+
+        public PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled)
+        {
+            if (packageName == null) throw new ArgumentNullException(nameof(packageName));
+            if (packageVersion == null) throw new ArgumentNullException(nameof(packageVersion));
+
+            alreadyInstalled = GetInstalledPackageByName(packageName);
+            if (alreadyInstalled == null) return PackageInstallType.NewInstall;
+
+            if (!SemVersion.TryParse(alreadyInstalled.Version, out var installedVersion))
+                throw new InvalidOperationException("Could not parse the currently installed package version " + alreadyInstalled.Version);
+
+            //compare versions
+            if (installedVersion >= packageVersion) return PackageInstallType.AlreadyInstalled;
+
+            //it's an upgrade
+            return PackageInstallType.Upgrade;
+        }
+
+        public PackageDefinition MergePackageDefinition(PackageDefinition original, PackageDefinition upgrade)
+        {
+            if (!SemVersion.TryParse(original.Version, out var originalVersion))
+                throw new InvalidOperationException("Could not parse the original version");
+            if(!SemVersion.TryParse(upgrade.Version, out var upgradeVersion))
+                throw new InvalidOperationException("Could not parse the upgrade version");
+            if (originalVersion >= upgradeVersion)
+                throw new InvalidOperationException("The upgrade version must be higher than the original version");
+            if (!original.Name.InvariantEquals(upgrade.Name))
+                throw new InvalidOperationException("Cannot merge the package definitions, the package name doesn't match");
+
+            var result = original.Clone();
+
+            result.PackagePath = upgrade.PackagePath;
+            result.PackageId = upgrade.PackageId;
+
+            result.UmbracoVersion = upgrade.UmbracoVersion;
+            result.Version = upgrade.Version;
+            result.Url = upgrade.Url;
+            result.Readme = upgrade.Readme;
+            result.AuthorUrl = upgrade.AuthorUrl;
+            result.Author = upgrade.Author;
+            result.LicenseUrl = upgrade.LicenseUrl;
+            result.PackageId = upgrade.PackageId;
+            result.Control = upgrade.Control;
+            result.IconUrl = upgrade.IconUrl;
+            result.License = upgrade.License;
+            result.ContentNodeId = upgrade.ContentNodeId;
+            result.ContentLoadChildNodes = upgrade.ContentLoadChildNodes;
+
+            result.Files = original.Files.Concat(upgrade.Files).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+            result.DataTypes = original.DataTypes.Concat(upgrade.DataTypes).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+            result.Templates = original.Templates.Concat(upgrade.Templates).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+            result.Languages = original.Languages.Concat(upgrade.Languages).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();            
+            result.Macros = original.Macros.Concat(upgrade.Macros).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+            result.Stylesheets = original.Stylesheets.Concat(upgrade.Stylesheets).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+            result.DocumentTypes = original.DocumentTypes.Concat(upgrade.DocumentTypes).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList(); 
+            result.DictionaryItems = original.DictionaryItems.Concat(upgrade.DictionaryItems).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
+
+            var originalActions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(result.Actions), result.Name);
+            var upgradeActions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(upgrade.Actions), result.Name).ToList();
+            var upgradeActionsLookup = upgradeActions.ToLookup(x => x.Alias, x => x.XmlData.ToString());
+
+            foreach (var originalAction in originalActions)
+            {
+                var upgradeActionsWithAlias = upgradeActionsLookup[originalAction.Alias];
+
+                //check if the original action does not exist already in our upgrade actions
+                if(upgradeActionsWithAlias.All(upgradeActionXml => upgradeActionXml != originalAction.XmlData.ToString()))
+                    upgradeActions.Add(originalAction);
+            }
+            result.Actions = new XElement("actions", upgradeActions.Select(x => x.XmlData)).ToString();
+
+            return result;
+        }
 
         public bool SaveInstalledPackage(PackageDefinition definition) => _installedPackages.SavePackage(definition);
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -59,9 +60,11 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult ValidateInstalled(string name, string version)
         {
-            var validate = ValidateInstalledInternal(name, version);
-            if (validate == false)
+            var installType = Services.PackagingService.GetPackageInstallType(name, SemVersion.Parse(version), out _);
+
+            if (installType == PackageInstallType.AlreadyInstalled)
                 return BadRequest();
+
             return Ok();
         }
 
@@ -130,32 +133,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private bool ValidateInstalledInternal(string name, string version)
-        {
-            var allInstalled = Services.PackagingService.GetAllInstalledPackages();
-            var found = allInstalled.FirstOrDefault(x =>
-            {
-                if (x.Name != name) return false;
-                //match the exact version
-                if (x.Version == version)
-                {
-                    return true;
-                }
-                //now try to compare the versions
-                if (Version.TryParse(x.Version, out var installed) && Version.TryParse(version, out var selected))
-                {
-                    if (installed >= selected) return true;
-                }
-                return false;
-            });
-            if (found != null)
-            {
-                //this package is already installed
-                return false;
-            }
-            return true;
-        }
-
         [HttpPost]
         [FileUploadCleanupFilter(false)]
         public async Task<LocalPackageInstallModel> UploadLocalPackage()
@@ -206,14 +183,16 @@ namespace Umbraco.Web.Editors
                     //Populate the model from the metadata in the package file (zip file)
                     PopulateFromPackageData(model);
 
-                    var validate = ValidateInstalledInternal(model.Name, model.Version);
+                    var installType = Services.PackagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
 
-                    if (validate == false)
+                    if (installType == PackageInstallType.AlreadyInstalled)
                     {
                         //this package is already installed
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                             Services.TextService.Localize("packager/packageAlreadyInstalled")));
                     }
+
+                    model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
 
                 }
                 else
@@ -259,14 +238,15 @@ namespace Umbraco.Web.Editors
             //Populate the model from the metadata in the package file (zip file)
             PopulateFromPackageData(model);
 
-            var validate = ValidateInstalledInternal(model.Name, model.Version);
+            var installType = Services.PackagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
 
-            if (validate == false)
+            if (installType == PackageInstallType.AlreadyInstalled)
             {
-                //this package is already installed
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                     Services.TextService.Localize("packager/packageAlreadyInstalled")));
             }
+
+            model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
 
             return model;
         }
@@ -288,20 +268,42 @@ namespace Umbraco.Web.Editors
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
                 if (UmbracoVersion.Current < packageMinVersion)
-                {
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                        Services.TextService.Localize("packager/targetVersionMismatch", new[] { packageMinVersion.ToString() })));
-                }
+                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
             }
 
+            var installType = Services.PackagingService.GetPackageInstallType(packageInfo.Name, SemVersion.Parse(packageInfo.Version), out var alreadyInstalled);
+
             var packageDefinition = PackageDefinition.FromCompiledPackage(packageInfo);
-            packageDefinition.PackageId = model.PackageGuid; //We must re-map the original package GUID that was generated
             packageDefinition.PackagePath = zipFile.FullName;
+            packageDefinition.PackageId = model.PackageGuid; //We must re-map the original package GUID that was generated
 
-            //save to the installedPackages.config
-            Services.PackagingService.SaveInstalledPackage(packageDefinition);
+            switch (installType)
+            {
+                case PackageInstallType.AlreadyInstalled:
+                    throw new InvalidOperationException("The package is already installed");
+                case PackageInstallType.NewInstall:
+                    
+                    //save to the installedPackages.config
+                    if (!Services.PackagingService.SaveInstalledPackage(packageDefinition))
+                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Could not save the package"));
 
-            model.Id = packageDefinition.Id;
+                    model.Id = packageDefinition.Id;
+                    break;
+                case PackageInstallType.Upgrade:
+
+                    //we need to append any changes from the new packageDefinition to the alreadyInstalled definition
+                    var mergedDefinition = Services.PackagingService.MergePackageDefinition(alreadyInstalled, packageDefinition);
+
+                    //update the installedPackages.config with the upgrade definition
+                    if (!Services.PackagingService.SaveInstalledPackage(packageDefinition))
+                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Could not save the package"));
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
 
             return model;
         }

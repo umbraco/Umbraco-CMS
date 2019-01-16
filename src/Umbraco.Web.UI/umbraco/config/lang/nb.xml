@@ -609,7 +609,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="packageUpgradeInstructions">Oppgraderingsinstrukser</key>
     <key alias="packageUpgradeText">Det er en oppdatering tilgjengelig for denne pakken. Du kan laste den ned direkte fra pakkebrønnen.</key>
     <key alias="packageVersion">Pakkeversjon</key>
-    <key alias="packageVersionHistory">Pakkeversjonshistorie</key>
     <key alias="viewPackageWebsite">Se pakkens nettsted</key>
   </area>
   <area alias="paste">

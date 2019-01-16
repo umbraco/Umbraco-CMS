@@ -640,7 +640,6 @@
     <key alias="packageUpgradeInstructions">Pokyny pro aktualizaci</key>
     <key alias="packageUpgradeText"> Pro tento balíček je dostupná aktualizace. Můžete si ji stáhnout přímo z úložiště balíčků umbraco.</key>
     <key alias="packageVersion">Verze balíčku</key>
-    <key alias="packageVersionHistory">Historie verzí balíčku</key>
     <key alias="viewPackageWebsite">Zobrazit web balíčku</key>
   </area>
   <area alias="paste">

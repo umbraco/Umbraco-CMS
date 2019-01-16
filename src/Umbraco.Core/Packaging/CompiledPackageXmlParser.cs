@@ -149,7 +149,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="actionsElement"></param>
         /// <param name="packageName"></param>
         /// <returns></returns>
-        public IEnumerable<PackageAction> GetPackageActions(XElement actionsElement, string packageName)
+        public static IEnumerable<PackageAction> GetPackageActions(XElement actionsElement, string packageName)
         {
             if (actionsElement == null) return Enumerable.Empty<PackageAction>();
 
