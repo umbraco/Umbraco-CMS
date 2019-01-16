@@ -19,6 +19,7 @@ namespace Umbraco.Web.Editors
     using System.Linq;
 
     using Umbraco.Core.IO;
+    using Umbraco.Web.Composing;
 
     /// <summary>
     /// The API controller used for editing dictionary items
@@ -80,6 +81,17 @@ namespace Umbraco.Web.Editors
             views.AddRange(this.FindPartialViewsFiles());
 
             return this.Request.CreateResponse(HttpStatusCode.OK, views);
+        }
+
+        /// <summary>
+        /// Gets the available parameter editors
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetParameterEditors()
+        {
+            return this.Request.CreateResponse(HttpStatusCode.OK, Current.ParameterEditors);
         }
 
         /// <summary>

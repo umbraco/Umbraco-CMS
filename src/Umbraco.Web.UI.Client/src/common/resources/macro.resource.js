@@ -94,6 +94,13 @@ function macroResource($q, $http, umbRequestHelper) {
                 $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetPartialViews"),
                     "Failed to get partial views")
             );
+        },
+
+        getParameterEditors: function () {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetParameterEditors"),
+                    "Failed to get parameter editors")
+            );
         }
     };
 }

@@ -26,7 +26,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Editor" description="">
-                            <select class="input-block-level" ng-model="model.parameter.editor" ng-options="i as i for i in model.editors"></select>
+                            <select class="input-block-level" ng-model="model.parameter.editor" ng-options="i.alias as (i.name) for i in model.editors"></select>
                         </umb-control-group>
 
 

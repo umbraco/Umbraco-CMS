@@ -71,10 +71,23 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         return deferred.promise;
     }
 
+    function getParameterEditors() {
+        var deferred = $q.defer();
+
+        macroResource.getParameterEditors().then(function (data) {
+            deferred.resolve(data);
+        }, function () {
+            deferred.reject();
+        });
+
+        return deferred.promise;
+    }
+
     function init() {
         vm.page.loading = true;
 
         vm.promises['partialViews'] = getPartialViews();
+        vm.promises['parameterEditors'] = getParameterEditors();
 
         $q.all(vm.promises).then(function (values) {
             var keys = Object.keys(values);
@@ -84,6 +97,10 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
 
                 if (keys[i] === 'partialViews') {
                     vm.views = values[key];
+                }
+
+                if (keys[i] === 'parameterEditors') {
+                    vm.parameterEditors = values[key];                    
                 }
             }
 
@@ -130,9 +147,7 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                     "editor": "Link picker"
                 }
             ]
-        }
-
-        vm.parameterEditors = ['editor', 'Link picker', 'Image picker'];
+        }        
     }
 
     init();      
