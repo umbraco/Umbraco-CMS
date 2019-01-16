@@ -1,5 +1,5 @@
 ﻿namespace Umbraco.Core.Persistence.Repositories
 {
-    interface IMediaTypeContainerRepository : IEntityContainerRepository
+    public interface IMediaTypeContainerRepository : IEntityContainerRepository
     { }
 }
