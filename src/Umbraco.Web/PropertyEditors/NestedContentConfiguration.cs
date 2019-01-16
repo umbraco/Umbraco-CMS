@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class NestedContentConfiguration
     {
-        [ConfigurationField("contentTypes", "Document types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the documebt types to use as the item blueprints. Only \"element\" types can be used.")]
+        [ConfigurationField("contentTypes", "Document types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the document types to use as the item blueprints. Only \"element\" types can be used.")]
         public ContentType[] ContentTypes { get; set; }
 
         [ConfigurationField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
