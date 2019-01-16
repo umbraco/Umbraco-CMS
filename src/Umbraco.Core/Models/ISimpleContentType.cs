@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models
         bool IsContainer { get; }
         string Name { get; }
         bool AllowedAsRoot { get; }
+        bool IsElement { get; }
         bool SupportsPropertyVariation(string culture, string s, bool b);
     }
 
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Models
             Icon = contentType.Icon;
             Name = contentType.Name;
             AllowedAsRoot = contentType.AllowedAsRoot;
+            IsElement = contentType.IsElement;
         }
 
         public string Alias { get; }
@@ -41,6 +43,7 @@ namespace Umbraco.Core.Models
         public bool IsContainer { get; }
         public string Name { get; }
         public bool AllowedAsRoot { get; }
+        public bool IsElement { get; }
 
         /// <inheritdoc />
         public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false)
