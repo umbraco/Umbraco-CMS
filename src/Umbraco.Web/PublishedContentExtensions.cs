@@ -272,7 +272,7 @@ namespace Umbraco.Web
         /// <param name="contents">The content.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>These of the inputs that has the specified culture or are invariant.</returns>
-        public static IEnumerable<IPublishedContent> WhereHasCultureOrInvariant(this IEnumerable<IPublishedContent> contents, string culture = null)
+        internal static IEnumerable<IPublishedContent> WhereHasCultureOrInvariant(this IEnumerable<IPublishedContent> contents, string culture = null)
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
 
