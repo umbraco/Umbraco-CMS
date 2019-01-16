@@ -1,7 +1,6 @@
-﻿<div data-element="editor-macros" ng-controller="Umbraco.Editors.Macros.EditController as vm">
-    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
-
+﻿<div data-element="editor-macros" ng-controller="Umbraco.Editors.Macros.EditController as vm">   
     <form name="macroForm" novalidate val-form-manager ng-submit="vm.save()">
+        <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
         <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header name="vm.macro.name"
                                alias="vm.macro.alias"

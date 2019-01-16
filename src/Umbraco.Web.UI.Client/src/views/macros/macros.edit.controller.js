@@ -6,7 +6,7 @@
  * @description
  * The controller for editing macros.
  */
-function MacrosEditController($scope, $routeParams, macroResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService) {
+function MacrosEditController($scope, $routeParams, macroResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, angularHelper) {
 
     var vm = this;
 
@@ -17,6 +17,7 @@ function MacrosEditController($scope, $routeParams, macroResource, editorState, 
 
     vm.save = saveMacro;
     vm.toggle = toggleValue;
+    
 
     init();
 
@@ -50,10 +51,24 @@ function MacrosEditController($scope, $routeParams, macroResource, editorState, 
             "cachePeriod": 2400,
             "cacheByPage": true,
             "cacheByUser": false,
-            "view" : "Second"
+            "view": "Second",
+            "parameters": [
+                {
+                    "key": "title",
+                    "label": "Label",
+                    "editor": "editor"                    
+                },
+                {
+                    "key": "link",
+                    "label": "Link",
+                    "editor": "Link picker"                   
+                }
+                ]
         }
 
         vm.views = ['First', 'Second', 'Third'];
+
+        vm.parameterEditors = ['editor', 'Link picker', 'Image picker'];
 
         vm.page.loading = false;
     }
@@ -82,6 +97,17 @@ function MacrosEditController($scope, $routeParams, macroResource, editorState, 
             //});
         }
     }
+
+    function setFormDirty() {
+        var currentForm = angularHelper.getCurrentForm($scope);
+
+        if (currentForm) {
+
+            currentForm.$setDirty();
+        }
+    }
+
+    vm.setDirty = setFormDirty;
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Macros.EditController", MacrosEditController);
