@@ -25,6 +25,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "isContainer")]
         public bool IsContainer { get; set; }
 
+        [DataMember(Name = "isElement")]
+        public bool IsElement { get; set; }
+
         [DataMember(Name = "allowAsRoot")]
         public bool AllowAsRoot { get; set; }
 

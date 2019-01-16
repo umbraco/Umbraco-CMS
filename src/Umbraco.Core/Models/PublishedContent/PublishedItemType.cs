@@ -4,12 +4,17 @@
     /// The type of published element.
     /// </summary>
     /// <remarks>Can be a simple element, or a document, a media, a member.</remarks>
-    public enum PublishedItemType // fixme - need to rename to PublishedElementType but then conflicts?
+    public enum PublishedItemType
     {
         /// <summary>
         /// Unknown.
         /// </summary>
         Unknown = 0,
+
+        /// <summary>
+        /// An element.
+        /// </summary>
+        Element,
 
         /// <summary>
         /// A document.
