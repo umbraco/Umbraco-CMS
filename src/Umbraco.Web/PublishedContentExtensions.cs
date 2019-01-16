@@ -276,7 +276,7 @@ namespace Umbraco.Web
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
 
-            var actualCulture = culture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+            var actualCulture = culture ?? Current.VariationContextAccessor.VariationContext.Culture;
 
             return contents.Where(x=>x.HasCulture(actualCulture) || !x.Cultures.Any());
         }
