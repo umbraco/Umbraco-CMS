@@ -48,6 +48,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
                 .ForMember(dest => dest.IsContainer, opt => opt.MapFrom(src => src.ContentType.IsContainer))
+                .ForMember(dest => dest.IsElement, opt => opt.MapFrom(src => src.ContentType.IsElement))
                 .ForMember(dest => dest.IsBlueprint, opt => opt.MapFrom(src => src.Blueprint))
                 .ForMember(dest => dest.IsChildOfListView, opt => opt.ResolveUsing(childOfListViewResolver))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
@@ -160,6 +161,5 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
     }
-
 
 }
