@@ -18,7 +18,6 @@ namespace Umbraco.Core.Packaging
         private readonly PackageFileInstallation _packageFileInstallation;
         private readonly CompiledPackageXmlParser _parser;
         private readonly IPackageActionRunner _packageActionRunner;
-        private readonly DirectoryInfo _packageExtractionFolder;
         private readonly DirectoryInfo _applicationRootFolder;
 
         /// <summary>
@@ -31,11 +30,8 @@ namespace Umbraco.Core.Packaging
         /// <param name="applicationRootFolder">
         /// The root folder of the application
         /// </param>
-        /// <param name="packageExtractionFolder">
-        /// The destination root folder to extract the package files (generally the same as applicationRoot) but can be modified for testing
-        /// </param>
         public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IPackageActionRunner packageActionRunner,
-            DirectoryInfo applicationRootFolder, DirectoryInfo packageExtractionFolder)
+            DirectoryInfo applicationRootFolder)
         {
             _packageExtraction = new PackageExtraction();
             _packageFileInstallation = packageFileInstallation ?? throw new ArgumentNullException(nameof(packageFileInstallation));
@@ -43,7 +39,6 @@ namespace Umbraco.Core.Packaging
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
             _packageActionRunner = packageActionRunner ?? throw new ArgumentNullException(nameof(packageActionRunner));
             _applicationRootFolder = applicationRootFolder ?? throw new ArgumentNullException(nameof(applicationRootFolder));
-            _packageExtractionFolder = packageExtractionFolder ?? throw new ArgumentNullException(nameof(packageExtractionFolder));
         }
 
         public CompiledPackage ReadPackage(FileInfo packageFile)
@@ -69,7 +64,7 @@ namespace Umbraco.Core.Packaging
 
             var packageZipFile = compiledPackage.PackageFile;
 
-            var files = _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _packageExtractionFolder.FullName).ToList();
+            var files = _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _applicationRootFolder.FullName).ToList();
 
             packageDefinition.Files = files;
 

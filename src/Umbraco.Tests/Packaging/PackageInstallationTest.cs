@@ -50,8 +50,7 @@ namespace Umbraco.Tests.Packaging
             PackageDataInstallation,
             new PackageFileInstallation(Parser, ProfilingLogger),
             Parser, Mock.Of<IPackageActionRunner>(),
-            applicationRootFolder: new DirectoryInfo(IOHelper.GetRootDirectorySafe()),
-            packageExtractionFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
+            applicationRootFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
 
         private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
         private const string HelloPackage = "Hello_1.0.0.zip";
@@ -106,7 +105,6 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        [Explicit("Will fail on CI?")]
         public void Can_Read_Compiled_Package_Warnings()
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
