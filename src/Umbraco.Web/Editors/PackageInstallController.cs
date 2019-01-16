@@ -315,7 +315,7 @@ namespace Umbraco.Web.Editors
             var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
-            Current.RestartAppPool(Request.TryGetHttpContext().Result);
+            UmbracoApplication.Restart(Request.TryGetHttpContext().Result);
 
             model.IsRestarting = true;
 

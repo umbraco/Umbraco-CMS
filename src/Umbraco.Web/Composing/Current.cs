@@ -159,41 +159,6 @@ namespace Umbraco.Web.Composing
 
         #endregion
 
-        #region Web Actions
-
-        internal static void RestartAppPool()
-        {
-            // see notes in overload
-
-            var httpContext = HttpContext.Current;
-            if (httpContext != null)
-            {
-                httpContext.Application.Add("AppPoolRestarting", true);
-                httpContext.User = null;
-            }
-            Thread.CurrentPrincipal = null;
-            HttpRuntime.UnloadAppDomain();
-        }
-
-        internal static void RestartAppPool(HttpContextBase httpContext)
-        {
-            // we're going to put an application wide flag to show that the application is about to restart.
-            // we're doing this because if there is a script checking if the app pool is fully restarted, then
-            // it can check if this flag exists...  if it does it means the app pool isn't restarted yet.
-            httpContext.Application.Add("AppPoolRestarting", true);
-
-            // unload app domain - we must null out all identities otherwise we get serialization errors
-            // http://www.zpqrtbnk.net/posts/custom-iidentity-serialization-issue
-            httpContext.User = null;
-            if (HttpContext.Current != null)
-                HttpContext.Current.User = null;
-            Thread.CurrentPrincipal = null;
-
-            HttpRuntime.UnloadAppDomain();
-        }
-
-        #endregion
-
         #region Core Getters
 
         // proxy Core for convenience
