@@ -40,6 +40,7 @@ namespace Umbraco.Web
         /// <param name="indexName">Optional index name.</param>
         /// <remarks>
         /// <para>When the <paramref name="culture"/> is not specified, all cultures are searched.</para>
+        /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
         IEnumerable<PublishedSearchResult> Search(string term, string culture = null, string indexName = null);
 
@@ -54,17 +55,24 @@ namespace Umbraco.Web
         /// <param name="indexName">Optional index name.</param>
         /// <remarks>
         /// <para>When the <paramref name="culture"/> is not specified, all cultures are searched.</para>
+        /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
         IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = null, string indexName = null);
 
         /// <summary>
         /// Executes the query and converts the results to PublishedSearchResult.
         /// </summary>
+        /// <remarks>
+        /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
+        /// </remarks>
         IEnumerable<PublishedSearchResult> Search(IQueryExecutor query);
 
         /// <summary>
         /// Executes the query and converts the results to PublishedSearchResult.
         /// </summary>
+        /// <remarks>
+        /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
+        /// </remarks>
         IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords);
     }
 }

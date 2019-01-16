@@ -130,8 +130,7 @@
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
                     configureViewModel();
-                    //this is required to re-validate
-                    vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+                    reValidate()
 
                 }
             }
@@ -182,6 +181,8 @@
             else {
                 vm.onValueChanged({ value: [] });
             }
+
+            reValidate();
         }
 
         /**
@@ -189,7 +190,7 @@
          */
         function validateMandatory() {
             return {
-                isValid: !vm.validation.mandatory || (vm.viewModel != null && vm.viewModel.length > 0),
+                isValid: !vm.validation.mandatory || (vm.viewModel != null && vm.viewModel.length > 0)|| (vm.value != null && vm.value.length > 0),
                 errorMsg: "Value cannot be empty",
                 errorKey: "required"
             };
@@ -271,6 +272,10 @@
             });
         }
 
+        function reValidate() {
+            //this is required to re-validate
+            vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+        }
 
     }
 

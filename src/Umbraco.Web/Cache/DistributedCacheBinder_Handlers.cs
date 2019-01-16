@@ -142,8 +142,8 @@ namespace Umbraco.Web.Cache
                 () => ContentService.Saved -= ContentService_Saved);
             Bind(() => ContentService.Copied += ContentService_Copied, // needed for permissions
                 () => ContentService.Copied -= ContentService_Copied);
-            Bind(() => ContentService.TreeChanged += ContentService_Changed,// handles all content changes
-                () => ContentService.TreeChanged -= ContentService_Changed);
+            Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
+                () => ContentService.TreeChanged -= ContentService_TreeChanged);
 
             // TreeChanged should also deal with this
             //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
@@ -206,7 +206,7 @@ namespace Umbraco.Web.Cache
         {
         }
 
-        private void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
+        private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }

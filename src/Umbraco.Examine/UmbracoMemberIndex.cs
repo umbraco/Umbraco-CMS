@@ -32,35 +32,6 @@ namespace Umbraco.Examine
             base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, validator)
         {
         }
-
-        /// <summary>
-        /// Overridden to ensure that the umbraco system field definitions are in place
-        /// </summary>
-        /// <param name="indexValueTypesFactory"></param>
-        /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypesFactory = null)
-        {
-            var keyDef = new FieldDefinition("__key", FieldDefinitionTypes.Raw);
-            FieldDefinitionCollection.TryAdd(keyDef);
-
-            return base.CreateFieldValueTypes(indexValueTypesFactory);
-        }
-
-        /// <summary>
-        /// Ensure some custom values are added to the index
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
-        {
-            base.OnTransformingIndexValues(e);
-
-            if (e.ValueSet.Values.TryGetValue("key", out var key) && e.ValueSet.Values.ContainsKey("__key") == false)
-            {
-                //double __ prefix means it will be indexed as culture invariant
-                e.ValueSet.Values["__key"] = key;
-            }
-
-        }
-
+        
     }
 }

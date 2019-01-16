@@ -107,6 +107,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
+            entity.IsElement = dto.IsElement;
             entity.Trashed = dto.NodeDto.Trashed;
             entity.Variations = (ContentVariation) dto.Variations;
         }
@@ -132,6 +133,7 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 AllowAtRoot = entity.AllowedAsRoot,
                 IsContainer = entity.IsContainer,
+                IsElement = entity.IsElement,
                 Variations = (byte) entity.Variations,
                 NodeDto = BuildNodeDto(entity, nodeObjectType)
             };
