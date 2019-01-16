@@ -1205,7 +1205,6 @@
     <key alias="packageUpgradeInstructions">Руководство по обновлению</key>
     <key alias="packageUpgradeText">Для данного пакета доступно обновление. Вы можете загрузить это обновление непосредственно из центрального репозитория пакетов Umbraco.</key>
     <key alias="packageVersion">Версия пакета</key>
-    <key alias="packageVersionHistory">История версий пакета</key>
     <key alias="viewPackageWebsite">Перейти на веб-сайт пакета</key>
     <key alias="packageAlreadyInstalled">Этот пакет уже установлен в системе</key>
     <key alias="targetVersionMismatch">Этот пакет не может быть установлен, он требует наличия Umbraco версии как минимум</key>

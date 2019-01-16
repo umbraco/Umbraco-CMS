@@ -152,7 +152,8 @@ namespace Umbraco.Tests.PublishedContent
                 new TestDefaultCultureAccessor(),
                 dataSource,
                 globalSettings,
-                new SiteDomainHelper());
+                new SiteDomainHelper(),
+                Mock.Of<IEntityXmlSerializer>());
 
             // get a snapshot, get a published content
             var snapshot = snapshotService.CreatePublishedSnapshot(previewToken: null);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _logger = logger;
         }
 
-        public override InstallSetupResult Execute(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             if (_runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
@@ -43,10 +44,10 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             //upgrade is required so set the flag for the next step
-            return new InstallSetupResult(new Dictionary<string, object>
+            return Task.FromResult(new InstallSetupResult(new Dictionary<string, object>
             {
                 {"upgrade", true}
-            });
+            }));
         }
 
         internal static void HandleConnectionStrings(ILogger logger)
