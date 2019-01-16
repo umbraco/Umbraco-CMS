@@ -50,7 +50,7 @@ namespace Umbraco.Core.Packaging
                 DictionaryItems = xml.Element("dictionaryitems")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 DataTypes = xml.Element("datatypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 Files = xml.Element("files")?.Elements("file").Select(x => x.Value).ToList() ?? new List<string>(),
-                Control = xml.Element("loadcontrol")?.Value ?? string.Empty
+                PackageView = xml.Element("view")?.Value ?? string.Empty
             };
 
             return retVal;
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Packaging
                 new XElement("files", (def.Files ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("file", x))),
                 new XElement("languages", string.Join(",", def.Languages ?? Array.Empty<string>())),
                 new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())),
-                new XElement("loadcontrol", def.Control ?? string.Empty)); //fixme: no more loadcontrol, needs to be an angular view
+                new XElement("view", def.PackageView ?? string.Empty)); 
 
             return packageXml;
         }

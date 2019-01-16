@@ -264,14 +264,14 @@
                                 name="vm.package.loadControl"
                                 allow-edit="true"
                                 allow-remove="true"
-                                on-edit="vm.openControlPicker()"
-                                on-remove="vm.removeControl()">
+                                on-edit="vm.openViewPicker()"
+                                on-remove="vm.removePackageView()">
                             </umb-node-preview>
 
                             <a href=""
                                 ng-if="!vm.package.loadControl"
                                 class="umb-node-preview-add"
-                                ng-click="vm.openControlPicker()"
+                                ng-click="vm.openViewPicker()"
                                 prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>

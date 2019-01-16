@@ -180,10 +180,10 @@ namespace Umbraco.Core.Packaging
                     AppendFileToManifest(fileName, temporaryPath, filesXml);
 
                 //Load control on install...
-                if (!string.IsNullOrEmpty(definition.Control))
+                if (!string.IsNullOrEmpty(definition.PackageView))
                 {
-                    var control = new XElement("control", definition.Control);
-                    AppendFileToManifest(definition.Control, temporaryPath, filesXml);
+                    var control = new XElement("view", definition.PackageView);
+                    AppendFileToManifest(definition.PackageView, temporaryPath, filesXml);
                     manifestRoot.Add(control);
                 }
 

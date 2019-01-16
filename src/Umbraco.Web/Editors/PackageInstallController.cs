@@ -376,10 +376,11 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             var redirectUrl = "";
-            if (packageInfo.Control.IsNullOrWhiteSpace() == false)
+            if (!packageInfo.PackageView.IsNullOrWhiteSpace())
             {
-                //fixme: this needs to be replaced with an angular view the installer.aspx no longer exists.
-                //redirectUrl = string.Format("/developer/framed/{0}",
+                //fixme!
+                throw new NotImplementedException();
+                //redirectUrl = string.Format("/packages/framed/{0}",
                 //    Uri.EscapeDataString(
                 //        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
             }

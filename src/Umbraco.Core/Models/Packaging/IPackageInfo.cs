@@ -13,7 +13,12 @@ namespace Umbraco.Core.Models.Packaging
         string Author { get; }
         string AuthorUrl { get; }
         string Readme { get; }
-        string Control { get; } //fixme - this needs to be an angular view
+
+        /// <summary>
+        /// This is the angular view path that will be loaded when the package installs
+        /// </summary>
+        string PackageView { get; }
+
         string IconUrl { get; }
     }
 }

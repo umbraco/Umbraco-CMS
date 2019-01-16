@@ -19,8 +19,8 @@
         vm.openContentPicker = openContentPicker;
         vm.openFilePicker = openFilePicker;
         vm.removeFile = removeFile;
-        vm.openControlPicker = openControlPicker;
-        vm.removeControl = removeControl;
+        vm.openViewPicker = openViewPicker;
+        vm.removePackageView = removePackageView;
         vm.downloadFile = downloadFile;
 
         const packageId = $routeParams.id;
@@ -220,16 +220,16 @@
             vm.package.files.splice(index, 1);
         }
 
-        function openControlPicker() {
+        function openViewPicker() {
             const controlPicker = {
-                title: "Select control",
+                title: "Select view",
                 section: "settings",
                 treeAlias: "files",
                 entityType: "file",
                 onlyInitialized: false,
                 select: function(node) {
                     const id = unescape(node.id);
-                    vm.package.loadControl = id;
+                    vm.package.packageView = id;
                     editorService.close();
                 },
                 close: function() {
@@ -239,8 +239,8 @@
             editorService.treePicker(controlPicker);
         }
 
-        function removeControl() {
-            vm.package.loadControl = null;
+        function removePackageView() {
+            vm.package.packageView = null;
         }
 
         onInit();
