@@ -2,6 +2,6 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    interface IEntityContainerRepository : IReadRepository<int, EntityContainer>, IWriteRepository<EntityContainer>
+    public interface IEntityContainerRepository : IReadRepository<int, EntityContainer>, IWriteRepository<EntityContainer>
     { }
 }
