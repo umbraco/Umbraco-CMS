@@ -326,18 +326,18 @@ namespace Umbraco.Tests.PublishedContent
             }
         }
 
-        [Test]
-        public void Descendants_Ordered_Properly()
-        {
-            var doc = GetNode(1046);
-
-            var expected = new[] { 1046, 1173, 1174, 117, 1177, 1178, 1179, 1176, 1175, 4444, 1172 };
-            var exindex = 0;
-
-            // must respect the XPath descendants-or-self axis!
-            foreach (var d in doc.DescendantsOrSelf())
-                Assert.AreEqual(expected[exindex++], d.Id);
-        }
+//        [Test]
+//        public void Descendants_Ordered_Properly()
+//        {
+//            var doc = GetNode(1046);
+//
+//            var expected = new[] { 1046, 1173, 1174, 117, 1177, 1178, 1179, 1176, 1175, 4444, 1172 };
+//            var exindex = 0;
+//
+//            // must respect the XPath descendants-or-self axis!
+//            foreach (var d in doc.DescendantsOrSelf())
+//                Assert.AreEqual(expected[exindex++], d.Id);
+//        }
 
         [Test]
         public void Get_Property_Value_Recursive()
@@ -367,18 +367,18 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 
-        [Test]
-        public void Complex_Linq()
-        {
-            var doc = GetNode(1173);
-
-            var result = doc.Ancestors().OrderBy(x => x.Level)
-                .Single()
-                .Descendants()
-                .FirstOrDefault(x => x.Value<string>("selectedNodes", defaultValue: "").Split(',').Contains("1173"));
-
-            Assert.IsNotNull(result);
-        }
+//        [Test]
+//        public void Complex_Linq()
+//        {
+//            var doc = GetNode(1173);
+//
+//            var result = doc.Ancestors().OrderBy(x => x.Level)
+//                .Single()
+//                .Descendants()
+//                .FirstOrDefault(x => x.Value<string>("selectedNodes", defaultValue: "").Split(',').Contains("1173"));
+//
+//            Assert.IsNotNull(result);
+//        }
 
         [Test]
         public void Children_GroupBy_DocumentTypeAlias()
@@ -437,36 +437,36 @@ namespace Umbraco.Tests.PublishedContent
 
         }
 
-        [Test]
-        public void FirstChild()
-        {
-            var doc = GetNode(1173); // has child nodes
-            Assert.IsNotNull(doc.FirstChild());
-            Assert.IsNotNull(doc.FirstChild(x => true));
-            Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
+//        [Test]
+//        public void FirstChild()
+//        {
+//            var doc = GetNode(1173); // has child nodes
+//            Assert.IsNotNull(doc.FirstChild());
+//            Assert.IsNotNull(doc.FirstChild(x => true));
+//            Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
+//
+//            doc = GetNode(1175); // does not have child nodes
+//            Assert.IsNull(doc.FirstChild());
+//            Assert.IsNull(doc.FirstChild(x => true));
+//            Assert.IsNull(doc.FirstChild<IPublishedContent>());
+//        }
 
-            doc = GetNode(1175); // does not have child nodes
-            Assert.IsNull(doc.FirstChild());
-            Assert.IsNull(doc.FirstChild(x => true));
-            Assert.IsNull(doc.FirstChild<IPublishedContent>());
-        }
-
-        [Test]
-        public void FirstChildAsT()
-        {
-            var doc = GetNode(1046); // has child nodes
-
-            var model = doc.FirstChild<Home>(x => true); // predicate
-
-            Assert.IsNotNull(model);
-            Assert.IsTrue(model.Id == 1173);
-            Assert.IsInstanceOf<Home>(model);
-            Assert.IsInstanceOf<IPublishedContent>(model);
-
-            doc = GetNode(1175); // does not have child nodes
-            Assert.IsNull(doc.FirstChild<Anything>());
-            Assert.IsNull(doc.FirstChild<Anything>(x => true));
-        }
+//        [Test]
+//        public void FirstChildAsT()
+//        {
+//            var doc = GetNode(1046); // has child nodes
+//
+//            var model = doc.FirstChild<Home>(x => true); // predicate
+//
+//            Assert.IsNotNull(model);
+//            Assert.IsTrue(model.Id == 1173);
+//            Assert.IsInstanceOf<Home>(model);
+//            Assert.IsInstanceOf<IPublishedContent>(model);
+//
+//            doc = GetNode(1175); // does not have child nodes
+//            Assert.IsNull(doc.FirstChild<Anything>());
+//            Assert.IsNull(doc.FirstChild<Anything>(x => true));
+//        }
 
         [Test]
         public void IsComposedOf()
@@ -668,31 +668,31 @@ namespace Umbraco.Tests.PublishedContent
         }
 
 
-        [Test]
-        public void Descendants_Or_Self()
-        {
-            var doc = GetNode(1046);
-
-            var result = doc.DescendantsOrSelf().ToArray();
-
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(10, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
-        }
-
-        [Test]
-        public void Descendants()
-        {
-            var doc = GetNode(1046);
-
-            var result = doc.Descendants().ToArray();
-
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(9, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
-        }
+//        [Test]
+//        public void Descendants_Or_Self()
+//        {
+//            var doc = GetNode(1046);
+//
+//            var result = doc.DescendantsOrSelf().ToArray();
+//
+//            Assert.IsNotNull(result);
+//
+//            Assert.AreEqual(10, result.Count());
+//            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
+//        }
+//
+//        [Test]
+//        public void Descendants()
+//        {
+//            var doc = GetNode(1046);
+//
+//            var result = doc.Descendants().ToArray();
+//
+//            Assert.IsNotNull(result);
+//
+//            Assert.AreEqual(9, result.Count());
+//            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
+//        }
 
         [Test]
         public void IsDescendant()
