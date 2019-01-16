@@ -6,76 +6,24 @@
  * @description
  * The controller for editing macros.
  */
-function MacrosEditController($scope, $routeParams, macroResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, angularHelper) {
+function MacrosEditController($scope, $q, $routeParams, macroResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, angularHelper) {
 
     var vm = this;
 
+    vm.promises = {};
+    
     vm.page = {};
     vm.page.loading = false;
     vm.page.saveButtonState = "init";
     vm.page.menu = {}
 
-    vm.save = saveMacro;
-    vm.toggle = toggleValue;
-    
-
-    init();
-
-    function init() {
-        vm.page.loading = true;
-
-
-        vm.page.navigation = [                
-                {
-                    "name": "Settings",
-                    "alias": "settings",
-                    "icon": "icon-settings",
-                    "view": "views/macros/views/settings.html",
-                    "active": true
-                },
-                {
-                    "name": "Parameters",
-                    "alias": "parameters",
-                    "icon": "icon-list",
-                    "view": "views/macros/views/parameters.html"
-                }
-        ];
-
-        vm.macro = {
-            "name": "Test macro",
-            "alias": "testMacro",
-            "id": 1,
-            "key": "unique key goes here",
-            "useInEditor": true,
-            "renderInEditor": false,
-            "cachePeriod": 2400,
-            "cacheByPage": true,
-            "cacheByUser": false,
-            "view": "Second",
-            "parameters": [
-                {
-                    "key": "title",
-                    "label": "Label",
-                    "editor": "editor"                    
-                },
-                {
-                    "key": "link",
-                    "label": "Link",
-                    "editor": "Link picker"                   
-                }
-                ]
-        }
-
-        vm.views = ['First', 'Second', 'Third'];
-
-        vm.parameterEditors = ['editor', 'Link picker', 'Image picker'];
-
-        vm.page.loading = false;
-    }
+ 
 
     function toggleValue(key) {
         vm.macro[key] = !vm.macro[key];
     }
+
+    vm.toggle = toggleValue;
 
     function saveMacro() {
         vm.page.saveButtonState = "busy";
@@ -98,6 +46,8 @@ function MacrosEditController($scope, $routeParams, macroResource, editorState, 
         }
     }
 
+    vm.save = saveMacro;
+
     function setFormDirty() {
         var currentForm = angularHelper.getCurrentForm($scope);
 
@@ -108,6 +58,84 @@ function MacrosEditController($scope, $routeParams, macroResource, editorState, 
     }
 
     vm.setDirty = setFormDirty;
+
+    function getPartialViews() {
+        var deferred = $q.defer();
+
+        macroResource.getPartialViews().then(function (data) {
+            deferred.resolve(data);
+        }, function () {
+            deferred.reject();
+        });
+
+        return deferred.promise;
+    }
+
+    function init() {
+        vm.page.loading = true;
+
+        vm.promises['partialViews'] = getPartialViews();
+
+        $q.all(vm.promises).then(function (values) {
+            var keys = Object.keys(values);
+
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+
+                if (keys[i] === 'partialViews') {
+                    vm.views = values[key];
+                }
+            }
+
+            vm.page.loading = false;
+        });
+
+
+        vm.page.navigation = [
+            {
+                "name": "Settings",
+                "alias": "settings",
+                "icon": "icon-settings",
+                "view": "views/macros/views/settings.html",
+                "active": true
+            },
+            {
+                "name": "Parameters",
+                "alias": "parameters",
+                "icon": "icon-list",
+                "view": "views/macros/views/parameters.html"
+            }
+        ];
+
+        vm.macro = {
+            "name": "Test macro",
+            "alias": "testMacro",
+            "id": 1,
+            "key": "unique key goes here",
+            "useInEditor": true,
+            "renderInEditor": false,
+            "cachePeriod": 2400,
+            "cacheByPage": true,
+            "cacheByUser": false,
+            "view": "Second",
+            "parameters": [
+                {
+                    "key": "title",
+                    "label": "Label",
+                    "editor": "editor"
+                },
+                {
+                    "key": "link",
+                    "label": "Link",
+                    "editor": "Link picker"
+                }
+            ]
+        }
+
+        vm.parameterEditors = ['editor', 'Link picker', 'Image picker'];
+    }
+
+    init();      
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Macros.EditController", MacrosEditController);

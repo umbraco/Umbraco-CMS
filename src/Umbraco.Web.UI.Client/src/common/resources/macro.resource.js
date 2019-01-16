@@ -87,6 +87,13 @@ function macroResource($q, $http, umbRequestHelper) {
                 ),
                 'Failed to create macro "' + name + '"'
             );
+        },
+
+        getPartialViews: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetPartialViews"),
+                    "Failed to get partial views")
+            );
         }
     };
 }
