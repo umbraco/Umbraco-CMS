@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
 using System.Web;
 using Semver;
@@ -133,11 +132,6 @@ namespace Umbraco.Core
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
 
-        // currently configured via app settings
-        private static bool BoolSetting(string key, bool missing) => ConfigurationManager.AppSettings[key]?.InvariantEquals("true") ?? missing;
-        private bool InstallMissingDatabase { get; } = BoolSetting("Umbraco.Core.RuntimeState.InstallMissingDatabase", false);
-        private bool InstallEmptyDatabase { get; } = BoolSetting("Umbraco.Core.RuntimeState.InstallEmptyDatabase", false);
-
         /// <summary>
         /// Determines the runtime level.
         /// </summary>
@@ -185,7 +179,7 @@ namespace Umbraco.Core
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
-            var tries = InstallMissingDatabase ? 2 : 5;
+            var tries = RuntimeStateOptions.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = databaseFactory.CanConnect;
@@ -199,7 +193,7 @@ namespace Umbraco.Core
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<RuntimeState>("Could not connect to database.");
 
-                if (InstallMissingDatabase)
+                if (RuntimeStateOptions.InstallMissingDatabase)
                 {
                     // ok to install on a configured but missing database
                     Level = RuntimeLevel.Install;
@@ -228,7 +222,7 @@ namespace Umbraco.Core
                 // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
 
-                if (InstallEmptyDatabase)
+                if (RuntimeStateOptions.InstallEmptyDatabase)
                 {
                     // ok to install on an empty database
                     Level = RuntimeLevel.Install;

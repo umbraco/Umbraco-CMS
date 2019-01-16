@@ -512,6 +512,7 @@
     <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeLevelReason.cs" />
+    <Compile Include="RuntimeStateOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
