@@ -133,7 +133,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Document Types">
-                            <div ng-repeat="doctype in vm.documentTypes">
+                            <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
                                 <label>
                                     <input
                                         type="checkbox"
@@ -146,7 +146,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Templates">
-                            <div ng-repeat="template in vm.templates">
+                            <div ng-repeat="template in ::vm.templates | orderBy:'name'">
                                 <label>
                                     <input
                                         type="checkbox"
@@ -158,7 +158,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Stylesheets">
-                            <div ng-repeat="stylesheet in vm.stylesheets">
+                            <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
                                 <label>
                                     <input
                                         type="checkbox"
@@ -170,7 +170,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Macros">
-                            <div ng-repeat="macro in vm.macros">
+                            <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
                                 <label>
                                     <input type="checkbox"
                                            checklist-model="vm.package.macros"
@@ -182,7 +182,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Languages">
-                            <div ng-repeat="language in vm.languages">
+                            <div ng-repeat="language in ::vm.languages | orderBy:'name'">
                                 <label>
                                     <input
                                         type="checkbox"
@@ -194,7 +194,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Dictionary Items">
-                            <div ng-repeat="dictionaryItem in vm.dictionaryItems">
+                            <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
                                 <label>
                                     <input
                                         type="checkbox"
@@ -206,7 +206,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="Data Types">
-                            <div ng-repeat="dataType in vm.dataTypes">
+                            <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
                                 <label>
                                     <input
                                         type="checkbox"

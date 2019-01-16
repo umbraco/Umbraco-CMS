@@ -44,7 +44,7 @@ namespace Umbraco.Core.Services.Implement
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
             IPackageInstallation packageInstallation)
-        {   
+        {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _installedPackages = installedPackages;
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Services.Implement
             if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
             var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId).ToList();
-            
+
             SaveInstalledPackage(packageDefinition);
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package files installed for package '{compiledPackage.Name}'.");
@@ -141,16 +141,44 @@ namespace Umbraco.Core.Services.Implement
             return summary;
         }
 
-        public UninstallationSummary UninstallPackage(PackageDefinition package, int userId = 0)
+        public UninstallationSummary UninstallPackage(string packageName, int userId = 0)
         {
-            var summary = _packageInstallation.UninstallPackage(package, userId);
-            
-            SaveInstalledPackage(package);
+            //this is ordered by descending version
+            var allPackageVersions = GetInstalledPackageByName(packageName)?.ToList();
+            if (allPackageVersions == null || allPackageVersions.Count == 0)
+                throw new InvalidOperationException("No installed package found by name " + packageName);
 
-            DeleteInstalledPackage(package.Id, userId);
+            var summary = new UninstallationSummary
+            {
+                MetaData = allPackageVersions[0]
+            };
+
+            var allSummaries = new List<UninstallationSummary>();
+
+            foreach (var packageVersion in allPackageVersions)
+            {
+                var versionUninstallSummary = _packageInstallation.UninstallPackage(packageVersion, userId);
+
+                allSummaries.Add(versionUninstallSummary);
+
+                //merge the summary
+                summary.ActionErrors = summary.ActionErrors.Concat(versionUninstallSummary.ActionErrors).Distinct().ToList();
+                summary.Actions = summary.Actions.Concat(versionUninstallSummary.Actions).Distinct().ToList();
+                summary.DataTypesUninstalled = summary.DataTypesUninstalled.Concat(versionUninstallSummary.DataTypesUninstalled).Distinct().ToList();
+                summary.DictionaryItemsUninstalled = summary.DictionaryItemsUninstalled.Concat(versionUninstallSummary.DictionaryItemsUninstalled).Distinct().ToList();
+                summary.DocumentTypesUninstalled = summary.DocumentTypesUninstalled.Concat(versionUninstallSummary.DocumentTypesUninstalled).Distinct().ToList();
+                summary.FilesUninstalled = summary.FilesUninstalled.Concat(versionUninstallSummary.FilesUninstalled).Distinct().ToList();
+                summary.LanguagesUninstalled = summary.LanguagesUninstalled.Concat(versionUninstallSummary.LanguagesUninstalled).Distinct().ToList();
+                summary.MacrosUninstalled = summary.MacrosUninstalled.Concat(versionUninstallSummary.MacrosUninstalled).Distinct().ToList();
+                summary.StylesheetsUninstalled = summary.StylesheetsUninstalled.Concat(versionUninstallSummary.StylesheetsUninstalled).Distinct().ToList();
+                summary.TemplatesUninstalled = summary.TemplatesUninstalled.Concat(versionUninstallSummary.TemplatesUninstalled).Distinct().ToList();
+
+                SaveInstalledPackage(packageVersion);
+                DeleteInstalledPackage(packageVersion.Id, userId);
+            }
 
             // trigger the UninstalledPackage event
-            UninstalledPackage.RaiseEvent(new UninstallPackageEventArgs<UninstallationSummary>(summary, package, false), this);
+            UninstalledPackage.RaiseEvent(new UninstallPackageEventArgs(allSummaries, false), this);
 
             return summary;
         }
@@ -181,9 +209,9 @@ namespace Umbraco.Core.Services.Implement
 
         public PackageDefinition GetInstalledPackageById(int id) => _installedPackages.GetById(id);
 
-        public PackageDefinition GetInstalledPackageByName(string name)
+        public IEnumerable<PackageDefinition> GetInstalledPackageByName(string name)
         {
-            var found = _installedPackages.GetAll().FirstOrDefault(x => x.Name.InvariantEquals(name));
+            var found = _installedPackages.GetAll().Where(x => x.Name.InvariantEquals(name)).OrderByDescending(x => SemVersion.Parse(x.Version));
             return found;
         }
 
@@ -192,7 +220,8 @@ namespace Umbraco.Core.Services.Implement
             if (packageName == null) throw new ArgumentNullException(nameof(packageName));
             if (packageVersion == null) throw new ArgumentNullException(nameof(packageVersion));
 
-            alreadyInstalled = GetInstalledPackageByName(packageName);
+            //get the latest version installed 
+            alreadyInstalled = GetInstalledPackageByName(packageName)?.OrderByDescending(x => SemVersion.Parse(x.Version)).FirstOrDefault();
             if (alreadyInstalled == null) return PackageInstallType.NewInstall;
 
             if (!SemVersion.TryParse(alreadyInstalled.Version, out var installedVersion))
@@ -203,62 +232,6 @@ namespace Umbraco.Core.Services.Implement
 
             //it's an upgrade
             return PackageInstallType.Upgrade;
-        }
-
-        public PackageDefinition MergePackageDefinition(PackageDefinition original, PackageDefinition upgrade)
-        {
-            if (!SemVersion.TryParse(original.Version, out var originalVersion))
-                throw new InvalidOperationException("Could not parse the original version");
-            if(!SemVersion.TryParse(upgrade.Version, out var upgradeVersion))
-                throw new InvalidOperationException("Could not parse the upgrade version");
-            if (originalVersion >= upgradeVersion)
-                throw new InvalidOperationException("The upgrade version must be higher than the original version");
-            if (!original.Name.InvariantEquals(upgrade.Name))
-                throw new InvalidOperationException("Cannot merge the package definitions, the package name doesn't match");
-
-            var result = original.Clone();
-
-            result.PackagePath = upgrade.PackagePath;
-            result.PackageId = upgrade.PackageId;
-
-            result.UmbracoVersion = upgrade.UmbracoVersion;
-            result.Version = upgrade.Version;
-            result.Url = upgrade.Url;
-            result.Readme = upgrade.Readme;
-            result.AuthorUrl = upgrade.AuthorUrl;
-            result.Author = upgrade.Author;
-            result.LicenseUrl = upgrade.LicenseUrl;
-            result.PackageId = upgrade.PackageId;
-            result.Control = upgrade.Control;
-            result.IconUrl = upgrade.IconUrl;
-            result.License = upgrade.License;
-            result.ContentNodeId = upgrade.ContentNodeId;
-            result.ContentLoadChildNodes = upgrade.ContentLoadChildNodes;
-
-            result.Files = original.Files.Concat(upgrade.Files).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
-            result.DataTypes = original.DataTypes.Concat(upgrade.DataTypes).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
-            result.Templates = original.Templates.Concat(upgrade.Templates).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
-            result.Languages = original.Languages.Concat(upgrade.Languages).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();            
-            result.Macros = original.Macros.Concat(upgrade.Macros).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
-            result.Stylesheets = original.Stylesheets.Concat(upgrade.Stylesheets).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
-            result.DocumentTypes = original.DocumentTypes.Concat(upgrade.DocumentTypes).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList(); 
-            result.DictionaryItems = original.DictionaryItems.Concat(upgrade.DictionaryItems).Distinct(StringComparer.InvariantCultureIgnoreCase).ToList();
-
-            var originalActions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(result.Actions), result.Name);
-            var upgradeActions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(upgrade.Actions), result.Name).ToList();
-            var upgradeActionsLookup = upgradeActions.ToLookup(x => x.Alias, x => x.XmlData.ToString());
-
-            foreach (var originalAction in originalActions)
-            {
-                var upgradeActionsWithAlias = upgradeActionsLookup[originalAction.Alias];
-
-                //check if the original action does not exist already in our upgrade actions
-                if(upgradeActionsWithAlias.All(upgradeActionXml => upgradeActionXml != originalAction.XmlData.ToString()))
-                    upgradeActions.Add(originalAction);
-            }
-            result.Actions = new XElement("actions", upgradeActions.Select(x => x.XmlData)).ToString();
-
-            return result;
         }
 
         public bool SaveInstalledPackage(PackageDefinition definition) => _installedPackages.SavePackage(definition);
@@ -289,10 +262,10 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs after a package is uninstalled
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs<UninstallationSummary>> UninstalledPackage;
+        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs> UninstalledPackage;
 
         #endregion
 
-        
+
     }
 }

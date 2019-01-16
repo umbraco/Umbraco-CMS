@@ -37,15 +37,35 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
 
-        UninstallationSummary UninstallPackage(PackageDefinition packageDefinition, int userId = 0);
+        /// <summary>
+        /// Uninstalls all versions of the package by name
+        /// </summary>
+        /// <param name="packageName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        UninstallationSummary UninstallPackage(string packageName, int userId = 0);
 
         #endregion
 
         #region Installed Packages
 
         IEnumerable<PackageDefinition> GetAllInstalledPackages();
+
+        /// <summary>
+        /// Returns the <see cref="PackageDefinition"/> for the installation id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         PackageDefinition GetInstalledPackageById(int id);
-        PackageDefinition GetInstalledPackageByName(string name);
+
+        /// <summary>
+        /// Returns all <see cref="PackageDefinition"/> for the package by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>
+        /// A list of all package definitions installed for this package (i.e. original install and any upgrades)
+        /// </returns>
+        IEnumerable<PackageDefinition> GetInstalledPackageByName(string name);
 
         /// <summary>
         /// Returns a <see cref="PackageInstallType"/> for a given package name and version
@@ -56,14 +76,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled);
         void DeleteInstalledPackage(int packageId, int userId = 0);
-
-        /// <summary>
-        /// Merges the package definition information from the upgrade on to the original and returns the merged definition
-        /// </summary>
-        /// <param name="original"></param>
-        /// <param name="upgrade"></param>
-        /// <returns></returns>
-        PackageDefinition MergePackageDefinition(PackageDefinition original, PackageDefinition upgrade);
 
         /// <summary>
         /// Persists a package definition to storage

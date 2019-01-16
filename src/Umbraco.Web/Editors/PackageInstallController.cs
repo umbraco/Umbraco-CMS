@@ -76,7 +76,7 @@ namespace Umbraco.Web.Editors
                 var package = Services.PackagingService.GetInstalledPackageById(packageId);
                 if (package == null) return NotFound();
 
-                var summary = Services.PackagingService.UninstallPackage(package);
+                var summary = Services.PackagingService.UninstallPackage(package.Name, Security.GetUserId().ResultOr(0));
 
                 //now get all other packages by this name since we'll uninstall all versions
                 foreach (var installed in Services.PackagingService.GetAllInstalledPackages()
@@ -283,22 +283,13 @@ namespace Umbraco.Web.Editors
                 case PackageInstallType.AlreadyInstalled:
                     throw new InvalidOperationException("The package is already installed");
                 case PackageInstallType.NewInstall:
-                    
-                    //save to the installedPackages.config
+                case PackageInstallType.Upgrade:
+
+                    //save to the installedPackages.config, this will create a new entry with a new Id
                     if (!Services.PackagingService.SaveInstalledPackage(packageDefinition))
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Could not save the package"));
 
                     model.Id = packageDefinition.Id;
-                    break;
-                case PackageInstallType.Upgrade:
-
-                    //we need to append any changes from the new packageDefinition to the alreadyInstalled definition
-                    var mergedDefinition = Services.PackagingService.MergePackageDefinition(alreadyInstalled, packageDefinition);
-
-                    //update the installedPackages.config with the upgrade definition
-                    if (!Services.PackagingService.SaveInstalledPackage(packageDefinition))
-                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Could not save the package"));
-
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

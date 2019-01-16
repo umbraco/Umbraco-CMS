@@ -228,14 +228,17 @@ namespace Umbraco.Core.Packaging
                 }
 
                 var content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], null, parentId);
+                if (content == null) continue;
+
                 contents.Add(content);
 
                 var children = (from child in root.Elements()
                                 where (string)child.Attribute("isDoc") == ""
                                 select child)
                     .ToList();
-                if (children.Any())
-                    contents.AddRange(CreateContentFromXml(children, content, importedContentTypes));
+
+                if (children.Count > 0)
+                    contents.AddRange(CreateContentFromXml(children, content, importedContentTypes).WhereNotNull());
             }
             return contents;
         }
@@ -258,7 +261,7 @@ namespace Umbraco.Core.Packaging
                 list.Add(content);
 
                 //Recursive call
-                XElement child1 = child;
+                var child1 = child;
                 var grandChildren = (from grand in child1.Elements()
                                      where (string)grand.Attribute("isDoc") == ""
                                      select grand).ToList();
@@ -272,36 +275,42 @@ namespace Umbraco.Core.Packaging
 
         private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId)
         {
+            var key = Guid.Empty;
+            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
+            {
+                //if a Key is supplied, then we need to check if the content already exists and if so we ignore the installation for this item
+                if (_contentService.GetById(key) != null)
+                    return null;
+            }
+
             var id = element.Attribute("id").Value;
             var level = element.Attribute("level").Value;
             var sortOrder = element.Attribute("sortOrder").Value;
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
-            //TODO: Shouldn't we be using this value???
-            var template = element.Attribute("template").Value;
-            var key = Guid.Empty;
-
+            var templateId = element.AttributeValue<int?>("template");
+            
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
+
+            var template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
 
             IContent content = parent == null
                 ? new Content(nodeName, parentId, contentType)
                 {
                     Level = int.Parse(level),
-                    SortOrder = int.Parse(sortOrder)
+                    SortOrder = int.Parse(sortOrder),
+                    TemplateId = template?.Id,
+                    Key = key
                 }
                 : new Content(nodeName, parent, contentType)
                 {
                     Level = int.Parse(level),
-                    SortOrder = int.Parse(sortOrder)
+                    SortOrder = int.Parse(sortOrder),
+                    TemplateId = template?.Id,
+                    Key = key
                 };
-
-            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
-            {
-                // update the Guid (for UDI support)
-                content.Key = key;
-            }
 
             foreach (var property in properties)
             {

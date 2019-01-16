@@ -120,11 +120,6 @@ namespace Umbraco.Core.Packaging
 
             if (definition.Id == default)
             {
-                //check if the name already exists
-                var existsByName = packagesXml.Root.Elements("package").Any(x => x.AttributeValue<string>("name") == definition.Name);
-                if (existsByName)
-                    return false;
-
                 //need to gen an id and persist
                 // Find max id
                 var maxId = packagesXml.Root.Elements("package").Max(x => x.AttributeValue<int?>("id")) ?? 0;

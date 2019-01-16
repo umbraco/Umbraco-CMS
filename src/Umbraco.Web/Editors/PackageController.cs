@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
+using Semver;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Web.Models.ContentEditing;
@@ -125,9 +126,9 @@ namespace Umbraco.Web.Editors
                     //group by name
                     x => x.Name,
                     //select the package with a parsed version
-                    pck => Version.TryParse(pck.Version, out var pckVersion)
+                    pck => SemVersion.TryParse(pck.Version, out var pckVersion)
                         ? new { package = pck, version = pckVersion }
-                        : new { package = pck, version = new Version(0, 0, 0) })
+                        : new { package = pck, version = new SemVersion(0, 0, 0) })
                 .Select(grouping =>
                 {
                     //get the max version for the package

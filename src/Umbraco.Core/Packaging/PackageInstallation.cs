@@ -76,12 +76,13 @@ namespace Umbraco.Core.Packaging
             return files;
         }
 
+        /// <inheritdoc />
         public UninstallationSummary UninstallPackage(PackageDefinition package, int userId)
         {
             //running this will update the PackageDefinition with the items being removed
             var summary = _packageDataInstallation.UninstallPackageData(package, userId);
 
-            summary.Actions = _parser.GetPackageActions(XElement.Parse(package.Actions), package.Name);
+            summary.Actions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(package.Actions), package.Name);
 
             //run actions before files are removed
             summary.ActionErrors = UndoPackageActions(package, summary.Actions).ToList();
@@ -109,7 +110,7 @@ namespace Umbraco.Core.Packaging
 
             installationSummary.StylesheetsInstalled = _packageDataInstallation.ImportStylesheets(compiledPackage.Stylesheets, userId);
             installationSummary.ContentInstalled = _packageDataInstallation.ImportContent(compiledPackage.Documents, importedDocTypes, userId);
-            installationSummary.Actions = _parser.GetPackageActions(XElement.Parse(compiledPackage.Actions), compiledPackage.Name);
+            installationSummary.Actions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(compiledPackage.Actions), compiledPackage.Name);
             installationSummary.MetaData = compiledPackage;
             installationSummary.FilesInstalled = packageDefinition.Files;
             

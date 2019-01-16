@@ -8,7 +8,7 @@ namespace Umbraco.Core.Packaging
     public interface IPackageInstallation
     {
         /// <summary>
-        /// Uninstalls a package including all data, entities and files
+        /// This will run the uninstallation sequence for this <see cref="PackageDefinition"/>
         /// </summary>
         /// <param name="packageDefinition"></param>
         /// <param name="userId"></param>
