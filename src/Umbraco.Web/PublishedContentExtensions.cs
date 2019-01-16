@@ -1023,21 +1023,15 @@ namespace Umbraco.Web
         #region Axes: children
 
 
-        private static IEnumerable<IPublishedContent> WhereHasCulture(this IEnumerable<IPublishedContent> contents, string culture = null)
+        private static IEnumerable<IPublishedContent> WhereHasCultureOrInvariant(this IEnumerable<IPublishedContent> contents, string culture = null)
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
 
-            var actualCulture = culture ?? GetCurrentCulture();
+            var actualCulture = culture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            return contents.Where(x=>x.HasCulture(actualCulture) ||x.HasCulture(null));
+            return contents.Where(x=>x.HasCulture(actualCulture) || !x.Cultures.Any());
         }
 
-        private static string GetCurrentCulture()
-        {
-
-            //Review: is this the correct way to get the current culture?
-            return System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
-        }
 
         /// <summary>
         /// Gets the children of the content.
@@ -1051,7 +1045,7 @@ namespace Umbraco.Web
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return content.Children.WhereHasCulture(culture);
+            return content.Children.WhereHasCultureOrInvariant(culture);
         }
 
         /// <summary>
