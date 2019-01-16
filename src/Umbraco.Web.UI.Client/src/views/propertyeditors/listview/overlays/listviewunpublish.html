@@ -14,7 +14,7 @@
                 
             <div class="umb-list umb-list--condensed">
         
-                <div class="umb-list-item" ng-repeat="language in vm.languages">
+                <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
                     <ng-form name="unpublishLanguageSelectorForm">
                         <div class="flex">
                             <input id="{{language.culture}}"
