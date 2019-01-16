@@ -52,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var (packageFile, packageId) = await DownloadPackageFilesAsync(starterKitId.Value);
 
-            Current.RestartAppPool();
+            UmbracoApplication.Restart();
 
             return new InstallSetupResult(new Dictionary<string, object>
             {

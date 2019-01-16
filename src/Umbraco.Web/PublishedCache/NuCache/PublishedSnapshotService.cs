@@ -101,6 +101,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
+
+            // we need an Xml serializer here so that the member cache can support XPath,
+            // for members this is done by navigating the serialized-to-xml member
             _entitySerializer = entitySerializer;
 
             // we always want to handle repository events, configured or not

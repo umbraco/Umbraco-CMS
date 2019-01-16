@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
         public EntityXmlSerializer(
             IContentService contentService,
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services.Implement
             IUserService userService,
             ILocalizationService localizationService,
             IContentTypeService contentTypeService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            UrlSegmentProviderCollection urlSegmentProviders)
         {
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
