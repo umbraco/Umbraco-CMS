@@ -257,10 +257,8 @@
                     error)
                 .then(function (result) {
 
-                    if (result.postInstallationPath) {
-                        //Put the redirect Uri in a cookie so we can use after reloading
-                        localStorageService.set("packageInstallUri", result.postInstallationPath);
-                    }
+                    //Put the package data in local storage so we can use after reloading
+                    localStorageService.set("packageInstallData", result);
 
                     vm.installState.status = labels.installStateCompleted;
                     vm.installCompleted = true;

@@ -130,7 +130,7 @@
         }
 
         function back() {
-            $location.path("packages/packages/created").search("create", null);
+            $location.path("packages/packages/created").search("create", null).search("packageId", null);
         }
 
         function createOrUpdatePackage(editPackageForm) {

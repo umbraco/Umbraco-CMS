@@ -36,7 +36,8 @@
         }
 
         function packageOptions(pck) {
-            $location.path("packages/packages/options/" + pck.id);
+            $location.path("packages/packages/options/" + pck.id)
+                .search("packageId", null); //ensure the installId flag is gone, it's only available on first install
         }
 
         function confirmUninstall(pck) {
@@ -56,7 +57,7 @@
                         vm.installState.progress = "100";
 
                         //set this flag so that on refresh it shows the installed packages list
-                        localStorageService.set("packageInstallUri", "installed");
+                        localStorageService.set("packageInstallData", "installed");
                         
                         //reload on next digest (after cookie)
                         $timeout(function () {

@@ -15,6 +15,10 @@
 
             packageResource.getInstalledById(packageId).then(pck => {
                 vm.package = pck;
+
+                //set the $scope too, packages can then access this if they wanted from their own scope or parent scope
+                $scope.package = pck;
+
                 vm.loading = false;
 
                 //make sure the packageView is formatted as a virtual path
@@ -30,7 +34,7 @@
         }
 
         function back() {
-            $location.path("packages/packages/installed");
+            $location.path("packages/packages/installed").search("packageId", null);
         }
 
 

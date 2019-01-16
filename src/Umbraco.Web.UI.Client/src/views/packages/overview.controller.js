@@ -4,26 +4,26 @@
     function PackagesOverviewController($scope, $location, $routeParams, localStorageService) {
 
         //Hack!
-        // if there is a cookie value for packageInstallUri then we need to redirect there,
+        // if there is a local storage value for packageInstallData then we need to redirect there,
         // the issue is that we still have webforms and we cannot go to a hash location and then window.reload
         // because it will double load it.
         // we will refresh and then navigate there.
 
-        let installPackageUri = localStorageService.get("packageInstallUri");
+        let packageInstallData = localStorageService.get("packageInstallData");
         let packageUri = $routeParams.method;
 
-        if (installPackageUri) {            
-            localStorageService.remove("packageInstallUri");                       
+        if (packageInstallData) {            
+            localStorageService.remove("packageInstallData");                       
         }
 
-        if (installPackageUri && installPackageUri !== "installed") {
+        if (packageInstallData && packageInstallData !== "installed" && packageInstallData.postInstallationPath) {
             //navigate to the custom installer screen, if it is just "installed" it means there is no custom installer screen
-            $location.path(installPackageUri).search("");
+            $location.path(packageInstallData.postInstallationPath).search("packageId", packageInstallData.id);
         }
         else {
             var vm = this;
 
-            packageUri = installPackageUri ? installPackageUri : packageUri; //use the path stored in storage over the one in the current path
+            packageUri = packageInstallData ? packageInstallData : packageUri; //use the path stored in storage over the one in the current path
 
             vm.page = {};
             vm.page.name = "Packages";
