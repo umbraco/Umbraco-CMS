@@ -839,8 +839,6 @@ namespace Umbraco.Web.Editors
                     return UmbracoObjectTypes.MediaType;
                 case UmbracoEntityTypes.DocumentType:
                     return UmbracoObjectTypes.DocumentType;
-                case UmbracoEntityTypes.Stylesheet:
-                    return UmbracoObjectTypes.Stylesheet;
                 case UmbracoEntityTypes.Member:
                     return UmbracoObjectTypes.Member;
                 case UmbracoEntityTypes.DataType:
@@ -912,13 +910,31 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.User:
 
-                    long total;
-                    var users = Services.UserService.GetAll(0, int.MaxValue, out total);
+                    var users = Services.UserService.GetAll(0, int.MaxValue, out _);
                     var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
                     return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
 
-                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Stylesheet:
+
+                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                        throw new NotSupportedException("Filtering on stylesheets is not currently supported");
+
+                    return Services.FileService.GetStylesheets().Select(Mapper.Map<EntityBasic>);
+                
                 case UmbracoEntityTypes.Language:
+
+                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                        throw new NotSupportedException("Filtering on languages is not currently supported");
+
+                    return Services.LocalizationService.GetAllLanguages().Select(Mapper.Map<EntityBasic>);
+                case UmbracoEntityTypes.DictionaryItem:
+
+                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                        throw new NotSupportedException("Filtering on languages is not currently supported");
+
+                    return GetAllDictionaryItems();
+
+                case UmbracoEntityTypes.Domain:
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }
@@ -937,5 +953,36 @@ namespace Umbraco.Web.Editors
             }
             return entities;
         }
+
+
+        #region Methods to get all dictionary items
+        private IEnumerable<EntityBasic> GetAllDictionaryItems()
+        {
+            var list = new List<EntityBasic>();
+
+            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems().OrderBy(DictionaryItemSort()))
+            {
+                var item = Mapper.Map<IDictionaryItem, EntityBasic>(dictionaryItem);
+                list.Add(item);
+                GetChildItemsForList(dictionaryItem, list);
+            }
+
+            return list;
+        }
+
+        private static Func<IDictionaryItem, string> DictionaryItemSort() => item => item.ItemKey;
+
+        private void GetChildItemsForList(IDictionaryItem dictionaryItem, ICollection<EntityBasic> list)
+        {
+            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(DictionaryItemSort()))
+            {
+                var item = Mapper.Map<IDictionaryItem, EntityBasic>(childItem);
+                list.Add(item);
+
+                GetChildItemsForList(childItem, list);
+            }
+        } 
+        #endregion
+
     }
 }
