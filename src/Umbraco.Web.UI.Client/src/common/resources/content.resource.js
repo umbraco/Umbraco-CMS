@@ -337,6 +337,29 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             'Failed to retrieve data for content id ' + id);
         },
 
+        getNotifySettingsById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetNotificationOptions",
+                        [{ contentId: id }])),
+                'Failed to retrieve data for content id ' + id);
+        },
+
+        setNotifySettingsById: function (id, options) {
+            if (!id) {
+                throw "contentId cannot be null";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "PostNotificationOptions",
+                        { contentId: id, notifyOptions: options })),
+                'Failed to set notify settings for content id ' + id);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getByIds

@@ -37,6 +37,7 @@ namespace Umbraco.Core.IO
             }
         }
 
+        [Obsolete("This file is no longer used and should not be accessed!")]
         public static string MetablogConfig
         {
             get

@@ -40,6 +40,32 @@
                         { searchTerm: searchTerm, page: pageIndex, pageSize: pageSize })),
                 'Failed to retrieve data for searching redirect urls');
         }
+        /**
+   * @ngdoc function
+   * @name umbraco.resources.redirectUrlResource#getRedirectsForContentItem
+   * @methodOf umbraco.resources.redirectUrlResource
+   * @function
+   *
+   * @description
+   * Used to retrieve RedirectUrls for a specific item of content for Information tab
+   * ##usage
+   * <pre>
+   * redirectUrlsResource.getRedirectsForContentItem("udi:123456")
+   *    .then(function(response) {
+   *
+   *    });
+   * </pre>
+   * @param {String} contentUdi identifier for the content item to retrieve redirects for
+   */
+        function getRedirectsForContentItem(contentUdi) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "RedirectUrlsForContentItem",
+                        { contentUdi: contentUdi })),
+                'Failed to retrieve redirects for content: ' + contentUdi);
+        }
 
         function getEnableState() {
 
@@ -50,7 +76,7 @@
                         "GetEnableState")),
                 'Failed to retrieve data to check if the 301 redirect is enabled');
         }
-
+     
         /**
          * @ngdoc function
          * @name umbraco.resources.redirectUrlResource#deleteRedirectUrl
@@ -107,7 +133,8 @@
             searchRedirectUrls: searchRedirectUrls,
             deleteRedirectUrl: deleteRedirectUrl,
             toggleUrlTracker: toggleUrlTracker,
-            getEnableState: getEnableState
+            getEnableState: getEnableState,
+            getRedirectsForContentItem: getRedirectsForContentItem
         };
 
         return resource;

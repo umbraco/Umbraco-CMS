@@ -10,36 +10,86 @@
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && currentNodePermissions.canCreate">
-                   <div class="btn-group" ng-show="listViewAllowedTypes.length > 1">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
+
+                   <div class="btn-group" ng-show="createAllowedButtonSingle">
+                       <a class="btn" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
+                           <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
+                       </a>
+                   </div>
+
+                   <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints">
+                       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                           <span ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
+                               <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
+                           </span>
+                           <span class="caret"></span>
+                       </a>
+
+                       <ul class="dropdown-menu">
+                           <li ng-repeat="(key, value) in listViewAllowedTypes[0].blueprints">
+                               <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].blueprints.alias, key)">
+                                   <i class="{{listViewAllowedTypes[0].icon}}"></i>
+                                   {{value}}
+                               </a>
+                           </li>
+                       </ul>
+                   </div>
+
+                   <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
                        </a>
                        <ul class="dropdown-menu">
                            <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
-                               <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
-                                   <i class="icon-{{contentType.cssClass}}"></i>
-                                   {{contentType.name}}
+                               <a href="" ng-click="createBlank(entityType,contentType.alias)" prevent-default>
+                                   <i class="{{contentType.icon}}"></i>
+                                   {{contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
+                               </a>
+                               <a href="" ng-repeat="(key, value) in contentType.blueprints" ng-click="createFromBlueprint(entityType,contentType.alias , key)" prevent-default>
+                                   &nbsp;&nbsp;<i class="{{contentType.icon}}"></i>
+                                   {{value}}
                                </a>
                            </li>
                        </ul>
                    </div>
-                   <div class="btn-group" ng-show="listViewAllowedTypes.length === 1">
-                       <a class="btn" href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{listViewAllowedTypes[0].alias}}&create=true">
-                           <i class="icon-{{listViewAllowedTypes[0].cssClass}}"></i>
-                           <localize key="actions_create">Create</localize> {{ listViewAllowedTypes[0].name }}
-                       </a>
-                   </div>
+
+                   <ul class="umb-actions umb-actions-child">
+
+                       <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
+                           <a ng-click="createFromBlueprint(key)">
+                               <i class="large {{docType.icon}}"></i>
+                               <span class="menu-label">
+                                   {{value}}
+                               </span>
+                           </a>
+                       </li>
+
+                       <li class="sep" ng-show="allowBlank">
+                           <a ng-click="createBlank(docType)">
+                               <i class="large {{docType.icon}}"></i>
+                               <span class="menu-label">
+                                   <localize key="blueprints_blankBlueprint">Blank</localize>
+                               </span>
+                           </a>
+                       </li>
+
+                   </ul>
+
+
+
                </umb-editor-sub-header-section>
 
+
+
+
                <umb-editor-sub-header-section ng-if="isAnythingSelected()">
-                   <umb-button
-                       type="button"
-                       label="Clear selection"
-                       label-key="buttons_clearSelection"
-                       action="clearSelection()"
-                       disabled="actionInProgress">
+                   <umb-button type="button"
+                               label="Clear selection"
+                               label-key="buttons_clearSelection"
+                               action="clearSelection()"
+                               disabled="actionInProgress">
                    </umb-button>
                </umb-editor-sub-header-section>
 

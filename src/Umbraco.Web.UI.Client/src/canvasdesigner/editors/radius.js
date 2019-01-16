@@ -12,7 +12,7 @@ angular.module("Umbraco.canvasdesigner")
    
     $scope.selectedradius = {
         name: "",
-        value: 0,
+        value: 0
     };
 
     $scope.setSelectedradius = function (radiustype) {
@@ -50,7 +50,7 @@ angular.module("Umbraco.canvasdesigner")
             topleftradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 1 ? $scope.item.defaultValue[1] : '',
             toprightradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 2 ? $scope.item.defaultValue[2] : '',
             bottomleftradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 3 ? $scope.item.defaultValue[3] : '',
-            bottomrightradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : '',
+            bottomrightradiusvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : ''
         };
     }
 

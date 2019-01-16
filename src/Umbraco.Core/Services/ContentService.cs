@@ -1872,7 +1872,7 @@ namespace Umbraco.Core.Services
                     }
                     copyEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Copied, this, copyEventArgs);
-                    Audit(uow, AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                    Audit(uow, AuditType.Copy, "Copy Content performed by user", userId, content.Id);
                     uow.Commit();
                 }
 
@@ -2060,12 +2060,15 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 var allContent = GetByIds(ids).ToDictionary(x => x.Id, x => x);
-                var items = ids.Select(x => allContent[x]);
+                if (allContent.Any() == false)
+                {
+                    return false;
+                }
+                var items = ids.Select(x => allContent[x]).ToArray();
 
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    var asArray = items.ToArray();
-                    var saveEventArgs = new SaveEventArgs<IContent>(asArray);
+                    var saveEventArgs = new SaveEventArgs<IContent>(items);
                     if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
@@ -2075,7 +2078,7 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateContentRepository(uow);
 
                     var i = 0;
-                    foreach (var content in asArray)
+                    foreach (var content in items)
                     {
                         //If the current sort order equals that of the content
                         //we don't need to update it, so just increment the sort order
@@ -2122,7 +2125,7 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, shouldBePublished, false);
                     }
 
-                    Audit(uow, AuditType.Sort, "Sorting content performed by user", userId, 0);
+                    Audit(uow, AuditType.Sort, "Sort child items performed by user", userId, items.First().ParentId);
                     uow.Commit();
                 }
             }
@@ -2572,8 +2575,18 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, descendants, false);
                     }
 
-                    Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
                     uow.Commit();
+
+                    if (publishStatus.StatusType == PublishStatusType.Success)
+                    {
+                        Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                    }
+                    else
+                    {
+                        Audit(uow, AuditType.Save, "Save performed by user", userId, content.Id);
+                    }
+                    uow.Commit();
+
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
             }

@@ -26,7 +26,6 @@ namespace Umbraco.Core.Strings
         [Obsolete("Use the other ctor that specifies all dependencies")]
         public DefaultShortStringHelper()
         {
-            _umbracoSettings = _umbracoSettings;
             InitializeLegacyUrlReplaceCharacters();
         }
 

@@ -116,7 +116,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var strLinkId = linkData.Link;
                     var udiAttempt = strLinkId.TryConvertTo<Udi>();
-                    if (udiAttempt.Success)
+                    if (udiAttempt.Success && udiAttempt.Result != null)
                     {
                         var content = helper.TypedContent(udiAttempt.Result);
                         if (content != null)

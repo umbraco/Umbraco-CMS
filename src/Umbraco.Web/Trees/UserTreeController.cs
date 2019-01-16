@@ -47,8 +47,6 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var baseUrl = Constants.Applications.Users + "/users/";
-
             var nodes = new TreeNodeCollection();
             return nodes;
         }

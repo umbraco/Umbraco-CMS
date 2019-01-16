@@ -31,7 +31,7 @@ angular.module("umbraco").controller('Umbraco.Dialogs.Template.QueryBuilderContr
 				sort:{
 					property:{
 						alias: "",
-						name: "",
+						name: ""
 					},
 					direction: "ascending"
 				}

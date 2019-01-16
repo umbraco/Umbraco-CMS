@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Web;
 using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
-using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.UI
 {
@@ -211,7 +207,7 @@ namespace Umbraco.Web.UI
 
             typeInstance.TypeID = typeId;
             typeInstance.ParentID = nodeId;
-            typeInstance.Alias = text;
+            typeInstance.Alias = text.CleanForXss();
 
             // check for returning url
             ITaskReturnUrl returnUrlTask = typeInstance as LegacyDialogTask;

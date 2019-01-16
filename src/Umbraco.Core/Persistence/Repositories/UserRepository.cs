@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Security;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
@@ -151,7 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IProfile GetProfile(string username)
         {
-            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);
+            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
 
             var dto = Database.Fetch<UserDto>(sql)
                 .FirstOrDefault();
@@ -186,6 +187,8 @@ UNION
 SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
 UNION
 SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+UNION
+SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL 
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
@@ -196,7 +199,8 @@ ORDER BY colName";
                 {UserState.Active, (int)result[1].num},
                 {UserState.Disabled, (int)result[2].num},
                 {UserState.LockedOut, (int)result[3].num},
-                {UserState.Invited, (int)result[4].num}
+                {UserState.Invited, (int)result[4].num},
+                {UserState.Inactive, (int) result[5].num}
             };
         }
 
@@ -378,6 +382,7 @@ ORDER BY colName";
                 "DELETE FROM cmsTask WHERE parentUserId = @Id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @Id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
+                "DELETE FROM umbracoUserStartNode WHERE userId = @Id",
                 "DELETE FROM umbracoUser WHERE id = @Id",
                 "DELETE FROM umbracoExternalLogin WHERE id = @Id"
             };
@@ -728,13 +733,13 @@ ORDER BY colName";
             {
                 foreach (var filterClause in customFilterWheres)
                 {
-                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
+                    filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
                 }
             }
 
             if (includeUserGroups != null && includeUserGroups.Length > 0)
             {
-                var subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
+                const string subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
 		            FROM umbracoUser
 		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
 		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
@@ -744,7 +749,7 @@ ORDER BY colName";
 
             if (excludeUserGroups != null && excludeUserGroups.Length > 0)
             {
-                var subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
+                const string subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
 		            FROM umbracoUser
 		            INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
 		            INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
@@ -763,6 +768,12 @@ ORDER BY colName";
                     if (userState.Contains(UserState.Active))
                     {
                         sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                        appended = true;
+                    }
+                    if (userState.Contains(UserState.Inactive))
+                    {
+                        if (appended) sb.Append(" OR ");
+                        sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
                         appended = true;
                     }
                     if (userState.Contains(UserState.Disabled))
@@ -794,12 +805,15 @@ ORDER BY colName";
             var sqlBaseIds = GetBaseQuery("id");
 
             if (query == null) query = new Query<IUser>();
+            var queryHasWhereClause = query.GetWhereClauses().Any();
             var translatorIds = new SqlTranslator<IUser>(sqlBaseIds, query);
             var sqlQueryIds = translatorIds.Translate();
+            var sqlBaseFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
+            var translatorFull = new SqlTranslator<IUser>(sqlBaseFull, query);
 
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
-                GetFilteredSqlForPagedResults(sqlQueryIds, filterSql),
+                GetFilteredSqlForPagedResults(sqlQueryIds, filterSql, queryHasWhereClause),
                 orderDirection, orderBy);
 
             // Get page of results and total count
@@ -815,10 +829,12 @@ ORDER BY colName";
                 var args = sqlNodeIdsWithSort.Arguments;
                 string sqlStringCount, sqlStringPage;
                 Database.BuildPageQueries<UserDto>(pageIndex * pageSize, pageSize, sqlNodeIdsWithSort.SQL, ref args, out sqlStringCount, out sqlStringPage);
+                
+                var sqlQueryFull = translatorFull.Translate();
 
-                var sqlQueryFull = GetBaseQuery("umbracoUser.*, umbracoUserGroup.*, umbracoUserGroup2App.*, umbracoUserStartNode.*");
-
-                var fullQueryWithPagedInnerJoin = sqlQueryFull
+                //We need to make this FULL query an inner join on the paged ID query
+                var splitQuery = sqlQueryFull.SQL.Split(new[] { "WHERE " }, StringSplitOptions.None);
+                var fullQueryWithPagedInnerJoin = new Sql(splitQuery[0])
                     .Append("INNER JOIN (")
                     //join the paged query with the paged query arguments
                     .Append(sqlStringPage, args)
@@ -827,9 +843,15 @@ ORDER BY colName";
 
                 AddGroupLeftJoin(fullQueryWithPagedInnerJoin);
 
+                if (splitQuery.Length > 1)
+                {
+                    //add the original where clause back with the original arguments
+                    fullQueryWithPagedInnerJoin.Where(splitQuery[1], sqlQueryIds.Arguments);
+                }   
+
                 //get sorted and filtered sql
                 var fullQuery = GetSortedSqlForPagedResults(
-                    GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, filterSql),
+                    GetFilteredSqlForPagedResults(fullQueryWithPagedInnerJoin, filterSql, queryHasWhereClause),
                     orderDirection, orderBy);
 
                 var users = ConvertFromDtos(Database.Fetch<UserDto, UserGroupDto, UserGroup2AppDto, UserStartNodeDto, UserDto>(new UserGroupRelator().Map, fullQuery))
@@ -841,14 +863,17 @@ ORDER BY colName";
             return Enumerable.Empty<IUser>();
         }
 
-        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql)
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql, bool hasWhereClause)
         {
             Sql filteredSql;
 
             // Apply filter
             if (filterSql != null)
             {
-                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
+                //ensure we don't append a WHERE if there is already one
+                var sqlFilter = hasWhereClause
+                    ? filterSql.SQL
+                    : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
                 // instance a couple of times to get the parameter order correct, for some reason the first

@@ -1,27 +1,42 @@
 <div class="umb-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
 
-    <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
-    <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
-    
+    <p ng-if="(mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
+    <p ng-if="(mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
+
     <div data-element="sortable-thumbnails" class="flex flex-wrap error">
-        <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
-            <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
+        <ul ui-sortable="sortableOptions" ng-model="mediaItems" class="umb-sortable-thumbnails">
+            <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="media in mediaItems track by $index">
+
+                <p class="label label__trashed" ng-if="media.trashed">
+                    <localize key="mediaPicker_trashed"></localize>
+                    <i class="icon-trash" aria-hidden="true"></i>
+                </p>
 
                 <!-- IMAGE -->
-                <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
+                <img ng-if="media.thumbnail"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
+                     alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- SVG -->
-                <img ng-class="{'trashed': image.trashed}" ng-if="image.metaData.umbracoExtension.Value === 'svg'" ng-src="{{image.metaData.umbracoFile.Value}}" alt="" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
-                <img ng-class="{'trashed': image.trashed}" ng-if="image.extension === 'svg'" ng-src="{{image.file}}" alt="" />
+                <img ng-if="!media.thumbnail && media.metaData.umbracoExtension.Value === 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.metaData.umbracoFile.Value}}"
+                     alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                <img ng-if="!media.thumbnail && media.metaData.umbracoExtension.Value !== 'svg' && media.extension === 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.file}}"
+                     alt=""
+                     title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- FILE -->
-                <span class="umb-icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
-                    <i class="icon {{image.icon}} large"></i>
-                    <small>{{image.name}}</small>
-                </span>
+                <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail || media.metaData.umbracoExtension.Value === 'svg' || media.extension === 'svg'">
+                    <span class="file-icon">
+                        <i class="icon {{media.icon}} large"></i>
+                        <span>.{{media.metaData.umbracoExtension.Value}}</span>
+                    </span>
+                    <small>{{media.name}}</small>
+                </div>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
-                    <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="goToItem(image)">
+                    <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="goToItem(media)">
                         <i class="icon icon-edit"></i>
                     </a>
                     <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove($index)">
@@ -30,7 +45,7 @@
                 </div>
             </li>
             <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd()">
-                <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" prevent-default>
+                <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (mediaItems.length === 0 || isMultiPicker)}" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>
             </li>

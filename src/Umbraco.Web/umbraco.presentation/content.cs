@@ -428,8 +428,6 @@ namespace umbraco
 
             if (!e.Cancel)
             {
-                XmlNode x;
-
                 //Hack: this is here purely for backwards compat if someone for some reason is using the
                 // ClearDocumentCache(int documentId) method and expecting it to remove the xml
                 if (removeDbXmlEntry)

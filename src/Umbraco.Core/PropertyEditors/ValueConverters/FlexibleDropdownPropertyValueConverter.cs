@@ -42,18 +42,19 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 return null;
             }
 
+            var isMultipleDataType = IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias);
+
             var selectedValues = (string[]) source;
+            
             if (selectedValues.Any())
             {
-                if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
-                {
+                if (isMultipleDataType)
                     return selectedValues;
-                }
 
                 return selectedValues.First();
             }
 
-            return source;
+            return isMultipleDataType ? source : string.Empty;
         }
 
         public Type GetPropertyValueType(PublishedPropertyType propertyType)

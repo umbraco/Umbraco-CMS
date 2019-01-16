@@ -7,10 +7,60 @@
     **/
 function logResource($q, $http, umbRequestHelper) {
 
+    function isValidDate(input) {
+        if (input) {
+            if (Object.prototype.toString.call(input) === "[object Date]" && !isNaN(input.getTime())) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    function dateToValidIsoString(input) {
+        if (isValidDate(input)) {
+            return input.toISOString();
+        }
+
+        return '';
+    };
+
     //the factory object returned
     return {
 
-        getPagedEntityLog: function (options) {
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.logResource#getPagedEntityLog
+        * @methodOf umbraco.resources.logResource
+        *
+        * @description
+        * Gets a paginated log history for a entity
+        *
+        * ##usage
+        * <pre>
+        * var options = {
+        *      id : 1234
+        *      pageSize : 10,
+        *      pageNumber : 1,
+        *      orderDirection : "Descending",
+        *      sinceDate : new Date(2018,0,1)
+        * };
+        * logResource.getPagedEntityLog(options)
+        *    .then(function(log) {
+        *        alert('its here!');
+        *    });
+        * </pre> 
+        * 
+        * @param {Object} options options object
+        * @param {Int} options.id the id of the entity
+        * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10, set to 0 to disable paging
+        * @param {Int} options.pageNumber if paging data, current page index, default = 1
+        * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Descending`
+        * @param {Date} options.sinceDate if provided this will only get log entries going back to this date
+        * @returns {Promise} resourcePromise object containing the log.
+        *
+        */
+        getPagedEntityLog: function(options) {
 
             var defaults = {
                 pageSize: 10,
@@ -24,11 +74,15 @@ function logResource($q, $http, umbRequestHelper) {
             angular.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
+
+            if (options.hasOwnProperty('sinceDate')) {
+                options.sinceDate = dateToValidIsoString(options.sinceDate);
+            }
+
             //change asc/desct
             if (options.orderDirection === "asc") {
                 options.orderDirection = "Ascending";
-            }
-            else if (options.orderDirection === "desc") {
+            } else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
 
@@ -45,7 +99,37 @@ function logResource($q, $http, umbRequestHelper) {
                 'Failed to retrieve log data for id');
         },
 
-        getPagedUserLog: function (options) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.logResource#getPagedUserLog
+         * @methodOf umbraco.resources.logResource
+         *
+         * @description
+         * Gets a paginated log history for the current user
+         *
+         * ##usage
+         * <pre>
+         * var options = {
+         *      pageSize : 10,
+         *      pageNumber : 1,
+         *      orderDirection : "Descending",
+         *      sinceDate : new Date(2018,0,1)
+         * };
+         * logResource.getPagedUserLog(options)
+         *    .then(function(log) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Object} options options object
+         * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10, set to 0 to disable paging
+         * @param {Int} options.pageNumber if paging data, current page index, default = 1
+         * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Descending`
+         * @param {Date} options.sinceDate if provided this will only get log entries going back to this date
+         * @returns {Promise} resourcePromise object containing the log.
+         *
+         */
+        getPagedUserLog: function(options) {
 
             var defaults = {
                 pageSize: 10,
@@ -59,11 +143,15 @@ function logResource($q, $http, umbRequestHelper) {
             angular.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
+
+            if (options.hasOwnProperty('sinceDate')) {
+                options.sinceDate = dateToValidIsoString(options.sinceDate);
+            }
+
             //change asc/desct
             if (options.orderDirection === "asc") {
                 options.orderDirection = "Ascending";
-            }
-            else if (options.orderDirection === "desc") {
+            } else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
 
@@ -71,7 +159,7 @@ function logResource($q, $http, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logApiBaseUrl",
-                        "GetPagedEntityLog",
+                        "GetPagedCurrentUserLog",
                         options)),
                 'Failed to retrieve log data for id');
         },
@@ -82,6 +170,7 @@ function logResource($q, $http, umbRequestHelper) {
          * @methodOf umbraco.resources.logResource
          *
          * @description
+         *  <strong>[OBSOLETE] use getPagedEntityLog instead</strong><br />
          * Gets the log history for a give entity id
          *
          * ##usage
@@ -96,23 +185,24 @@ function logResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the log.
          *
          */
-        getEntityLog: function (id) {            
+        getEntityLog: function(id) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "logApiBaseUrl",
-                       "GetEntityLog",
-                       [{ id: id }])),
-               'Failed to retrieve user data for id ' + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetEntityLog",
+                        [{ id: id }])),
+                'Failed to retrieve user data for id ' + id);
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.logResource#getUserLog
          * @methodOf umbraco.resources.logResource
          *
          * @description
-         * Gets the current users' log history for a given type of log entry
+         * <strong>[OBSOLETE] use getPagedUserLog instead</strong><br />
+         * Gets the current user's log history for a given type of log entry
          *
          * ##usage
          * <pre>
@@ -127,14 +217,14 @@ function logResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the log.
          *
          */
-        getUserLog: function (type, since) {            
+        getUserLog: function(type, since) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "logApiBaseUrl",
-                       "GetCurrentUserLog",
-                       [{ logtype: type}, {sinceDate: since }])),
-               'Failed to retrieve log data for current user of type ' + type + ' since ' + since);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetCurrentUserLog",
+                        [{ logtype: type }, { sinceDate:  dateToValidIsoString(since) }])),
+                'Failed to retrieve log data for current user of type ' + type + ' since ' + since);
         },
 
         /**
@@ -158,16 +248,16 @@ function logResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the log.
          *
          */
-        getLog: function (type, since) {            
+        getLog: function(type, since) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "logApiBaseUrl",
-                       "GetLog",
-                       [{ logtype: type}, {sinceDate: since }])),
-               'Failed to retrieve log data of type ' + type + ' since ' + since);
-        }
-    };
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetLog",
+                        [{ logtype: type }, { sinceDate: dateToValidIsoString(since) }])),
+                'Failed to retrieve log data of type ' + type + ' since ' + since);
+        }      
+};
 }
 
 angular.module('umbraco.resources').factory('logResource', logResource);

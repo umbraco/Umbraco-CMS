@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function GridRichTextEditorController($scope, tinyMceService, macroService) {
+    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState) {
 
         var vm = this;
 
@@ -11,9 +11,11 @@
         vm.openEmbed = openEmbed;
 
         function openLinkPicker(editor, currentTarget, anchorElement) {
+						
             vm.linkPickerOverlay = {
                 view: "linkpicker",
                 currentTarget: currentTarget,
+				anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
                 show: true,
                 submit: function(model) {
                     tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);

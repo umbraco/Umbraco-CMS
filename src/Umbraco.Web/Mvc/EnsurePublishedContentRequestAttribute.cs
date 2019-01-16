@@ -15,7 +15,7 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     /// <remarks>
     /// This is inspired from this discussion:
-    /// http://our.umbraco.org/forum/developers/extending-umbraco/41367-Umbraco-6-MVC-Custom-MVC-Route?p=3
+    /// https://our.umbraco.com/forum/developers/extending-umbraco/41367-Umbraco-6-MVC-Custom-MVC-Route?p=3
     /// 
     /// which is based on custom routing found here:
     /// http://shazwazza.com/post/Custom-MVC-routing-in-Umbraco

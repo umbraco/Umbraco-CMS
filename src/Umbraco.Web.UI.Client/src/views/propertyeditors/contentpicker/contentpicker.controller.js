@@ -77,10 +77,16 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     // sortable options
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
-        zIndex: 6000
+        zIndex: 6000,
+        update: function (e, ui) {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }
     };
 
     if ($scope.model.config) {
@@ -182,7 +188,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
           if (angular.isArray(model.selection)) {
              _.each(model.selection, function (item, i) {
                   $scope.add(item);
-             });
+              });
+              angularHelper.getCurrentForm($scope).$setDirty();
           }
 
           $scope.contentPickerOverlay.show = false;

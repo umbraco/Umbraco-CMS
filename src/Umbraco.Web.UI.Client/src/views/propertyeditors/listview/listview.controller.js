@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService, mediaHelper) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -58,23 +58,31 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       items: []
    };
 
-   $scope.currentNodePermissions = {}
+   $scope.createAllowedButtonSingle = false;
+   $scope.createAllowedButtonSingleWithBlueprints = false;
+   $scope.createAllowedButtonMultiWithBlueprints = false;
 
-   //Just ensure we do have an editorState
-   if (editorState.current) {
-      //Fetch current node allowed actions for the current user
-      //This is the current node & not each individual child node in the list
-      var currentUserPermissions = editorState.current.allowedActions;
 
-      //Create a nicer model rather than the funky & hard to remember permissions strings
-      $scope.currentNodePermissions = {
-         "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-         "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-         "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
-         "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-         "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-      };
+   //when this is null, we don't check permissions
+   $scope.currentNodePermissions = null;
+
+   if ($scope.entityType === "content") {
+       //Just ensure we do have an editorState
+       if (editorState.current) {
+           //Fetch current node allowed actions for the current user
+           //This is the current node & not each individual child node in the list
+           var currentUserPermissions = editorState.current.allowedActions;
+
+           //Create a nicer model rather than the funky & hard to remember permissions strings
+           $scope.currentNodePermissions = {
+               "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+               "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
+               "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+               "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+               "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+               "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+           };
+       }
    }
 
    //when this is null, we don't check permissions
@@ -213,10 +221,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             },
             500);
 
-        if (reload === true) {
-            $scope.reloadView($scope.contentId, true);
-        }
-
         if (err.data && angular.isArray(err.data.notifications)) {
             for (var i = 0; i < err.data.notifications.length; i++) {
                 notificationsService.showNotification(err.data.notifications[i]);
@@ -250,12 +254,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    with simple values */
 
    $scope.getContent = function() {
-       $scope.reloadView($scope.contentId, true);
+       $scope.reloadView($scope.contentId);
    }
 
-   $scope.reloadView = function (id, reloadFolders) {
-
+   $scope.reloadView = function (id) {
       $scope.viewLoaded = false;
+      $scope.folders = [];
 
       listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
 
@@ -265,23 +269,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          $scope.listViewResultSet = data;
 
          //update all values for display
+         var section = appState.getSectionState("currentSection");
          if ($scope.listViewResultSet.items) {
             _.each($scope.listViewResultSet.items, function (e, index) {
                setPropertyValues(e);
+               // create the folders collection (only for media list views)
+               if (section === "media" && !mediaHelper.hasFilePropertyType(e)) {
+                   $scope.folders.push(e);
+               }
             });
          }
 
-         if (reloadFolders && $scope.entityType === 'media') {
-            //The folders aren't loaded - we only need to do this once since we're never changing node ids
-            mediaResource.getChildFolders($scope.contentId)
-                    .then(function (folders) {
-                       $scope.folders = folders;
-                       $scope.viewLoaded = true;
-                    });
-
-         } else {
-            $scope.viewLoaded = true;
-         }
+          $scope.viewLoaded = true;
 
          //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
          // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
@@ -399,6 +398,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                         if (activeNode) {
                             navigationService.reloadNode(activeNode);
                         }
+                        $scope.getContent();
                     });
                 }
             });
@@ -606,7 +606,32 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          id = -1;
       }
 
-      $scope.listViewAllowedTypes = getContentTypesCallback(id);
+       //$scope.listViewAllowedTypes = getContentTypesCallback(id);
+      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+          $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+          var blueprints = false;
+          _.each(listViewAllowedTypes, function (allowedType) {
+              if (_.isEmpty(allowedType.blueprints)) {
+                  // this helps the view understand that there are no blueprints available
+                  allowedType.blueprints = null;
+              }
+              else {
+                  blueprints = true;
+              }
+          });
+
+          if (listViewAllowedTypes.length === 1 && blueprints === false) {
+              $scope.createAllowedButtonSingle = true;
+          }
+          if (listViewAllowedTypes.length === 1 && blueprints === true) {
+              $scope.createAllowedButtonSingleWithBlueprints = true;
+          }
+          if (listViewAllowedTypes.length > 1) {
+              $scope.createAllowedButtonMultiWithBlueprints = true;
+          }
+      });
+
 
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
@@ -620,7 +645,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              $scope.options.allowBulkMove ||
              $scope.options.allowBulkDelete;
 
-      $scope.reloadView($scope.contentId, true);
+      $scope.reloadView($scope.contentId);
    }
 
    function getLocalizedKey(alias) {
@@ -657,6 +682,22 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          }
       }
    }
+
+
+   function createBlank(entityType,docTypeAlias) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true");
+   }
+
+   function createFromBlueprint(entityType,docTypeAlias, blueprintId) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+   }
+
+   $scope.createBlank = createBlank;
+   $scope.createFromBlueprint = createFromBlueprint;
 
    //GO!
    initView();

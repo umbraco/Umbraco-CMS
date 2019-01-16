@@ -104,8 +104,7 @@ namespace Umbraco.Tests.Dependencies
             var packageConfigFiles = new List<FileInfo>();
             var packageDirectories =
                 sourceDirectory.GetDirectories().Where(x =>
-                            x.Name.StartsWith("Umbraco.Tests") == false &&
-                            x.Name.StartsWith("Umbraco.MSBuild.Tasks") == false).ToArray();
+                            x.Name.StartsWith("Umbraco.Tests") == false).ToArray();
 
             foreach (var directory in packageDirectories)
             {

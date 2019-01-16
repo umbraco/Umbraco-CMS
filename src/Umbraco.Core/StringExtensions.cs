@@ -164,7 +164,7 @@ namespace Umbraco.Core
                 var obj = JsonConvert.DeserializeObject(input);
                 return obj;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return input;
             }
@@ -189,7 +189,6 @@ namespace Umbraco.Core
                 outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
             return new string(outputArray);
         }
-
         private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
         /// <summary>
@@ -542,7 +541,7 @@ namespace Umbraco.Core
         public static string StripHtml(this string text)
         {
             const string pattern = @"<(.|\n)*?>";
-            return Regex.Replace(text, pattern, String.Empty);
+            return Regex.Replace(text, pattern, string.Empty);
         }
 
         /// <summary>
@@ -622,7 +621,7 @@ namespace Umbraco.Core
                 byte[] decodedBytes = UrlTokenDecode(input);
                 return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
                 return null;
             }
@@ -1573,6 +1572,30 @@ namespace Umbraco.Core
             byte temp = guid[left];
             guid[left] = guid[right];
             guid[right] = temp;
+        }
+        
+        /// <summary>
+        /// Converts a file name to a friendly name for a content item
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string ToFriendlyName(this string fileName)
+        {
+            // strip the file extension
+            fileName = fileName.StripFileExtension();
+
+            // underscores and dashes to spaces
+            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+
+            // any other conversions ?
+
+            // Pascalcase (to be done last)
+            fileName = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(fileName);
+
+            // Replace multiple consecutive spaces with a single space
+            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+
+            return fileName;
         }
     }
 }

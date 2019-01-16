@@ -140,6 +140,9 @@ namespace Umbraco.Core.Persistence.Factories
         /// <returns></returns>
         internal static bool TryMatch(string text, out string mediaPath)
         {
+            //TODO: In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
+            // can tell us directly what any URL is for a given property if it contains an asset
+
             mediaPath = null;
 
             if (string.IsNullOrWhiteSpace(text))

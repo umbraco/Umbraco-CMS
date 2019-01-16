@@ -18,6 +18,7 @@
 
         <umb-toggle
             checked="vm.checked"
+            disabled="vm.disabled"
             on-click="vm.toggle()"
             show-labels="true"
             label-on="Start"
@@ -38,6 +39,7 @@
 
             var vm = this;
             vm.checked = false;
+            vm.disabled = false;
 
             vm.toggle = toggle;
 
@@ -52,6 +54,7 @@
 </pre>
 
 @param {boolean} checked Set to <code>true</code> or <code>false</code> to toggle the switch.
+@param {boolean} disabled Set to <code>true</code> or <code>false</code> to disable/enable the switch.
 @param {callback} onClick The function which should be called when the toggle is clicked.
 @param {string=} showLabels Set to <code>true</code> or <code>false</code> to show a "On" or "Off" label next to the switch.
 @param {string=} labelOn Set a custom label for when the switched is turned on. It will default to "On".
@@ -64,7 +67,7 @@
 (function () {
     'use strict';
 
-    function ToggleDirective(localizationService) {
+    function ToggleDirective(localizationService, eventsService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -73,6 +76,7 @@
 
             function onInit() {
                 setLabelText();
+                eventsService.emit("toggleValue", { value: scope.checked });
             }
 
             function setLabelText() {
@@ -98,7 +102,8 @@
             }
 
             scope.click = function() {
-                if(scope.onClick) {
+                if (scope.onClick) {
+                    eventsService.emit("toggleValue", { value: !scope.checked });
                     scope.onClick();
                 }
             };
@@ -113,6 +118,7 @@
             templateUrl: 'views/components/buttons/umb-toggle.html',
             scope: {
                 checked: "=",
+                disabled: "=",
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",

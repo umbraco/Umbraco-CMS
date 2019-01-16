@@ -10,7 +10,7 @@ namespace umbraco.MacroEngines.RazorDataTypeModels
     [RazorDataTypeModel("f231cd8a-e447-424a-94a4-bc73b11736bb", 90)]
     [RazorDataTypeModel(Constants.PropertyEditors.RadioButtonList, 90)]
     [RazorDataTypeModel(Constants.PropertyEditors.MemberPicker, 90)]
-    [RazorDataTypeModel("f6524852-2fb0-11e0-a9fa-6f1cdfd72085", 90)] //Extended Content Picker http://our.umbraco.org/projects/backoffice-extensions/extended-content-picker
+    [RazorDataTypeModel("f6524852-2fb0-11e0-a9fa-6f1cdfd72085", 90)] //Extended Content Picker https://our.umbraco.com/projects/backoffice-extensions/extended-content-picker
     public class IntegerDataTypeModel : IRazorDataTypeModel
     {
         public bool Init(int CurrentNodeId, string PropertyData, out object instance)

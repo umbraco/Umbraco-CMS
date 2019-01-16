@@ -84,14 +84,19 @@ namespace umbraco.presentation.umbraco.translation {
             pageRow[ui.Text("name")] = ui.Text("nodeName");
             pageRow[ui.Text("value")] = page.Text;
             pageTable.Rows.Add(pageRow);
-            
-            foreach (PropertyType pt in page.ContentType.PropertyTypes) {
+
+            foreach (PropertyType pt in page.ContentType.PropertyTypes)
+            {
                 pageRow = pageTable.NewRow();
                 pageRow[ui.Text("name")] = pt.Name;
-                pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
+                var property = page.getProperty(pt.Alias);
+                if (property != null && property.Value != null)
+                {
+                    pageRow[ui.Text("value")] = property.Value;
+                }
                 pageTable.Rows.Add(pageRow);
             }
-            
+
             dg_fields.DataSource = pageTable;
             dg_fields.DataBind();
         }

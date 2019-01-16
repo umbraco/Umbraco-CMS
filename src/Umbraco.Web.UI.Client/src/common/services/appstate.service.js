@@ -329,7 +329,7 @@ angular.module('umbraco.services').factory("editorState", function() {
         },
         set: function (value) {
             throw "Use editorState.set to set the value of the current entity";
-        },
+        }
     });
 
     return state;

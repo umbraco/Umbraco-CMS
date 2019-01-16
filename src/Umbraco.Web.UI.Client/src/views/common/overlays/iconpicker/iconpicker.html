@@ -15,27 +15,11 @@
     </div>
 
     <div class="umb-control-group">
-        <select ng-model="color" ng-change="changeColor(color)" class="input-block-level">
-            <option value=""><localize key="colors_black">Black</localize></option>
-            <option value="color-blue-grey"><localize key="colors_bluegrey">Blue Grey</localize></option>
-            <option value="color-grey"><localize key="colors_grey">Grey</localize></option>
-            <option value="color-brown"><localize key="colors_brown">Brown</localize></option>
-            <option value="color-blue"><localize key="colors_blue">Blue</localize></option>
-            <option value="color-light-blue"><localize key="colors_lightblue">Light Blue</localize></option>
-            <option value="color-cyan"><localize key="colors_cyan">Cyan</localize></option>
-            <option value="color-green"><localize key="colors_green">Green</localize></option>
-            <option value="color-light-green"><localize key="colors_lightgreen">Light Green</localize></option>
-            <option value="color-yellow"><localize key="colors_yellow">Yellow</localize></option>
-            <option value="color-lime"><localize key="colors_lime">Lime</localize></option>
-            <option value="color-amber"><localize key="colors_amber">Amber</localize></option>
-            <option value="color-orange"><localize key="colors_orange">Orange</localize></option>
-            <option value="color-deep-orange"><localize key="colors_deeporange">Deep Orange</localize></option>
-            <option value="color-red"><localize key="colors_red">Red</localize></option>
-            <option value="color-pink"><localize key="colors_pink">Pink</localize></option>
-            <option value="color-purple"><localize key="colors_purple">Purple</localize></option>
-            <option value="color-deep-purple"><localize key="colors_deeppurple">Deep Purple</localize></option>
-            <option value="color-indigo"><localize key="colors_indigo">Indigo</localize></option>
-        </select>
+        <umb-color-swatches colors="colors"
+                            selected-color="color"
+                            size="s"
+                            use-color-class="true">
+        </umb-color-swatches>
     </div>
 
     <umb-load-indicator ng-if="loading"></umb-load-indicator>

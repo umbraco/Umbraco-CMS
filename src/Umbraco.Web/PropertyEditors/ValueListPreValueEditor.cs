@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using umbraco;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -37,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     new PreValueField(new EnsureUniqueValuesValidator())
                         {
-                            Description = "Add and remove values for the list",
+                            Description = "Add, remove or sort values for the list.",
                             //we're going to call this 'items' because we are going to override the 
                             //serialization of the pre-values to ensure that each one gets saved with it's own key 
                             //(new db row per pre-value, thus to maintain backwards compatibility)
@@ -45,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
                             //It's also important to note that by default the dropdown angular controller is expecting the 
                             // config options to come in with a property called 'items'
                             Key = "items",
-                            Name = ui.Text("editdatatype", "addPrevalue"),
+                            Name = ApplicationContext.Current.Services.TextService.Localize("editdatatype/addPrevalue"),
                             View = "multivalues"
                         }                   
                 };

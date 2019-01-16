@@ -386,7 +386,6 @@
     <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
     <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
-    <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Migrations\Upgrades\ValidateV7UpgradeTest.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
@@ -438,8 +437,6 @@
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
-    <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
-    <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />

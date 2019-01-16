@@ -73,7 +73,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
             var extension = file.file.substring(file.file.lastIndexOf(".") + 1, file.file.length);
 
-            file.thumbnail = thumbnailUrl;
+            file.thumbnail = thumbnailUrl + '&rnd=' + Math.random();
             file.extension = extension.toLowerCase();
         });
 
@@ -118,7 +118,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the scope's files collection
                 $scope.files.push({ alias: $scope.model.alias, file: args.files[i] });
-                newVal += args.files[i].name + ",";
+                newVal += args.files[i].name.split(',').join('-') + ",";
             }
 
             //this is required to re-validate

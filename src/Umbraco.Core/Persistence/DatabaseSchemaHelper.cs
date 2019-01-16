@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -11,6 +10,9 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Persistence
 {
 
+    /// <summary>
+    /// Helper class for working with databases and schemas.
+    /// </summary>
     public class DatabaseSchemaHelper
     {
         private readonly Database _db;
@@ -18,6 +20,22 @@ namespace Umbraco.Core.Persistence
         private readonly ISqlSyntaxProvider _syntaxProvider;
         private readonly BaseDataCreation _baseDataCreation;
 
+        /// <summary>
+        /// Intializes a new helper instance.
+        /// </summary>
+        /// <param name="db">The database to be used.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="syntaxProvider">The syntax provider.</param>
+        /// <example>
+        /// A new instance could be initialized like:
+        /// <code>
+        /// var schemaHelper = new DatabaseSchemaHelper(
+        ///     ApplicationContext.Current.DatabaseContext.Database,
+        ///     ApplicationContext.Current.ProfilingLogger.Logger,
+        ///     ApplicationContext.Current.DatabaseContext.SqlSyntax
+        /// );
+        /// </code>
+        /// </example>
         public DatabaseSchemaHelper(Database db, ILogger logger, ISqlSyntaxProvider syntaxProvider)
         {
             _db = db;
@@ -26,11 +44,41 @@ namespace Umbraco.Core.Persistence
             _baseDataCreation = new BaseDataCreation(db, logger);
         }
 
+        /// <summary>
+        /// Returns whether a table with the specified <paramref name="tableName"/> exists in the database.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <returns><c>true</c> if the table exists; otherwise <c>false</c>.</returns>
+        /// <example>
+        /// <code>
+        /// if (schemaHelper.TableExist("MyTable"))
+        /// {
+        ///     // do something when the table exists
+        /// }
+        /// </code>
+        /// </example>
         public bool TableExist(string tableName)
         {
             return _syntaxProvider.DoesTableExist(_db, tableName);
         }
 
+        /// <summary>
+        /// Returns whether the table for the specified <typeparamref name="T"/> exists in the database.
+        /// 
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// </summary>
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
+        /// <returns><c>true</c> if the table exists; otherwise <c>false</c>.</returns>
+        /// <example>
+        /// <code>
+        /// if (schemaHelper.TableExist&lt;MyDto&gt;)
+        /// {
+        ///     // do something when the table exists
+        /// }
+        /// </code>
+        /// </example>
         public bool TableExist<T>()
         {
             var poco = Database.PocoData.ForType(typeof(T));
@@ -90,6 +138,17 @@ namespace Umbraco.Core.Persistence
             _logger.Info<Database>("Finalized database schema creation");
         }
 
+        /// Creates a new table in the database based on the type of <typeparamref name="T"/>.
+        /// 
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// 
+        /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
+        /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
+        /// not do anything if the parameter is <c>false</c>.
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
+        /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
         public void CreateTable<T>(bool overwrite)
            where T : new()
         {
@@ -97,6 +156,16 @@ namespace Umbraco.Core.Persistence
             CreateTable(overwrite, tableType);
         }
 
+        /// <summary>
+        /// Creates a new table in the database based on the type of <typeparamref name="T"/>.
+        /// 
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// 
+        /// If a table with the same name already exists, this method will not do anything.
+        /// </summary>
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
         public void CreateTable<T>()
           where T : new()
         {
@@ -104,6 +173,19 @@ namespace Umbraco.Core.Persistence
             CreateTable(false, tableType);
         }
 
+        /// <summary>
+        /// Creates a new table in the database for the specified <paramref name="modelType"/>.
+        /// 
+        /// If <paramref name="modelType"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from
+        /// that  attribute will be used for the table name. If the attribute is not present, the name
+        /// <paramref name="modelType"/> will be used instead.
+        /// 
+        /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
+        /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
+        /// not do anything if the parameter is <c>false</c>.
+        /// </summary>
+        /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
+        /// <param name="modelType">The the representing the table.</param>
         public void CreateTable(bool overwrite, Type modelType)
         {
             var tableDefinition = DefinitionFactory.GetTableDefinition(_syntaxProvider, modelType);
@@ -117,6 +199,8 @@ namespace Umbraco.Core.Persistence
             var tableExist = TableExist(tableName);
             if (overwrite && tableExist)
             {
+                _logger.Info<Database>(string.Format("Table '{0}' already exists, but will be recreated", tableName));
+
                 DropTable(tableName);
                 tableExist = false;
             }
@@ -169,15 +253,37 @@ namespace Umbraco.Core.Persistence
                         _logger.Info<Database>(string.Format("Create Foreign Key sql {0}:\n {1}", createdFk, sql));
                     }
 
-                    
-
                     transaction.Complete();
+                    if (overwrite)
+                    {
+                        _logger.Info<Database>(string.Format("Table '{0}' was recreated", tableName));
+                    }
+                    else
+                    {
+                        _logger.Info<Database>(string.Format("New table '{0}' was created", tableName));
+                    }
                 }
             }
-
-            _logger.Info<Database>(string.Format("New table '{0}' was created", tableName));
+            else
+            {
+                // The table exists and was not recreated/overwritten.
+                _logger.Info<Database>(string.Format("Table '{0}' already exists - no changes were made", tableName));
+            }
         }
 
+        /// <summary>
+        /// Drops the table for the specified <typeparamref name="T"/>.
+        /// 
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// </summary>
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
+        /// <example>
+        /// <code>
+        /// schemaHelper.DropTable&lt;MyDto&gt;);
+        /// </code>
+        /// </example>
         public void DropTable<T>()
             where T : new()
         {
@@ -193,6 +299,15 @@ namespace Umbraco.Core.Persistence
             DropTable(tableName);
         }
 
+        /// <summary>
+        /// Drops the table with the specified <paramref name="tableName"/>.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <example>
+        /// <code>
+        /// schemaHelper.DropTable("MyTable");
+        /// </code>
+        /// </example>
         public void DropTable(string tableName)
         {
             var sql = new Sql(string.Format(

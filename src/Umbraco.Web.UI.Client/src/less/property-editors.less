@@ -1,12 +1,28 @@
+@checkered-background: url(../img/checkered-background.png);
+
 //
 // Container styles
 // --------------------------------------------------
 .umb-editor {
   min-width:66.6%;
+
+	&-pull {
+		float:left;
+		width:66.6%;
+	}
+
+	&-push {
+		float:right;
+	}
 }
 
 .umb-editor-tiny {
   width: 60px;
+
+	&.umb-editor-push {
+		width:30%;
+		min-width:0;
+	}
 }
 
 .umb-editor-small {
@@ -27,6 +43,27 @@
 .umb-codeeditor{
   width: 99%;
 }
+
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
 
 //
 // Content picker
@@ -67,11 +104,11 @@ div.umb-codeeditor {
   border: 1px solid @gray-8;
 }
 div.umb-codeeditor .umb-el-wrap {
-  padding: 0px;
+  padding: 0;
 }
 div.umb-codeeditor .umb-btn-toolbar {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   border-bottom: @gray-8 1px solid;
   background: @gray-10;
 }
@@ -80,7 +117,14 @@ div.umb-codeeditor .umb-btn-toolbar {
 //
 // RTE
 // --------------------------------------------------
-.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0px !important;}
+.umb-rte {
+    position: relative;
+
+    .-loading {
+        position: absolute;
+    }
+}
+.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0 !important;}
 .mce-panel{background: @gray-10 !important; border-color: @gray-8 !important;}
 .mce-btn-group, .mce-btn{border: none !important; background: none !important;}
 .mce-ico{font-size: 12px !important; color: @gray-1 !important;}
@@ -98,69 +142,121 @@ div.umb-codeeditor .umb-btn-toolbar {
 //
 // Color picker
 // --------------------------------------------------
-ul.color-picker li {
-  padding: 2px;
-  margin: 3px;
-  border: 2px solid transparent;
-  width: 60px;
-}
-ul.color-picker li.active {
-  border: 2px dashed @gray-8;
-}
-ul.color-picker li a  {
-  height: 50px;
-  display:block;
-  cursor:pointer;
-}
-
-.control-group.color-picker-preval .thumbnail {
-  width:30px;
-  border:none;
-}
 
 /* pre-value editor */
-/*.control-group.color-picker-preval:before {
-    content: "";
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-}*/
+.control-group.color-picker-preval {
+    .thumbnail {
+        width: 34px;
+        height: 34px;
+        min-width: auto;
+        border: none;
+        cursor: move;
+        border-radius: 3px;
+        margin-top: auto;
+        margin-bottom: auto;
+        flex: 0 0 auto;
+    }
 
-/*.control-group.color-picker-preval div.thumbnail {
-    display: inline-block;
-    vertical-align: middle;
-}*/
-.control-group.color-picker-preval div.color-picker-prediv {
-    display: inline-block;
-    width: 60%;
+    .handle {
+        float: left;
+        display: inline-flex;
+        margin: 5px 3px 5px 0;
+    }
+
+    div.color-picker-prediv {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        flex: 1;
+
+        pre {
+            display: inline-flex;
+            font-family: monospace;
+            margin-left: 15px;
+            margin-right: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 0;
+            vertical-align: middle;
+            padding: 6px 10px;
+            background: #f7f7f7;
+            flex: 0 0 auto;
+        }
+
+        span {
+            margin-left: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    input[type="text"] {
+        display: flex;
+        flex: 1 1 100px;
+        margin-top: 1px;
+        margin-right: 15px;
+        min-width: auto;
+        width: auto;
+    }
+
+    .sp-replacer {
+        display: inline-flex;
+        margin-right: 18px;
+    }
+
+    label {
+        border: 1px solid @white;
+        padding: 6px 10px;
+        font-family: monospace;
+        border: 1px solid #dfdfe1;
+        background: #f7f7f7;
+        margin: 0 15px 0 3px;
+        border-radius: 3px;
+    }
 }
 
-.control-group.color-picker-preval pre {
-    display: inline;
-    margin-right: 20px;
-    margin-left: 10px;
-    width: 50%;
-    white-space: nowrap;
-    overflow: hidden;
-    margin-bottom: 0;
-    vertical-align: middle;
+//
+// Image Cropper
+// --------------------------------------------------
+
+.umb-prevalues-multivalues.umb-cropsizes{
+
+    max-width: 500px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
 }
 
-.control-group.color-picker-preval btn {
-    //vertical-align: middle;
-}
+.umb-cropsizes {
 
-.control-group.color-picker-preval input[type="text"] {
-    min-width: 40%;
-    width: 40%;
-    display: inline-block;
-    margin-right: 20px;
-    margin-top: 1px;
-}
+    &__add {
+        display: inline-flex;
+        align-items: center;
+    }
 
-.control-group.color-picker-preval label {
-    border: solid @white 1px;
-    padding: 6px;
+    &__controls {
+        margin: 24px 0 0;
+        display: flex;
+    }
+    
+    &__input {
+        width: 100%;
+        &-wrap{
+            flex: 1 1 auto;
+            margin-right: 10px;
+            &--narrow {
+                flex: 0 1 100px;
+            }
+        }
+   }
 }
 
 
@@ -182,6 +278,18 @@ ul.color-picker li a  {
     &:hover {
         color: @turquoise-d1;
         border-color: @turquoise;
+    }
+}
+
+.umb-mediapicker .label{
+    &__trashed{
+        background-color: @red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        transform: translate3d(-50%,-50%,0);
+        margin: 0;
     }
 }
 
@@ -265,7 +373,7 @@ ul.color-picker li a  {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 5px 5px 0;
+    margin: 0 0 5px 5px;
     padding: 5px;
 }
 
@@ -280,10 +388,10 @@ ul.color-picker li a  {
     max-height:100%;
     margin:auto;
     display:block;
-    background-image: url(../img/checkered-background.png);
+    background-image: @checkered-background;
 }
 
-.umb-sortable-thumbnails li img.trashed {
+.umb-sortable-thumbnails li .trashed {
     opacity:0.3;
 }
 
@@ -296,12 +404,29 @@ ul.color-picker li a  {
     text-align: center;
 }
 
-.umb-sortable-thumbnails .umb-icon-holder .icon{
+.umb-sortable-thumbnails .umb-icon-holder .icon {
     font-size: 40px;
     line-height: 50px;
     color: @gray-3;
     display: block;
 }
+
+.umb-sortable-thumbnails .umb-icon-holder .file-icon > span {
+    color: @white;
+    background: @gray-4;
+    padding: 1px 3px;
+    font-size: 10px;
+    line-height: 130%;
+    display: block;
+    margin-top: -30px;
+    width: 2em;
+}
+
+.umb-sortable-thumbnails .umb-icon-holder .file-icon + small {
+    display: block;
+    margin-top: 1em;
+}
+
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
     width: 124px;
@@ -324,7 +449,7 @@ ul.color-picker li a  {
     > li:not(.unsortable) {
         cursor: move;
     }
-} 
+}
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
     opacity: 1;
@@ -476,12 +601,18 @@ ul.color-picker li a  {
         vertical-align: top;
     }
 
-    .gravity-container .viewport {
-        max-width: 600px;
-    }
+    .gravity-container {
+        border: 1px solid @gray-8;
+        line-height: 0;
 
-    .gravity-container .viewport:hover {
-        cursor: pointer;
+        .viewport {
+            max-width: 600px;
+            background: @checkered-background;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .imagecropper {
@@ -494,6 +625,10 @@ ul.color-picker li a  {
             float: left;
             max-width: 100%;
         }
+
+        .viewport img {
+            background: @checkered-background;
+        }
     }
 
     .imagecropper .umb-cropper__container {
@@ -504,6 +639,16 @@ ul.color-picker li a  {
 
         @media (min-width: 769px) {
             width: 600px;
+        }
+    }
+
+    .imagecropper .umb-cropper__container .button-drawer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px;
+
+        button {
+            margin-left: 4px;
         }
     }
 
@@ -630,8 +775,8 @@ ul.color-picker li a  {
 
 
 .umb-photo-folder .picrow div, .umb-photo-preview{
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   border: none;
   display: inline-block;
   vertical-align: top;
@@ -668,9 +813,9 @@ ul.color-picker li a  {
 //this is a temp hack, to provide selectors in the dialog:
 .umb-photo-folder .pic:hover .selector-overlay {
   position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 5px;
   background: @black;
   z-index: 100;
@@ -750,7 +895,11 @@ ul.color-picker li a  {
 .umb-fileupload ul {
   list-style: none;
   vertical-align: middle;
-  margin-bottom: 0px;
+  margin-bottom: 0;
+
+  img {
+    background: @checkered-background;
+  }
 }
 
 .umb-fileupload label {
@@ -854,10 +1003,39 @@ ul.color-picker li a  {
 //
 // Tags
 // --------------------------------------------------
-.umb-tags{border: @gray-10 solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
-.umb-tags .tag{cursor: pointer;  margin: 7px; padding: 7px; background: @turquoise}
-.umb-tags .tag i{padding: 2px;}
-.umb-tags input{border: none; background: @white}
+.umb-tags{
+    border: @gray-10 solid 1px;
+    padding: 10px;
+    font-size: 13px;
+    text-shadow: none;
+
+    .tag{
+        cursor: default;
+        margin: 7px;
+        padding: 10px;
+        background: @turquoise;
+        position: relative;
+
+        .icon-trash{
+            cursor: pointer;
+            padding: 2px;
+            font-size: 12px;
+            position: relative;
+            right: -6px;
+        }
+
+        .umb_confirm-action__overlay.-left{
+            top: 6px;
+            left: auto;
+            right: 15px;
+        }
+    }
+
+    input{
+        border: none;
+        background: @white;
+    }
+}
 
 //
 // Date/time picker
@@ -879,7 +1057,20 @@ ul.color-picker li a  {
 
 //
 // Nested boolean (e.g. list view bulk action permissions)
-// ---------------------=====-----------------------------
+// -------------------------------------------------------
 .umb-nested-boolean label {margin-bottom: 8px; float: left; width: 320px;}
 .umb-nested-boolean label span {float: left; width: 80%;}
 .umb-nested-boolean label input[type='checkbox'] {margin-right: 10px; float: left;}
+
+//
+// Custom styles of property editors in property preview in document type editor
+// -----------------------------------------------------------------------------
+.umb-group-builder__property-preview {
+    .umb-property-editor {
+        .slider {
+            .tooltip {
+                display: none;
+            }
+        }
+    }
+}

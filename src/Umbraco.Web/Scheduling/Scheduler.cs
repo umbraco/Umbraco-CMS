@@ -104,13 +104,13 @@ namespace Umbraco.Web.Scheduling
                 _keepAliveRunner.TryAdd(tasks[0]);
 
                 // scheduled publishing/unpublishing
-                // install on all, will only run on non-slaves servers
+                // install on all, will only run on non-replica servers
                 _publishingRunner.TryAdd(tasks[1]);
 
                 _tasksRunner.TryAdd(tasks[2]);
 
                 // log scrubbing
-                // install on all, will only run on non-slaves servers
+                // install on all, will only run on non-replica servers
                 _scrubberRunner.TryAdd(tasks[3]);
 
                 if (healthCheckConfig.NotificationSettings.Enabled)

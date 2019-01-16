@@ -1,0 +1,47 @@
+﻿.umb-multiple-textbox{
+    &__confirm{
+        position: relative;
+
+        &-action{
+            margin: 0;
+            padding: 2px;
+            background: transparent;
+            border: 0 none;
+        }
+    }
+}
+
+.umb-multiple-textbox .textbox-wrapper {
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.umb-multiple-textbox .textbox-wrapper .umb-editor {
+    margin-bottom: 0;
+}
+
+.umb-multiple-textbox .textbox-wrapper i:not(.icon-delete, .icon-check) {
+    margin-right: 5px;
+}
+
+.umb-multiple-textbox .textbox-wrapper i.handle {
+    margin-left: 5px;
+}
+
+.umb-multiple-textbox .textbox-wrapper a.remove {
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+.umb-multiple-textbox .add-link {
+    &:extend(.umb-node-preview-add);
+}
+
+.umb-editor-wrapper .umb-multiple-textbox .add-link {
+    &:extend(.umb-editor-wrapper .umb-node-preview);
+}
+
+.umb-modal .umb-multiple-textbox .textbox-wrapper .umb-editor {
+    flex: 1 1 auto;
+    width: auto;
+}

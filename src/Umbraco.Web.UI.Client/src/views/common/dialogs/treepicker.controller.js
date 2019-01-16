@@ -8,7 +8,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.section = dialogOptions.section;
 	    $scope.treeAlias = dialogOptions.treeAlias;
 	    $scope.multiPicker = dialogOptions.multiPicker;
-	    $scope.hideHeader = true; 	    	    
+        $scope.hideHeader = (typeof dialogOptions.hideHeader) === "boolean" ? dialogOptions.hideHeader : true;; 	    	    
         $scope.searchInfo = {
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
@@ -93,7 +93,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                                 },
 	                            name: searchText,
 	                            metaData: {
-	                                listViewNode: child,
+	                                listViewNode: child
 	                            },
 	                            cssClass: "icon-search",
 	                            cssClasses: ["not-published"]

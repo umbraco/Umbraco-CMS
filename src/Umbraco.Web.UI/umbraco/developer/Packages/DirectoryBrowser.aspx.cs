@@ -95,7 +95,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                     {
                         _sb.Append("<tr><td class=\"tdDir\"><a href=\"" + _lsScriptName + "?path=" + _lsWebPath + oDir.Name + "&target=" + Target + "\">" + oDir.Name + "</a>  <small><a href=\"javascript:postPath('/" + _lsWebPath + oDir.Name + "')\"> (Include entire folder)</small></td></tr>");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         _sb.Append("<tr><td class=\"tdDir\">" + oDir.Name + " (Access Denied)</td></tr>");
                     }

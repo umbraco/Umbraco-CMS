@@ -6,7 +6,7 @@
       <name>Template-Update</name>
       <version>0.1</version>
       <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://our.umbraco.org/projects</url>
+      <url>https://our.umbraco.com/projects</url>
       <requirements>
         <major>3</major>
         <minor>0</minor>

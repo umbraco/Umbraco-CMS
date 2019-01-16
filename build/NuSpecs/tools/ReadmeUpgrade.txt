@@ -11,7 +11,7 @@
 *** IMPORTANT NOTICE FOR UPGRADES FROM VERSIONS BELOW 7.7.0 ***
 
 Be sure to read the version specific upgrade information before proceeding:
-https://our.umbraco.org/documentation/Getting-Started/Setup/Upgrading/version-specific#version-7-7-0
+https://our.umbraco.com/documentation/Getting-Started/Setup/Upgrading/version-specific#version-7-7-0
 
 Depending on the version you are upgrading from, you may need to make some changes to your web.config
 and you will need to be aware of the breaking changes listed there to see if these affect your installation.
@@ -33,7 +33,7 @@ Publish this won't affect you.
 The following items will now be automatically included when creating a deploy package or publishing to the file 
 system: umbraco, umbraco_client, config\splashes and global.asax.
 
-Please read the release notes on our.umbraco.org:
-http://our.umbraco.org/contribute/releases
+Please read the release notes on our.umbraco.com:
+http://our.umbraco.com/contribute/releases
 
 - Umbraco

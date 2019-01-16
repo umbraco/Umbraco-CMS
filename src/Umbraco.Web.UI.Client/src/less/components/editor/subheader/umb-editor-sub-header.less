@@ -1,12 +1,18 @@
 .umb-editor-sub-header {
-   padding: 15px 0;
-   margin-bottom: 30px;
-   background: @white;
-   display: flex;
-   justify-content: space-between;
-   margin-top: -30px;
-   position: relative;
-   top: 0;
+    padding: 15px 0;
+    margin-bottom: 30px;
+    background: @white;
+    display: flex;
+    justify-content: space-between;
+    margin-top: -30px;
+    position: relative;
+    top: 0;
+
+    &.nested {
+        margin-top: 0;
+        margin-bottom: 0;
+        background: @gray-10;
+    }
 }
 
 .umb-editor-sub-header.-umb-sticky-bar {

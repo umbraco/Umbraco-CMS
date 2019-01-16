@@ -622,7 +622,7 @@ namespace Umbraco.Core.Security
         private bool UpdateMemberProperties(IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
-            
+
             //don't assign anything if nothing has changed as this will trigger the track changes of the model
 
             if (identityUser.IsPropertyDirty("LastLoginDateUtc")
@@ -630,7 +630,16 @@ namespace Umbraco.Core.Security
                 || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
             {
                 anythingChanged = true;
-                user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
+                //if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
+                var dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
+                user.LastLoginDate = dt;
+            }
+            if (identityUser.IsPropertyDirty("LastPasswordChangeDateUtc")
+                || (user.LastPasswordChangeDate != default(DateTime) && identityUser.LastPasswordChangeDateUtc.HasValue == false)
+                || identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value)
+            {
+                anythingChanged = true;
+                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
             if (identityUser.IsPropertyDirty("EmailConfirmed")
                 || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)

@@ -332,7 +332,7 @@
       <name>uBlogsy</name>
       <version>3.0</version>
       <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://our.umbraco.org/projects/starter-kits/ublogsy</url>
+      <url>https://our.umbraco.com/projects/starter-kits/ublogsy</url>
       <requirements>
         <major>3</major>
         <minor>0</minor>

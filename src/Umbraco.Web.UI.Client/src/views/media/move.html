@@ -1,56 +1,76 @@
 <div ng-controller="Umbraco.Editors.Media.MoveController">
-<div class="umb-dialog-body" ng-cloak>
-	<div class="umb-pane">
+    <div class="umb-dialog-body" ng-cloak>
+	    <div class="umb-pane">
 
-		<div ng-show="error">
-			<div class="alert alert-error">
-				<div><strong>{{error.errorMsg}}</strong></div>
-				<div>{{error.data.message}}</div>
+		    <div ng-show="error">
+			    <div class="alert alert-error">
+				    <div><strong>{{error.errorMsg}}</strong></div>
+				    <div>{{error.data.message}}</div>
+                </div>
             </div>
-        </div>
 
-		<div ng-show="success">
-			<div class="alert alert-success">
-				<strong>{{currentNode.name}}</strong> was moved underneath <strong>{{target.name}}</strong>
-			</div>
-			<button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
-		</div>
+		    <div ng-show="success">
+			    <div class="alert alert-success">
+			        <strong>{{currentNode.name}}</strong>
+			        <localize key="actions_wasMovedTo">was moved to</localize>
+			        <strong>{{target.name}}</strong>
+			    </div>
+			    <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+		    </div>
 
-		<p class="abstract" ng-hide="success">
-            <localize key="actions_chooseWhereToMove">Choose where to move</localize>
-            <strong>{{currentNode.name}}</strong>
-            <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
-        </p>
+		    <p class="abstract" ng-hide="success">
+                <localize key="actions_chooseWhereToMove">Choose where to move</localize>
+                <strong>{{currentNode.name}}</strong>
+                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
+            </p>
 
-		<div ng-hide="success">
+		    <div ng-hide="success">
             
-			<div ng-hide="miniListView">
-				<umb-tree
-					section="media"
-				    hideheader="{{treeModel.hideHeader}}"
-					hideoptions="true"
-					isdialog="true"
-					eventhandler="dialogTreeEventHandler"
-					enablelistviewexpand="true"
-					enablecheckboxes="true">
-				</umb-tree>
-			</div>
+			    <div ng-hide="miniListView">
+                    <umb-tree-search-box 
+                        hide-search-callback="hideSearch"
+                        search-callback="onSearchResults"
+                        search-from-id="{{searchInfo.searchFromId}}"
+                        search-from-name="{{searchInfo.searchFromName}}"
+                        show-search="{{searchInfo.showSearch}}"
+                        section="media">
+                    </umb-tree-search-box>
 
-			<umb-mini-list-view
-				ng-if="miniListView"
-				node="miniListView"
-				entity-type="Media"
-				on-select="selectListViewNode(node)"
-				on-close="closeMiniListView()">
-			</umb-mini-list-view>
+                    <br />
 
-		</div>
-	</div>
-</div>
+                    <umb-tree-search-results
+                        ng-if="searchInfo.showSearch"
+                        results="searchInfo.results"
+                        select-result-callback="selectResult">
+                    </umb-tree-search-results>
 
+                    <div ng-hide="searchInfo.showSearch">
+                        <umb-tree
+                            section="media"
+                            hideheader="{{treeModel.hideHeader}}"
+                            hideoptions="true"
+                            isdialog="true"
+                            eventhandler="dialogTreeEventHandler"
+                            enablelistviewexpand="true"
+                            enablecheckboxes="true">
+                        </umb-tree>
+                    </div>
+			    </div>
 
-<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-	<a class="btn btn-link" ng-click="nav.hideDialog()"><localize key="general_cancel">Cancel</localize></a>
-	<button class="btn btn-primary" ng-click="move()"><localize key="actions_move">Move</localize></button>
-</div>
+			    <umb-mini-list-view
+				    ng-if="miniListView"
+				    node="miniListView"
+				    entity-type="Media"
+				    on-select="selectListViewNode(node)"
+				    on-close="closeMiniListView()">
+			    </umb-mini-list-view>
+
+		    </div>
+	    </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+	    <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy"><localize key="general_cancel">Cancel</localize></a>
+	    <button class="btn btn-primary" ng-click="move()" ng-disabled="busy || !target"><localize key="actions_move">Move</localize></button>
+    </div>
 </div>

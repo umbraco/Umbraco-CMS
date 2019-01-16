@@ -12,7 +12,7 @@ angular.module("Umbraco.canvasdesigner")
    
     $scope.selectedpadding = {
         name: "",
-        value: 0,
+        value: 0
     };
 
     $scope.setSelectedpadding = function (paddingtype) {
@@ -50,7 +50,7 @@ angular.module("Umbraco.canvasdesigner")
             leftpaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 1 ? $scope.item.defaultValue[1] : '',
             rightpaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 2 ? $scope.item.defaultValue[2] : '',
             toppaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 3 ? $scope.item.defaultValue[3] : '',
-            bottompaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : '',
+            bottompaddingvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : ''
         };
     }
 

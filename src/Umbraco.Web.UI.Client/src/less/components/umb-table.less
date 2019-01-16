@@ -93,7 +93,7 @@ input.umb-table__input {
     cursor: pointer;
     font-size: 14px;
     position: relative;
-    min-height: 32px;
+    min-height: 52px;
     &:hover {
         background-color: @gray-10;
     }
@@ -165,7 +165,7 @@ input.umb-table__input {
 
 }
 
-.-content .-unpublished {
+.-content .-unpublished:not(.with-unpublished-version) {
     .umb-table__name > * {
         opacity: .4;
     }

@@ -1,4 +1,4 @@
-﻿<div id="{{model.alias}}" class="nested-content__doctypepicker" ng-controller="Umbraco.PropertyEditors.NestedContent.DocTypePickerController">
+﻿<div id="{{model.alias}}" class="umb-nested-content__doctypepicker" ng-controller="Umbraco.PropertyEditors.NestedContent.DocTypePickerController">
     <div>
         <table class="table table-striped">
             <thead>
@@ -22,7 +22,7 @@
                     </td>
                     <td>
                         <select id="{{model.alias}}_doctype_select"
-                            ng-options="dt.alias as dt.name for dt in model.docTypes | orderBy: 'name'"
+                            ng-options="dt.alias as dt.name for dt in selectableDocTypesFor(config) | orderBy: 'name'"
                             ng-model="config.ncAlias" required></select>
                     </td>
                     <td>
@@ -45,11 +45,11 @@
             <a class="btn" ng-click="add()">
                 <localize key="general_add">Add</localize>
             </a>
-            <i class="icon icon-help-alt medium nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
+            <i class="icon icon-help-alt medium umb-nested-content__help-icon" ng-click="showHelpText = !showHelpText"></i>
         </div>
     </div>
     <br/>
-    <div class="nested-content__help-text" ng-show="showHelpText">
+    <div class="umb-nested-content__help-text" ng-show="showHelpText">
         <p>
             <b><localize key="editcontenttype_tab">Tab</localize>:</b><br/>
             Select the tab who's properties should be displayed. If left blank, the first tab on the doc type will be used.

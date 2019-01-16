@@ -241,8 +241,8 @@ namespace Umbraco.Web.Routing
         /// <param name="cacheRefresherEventArgs"></param>
         private void PageCacheRefresher_CacheUpdated(PageCacheRefresher sender, CacheRefresherEventArgs cacheRefresherEventArgs)
         {
-            // only on master / single, not on slaves!
-            if (IsSlaveServer) return;
+            // only on master / single, not on replicas!
+            if (IsReplicaServer) return;
 
             // simply getting OldRoutes will register it in the request cache,
             // so whatever we do with it, try/finally it to ensure it's cleared
@@ -299,8 +299,8 @@ namespace Umbraco.Web.Routing
             return route == null;
         }
 
-        // gets a value indicating whether server is 'slave'
-        private static bool IsSlaveServer
+        // gets a value indicating whether server is 'replica'
+        private static bool IsReplicaServer
         {
             get
             {

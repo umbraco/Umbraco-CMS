@@ -2,7 +2,7 @@
 <language alias="tr" intName="Turkish" localName="Türkçe" lcid="" culture="tr-TR">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Kültür ve Hostnames</key>
@@ -456,7 +456,7 @@
               <p>
               <strong>Tekrar dene</strong>. 
               <br />
-              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi.</a></p>]]>
     </key>
     <key alias="databaseText">

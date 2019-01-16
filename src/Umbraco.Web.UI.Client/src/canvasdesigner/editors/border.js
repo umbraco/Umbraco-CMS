@@ -73,7 +73,7 @@ angular.module("Umbraco.canvasdesigner")
             topbordertype: 'solid',
             bottombordersize: '',
             bottombordercolor: '',
-            bottombordertype: 'solid',
+            bottombordertype: 'solid'
         };
     }
 

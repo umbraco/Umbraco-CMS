@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -291,6 +292,14 @@ namespace Umbraco.Core.Services
                 {"ContentTypeAlias", contentTypeAlias},
             };
 
+            // check that the template hasn't been created on disk before creating the content type
+            // if it exists, set the new template content to the existing file content
+            string content = GetViewContent(contentTypeAlias);
+            if (content != null)
+            {
+                template.Content = content;
+            }
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
@@ -312,17 +321,29 @@ namespace Umbraco.Core.Services
             return Attempt.Succeed(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.Success, evtMsgs));
         }
 
+        /// <summary>
+        /// Create a new template, setting the content if a view exists in the filesystem
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        /// <param name="masterTemplate"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
+            // file might already be on disk, if so grab the content to avoid overwriting
             var template = new Template(name, name)
             {
-                Content = content
+                Content = GetViewContent(name) ?? content
             };
+
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
             }
+
             SaveTemplate(template, userId);
+
             return template;
         }
 
@@ -1074,6 +1095,33 @@ namespace Umbraco.Core.Services
         public string GetPartialViewMacroSnippetContent(string snippetName)
         {
             return GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialViewMacro);
+        }
+
+        private string GetViewContent(string filename)
+        {
+            if (filename.IsNullOrWhiteSpace())
+                throw new ArgumentNullException(nameof(filename));
+
+            if (filename.EndsWith(".cshtml") == false)
+            {
+                filename = $"{filename}.cshtml";
+            }
+
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateTemplateRepository(uow);
+                var stream = repository.GetFileContentStream(filename);
+
+                if (stream == null)
+                {
+                    return null;
+                }
+
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return reader.ReadToEnd().Trim();
+                }
+            }
         }
 
         private string GetPartialViewMacroSnippetContent(string snippetName, PartialViewType partialViewType)
