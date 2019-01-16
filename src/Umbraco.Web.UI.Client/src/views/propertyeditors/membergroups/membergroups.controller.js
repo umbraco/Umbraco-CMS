@@ -1,15 +1,4 @@
-﻿function memberGroupController($scope) {
-
-    //set the available to the keys of the dictionary who's value is true
-    $scope.getAvailable = function () {
-        var available = [];
-        for (var n in $scope.model.value) {
-            if ($scope.model.value[n] === false) {
-                available.push(n);
-            }
-        }
-        return available;
-    };
+﻿function memberGroupController($scope, editorService, memberGroupResource) {
     //set the selected to the keys of the dictionary who's value is true
     $scope.getSelected = function () {
         var selected = [];
@@ -21,16 +10,30 @@
         return selected;
     };
 
-    $scope.addItem = function(item) {
-        //keep the model up to date
-        $scope.model.value[item] = true;
-    };
-    
-    $scope.removeItem = function (item) {
-        //keep the model up to date
-        $scope.model.value[item] = false;
-    };
+    $scope.pickGroup = function() {
+        editorService.memberGroupPicker({
+            multiPicker: true,
+            submit: function (model) {
+                var selectedGroupIds = _.map(model.selectedMemberGroups
+                    ? model.selectedMemberGroups
+                    : [model.selectedMemberGroup],
+                    function(id) { return parseInt(id) }
+                );
+                memberGroupResource.getByIds(selectedGroupIds).then(function (selectedGroups) {
+                    _.each(selectedGroups, function(group) {
+                        $scope.model.value[group.name] = true;
+                    });
+                });
+                editorService.close();
+            },
+            close: function () {
+                editorService.close();
+            }
+        });
+    }
 
-
+    $scope.removeGroup = function (group) {
+        $scope.model.value[group] = false;
+    }
 }
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MemberGroupController", memberGroupController);

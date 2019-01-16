@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService)?.Name ?? "??"));
             xml.Add(new XAttribute("writerID", content.WriterId));
 
-            xml.Add(new XAttribute("template", content.Template?.Id.ToString(CultureInfo.InvariantCulture) ?? "0"));
+            xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? ""));
 
             xml.Add(new XAttribute("isPublished", content.Published));
 
@@ -337,7 +337,8 @@ namespace Umbraco.Core.Services
                                     new XElement("Thumbnail", contentType.Thumbnail),
                                     new XElement("Description", contentType.Description),
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
-                                    new XElement("IsListView", contentType.IsContainer.ToString()));
+                                    new XElement("IsListView", contentType.IsContainer.ToString()),
+                                    new XElement("IsElement", contentType.IsElement.ToString()));
 
             var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
             if(masterContentType != null)

@@ -42,13 +42,5 @@ namespace Umbraco.Core.Composing
         {
             return mgr.GetTypesWithAttribute<BaseMapper, MapperForAttribute>();
         }
-
-        /// <summary>
-        /// Gets all classes implementing ISqlSyntaxProvider and marked with the SqlSyntaxProviderAttribute.
-        /// </summary>
-        public static IEnumerable<Type> GetSqlSyntaxProviders(this TypeLoader mgr)
-        {
-            return mgr.GetTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
-        }
     }
 }

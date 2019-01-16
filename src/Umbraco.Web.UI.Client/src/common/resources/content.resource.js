@@ -940,8 +940,116 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to roll back content item with id " + contentId
             );
-        }
+        },
 
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getPublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getPublicAccess(contentId)
+          *    .then(function(publicAccess) {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @returns {Promise} resourcePromise object containing the public access protection
+          *
+          */
+        getPublicAccess: function (contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPublicAccess", {
+                        contentId: contentId
+                    })
+                ),
+                "Failed to get public access for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#updatePublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Sets or updates the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.updatePublicAccess(contentId, userName, password, roles, loginPageId, errorPageId)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @param {Array} groups The names of the groups that should have access (if using group based protection)
+          * @param {Array} usernames The usernames of the members that should have access (if using member based protection)
+          * @param {Int} loginPageId The Id of the login page
+          * @param {Int} errorPageId The Id of the error page
+          * @returns {Promise} resourcePromise object containing the public access protection
+          *
+          */
+        updatePublicAccess: function (contentId, groups, usernames, loginPageId, errorPageId) {
+            var publicAccess = {
+                contentId: contentId,
+                loginPageId: loginPageId,
+                errorPageId: errorPageId
+            };
+            if (angular.isArray(groups) && groups.length) {
+                publicAccess.groups = groups;
+            }
+            else if (angular.isArray(usernames) && usernames.length) {
+                publicAccess.usernames = usernames;
+            }
+            else {
+                throw "must supply either userName/password or roles";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess)
+                ),
+                "Failed to update public access for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#removePublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Removes the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.removePublicAccess(contentId)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @returns {Promise} resourcePromise object that's resolved once the public access has been removed
+          *
+          */
+        removePublicAccess: function (contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "RemovePublicAccess", {
+                        contentId: contentId
+                    })
+                ),
+                "Failed to remove public access for content item with id " + contentId
+            );
+        }
     };
 }
 

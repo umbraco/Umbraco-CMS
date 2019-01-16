@@ -12,13 +12,13 @@
                     <div class="umb-nested-content__heading" ng-class="{'-with-icon': showIcons}"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-bind="$parent.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
-                        <a class="umb-nested-content__icon umb-nested-content__icon--edit" title="{{editIconTitle}}" ng-class="{ 'umb-nested-content__icon--active' : $parent.realCurrentNode.id == node.id }" ng-click="$parent.editNode($index); $event.stopPropagation();" ng-show="$parent.maxItems > 1" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--edit" localize="title" title="general_edit" ng-class="{ 'umb-nested-content__icon--active' : $parent.realCurrentNode.id == node.id }" ng-click="$parent.editNode($index); $event.stopPropagation();" ng-show="$parent.maxItems > 1" prevent-default>
                             <i class="icon icon-edit"></i>
                         </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--move" title="{{moveIconTitle}}" ng-click="$event.stopPropagation();" ng-show="$parent.nodes.length > 1" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--move" localize="title" title="actions_move" ng-click="$event.stopPropagation();" ng-show="$parent.nodes.length > 1" prevent-default>
                             <i class="icon icon-navigation"></i>
                         </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" title="{{deleteIconTitle}}" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
                     </div>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="umb-nested-content__footer-bar" ng-hide="nodes.length >= maxItems">
-            <a class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
+            <a href class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
                 <i class="icon icon-add"></i>
             </a>
         </div>

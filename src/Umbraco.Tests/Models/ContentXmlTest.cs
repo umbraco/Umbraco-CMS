@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Models
         public void Can_Generate_Xml_Representation_Of_Content()
         {
             // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(content.GetCreatorProfile(ServiceContext.UserService).Name, (string)element.Attribute("creatorName"));
             Assert.AreEqual(content.GetWriterProfile(ServiceContext.UserService).Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
-            Assert.AreEqual(content.Template == null ? "0" : content.Template.Id.ToString(), (string)element.Attribute("template"));
+            Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
 
             Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
             Assert.AreEqual(content.Properties["bodyText"].GetValue().ToString(), element.Elements("bodyText").Single().Value);

@@ -190,8 +190,8 @@ AND umbracoNode.nodeObjectType = @objectType",
                                         SortOrder = allowedContentType.SortOrder
                                     });
             }
-            
-        
+
+
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
@@ -328,14 +328,14 @@ AND umbracoNode.id <> @id",
             // We check if the entity's own PropertyTypes has been modified and then also check
             // any of the property groups PropertyTypes has been modified.
             // This specifically tells us if any property type collections have changed.
-            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
+            if (entity.IsPropertyDirty("NoGroupPropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
             {
                 var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { entity.Id });
-                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
+                var dbPropertyTypeIds = dbPropertyTypes.Select(x => x.Id);
                 var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
-                var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
-                foreach (var item in items)
-                    DeletePropertyType(entity.Id, item);
+                var propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
+                foreach (var propertyTypeId in propertyTypeToDeleteIds)
+                    DeletePropertyType(entity.Id, propertyTypeId);
             }
 
             // Delete tabs ... by excepting entries from db with entries from collections.
@@ -620,7 +620,7 @@ AND umbracoNode.id <> @id",
             var sqlDelete = Sql()
                 .Delete<RedirectUrlDto>()
                 .WhereIn((System.Linq.Expressions.Expression<Func<RedirectUrlDto, object>>)(x => x.ContentKey), sqlSelect);
-            
+
             Database.Execute(sqlDelete);
         }
 
@@ -663,9 +663,11 @@ AND umbracoNode.id <> @id",
                 {
                     case ContentVariation.Culture:
                         CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
+                        CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
                         break;
                     case ContentVariation.Nothing:
                         CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
+                        CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
                         break;
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
@@ -690,7 +692,7 @@ AND umbracoNode.id <> @id",
                     //first clear out any existing names that might already exists under the default lang
                     //there's 2x tables to update
 
-                    //clear out the versionCultureVariation table 
+                    //clear out the versionCultureVariation table
                     var sqlSelect = Sql().Select<ContentVersionCultureVariationDto>(x => x.Id)
                         .From<ContentVersionCultureVariationDto>()
                         .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
@@ -757,6 +759,139 @@ AND umbracoNode.id <> @id",
             }
         }
 
+        ///
+        private void CopyTagData(int? sourceLanguageId, int? targetLanguageId, IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
+        {
+            // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
+
+            // fixme - should we batch then?
+            var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
+            if (whereInArgsCount > 2000)
+                throw new NotSupportedException("Too many property/content types.");
+
+            // delete existing relations (for target language)
+            // do *not* delete existing tags
+
+            var sqlSelectTagsToDelete = Sql()
+                .Select<TagDto>(x => x.Id)
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId);
+
+            if (contentTypeIds != null)
+                sqlSelectTagsToDelete
+                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+            sqlSelectTagsToDelete
+                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
+
+            var sqlDeleteRelations = Sql()
+                .Delete<TagRelationshipDto>()
+                .WhereIn<TagRelationshipDto>(x => x.TagId, sqlSelectTagsToDelete);
+
+            Database.Execute(sqlDeleteRelations);
+
+            // do *not* delete the tags - they could be used by other content types / property types
+            /*
+            var sqlDeleteTag = Sql()
+                .Delete<TagDto>()
+                .WhereIn<TagDto>(x => x.Id, sqlTagToDelete);
+            Database.Execute(sqlDeleteTag);
+            */
+
+            // copy tags from source language to target language
+            // target tags may exist already, so we have to check for existence here
+            //
+            // select tags to insert: tags pointed to by a relation ship, for proper property/content types,
+            // and of source language, and where we cannot left join to an existing tag with same text,
+            // group and languageId
+
+            var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
+            var sqlSelectTagsToInsert = Sql()
+                .SelectDistinct<TagDto>(x => x.Text, x => x.Group)
+                .Append(", " + targetLanguageIdS)
+                .From<TagDto>();
+
+            sqlSelectTagsToInsert
+                .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
+                .LeftJoin<TagDto>("xtags").On<TagDto, TagDto>((tag, xtag) => tag.Text == xtag.Text && tag.Group == xtag.Group && xtag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "xtags");
+
+            if (contentTypeIds != null)
+                sqlSelectTagsToInsert
+                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+            sqlSelectTagsToInsert
+                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
+                .WhereNull<TagDto>(x => x.Id, "xtags") // ie, not exists
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
+
+            var cols = Sql().Columns<TagDto>(x => x.Text, x => x.Group, x => x.LanguageId);
+            var sqlInsertTags = Sql($"INSERT INTO {TagDto.TableName} ({cols})").Append(sqlSelectTagsToInsert);
+
+            Database.Execute(sqlInsertTags);
+
+            // create relations to new tags
+            // any existing relations have been deleted above, no need to check for existence here
+            //
+            // select node id and property type id from existing relations to tags of source language,
+            // for proper property/content types, and select new tag id from tags, with matching text,
+            // and group, but for the target language
+
+            var sqlSelectRelationsToInsert = Sql()
+                .SelectDistinct<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId)
+                .AndSelect<TagDto>("otag", x => x.Id)
+                .From<TagRelationshipDto>()
+                .InnerJoin<TagDto>().On<TagRelationshipDto, TagDto>((rel, tag) => rel.TagId == tag.Id)
+                .InnerJoin<TagDto>("otag").On<TagDto, TagDto>((tag, otag) => tag.Text == otag.Text && tag.Group == otag.Group && otag.LanguageId.SqlNullableEquals(targetLanguageId, -1), aliasRight: "otag");
+
+            if (contentTypeIds != null)
+                sqlSelectRelationsToInsert
+                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+            sqlSelectRelationsToInsert
+                .Where<TagDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1))
+                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds);
+
+            var relationColumnsToInsert = Sql().Columns<TagRelationshipDto>(x => x.NodeId, x => x.PropertyTypeId, x => x.TagId);
+            var sqlInsertRelations = Sql($"INSERT INTO {TagRelationshipDto.TableName} ({relationColumnsToInsert})").Append(sqlSelectRelationsToInsert);
+
+            Database.Execute(sqlInsertRelations);
+
+            // delete original relations - *not* the tags - all of them
+            // cannot really "go back" with relations, would have to do it with property values
+
+            sqlSelectTagsToDelete = Sql()
+                .Select<TagDto>(x => x.Id)
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId);
+
+            if (contentTypeIds != null)
+                sqlSelectTagsToDelete
+                    .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+
+            sqlSelectTagsToDelete
+                .WhereIn<TagRelationshipDto>(x => x.PropertyTypeId, propertyTypeIds)
+                .Where<TagDto>(x => !x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
+
+            sqlDeleteRelations = Sql()
+                .Delete<TagRelationshipDto>()
+                .WhereIn<TagRelationshipDto>(x => x.TagId, sqlSelectTagsToDelete);
+
+            Database.Execute(sqlDeleteRelations);
+
+            // no
+            /*
+            var sqlDeleteTag = Sql()
+                .Delete<TagDto>()
+                .WhereIn<TagDto>(x => x.Id, sqlTagToDelete);
+            Database.Execute(sqlDeleteTag);
+            */
+        }
+
         /// <summary>
         /// Copies property data from one language to another.
         /// </summary>
@@ -766,6 +901,8 @@ AND umbracoNode.id <> @id",
         /// <param name="contentTypeIds">The content type identifiers.</param>
         private void CopyPropertyData(int? sourceLanguageId, int? targetLanguageId, IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
         {
+            // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
+            //
             // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
@@ -793,11 +930,7 @@ AND umbracoNode.id <> @id",
                 sqlDelete.WhereIn<PropertyDataDto>(x => x.VersionId, inSql);
             }
 
-            // NPoco cannot turn the clause into IS NULL with a nullable parameter - deal with it
-            if (targetLanguageId == null)
-                sqlDelete.Where<PropertyDataDto>(x => x.LanguageId == null);
-            else
-                sqlDelete.Where<PropertyDataDto>(x => x.LanguageId == targetLanguageId);
+            sqlDelete.Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(targetLanguageId, -1));
 
             sqlDelete
                 .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
@@ -821,11 +954,7 @@ AND umbracoNode.id <> @id",
                     .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pdata, cversion) => pdata.VersionId == cversion.Id)
                     .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>((cversion, c) => cversion.NodeId == c.NodeId);
 
-            // NPoco cannot turn the clause into IS NULL with a nullable parameter - deal with it
-            if (sourceLanguageId == null)
-                sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId == null);
-            else
-                sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId == sourceLanguageId);
+            sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(sourceLanguageId, -1));
 
             sqlSelectData
                 .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
@@ -1154,7 +1283,7 @@ AND umbracoNode.id <> @id",
                 if (db == null) throw new ArgumentNullException(nameof(db));
 
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc, cmsContentType.variations as ctVariations,
-                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
+                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.IsElement as ctIsElement, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
@@ -1255,6 +1384,7 @@ AND umbracoNode.id <> @id",
                     Description = currCt.ctDesc,
                     Icon = currCt.ctIcon,
                     IsContainer = currCt.ctIsContainer,
+                    IsElement = currCt.ctIsElement,
                     NodeId = currCt.ctId,
                     PrimaryKey = currCt.ctPk,
                     Thumbnail = currCt.ctThumb,
@@ -1293,7 +1423,7 @@ AND umbracoNode.id <> @id",
 
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc, cmsContentType.variations as ctVariations,
-                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
+                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.IsElement as ctIsElement, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
@@ -1430,6 +1560,7 @@ AND umbracoNode.id <> @id",
                         Description = currCt.ctDesc,
                         Icon = currCt.ctIcon,
                         IsContainer = currCt.ctIsContainer,
+                        IsElement = currCt.ctIsElement,
                         NodeId = currCt.ctId,
                         PrimaryKey = currCt.ctPk,
                         Thumbnail = currCt.ctThumb,

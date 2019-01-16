@@ -191,7 +191,7 @@
 							$timeout(function() {
 								var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
 								if (nameField) {
-									nameField.bind('blur', function(event) {
+									nameField.on('blur', function(event) {
 										if (event.target.value) {
 											vm.save(true);
 										}
@@ -438,7 +438,7 @@
                 var emptyStateMessage = values[1];
 
                 var dictionaryItem = {
-                    section: "settings",
+                    section: "translation",
                     treeAlias: "dictionary",
                     entityType: "dictionary",
                     multiPicker: false,

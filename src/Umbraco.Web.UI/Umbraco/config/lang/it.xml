@@ -13,7 +13,7 @@
     <key alias="createPackage">Crea pacchetto</key>
     <key alias="delete">Cancella</key>
     <key alias="disable">Disabilita</key>
-    <key alias="emptyTrashcan">Svuota il cestino</key>
+    <key alias="emptyRecycleBin">Svuota il cestino</key>
     <key alias="exportDocumentType">Esporta il tipo di documento</key>
     <key alias="importDocumentType">Importa il tipo di documento</key>
     <key alias="importPackage">Importa il pacchetto</key>
@@ -164,7 +164,6 @@
     <key alias="closeThisWindow">Chiudi questa finestra</key>
     <key alias="confirmdelete"><![CDATA[Sei sicuro di voler eliminare?]]></key>
     <key alias="confirmdisable"><![CDATA[Sei sicuro di voler disabilitare?]]></key>
-    <key alias="confirmEmptyTrashcan"><![CDATA[Cliccare per confermare la cancellazione di %0% elemento(i)]]></key>
     <key alias="confirmlogout"><![CDATA[Sei sicuro?]]></key>
     <key alias="confirmSure"><![CDATA[Sei sicuro?]]></key>
     <key alias="cut">Taglia</key>

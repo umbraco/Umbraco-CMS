@@ -266,7 +266,7 @@ angular.module("umbraco.directives")
 					//ie hack
 					if(window.navigator.userAgent.indexOf("MSIE ") >= 0){
 						var ranger = element.find("input");
-						ranger.bind("change",function(){
+						ranger.on("change",function(){
 							scope.$apply(function(){
 								scope.dimensions.scale.current = ranger.val();
 							});
@@ -274,7 +274,7 @@ angular.module("umbraco.directives")
 					}
 
 					//// INIT /////
-					$image.load(function(){
+					$image.on("load", function(){
 						$timeout(function(){
 							init($image);
 						});

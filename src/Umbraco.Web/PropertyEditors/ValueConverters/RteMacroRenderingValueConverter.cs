@@ -22,7 +22,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ServiceContext _services;
-        private readonly CacheHelper _appCache;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
         {
@@ -31,11 +30,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyCacheLevel.Snapshot;
         }
 
-        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _services = services;
-            _appCache = appCache;
         }
 
         // NOT thread-safe over a request because it modifies the
@@ -49,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var sb = new StringBuilder();
 
-                var umbracoHelper = new UmbracoHelper(umbracoContext, _services, _appCache);
+                var umbracoHelper = new UmbracoHelper(umbracoContext, _services);
                 MacroTagParser.ParseMacros(
                     source,
                     //callback for when text block is found

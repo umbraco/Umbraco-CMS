@@ -1,15 +1,17 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $routeParams, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
+    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
-        function link(scope, element, attrs, umbVariantContentCtrl) {
+        function link(scope, umbVariantContentCtrl) {
 
             var evts = [];
             var isInfoTab = false;
             var auditTrailLoaded = false;
             var labels = {};
             scope.publishStatus = [];
+            scope.currentVariant = null;
+            scope.currentUrls = [];
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
@@ -17,39 +19,68 @@
 
             function onInit() {
 
-                userService.getCurrentUser().then(function(user){
-                        // only allow change of media type if user has access to the settings sections
-                        angular.forEach(user.sections, function(section){
-                            if(section.alias === "settings") {
-                                scope.allowChangeDocumentType = true;
-                                scope.allowChangeTemplate = true;
-                            }
-                        });
-                    });
+                // set currentVariant
+                scope.currentVariant = _.find(scope.node.variants, (v) => v.active);
+
+                updateCurrentUrls();
+
+                // if there are any infinite editors open we are in infinite editing
+                scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
+
+                userService.getCurrentUser().then(function (user) {
+                    // only allow change of media type if user has access to the settings sections
+                    const hasAccessToSettings = user.allowedSections.indexOf("settings") !== -1 ? true : false;
+                    scope.allowChangeDocumentType = hasAccessToSettings;
+                    scope.allowChangeTemplate = hasAccessToSettings;
+                });
 
                 var keys = [
-                    "general_deleted", 
-                    "content_unpublished", 
+                    "general_deleted",
+                    "content_unpublished",
                     "content_published",
                     "content_publishedPendingChanges",
-                    "content_notCreated"
+                    "content_notCreated",
+                    "prompt_unsavedChanges",
+                    "prompt_doctypeChangeWarning",
+                    "general_history",
+                    "auditTrails_historyIncludingVariants",
+                    "content_itemNotPublished"
                 ];
 
                 localizationService.localizeMany(keys)
-                    .then(function(data){
+                    .then(function (data) {
                         labels.deleted = data[0];
                         labels.unpublished = data[1]; //aka draft
                         labels.published = data[2];
                         labels.publishedPendingChanges = data[3];
                         labels.notCreated = data[4];
+                        labels.unsavedChanges = data[5];
+                        labels.doctypeChangeWarning = data[6];
+                        labels.notPublished = data[9];
 
-                        setNodePublishStatus(scope.node);
+                        scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
+
+                        setNodePublishStatus();
+
+                        if (scope.currentUrls.length === 0) {
+                            if (scope.node.id > 0) {
+                                //it's created but not published
+                                scope.currentUrls.push({ text: labels.notPublished, isUrl: false });
+                            }
+                            else {
+                                //it's new
+                                scope.currentUrls.push({ text: labels.notCreated, isUrl: false })
+                            }
+                        }
 
                     });
 
                 scope.auditTrailOptions = {
                     "id": scope.node.id
                 };
+
+                // make sure dates are formatted to the user's locale
+                formatDatesToLocal();
 
                 // get available templates
                 scope.availableTemplates = scope.node.allowedTemplates;
@@ -66,9 +97,9 @@
                 }
 
                 //load in the audit trail if we are currently looking at the INFO tab
-                if (umbVariantContentCtrl) {
+                if (umbVariantContentCtrl && umbVariantContentCtrl.editor) {
                     var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
-                    if (activeApp.alias === "umbInfo") {
+                    if (activeApp && activeApp.alias === "umbInfo") {
                         isInfoTab = true;
                         loadAuditTrail();
                         loadRedirectUrls();
@@ -84,25 +115,56 @@
             };
 
             scope.openDocumentType = function (documentType) {
-                var editor = {
+
+                const variantIsDirty = _.some(scope.node.variants, function (variant) {
+                    return variant.isDirty;
+                });
+
+                // add confirmation dialog before opening the doc type editor
+                if (variantIsDirty) {
+                    const confirm = {
+                        title: labels.unsavedChanges,
+                        view: "default",
+                        content: labels.doctypeChangeWarning,
+                        submitButtonLabelKey: "general_continue",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function () {
+                            openDocTypeEditor(documentType);
+                            overlayService.close();
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(confirm);
+                } else {
+                    openDocTypeEditor(documentType);
+                }
+
+            };
+
+            function openDocTypeEditor(documentType) {
+                const editor = {
                     id: documentType.id,
-                    submit: function(model) {
+                    submit: function (model) {
+                        const args = { node: scope.node };
+                        eventsService.emit('editors.content.reload', args);
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
                 editorService.documentTypeEditor(editor);
-            };
+            }
 
             scope.openTemplate = function () {
                 var templateEditor = {
                     id: scope.node.templateId,
-                    submit: function(model) {
+                    submit: function (model) {
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
@@ -114,16 +176,16 @@
                 scope.node.template = templateAlias;
             };
 
-            scope.openRollback = function() {
-                
+            scope.openRollback = function () {
+
                 var rollback = {
                     node: scope.node,
-                    submit: function(model) {
+                    submit: function (model) {
                         const args = { node: scope.node };
                         eventsService.emit("editors.content.reload", args);
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
@@ -183,12 +245,13 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
-
                     switch (item.logType) {
                         case "Publish":
+                        case "PublishVariant":
                             item.logTypeColor = "success";
                             break;
                         case "Unpublish":
+                        case "UnpublishVariant":
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;
@@ -198,50 +261,50 @@
                 });
             }
 
-            function setNodePublishStatus(node) {
+            function setNodePublishStatus() {
 
-                scope.publishStatus = [];
+                scope.status = {};
 
                 // deleted node
-                if (node.trashed === true) {
-                    scope.publishStatus.push({
-                        label: labels.deleted,
-                        color: "danger"
-                    });
+                if (scope.node.trashed === true) {
+                    scope.status.color = "danger";
                     return;
                 }
 
-                if (node.variants) {
-                    for (var i = 0; i < node.variants.length; i++) {
+                // variant status
+                if (scope.currentVariant.state === "NotCreated") {
+                    // not created
+                    scope.status.color = "gray";
+                }
+                else if (scope.currentVariant.state === "Draft") {
+                    // draft node
+                    scope.status.color = "gray";
+                }
+                else if (scope.currentVariant.state === "Published") {
+                    // published node
+                    scope.status.color = "success";
+                }
+                else if (scope.currentVariant.state === "PublishedPendingChanges") {
+                    // published node with pending changes
+                    scope.status.color = "success";
+                }
+            }
 
-                        var variant = node.variants[i];
+            function formatDatesToLocal() {
+                // get current backoffice user and format dates
+                userService.getCurrentUser().then(function (currentUser) {
+                    scope.currentVariant.createDateFormatted = dateHelper.getLocalDate(scope.currentVariant.createDate, currentUser.locale, 'LLL');
+                });
+            }
 
-                        var status = {
-                            culture: variant.language ? variant.language.culture : null
-                        };
-
-                        if (variant.state === "NotCreated") {
-                            status.label = labels.notCreated;
-                            status.color = "gray";
-                        }
-                        else if (variant.state === "Draft") {
-                            // draft node
-                            status.label = labels.unpublished;
-                            status.color = "gray";
-                        }
-                        else if (variant.state === "Published") {
-                            // published node
-                            status.label = labels.published;
-                            status.color = "success";
-                        }
-                        else if (variant.state === "PublishedPendingChanges") {
-                            // published node with pending changes
-                            status.label = labels.publishedPendingChanges;
-                            status.color = "success";
-                        }
-                        
-                        scope.publishStatus.push(status);
-                    }
+            function updateCurrentUrls() {
+                // find the urls for the currently selected language
+                if (scope.node.variants.length > 1) {
+                    // nodes with variants
+                    scope.currentUrls = _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
+                } else {
+                    // invariant nodes
+                    scope.currentUrls = scope.node.urls;
                 }
             }
 
@@ -268,7 +331,8 @@
                     auditTrailLoaded = false;
                     loadAuditTrail();
                     loadRedirectUrls();
-                    setNodePublishStatus(scope.node);
+                    setNodePublishStatus();
+                    updateCurrentUrls();
                 }
             });
 

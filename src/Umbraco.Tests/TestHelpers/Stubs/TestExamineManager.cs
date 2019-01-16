@@ -6,64 +6,40 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestExamineManager : IExamineManager
     {
-        private readonly ConcurrentDictionary<string, IIndexer> _indexers = new ConcurrentDictionary<string, IIndexer>();
+        private readonly ConcurrentDictionary<string, IIndex> _indexers = new ConcurrentDictionary<string, IIndex>();
         private readonly ConcurrentDictionary<string, ISearcher> _searchers = new ConcurrentDictionary<string, ISearcher>();
 
-        public void AddIndexer(string name, IIndexer indexer)
+        public IIndex AddIndex(IIndex indexer)
         {
-            _indexers.TryAdd(name, indexer);
+            _indexers.TryAdd(indexer.Name, indexer);
+            return indexer;
         }
 
-        public void AddSearcher(string name, ISearcher searcher)
+        public ISearcher AddSearcher(ISearcher searcher)
         {
-            _searchers.TryAdd(name, searcher);
+            _searchers.TryAdd(searcher.Name, searcher);
+            return searcher;
         }
-
-        public void DeleteFromIndexes(string nodeId)
-        {
-            //noop
-        }
-
-        public void DeleteFromIndexes(string nodeId, IEnumerable<IIndexer> providers)
-        {
-            //noop
-        }
-
+        
         public void Dispose()
         {
             //noop
         }
 
-        public IIndexer GetIndexer(string indexerName)
+        public bool TryGetIndex(string indexName, out IIndex index)
         {
-            return _indexers.TryGetValue(indexerName, out var indexer) ? indexer : null;
+            return _indexers.TryGetValue(indexName, out index);
         }
 
-        public ISearcher GetRegisteredSearcher(string searcherName)
+        public bool TryGetSearcher(string searcherName, out ISearcher searcher)
         {
-            return _searchers.TryGetValue(searcherName, out var indexer) ? indexer : null;
+            return _searchers.TryGetValue(searcherName, out searcher);
         }
 
-        public void IndexAll(string indexCategory)
-        {
-            //noop
-        }
+        public IEnumerable<IIndex> Indexes => _indexers.Values;
 
-        public void IndexItems(ValueSet[] nodes)
-        {
-            //noop
-        }
+        public IEnumerable<ISearcher> RegisteredSearchers => _searchers.Values;
 
-        public void IndexItems(ValueSet[] nodes, IEnumerable<IIndexer> providers)
-        {
-            //noop
-        }
-
-        public void RebuildIndexes()
-        {
-            //noop
-        }
-
-        public IReadOnlyDictionary<string, IIndexer> IndexProviders => _indexers;
+        public IReadOnlyDictionary<string, IIndex> IndexProviders => _indexers;
     }
 }

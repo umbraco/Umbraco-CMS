@@ -1,10 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Web;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
+﻿using Examine.LuceneEngine.Search;
+using Examine.Search;
 using Umbraco.Core;
-using Umbraco.Examine.Config;
 
 namespace Umbraco.Examine
 {
@@ -76,17 +72,6 @@ namespace Umbraco.Examine
             return fieldQuery;
         }
 
-        /// <summary>
-        /// Used to replace any available tokens in the index path before the lucene directory is assigned to the path
-        /// </summary>
-        /// <param name="indexSet"></param>
-        internal static void ReplaceTokensInIndexPath(this IndexSet indexSet)
-        {
-            if (indexSet == null) return;
-            indexSet.IndexPath = indexSet.IndexPath
-                .Replace("{machinename}", NetworkHelper.FileSafeMachineName)
-                .Replace("{appdomainappid}", (HttpRuntime.AppDomainAppId ?? string.Empty).ReplaceNonAlphanumericChars(""))
-                .EnsureEndsWith('/');
-        }
+        
     }
 }

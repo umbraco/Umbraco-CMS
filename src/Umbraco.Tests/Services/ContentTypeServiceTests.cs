@@ -17,10 +17,41 @@ using Umbraco.Tests.Scoping;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
+    [Category("Slow")]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentTypeServiceTests : TestWithSomeContentBase
     {
+        [Test]
+        public void CanSaveAndGetIsElement()
+        {
+            //create content type with a property type that varies by culture
+            IContentType contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Nothing;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Nothing
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            contentType = ServiceContext.ContentTypeService.Get(contentType.Id);
+            Assert.IsFalse(contentType.IsElement);
+
+            contentType.IsElement = true;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            contentType = ServiceContext.ContentTypeService.Get(contentType.Id);
+            Assert.IsTrue(contentType.IsElement);
+        }
+
         [Test]
         public void Change_Content_Type_Variation_Clears_Redirects()
         {
@@ -148,7 +179,7 @@ namespace Umbraco.Tests.Services
             //change the content type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello2", "en-US");
             ServiceContext.ContentService.Save(doc);
-            contentType.Variations = ContentVariation.Nothing;            
+            contentType.Variations = ContentVariation.Nothing;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
@@ -372,7 +403,7 @@ namespace Umbraco.Tests.Services
             doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
 
             //this will be null because the doc type was changed back to variant but it's property types don't get changed back
-            Assert.IsNull(doc.GetValue("title", "en-US")); 
+            Assert.IsNull(doc.GetValue("title", "en-US"));
             Assert.IsNull(doc2.GetValue("title", "en-US"));
         }
 
@@ -611,7 +642,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Deleting_PropertyType_Removes_The_Property_From_Content()
         {
-            IContentType contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            IContentType contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent contentItem = MockedContent.CreateTextpageContent(contentType1, "Testing", -1);
@@ -633,11 +664,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Rebuild_Content_Xml_On_Alias_Change()
         {
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            var contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
 
-            var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "Test2");
+            var contentType2 = MockedContentTypes.CreateTextPageContentType("test2", "Test2");
             ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType2);
 
@@ -701,7 +732,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Rebuild_Content_Xml_On_Property_Removal()
         {
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            var contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
@@ -1714,50 +1745,65 @@ namespace Umbraco.Tests.Services
             // Arrange
             var service = ServiceContext.ContentTypeService;
 
+            // create 'page' content type with a 'Content_' group
             var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, false, "Content_");
+            Assert.IsTrue(page.PropertyGroups.Contains("Content_"));
+            Assert.AreEqual(3, page.PropertyTypes.Count());
             service.Save(page);
+
+            // create 'contentPage' content type as a child of 'page'
             var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true);
-            service.Save(contentPage);
-            var composition = MockedContentTypes.CreateMetaContentType();
-            composition.AddPropertyGroup("Content");
-            service.Save(composition);
-            //Adding Meta-composition to child doc type
-            contentPage.AddContentType(composition);
+            Assert.AreEqual(3, contentPage.PropertyTypes.Count());
             service.Save(contentPage);
 
-            // Act
-            var propertyTypeOne = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "testTextbox")
+            // add 'Content' group to 'meta' content type
+            var meta = MockedContentTypes.CreateMetaContentType();
+            meta.AddPropertyGroup("Content");
+            Assert.AreEqual(2, meta.PropertyTypes.Count());
+            service.Save(meta);
+
+            // add 'meta' content type to 'contentPage' composition
+            contentPage.AddContentType(meta);
+            service.Save(contentPage);
+
+            // add property 'prop1' to 'contentPage' group 'Content_'
+            var prop1 = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "testTextbox")
             {
                  Name = "Test Textbox", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var firstOneAdded = contentPage.AddPropertyType(propertyTypeOne, "Content_");
-            var propertyTypeTwo = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "anotherTextbox")
+            var prop1Added = contentPage.AddPropertyType(prop1, "Content_");
+            Assert.IsTrue(prop1Added);
+
+            // add property 'prop2' to 'contentPage' group 'Content'
+            var prop2 = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "anotherTextbox")
             {
                  Name = "Another Test Textbox", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var secondOneAdded = contentPage.AddPropertyType(propertyTypeTwo, "Content");
+            var prop2Added = contentPage.AddPropertyType(prop2, "Content");
+            Assert.IsTrue(prop2Added);
+
+            // save 'contentPage' content type
             service.Save(contentPage);
 
-            Assert.That(page.PropertyGroups.Contains("Content_"), Is.True);
-            var propertyGroup = page.PropertyGroups["Content_"];
-            page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "ContentTab", SortOrder = 0});
+            var group = page.PropertyGroups["Content_"];
+            group.Name = "ContentTab"; // rename the group
             service.Save(page);
+            Assert.AreEqual(3, page.PropertyTypes.Count());
 
-            // Assert
-            Assert.That(firstOneAdded, Is.True);
-            Assert.That(secondOneAdded, Is.True);
+            // get 'contentPage' content type again
+            var contentPageAgain = service.Get("contentPage");
+            Assert.IsNotNull(contentPageAgain);
 
-            var contentType = service.Get("contentPage");
-            Assert.That(contentType, Is.Not.Null);
+            // assert that 'Content_' group is still there because we don't propagate renames
+            var findGroup = contentPageAgain.CompositionPropertyGroups.FirstOrDefault(x => x.Name == "Content_");
+            Assert.IsNotNull(findGroup);
 
-            var compositionPropertyGroups = contentType.CompositionPropertyGroups;
-
-            // now it is still 1, because we don't propagate renames anymore
-            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(1));
-
-            var propertyTypeCount = contentType.PropertyTypes.Count();
-            var compPropertyTypeCount = contentType.CompositionPropertyTypes.Count();
+            // count all property types (local and composed)
+            var propertyTypeCount = contentPageAgain.PropertyTypes.Count();
             Assert.That(propertyTypeCount, Is.EqualTo(5));
+
+            // count composed property types
+            var compPropertyTypeCount = contentPageAgain.CompositionPropertyTypes.Count();
             Assert.That(compPropertyTypeCount, Is.EqualTo(10));
         }
 

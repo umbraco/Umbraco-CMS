@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Lucene.Net.Store;
+using Examine.Search;
 using NUnit.Framework;
-using Examine.LuceneEngine.SearchCriteria;
 using Moq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
-using Umbraco.Examine;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Composing;
+using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -53,24 +53,27 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
+            var propertyEditors = Factory.GetInstance<PropertyEditorCollection>();
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider.SqlContext, true);
+
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, contentService: contentService))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
             using (indexer.ProcessNonAsync())
             {
-                indexer.RebuildIndex();
-                
+                indexer.CreateIndex();
+                rebuilder.Populate(indexer);
 
                 var searcher = indexer.GetSearcher();
 
-                var numberSortedCriteria = searcher.CreateCriteria()
-                    .ParentId(1148).And()
+                var numberSortedCriteria = searcher.CreateQuery()
+                    .ParentId(1148)
                     .OrderBy(new SortableField("sortOrder", SortType.Int));
-                var numberSortedResult = searcher.Search(numberSortedCriteria.Compile());
+                var numberSortedResult = numberSortedCriteria.Execute();
 
-                var stringSortedCriteria = searcher.CreateCriteria()
-                    .ParentId(1148).And()
-                    .OrderBy("sortOrder"); //will default to string
-                var stringSortedResult = searcher.Search(stringSortedCriteria.Compile());
+                var stringSortedCriteria = searcher.CreateQuery()
+                    .ParentId(1148)
+                    .OrderBy(new SortableField("sortOrder"));//will default to string
+                var stringSortedResult = stringSortedCriteria.Execute();
 
                 Assert.AreEqual(12, numberSortedResult.TotalItemCount);
                 Assert.AreEqual(12, stringSortedResult.TotalItemCount);
@@ -80,12 +83,12 @@ namespace Umbraco.Tests.UmbracoExamine
             }
         }
 
-        private bool IsSortedByNumber(IEnumerable<SearchResult> results)
+        private bool IsSortedByNumber(IEnumerable<ISearchResult> results)
         {
             var currentSort = 0;
             foreach (var searchResult in results)
             {
-                var sort = int.Parse(searchResult.Fields["sortOrder"]);
+                var sort = int.Parse(searchResult.Values["sortOrder"]);
                 if (currentSort >= sort)
                 {
                     return false;

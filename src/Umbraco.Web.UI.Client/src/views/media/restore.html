@@ -2,24 +2,32 @@
 	<div class="umb-dialog-body">
 		<umb-pane>
 
-			<p class="abstract" ng-hide="error != null || success == true">
-				<localize key="actions_restore">Restore</localize> <strong>{{currentNode.name}}</strong> <localize key="general_under">under</localize> <strong>{{target.name}}</strong>?
+		    <umb-load-indicator
+		        ng-show="loading">
+		    </umb-load-indicator>
+
+		    <p class="abstract" ng-hide="loading || error != null || success">
+				<localize key="actions_restore">Restore</localize> <strong>{{source.name}}</strong> <localize key="general_under">under</localize> <strong>{{target.name}}</strong>?
             </p>
 
-            <div class="alert alert-error" ng-show="error != null">
-                <div><strong>{{error.errorMsg}}</strong></div>
-                <div>{{error.data.Message}}</div>
-            </div>
+		    <div ng-show="error">
+		        <div class="alert alert-error">
+		            <div><strong>{{error.errorMsg}}</strong></div>
+		            <div>{{error.data.Message}}</div>
+		        </div>
+		    </div>
 
-			<div class="alert alert-success" ng-show="success == true">
-				<p><strong>{{currentNode.name}}</strong> <localize key="editdatatype_wasMoved">was moved underneath</localize> <strong>{{target.name}}</strong></p>
-				<button class="btn btn-primary" ng-click="close()"><localize key="general_ok">OK</localize></button>
-			</div>
+		    <div ng-show="success">
+		        <div class="alert alert-success">
+                    <strong>{{source.name}}</strong> <localize key="editdatatype_wasMoved">was moved underneath</localize> <strong>{{target.name}}</strong>
+		        </div>
+		        <button class="btn btn-primary" ng-click="close()"><localize key="general_ok">Ok</localize></button>
+		    </div>
 
 		</umb-pane>
 	</div>
 
-	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success == true">
+	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="loading || success">
 		<a class="btn btn-link" ng-click="close()"><localize key="general_cancel">Cancel</localize></a>
 		<button class="btn btn-primary" ng-click="restore()" ng-show="error == null"><localize key="actions_restore">Restore</localize></button>
 	</div>

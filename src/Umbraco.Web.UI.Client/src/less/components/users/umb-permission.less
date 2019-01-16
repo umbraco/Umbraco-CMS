@@ -4,10 +4,6 @@
     padding: 7px 0;
 }
 
-.umb-permission--disabled {
-    opacity: 0.8;
-}
-
 .umb-permission:last-of-type {
     border-bottom: none;
 }
@@ -23,6 +19,12 @@
     justify-content: center;
     flex: 1 1 auto;
     cursor: pointer;
+}
+
+.umb-permission--disabled .umb-permission__toggle,
+.umb-permission--disabled .umb-permission__content {
+    cursor: not-allowed;
+    opacity: 0.8;
 }
 
 .umb-permission__description {

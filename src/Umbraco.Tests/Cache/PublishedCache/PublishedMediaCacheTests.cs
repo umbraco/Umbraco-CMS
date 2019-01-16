@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -7,13 +6,13 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
-using LightInject;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.PublishedContent;
@@ -30,7 +29,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         {
             base.Compose();
 
-            Container.GetInstance<UrlSegmentProviderCollectionBuilder>()
+            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
         }
@@ -111,7 +110,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         [TestCase("id")]
-        [TestCase("nodeId")]
         [TestCase("__NodeId")]
         public void DictionaryDocument_Id_Keys(string key)
         {
@@ -128,7 +126,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         [TestCase("nodeName")]
-        [TestCase("__nodeName")]
         public void DictionaryDocument_NodeName_Keys(string key)
         {
             var dicDoc = GetDictionaryDocument(nodeNameKey: key);
@@ -204,12 +201,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 {"creatorName", "Shannon"}
             };
 
-            var result = new SearchResult("1234", 1, 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
+            var result = new SearchResult("1234", 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
 
             var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 
-            DoAssert(doc, 1234, key, 0, 0, "/media/test.jpg", "Image", 23, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
+            DoAssert(doc, 1234, key, templateIdVal: null, 0, "/media/test.jpg", "Image", 23, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
             Assert.AreEqual(null, doc.Parent);
         }
 
@@ -225,7 +222,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
 
-            DoAssert(doc, 2000, key, 0, 2, "image1", "Image", 23, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
+            DoAssert(doc, 2000, key, templateIdVal: null, 2, "image1", "Image", 23, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
             Assert.AreEqual(null, doc.Parent);
             Assert.AreEqual(2, doc.Children.Count());
             Assert.AreEqual(2001, doc.Children.ElementAt(0).Id);
@@ -339,7 +336,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             DictionaryPublishedContent dicDoc,
             int idVal = 1234,
             Guid keyVal = default(Guid),
-            int templateIdVal = 0,
+            int? templateIdVal = null,
             int sortOrderVal = 44,
             string urlNameVal = "testing",
             string nodeTypeAliasVal = "myType",
@@ -370,7 +367,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             IPublishedContent doc,
             int idVal = 1234,
             Guid keyVal = default(Guid),
-            int templateIdVal = 0,
+            int? templateIdVal = null,
             int sortOrderVal = 44,
             string urlNameVal = "testing",
             string nodeTypeAliasVal = "myType",
@@ -404,9 +401,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Assert.AreEqual(createDateVal.Value, doc.CreateDate);
             Assert.AreEqual(updateDateVal.Value, doc.UpdateDate);
             Assert.AreEqual(levelVal, doc.Level);
-
         }
-
-
     }
 }

@@ -81,25 +81,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 : undefined;
         });
 
-        $scope.editIconTitle = '';
-        $scope.moveIconTitle = '';
-        $scope.deleteIconTitle = '';
-
-        // localize the edit icon title
-        localizationService.localize('general_edit').then(function (value) {
-            $scope.editIconTitle = value;
-        });
-
-        // localize the delete icon title
-        localizationService.localize('general_delete').then(function (value) {
-            $scope.deleteIconTitle = value;
-        });
-
-        // localize the move icon title
-        localizationService.localize('actions_move').then(function (value) {
-            $scope.moveIconTitle = value;
-        });
-
         $scope.nodes = [];
         $scope.currentNode = undefined;
         $scope.realCurrentNode = undefined;
@@ -115,6 +96,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.singleMode = $scope.minItems == 1 && $scope.maxItems == 1;
         $scope.showIcons = $scope.model.config.showIcons || true;
         $scope.wideMode = $scope.model.config.hideLabel == "1";
+
+        $scope.labels = {};
+        localizationService.localizeMany(["grid_insertControl"]).then(function(data) {
+            $scope.labels.docTypePickerTitle = data[0];
+        });
 
         // helper to force the current form into the dirty state
         $scope.setDirty = function () {
@@ -138,7 +124,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
 
             $scope.overlayMenu = {
-                title: localizationService.localize('grid_insertControl'),
+                title: $scope.labels.docTypePickerTitle,
                 show: false,
                 style: {},
                 filter: $scope.scaffolds.length > 15 ? true : false,

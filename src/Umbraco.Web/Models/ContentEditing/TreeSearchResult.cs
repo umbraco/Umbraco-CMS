@@ -30,6 +30,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string JsFormatterMethod { get; set; }
 
         [DataMember(Name = "results")]
-        public IEnumerable<SearchResultItem> Results { get; set; }
+        public IEnumerable<SearchResultEntity> Results { get; set; }
     }
 }

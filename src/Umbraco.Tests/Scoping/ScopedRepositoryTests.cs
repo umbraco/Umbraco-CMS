@@ -10,9 +10,9 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
-using LightInject;
 using Moq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.Scoping
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scoping
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class ScopedRepositoryTests : TestWithDatabaseBase
     {
-        private CacheRefresherComponent _cacheRefresher;
+        private DistributedCacheBinder _distributedCacheBinder;
 
         protected override void Compose()
         {
@@ -31,29 +31,27 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // fixme - and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
-        protected override void ComposeCacheHelper()
+        protected override CacheHelper GetCacheHelper()
         {
             // this is what's created core web runtime
-            var cacheHelper = new CacheHelper(
+            return new CacheHelper(
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 NullCacheProvider.Instance,
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
-            Container.RegisterSingleton(f => cacheHelper);
-            Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
         }
 
         [TearDown]
         public void Teardown()
         {
-            _cacheRefresher?.Unbind();
-            _cacheRefresher = null;
+            _distributedCacheBinder?.UnbindEvents();
+            _distributedCacheBinder = null;
         }
 
         [TestCase(true)]
@@ -76,8 +74,8 @@ namespace Umbraco.Tests.Scoping
             // get user again - else we'd modify the one that's in the cache
             user = service.GetUserById(user.Id);
 
-            _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize(new DistributedCache());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -157,8 +155,8 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
 
-            _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize(new DistributedCache());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -249,8 +247,8 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
 
-            _cacheRefresher = new CacheRefresherComponent(true);
-            _cacheRefresher.Initialize(new DistributedCache());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))

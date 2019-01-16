@@ -210,53 +210,55 @@ namespace Umbraco.Core.Composing
         /// NOTE the comma vs period... comma delimits the name in an Assembly FullName property so if it ends with comma then its an exact name match
         /// NOTE this means that "foo." will NOT exclude "foo.dll" but only "foo.*.dll"
         /// </remarks>
-        internal static readonly string[] KnownAssemblyExclusionFilter = new[]
-                {
-                    "mscorlib,",
-                    "System.",
-                    "Antlr3.",
-                    "Autofac.",
-                    "Autofac,",
-                    "Castle.",
-                    "ClientDependency.",
-                    "DataAnnotationsExtensions.",
-                    "DataAnnotationsExtensions,",
-                    "Dynamic,",
-                    "HtmlDiff,",
-                    "Iesi.Collections,",
-                    "Microsoft.",
-                    "Newtonsoft.",
-                    "NHibernate.",
-                    "NHibernate,",
-                    "NuGet.",
-                    "RouteDebugger,",
-                    "SqlCE4Umbraco,",
-                    "umbraco.datalayer,",
-                    "umbraco.interfaces,",
-                    //"umbraco.providers,",
-                    //"Umbraco.Web.UI,",
-                    "umbraco.webservices",
-                    "Lucene.",
-                    "Examine,",
-                    "Examine.",
-                    "ServiceStack.",
-                    "MySql.",
-                    "HtmlAgilityPack.",
-                    "TidyNet.",
-                    "ICSharpCode.",
-                    "CookComputing.",
-                    "AutoMapper,",
-                    "AutoMapper.",
-                    "AzureDirectory,",
-                    "itextsharp,",
-                    "UrlRewritingNet.",
-                    "HtmlAgilityPack,",
-                    "MiniProfiler,",
-                    "Moq,",
-                    "nunit.framework,",
-                    "TidyNet,",
-                    "WebDriver,"
-                };
+        internal static readonly string[] KnownAssemblyExclusionFilter = {
+            "Antlr3.",
+            "AutoMapper,",
+            "AutoMapper.",
+            "Autofac,", // DI
+            "Autofac.",
+            "AzureDirectory,",
+            "Castle.", // DI, tests
+            "ClientDependency.",
+            "CookComputing.",
+            "CSharpTest.", // BTree for NuCache
+            "DataAnnotationsExtensions,",
+            "DataAnnotationsExtensions.",
+            "Dynamic,",
+            "Examine,",
+            "Examine.",
+            "HtmlAgilityPack,",
+            "HtmlAgilityPack.",
+            "HtmlDiff,",
+            "ICSharpCode.",
+            "Iesi.Collections,", // used by NHibernate
+            "LightInject.", // DI
+            "LightInject,",
+            "Lucene.",
+            "Markdown,",
+            "Microsoft.",
+            "MiniProfiler,",
+            "Moq,",
+            "MySql.",
+            "NHibernate,",
+            "NHibernate.",
+            "Newtonsoft.",
+            "NPoco,",
+            "NuGet.",
+            "RouteDebugger,",
+            "Semver.",
+            "Serilog.",
+            "Serilog,",
+            "ServiceStack.",
+            "SqlCE4Umbraco,",
+            "Superpower,", // used by Serilog
+            "System.",
+            "TidyNet,",
+            "TidyNet.",
+            "WebDriver,",
+            "itextsharp,",
+            "mscorlib,",
+            "nunit.framework,",
+        };
 
         /// <summary>
         /// Finds any classes derived from the type T that contain the attribute TAttribute
@@ -616,6 +618,8 @@ namespace Umbraco.Core.Composing
             // doesn't actualy load in all assemblies, only the types that have been referenced so far.
             // However, in a web context, the BuildManager will have executed which will force all assemblies
             // to be loaded so it's fine for now.
+            // It could be fairly easy to parse the typeName to get the assembly name and then do Assembly.Load and
+            // find the type from there.
 
             //now try fall back procedures.
             type = Type.GetType(typeName);

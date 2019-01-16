@@ -51,7 +51,7 @@ namespace Umbraco.Web.Models
         public abstract string Path { get; }
 
         /// <inheritdoc />
-        public abstract int TemplateId { get; }
+        public abstract int? TemplateId { get; }
 
         /// <inheritdoc />
         public abstract int CreatorId { get; }
@@ -142,7 +142,7 @@ namespace Umbraco.Web.Models
         public abstract PublishedItemType ItemType { get; }
 
         /// <inheritdoc />
-        public abstract bool IsDraft { get; }
+        public abstract bool IsDraft(string culture = null);
 
         #endregion
 

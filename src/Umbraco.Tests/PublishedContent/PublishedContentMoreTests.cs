@@ -3,12 +3,13 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Core;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
+    [UmbracoTest(TypeLoader = UmbracoTestOptions.TypeLoader.PerFixture)]
     public class PublishedContentMoreTests : PublishedContentSnapshotTestBase
     {
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
@@ -194,7 +195,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void PublishedContentQueryTypedContentList()
         {
-            var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache);
+            var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache, UmbracoContext.Current.VariationContextAccessor);
             var result = query.Content(new[] { 1, 2, 4 }).ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);

@@ -41,6 +41,10 @@ namespace Umbraco.Core.Persistence.Dtos
         [Constraint(Default = "0")]
         public bool IsContainer { get; set; }
 
+        [Column("isElement")]
+        [Constraint(Default = "0")]
+        public bool IsElement { get; set; }
+
         [Column("allowAtRoot")]
         [Constraint(Default = "0")]
         public bool AllowAtRoot { get; set; }

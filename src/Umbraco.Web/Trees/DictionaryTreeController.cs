@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
-using Umbraco.Core.Services;
+using Umbraco.Core.Models;
 using Umbraco.Web.Actions;
-
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 
@@ -52,10 +51,12 @@ namespace Umbraco.Web.Trees
 
             var nodes = new TreeNodeCollection();
 
+            Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
+
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.AddRange(
-                    Services.LocalizationService.GetRootDictionaryItems().Select(
+                    Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
                         x => CreateTreeNode(
                             x.Id.ToInvariantString(),
                             id,
@@ -71,7 +72,7 @@ namespace Umbraco.Web.Trees
                 if (parentDictionary == null)
                     return nodes;
 
-                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderByDescending(item => item.Key).Select(
+                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
                     x => CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,

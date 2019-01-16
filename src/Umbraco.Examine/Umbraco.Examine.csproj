@@ -48,30 +48,46 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine" Version="1.0.0-beta025" />
+    <PackageReference Include="Examine" Version="1.0.0-beta078" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\ConfigIndexCriteria.cs" />
-    <Compile Include="Config\ConfigIndexField.cs" />
-    <Compile Include="Config\IndexFieldCollectionExtensions.cs" />
-    <Compile Include="Config\IndexSet.cs" />
-    <Compile Include="Config\IndexSetCollection.cs" />
-    <Compile Include="Config\IndexSets.cs" />
+    <Compile Include="BaseValueSetBuilder.cs" />
+    <Compile Include="ContentIndexPopulator.cs" />
+    <Compile Include="ContentValueSetBuilder.cs" />
+    <Compile Include="ExamineExtensions.cs" />
+    <Compile Include="IContentValueSetBuilder.cs" />
+    <Compile Include="IContentValueSetValidator.cs" />
+    <Compile Include="IIndexCreator.cs" />
+    <Compile Include="IIndexDiagnostics.cs" />
+    <Compile Include="IIndexPopulator.cs" />
+    <Compile Include="IndexPopulator.cs" />
+    <Compile Include="IndexRebuilder.cs" />
+    <Compile Include="IPublishedContentValueSetBuilder.cs" />
+    <Compile Include="IUmbracoIndex.cs" />
+    <Compile Include="IValueSetBuilder.cs" />
+    <Compile Include="MediaIndexPopulator.cs" />
+    <Compile Include="MediaValueSetBuilder.cs" />
+    <Compile Include="MemberIndexPopulator.cs" />
+    <Compile Include="MemberValueSetBuilder.cs" />
+    <Compile Include="MemberValueSetValidator.cs" />
+    <Compile Include="PublishedContentIndexPopulator.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UmbracoContentIndexer.cs" />
-    <Compile Include="UmbracoContentIndexerOptions.cs" />
-    <Compile Include="UmbracoContentValueSetValidator.cs" />
-    <Compile Include="UmbracoExamineIndexer.cs" />
-    <Compile Include="UmbracoExamineSearcher.cs" />
-    <Compile Include="UmbracoMemberIndexer.cs" />
+    <Compile Include="UmbracoContentIndex.cs" />
+    <Compile Include="ContentValueSetValidator.cs" />
+    <Compile Include="UmbracoExamineIndexDiagnostics.cs" />
+    <Compile Include="UmbracoExamineIndex.cs" />
+    <Compile Include="LuceneIndexCreator.cs" />
+    <Compile Include="UmbracoFieldDefinitionCollection.cs" />
+    <Compile Include="UmbracoMemberIndex.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ValueSetValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">

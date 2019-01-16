@@ -32,11 +32,11 @@
                 
                         <div ng-show="model.embed.supportsDimensions">
                             <umb-control-group label="@general_width">
-                                <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.width" on-blur="vm.changeSize('width')" />
+                                <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
                             </umb-control-group>
                 
                             <umb-control-group label="@general_height">
-                                <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.height" on-blur="vm.changeSize('height')" />
+                                <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.height" ng-blur="vm.changeSize('height')" />
                             </umb-control-group>
                 
                             <umb-control-group label="@general_constrain">
@@ -54,6 +54,7 @@
                         type="button"
                         button-style="link"
                         label-key="general_close"
+                        shortcut="esc"
                         action="vm.close()">
                     </umb-button>
                     <umb-button

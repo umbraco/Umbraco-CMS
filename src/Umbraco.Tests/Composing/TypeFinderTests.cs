@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Composing
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(global::Umbraco.Examine.UmbracoExamineIndexer).Assembly
+                    typeof(global::Umbraco.Examine.UmbracoExamineIndex).Assembly
                 };
 
         }
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Composing
             Assert.AreEqual(21, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
         }
 
-        private static ProfilingLogger GetTestProfilingLogger()
+        private static IProfilingLogger GetTestProfilingLogger()
         {
             var logger = new DebugDiagnosticsLogger();
             var profiler = new TestProfiler();

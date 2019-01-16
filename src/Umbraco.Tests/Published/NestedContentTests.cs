@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Published
 
             // ReSharper disable UnassignedGetOnlyAutoProperty
             public override PublishedItemType ItemType { get; }
-            public override bool IsDraft { get; }
+            public override bool IsDraft(string culture = null) => false;
             public override IPublishedContent Parent { get; }
             public override IEnumerable<IPublishedContent> Children { get; }
             public override PublishedContentType ContentType { get; }
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Published
 
             // ReSharper disable UnassignedGetOnlyAutoProperty
             public override int Id { get; }
-            public override int TemplateId { get; }
+            public override int? TemplateId { get; }
             public override int SortOrder { get; }
             public override string Name { get; }
             public override PublishedCultureInfo GetCulture(string culture = ".") => throw new NotSupportedException();

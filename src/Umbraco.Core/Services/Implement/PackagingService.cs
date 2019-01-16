@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services.Implement
             IEntityService entityService,
             IUserService userService,
             IScopeProvider scopeProvider,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository,
             PropertyEditorCollection propertyEditors)
         {
@@ -577,6 +577,10 @@ namespace Umbraco.Core.Services.Implement
             var isListView = infoElement.Element("IsListView");
             if (isListView != null)
                 contentType.IsContainer = isListView.Value.InvariantEquals("true");
+
+            var isElement = infoElement.Element("IsElement");
+            if (isElement != null)
+                contentType.IsElement = isElement.Value.InvariantEquals("true");
 
             //Name of the master corresponds to the parent and we need to ensure that the Parent Id is set
             var masterElement = infoElement.Element("Master");

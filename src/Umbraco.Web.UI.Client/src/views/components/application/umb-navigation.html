@@ -19,7 +19,7 @@
             <div id="tree" ng-show="authenticated">
                 <umb-tree
                     api="treeApi"
-                    on-init="onTreeInit()" >
+                    on-init="onTreeInit()">
                 </umb-tree>
             </div>
         </div>
@@ -44,6 +44,9 @@
             </umb-context-dialog>
 
         </div>
+
+        <div class="umb-editor__overlay" ng-show="infiniteMode"></div>
+
     </div>
 
 </div>

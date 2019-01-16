@@ -23,6 +23,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Tag, TagDto>(src => src.Id, dto => dto.Id);
             CacheMap<Tag, TagDto>(src => src.Text, dto => dto.Text);
             CacheMap<Tag, TagDto>(src => src.Group, dto => dto.Group);
+            CacheMap<Tag, TagDto>(src => src.LanguageId, dto => dto.LanguageId);
         }
     }
 }

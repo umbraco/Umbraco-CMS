@@ -10,7 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public int VersionId { get; set; }
         public DateTime VersionDate { get; set; }
         public int WriterId { get; set; }
-        public int TemplateId { get; set; }
+        public int? TemplateId { get; set; }
         public bool Published { get; set; }
 
         public IDictionary<string, PropertyData[]> Properties { get; set; }

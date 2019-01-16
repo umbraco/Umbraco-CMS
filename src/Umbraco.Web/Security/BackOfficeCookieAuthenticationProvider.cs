@@ -21,7 +21,7 @@ namespace Umbraco.Web.Security
         private readonly IUserService _userService;
         private readonly IRuntimeState _runtimeState;
         private readonly IGlobalSettings _globalSettings;
-        
+
         public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings)
         {
             _userService = userService;
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Security
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(Current.Configs.Settings().Security.AuthCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
@@ -111,8 +111,8 @@ namespace Umbraco.Web.Security
                 await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _globalSettings);
         }
 
-        
 
-        
+
+
     }
 }

@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
               base.TearDown();
         }
 
-        private static ProfilingLogger GetTestProfilingLogger()
+        private static IProfilingLogger GetTestProfilingLogger()
         {
             var logger = new DebugDiagnosticsLogger();
             var profiler = new TestProfiler();

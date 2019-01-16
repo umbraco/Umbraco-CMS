@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             cacheHelper = cacheHelper ?? CacheHelper;
 
-            templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, templateRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, cacheHelper, Logger);
@@ -432,8 +432,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var fetched = repository.Get(textpage.Id);
 
-                Assert.NotNull(textpage.Template);
-                Assert.AreEqual(textpage.Template, contentType.DefaultTemplate);
+                Assert.True(textpage.TemplateId.HasValue);
+                Assert.NotZero(textpage.TemplateId.Value);
+                Assert.AreEqual(textpage.TemplateId, contentType.DefaultTemplate.Id);
 
                 scope.Complete();
 
@@ -557,12 +558,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
-                content.Template = null;
+                content.TemplateId = null;
                 repository.Save(content);
 
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
-                Assert.IsNull(updatedContent.Template);
+                Assert.False(updatedContent.TemplateId.HasValue);
             }
 
         }
@@ -670,7 +671,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void AliasRegexTest()
         {
-            var regex = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)).AliasRegex;
+            var regex = new SqlServerSyntaxProvider().AliasRegex;
             Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
             const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
             var matches = regex.Matches(sql);

@@ -55,7 +55,7 @@ angular.module("umbraco.directives")
                         //initialize the standard editor functionality for Umbraco
                         tinyMceService.initializeEditor({
                             editor: editor,
-                            value: scope.value,
+                            model: scope,
                             currentForm: angularHelper.getCurrentForm(scope)
                         });
 

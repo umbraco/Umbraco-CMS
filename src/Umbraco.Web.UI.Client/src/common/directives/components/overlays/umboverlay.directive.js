@@ -124,58 +124,6 @@
     </tr>
 </table>
 
-
-<h1>Content Picker</h1>
-Opens a content picker.</br>
-<strong>view: </strong>contentpicker
-<table>
-    <thead>
-        <tr>
-            <th>Param</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tr>
-        <td>model.multiPicker</td>
-        <td>Boolean</td>
-        <td>Pick one or multiple items</td>
-    </tr>
-</table>
-<table>
-    <thead>
-        <tr>
-            <th>Returns</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tr>
-        <td>model.selection</td>
-        <td>Array</td>
-        <td>Array of content objects</td>
-    </tr>
-</table>
-
-
-<h1>Icon Picker</h1>
-Opens an icon picker.</br>
-<strong>view: </strong>iconpicker
-<table>
-    <thead>
-        <tr>
-            <th>Returns</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tr>
-        <td>model.icon</td>
-        <td>String</td>
-        <td>The icon class</td>
-    </tr>
-</table>
-
 <h1>Item Picker</h1>
 Opens an item picker.</br>
 <strong>view: </strong>itempicker
@@ -218,170 +166,6 @@ Opens an item picker.</br>
         <td>Object</td>
         <td>The selected item</td>
     </tr>
-</table>
-
-<h1>Macro Picker</h1>
-Opens a media picker.</br>
-<strong>view: </strong>macropicker
-<table>
-    <thead>
-        <tr>
-            <th>Param</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.dialogData</td>
-            <td>Object</td>
-            <td>Object which contains array of allowedMacros. Set to <code>null</code> to allow all.</td>
-        </tr>
-    </tbody>
-</table>
-<table>
-    <thead>
-        <tr>
-            <th>Returns</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.macroParams</td>
-            <td>Array</td>
-            <td>Array of macro params</td>
-        </tr>
-        <tr>
-            <td>model.selectedMacro</td>
-            <td>Object</td>
-            <td>The selected macro</td>
-        </tr>
-    </tbody>
-</table>
-
-<h1>Media Picker</h1>
-Opens a media picker.</br>
-<strong>view: </strong>mediapicker
-<table>
-    <thead>
-        <tr>
-            <th>Param</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.multiPicker</td>
-            <td>Boolean</td>
-            <td>Pick one or multiple items</td>
-        </tr>
-        <tr>
-            <td>model.onlyImages</td>
-            <td>Boolean</td>
-            <td>Only display files that have an image file-extension</td>
-        </tr>
-        <tr>
-            <td>model.disableFolderSelect</td>
-            <td>Boolean</td>
-            <td>Disable folder selection</td>
-        </tr>
-    </tbody>
-</table>
-<table>
-    <thead>
-        <tr>
-            <th>Returns</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.selectedImages</td>
-            <td>Array</td>
-            <td>Array of selected images</td>
-        </tr>
-    </tbody>
-</table>
-
-<h1>Member Group Picker</h1>
-Opens a member group picker.</br>
-<strong>view: </strong>membergrouppicker
-<table>
-    <thead>
-        <tr>
-            <th>Param</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.multiPicker</td>
-            <td>Boolean</td>
-            <td>Pick one or multiple items</td>
-        </tr>
-    </tbody>
-</table>
-<table>
-    <thead>
-        <tr>
-            <th>Returns</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.selectedMemberGroup</td>
-            <td>String</td>
-            <td>The selected member group</td>
-        </tr>
-        <tr>
-            <td>model.selectedMemberGroups (multiPicker)</td>
-            <td>Array</td>
-            <td>The selected member groups</td>
-        </tr>
-    </tbody>
-</table>
-
-<h1>Member Picker</h1>
-Opens a member picker. </br>
-<strong>view: </strong>memberpicker
-<table>
-    <thead>
-        <tr>
-            <th>Param</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.multiPicker</td>
-            <td>Boolean</td>
-            <td>Pick one or multiple items</td>
-        </tr>
-    </tbody>
-</table>
-<table>
-    <thead>
-        <tr>
-            <th>Returns</th>
-            <th>Type</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>model.selection</td>
-            <td>Array</td>
-            <td>Array of selected members/td>
-        </tr>
-    </tbody>
 </table>
 
 <h1>YSOD</h1>
@@ -500,7 +284,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             overlayNumber = overlayHelper.registerOverlay();
 
-            $(document).bind("keydown.overlay-" + overlayNumber, function(event) {
+            $(document).on("keydown.overlay-" + overlayNumber, function(event) {
 
                if (event.which === 27) {
 
@@ -527,7 +311,7 @@ Opens an overlay to show a custom YSOD. </br>
                      var submitOnEnterValue = submitOnEnter ? document.activeElement.getAttribute("overlay-submit-on-enter") : "";
 
                      if(clickableElements.indexOf(activeElementType) === 0) {
-                        document.activeElement.click();
+                        document.activeElement.trigger("click");
                         event.preventDefault();
                      } else if(activeElementType === "TEXTAREA" && !submitOnEnter) {
 
@@ -557,7 +341,7 @@ Opens an overlay to show a custom YSOD. </br>
 
                overlayHelper.unregisterOverlay();
 
-               $(document).unbind("keydown.overlay-" + overlayNumber);
+               $(document).off("keydown.overlay-" + overlayNumber);
 
                isRegistered = false;
             }
@@ -582,12 +366,12 @@ Opens an overlay to show a custom YSOD. </br>
 
             var overlayIndex = overlayNumber - 1;
             var indentSize = overlayIndex * 20;
-            var overlayWidth = el.context.clientWidth;
+            var overlayWidth = el[0].clientWidth;
 
             el.css('width', overlayWidth - indentSize);
             
             if(scope.position === "center" && overlayIndex > 0 || scope.position === "target" && overlayIndex > 0) {
-               var overlayTopPosition = el.context.offsetTop;
+               var overlayTopPosition = el[0].offsetTop;
                el.css('top', overlayTopPosition + indentSize);
             }
 
@@ -621,8 +405,8 @@ Opens an overlay to show a custom YSOD. </br>
                mousePositionClickY = scope.model.event.pageY;
 
                // element size
-               elementHeight = el.context.clientHeight;
-               elementWidth = el.context.clientWidth;
+               elementHeight = el[0].clientHeight;
+               elementWidth = el[0].clientWidth;
 
                // move element to this position
                position.left = mousePositionClickX - (elementWidth / 2);

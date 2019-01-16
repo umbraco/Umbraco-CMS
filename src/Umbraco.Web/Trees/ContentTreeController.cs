@@ -9,11 +9,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -35,7 +33,14 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureContentResult")]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     {
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly ActionCollection _actions;
+
+        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions)
+        {
+            _treeSearcher = treeSearcher;
+            _actions = actions;
+        }
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -56,14 +61,12 @@ namespace Umbraco.Web.Trees
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 
-                var hasChildren = ShouldRenderChildrenOfContainer(entity);
-                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.Document,
                     parentId,
                     queryStrings,
-                    hasChildren);
+                    entity.HasChildren);
 
                 // set container style if it is one
                 if (isContainer)
@@ -122,7 +125,7 @@ namespace Umbraco.Web.Trees
 
                 // we need to get the default permissions as you can't set permissions on the very root node
                 var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
-                var nodeActions = Current.Actions.FromEntityPermission(permission)
+                var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
@@ -138,8 +141,6 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
-                //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
@@ -258,6 +259,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -308,15 +310,14 @@ namespace Umbraco.Web.Trees
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
             where TAction : IAction
         {
-            //fixme: Inject
-            var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
+            var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", _actions.GetAction<TAction>().Alias), hasSeparator);
             if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
             menuItem.OpensDialog = opensDialog;
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
+            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

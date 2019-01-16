@@ -8,15 +8,13 @@ using Umbraco.Core.Logging;
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Represents the main AppDomain running for a given application.
+    /// Provides the full implementation of <see cref="IMainDom"/>.
     /// </summary>
     /// <remarks>
-    /// <para>There can be only one "main" AppDomain running for a given application at a time.</para>
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
-    /// <para>It is possible to register against the MainDom and be notified when it is released.</para>
     /// </remarks>
-    internal class MainDom : IRegisteredObject
+    internal class MainDom : IMainDom, IRegisteredObject
     {
         #region Vars
 
@@ -84,9 +82,7 @@ namespace Umbraco.Core
         /// <param name="weight">An optional weight (lower goes first).</param>
         /// <returns>A value indicating whether it was possible to register.</returns>
         public bool Register(Action release, int weight = 100)
-        {
-            return Register(null, release, weight);
-        }
+            => Register(null, release, weight);
 
         /// <summary>
         /// Registers a resource that requires the current AppDomain to be the main domain to function.
@@ -195,7 +191,9 @@ namespace Umbraco.Core
             }
         }
 
-        // gets a value indicating whether we are the main domain
+        /// <summary>
+        /// Gets a value indicating whether the current domain is the main domain.
+        /// </summary>
         public bool IsMainDom => _isMainDom;
 
         // IRegisteredObject

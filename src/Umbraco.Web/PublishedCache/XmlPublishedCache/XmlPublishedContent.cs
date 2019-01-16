@@ -109,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override int TemplateId
+        public override int? TemplateId
         {
             get
             {
@@ -221,13 +221,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override bool IsDraft
+        public override bool IsDraft(string culture = null)
         {
-            get
-            {
-	            EnsureNodeInitialized();
-                return _isDraft;
-            }
+	        EnsureNodeInitialized();
+            return _isDraft; // bah
         }
 
         public override IEnumerable<IPublishedProperty> Properties

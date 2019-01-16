@@ -7,27 +7,32 @@ namespace Umbraco.Core.Scoping
     internal class ScopeContext : IScopeContext, IInstanceIdentifiable
     {
         private Dictionary<string, IEnlistedObject> _enlisted;
-        private bool _exiting;
 
         public void ScopeExit(bool completed)
         {
             if (_enlisted == null)
                 return;
 
-            _exiting = true;
+            // fixme - can we create infinite loops?
+            // fixme - what about nested events? will they just be plainly ignored = really bad?
 
             List<Exception> exceptions = null;
-            foreach (var enlisted in _enlisted.Values.OrderBy(x => x.Priority))
+            List<IEnlistedObject> orderedEnlisted;
+            while ((orderedEnlisted = _enlisted.Values.OrderBy(x => x.Priority).ToList()).Count > 0)
             {
-                try
+                _enlisted.Clear();
+                foreach (var enlisted in orderedEnlisted)
                 {
-                    enlisted.Execute(completed);
-                }
-                catch (Exception e)
-                {
-                    if (exceptions == null)
-                        exceptions = new List<Exception>();
-                    exceptions.Add(e);
+                    try
+                    {
+                        enlisted.Execute(completed);
+                    }
+                    catch (Exception e)
+                    {
+                        if (exceptions == null)
+                            exceptions = new List<Exception>();
+                        exceptions.Add(e);
+                    }
                 }
             }
 
@@ -74,9 +79,6 @@ namespace Umbraco.Core.Scoping
 
         public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100)
         {
-            if (_exiting)
-                throw new InvalidOperationException("Cannot enlist now, context is exiting.");
-
             var enlistedObjects = _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 
             if (enlistedObjects.TryGetValue(key, out var enlisted))

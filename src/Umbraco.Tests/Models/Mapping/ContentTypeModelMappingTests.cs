@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -55,13 +53,13 @@ namespace Umbraco.Tests.Models.Mapping
             var dataEditors = new DataEditorCollection(editors);
             _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
             _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
-            Container.RegisterSingleton(f => _editorsMock.Object);
+            Composition.RegisterUnique(f => _editorsMock.Object);
 
-            Container.RegisterSingleton(_ => _contentTypeService.Object);
-            Container.RegisterSingleton(_ => _contentService.Object);
-            Container.RegisterSingleton(_ => _dataTypeService.Object);
-            Container.RegisterSingleton(_ => _entityService.Object);
-            Container.RegisterSingleton(_ => _fileService.Object);
+            Composition.RegisterUnique(_ => _contentTypeService.Object);
+            Composition.RegisterUnique(_ => _contentService.Object);
+            Composition.RegisterUnique(_ => _dataTypeService.Object);
+            Composition.RegisterUnique(_ => _entityService.Object);
+            Composition.RegisterUnique(_ => _fileService.Object);
         }
 
         [Test]
@@ -427,7 +425,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var contentType = MockedContentTypes.CreateTextPageContentType();
             MockedContentTypes.EnsureAllIds(contentType, 8888);
 
             //Act

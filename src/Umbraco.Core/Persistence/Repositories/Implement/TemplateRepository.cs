@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -30,13 +29,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplatesSection templateConfig,
-                [Inject(Constants.Composing.FileSystems.MasterpageFileSystem)] IFileSystem masterpageFileSystem,
-                [Inject(Constants.Composing.FileSystems.ViewFileSystem)] IFileSystem viewFileSystem)
+        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplatesSection templateConfig, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
         {
-            _masterpagesFileSystem = masterpageFileSystem;
-            _viewsFileSystem = viewFileSystem;
+            _masterpagesFileSystem = fileSystems.MasterPagesFileSystem;
+            _viewsFileSystem = fileSystems.MvcViewsFileSystem;
             _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
@@ -152,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //Save to db
             var template = (Template)entity;
             template.AddingEntity();
-            
+
             var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, template.Id);
 
             //Create the (base) node data - umbracoNode

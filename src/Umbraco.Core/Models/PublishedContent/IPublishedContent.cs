@@ -62,7 +62,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the identifier of the template to use to render the content item.
         /// </summary>
-        int TemplateId { get; }
+        int? TemplateId { get; }
 
         /// <summary>
         /// Gets the identifier of the user who created the content item.
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// is the edited version) or false (document is published, and has not been edited, and
         /// what is returned is the published version).</para>
         /// </remarks>
-        bool IsDraft { get; }
+        bool IsDraft(string culture = null);
 
         // fixme - consider having an IsPublished flag too
         // so that when IsDraft is true, we can check whether there is a published version?

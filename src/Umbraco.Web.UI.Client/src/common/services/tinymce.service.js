@@ -1194,7 +1194,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     .css("top", "auto")
                     .css("margin-top", "0")
                     .css("width", tinyMceWidth);
-            } 
+            }
 
         },
 
@@ -1214,15 +1214,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             if (!args.editor) {
                 throw "args.editor is required";
             }
-            //if (!args.value) {
-            //    throw "args.value is required";
+            //if (!args.model.value) {
+            //    throw "args.model.value is required";
             //}
 
             var unwatch = null;
 
             //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
             function startWatch() {
-                unwatch = $rootScope.$watch(() => args.value, function (newVal, oldVal) {
+                unwatch = $rootScope.$watch(() => args.model.value, function (newVal, oldVal) {
                     if (newVal !== oldVal) {
                         //update the display val again if it has changed from the server;
                         //uses an empty string in the editor when the value is null
@@ -1247,7 +1247,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 //stop watching before we update the value
                 stopWatch();
                 angularHelper.safeApply($rootScope, function () {
-                    args.value = args.editor.getContent();
+                    args.model.value = args.editor.getContent();
                 });
                 //re-watch the value
                 startWatch();
@@ -1255,8 +1255,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             args.editor.on('init', function (e) {
 
-                if (args.value) {
-                    args.editor.setContent(args.value);
+                if (args.model.value) {
+                    args.editor.setContent(args.model.value);
                 }
                 //enable browser based spell checking
                 args.editor.getBody().setAttribute('spellcheck', true);

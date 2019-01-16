@@ -415,20 +415,19 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "")
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
 
-                var filterQuery = string.IsNullOrWhiteSpace(filter) ? null : Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
-                return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -448,14 +447,13 @@ namespace Umbraco.Core.Services.Implement
                     query.Where(x => x.Path.SqlStartsWith(path + ",", TextColumnType.NVarchar));
                 }
 
-                var filterQuery = string.IsNullOrWhiteSpace(filter) ? null : Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
-                return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null)
         {
             totalRecords = 0;
 
@@ -492,14 +490,13 @@ namespace Umbraco.Core.Services.Implement
                     query.WhereAny(clauses);
                 }
 
-                var filterQuery = string.IsNullOrWhiteSpace(filter) ? null : Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
-                return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
         /// <inheritdoc />
         public IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "", bool includeTrashed = true)
+            IQuery<IUmbracoEntity> filter = null, Ordering ordering = null, bool includeTrashed = true)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -507,8 +504,7 @@ namespace Umbraco.Core.Services.Implement
                 if (includeTrashed == false)
                     query.Where(x => x.Trashed == false);
 
-                var filterQuery = string.IsNullOrWhiteSpace(filter) ? null : Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter));
-                return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 

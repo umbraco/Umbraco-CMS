@@ -70,10 +70,7 @@ namespace Umbraco.Core.Collections
         /// The number of elements contained in the <see cref="T:System.Collections.ICollection"/>.
         /// </returns>
         /// <filterpriority>2</filterpriority>
-        public int Count
-        {
-            get { return GetThreadSafeClone().Count; }
-        }
+        public int Count => GetThreadSafeClone().Count;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
@@ -81,10 +78,7 @@ namespace Umbraco.Core.Collections
         /// <returns>
         /// true if the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only; otherwise, false.
         /// </returns>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.

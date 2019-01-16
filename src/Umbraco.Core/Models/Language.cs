@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models
 
                 try
                 {
-                    var globalSettings = (IGlobalSettings) Composing.Current.Container.GetInstance(typeof(IGlobalSettings));
+                    var globalSettings = (IGlobalSettings) Composing.Current.Factory.GetInstance(typeof(IGlobalSettings));
                     var defaultUiCulture = CultureInfo.GetCultureInfo(globalSettings.DefaultUILanguage);
                     Thread.CurrentThread.CurrentUICulture = defaultUiCulture;
 

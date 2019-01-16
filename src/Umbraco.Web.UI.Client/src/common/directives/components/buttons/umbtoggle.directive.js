@@ -18,6 +18,7 @@
 
         <umb-toggle
             checked="vm.checked"
+            disabled="vm.disabled"
             on-click="vm.toggle()"
             show-labels="true"
             label-on="Start"
@@ -38,6 +39,7 @@
 
             var vm = this;
             vm.checked = false;
+            vm.disabled = false;
 
             vm.toggle = toggle;
 
@@ -115,6 +117,7 @@
             templateUrl: 'views/components/buttons/umb-toggle.html',
             scope: {
                 checked: "=",
+                disabled: "=",
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",

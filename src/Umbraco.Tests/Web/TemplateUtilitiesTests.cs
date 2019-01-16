@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Web;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -35,20 +34,22 @@ namespace Umbraco.Tests.Web
             // should not depend on more than IdkMap maybe - fix this!
             var entityService = new Mock<IEntityService>();
             entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
-            var serviceContext = new ServiceContext(entityService: entityService.Object);
+            var serviceContext = ServiceContext.CreatePartial(entityService: entityService.Object);
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IServiceContainer>();
-            container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
-            container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
-            Current.Container = container.Object;
+            var factory = new Mock<IFactory>();
+            factory.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
+                new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            factory.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
+
+            var settings = SettingsForTests.GetDefaultUmbracoSettings();
+            factory.Setup(x => x.GetInstance(typeof(IUmbracoSettingsSection))).Returns(settings);
+
+            Current.Factory = factory.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             Udi.ResetUdiTypes();
-
-            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefaultUmbracoSettings());
         }
 
         [TearDown]
@@ -79,10 +80,10 @@ namespace Umbraco.Tests.Web
             var testUrlProvider = new Mock<IUrlProvider>();
             testUrlProvider
                 .Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
-                .Returns((UmbracoContext umbCtx, IPublishedContent content, UrlProviderMode mode, string culture, Uri url) => "/my-test-url");
+                .Returns((UmbracoContext umbCtx, IPublishedContent content, UrlProviderMode mode, string culture, Uri url) => UrlInfo.Url("/my-test-url"));
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-            
+
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();
             Mock.Get(publishedContent).Setup(x => x.Id).Returns(1234);

@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags(""))
+                                controller => controller.GetTags("", ""))
                         },
                         {
                             "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
@@ -299,6 +299,10 @@ namespace Umbraco.Web.Editors
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
+                        },
+                        {
+                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                                controller => controller.GetById(1))
                         }
                     }
                 },
@@ -310,25 +314,25 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
+                            string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
-                        {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
+                        {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
+                        {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                     }

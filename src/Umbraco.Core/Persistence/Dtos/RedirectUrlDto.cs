@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         // notes
         //
-        // we want a unique, non-clustered  index on (url ASC, contentId ASC, createDate DESC) but the
+        // we want a unique, non-clustered  index on (url ASC, contentId ASC, culture ASC, createDate DESC) but the
         // problem is that the index key must be 900 bytes max. should we run without an index? done
         // some perfs comparisons, and running with an index on a hash is only slightly slower on
         // inserts, and much faster on reads, so... we have an index on a hash.
@@ -41,9 +41,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public string Url { get; set; }
 
+        [Column("culture")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Culture { get; set; }
+
         [Column("urlHash")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, createDateUtc")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, culture, createDateUtc")]
         [Length(40)]
         public string UrlHash { get; set; }
     }

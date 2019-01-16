@@ -93,18 +93,36 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures)
+        /// <summary>
+        /// Creates a collection of <see cref="PropertyDataDto"/> from a collection of <see cref="Property"/>
+        /// </summary>
+        /// <param name="contentVariation">
+        /// The <see cref="ContentVariation"/> of the entity containing the collection of <see cref="Property"/>
+        /// </param>
+        /// <param name="currentVersionId"></param>
+        /// <param name="publishedVersionId"></param>
+        /// <param name="properties">The properties to map</param>
+        /// <param name="languageRepository"></param>
+        /// <param name="edited">out parameter indicating that one or more properties have been edited</param>
+        /// <param name="editedCultures">out parameter containing a collection of of edited cultures when the contentVariation varies by culture</param>
+        /// <returns></returns>
+        public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<Property> properties,
+            ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
             edited = false;
             editedCultures = null; // don't allocate unless necessary
+            string defaultCulture = null; //don't allocate unless necessary
+
+            var entityVariesByCulture = contentVariation.VariesByCulture();
 
             foreach (var property in properties)
             {
                 if (property.PropertyType.IsPublishing)
                 {
-                    var editingCultures = property.PropertyType.VariesByCulture();
-                    if (editingCultures && editedCultures == null) editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    //create the resulting hashset if it's not created and the entity varies by culture
+                    if (entityVariesByCulture && editedCultures == null)
+                        editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     // publishing = deal with edit and published values
                     foreach (var propertyValue in property.Values)
@@ -125,12 +143,24 @@ namespace Umbraco.Core.Persistence.Factories
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
                         edited |= !sameValues;
 
-                        if (editingCultures && // cultures can be edited, ie CultureNeutral is supported
-                            propertyValue.Culture != null && propertyValue.Segment == null && // and value is CultureNeutral
-                            !sameValues) // and edited and published are different
+                        if (entityVariesByCulture // cultures can be edited, ie CultureNeutral is supported
+                            && propertyValue.Culture != null && propertyValue.Segment == null // and value is CultureNeutral
+                            && !sameValues) // and edited and published are different
                         {
                             editedCultures.Add(propertyValue.Culture); // report culture as edited
                         }
+
+                        // flag culture as edited if it contains an edited invariant property 
+                        if (propertyValue.Culture == null //invariant property
+                            && !sameValues // and edited and published are different
+                            && entityVariesByCulture) //only when the entity is variant
+                        {
+                            if (defaultCulture == null)
+                                defaultCulture = languageRepository.GetDefaultIsoCode();
+
+                            editedCultures.Add(defaultCulture);
+                        }
+                        
                     }
                 }
                 else

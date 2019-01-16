@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LightInject;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -16,20 +16,25 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class TourController : UmbracoAuthorizedJsonController
     {
+        private readonly TourFilterCollection _filters;
+
+        public TourController(TourFilterCollection filters)
+        {
+            _filters = filters;
+        }
+
         public IEnumerable<BackOfficeTourFile> GetTours()
         {
             var result = new List<BackOfficeTourFile>();
 
-            if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
+            if (Current.Configs.Settings().BackOffice.Tours.EnableTours == false)
                 return result;
 
-            var filters = Current.Container.GetInstance<TourFilterCollection>().ToList(); // fixme inject
-
             //get all filters that will be applied to all tour aliases
-            var aliasOnlyFilters = filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();
+            var aliasOnlyFilters = _filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();
 
             //don't pass in any filters for core tours that have a plugin name assigned
-            var nonPluginFilters = filters.Where(x => x.PluginName == null).ToList();
+            var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
             var coreToursPath = Path.Combine(IOHelper.MapPath(SystemDirectories.Config), "BackOfficeTours");
@@ -45,7 +50,7 @@ namespace Umbraco.Web.Editors
             foreach (var plugin in Directory.EnumerateDirectories(IOHelper.MapPath(SystemDirectories.AppPlugins)))
             {
                 var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
-                var pluginFilters = filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName)).ToList();
+                var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName)).ToList();
 
                 //If there is any filter applied to match the plugin only (no file or tour alias) then ignore the plugin entirely
                 var isPluginFiltered = pluginFilters.Any(x => x.TourFileName == null && x.TourAlias == null);

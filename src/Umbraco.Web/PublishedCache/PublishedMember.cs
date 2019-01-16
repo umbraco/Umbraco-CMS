@@ -79,7 +79,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override PublishedItemType ItemType => PublishedItemType.Member;
 
-        public override bool IsDraft => false;
+        public override bool IsDraft(string culture = null) => false;
 
         public override IPublishedContent Parent => null;
 
@@ -129,7 +129,7 @@ namespace Umbraco.Web.PublishedCache
 
         public override Guid Key => _member.Key;
 
-        public override int TemplateId => throw new NotSupportedException();
+        public override int? TemplateId => throw new NotSupportedException();
 
         public override int SortOrder => 0;
 

@@ -14,7 +14,6 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -33,13 +32,14 @@ namespace Umbraco.Web.Trees
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
     public class MemberTreeController : TreeController, ISearchableTree
     {
-        public MemberTreeController()
+        public MemberTreeController(UmbracoTreeSearcher treeSearcher)
         {
+            _treeSearcher = treeSearcher;
             _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             _isUmbracoProvider = _provider.IsUmbracoMembershipProvider();
         }
 
-        private readonly UmbracoTreeSearcher _treeSearcher = new UmbracoTreeSearcher();
+        private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly MembershipProvider _provider;
         private readonly bool _isUmbracoProvider;
 
@@ -115,8 +115,6 @@ namespace Umbraco.Web.Trees
 
                 return node;
             }
-
-
         }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -126,14 +124,14 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", false,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", true,
                             queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
                 {
                     nodes.AddRange(Services.MemberTypeService.GetAll()
                         .Select(memberType =>
-                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, "icon-users", false,
+                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, "icon-users", true,
                                 queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
@@ -187,13 +185,12 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add(new ExportMember(Services.TextService));
             }
 
-
             return menu;
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Member, pageSize, pageIndex, out totalFound, searchFrom);
+            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Member, pageSize, pageIndex, out totalFound, searchFrom);
         }
     }
 }

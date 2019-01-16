@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string Path => _content.Path;
 
         /// <inheritdoc />
-        public virtual int TemplateId => _content.TemplateId;
+        public virtual int? TemplateId => _content.TemplateId;
 
         /// <inheritdoc />
         public virtual int CreatorId => _content.CreatorId;
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual PublishedItemType ItemType => _content.ItemType;
 
         /// <inheritdoc />
-        public virtual bool IsDraft => _content.IsDraft;
+        public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);
 
         #endregion
 

@@ -26,6 +26,7 @@ namespace Umbraco.Core.Models
         private string _thumbnail = "folder.png";
         private bool _allowedAsRoot; // note: only one that's not 'pure element type'
         private bool _isContainer;
+        private bool _isElement;
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _noGroupPropertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
@@ -90,10 +91,11 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
             public readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
             public readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
+            public readonly PropertyInfo IsElementSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsElement);
             public readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
             public readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
-            public readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
-            public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
+            public readonly PropertyInfo PropertyGroupsSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
+            public readonly PropertyInfo PropertyTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
             public readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
             public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<ContentTypeBase, ContentVariation>(x => x.Variations);
 
@@ -106,12 +108,12 @@ namespace Umbraco.Core.Models
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertyGroupCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyGroupsSelector);
         }
 
         protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyTypesSelector);
         }
 
         /// <summary>
@@ -178,6 +180,14 @@ namespace Umbraco.Core.Models
         {
             get => _isContainer;
             set => SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector);
+        }
+
+        /// <inheritdoc />
+        [DataMember]
+        public bool IsElement
+        {
+            get => _isElement;
+            set => SetPropertyValueAndDetectChanges(value, ref _isElement, Ps.Value.IsElementSelector);
         }
 
         /// <summary>
@@ -263,6 +273,8 @@ namespace Umbraco.Core.Models
             get => _noGroupPropertyTypes;
             set
             {
+                if (_noGroupPropertyTypes != null)
+                    _noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;
                 _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing, value);
                 _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
                 PropertyTypesChanged(_noGroupPropertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -376,7 +388,7 @@ namespace Umbraco.Core.Models
                     if (!HasPropertyTypeBeenRemoved)
                     {
                         HasPropertyTypeBeenRemoved = true;
-                        OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
+                        OnPropertyChanged(Ps.Value.PropertyTypesSelector);
                     }
                     break;
                 }
@@ -388,7 +400,7 @@ namespace Umbraco.Core.Models
                 if (!HasPropertyTypeBeenRemoved)
                 {
                     HasPropertyTypeBeenRemoved = true;
-                    OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
+                    OnPropertyChanged(Ps.Value.PropertyTypesSelector);
                 }
             }
         }
@@ -412,7 +424,7 @@ namespace Umbraco.Core.Models
 
             // actually remove the group
             PropertyGroups.RemoveItem(propertyGroupName);
-            OnPropertyChanged(Ps.Value.PropertyGroupCollectionSelector);
+            OnPropertyChanged(Ps.Value.PropertyGroupsSelector);
         }
 
         /// <summary>

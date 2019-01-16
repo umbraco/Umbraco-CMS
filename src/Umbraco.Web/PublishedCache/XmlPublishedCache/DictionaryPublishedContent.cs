@@ -52,12 +52,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             LoadedFromExamine = fromExamine;
 
             ValidateAndSetProperty(valueDictionary, val => _id = Int32.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
-            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
+            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key", "__key", "__Key");
             //ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
-            ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName", "__nodeName");
+            ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");
             ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
-            ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndexer.ItemTypeFieldName);
+            ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndex.ItemTypeFieldName);
             ValidateAndSetProperty(valueDictionary, val => _documentTypeId = Int32.Parse(val), "nodeType");
             //ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
             ValidateAndSetProperty(valueDictionary, val => _creatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
@@ -148,7 +148,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override Guid Key => _key;
 
-        public override int TemplateId => 0;
+        public override int? TemplateId => null;
 
         public override int SortOrder => _sortOrder;
 
@@ -176,7 +176,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override int Level => _level;
 
-        public override bool IsDraft => false;
+        public override bool IsDraft(string culture = null) => false;
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 

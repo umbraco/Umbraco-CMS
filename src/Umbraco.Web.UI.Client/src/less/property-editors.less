@@ -1,3 +1,5 @@
+@checkered-background: url(../img/checkered-background.png);
+
 //
 // Container styles
 // --------------------------------------------------
@@ -353,7 +355,7 @@
     max-height:100%;
     margin:auto;
     display:block;
-    background-image: url(../img/checkered-background.png);
+    background-image: @checkered-background;
 }
 
 .umb-sortable-thumbnails li .trashed {
@@ -576,12 +578,18 @@
         vertical-align: top;
     }
 
-    .gravity-container .viewport {
-        max-width: 600px;
-    }
+    .gravity-container {
+        border: 1px solid @gray-8;
+        line-height: 0;
 
-    .gravity-container .viewport:hover {
-        cursor: pointer;
+        .viewport {
+            max-width: 600px;
+            background: @checkered-background;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .imagecropper {
@@ -593,6 +601,10 @@
             flex-direction: column;
             float: left;
             max-width: 100%;
+        }
+
+        .viewport img {
+            background: @checkered-background;
         }
     }
 
@@ -687,7 +699,7 @@
 //
 // folder-browser
 // --------------------------------------------------
-.umb-folderbrowser .add-link{
+.umb-folderbrowser .add-link {
   display: inline-block;
   height: 120px;
   width: 120px;
@@ -695,17 +707,6 @@
   border: 1px @gray-10 dashed;
   line-height: 120px
 }
-
-.umb-upload-button-big:hover{color: @gray-8;}
-
-.umb-upload-button-big {display: block}
-.umb-upload-button-big input {
-  left: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-}
-
 
 //
 // File upload
@@ -724,6 +725,10 @@
   list-style: none;
   vertical-align: middle;
   margin-bottom: 0;
+
+  img {
+    background: @checkered-background;
+  }
 }
 
 .umb-fileupload label {
@@ -770,20 +775,6 @@
 .umb-fileupload input {
   font-size: 12px;
   line-height: 1;
-}
-
-//
-// Member group picker
-// --------------------------------------------------
-
-.umb-member-group-box {
-  width: 45%;
-}
-.umb-member-group-box:nth-child(1){
-  float:left;
-}
-.umb-member-group-box:nth-child(2){
-  float:right;
 }
 
 //

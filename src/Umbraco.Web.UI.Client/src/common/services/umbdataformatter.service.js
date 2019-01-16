@@ -64,7 +64,7 @@
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'isElement');
 
                 //TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
@@ -262,7 +262,7 @@
                     saveModel[props[m]] = startId.id;
                 }
 
-                saveModel.parentId = -1; 
+                saveModel.parentId = -1;
                 return saveModel;
             },
 
@@ -293,7 +293,7 @@
                 });
                 saveModel.email = propEmail.value.trim();
                 saveModel.username = propLogin.value.trim();
-                
+
                 saveModel.password = this.formatChangePasswordModel(propPass.value);
 
                 var selectedGroups = [];
@@ -336,7 +336,7 @@
 
             /** formats the display model used to display the media to the model used to save the media */
             formatMediaPostData: function (displayModel, action) {
-                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
+                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but
                 // we don't want to post all of the data as it is unecessary.
                 var saveModel = {
                     id: displayModel.id,
@@ -354,7 +354,7 @@
             /** formats the display model used to display the content to the model used to save the content  */
             formatContentPostData: function (displayModel, action) {
 
-                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
+                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but
                 // we don't want to post all of the data as it is unecessary.
                 var saveModel = {
                     id: displayModel.id,
@@ -379,7 +379,7 @@
                 var propExpireDate = displayModel.removeDate;
                 var propReleaseDate = displayModel.releaseDate;
                 var propTemplate = displayModel.template;
-            
+
                 saveModel.expireDate = propExpireDate ? propExpireDate : null;
                 saveModel.releaseDate = propReleaseDate ? propReleaseDate : null;
                 saveModel.templateAlias = propTemplate ? propTemplate : null;
@@ -389,8 +389,8 @@
 
             /**
              * This formats the server GET response for a content display item
-             * @param {} displayModel 
-             * @returns {} 
+             * @param {} displayModel
+             * @returns {}
              */
             formatContentGetData: function(displayModel) {
 
@@ -418,7 +418,7 @@
                             }
                         });
                     });
-                    
+
 
                     //now assign this same invariant property instance to the same index of the other variants property array
                     for (var j = 1; j < displayModel.variants.length; j++) {
@@ -431,6 +431,24 @@
                 }
 
                 return displayModel;
+            },
+
+            /**
+             * Formats the display model used to display the relation type to a model used to save the relation type.
+             * @param {Object} relationType
+             */
+            formatRelationTypePostData : function(relationType) {
+                var saveModel = {
+                    id: relationType.id,
+                    name: relationType.name,
+                    alias: relationType.alias,
+                    key : relationType.key,
+                    isBidirectional: relationType.isBidirectional,
+                    parentObjectType: relationType.parentObjectType,
+                    childObjectType: relationType.childObjectType
+                };
+
+                return saveModel;
             }
         };
     }

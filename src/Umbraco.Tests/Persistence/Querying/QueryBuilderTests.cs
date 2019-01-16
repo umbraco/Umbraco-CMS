@@ -107,8 +107,6 @@ namespace Umbraco.Tests.Persistence.Querying
             var translator = new SqlTranslator<IContent>(sql, query);
             var result = translator.Translate();
 
-            result.WriteToConsole();
-
             Assert.AreEqual("-1,1046,1076,1089%", result.Arguments[0]);
             Assert.AreEqual(1046, result.Arguments[1]);
             Assert.AreEqual(true, result.Arguments[2]);

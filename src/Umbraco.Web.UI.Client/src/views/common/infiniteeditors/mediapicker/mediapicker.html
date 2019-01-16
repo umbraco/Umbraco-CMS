@@ -68,8 +68,8 @@
                                 <i class="icon icon-add small"></i>
                             </a>
     
-                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                on-blur="submitFolder()" focus-when="{{showFolderInput}}" />
+                            <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
+                                ng-blur="submitFolder()" focus-when="{{showFolderInput}}" />
                         </li>
                     </ul>
                     <div class="umb-loader" ng-if="creatingFolder"></div>
@@ -171,6 +171,7 @@
             <umb-button
                 action="close()"
                 button-style="link"
+                shortcut="esc"
                 label="Close"
                 type="button">
             </umb-button>

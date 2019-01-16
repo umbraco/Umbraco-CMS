@@ -1,5 +1,5 @@
 ﻿<div class="umb-pane">
-  <div ng-repeat="property in tab.properties" style="position: relative;">
+  <div ng-repeat="property in tab.properties" class="umb-nested-content-property-container">
 
     <umb-property property="property" ng-class="{'umb-nested-content--not-supported': property.notSupported}">
       <umb-property-editor model="property"></umb-property-editor>
