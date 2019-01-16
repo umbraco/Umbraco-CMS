@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Packaging
         private PackageDataInstallation PackageDataInstallation => Factory.GetInstance<PackageDataInstallation>();
 
         [Test]
-        public void PackagingService_Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
+        public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
         {
             // Arrange
             string strXml = ImportResources.uBlogsy_Package;
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
+        public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
         {
             // Arrange
             var strXml = ImportResources.InheritedDocTypes_Package;
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
+        public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
         {
             // Arrange
             string strXml = ImportResources.InheritedDocTypes_Package;
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Template_Package_Xml()
+        public void Can_Import_Template_Package_Xml()
         {
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Single_Template()
+        public void Can_Import_Single_Template()
         {
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_StandardMvc_ContentTypes_Package_Xml()
+        public void Can_Import_StandardMvc_ContentTypes_Package_Xml()
         {
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
+        public void Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
         {
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Fanoe_Starterkit_ContentTypes_And_Templates_Xml()
+        public void Can_Import_Fanoe_Starterkit_ContentTypes_And_Templates_Xml()
         {
             // Arrange
             string strXml = ImportResources.Fanoe_Package;
@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Content_Package_Xml()
+        public void Can_Import_Content_Package_Xml()
         {
             // Arrange
             string strXml = ImportResources.StandardMvc_Package;
@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
+        public void Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
         {
             AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
         }
@@ -381,7 +381,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Templates_Package_Xml_With_Invalid_Master()
+        public void Can_Import_Templates_Package_Xml_With_Invalid_Master()
         {
             // Arrange
             string strXml = ImportResources.XsltSearch_Package;
@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Single_DocType()
+        public void Can_Import_Single_DocType()
         {
             // Arrange
             string strXml = ImportResources.SingleDocType;
@@ -416,7 +416,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Export_Single_DocType()
+        public void Can_Export_Single_DocType()
         {
             // Arrange
             string strXml = ImportResources.SingleDocType;
@@ -440,7 +440,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_ReImport_Single_DocType()
+        public void Can_ReImport_Single_DocType()
         {
             // Arrange
             string strXml = ImportResources.SingleDocType;
@@ -463,7 +463,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_ReImport_Templates_To_Update()
+        public void Can_ReImport_Templates_To_Update()
         {
             var newPackageXml = XElement.Parse(ImportResources.TemplateOnly_Package);
             var updatedPackageXml = XElement.Parse(ImportResources.TemplateOnly_Updated_Package);
@@ -491,7 +491,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_DictionaryItems()
+        public void Can_Import_DictionaryItems()
         {
             // Arrange
             const string expectedEnglishParentValue = "ParentValue";
@@ -515,7 +515,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Nested_DictionaryItems()
+        public void Can_Import_Nested_DictionaryItems()
         {
             // Arrange
             const string parentKey = "Parent";
@@ -541,7 +541,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_WhenExistingDictionaryKey_ImportsNewChildren()
+        public void WhenExistingDictionaryKey_ImportsNewChildren()
         {
             // Arrange
             const string expectedEnglishParentValue = "ExistingParentValue";
@@ -566,7 +566,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_WhenExistingDictionaryKey_OnlyAddsNewLanguages()
+        public void WhenExistingDictionaryKey_OnlyAddsNewLanguages()
         {
             // Arrange
             const string expectedEnglishParentValue = "ExistingParentValue";
@@ -591,7 +591,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Languages()
+        public void Can_Import_Languages()
         {
             // Arrange
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
@@ -610,7 +610,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Macros()
+        public void Can_Import_Macros()
         {
             // Arrange
             string strXml = ImportResources.uBlogsy_Package;
@@ -632,7 +632,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Macros_With_Properties()
+        public void Can_Import_Macros_With_Properties()
         {
             // Arrange
             string strXml = ImportResources.XsltSearch_Package;
@@ -655,7 +655,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Package_With_Compositions()
+        public void Can_Import_Package_With_Compositions()
         {
             // Arrange
             string strXml = ImportResources.CompositionsTestPackage;
@@ -684,7 +684,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
-        public void PackagingService_Can_Import_Package_With_Compositions_Ordered()
+        public void Can_Import_Package_With_Compositions_Ordered()
         {
             // Arrange
             string strXml = ImportResources.CompositionsTestPackage_Random;
