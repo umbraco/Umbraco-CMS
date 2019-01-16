@@ -15,6 +15,6 @@ namespace Umbraco.Web.PropertyEditors
         public string StartNodeQuery {get;set;}
 
         [JsonProperty("id")]
-        public int? StartNodeId {get;set;}
+        public string StartNodeId {get;set;}
     }
 }

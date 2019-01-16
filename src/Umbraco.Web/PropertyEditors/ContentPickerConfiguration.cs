@@ -8,6 +8,6 @@ namespace Umbraco.Web.PropertyEditors
         public bool ShowOpenButton { get; set; }
 
         [ConfigurationField("startNodeId", "Start node", "treepicker")] // + config in configuration editor ctor
-        public int StartNodeId { get; set; } = -1; // default value is -1
+        public string StartNodeId { get; set; }
     }
 }
