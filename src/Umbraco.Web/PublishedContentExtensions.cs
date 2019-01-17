@@ -4,9 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using Examine;
-using Examine.Search;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -267,6 +265,21 @@ namespace Umbraco.Web
         /// <remarks>Culture is case-insensitive.</remarks>
         public static bool HasCulture(this IPublishedContent content, string culture)
             => content.Cultures.ContainsKey(culture);
+
+        /// <summary>
+        /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
+        /// </summary>
+        /// <param name="contents">The content items.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
+        internal static IEnumerable<IPublishedContent> WhereIsInvariantOrHasCulture(this IEnumerable<IPublishedContent> contents, string culture = null)
+        {
+            if (contents == null) throw new ArgumentNullException(nameof(contents));
+
+            culture = culture ?? Current.VariationContextAccessor.VariationContext?.Culture ?? "";
+
+            // either does not vary by culture, or has the specified culture
+            return contents.Where(x => !x.ContentType.VariesByCulture() || x.HasCulture(culture));
+        }
 
         #endregion
 
@@ -767,27 +780,29 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="parentNodes"></param>
         /// <param name="docTypeAlias"></param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns></returns>
         /// <remarks>
         /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
         /// </remarks>
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
         {
-            return parentNodes.SelectMany(x => x.DescendantsOrSelf(docTypeAlias));
+            return parentNodes.SelectMany(x => x.DescendantsOrSelf(docTypeAlias, culture));
         }
 
         /// <summary>
         /// Returns all DescendantsOrSelf of all content referenced
         /// </summary>
         /// <param name="parentNodes"></param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns></returns>
         /// <remarks>
         /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
         /// </remarks>
-        public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes)
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes, string culture = null)
             where T : class, IPublishedContent
         {
-            return parentNodes.SelectMany(x => x.DescendantsOrSelf<T>());
+            return parentNodes.SelectMany(x => x.DescendantsOrSelf<T>(culture));
         }
 
 
@@ -810,133 +825,133 @@ namespace Umbraco.Web
         // - the relative order of siblings is the order in which they occur in the children property of their parent node.
         // - children and descendants occur before following siblings.
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content)
+        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string culture = null)
         {
-            return content.DescendantsOrSelf(false, null);
+            return content.DescendantsOrSelf(false, null, culture);
         }
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, int level)
+        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, int level, string culture = null)
         {
-            return content.DescendantsOrSelf(false, p => p.Level >= level);
+            return content.DescendantsOrSelf(false, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string contentTypeAlias)
+        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias);
+            return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias, culture);
         }
 
-        public static IEnumerable<T> Descendants<T>(this IPublishedContent content)
+        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Descendants().OfType<T>();
+            return content.Descendants(culture).OfType<T>();
         }
 
-        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, int level)
+        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, int level, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Descendants(level).OfType<T>();
+            return content.Descendants(level, culture).OfType<T>();
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string culture = null)
         {
-            return content.DescendantsOrSelf(true, null);
+            return content.DescendantsOrSelf(true, null, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, int level)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, int level, string culture = null)
         {
-            return content.DescendantsOrSelf(true, p => p.Level >= level);
+            return content.DescendantsOrSelf(true, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string contentTypeAlias)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias);
+            return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias, culture);
         }
 
-        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content)
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.DescendantsOrSelf().OfType<T>();
+            return content.DescendantsOrSelf(culture).OfType<T>();
         }
 
-        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, int level)
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, int level, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.DescendantsOrSelf(level).OfType<T>();
+            return content.DescendantsOrSelf(level, culture).OfType<T>();
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content)
+        public static IPublishedContent Descendant(this IPublishedContent content, string culture = null)
         {
-            return content.Children.FirstOrDefault();
+            return content.Children(culture).FirstOrDefault();
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, int level)
+        public static IPublishedContent Descendant(this IPublishedContent content, int level, string culture = null)
         {
-            return content.EnumerateDescendants(false).FirstOrDefault(x => x.Level == level);
+            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias)
+        public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.EnumerateDescendants(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
-        public static T Descendant<T>(this IPublishedContent content)
+        public static T Descendant<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.EnumerateDescendants(false).FirstOrDefault(x => x is T) as T;
+            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x is T) as T;
         }
 
-        public static T Descendant<T>(this IPublishedContent content, int level)
+        public static T Descendant<T>(this IPublishedContent content, int level, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Descendant(level) as T;
+            return content.Descendant(level, culture) as T;
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content)
+        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string culture = null)
         {
             return content;
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, int level)
+        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, int level, string culture = null)
         {
-            return content.EnumerateDescendants(true).FirstOrDefault(x => x.Level == level);
+            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string contentTypeAlias)
+        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.EnumerateDescendants(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
-        public static T DescendantOrSelf<T>(this IPublishedContent content)
+        public static T DescendantOrSelf<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.EnumerateDescendants(true).FirstOrDefault(x => x is T) as T;
+            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x is T) as T;
         }
 
-        public static T DescendantOrSelf<T>(this IPublishedContent content, int level)
+        public static T DescendantOrSelf<T>(this IPublishedContent content, int level, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.DescendantOrSelf(level) as T;
+            return content.DescendantOrSelf(level, culture) as T;
         }
 
-        internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
+        internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func, string culture = null)
         {
-            return content.EnumerateDescendants(orSelf).Where(x => func == null || func(x));
+            return content.EnumerateDescendants(orSelf, culture).Where(x => func == null || func(x));
         }
 
-        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf)
+        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf,  string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
 
-            foreach (var desc in content.Children.SelectMany(x => x.EnumerateDescendants()))
+            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants()))
                 yield return desc;
         }
 
-        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content)
+        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, string culture = null)
         {
             yield return content;
 
-            foreach (var desc in content.Children.SelectMany(x => x.EnumerateDescendants()))
+            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants()))
                 yield return desc;
         }
 
@@ -1026,15 +1041,25 @@ namespace Umbraco.Web
         /// Gets the children of the content.
         /// </summary>
         /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The children of the content.</returns>
         /// <remarks>
         /// <para>Children are sorted by their sortOrder.</para>
         /// <para>This method exists for consistency, it is the same as calling content.Children as a property.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content)
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return content.Children;
+
+            //
+            return content.Children.Where(x =>
+            {
+                if (!x.ContentType.VariesByCulture()) return true; // invariant = always ok
+                return x.HasCulture(culture);
+                return false;
+            });
+
+            return content.Children.WhereIsInvariantOrHasCulture(culture);
         }
 
         /// <summary>
@@ -1042,24 +1067,26 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="predicate">The predicate.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The children of the content, filtered by the predicate.</returns>
         /// <remarks>
         /// <para>Children are sorted by their sortOrder.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, Func<IPublishedContent, bool> predicate, string culture = null)
         {
-            return content.Children().Where(predicate);
+            return content.Children(culture).Where(predicate);
         }
 
         /// <summary>
         /// Gets the children of the content, of any of the specified types.
         /// </summary>
         /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <param name="alias">One or more content type alias.</param>
         /// <returns>The children of the content, of any of the specified types.</returns>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, params string[] alias)
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null, params string[] alias)
         {
-            return content.Children(x => alias.InvariantContains(x.ContentType.Alias));
+            return content.Children(x => alias.InvariantContains(x.ContentType.Alias), culture);
         }
 
         /// <summary>
@@ -1067,19 +1094,20 @@ namespace Umbraco.Web
         /// </summary>
         /// <typeparam name="T">The content type.</typeparam>
         /// <param name="content">The content.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The children of content, of the given content type.</returns>
         /// <remarks>
         /// <para>Children are sorted by their sortOrder.</para>
         /// </remarks>
-        public static IEnumerable<T> Children<T>(this IPublishedContent content)
+        public static IEnumerable<T> Children<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Children().OfType<T>();
+            return content.Children(culture).OfType<T>();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content)
+        public static IPublishedContent FirstChild(this IPublishedContent content, string culture = null)
         {
-            return content.Children().FirstOrDefault();
+            return content.Children(culture).FirstOrDefault();
         }
 
         /// <summary>
@@ -1088,26 +1116,26 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="alias">The content type alias.</param>
         /// <returns>The first child of content, of the given content type.</returns>
-        public static IPublishedContent FirstChild(this IPublishedContent content, string alias)
+        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null)
         {
-            return content.Children(alias).FirstOrDefault();
+            return content.Children(culture,alias).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate, string culture = null)
         {
-            return content.Children(predicate).FirstOrDefault();
+            return content.Children(predicate, culture).FirstOrDefault();
         }
 
-        public static T FirstChild<T>(this IPublishedContent content)
+        public static T FirstChild<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Children<T>().FirstOrDefault();
+            return content.Children<T>(culture).FirstOrDefault();
         }
 
-        public static T FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate)
+        public static T FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Children<T>().FirstOrDefault(predicate);
+            return content.Children<T>(culture).FirstOrDefault(predicate);
         }
 
         /// <summary>
@@ -1116,10 +1144,11 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="services">A service context.</param>
         /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The children of the content.</returns>
-        public static DataTable ChildrenAsTable(this IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "")
+        public static DataTable ChildrenAsTable(this IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "", string culture = null)
         {
-            return GenerateDataTable(content, services, contentTypeAliasFilter);
+            return GenerateDataTable(content, services, contentTypeAliasFilter, culture);
         }
 
         /// <summary>
@@ -1128,14 +1157,15 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="services">A service context.</param>
         /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The children of the content.</returns>
-        private static DataTable GenerateDataTable(IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "")
+        private static DataTable GenerateDataTable(IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "", string culture = null)
         {
             var firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
-                                ? content.Children.Any()
-                                    ? content.Children.ElementAt(0)
+                                ? content.Children(culture).Any()
+                                    ? content.Children(culture).ElementAt(0)
                                     : null
-                                : content.Children.FirstOrDefault(x => x.ContentType.Alias == contentTypeAliasFilter);
+                                : content.Children(culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAliasFilter);
             if (firstNode == null)
                 return new DataTable(); //no children found
 
