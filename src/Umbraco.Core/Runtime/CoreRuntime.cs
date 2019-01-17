@@ -252,7 +252,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.DetermineRuntimeLevel(databaseFactory, profilingLogger);
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel}", _state.Level);
+                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {
@@ -263,6 +263,7 @@ namespace Umbraco.Core.Runtime
                 catch
                 {
                     _state.Level = RuntimeLevel.BootFailed;
+                    _state.Reason = RuntimeLevelReason.BootFailedOnException;
                     timer.Fail();
                     throw;
                 }

@@ -882,7 +882,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="packageUpgradeInstructions">Instrukcja aktualizacji</key>
     <key alias="packageUpgradeText">Jest dostępna aktualizacja dla tego pakietu. Możesz ją pobrać wprost z repozytorium pakietów Umbraco.</key>
     <key alias="packageVersion">Wersja pakietu</key>
-    <key alias="packageVersionHistory">Historia wersji pakietu</key>
     <key alias="viewPackageWebsite">Odwiedź stronę pakietu</key>
     <key alias="packageAlreadyInstalled">Pakiet jest już zainstalowany</key>
     <key alias="targetVersionMismatch">Ten pakiet nie może być zainstalowany, ponieważ wymaga Umbraco w wersji przynajmniej %0%</key>

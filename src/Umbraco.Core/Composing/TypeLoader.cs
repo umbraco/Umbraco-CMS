@@ -405,7 +405,7 @@ namespace Umbraco.Core.Composing
                         break;
                     case LocalTempStorage.Default:
                     default:
-                        var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
+                        var tempFolder = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "TypesCache");
                         _fileBasePath = Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName);
                         break;
                 }

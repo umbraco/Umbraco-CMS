@@ -8,7 +8,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {
-    internal class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
+    public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
 

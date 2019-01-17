@@ -22,6 +22,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -66,7 +67,9 @@ namespace Umbraco.Tests.PublishedContent
         /// <returns></returns>
         internal IPublishedContent GetNode(int id, UmbracoContext umbracoContext)
         {
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), Current.Services.MediaService, Current.Services.UserService, new StaticCacheProvider(), ContentTypesCache);
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null),
+                ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache,
+                Factory.GetInstance<IEntityXmlSerializer>());
             var doc = cache.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
@@ -108,34 +111,34 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 
-//        [Test]
-//        public void Ensure_Children_Sorted_With_Examine()
-//        {
-//            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
-//
-//            using (var luceneDir = new RandomIdRamDirectory())
-//            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-//                validator: new ContentValueSetValidator(true)))
-//            using (indexer.ProcessNonAsync())
-//            {
-//                rebuilder.RegisterIndex(indexer.Name);
-//                rebuilder.Populate(indexer);
-//
-//                var searcher = indexer.GetSearcher();
-//                var ctx = GetUmbracoContext("/test");
-//                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
-//
-//                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-//                var publishedMedia = cache.GetById(1111);
-//                var rootChildren = publishedMedia.Children().ToArray();
-//                var currSort = 0;
-//                for (var i = 0; i < rootChildren.Count(); i++)
-//                {
-//                    Assert.GreaterOrEqual(rootChildren[i].SortOrder, currSort);
-//                    currSort = rootChildren[i].SortOrder;
-//                }
-//            }
-//        }
+        [Test]
+        public void Ensure_Children_Sorted_With_Examine()
+        {
+            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(true)))
+            using (indexer.ProcessNonAsync())
+            {
+                rebuilder.RegisterIndex(indexer.Name);
+                rebuilder.Populate(indexer);
+
+                var searcher = indexer.GetSearcher();
+                var ctx = GetUmbracoContext("/test");
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+
+                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+                var publishedMedia = cache.GetById(1111);
+                var rootChildren = publishedMedia.Children().ToArray();
+                var currSort = 0;
+                for (var i = 0; i < rootChildren.Count(); i++)
+                {
+                    Assert.GreaterOrEqual(rootChildren[i].SortOrder, currSort);
+                    currSort = rootChildren[i].SortOrder;
+                }
+            }
+        }
 
         [Test]
         public void Do_Not_Find_In_Recycle_Bin()
@@ -153,7 +156,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
 
                 //ensure it is found
                 var publishedMedia = cache.GetById(3113);
@@ -185,89 +188,89 @@ namespace Umbraco.Tests.PublishedContent
 
         }
 
-//        [Test]
-//        public void Children_With_Examine()
-//        {
-//            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
-//
-//            using (var luceneDir = new RandomIdRamDirectory())
-//            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-//                validator: new ContentValueSetValidator(true)))
-//            using (indexer.ProcessNonAsync())
-//            {
-//                rebuilder.RegisterIndex(indexer.Name);
-//                rebuilder.Populate(indexer);
-//
-//                var searcher = indexer.GetSearcher();
-//                var ctx = GetUmbracoContext("/test");
-//                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
-//
-//                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-//                var publishedMedia = cache.GetById(1111);
-//                var rootChildren = publishedMedia.Children();
-//                Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { 2222, 1113, 1114, 1115, 1116 }));
-//
-//                var publishedChild1 = cache.GetById(2222);
-//                var subChildren = publishedChild1.Children();
-//                Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { 2112 }));
-//            }
-//        }
+        [Test]
+        public void Children_With_Examine()
+        {
+            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
-//        [Test]
-//        public void Descendants_With_Examine()
-//        {
-//            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
-//
-//            using (var luceneDir = new RandomIdRamDirectory())
-//            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-//                validator: new ContentValueSetValidator(true)))
-//            using (indexer.ProcessNonAsync())
-//            {
-//                rebuilder.RegisterIndex(indexer.Name);
-//                rebuilder.Populate(indexer);
-//
-//                var searcher = indexer.GetSearcher();
-//                var ctx = GetUmbracoContext("/test");
-//                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
-//
-//                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-//                var publishedMedia = cache.GetById(1111);
-//                var rootDescendants = publishedMedia.Descendants();
-//                Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1113, 1114, 1115, 1116 }));
-//
-//                var publishedChild1 = cache.GetById(2222);
-//                var subDescendants = publishedChild1.Descendants();
-//                Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 3113 }));
-//            }
-//        }
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(true)))
+            using (indexer.ProcessNonAsync())
+            {
+                rebuilder.RegisterIndex(indexer.Name);
+                rebuilder.Populate(indexer);
 
-//        [Test]
-//        public void DescendantsOrSelf_With_Examine()
-//        {
-//            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
-//
-//            using (var luceneDir = new RandomIdRamDirectory())
-//            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-//                validator: new ContentValueSetValidator(true)))
-//            using (indexer.ProcessNonAsync())
-//            {
-//                rebuilder.RegisterIndex(indexer.Name);
-//                rebuilder.Populate(indexer);
-//
-//                var searcher = indexer.GetSearcher();
-//                var ctx = GetUmbracoContext("/test");
-//                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
-//
-//                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-//                var publishedMedia = cache.GetById(1111);
-//                var rootDescendants = publishedMedia.DescendantsOrSelf();
-//                Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 1111, 2112, 2222, 1113, 1114, 1115, 1116 }));
-//
-//                var publishedChild1 = cache.GetById(2222);
-//                var subDescendants = publishedChild1.DescendantsOrSelf();
-//                Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2222, 2112, 3113 }));
-//            }
-//        }
+                var searcher = indexer.GetSearcher();
+                var ctx = GetUmbracoContext("/test");
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+
+                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+                var publishedMedia = cache.GetById(1111);
+                var rootChildren = publishedMedia.Children();
+                Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { 2222, 1113, 1114, 1115, 1116 }));
+
+                var publishedChild1 = cache.GetById(2222);
+                var subChildren = publishedChild1.Children();
+                Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { 2112 }));
+            }
+        }
+
+        [Test]
+        public void Descendants_With_Examine()
+        {
+            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(true)))
+            using (indexer.ProcessNonAsync())
+            {
+                rebuilder.RegisterIndex(indexer.Name);
+                rebuilder.Populate(indexer);
+
+                var searcher = indexer.GetSearcher();
+                var ctx = GetUmbracoContext("/test");
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+
+                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+                var publishedMedia = cache.GetById(1111);
+                var rootDescendants = publishedMedia.Descendants();
+                Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1113, 1114, 1115, 1116 }));
+
+                var publishedChild1 = cache.GetById(2222);
+                var subDescendants = publishedChild1.Descendants();
+                Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 3113 }));
+            }
+        }
+
+        [Test]
+        public void DescendantsOrSelf_With_Examine()
+        {
+            var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(true)))
+            using (indexer.ProcessNonAsync())
+            {
+                rebuilder.RegisterIndex(indexer.Name);
+                rebuilder.Populate(indexer);
+
+                var searcher = indexer.GetSearcher();
+                var ctx = GetUmbracoContext("/test");
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
+
+                //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+                var publishedMedia = cache.GetById(1111);
+                var rootDescendants = publishedMedia.DescendantsOrSelf();
+                Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 1111, 2112, 2222, 1113, 1114, 1115, 1116 }));
+
+                var publishedChild1 = cache.GetById(2222);
+                var subDescendants = publishedChild1.DescendantsOrSelf();
+                Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2222, 2112, 3113 }));
+            }
+        }
 
         [Test]
         public void Ancestors_With_Examine()
@@ -285,7 +288,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -311,7 +314,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
-                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
+                var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(3113);
@@ -320,79 +323,79 @@ namespace Umbraco.Tests.PublishedContent
             }
         }
 
-//        [Test]
-//        public void Children_Without_Examine()
-//        {
-//            var user = ServiceContext.UserService.GetUserById(0);
-//            var mType = MakeNewMediaType(user, "TestMediaType");
-//            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
-//
-//            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
-//            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
-//            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
-//
-//            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
-//            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
-//            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
-//
-//            var publishedMedia = GetNode(mRoot.Id);
-//            var rootChildren = publishedMedia.Children();
-//            Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mChild2.Id, mChild3.Id }));
-//
-//            var publishedChild1 = GetNode(mChild1.Id);
-//            var subChildren = publishedChild1.Children();
-//            Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
-//        }
+        [Test]
+        public void Children_Without_Examine()
+        {
+            var user = ServiceContext.UserService.GetUserById(0);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
 
-//        [Test]
-//        public void Descendants_Without_Examine()
-//        {
-//            var user = ServiceContext.UserService.GetUserById(0);
-//            var mType = MakeNewMediaType(user, "TestMediaType");
-//            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
-//
-//            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
-//            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
-//            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
-//
-//            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
-//            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
-//            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
-//
-//            var publishedMedia = GetNode(mRoot.Id);
-//            var rootDescendants = publishedMedia.Descendants();
-//            Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mChild2.Id, mChild3.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
-//
-//            var publishedChild1 = GetNode(mChild1.Id);
-//            var subDescendants = publishedChild1.Descendants();
-//            Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
-//        }
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
 
-//        [Test]
-//        public void DescendantsOrSelf_Without_Examine()
-//        {
-//            var user = ServiceContext.UserService.GetUserById(0);
-//            var mType = MakeNewMediaType(user, "TestMediaType");
-//            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
-//
-//            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
-//            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
-//            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
-//
-//            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
-//            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
-//            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
-//
-//            var publishedMedia = GetNode(mRoot.Id);
-//            var rootDescendantsOrSelf = publishedMedia.DescendantsOrSelf();
-//            Assert.IsTrue(rootDescendantsOrSelf.Select(x => x.Id).ContainsAll(
-//                new[] { mRoot.Id, mChild1.Id, mChild2.Id, mChild3.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
-//
-//            var publishedChild1 = GetNode(mChild1.Id);
-//            var subDescendantsOrSelf = publishedChild1.DescendantsOrSelf();
-//            Assert.IsTrue(subDescendantsOrSelf.Select(x => x.Id).ContainsAll(
-//                new[] { mChild1.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
-//        }
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
+
+            var publishedMedia = GetNode(mRoot.Id);
+            var rootChildren = publishedMedia.Children();
+            Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mChild2.Id, mChild3.Id }));
+
+            var publishedChild1 = GetNode(mChild1.Id);
+            var subChildren = publishedChild1.Children();
+            Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
+        }
+
+        [Test]
+        public void Descendants_Without_Examine()
+        {
+            var user = ServiceContext.UserService.GetUserById(0);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
+
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
+
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
+
+            var publishedMedia = GetNode(mRoot.Id);
+            var rootDescendants = publishedMedia.Descendants();
+            Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mChild2.Id, mChild3.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
+
+            var publishedChild1 = GetNode(mChild1.Id);
+            var subDescendants = publishedChild1.Descendants();
+            Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
+        }
+
+        [Test]
+        public void DescendantsOrSelf_Without_Examine()
+        {
+            var user = ServiceContext.UserService.GetUserById(0);
+            var mType = MakeNewMediaType(user, "TestMediaType");
+            var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
+
+            var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
+            var mChild2 = MakeNewMedia("Child2", mType, user, mRoot.Id);
+            var mChild3 = MakeNewMedia("Child3", mType, user, mRoot.Id);
+
+            var mSubChild1 = MakeNewMedia("SubChild1", mType, user, mChild1.Id);
+            var mSubChild2 = MakeNewMedia("SubChild2", mType, user, mChild1.Id);
+            var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
+
+            var publishedMedia = GetNode(mRoot.Id);
+            var rootDescendantsOrSelf = publishedMedia.DescendantsOrSelf();
+            Assert.IsTrue(rootDescendantsOrSelf.Select(x => x.Id).ContainsAll(
+                new[] { mRoot.Id, mChild1.Id, mChild2.Id, mChild3.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
+
+            var publishedChild1 = GetNode(mChild1.Id);
+            var subDescendantsOrSelf = publishedChild1.DescendantsOrSelf();
+            Assert.IsTrue(subDescendantsOrSelf.Select(x => x.Id).ContainsAll(
+                new[] { mChild1.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
+        }
 
         [Test]
         public void Parent_Without_Examine()
@@ -479,7 +482,7 @@ namespace Umbraco.Tests.PublishedContent
             </Image>");
             var node = xml.DescendantsAndSelf("Image").Single(x => (int)x.Attribute("id") == nodeId);
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
 
             var nav = node.CreateNavigator();
 
@@ -499,7 +502,7 @@ namespace Umbraco.Tests.PublishedContent
             var errorXml = new XElement("error", string.Format("No media is maching '{0}'", 1234));
             var nav = errorXml.CreateNavigator();
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
             var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/"), 1234);
 
             Assert.IsNull(converted);

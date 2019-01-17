@@ -861,7 +861,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
     <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra Umbracos pakke opbevaringsbase.</key>
     <key alias="packageVersion">Pakke version</key>
-    <key alias="packageVersionHistory">Pakke versionshistorik</key>
     <key alias="viewPackageWebsite">Se pakkeudviklerens website</key>
     <key alias="packageAlreadyInstalled">Pakke allerede installeret</key>
     <key alias="targetVersionMismatch">Denne pakke kan ikke installeres, den kræver en minimum Umbraco version af</key>

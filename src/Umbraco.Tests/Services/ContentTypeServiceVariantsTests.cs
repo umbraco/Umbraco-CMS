@@ -67,7 +67,8 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IEntityXmlSerializer>());
         }
 
         public class LocalServerMessenger : ServerMessengerBase

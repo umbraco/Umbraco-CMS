@@ -34,6 +34,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IGlobalSettings _globalSettings;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IEntityXmlSerializer _entitySerializer;
 
         #region Constructors
 
@@ -42,20 +43,20 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             ICacheProvider requestCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
+            IEntityXmlSerializer entitySerializer,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
-            : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, segmentProviders,
+            : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, 
                 publishedSnapshotAccessor, variationContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, siteDomainHelper, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
@@ -69,27 +70,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
-            PublishedContentTypeCache contentTypeCache,
-            MainDom mainDom,
-            bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(),
-                publishedSnapshotAccessor, variationContextAccessor,
-                documentRepository, mediaRepository, memberRepository,
-                defaultCultureAccessor,
-                logger, globalSettings, siteDomainHelper, contentTypeCache, mainDom, testing, enableRepositoryEvents)
-        { }
-
-        private PublishedSnapshotService(ServiceContext serviceContext,
-            IPublishedContentTypeFactory publishedContentTypeFactory,
-            IScopeProvider scopeProvider,
-            ICacheProvider requestCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
-            IDefaultCultureAccessor defaultCultureAccessor,
-            ILogger logger,
-            IGlobalSettings globalSettings,
-            ISiteDomainHelper siteDomainHelper,
+            IEntityXmlSerializer entitySerializer,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
@@ -100,9 +81,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
 
-            _xmlStore = new XmlStore(serviceContext, scopeProvider, _routesCache,
-                _contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
-                documentRepository, mediaRepository, memberRepository, globalSettings);
+            _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
+                _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
+                documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
@@ -113,6 +94,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _requestCache = requestCache;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
+            _entitySerializer = entitySerializer;
         }
 
         public override void Dispose()
@@ -157,7 +139,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _siteDomainHelper, _contentTypeCache, _routesCache, previewToken),
-                new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache),
+                new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),
                 domainCache);
         }

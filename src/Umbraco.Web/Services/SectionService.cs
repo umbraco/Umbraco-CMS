@@ -298,7 +298,7 @@ namespace Umbraco.Web.Services
                     //we need to interrogate the attributes for the data. Would be better to have a base class that contains
                     //metadata populated by the attribute. Oh well i guess.
                     var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single());
-                    return Enumerable.ToArray<Section>(attrs.Select(x => new Section(x.Name, x.Alias, x.SortOrder)));
+                    return attrs.Select(x => new Section(x.Name, x.Alias, x.SortOrder)).ToArray();
                 });
             }
 

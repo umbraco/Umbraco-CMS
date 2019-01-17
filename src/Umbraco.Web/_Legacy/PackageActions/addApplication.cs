@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Composing;
@@ -10,7 +11,7 @@ namespace Umbraco.Web._Legacy.PackageActions
     /// This class implements the IPackageAction Interface, used to execute code when packages are installed.
     /// All IPackageActions only takes a PackageName and a XmlNode as input, and executes based on the data in the xmlnode.
     /// </summary>
-    public class addApplication : IPackageAction
+    public class AddApplication : IPackageAction
     {
 
         #region IPackageAction Members
@@ -24,20 +25,20 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// <Action runat="install" [undo="false"] alias="addApplication" appName="Application Name"  appAlias="myApplication" appIcon="application.gif"/>
         /// </code></example>
         /// <returns>true if successfull</returns>
-        public bool Execute(string packageName, XmlNode xmlData)
+        public bool Execute(string packageName, XElement xmlData)
         {
-            string name = xmlData.Attributes["appName"].Value;
-            string alias = xmlData.Attributes["appAlias"].Value;
-            string icon = xmlData.Attributes["appIcon"].Value;
+            string name = xmlData.AttributeValue<string>("appName");
+            string alias = xmlData.AttributeValue<string>("appAlias");
+            string icon = xmlData.AttributeValue<string>("appIcon");
 
             Current.Services.SectionService.MakeNew(name, alias, icon);
 
             return true;
         }
 
-        public bool Undo(string packageName, XmlNode xmlData)
+        public bool Undo(string packageName, XElement xmlData)
         {
-            string alias = xmlData.Attributes["appAlias"].Value;
+            string alias = xmlData.AttributeValue<string>("appAlias");
             var section = Current.Services.SectionService.GetByAlias(alias);
             if (section != null)
             {
@@ -55,11 +56,6 @@ namespace Umbraco.Web._Legacy.PackageActions
         }
 
         #endregion
-
-        public XmlNode SampleXml()
-        {
-            throw new NotImplementedException();
-        }
-
+        
     }
 }

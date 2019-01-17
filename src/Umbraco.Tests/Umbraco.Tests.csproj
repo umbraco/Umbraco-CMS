@@ -62,6 +62,8 @@
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Text.Encoding" />
@@ -139,6 +141,8 @@
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
+    <Compile Include="Services\EntityXmlSerializerTests.cs" />
+    <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -440,7 +444,7 @@
     <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Services\DataTypeServiceTests.cs" />
     <Compile Include="Services\EntityServiceTests.cs" />
-    <Compile Include="Services\Importing\PackageImportTests.cs" />
+    <Compile Include="Packaging\PackageDataInstallationTests.cs" />
     <Compile Include="Services\Importing\ImportResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

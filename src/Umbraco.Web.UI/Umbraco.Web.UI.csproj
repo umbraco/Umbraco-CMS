@@ -107,7 +107,7 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.32</Version>
+      <Version>8.0.0-alpha.33</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -157,13 +157,6 @@
     <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.designer.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.cs">
-      <DependentUpon>directoryBrowser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.designer.cs">
-      <DependentUpon>directoryBrowser.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -209,7 +202,6 @@
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\create.aspx" />
-    <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
@@ -299,8 +291,6 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
-    <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>

@@ -4,7 +4,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {
-    internal abstract class ContentTypeServiceBase : ScopeRepositoryService
+    public abstract class ContentTypeServiceBase : ScopeRepositoryService
     {
         protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
