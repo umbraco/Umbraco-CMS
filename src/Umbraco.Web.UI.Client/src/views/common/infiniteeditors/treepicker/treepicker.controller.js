@@ -54,6 +54,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.toggleLanguageSelector = toggleLanguageSelector;
         vm.selectLanguage = selectLanguage;
         vm.onSearchResults = onSearchResults;
+        vm.selectResult = selectResult;
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;

@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.Trees
         {
             Name = name.IsNullOrWhiteSpace() ? action.Alias : name;
             Alias = action.Alias;
-            SeperatorBefore = false;
+            SeparatorBefore = false;
             Icon = action.Icon;
             Action = action;
         }
@@ -80,8 +80,8 @@ namespace Umbraco.Web.Models.Trees
         /// <summary>
         /// Ensures a menu separator will exist before this menu item
         /// </summary>
-        [DataMember(Name = "seperator")]
-        public bool SeperatorBefore { get; set; }
+        [DataMember(Name = "separator")]
+        public bool SeparatorBefore { get; set; }
 
         [DataMember(Name = "cssclass")]
         public string Icon { get; set; }
