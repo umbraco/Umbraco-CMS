@@ -1,15 +1,13 @@
-﻿using System.Web;
+﻿using System.Linq;
+using System.Web;
 using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -23,9 +21,7 @@ using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -207,12 +203,13 @@ namespace Umbraco.Web.Runtime
                 .Append<TranslationBackOfficeSection>();
 
             // register back office trees
-            foreach (var treeControllerType in umbracoApiControllerTypes)
+            foreach (var treeControllerType in umbracoApiControllerTypes
+                .Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)))
             {
                 var attribute = treeControllerType.GetCustomAttribute<TreeAttribute>(false);
                 if (attribute == null) continue;
                 var tree = new Tree(attribute.SortOrder, attribute.ApplicationAlias, attribute.TreeAlias, attribute.TreeTitle, treeControllerType, attribute.IsSingleNodeTree);
-                composition.WithCollectionBuilder<TreeCollectionBuilder>().AddTree(tree);
+                composition.WithCollectionBuilder<TreeCollectionBuilder>().Trees.Add(tree);
             }
         }
     }

@@ -24,13 +24,13 @@ namespace Umbraco.Web.Services
         public IEnumerable<Tree> GetAll() => _treeCollection;
 
         /// <inheritdoc />
-        public IEnumerable<Tree> GetApplicationTrees(string applicationAlias)
-            => GetAll().Where(x => x.ApplicationAlias.InvariantEquals(applicationAlias)).OrderBy(x => x.SortOrder).ToList();
+        public IEnumerable<Tree> GetTrees(string sectionAlias)
+            => GetAll().Where(x => x.ApplicationAlias.InvariantEquals(sectionAlias)).OrderBy(x => x.SortOrder).ToList();
 
-        public IDictionary<string, IEnumerable<Tree>> GetGroupedApplicationTrees(string applicationAlias)
+        public IDictionary<string, IEnumerable<Tree>> GetGroupedTrees(string sectionAlias)
         {
             var result = new Dictionary<string, IEnumerable<Tree>>();
-            var foundTrees = GetApplicationTrees(applicationAlias).ToList();
+            var foundTrees = GetTrees(sectionAlias).ToList();
             foreach(var treeGroup in _groupedTrees.Value)
             {
                 List<Tree> resultGroup = null;

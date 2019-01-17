@@ -12,12 +12,6 @@ namespace Umbraco.Web.Trees
     {
         protected override BackOfficeSectionCollectionBuilder This => this;
 
-        // need to inject dependencies in the collection, so override creation
-        public override BackOfficeSectionCollection CreateCollection(IFactory factory)
-        {
-            return new BackOfficeSectionCollection(CreateItems(factory));
-        }
-
         protected override IEnumerable<IBackOfficeSection> CreateItems(IFactory factory)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
@@ -25,7 +19,8 @@ namespace Umbraco.Web.Trees
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetInstance<ManifestParser>();
 
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.Sections.Select(x => new ManifestBackOfficeSection(x.Key, x.Value)));
+            return base.CreateItems(factory)
+                .Concat(manifestParser.Manifest.Sections.Select(x => new ManifestBackOfficeSection(x.Key, x.Value)));
         }
 
         private class ManifestBackOfficeSection : IBackOfficeSection

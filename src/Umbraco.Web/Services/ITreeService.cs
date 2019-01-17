@@ -26,16 +26,16 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Gets the application tree for the applcation with the specified alias
         /// </summary>
-        /// <param name="applicationAlias">The application alias.</param>
+        /// <param name="sectionAlias">The application alias.</param>
         /// <returns>Returns a ApplicationTree Array</returns>
-        IEnumerable<Tree> GetApplicationTrees(string applicationAlias);
+        IEnumerable<Tree> GetTrees(string sectionAlias);
         
         /// <summary>
         /// Gets the grouped application trees for the application with the specified alias
         /// </summary>
-        /// <param name="applicationAlias"></param>
+        /// <param name="sectionAlias"></param>
         /// <returns></returns>
-        IDictionary<string, IEnumerable<Tree>> GetGroupedApplicationTrees(string applicationAlias);
+        IDictionary<string, IEnumerable<Tree>> GetGroupedTrees(string sectionAlias);
     }
     
 }

@@ -3,16 +3,15 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Trees
 {
-    //fixme - how will we allow users to modify these items? they will need to be able to change the ApplicationTree's registered (i.e. sort order, section)
-    public class TreeCollectionBuilder : CollectionBuilderBase<TreeCollectionBuilder, TreeCollection, Tree>
+    public class TreeCollectionBuilder : ICollectionBuilder<TreeCollection, Tree>
     {
-        private readonly List<Tree> _instances = new List<Tree>();
+        /// <summary>
+        /// expose the list of trees which developers can manipulate before the collection is created
+        /// </summary>
+        public List<Tree> Trees { get; } = new List<Tree>();
 
-        public void AddTree(Tree tree)
-        {
-            _instances.Add(tree);
-        }
+        public TreeCollection CreateCollection(IFactory factory) => new TreeCollection(Trees);
 
-        protected override IEnumerable<Tree> CreateItems(IFactory factory) => _instances;
+        public void RegisterWith(IRegister register) => register.Register(CreateCollection, Lifetime.Singleton);
     }
 }
