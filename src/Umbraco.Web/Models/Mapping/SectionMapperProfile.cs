@@ -3,6 +3,7 @@ using AutoMapper;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Models.Mapping
 {

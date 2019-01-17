@@ -25,6 +25,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.PublishedContent;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -195,9 +196,15 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentEditorContentAppFactory>()
                 .Append<ContentInfoContentAppFactory>();
 
-            // register back office sections
+            // register back office sections in the order we want them rendered
             composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>()
-                .Add(() => composition.TypeLoader.GetTypes<IBackOfficeSection>());
+                .Append<ContentBackOfficeSection>()
+                .Append<MediaBackOfficeSection>()
+                .Append<SettingsBackOfficeSection>()
+                .Append<PackagesBackOfficeSection>()
+                .Append<UsersBackOfficeSection>()
+                .Append<MembersBackOfficeSection>()
+                .Append<TranslationBackOfficeSection>();
 
             // register back office trees
             foreach (var treeControllerType in umbracoApiControllerTypes)

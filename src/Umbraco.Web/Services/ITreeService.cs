@@ -29,15 +29,7 @@ namespace Umbraco.Web.Services
         /// <param name="applicationAlias">The application alias.</param>
         /// <returns>Returns a ApplicationTree Array</returns>
         IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias);
-
-        ///// <summary>
-        ///// Gets the application tree for the applcation with the specified alias
-        ///// </summary>
-        ///// <param name="applicationAlias">The application alias.</param>
-        ///// <param name="onlyInitialized"></param>
-        ///// <returns>Returns a ApplicationTree Array</returns>
-        //IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias, bool onlyInitialized);
-
+        
         /// <summary>
         /// Gets the grouped application trees for the application with the specified alias
         /// </summary>

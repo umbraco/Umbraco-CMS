@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Services
     public class SectionServiceTests : TestWithSomeContentBase
     {
         //fixme
-        private ISectionService SectionService => new SectionService(ServiceContext.UserService, null, null);
+        private ISectionService SectionService => new SectionService(ServiceContext.UserService, null);
 
        
         [Test]

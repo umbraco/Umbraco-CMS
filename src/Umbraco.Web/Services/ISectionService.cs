@@ -2,6 +2,7 @@
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Services
 {

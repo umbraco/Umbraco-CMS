@@ -166,8 +166,16 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
+    <Compile Include="Trees\MediaBackOfficeSection.cs" />
+    <Compile Include="Trees\MembersBackOfficeSection.cs" />
+    <Compile Include="Trees\PackagesBackOfficeSection.cs" />
+    <Compile Include="Trees\SettingsBackOfficeSection.cs" />
+    <Compile Include="Trees\TranslationBackOfficeSection.cs" />
+    <Compile Include="Trees\TreeCollectionBuilder.cs" />
+    <Compile Include="Trees\UsersBackOfficeSection.cs" />
     <Compile Include="Trees\ApplicationTree.cs" />
-    <Compile Include="Models\ContentEditing\IBackOfficeSection.cs" />
+    <Compile Include="Models\Trees\IBackOfficeSection.cs" />
     <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
     <Compile Include="Models\ContentEditing\ObjectType.cs" />
@@ -591,7 +599,7 @@
     <Compile Include="Actions\ActionUpdate.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
-    <Compile Include="Models\Trees\ApplicationDefinitions.cs" />
+    <Compile Include="Trees\ContentBackOfficeSection.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Models\Trees\TreeNode.cs" />
@@ -673,7 +681,6 @@
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
-    <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
     <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
     <Compile Include="Cache\DataTypeCacheRefresher.cs" />
     <Compile Include="Cache\DictionaryCacheRefresher.cs" />
@@ -970,7 +977,7 @@
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
     <Compile Include="Models\ContentEditing\SearchResultEntity.cs" />
-    <Compile Include="Models\Trees\SectionRootNode.cs" />
+    <Compile Include="Models\Trees\TreeRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
     <Compile Include="Models\Trees\TreeNodeCollection.cs" />
     <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
