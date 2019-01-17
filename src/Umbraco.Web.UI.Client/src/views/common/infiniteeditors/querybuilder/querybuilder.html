@@ -53,7 +53,7 @@
 
 							</div>
 
-							<div class="query-items" ng-repeat="filter in vm.query.filters">
+							<div class="query-items" ng-repeat="filter in vm.query.filters ">
 
 								<span ng-if="$first">
 									<localize key="template_where">where</localize>
@@ -67,14 +67,14 @@
 									<umb-button
 										type="button"
 										button-style="outline"
-										action="vm.propertyFilterOpen = !vm.propertyFilterOpen"
+										action="vm.propertyFilterOpen[$index] = !vm.propertyFilterOpen[$index]"
 										label="{{filter.property.name}}"
 										show-caret="true">
 									</umb-button>
 
-									<umb-dropdown ng-if="vm.propertyFilterOpen" on-close="vm.propertyFilterOpen = false">
+									<umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="console.log(1);vm.propertyFilterOpen[$index] = false">
 										<umb-dropdown-item ng-repeat="property in vm.properties">
-											<a href ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen = false;">
+											<a href ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen[$parent.$parent.$index] = false;">
 												{{property.name}}
 											</a>
 										</umb-dropdown-item>
@@ -87,14 +87,14 @@
 									<umb-button
 										type="button"
 										button-style="outline"
-										action="vm.termFilterOpen = !vm.termFilterOpen"
+										action="vm.termFilterOpen[$index] = !vm.termFilterOpen[$index]"
 										label="{{filter.term.name}}"
 										show-caret="true">
 									</umb-button>
 
-									<umb-dropdown ng-if="vm.termFilterOpen" on-close="vm.termFilterOpen = false">
+									<umb-dropdown ng-if="vm.termFilterOpen[$index]" on-close="vm.termFilterOpen[$index] = false">
 										<umb-dropdown-item ng-repeat="term in vm.getPropertyOperators(filter.property)">
-											<a href ng-click="vm.setFilterTerm(filter, term); vm.termFilterOpen = false;">
+											<a href ng-click="vm.setFilterTerm(filter, term); vm.termFilterOpen[$parent.$parent.$index] = false;">
 												{{term.name}}
 											</a>
 										</umb-dropdown-item>
