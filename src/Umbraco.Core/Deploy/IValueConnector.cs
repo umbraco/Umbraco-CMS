@@ -20,9 +20,10 @@ namespace Umbraco.Core.Deploy
         /// Gets the deploy property value corresponding to a content property value, and gather dependencies.
         /// </summary>
         /// <param name="value">The content property value.</param>
+        /// <param name="propertyType">The value property type</param>
         /// <param name="dependencies">The content dependencies.</param>
         /// <returns>The deploy property value.</returns>
-        string ToArtifact(object value, ICollection<ArtifactDependency> dependencies);
+        string ToArtifact(object value, PropertyType propertyType, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
         /// Gets the content property value corresponding to a deploy property value.
