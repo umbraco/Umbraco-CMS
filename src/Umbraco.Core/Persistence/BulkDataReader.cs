@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence
         /// A helper method to support <see cref="AddSchemaTableRows"/>.
         /// </summary>
         /// <remarks>
-        /// This methds does extensive argument checks. These errors will cause hard to diagnose exceptions in latter
+        /// This methods does extensive argument checks. These errors will cause hard to diagnose exceptions in latter
         /// processing so it is important to detect them when they can be easily associated with the code defect.
         /// </remarks>
         /// <exception cref="ArgumentException">

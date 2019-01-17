@@ -187,7 +187,7 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         /// <summary>
-        /// Buils a dto from an IMedia item.
+        /// Builds a dto from an IMedia item.
         /// </summary>
         public static MediaDto BuildDto(IMedia entity)
         {
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         /// <summary>
-        /// Buils a dto from an IMember item.
+        /// Builds a dto from an IMember item.
         /// </summary>
         public static MemberDto BuildDto(IMember entity)
         {

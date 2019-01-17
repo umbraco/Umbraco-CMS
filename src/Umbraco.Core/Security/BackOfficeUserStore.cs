@@ -538,7 +538,7 @@ namespace Umbraco.Core.Security
         /// <param name="user"/>
         /// <returns/>
         /// <remarks>
-        /// Currently we do not suport a timed lock out, when they are locked out, an admin will  have to reset the status
+        /// Currently we do not support a timed lock out, when they are locked out, an admin will  have to reset the status
         /// </remarks>
         public Task<DateTimeOffset> GetLockoutEndDateAsync(BackOfficeIdentityUser user)
         {
@@ -555,7 +555,7 @@ namespace Umbraco.Core.Security
         /// <param name="user"/><param name="lockoutEnd"/>
         /// <returns/>
         /// <remarks>
-        /// Currently we do not suport a timed lock out, when they are locked out, an admin will  have to reset the status
+        /// Currently we do not support a timed lock out, when they are locked out, an admin will  have to reset the status
         /// </remarks>
         public Task SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset lockoutEnd)
         {

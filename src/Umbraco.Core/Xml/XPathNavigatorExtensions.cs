@@ -21,7 +21,7 @@ namespace Umbraco.Core.Xml
 
             // Reflector shows that the standard XPathNavigator.Compile method just does
             //   return XPathExpression.Compile(xpath);
-            // only difference is, XPathNavigator.Compile is virtual so it could be overriden
+            // only difference is, XPathNavigator.Compile is virtual so it could be overridden
             // by a class inheriting from XPathNavigator... there does not seem to be any
             // doing it in the Framework, though... so we'll assume it's much cleaner to use
             // the static compile:

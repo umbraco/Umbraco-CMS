@@ -95,8 +95,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             CurrentColumn.IsPrimaryKey = true;
 
             //For MySQL, the PK will be created WITH the create table expression, however for
-            // SQL Server, the PK get's created in a different Alter table expression afterwords.
-            // MySQL will choke if the same constraint is again added afterword
+            // SQL Server, the PK get's created in a different Alter table expression afterwards.
+            // MySQL will choke if the same constraint is again added afterward
             // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
             // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
             // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
@@ -124,8 +124,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             CurrentColumn.PrimaryKeyName = primaryKeyName;
 
             //For MySQL, the PK will be created WITH the create table expression, however for
-            // SQL Server, the PK get's created in a different Alter table expression afterwords.
-            // MySQL will choke if the same constraint is again added afterword
+            // SQL Server, the PK get's created in a different Alter table expression afterwards.
+            // MySQL will choke if the same constraint is again added afterward
             // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
             // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
             // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use

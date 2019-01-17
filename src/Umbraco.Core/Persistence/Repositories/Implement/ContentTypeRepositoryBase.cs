@@ -1751,7 +1751,7 @@ ORDER BY contentTypeId, groupId, id";
 
         public string GetUniqueAlias(string alias)
         {
-            // alias is unique accross ALL content types!
+            // alias is unique across ALL content types!
             var aliasColumn = SqlSyntax.GetQuotedColumnName("alias");
             var aliases = Database.Fetch<string>(@"SELECT cmsContentType." + aliasColumn + @" FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id

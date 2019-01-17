@@ -18,7 +18,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_6_0
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoRelation_parentChildType")) == false)
             {
                 //This will remove any corrupt/duplicate data in the relation table before the index is applied
-                //Ensure this executes in a defered block which will be done inside of the migration transaction
+                //Ensure this executes in a deferred block which will be done inside of the migration transaction
                 var database = Database;
 
                 //We need to check if this index has corrupted data and then clear that data

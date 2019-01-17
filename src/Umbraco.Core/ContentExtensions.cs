@@ -85,7 +85,7 @@ namespace Umbraco.Core
         #endregion
 
         /// <summary>
-        /// Removes characters that are not valide XML characters from all entity properties
+        /// Removes characters that are not valid XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
         /// </summary>
         /// <returns></returns>

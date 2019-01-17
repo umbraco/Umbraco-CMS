@@ -111,7 +111,7 @@ namespace Umbraco.Core.Strings
         /// <param name="textB">B-version of the text (usualy the new one)</param>
         /// <param name="trimSpace">When set to true, all leading and trailing whitespace characters are stripped out before the comparation is done.</param>
         /// <param name="ignoreSpace">When set to true, all whitespace characters are converted to a single space character before the comparation is done.</param>
-        /// <param name="ignoreCase">When set to true, all characters are converted to their lowercase equivivalence before the comparation is done.</param>
+        /// <param name="ignoreCase">When set to true, all characters are converted to their lowercase equivalence before the comparation is done.</param>
         /// <returns>Returns a array of Items that describe the differences.</returns>
         public static Item[] DiffText(string textA, string textB, bool trimSpace, bool ignoreSpace, bool ignoreCase)
         {

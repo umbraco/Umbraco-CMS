@@ -59,7 +59,7 @@ namespace Umbraco.Core.Cache
         protected internal static object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
         {
             // if onlyIfValueIsCreated, do not trigger value creation
-            // must return something, though, to differenciate from null values
+            // must return something, though, to differentiate from null values
             if (onlyIfValueIsCreated && lazy.IsValueCreated == false) return ValueNotCreated;
 
             // if execution has thrown then lazy.IsValueCreated is false

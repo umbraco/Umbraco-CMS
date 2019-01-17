@@ -71,7 +71,7 @@ namespace Umbraco.Core.Manifest
             if (jobject["editor"] == null)
                 throw new InvalidOperationException("Missing 'editor' value.");
 
-            // explicitely assign a value editor of type ValueEditor
+            // explicitly assign a value editor of type ValueEditor
             // (else the deserializer will try to read it before setting it)
             // (and besides it's an interface)
             target.ExplicitValueEditor = new DataValueEditor();
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Manifest
 
             if (jobject["prevalues"] is JObject config)
             {
-                // explicitely assign a configuration editor of type ConfigurationEditor
+                // explicitly assign a configuration editor of type ConfigurationEditor
                 // (else the deserializer will try to read it before setting it)
                 // (and besides it's an interface)
                 target.ExplicitConfigurationEditor = new ConfigurationEditor();
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Manifest
 
             if (jobject.Property("view") != null)
             {
-                // explicitely assign a value editor of type ParameterValueEditor
+                // explicitly assign a value editor of type ParameterValueEditor
                 target.ExplicitValueEditor = new DataValueEditor();
 
                 // move the 'view' property

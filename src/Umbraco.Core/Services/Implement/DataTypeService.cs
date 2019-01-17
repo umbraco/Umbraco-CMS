@@ -330,7 +330,7 @@ namespace Umbraco.Core.Services.Implement
         /// Saves an <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="userId">Id of the user issuing the save</param>
         public void Save(IDataType dataType, int userId = 0)
         {
             dataType.CreatorId = userId;
@@ -362,7 +362,7 @@ namespace Umbraco.Core.Services.Implement
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="userId">Id of the user issuing the save</param>
         public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0)
         {
             Save(dataTypeDefinitions, userId, true);
@@ -372,7 +372,7 @@ namespace Umbraco.Core.Services.Implement
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="userId">Id of the user issuing the save</param>
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
         public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
         {
@@ -412,7 +412,7 @@ namespace Umbraco.Core.Services.Implement
         /// all the <see cref="PropertyType"/> data that references this <see cref="IDataType"/>.
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
-        /// <param name="userId">Optional Id of the user issueing the deletion</param>
+        /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -444,7 +444,7 @@ namespace Umbraco.Core.Services.Implement
                     // so... we are modifying content types here. the service will trigger Deleted event,
                     // which will propagate to DataTypeCacheRefresher which will clear almost every cache
                     // there is to clear... and in addition published snapshot caches will clear themselves too, so
-                    // this is probably safe alghough it looks... weird.
+                    // this is probably safe although it looks... weird.
                     //
                     // what IS weird is that a content type is losing a property and we do NOT raise any
                     // content type event... so ppl better listen on the data type events too.

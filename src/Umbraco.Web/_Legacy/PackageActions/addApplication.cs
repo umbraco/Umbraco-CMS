@@ -24,7 +24,7 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// <example><code>
         /// <Action runat="install" [undo="false"] alias="addApplication" appName="Application Name"  appAlias="myApplication" appIcon="application.gif"/>
         /// </code></example>
-        /// <returns>true if successfull</returns>
+        /// <returns>true if successful</returns>
         public bool Execute(string packageName, XElement xmlData)
         {
             string name = xmlData.AttributeValue<string>("appName");
