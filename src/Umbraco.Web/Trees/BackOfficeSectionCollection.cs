@@ -11,5 +11,6 @@ namespace Umbraco.Web.Trees
         public BackOfficeSectionCollection(IEnumerable<IBackOfficeSection> items)
             : base(items)
         { }
+        
     }
 }

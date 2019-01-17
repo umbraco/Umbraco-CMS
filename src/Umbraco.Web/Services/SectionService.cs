@@ -1,22 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Xml.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Trees;
-using File = System.IO.File;
 
 namespace Umbraco.Web.Services
 {

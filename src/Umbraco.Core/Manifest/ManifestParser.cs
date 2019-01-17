@@ -101,6 +101,7 @@ namespace Umbraco.Core.Manifest
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<ManifestContentAppDefinition>();
             var dashboards = new List<ManifestDashboardDefinition>();
+            var sections = new Dictionary<string, string>();
 
             foreach (var manifest in manifests)
             {
@@ -111,6 +112,9 @@ namespace Umbraco.Core.Manifest
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
                 if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
+                if (manifest.Sections != null)
+                    foreach (var (key, value) in manifest.Sections)
+                        sections[key] = value;
             }
 
             return new PackageManifest
@@ -121,7 +125,8 @@ namespace Umbraco.Core.Manifest
                 ParameterEditors = parameterEditors.ToArray(),
                 GridEditors = gridEditors.ToArray(),
                 ContentApps = contentApps.ToArray(),
-                Dashboards = dashboards.ToArray()
+                Dashboards = dashboards.ToArray(),
+                Sections = sections
             };
         }
 

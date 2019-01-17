@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
@@ -30,5 +31,11 @@ namespace Umbraco.Core.Manifest
 
         [JsonProperty("dashboards")]
         public ManifestDashboardDefinition[] Dashboards { get; set; } = Array.Empty<ManifestDashboardDefinition>();
+
+        /// <summary>
+        /// Declares the back office sections that this package installs
+        /// </summary>
+        [JsonProperty("sections")]
+        public IReadOnlyDictionary<string, string> Sections { get; set; } = new Dictionary<string, string>();
     }
 }
