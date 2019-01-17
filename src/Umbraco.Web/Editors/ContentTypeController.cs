@@ -263,6 +263,15 @@ namespace Umbraco.Web.Editors
                 }
             }
 
+            //Before we send this model into this saving/mapping pipeline, we also need to do some cleanup on templates.
+            //If the doc type is an element type, it can't have any templates assigned, so we need to reset the allowed templates here.
+            if (contentTypeSave.IsElement)
+            {
+                contentTypeSave.AllowedTemplates = new string[] { };
+                contentTypeSave.DefaultTemplate = null;
+            }
+
+
             var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
                 contentTypeSave:    contentTypeSave,
                 getContentType:     i => Services.ContentTypeService.Get(i),

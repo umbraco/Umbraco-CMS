@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Editors.DocumentType.TemplatesController as vm">
-    <umb-box>
+    <umb-box ng-hide="vm.isElement">
         <umb-box-content>
             <div class="sub-view-columns">
 
@@ -9,29 +9,34 @@
                 </div>
                 
                 <div class="sub-view-column-right">
-        <umb-grid-selector
-            ng-if="vm.availableTemplates"
-            selected-items="model.allowedTemplates"
-            available-items="vm.availableTemplates"
-            default-item="model.defaultTemplate"
-            item-name="template"
-            name="model.name"
-            alias="model.alias"
-            update-placeholder="vm.updateTemplatePlaceholder">
-        </umb-grid-selector>
+                    <umb-grid-selector
+                        ng-if="vm.availableTemplates"
+                        selected-items="model.allowedTemplates"
+                        available-items="vm.availableTemplates"
+                        default-item="model.defaultTemplate"
+                        item-name="template"
+                        name="model.name"
+                        alias="model.alias"
+                        update-placeholder="vm.updateTemplatePlaceholder">
+                    </umb-grid-selector>
 
-        <umb-button
-            ng-if="vm.canCreateTemplate"
-            type="button"
-            button-style="info"
-            action="vm.createTemplate()"
-            state="vm.createTemplateButtonState"
-            label-key="settings_createMatchingTemplate">
-        </umb-button>
+                    <umb-button
+                        ng-if="vm.canCreateTemplate"
+                        type="button"
+                        button-style="info"
+                        action="vm.createTemplate()"
+                        state="vm.createTemplateButtonState"
+                        label-key="settings_createMatchingTemplate">
+                    </umb-button>
 
                 </div>
 
             </div>
         </umb-box-content>
     </umb-box>
+    <umb-empty-state
+        ng-show="vm.isElement"
+        position="center">
+        <localize key="contentTypeEditor_elementHasNoTemplates">An Element type can't have any templates</localize>
+    </umb-empty-state>
 </div>
