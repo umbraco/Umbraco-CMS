@@ -169,7 +169,7 @@ ORDER BY colName";
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            //TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
             //and also business logic models for these objects but that's just so overkill for what we are doing
             //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
             var now = DateTime.UtcNow;
@@ -690,7 +690,7 @@ ORDER BY colName";
         /// <param name="excludeUserGroups">
         /// A filter to only include users that do not belong to these user groups
         /// </param>
-        /// <param name="userState">Optional parameter to filter by specfied user state</param>
+        /// <param name="userState">Optional parameter to filter by specified user state</param>
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>

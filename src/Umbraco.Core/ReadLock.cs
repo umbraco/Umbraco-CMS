@@ -11,7 +11,7 @@ namespace Umbraco.Core
     /// </summary>
     /// <remarks>
     /// <para>Intended as an infrastructure class.</para>
-    /// <para>This is a very unefficient way to lock as it allocates one object each time we lock,
+    /// <para>This is a very inefficient way to lock as it allocates one object each time we lock,
     /// so it's OK to use this class for things that happen once, where it is convenient, but not
     /// for performance-critical code!</para>
     /// </remarks>

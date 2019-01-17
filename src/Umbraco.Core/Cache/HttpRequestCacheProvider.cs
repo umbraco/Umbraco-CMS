@@ -19,7 +19,7 @@ namespace Umbraco.Core.Cache
         // that is initialized with a method that returns the "current" context.
         // NOTE
         //   but then it is initialized with () => new HttpContextWrapper(HttpContent.Current)
-        //   which is higly inefficient because it creates a new wrapper each time we refer to _context()
+        //   which is highly inefficient because it creates a new wrapper each time we refer to _context()
         //   so replace it with _context1 and _context2 below + a way to get context.Items.
         //private readonly Func<HttpContextBase> _context;
 

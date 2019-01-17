@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
-    /// Defines the the User Profile interface
+    /// Defines the User Profile interface
     /// </summary>
     public interface IProfile
     {

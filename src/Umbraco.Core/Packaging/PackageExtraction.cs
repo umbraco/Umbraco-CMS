@@ -56,7 +56,7 @@ namespace Umbraco.Core.Packaging
             // Check if the file is a valid package
             if (alowedExtension.All(ae => ae.InvariantEquals(extension) == false))
             {
-                throw new ArgumentException("Error - file isn't a package. only extentions: \"{string.Join(", ", alowedExtension)}\" is allowed");
+                throw new ArgumentException("Error - file isn't a package. only extensions: \"{string.Join(", ", alowedExtension)}\" is allowed");
             }
         }
 

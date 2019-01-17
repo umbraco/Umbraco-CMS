@@ -533,7 +533,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<ITemplate> GetAll(params string[] aliases)
         {
             //We must call the base (normal) GetAll method
-            // which is cached. This is a specialized method and unfortunatley with the params[] it
+            // which is cached. This is a specialized method and unfortunately with the params[] it
             // overlaps with the normal GetAll method.
             if (aliases.Any() == false) return base.GetMany();
 

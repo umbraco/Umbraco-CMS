@@ -104,7 +104,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <param name="properties">The properties to map</param>
         /// <param name="languageRepository"></param>
         /// <param name="edited">out parameter indicating that one or more properties have been edited</param>
-        /// <param name="editedCultures">out parameter containing a collection of of edited cultures when the contentVariation varies by culture</param>
+        /// <param name="editedCultures">out parameter containing a collection of edited cultures when the contentVariation varies by culture</param>
         /// <returns></returns>
         public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<Property> properties,
             ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures)

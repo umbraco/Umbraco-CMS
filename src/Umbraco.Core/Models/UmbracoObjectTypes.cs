@@ -5,7 +5,7 @@ using Umbraco.Core.CodeAnnotations;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Enum used to represent the Umbraco Object Types and thier associated GUIDs
+    /// Enum used to represent the Umbraco Object Types and their associated GUIDs
     /// </summary>
     public enum UmbracoObjectTypes
     {

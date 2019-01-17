@@ -68,7 +68,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="culture">The culture.</param>
         /// <param name="segment">The segment.</param>
-        /// <param name="wildcards">A value indicating whether wilcards are supported.</param>
+        /// <param name="wildcards">A value indicating whether wildcard are supported.</param>
         /// <returns>True if the combination is valid; otherwise false.</returns>
         /// <remarks>
         /// <para>The combination must match the content type variation exactly. For instance, if the content type varies by culture,
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="culture">The culture.</param>
         /// <param name="segment">The segment.</param>
-        /// <param name="wildcards">A value indicating whether wilcards are supported.</param>
+        /// <param name="wildcards">A value indicating whether wildcard are supported.</param>
         /// <returns>True if the combination is valid; otherwise false.</returns>
         /// <remarks>
         /// <para>The combination must be valid for properties of the content type. For instance, if the content type varies by culture,

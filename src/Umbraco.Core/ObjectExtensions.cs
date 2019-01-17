@@ -153,7 +153,7 @@ namespace Umbraco.Core
                         // Recursively call into this method with the inner (not-nullable) type and handle the outcome
                         var inner = input.TryConvertTo(underlying);
 
-                        // And if sucessful, fall on through to rewrap in a nullable; if failed, pass on the exception
+                        // And if successful, fall on through to rewrap in a nullable; if failed, pass on the exception
                         if (inner.Success)
                         {
                             input = inner.Result; // Now fall on through...
@@ -216,7 +216,7 @@ namespace Umbraco.Core
                     return Attempt.Succeed(input);
                 }
 
-                // Re-check convertables since we altered the input through recursion
+                // Re-check convertibles since we altered the input through recursion
                 if (input is IConvertible convertible2)
                 {
                     return Attempt.Succeed(Convert.ChangeType(convertible2, target));
@@ -391,7 +391,7 @@ namespace Umbraco.Core
         }
         internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
         {
-            //TODO: Localise this exception
+            //TODO: Localize this exception
             if (isDisposed)
                 throw new ObjectDisposedException(objectname);
         }

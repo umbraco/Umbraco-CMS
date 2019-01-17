@@ -161,7 +161,7 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         /// <param name="result"></param>
         /// <remarks>
-        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK contraints.
+        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK constraints.
         /// Any unique "constraints" in the database are done with unique indexes.
         /// </remarks>
         private void ValidateDbConstraints(DatabaseSchemaResult result)
@@ -374,9 +374,11 @@ namespace Umbraco.Core.Migrations.Install
         /// attribute will be used for the table name. If the attribute is not present, the name
         /// <typeparamref name="T"/> will be used instead.
         /// </remarks>
-        public bool TableExists<T>()        {
+        public bool TableExists<T>()
+        {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            return table != null && TableExists(table.Name);        }
+            return table != null && TableExists(table.Name);
+        }
 
         /// <summary>
         /// Creates a new table in the database based on the type of <typeparamref name="T"/>.
@@ -403,7 +405,7 @@ namespace Umbraco.Core.Migrations.Install
         /// Creates a new table in the database for the specified <paramref name="modelType"/>.
         /// </summary>
         /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
-        /// <param name="modelType">The the representing the table.</param>
+        /// <param name="modelType">The representing the table.</param>
         /// <param name="dataCreation"></param>
         /// <remarks>
         /// If <paramref name="modelType"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from

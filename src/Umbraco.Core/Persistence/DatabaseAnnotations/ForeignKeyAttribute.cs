@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         internal string OnUpdate { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the foreign key refence
+        /// Gets or sets the name of the foreign key reference
         /// </summary>
         /// <remarks>
         /// Overrides the default naming of a foreign key reference:

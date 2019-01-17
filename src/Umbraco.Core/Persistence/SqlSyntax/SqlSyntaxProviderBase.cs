@@ -482,7 +482,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var dbTypeDefinition = column.Size != default(int)
                 ? $"{definition}({column.Size})"
                 : definition;
-            //NOTE Percision is left out
+            //NOTE Precision is left out
             return dbTypeDefinition;
         }
 

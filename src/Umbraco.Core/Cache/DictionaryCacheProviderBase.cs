@@ -16,7 +16,7 @@ namespace Umbraco.Core.Cache
         // an object that represent a value that has not been created yet
         protected internal static readonly object ValueNotCreated = new object();
 
-        // manupulate the underlying cache entries
+        // manipulate the underlying cache entries
         // these *must* be called from within the appropriate locks
         // and use the full prefixed cache keys
         protected abstract IEnumerable<DictionaryEntry> GetDictionaryEntries();

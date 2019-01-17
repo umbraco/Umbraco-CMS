@@ -186,7 +186,7 @@ namespace Umbraco.Core.Services.Implement
             if (xMasterDoc.Root == null) return;
             if (_supplementFileSources != null)
             {
-                //now load in suplementary
+                //now load in supplementary
                 var found = _supplementFileSources.Where(x =>
                 {
                     var fileName = Path.GetFileName(x.File.FullName);

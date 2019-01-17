@@ -221,7 +221,7 @@ namespace Umbraco.Core.Configuration
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        //fixme surely thsi doesn't belong here and it's also a web request context thing
+        //fixme surely this doesn't belong here and it's also a web request context thing
         public static bool DebugMode
         {
             get

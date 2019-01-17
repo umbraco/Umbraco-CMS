@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         Section GetByAlias(string appAlias);
 
         /// <summary>
-        /// Creates a new applcation if no application with the specified alias is found.
+        /// Creates a new application if no application with the specified alias is found.
         /// </summary>
         /// <param name="name">The application name.</param>
         /// <param name="alias">The application alias.</param>
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Creates a new applcation if no application with the specified alias is found.
+        /// Creates a new application if no application with the specified alias is found.
         /// </summary>
         /// <param name="name">The application name.</param>
         /// <param name="alias">The application alias.</param>

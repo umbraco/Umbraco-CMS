@@ -264,7 +264,7 @@ namespace Umbraco.Core
             return -1;
         }
 
-        ///<summary>Finds the index of the first occurence of an item in an enumerable.</summary>
+        ///<summary>Finds the index of the first occurrence of an item in an enumerable.</summary>
         ///<param name="items">The enumerable to search.</param>
         ///<param name="item">The item to find.</param>
         ///<returns>The index of the first matching item, or -1 if the item was not found.</returns>

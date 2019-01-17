@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dtos = Database.Fetch<ContentTypeTemplateDto>(sql);
 
             return
-                //This returns a lookup from the GetAll cached looup
+                //This returns a lookup from the GetAll cached lookup
                 (dtos.Any()
                     ? GetMany(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
                     : Enumerable.Empty<IContentType>())

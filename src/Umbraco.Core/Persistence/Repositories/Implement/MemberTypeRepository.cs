@@ -205,7 +205,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.Icon = "icon-user";
             }
 
-            //By Convention we add 9 stnd PropertyTypes to an Umbraco MemberType
+            //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
             entity.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var standardPropertyType in standardPropertyTypes)
