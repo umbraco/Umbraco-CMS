@@ -42,10 +42,10 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-        private readonly IApplicationTreeService _treeService;
+        private readonly ITreeService _treeService;
 
         public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState,
-            IApplicationTreeService treeService)
+            ITreeService treeService)
             : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
         {
             _treeService = treeService;
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
 
                     var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
 
-                    result[tree.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
+                    result[ApplicationTree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
                     {
                         Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,

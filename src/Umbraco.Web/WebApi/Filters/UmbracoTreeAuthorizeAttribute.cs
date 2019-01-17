@@ -41,18 +41,16 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            throw new NotImplementedException();
+            var apps = _treeAliases.Select(x => Current.TreeService
+                .GetByAlias(x))
+                .WhereNotNull()
+                .Select(x => x.ApplicationAlias)
+                .Distinct()
+                .ToArray();
 
-            //var apps = _treeAliases.Select(x => Current.Services.ApplicationTreeService
-            //    .GetByAlias(x))
-            //    .WhereNotNull()
-            //    .Select(x => x.ApplicationAlias)
-            //    .Distinct()
-            //    .ToArray();
-
-            //return Current.UmbracoContext.Security.CurrentUser != null
-            //       && apps.Any(app => Current.UmbracoContext.Security.UserHasSectionAccess(
-            //           app, Current.UmbracoContext.Security.CurrentUser));
+            return Current.UmbracoContext.Security.CurrentUser != null
+                   && apps.Any(app => Current.UmbracoContext.Security.UserHasSectionAccess(
+                       app, Current.UmbracoContext.Security.CurrentUser));
         }
     }
 }

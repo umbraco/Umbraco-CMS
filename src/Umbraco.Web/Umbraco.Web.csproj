@@ -166,8 +166,9 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
-    <Compile Include="Models\ContentEditing\ApplicationTree.cs" />
+    <Compile Include="Trees\ApplicationTree.cs" />
     <Compile Include="Models\ContentEditing\IBackOfficeSection.cs" />
+    <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
     <Compile Include="Models\ContentEditing\ObjectType.cs" />
     <Compile Include="Models\ContentEditing\RelationDisplay.cs" />
@@ -183,7 +184,7 @@
     <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
     <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
-    <Compile Include="Services\IApplicationTreeService.cs" />
+    <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Trees\BackOfficeSectionCollection.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
@@ -551,7 +552,6 @@
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
-    <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
@@ -649,7 +649,7 @@
     <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
-    <Compile Include="Services\ApplicationTreeService.cs" />
+    <Compile Include="Services\TreeService.cs" />
     <Compile Include="Security\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
@@ -972,7 +972,6 @@
     <Compile Include="Models\ContentEditing\SearchResultEntity.cs" />
     <Compile Include="Models\Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
-    <Compile Include="Trees\TreeControllerResolver.cs" />
     <Compile Include="Models\Trees\TreeNodeCollection.cs" />
     <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
     <Compile Include="Trees\TreeNodeRenderingEventArgs.cs" />
@@ -1056,7 +1055,6 @@
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
     <Compile Include="WebApi\JsonCamelCaseFormatter.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
-    <Compile Include="WebApi\MvcVersionCheck.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\PrefixlessBodyModelValidator.cs" />
     <Compile Include="WebApi\PrefixlessBodyModelValidatorAttribute.cs" />

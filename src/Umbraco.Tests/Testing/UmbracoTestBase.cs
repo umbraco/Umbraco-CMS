@@ -342,7 +342,7 @@ namespace Umbraco.Tests.Testing
             Composition.ComposeServices();
 
             // composition root is doing weird things, fix
-            Composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            Composition.RegisterUnique<ITreeService, TreeService>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this

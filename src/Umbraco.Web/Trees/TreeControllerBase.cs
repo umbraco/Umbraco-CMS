@@ -25,7 +25,7 @@ namespace Umbraco.Web.Trees
     /// Developers should generally inherit from TreeController.
     /// </remarks>
     [AngularJsonOnlyConfiguration]
-    public abstract class TreeControllerBase : UmbracoAuthorizedApiController
+    public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
         protected TreeControllerBase()
         {
@@ -62,10 +62,16 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public abstract string RootNodeDisplayName { get; }
 
-        /// <summary>
-        /// Gets the current tree alias from the attribute assigned to it.
-        /// </summary>
+        /// <inheritdoc />
         public abstract string TreeAlias { get; }
+        /// <inheritdoc />
+        public abstract string TreeTitle { get; }
+        /// <inheritdoc />
+        public abstract string ApplicationAlias { get; }
+        /// <inheritdoc />
+        public abstract int SortOrder { get; }
+        /// <inheritdoc />
+        public abstract bool IsSingleNodeTree { get; }
 
         /// <summary>
         /// Returns the root node for the tree

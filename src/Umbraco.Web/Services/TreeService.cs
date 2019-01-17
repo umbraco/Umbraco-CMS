@@ -18,18 +18,18 @@ using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Services
 {
-    internal class ApplicationTreeService : IApplicationTreeService
+    internal class TreeService : ITreeService
     {
         private readonly ILogger _logger;
         private readonly TreeCollection _treeCollection;
         private static readonly object Locker = new object();
         private readonly Lazy<IReadOnlyCollection<IGrouping<string, string>>> _groupedTrees;
 
-        public ApplicationTreeService(ILogger logger, TreeCollection treeCollection)
+        public TreeService(ILogger logger, TreeCollection treeCollection)
         {
             _logger = logger;
             _treeCollection = treeCollection;
-            //_groupedTrees = new Lazy<IReadOnlyCollection<IGrouping<string, string>>>(InitGroupedTrees);
+            _groupedTrees = new Lazy<IReadOnlyCollection<IGrouping<string, string>>>(InitGroupedTrees);
         }
 
         ///// <summary>
@@ -233,7 +233,7 @@ namespace Umbraco.Web.Services
         //}
 
         /// <inheritdoc />
-        public ApplicationTree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(t => t.Alias == treeAlias);
+        public ApplicationTree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(t => t.TreeAlias == treeAlias);
 
         /// <inheritdoc />
         public IEnumerable<ApplicationTree> GetAll() => _treeCollection;
@@ -273,7 +273,7 @@ namespace Umbraco.Web.Services
                 { 
                     foreach(var treeAliasInGroup in treeGroup)
                     {
-                        if (tree.Alias == treeAliasInGroup)
+                        if (tree.TreeAlias == treeAliasInGroup)
                         {
                             if (resultGroup == null) resultGroup = new List<ApplicationTree>();
                             resultGroup.Add(tree);
@@ -286,21 +286,21 @@ namespace Umbraco.Web.Services
             return result;
         }
 
-        ///// <summary>
-        ///// Creates a group of all tree groups and their tree aliases
-        ///// </summary>
-        ///// <returns></returns>
-        ///// <remarks>
-        ///// Used to initialize the <see cref="_groupedTrees"/> field
-        ///// </remarks>
-        //private IReadOnlyCollection<IGrouping<string, string>> InitGroupedTrees()
-        //{
-        //    var result = GetAll()
-        //        .Select(x => (treeAlias: x.Alias, treeGroup: x.GetRuntimeType().GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
-        //        .GroupBy(x => x.treeGroup, x => x.treeAlias)
-        //        .ToList();
-        //    return result;
-        //}
+        /// <summary>
+        /// Creates a group of all tree groups and their tree aliases
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Used to initialize the <see cref="_groupedTrees"/> field
+        /// </remarks>
+        private IReadOnlyCollection<IGrouping<string, string>> InitGroupedTrees()
+        {
+            var result = GetAll()
+                .Select(x => (treeAlias: x.TreeAlias, treeGroup: x.TreeControllerType.GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
+                .GroupBy(x => x.treeGroup, x => x.treeAlias)
+                .ToList();
+            return result;
+        }
 
         ///// <summary>
         ///// Loads in the xml structure from disk if one is found, otherwise loads in an empty xml structure, calls the

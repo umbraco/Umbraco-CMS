@@ -408,7 +408,7 @@ namespace Umbraco.Web.Editors
                     let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
                     select new Dictionary<string, string>
                 {
-                    {"alias", treeAttr.Alias}, {"packageFolder", pluginAttr.AreaName}
+                    {"alias", treeAttr.TreeAlias}, {"packageFolder", pluginAttr.AreaName}
                 }).ToArray();
 
         }
