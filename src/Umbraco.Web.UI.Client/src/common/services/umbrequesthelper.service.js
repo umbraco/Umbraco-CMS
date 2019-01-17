@@ -3,7 +3,7 @@
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, notificationsService, eventsService, formHelper) {
+function umbRequestHelper($http, $q, notificationsService, eventsService, formHelper, overlayService) {
 
     return {
 
@@ -176,11 +176,9 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
                     //show a ysod dialog
                     if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
-                        eventsService.emit('app.ysod',
-                        {
-                            errorMsg: 'An error occured',
-                            data: response.data
-                        });
+                        const error = { errorMsg: 'An error occured', data: response.data };
+                        //TODO: All YSOD handling should be done with an interceptor
+                        overlayService.ysod(error);
                     }
                     else {
                         //show a simple error notification                         
@@ -290,11 +288,9 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         }
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
-                            eventsService.emit('app.ysod',
-                            {
-                                errorMsg: 'An error occured',
-                                data: response.data
-                            });
+                            const error = { errorMsg: 'An error occured', data: response.data };
+                            //TODO: All YSOD handling should be done with an interceptor
+                            overlayService.ysod(error);
                         }
                         else {
                             //show a simple error notification                         

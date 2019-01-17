@@ -44,16 +44,14 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(JsonPayload[] payloads)
         {
-            var runtimeCache = Current.ApplicationCache.RuntimeCache;
-
-            runtimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            CacheHelper.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
 
             var idsRemoved = new HashSet<int>();
+            var isolatedCache = CacheHelper.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
 
             foreach (var payload in payloads)
             {
-                // remove that one
-                runtimeCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+                isolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
 
                 _idkMap.ClearCache(payload.Id);
 
@@ -61,7 +59,7 @@ namespace Umbraco.Web.Cache
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                 {
                     var pathid = "," + payload.Id + ",";
-                    runtimeCache.ClearCacheObjectTypes<IContent>((k, v) => v.Path.Contains(pathid));
+                    isolatedCache.ClearCacheObjectTypes<IContent>((k, v) => v.Path.Contains(pathid));
                 }
 
                 //if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content

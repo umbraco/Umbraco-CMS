@@ -76,11 +76,13 @@ namespace Umbraco.Core.Components
             var composerTypeList = _composerTypes
                 .Where(x =>
                 {
-                    // use the min level specified by the attribute if any
-                    // otherwise, user composers have Run min level, anything else is Unknown (always run)
+                    // use the min/max levels specified by the attribute if any
+                    // otherwise, min: user composers are Run, anything else is Unknown (always run)
+                    //            max: everything is Run (always run)
                     var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
                     var minLevel = attr?.MinLevel ?? (x.Implements<IUserComposer>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
-                    return _composition.RuntimeState.Level >= minLevel;
+                    var maxLevel = attr?.MaxLevel ?? RuntimeLevel.Run;
+                    return _composition.RuntimeState.Level >= minLevel && _composition.RuntimeState.Level <= maxLevel;
                 })
                 .ToList();
 

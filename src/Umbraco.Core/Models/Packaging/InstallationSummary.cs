@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.Packaging
@@ -8,36 +9,19 @@ namespace Umbraco.Core.Models.Packaging
     [DataContract(IsReference = true)]
     public class InstallationSummary
     {
-        public MetaData MetaData { get; set; }
-        public IEnumerable<IDataType> DataTypesInstalled { get; set; }
-        public IEnumerable<ILanguage> LanguagesInstalled { get; set; }
-        public IEnumerable<IDictionaryItem> DictionaryItemsInstalled { get; set; }
-        public IEnumerable<IMacro> MacrosInstalled { get; set; }
-        public IEnumerable<string> FilesInstalled { get; set; }
-        public IEnumerable<ITemplate> TemplatesInstalled { get; set; }
-        public IEnumerable<IContentType> ContentTypesInstalled { get; set; }
-        public IEnumerable<IFile> StylesheetsInstalled { get; set; }
-        public IEnumerable<IContent> ContentInstalled { get; set; }
-        public IEnumerable<PackageAction> Actions { get; set; }
-        public bool PackageInstalled { get; set; }
+        public IPackageInfo MetaData { get; set; }
+        public IEnumerable<IDataType> DataTypesInstalled { get; set; } = Enumerable.Empty<IDataType>();
+        public IEnumerable<ILanguage> LanguagesInstalled { get; set; } = Enumerable.Empty<ILanguage>();
+        public IEnumerable<IDictionaryItem> DictionaryItemsInstalled { get; set; } = Enumerable.Empty<IDictionaryItem>();
+        public IEnumerable<IMacro> MacrosInstalled { get; set; } = Enumerable.Empty<IMacro>();
+        public IEnumerable<string> FilesInstalled { get; set; } = Enumerable.Empty<string>();
+        public IEnumerable<ITemplate> TemplatesInstalled { get; set; } = Enumerable.Empty<ITemplate>();
+        public IEnumerable<IContentType> DocumentTypesInstalled { get; set; } = Enumerable.Empty<IContentType>();
+        public IEnumerable<IFile> StylesheetsInstalled { get; set; } = Enumerable.Empty<IFile>();
+        public IEnumerable<IContent> ContentInstalled { get; set; } = Enumerable.Empty<IContent>();
+        public IEnumerable<PackageAction> Actions { get; set; } = Enumerable.Empty<PackageAction>();
+        public IEnumerable<string> ActionErrors { get; set; } = Enumerable.Empty<string>();
+        
     }
 
-    internal static class InstallationSummaryExtentions
-    {
-        public static InstallationSummary InitEmpty(this InstallationSummary summary)
-        {
-            summary.Actions = new List<PackageAction>();
-            summary.ContentInstalled = new List<IContent>();
-            summary.ContentTypesInstalled = new List<IContentType>();
-            summary.DataTypesInstalled = new List<IDataType>();
-            summary.DictionaryItemsInstalled = new List<IDictionaryItem>();
-            summary.FilesInstalled = new List<string>();
-            summary.LanguagesInstalled = new List<ILanguage>();
-            summary.MacrosInstalled = new List<IMacro>();
-            summary.MetaData = new MetaData();
-            summary.TemplatesInstalled = new List<ITemplate>();
-            summary.PackageInstalled = false;
-            return summary;
-        }
-    }
 }

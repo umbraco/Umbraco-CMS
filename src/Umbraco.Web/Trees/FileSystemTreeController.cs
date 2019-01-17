@@ -55,6 +55,10 @@ namespace Umbraco.Web.Trees
             var files = FileSystem.GetFiles(path).Where(x =>
             {
                 var extension = Path.GetExtension(x);
+
+                if (Extensions.Contains("*"))
+                    return true;
+                
                 return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
             });
 

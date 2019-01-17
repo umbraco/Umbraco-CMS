@@ -103,14 +103,6 @@ function MainController($scope, $location, appState, treeService, notificationsS
 
     }));
 
-    evts.push(eventsService.on("app.ysod", function (name, error) {
-        $scope.ysodOverlay = {
-            view: "ysod",
-            error: error,
-            show: true
-        };
-    }));
-
     // events for search
     evts.push(eventsService.on("appState.searchState.changed", function (e, args) {
         if (args.key === "show") {

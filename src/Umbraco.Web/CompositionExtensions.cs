@@ -81,7 +81,7 @@ namespace Umbraco.Core.Components
         /// Gets the url providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        internal static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
+        public static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
             => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
 
         #endregion

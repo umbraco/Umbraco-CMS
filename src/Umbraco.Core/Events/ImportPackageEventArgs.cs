@@ -7,44 +7,28 @@ namespace Umbraco.Core.Events
 {
     public class ImportPackageEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportPackageEventArgs<TEntity>>
     {
-        private readonly MetaData _packageMetaData;
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying packageMetaData instead")]
-        public ImportPackageEventArgs(TEntity eventObject, bool canCancel)
+        public ImportPackageEventArgs(TEntity eventObject, IPackageInfo packageMetaData, bool canCancel)
             : base(new[] { eventObject }, canCancel)
         {
+            PackageMetaData = packageMetaData ?? throw new ArgumentNullException(nameof(packageMetaData));
         }
 
-        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData, bool canCancel)
-            : base(new[] { eventObject }, canCancel)
-        {
-            if (packageMetaData == null) throw new ArgumentNullException("packageMetaData");
-            _packageMetaData = packageMetaData;
-        }
-
-        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData)
+        public ImportPackageEventArgs(TEntity eventObject, IPackageInfo packageMetaData)
             : this(eventObject, packageMetaData, true)
         {
             
         }
 
-        public MetaData PackageMetaData
-        {
-            get { return _packageMetaData; }
-        }
+        public IPackageInfo PackageMetaData { get; }
 
-        public IEnumerable<TEntity> InstallationSummary
-        {
-            get { return EventObject; }
-        }
+        public IEnumerable<TEntity> InstallationSummary => EventObject;
 
         public bool Equals(ImportPackageEventArgs<TEntity> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             //TODO: MetaData for package metadata has no equality operators :/
-            return base.Equals(other) && _packageMetaData.Equals(other._packageMetaData);
+            return base.Equals(other) && PackageMetaData.Equals(other.PackageMetaData);
         }
 
         public override bool Equals(object obj)
@@ -59,7 +43,7 @@ namespace Umbraco.Core.Events
         {
             unchecked
             {
-                return (base.GetHashCode() * 397) ^ _packageMetaData.GetHashCode();
+                return (base.GetHashCode() * 397) ^ PackageMetaData.GetHashCode();
             }
         }
 

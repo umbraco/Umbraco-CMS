@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesOverviewController($scope, $route, $location, navigationService, $timeout, localStorageService) {
+    function PackagesOverviewController($scope, $location, localStorageService) {
 
         //Hack!
         // if there is a cookie value for packageInstallUri then we need to redirect there,
@@ -9,10 +9,13 @@
         // because it will double load it.
         // we will refresh and then navigate there.
 
-        var installPackageUri = localStorageService.get("packageInstallUri");
+        let installPackageUri = localStorageService.get("packageInstallUri");
+        let packageUri = $location.search().subview;
+
         if (installPackageUri) {            
             localStorageService.remove("packageInstallUri");                       
         }
+
         if (installPackageUri && installPackageUri !== "installed") {
             //navigate to the custom installer screen, if it is just "installed", then we'll 
             //show the installed view
@@ -21,6 +24,8 @@
         else {
             var vm = this;
 
+            packageUri = installPackageUri ? installPackageUri : packageUri; //use the path stored in storage over the one in the current path
+
             vm.page = {};
             vm.page.name = "Packages";
             vm.page.navigation = [
@@ -28,28 +33,44 @@
                     "name": "Packages",
                     "icon": "icon-cloud",
                     "view": "views/packages/views/repo.html",
-                    "active": !installPackageUri || installPackageUri === "navigation",
-                    "alias": "umbPackages"
+                    "active": !packageUri || packageUri === "navigation",
+                    "alias": "umbPackages",
+                    "action": function() {
+                        $location.search("subview", "navigation");
+                    }
                 },
                 {
                     "name": "Installed",
                     "icon": "icon-box",
                     "view": "views/packages/views/installed.html",
-                    "active": installPackageUri === "installed",
-                    "alias": "umbInstalled"
+                    "active": packageUri === "installed",
+                    "alias": "umbInstalled",
+                    "action": function() {
+                        $location.search("subview", "installed");
+                    }
                 },
                 {
                     "name": "Install local",
                     "icon": "icon-add",
                     "view": "views/packages/views/install-local.html",
-                    "active": installPackageUri === "local",
-                    "alias": "umbInstallLocal"
+                    "active": packageUri === "local",
+                    "alias": "umbInstallLocal",
+                    "action": function() {
+                        $location.search("subview", "local");
+                    }
+                },
+                {
+                    "name": "Created",
+                    "icon": "icon-add",
+                    "view": "views/packages/views/created.html",
+                    "active": packageUri === "created",
+                    "alias": "umbCreatedPackages",
+                    "action": function() {
+                        $location.search("subview", "created");
+                    }
                 }
             ];
 
-            $timeout(function () {
-                navigationService.syncTree({ tree: "packages", path: "-1" });
-            });
         }
 
     }

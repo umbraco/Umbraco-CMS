@@ -6,7 +6,7 @@ using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services.Implement
 {
-    internal abstract class ContentTypeServiceBase<TItem, TService> : ContentTypeServiceBase
+    public abstract class ContentTypeServiceBase<TItem, TService> : ContentTypeServiceBase
         where TItem : class, IContentTypeComposition
         where TService : class, IContentTypeServiceBase<TItem>
     {
