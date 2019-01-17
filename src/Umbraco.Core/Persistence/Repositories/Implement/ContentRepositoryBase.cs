@@ -515,7 +515,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // now we have
-            // - the definitinos
+            // - the definitions
             // - all property data dtos
             // - tag editors
             // and we need to build the proper property collections
@@ -865,7 +865,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             public Guid Version => DocumentDto?.VersionId ?? ContentVersionDto.VersionId;
 
-            // This is used to determien which version is the most recent
+            // This is used to determine which version is the most recent
             public int VersionId => ContentVersionDto.Id;
 
             public DateTime VersionDate => ContentVersionDto.VersionDate;
@@ -924,7 +924,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             /// <summary>
-            /// Creates a paged query based on the original query and subtitutes the selectColumns specified
+            /// Creates a paged query based on the original query and substitutes the selectColumns specified
             /// </summary>
             /// <param name="columns"></param>
             /// <returns></returns>

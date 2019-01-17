@@ -153,7 +153,7 @@ namespace Umbraco.Core.Packaging
         {
             if (actionsElement == null) return Enumerable.Empty<PackageAction>();
 
-            //invariant check ... because people can realy enter anything :/
+            //invariant check ... because people can really enter anything :/
             if (!string.Equals("actions", actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase))
                 throw new FormatException("Must be \"<actions>\" as root");
 
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Packaging
 
             var actionElementName = actionsElement.Elements().First().Name.LocalName;
 
-            //invariant check ... because people can realy enter anything :/
+            //invariant check ... because people can really enter anything :/
             if (!string.Equals("action", actionElementName, StringComparison.InvariantCultureIgnoreCase))
                 throw new FormatException("Must be \"<action\" as element");
 
@@ -170,7 +170,7 @@ namespace Umbraco.Core.Packaging
                 {
                     var aliasAttr = e.Attribute("alias") ?? e.Attribute("Alias"); //allow both ... because people can really enter anything :/
                     if (aliasAttr == null)
-                        throw new ArgumentException("missing \"alias\" atribute in alias element", nameof(actionsElement));
+                        throw new ArgumentException("missing \"alias\" attribute in alias element", nameof(actionsElement));
 
                     var packageAction = new PackageAction
                     {

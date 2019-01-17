@@ -128,7 +128,7 @@ namespace Umbraco.Core.PropertyEditors
 
             // mandatory and regex validators cannot be part of valueEditor.Validators because they
             // depend on values that are not part of the configuration, .Mandatory and .ValidationRegEx,
-            // so they have to be explicitely invoked here.
+            // so they have to be explicitly invoked here.
 
             if (required)
             {

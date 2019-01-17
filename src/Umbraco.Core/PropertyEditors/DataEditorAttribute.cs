@@ -48,7 +48,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="name">The friendly name of the editor.</param>
         /// <param name="view">The view to use to render the editor.</param>
         /// <remarks>
-        /// <para>Set <paramref name="view"/> to <see cref="NullView"/> to explicitely set the view to null.</para>
+        /// <para>Set <paramref name="view"/> to <see cref="NullView"/> to explicitly set the view to null.</para>
         /// <para>Otherwise, <paramref name="view"/> cannot be null nor empty.</para>
         /// </remarks>
         public DataEditorAttribute(string alias, EditorType type, string name, string view)

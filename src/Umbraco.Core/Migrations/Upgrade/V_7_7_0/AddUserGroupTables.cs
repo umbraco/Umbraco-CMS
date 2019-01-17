@@ -30,7 +30,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
             var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
-            //In some very rare cases, there might alraedy be user group tables that we'll need to remove first
+            //In some very rare cases, there might already be user group tables that we'll need to remove first
             //but of course we don't want to remove the tables we will be creating below if they already exist so
             //need to do some checks first since these old rare tables have a different schema
             RemoveOldTablesIfExist(tables, columns);
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
         }
 
         /// <summary>
-        /// In some very rare cases, there might alraedy be user group tables that we'll need to remove first
+        /// In some very rare cases, there might already be user group tables that we'll need to remove first
         /// but of course we don't want to remove the tables we will be creating below if they already exist so
         /// need to do some checks first since these old rare tables have a different schema
         /// </summary>

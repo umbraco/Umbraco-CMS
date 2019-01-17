@@ -86,7 +86,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 //Otherwise its a application/section with no trees (aka a full screen app)
-                //For example we do not have a Forms tree definied in C# & can not attribute with [Tree(isSingleNodeTree:true0]
+                //For example we do not have a Forms tree defined in C# & can not attribute with [Tree(isSingleNodeTree:true0]
                 var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
                 var section = Services.TextService.Localize("sections/" + application);
 

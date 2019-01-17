@@ -203,7 +203,7 @@ namespace Umbraco.Core.Components
         /// Sets the server registrar.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        /// <param name="factory">A function creating a server registar.</param>
+        /// <param name="factory">A function creating a server registrar.</param>
         public static void SetServerRegistrar(this Composition composition, Func<IFactory, IServerRegistrar> factory)
         {
             composition.RegisterUnique(factory);

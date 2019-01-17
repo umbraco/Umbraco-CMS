@@ -109,7 +109,7 @@ namespace Umbraco.Core.Composing
         /// Gets or sets the set of assemblies to scan.
         /// </summary>
         /// <remarks>
-        /// <para>If not explicitely set, defaults to all assemblies except those that are know to not have any of the
+        /// <para>If not explicitly set, defaults to all assemblies except those that are know to not have any of the
         /// types we might scan. Because we only scan for application types, this means we can safely exclude GAC assemblies
         /// for example.</para>
         /// <para>This is for unit tests.</para>
