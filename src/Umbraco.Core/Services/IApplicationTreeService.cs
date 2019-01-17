@@ -44,14 +44,14 @@ namespace Umbraco.Core.Services
         IEnumerable<ApplicationTree> GetAll();
         
         /// <summary>
-        /// Gets the application tree for the applcation with the specified alias
+        /// Gets the application tree for the application with the specified alias
         /// </summary>
         /// <param name="applicationAlias">The application alias.</param>
         /// <returns>Returns a ApplicationTree Array</returns>
         IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias);
 
         /// <summary>
-        /// Gets the application tree for the applcation with the specified alias
+        /// Gets the application tree for the application with the specified alias
         /// </summary>
         /// <param name="applicationAlias">The application alias.</param>
         /// <param name="onlyInitialized"></param>
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the application tree for the applcation with the specified alias
+        /// Gets the application tree for the application with the specified alias
         /// </summary>
         /// <param name="applicationAlias">The application alias.</param>
         /// <returns>Returns a ApplicationTree Array</returns>
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the application tree for the applcation with the specified alias
+        /// Gets the application tree for the application with the specified alias
         /// </summary>
         /// <param name="applicationAlias">The application alias.</param>
         /// <param name="onlyInitialized"></param>

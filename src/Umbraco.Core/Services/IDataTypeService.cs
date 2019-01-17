@@ -84,7 +84,7 @@ namespace Umbraco.Core.Services
         /// Gets a <see cref="IDataType"/> by its control Id
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
-        /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
+        /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
         Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);

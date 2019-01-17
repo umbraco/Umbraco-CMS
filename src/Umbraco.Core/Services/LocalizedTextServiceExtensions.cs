@@ -56,7 +56,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Convert an array of strings to a dictionary of indicies -> values
+        /// Convert an array of strings to a dictionary of indexes -> values
         /// </summary>
         /// <param name="variables"></param>
         /// <returns></returns>

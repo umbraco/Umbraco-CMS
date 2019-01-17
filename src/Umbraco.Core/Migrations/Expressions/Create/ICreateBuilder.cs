@@ -14,17 +14,17 @@ namespace Umbraco.Core.Migrations.Expressions.Create
     public interface ICreateBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Builds a Create Table expresion, and executes.
+        /// Builds a Create Table expression, and executes.
         /// </summary>
         IExecutableBuilder Table<TDto>(bool withoutKeysAndIndexes = false);
 
         /// <summary>
-        /// Builds a Create Keys and Indexes expresion, and executes.
+        /// Builds a Create Keys and Indexes expression, and executes.
         /// </summary>
         IExecutableBuilder KeysAndIndexes<TDto>();
 
         /// <summary>
-        /// Builds a Create Keys and Indexes expresion, and executes.
+        /// Builds a Create Keys and Indexes expression, and executes.
         /// </summary>
         IExecutableBuilder KeysAndIndexes(Type typeOfDto);
 

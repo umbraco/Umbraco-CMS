@@ -5,7 +5,7 @@
     /// </summary>
     public enum OperationResultType : byte
     {
-        // all "ResultType" enums must be byte-based, and declare Failed = 128, and declare
+        // all "ResultType" enum's must be byte-based, and declare Failed = 128, and declare
         // every failure codes as >128 - see OperationResult and OperationResultType for details.
 
         /// <summary>

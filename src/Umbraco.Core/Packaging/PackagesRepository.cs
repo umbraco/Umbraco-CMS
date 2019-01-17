@@ -505,7 +505,7 @@ namespace Umbraco.Core.Packaging
         /// Converts a umbraco stylesheet to a package xml node
         /// </summary>
         /// <param name="name">The name of the stylesheet.</param>
-        /// <param name="includeProperties">if set to <c>true</c> [incluce properties].</param>
+        /// <param name="includeProperties">if set to <c>true</c> [include properties].</param>
         /// <returns></returns>
         private XElement GetStylesheetXml(string name, bool includeProperties)
         {

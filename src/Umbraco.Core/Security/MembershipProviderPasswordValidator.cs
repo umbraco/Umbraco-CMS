@@ -5,7 +5,7 @@ using Microsoft.AspNet.Identity;
 namespace Umbraco.Core.Security
 {
     /// <summary>
-    /// Ensure that both the normal password validator rules are processed along with the underlying memberhsip provider rules
+    /// Ensure that both the normal password validator rules are processed along with the underlying membership provider rules
     /// </summary>
     public class MembershipProviderPasswordValidator : PasswordValidator
     {

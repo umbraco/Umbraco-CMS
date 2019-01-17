@@ -109,7 +109,7 @@ namespace Umbraco.Core.Services
             IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
-        /// Gets paged documents of a content content
+        /// Gets paged documents of a content
         /// </summary>
         /// <param name="contentTypeId">The page number.</param>
         /// <param name="pageIndex">The page number.</param>

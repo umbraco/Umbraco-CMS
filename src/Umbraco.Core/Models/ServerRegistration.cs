@@ -26,13 +26,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         public ServerRegistration()
         { }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         /// <param name="id">The unique id of the server registration.</param>
         /// <param name="serverAddress">The server url.</param>
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         /// <param name="serverAddress">The server url.</param>
         /// <param name="serverIdentity">The unique server identity.</param>

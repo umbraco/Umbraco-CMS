@@ -6,7 +6,7 @@ using Umbraco.Core.IO;
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// The client Soap service for making distrubuted cache calls between servers
+    /// The client Soap service for making distributed cache calls between servers
     /// </summary>
     [WebServiceBinding(Name = "CacheRefresherSoap", Namespace = "http://umbraco.org/webservices/")]
     [Obsolete("Legacy load balancing is obsolete and should be removed")]

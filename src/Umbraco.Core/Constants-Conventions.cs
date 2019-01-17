@@ -195,7 +195,7 @@ namespace Umbraco.Core
                 public const string LastLockoutDateLabel = "Last Lockout Date";
 
                 /// <summary>
-                /// Property alias for the number of failed login attemps
+                /// Property alias for the number of failed login attempts
                 /// </summary>
                 public const string FailedPasswordAttempts = "umbracoMemberFailedPasswordAttempts";
 

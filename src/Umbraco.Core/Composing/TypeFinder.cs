@@ -163,8 +163,8 @@ namespace Umbraco.Core.Composing
 
         /// <summary>
         /// Return a list of found local Assemblies excluding the known assemblies we don't want to scan
-        /// and exluding the ones passed in and excluding the exclusion list filter, the results of this are
-        /// cached for perforance reasons.
+        /// and excluding the ones passed in and excluding the exclusion list filter, the results of this are
+        /// cached for performance reasons.
         /// </summary>
         /// <param name="excludeFromResults"></param>
         /// <returns></returns>
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Return a distinct list of found local Assemblies and exluding the ones passed in and excluding the exclusion list filter
+        /// Return a distinct list of found local Assemblies and excluding the ones passed in and excluding the exclusion list filter
         /// </summary>
         /// <param name="excludeFromResults"></param>
         /// <param name="exclusionFilter"></param>
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// this is our assembly filter to filter out known types that def dont contain types we'd like to find or plugins
+        /// this is our assembly filter to filter out known types that def don't contain types we'd like to find or plugins
         /// </summary>
         /// <remarks>
         /// NOTE the comma vs period... comma delimits the name in an Assembly FullName property so if it ends with comma then its an exact name match

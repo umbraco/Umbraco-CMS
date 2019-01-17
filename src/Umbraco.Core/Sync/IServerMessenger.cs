@@ -25,7 +25,7 @@ namespace Umbraco.Core.Sync
         void PerformRefresh(ICacheRefresher refresher, string jsonPayload);
 
         /// <summary>
-        /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
+        /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the invalidated items.</typeparam>
         /// <param name="refresher">The ICacheRefresher.</param>
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Sync
         void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
-        /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
+        /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the invalidated items.</typeparam>
         /// <param name="refresher">The ICacheRefresher.</param>

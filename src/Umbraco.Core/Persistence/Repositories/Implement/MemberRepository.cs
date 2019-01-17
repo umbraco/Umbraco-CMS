@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // check if the query is based on properties or not
 
             var wheres = query.GetWhereClauses();
-            //this is a pretty rudimentary check but wil work, we just need to know if this query requires property
+            //this is a pretty rudimentary check but will work, we just need to know if this query requires property
             // level queries
             if (wheres.Any(x => x.Item1.Contains("cmsPropertyType")))
             {
@@ -583,7 +583,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // load all properties for all documents from database in 1 query - indexed by version id
             var properties = GetPropertyCollections(temps);
 
-            // assign properites
+            // assign properties
             foreach (var temp in temps)
             {
                 temp.Content.Properties = properties[temp.VersionId];

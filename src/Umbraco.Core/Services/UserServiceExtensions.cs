@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
         /// <param name="fallbackToDefaultPermissions">
         ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {

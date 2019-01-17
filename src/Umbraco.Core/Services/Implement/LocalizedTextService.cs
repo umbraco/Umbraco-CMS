@@ -111,7 +111,7 @@ namespace Umbraco.Core.Services.Implement
                 //convert all areas + keys to a single key with a '/'
                 result = GetStoredTranslations(xmlSource, culture);
 
-                //merge with the english file in case there's keys in there that don't exist in the local file
+                //merge with the English file in case there's keys in there that don't exist in the local file
                 var englishCulture = new CultureInfo("en-US");
                 if (culture.Equals(englishCulture) == false)
                 {

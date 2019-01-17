@@ -140,7 +140,7 @@ namespace Umbraco.Core.Models.Entities
 
             // same identity if
             // - same object (reference equals)
-            // - or same Clr type, both have identities, and they are identical
+            // - or same common language runtime type, both have identities, and they are identical
 
             if (ReferenceEquals(this, other))
                 return true;

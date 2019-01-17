@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="excludeUserGroups">
         /// A filter to only include users that do not belong to these user groups
         /// </param>
-        /// <param name="userState">Optional parameter to filter by specfied user state</param>
+        /// <param name="userState">Optional parameter to filter by specified user state</param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
             Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,

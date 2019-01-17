@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
             }
 
             // if it is not used then composition is possible
-            // hashset guarantees unicity on Id
+            // hashset guarantees unity on Id
             var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
                 (x, y) => x.Id == y.Id,
                 x => x.Id));
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Services
         {
             if (ctype == null) return Enumerable.Empty<IContentTypeComposition>();
 
-            // hashset guarantees unicity on Id
+            // hashset guarantees unity on Id
             var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
                 (x, y) => x.Id == y.Id,
                 x => x.Id));

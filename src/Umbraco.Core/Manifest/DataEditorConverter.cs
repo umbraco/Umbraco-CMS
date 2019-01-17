@@ -129,7 +129,7 @@ namespace Umbraco.Core.Manifest
             //   "config": { "key1": "value1", "key2": "value2" ... }
             // }
             //
-            // the view is at top level, but should be down one level to be propertly
+            // the view is at top level, but should be down one level to be properly
             // deserialized as a ParameterValueEditor property -> need to move it
 
             if (jobject.Property("view") != null)

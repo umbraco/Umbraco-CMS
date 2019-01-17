@@ -9,7 +9,7 @@ namespace Umbraco.Core.Services
     /// Defines part of the MemberService, which is specific to methods used by the membership provider.
     /// </summary>
     /// <remarks>
-    /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
+    /// Idea is to have this as an isolated interface so that it can be easily 'replaced' in the membership provider implementation.
     /// </remarks>
     public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
     {
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
     /// either <see cref="IMember"/> for the MemberService or <see cref="IUser"/> for the UserService.
     /// </summary>
     /// <remarks>
-    /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
+    /// Idea is to have this as an isolated interface so that it can be easily 'replaced' in the membership provider implementation.
     /// </remarks>
     public interface IMembershipMemberService<T> : IService
         where T : class, IMembershipUser

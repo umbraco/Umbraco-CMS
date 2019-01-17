@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
     /// <summary>
-    /// Represents a database index definition retreived by querying the database
+    /// Represents a database index definition retrieved by querying the database
     /// </summary>
     internal class DbIndexDefinition
     {
