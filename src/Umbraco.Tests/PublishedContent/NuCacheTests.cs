@@ -153,7 +153,8 @@ namespace Umbraco.Tests.PublishedContent
                 dataSource,
                 globalSettings,
                 new SiteDomainHelper(),
-                contentTypeService);
+                contentTypeService,
+                Mock.Of<IEntityXmlSerializer>());
 
             // get a snapshot, get a published content
             var snapshot = snapshotService.CreatePublishedSnapshot(previewToken: null);

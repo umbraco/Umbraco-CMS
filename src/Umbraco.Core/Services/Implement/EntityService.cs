@@ -258,6 +258,9 @@ namespace Umbraco.Core.Services.Implement
         public virtual IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, params int[] ids)
         {
             var entityType = objectType.GetClrType();
+            if (entityType == null)
+                throw new NotSupportedException($"Type \"{objectType}\" is not supported here.");
+
             GetGetters(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))

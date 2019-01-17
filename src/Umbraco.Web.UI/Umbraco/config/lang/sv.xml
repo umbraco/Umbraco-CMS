@@ -564,7 +564,6 @@
     <key alias="packageUpgradeInstructions">Uppdateringsinstruktioner</key>
     <key alias="packageUpgradeText">Det finns an uppdaterad version av paketet. Du kan hämta den direkt från Umbracos paketvalv.</key>
     <key alias="packageVersion">Paketversion</key>
-    <key alias="packageVersionHistory">Versionshistorik för paket</key>
     <key alias="viewPackageWebsite">Besök paketets webbplats</key>
   </area>
   <area alias="paste">

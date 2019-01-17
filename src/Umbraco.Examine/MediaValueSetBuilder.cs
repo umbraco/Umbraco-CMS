@@ -10,7 +10,7 @@ namespace Umbraco.Examine
 {
     public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     {
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,

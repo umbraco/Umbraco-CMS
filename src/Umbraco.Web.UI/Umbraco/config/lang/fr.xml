@@ -1048,7 +1048,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="packageUpgradeInstructions">Instructions de mise à jour</key>
     <key alias="packageUpgradeText">Il y a une mise à jour disponible pour ce package. Vous pouvez la télécharger directement depuis le repository des packages Umbraco.</key>
     <key alias="packageVersion">Version du package</key>
-    <key alias="packageVersionHistory">Historique des versions du package</key>
     <key alias="viewPackageWebsite">Voir le site internet du package</key>
     <key alias="packageAlreadyInstalled">Package déjà installé</key>
     <key alias="targetVersionMismatch">Ce package ne peut pas être installé, il nécessite au minimum la version Umbraco %0%</key>

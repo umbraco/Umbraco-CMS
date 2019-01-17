@@ -715,7 +715,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="packageUpgradeInstructions">更新の手順</key>
     <key alias="packageUpgradeText"> このパッケージの更新があります。Umbracoのパッケージリポジトリから直接ダウンロードできます。</key>
     <key alias="packageVersion">パッケージのバージョン</key>
-    <key alias="packageVersionHistory">パッケージのバージョン履歴</key>
     <key alias="viewPackageWebsite">パッケージのウェブサイトを見る</key>
   </area>
   <area alias="paste">

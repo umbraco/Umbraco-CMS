@@ -16,7 +16,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataType"/>
     /// </summary>
-    internal class DataTypeService : ScopeRepositoryService, IDataTypeService
+    public class DataTypeService : ScopeRepositoryService, IDataTypeService
     {
         private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;

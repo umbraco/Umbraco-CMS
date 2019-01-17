@@ -4163,7 +4163,7 @@ html {
 	text-align: center;
 }
 
-.text--center .seperator {
+.text--center .separator {
 	margin-right: auto;
 	margin-left: auto;
 }
