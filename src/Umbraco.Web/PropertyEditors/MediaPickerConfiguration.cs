@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -17,6 +18,6 @@ namespace Umbraco.Web.PropertyEditors
         public bool DisableFolderSelect { get; set; }
 
         [ConfigurationField("startNodeId", "Start node", "mediapicker")]
-        public string StartNodeId { get; set; }
+        public Udi StartNodeId { get; set; }
     }
 }
