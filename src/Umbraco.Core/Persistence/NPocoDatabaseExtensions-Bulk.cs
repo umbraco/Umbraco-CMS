@@ -71,10 +71,6 @@ namespace Umbraco.Core.Persistence
                     ? BulkInsertRecordsSqlServer(database, pocoData, recordsA)
                     : BulkInsertRecordsWithCommands(database, recordsA);
             }
-
-            if (database.DatabaseType.IsMySql())
-                return BulkInsertRecordsWithCommands(database, recordsA);
-
             throw new NotSupportedException();
         }
 

@@ -300,7 +300,7 @@ ORDER BY colName";
         // NPoco cannot fetch 2+ references at a time
         // plus it creates a combinatorial explosion
         // better use extra queries
-        // unfortunately, SqlCe and MySql don't support multiple result sets
+        // unfortunately, SqlCe doesn't support multiple result sets
         private void PerformGetReferencedDtos(List<UserDto> dtos)
         {
             if (dtos.Count == 0) return;

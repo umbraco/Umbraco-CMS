@@ -167,15 +167,7 @@ namespace Umbraco.Core.Persistence
 
 #if DEBUG_DATABASES
             // determines the database connection SPID for debugging
-            if (DatabaseType.IsMySql())
-            {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "SELECT CONNECTION_ID()";
-                    _spid = Convert.ToInt32(command.ExecuteScalar());
-                }
-            }
-            else if (DatabaseType.IsSqlServer())
+            if (DatabaseType.IsSqlServer())
             {
                 using (var command = connection.CreateCommand())
                 {

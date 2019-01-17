@@ -1063,17 +1063,6 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
         {
-            // MySql wants "FOR UPDATE" at the end, and T-Sql wants "WITH (UPDLOCK)" in the FROM statement,
-            // and we want to implement it in the least expensive way, so parsing the entire string here is
-            // a no, so we use reflection to work on the Sql expression before it is built.
-            // TODO propose a clean way to do that type of thing in NPoco
-
-            if (sql.SqlContext.DatabaseType.IsMySql())
-            {
-                sql.Append("FOR UPDATE");
-                return sql;
-            }
-
             // go find the first FROM clause, and append the lock hint
             Sql s = sql;
             var updated = false;

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
@@ -17,7 +15,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         // notes
         // do NOT use Rename.Column as it's borked on SQLCE - use ReplaceColumn instead
-        // not sure it all runs on MySql, needs to test
 
         public override void Migrate()
         {
@@ -195,9 +192,7 @@ JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.nodeId=cver.n
 FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId
 WHERE doc.newest=1 AND doc.published=1");
-            var getIdentity = Database.SqlContext.DatabaseType.IsMySql()
-                ? "LAST_INSERT_ID()"
-                : "@@@@IDENTITY";
+            var getIdentity = "@@@@IDENTITY";
             foreach (var t in temp3)
             {
                 Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} (nodeId, versionId, versionDate, userId, {SqlSyntax.GetQuotedColumnName("current")}, text)

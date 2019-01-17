@@ -11,7 +11,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
@@ -151,13 +150,10 @@ namespace Umbraco.Core.Migrations.Install
         /// Configures a connection string that has been entered manually.
         /// </summary>
         /// <param name="connectionString">A connection string.</param>
-        /// <remarks>Has to be either SQL Server or MySql</remarks>
+        /// <remarks>Has to be SQL Server</remarks>
         public void ConfigureDatabaseConnection(string connectionString)
         {
-            var provider = DbConnectionExtensions.DetectProviderNameFromConnectionString(connectionString);
-            var providerName = provider.ToString().ToLower().Contains("mysql")
-                ? Constants.DbProviderNames.MySql
-                : Constants.DbProviderNames.SqlServer;
+            const string providerName = Constants.DbProviderNames.SqlServer;
 
             SaveConnectionString(connectionString, providerName, _logger);
             _databaseFactory.Configure(connectionString, providerName);
@@ -170,7 +166,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="databaseName">The name of the database.</param>
         /// <param name="user">The user name.</param>
         /// <param name="password">The user password.</param>
-        /// <param name="databaseProvider">The name the provider (Sql, Sql Azure, Sql Ce, MySql).</param>
+        /// <param name="databaseProvider">The name of the provider (Sql, Sql Azure, Sql Ce).</param>
         public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
         {
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
@@ -186,22 +182,15 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="databaseName">The name of the database.</param>
         /// <param name="user">The user name.</param>
         /// <param name="password">The user password.</param>
-        /// <param name="databaseProvider">The name the provider (Sql, Sql Azure, Sql Ce, MySql).</param>
+        /// <param name="databaseProvider">The name of the provider (Sql, Sql Azure, Sql Ce).</param>
         /// <param name="providerName"></param>
         /// <returns>A connection string.</returns>
         public static string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
             providerName = Constants.DbProviderNames.SqlServer;
-            var test = databaseProvider.ToLower();
-            if (test.Contains("mysql"))
-            {
-                providerName = Constants.DbProviderNames.MySql;
-                return $"Server={server}; Database={databaseName};Uid={user};Pwd={password}";
-            }
-            if (test.Contains("azure"))
-            {
+            var provider = databaseProvider.ToLower();
+            if (provider.InvariantContains("azure"))
                 return GetAzureConnectionString(server, databaseName, user, password);
-            }
             return $"server={server};database={databaseName};user id={user};password={password}";
         }
 
@@ -433,10 +422,9 @@ namespace Umbraco.Core.Migrations.Install
                 _logger.Info<DatabaseBuilder>("Database configuration status: Started");
 
                 var database = scope.Database;
+                
+                var message = string.Empty;
 
-                // If MySQL, we're going to ensure that database calls are maintaining proper casing as to remove the necessity for checks
-                // for case insensitive queries. In an ideal situation (which is what we're striving for), all calls would be case sensitive.
-                var message = database.DatabaseType.IsMySql() ? ResultMessageForMySql : "";
                 var schemaResult = ValidateSchema();
                 var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
                 //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
@@ -494,14 +482,12 @@ namespace Umbraco.Core.Migrations.Install
                 }
 
                 _logger.Info<DatabaseBuilder>("Database upgrade started");
-
-                var message = _scopeProvider.SqlContext.DatabaseType.IsMySql() ? ResultMessageForMySql : "";
-
+                
                 // upgrade
                 var upgrader = new UmbracoUpgrader();
                 upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger, _postMigrations);
 
-                message = message + "<p>Upgrade completed!</p>";
+                var message = "<p>Upgrade completed!</p>";
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
@@ -514,15 +500,6 @@ namespace Umbraco.Core.Migrations.Install
                 return HandleInstallException(ex);
             }
         }
-
-        private const string ResultMessageForMySql = "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
-             "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
-             "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
-             "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-             "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
-             "<pre>lower_case_table_names=1</pre><br />" +
-             "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-             "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
 
         private Attempt<Result> CheckReadyForInstall()
         {

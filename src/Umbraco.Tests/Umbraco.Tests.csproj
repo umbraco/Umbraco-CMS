@@ -559,7 +559,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />

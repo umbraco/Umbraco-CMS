@@ -104,7 +104,6 @@
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
-    <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
       <Version>8.0.0-alpha.33</Version>
