@@ -22,20 +22,17 @@ namespace Umbraco.Core.Deploy
         /// Gets the value to be deployed from the control value as a string.
         /// </summary>
         /// <param name="gridControl">The control containing the value.</param>
-        /// <param name="property">The property where the control is located. Do not modify - only used for context</param>
         /// <param name="dependencies">The dependencies of the property.</param>
         /// <returns>The grid cell value to be deployed.</returns>
         /// <remarks>Note that </remarks>
-        string GetValue(GridValue.GridControl gridControl, Property property, ICollection<ArtifactDependency> dependencies);
+        string ToArtifact(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
         /// Allows you to modify the value of a control being deployed.
         /// </summary>
         /// <param name="gridControl">The control being deployed.</param>
-        /// <param name="property">The property where the <paramref name="gridControl"/> is located. Do not modify - only used for context.</param>
         /// <remarks>Follows the pattern of the property value connectors (<see cref="IValueConnector"/>). The SetValue method is used to modify the value of the <paramref name="gridControl"/>.</remarks>
-        /// <remarks>Note that only the <paramref name="gridControl"/> value should be modified - not the <paramref name="property"/>.</remarks>
-        /// <remarks>The <paramref name="property"/> should only be used to assist with context data relevant when setting the <paramref name="gridControl"/> value.</remarks>
-        void SetValue(GridValue.GridControl gridControl, Property property);
+
+        void FromArtifact(GridValue.GridControl gridControl);
     }
 }
