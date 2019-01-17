@@ -640,7 +640,7 @@ angular.module('umbraco.mocks').
                   "templateEditor_urlEncodeHelp": "Will format special characters in URLs",
                   "templateEditor_usedIfAllEmpty": "Will only be used when the field values above are empty",
                   "templateEditor_usedIfEmpty": "This field will only be used if the primary field is empty",
-                  "templateEditor_withTime": "Yes, with time. Seperator: ",
+                  "templateEditor_withTime": "Yes, with time. Separator: ",
                   "translation_details": "Translation details",
                   "translation_DownloadXmlDTD": "Download xml DTD",
                   "translation_fields": "Fields",

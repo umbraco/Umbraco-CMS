@@ -44,6 +44,7 @@ the directive will use {@link umbraco.directives.directive:umbLockedField umbLoc
 
 @param {string} alias (<code>binding</code>): The model where the alias is bound.
 @param {string} aliasFrom (<code>binding</code>): The model to generate the alias from.
+@param {string} validationPosition (<code>binding</code>): The position of the validation. Set to <code>'left'</code> or <code>'right'</code>.
 @param {boolean=} enableLock (<code>binding</code>): Set to <code>true</code> to add a lock next to the alias from where it can be unlocked and changed.
 **/
 
@@ -57,6 +58,7 @@ angular.module("umbraco.directives")
                 alias: '=',
                 aliasFrom: '=',
                 enableLock: '=?',
+                validationPosition: '=?',
                 serverValidationField: '@'
             },
             link: function (scope, element, attrs, ctrl) {
