@@ -6,6 +6,8 @@ var gulp = require('gulp');
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
+var processJs = require('../util/processJs');
+
 var watch = require('gulp-watch');
 
 gulp.task('watch', function () {
