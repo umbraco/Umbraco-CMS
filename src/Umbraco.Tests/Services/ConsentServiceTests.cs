@@ -9,7 +9,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     public class ConsentServiceTests : BaseServiceTest
     {
         [SetUp]
@@ -120,6 +120,21 @@ namespace Umbraco.Tests.Services
 
             Assert.Throws<ArgumentException>(() =>
                 consentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Granted | ConsentState.Revoked, "no comment"));
+        }
+
+        [Test]
+        public void CanRegisterConsentWithoutComment()
+        {
+            var consentService = ServiceContext.ConsentService;
+
+            // Attept to add consent without a comment
+            consentService.RegisterConsent("user/1234", "app1", "consentWithoutComment", ConsentState.Granted);
+
+            // Attempt to retrieve the consent we just added without a comment
+            var consents = consentService.LookupConsent(source: "user/1234", action: "consentWithoutComment").ToArray();
+
+            // Confirm we got our expected consent record
+            Assert.AreEqual(1, consents.Length);
         }
     }
 }

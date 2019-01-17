@@ -1,17 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Web;
-using System.Xml.Linq;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.IO;
-using Umbraco.Core.Events;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
-using umbraco.DataLayer;
 
 namespace umbraco.BusinessLogic
 {

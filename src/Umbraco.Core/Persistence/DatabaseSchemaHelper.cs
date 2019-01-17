@@ -31,6 +31,13 @@ namespace Umbraco.Core.Persistence
             return _syntaxProvider.DoesTableExist(_db, tableName);
         }
 
+        public bool TableExist<T>()
+        {
+            var poco = Database.PocoData.ForType(typeof(T));
+            var tableName = poco.TableInfo.TableName;
+            return TableExist(tableName);
+        }
+
         internal void UninstallDatabaseSchema()
         {
             var creation = new DatabaseSchemaCreation(_db, _logger, _syntaxProvider);

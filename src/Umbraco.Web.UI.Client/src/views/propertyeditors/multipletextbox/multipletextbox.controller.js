@@ -6,7 +6,7 @@
         axis: 'y',
         containment: 'parent',
         cursor: 'move',
-        items: '> div.control-group',
+        items: '> div.textbox-wrapper',
         tolerance: 'pointer'
     };
 

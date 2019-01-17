@@ -2,7 +2,7 @@
     <div style="max-width: 600px">
         <div class="control-group uSky-templates">
 
-            <h4><localize key="grid_gridLayouts"/></h4>
+            <h4><localize key="grid_gridLayouts" /></h4>
             <p><localize key="grid_gridLayoutsDetail" /></p>
 
             <ul class="unstyled"
@@ -38,7 +38,7 @@
             <button class="btn btn-small"
                     prevent-default
                     ng-click="configureTemplate()">
-                    <i class="icon-add"></i> <localize key="grid_addGridLayout" />
+                <i class="icon-add"></i> <localize key="grid_addGridLayout" />
             </button>
         </div>
     </div>
@@ -57,13 +57,13 @@
                     <li ng-repeat="layout in model.value.layouts" class="clearfix">
 
                         <div ng-click="configureLayout(layout)"
-                            class="preview-rows columns" style="margin-top: 5px; margin-bottom: 25px; float:left">
+                             class="preview-rows columns" style="margin-top: 5px; margin-bottom: 25px; float:left">
 
                             <div class="preview-row">
                                 <div class="preview-col"
-                                    ng-class="{last:$last}"
-                                    ng-repeat="area in layout.areas | filter:zeroWidthFilter"
-                                    ng-style="{width: percentage(area.grid) + '%', 'max-width': '100%'}">
+                                     ng-class="{last:$last}"
+                                     ng-repeat="area in layout.areas | filter:zeroWidthFilter"
+                                     ng-style="{width: percentage(area.grid) + '%', 'max-width': '100%'}">
 
                                     <div class="preview-cell">
                                         <p style="font-size: 6px; line-height: 8px; text-align: center" ng-show="area.maxItems > 0">{{area.maxItems}}</p>
@@ -95,15 +95,13 @@
 
     <div style="max-width: 600px">
 
-        <umb-control-group
-            label="@grid_columns"
-            description="@grid_columnsDetails">
-                <input type="number" min="1" ng-model="model.value.columns" />
+        <umb-control-group label="@grid_columns"
+                           description="@grid_columnsDetails">
+            <input type="number" min="1" ng-model="model.value.columns" />
         </umb-control-group>
 
-        <umb-control-group
-            label="@grid_settings"
-            description="@grid_settingsDetails">
+        <umb-control-group label="@grid_settings"
+                           description="@grid_settingsDetails">
 
             <ul class="unstyled list-icons umb-contentpicker"
                 ui-sortable
@@ -113,8 +111,7 @@
                     <i class="icon icon-navigation handle"></i>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
-                        <i class="icon icon-delete red hover-show"></i>
-                        <i class="icon-settings-alt-2 hover-hide"></i>
+                        <i class="icon icon-delete red"></i>
                         {{configValue.label}}
                     </a>
                 </li>
@@ -122,7 +119,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-add turquoise"></i>
+                    <i class="icon icon-settings-alt-2 turquoise"></i>
 
                     <a href="#" ng-click="editConfig()" prevent-default>
                         <localize key="general_edit" />
@@ -132,10 +129,8 @@
         </umb-control-group>
 
 
-
-        <umb-control-group
-            label="@grid_styles"
-            description="@grid_stylesDetails">
+        <umb-control-group label="@grid_styles"
+                           description="@grid_stylesDetails">
 
             <ul class="unstyled list-icons umb-contentpicker"
                 ui-sortable
@@ -145,8 +140,7 @@
                     <i class="icon icon-navigation handle"></i>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
-                        <i class="icon icon-delete red hover-show"></i>
-                        <i class="icon-brush hover-hide"></i>
+                        <i class="icon icon-delete red"></i>
                         {{style.label}}
                     </a>
 
@@ -155,7 +149,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-add turquoise"></i>
+                    <i class="icon icon-settings-alt-2 turquoise"></i>
                     <a href="#" ng-click="editStyles()" prevent-default>
                         <localize key="general_edit" />
                     </a>
@@ -164,32 +158,28 @@
         </umb-control-group>
     </div>
 
-    <umb-overlay
-      ng-if="layoutConfigOverlay.show"
-      model="layoutConfigOverlay"
-      view="layoutConfigOverlay.view"
-      position="right">
+    <umb-overlay ng-if="layoutConfigOverlay.show"
+                 model="layoutConfigOverlay"
+                 view="layoutConfigOverlay.view"
+                 position="right">
     </umb-overlay>
 
-    <umb-overlay
-      ng-if="rowConfigOverlay.show"
-      model="rowConfigOverlay"
-      view="rowConfigOverlay.view"
-      position="right">
+    <umb-overlay ng-if="rowConfigOverlay.show"
+                 model="rowConfigOverlay"
+                 view="rowConfigOverlay.view"
+                 position="right">
     </umb-overlay>
 
-    <umb-overlay
-      ng-if="editConfigCollectionOverlay.show"
-      model="editConfigCollectionOverlay"
-      view="editConfigCollectionOverlay.view"
-      position="right">
+    <umb-overlay ng-if="editConfigCollectionOverlay.show"
+                 model="editConfigCollectionOverlay"
+                 view="editConfigCollectionOverlay.view"
+                 position="right">
     </umb-overlay>
 
-    <umb-overlay
-      ng-if="rowDeleteOverlay.show"
-      model="rowDeleteOverlay"
-      view="rowDeleteOverlay.view"
-      position="right">
+    <umb-overlay ng-if="rowDeleteOverlay.show"
+                 model="rowDeleteOverlay"
+                 view="rowDeleteOverlay.view"
+                 position="right">
     </umb-overlay>
 
 </div>

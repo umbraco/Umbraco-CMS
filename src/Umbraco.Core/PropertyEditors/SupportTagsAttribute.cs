@@ -31,7 +31,7 @@ namespace Umbraco.Core.PropertyEditors
             Delimiter = ",";
             ReplaceTags = true;
             TagGroup = "default";
-            StorageType = TagCacheStorageType.Csv;
+            StorageType = TagCacheStorageType.Json;
         }
 
         /// <summary>

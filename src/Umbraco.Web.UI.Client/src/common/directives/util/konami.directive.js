@@ -1,7 +1,7 @@
 ﻿/**
  * Konami Code directive for AngularJS
  * @version v0.0.1
- * @license MIT License, http://www.opensource.org/licenses/MIT
+ * @license MIT License, https://www.opensource.org/licenses/MIT
  */
 
 angular.module('umbraco.directives')

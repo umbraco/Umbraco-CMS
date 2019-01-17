@@ -1,9 +1,9 @@
 (function() {
   'use strict';
 
-  function ListViewSettingsDirective(contentTypeResource, dataTypeResource, dataTypeHelper, listViewPrevalueHelper) {
+  function ListViewSettingsDirective(dataTypeResource, dataTypeHelper, listViewPrevalueHelper) {
 
-    function link(scope, el, attr, ctrl) {
+    function link(scope) {
 
       scope.dataType = {};
       scope.editDataTypeSettings = false;
@@ -22,7 +22,6 @@
 
               listViewPrevalueHelper.setPrevalues(dataType.preValues);
               scope.customListViewCreated = checkForCustomListView();
-
             });
 
         } else {
@@ -111,8 +110,16 @@
 
       };
 
+     scope.toggle = function(){
+        if(scope.enableListView){
+          scope.enableListView = false;
+            return;
+        }
+        scope.enableListView = true;
+    };
+
       /* ----------- SCOPE WATCHERS ----------- */
-      var unbindEnableListViewWatcher = scope.$watch('enableListView', function(newValue, oldValue){
+      var unbindEnableListViewWatcher = scope.$watch('enableListView', function(newValue){
 
         if(newValue !== undefined) {
           activate();

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
-using System.Linq;
+using umbraco.interfaces;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Macros
 {

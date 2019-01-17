@@ -31,6 +31,8 @@
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
         vm.unlockUser = unlockUser;
+        vm.resendInvite = resendInvite;
+        vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
         vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
@@ -49,7 +51,9 @@
                 "sections_users",
                 "content_contentRoot",
                 "media_mediaRoot",
-                "user_noStartNodes"
+                "user_noStartNodes",
+                "user_defaultInvitationMessage",
+                "user_deleteUserConfirmation"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -61,6 +65,8 @@
                 vm.labels.contentRoot = values[5];
                 vm.labels.mediaRoot = values[6];
                 vm.labels.noStartNodes = values[7];
+                vm.labels.defaultInvitationMessage = values[8];
+                vm.labels.deleteUserConfirmation = values[9];
             });
 
             // get user
@@ -341,11 +347,51 @@
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers([vm.user.id]).then(function (data) {
                 vm.user.userState = 0;
+                vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
+                
                 formHelper.showNotifications(data);
             }, function (error) {
                 vm.unlockUserButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
+
+        function resendInvite() {
+            vm.resendInviteButtonState = "busy";
+
+            if (vm.resendInviteMessage) {
+                vm.user.message = vm.resendInviteMessage;
+            }
+            else {
+                vm.user.message = vm.labels.defaultInvitationMessage;
+            }
+
+            usersResource.inviteUser(vm.user).then(function (data) {
+                vm.resendInviteButtonState = "success";
+                vm.resendInviteMessage = "";
+                formHelper.showNotifications(data);
+            }, function (error) {
+                vm.resendInviteButtonState = "error";
+                formHelper.showNotifications(error.data);
+            });
+        }
+
+        function deleteNonLoggedInUser() {
+            vm.deleteNotLoggedInUserButtonState = "busy";
+
+            var confirmationMessage = vm.labels.deleteUserConfirmation;
+            if (!confirm(confirmationMessage)) {
+                vm.deleteNotLoggedInUserButtonState = "danger";
+                return;
+            }
+
+            usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
+                formHelper.showNotifications(data);
+                goToPage(vm.breadcrumbs[0]);
+            }, function (error) {
+                vm.deleteNotLoggedInUserButtonState = "error";
                 formHelper.showNotifications(error.data);
             });
         }

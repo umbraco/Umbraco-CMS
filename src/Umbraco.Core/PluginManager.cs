@@ -343,7 +343,7 @@ namespace Umbraco.Core
             {
                 return ReadCache();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 try
                 {
@@ -519,7 +519,7 @@ namespace Umbraco.Core
                 {
                     return new FileStream(path, fileMode, fileAccess, fileShare);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     if (--attempts == 0)
                         throw;

@@ -8,8 +8,6 @@ namespace Umbraco.Web.HealthCheck
     [DataContract(Name = "healtCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
-        private readonly ILocalizedTextService _textService;
-
         /// <summary>
         /// Empty ctor used for serialization
         /// </summary>

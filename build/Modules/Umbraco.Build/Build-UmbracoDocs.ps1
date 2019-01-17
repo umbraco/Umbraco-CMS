@@ -42,7 +42,7 @@ function Build-UmbracoDocs
   #get-content .\build.tmp\belle-docs.log | %{ if ($_ -match "build") { write $_}}
   
   # change baseUrl
-  $baseUrl = "https://our.umbraco.org/apidocs/ui/"
+  $baseUrl = "https://our.umbraco.com/apidocs/ui/"
   $indexPath = "$src/Umbraco.Web.UI.Client/docs/api/index.html"
   (Get-Content $indexPath).Replace("origin + location.href.substr(origin.length).replace(rUrl, indexFile)", "'$baseUrl'") `
     | Set-Content $indexPath

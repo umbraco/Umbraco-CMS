@@ -3,10 +3,24 @@
 // --------------------------------------------------
 .umb-editor {
   min-width:66.6%;
+
+	&-pull {
+		float:left;
+		width:66.6%;
+	}
+
+	&-push {
+		float:right;
+	}
 }
 
 .umb-editor-tiny {
   width: 60px;
+
+	&.umb-editor-push {
+		width:30%;
+		min-width:0;
+	}
 }
 
 .umb-editor-small {
@@ -27,6 +41,27 @@
 .umb-codeeditor{
   width: 99%;
 }
+
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
 
 //
 // Content picker
@@ -99,68 +134,100 @@ div.umb-codeeditor .umb-btn-toolbar {
 // Color picker
 // --------------------------------------------------
 ul.color-picker li {
-  padding: 2px;
-  margin: 3px;
-  border: 2px solid transparent;
-  width: 60px;
-}
-ul.color-picker li.active {
-  border: 2px dashed @gray-8;
-}
-ul.color-picker li a  {
-  height: 50px;
-  display:block;
-  cursor:pointer;
-}
+    padding: 2px;
+    margin: 3px;
+    border: 2px solid transparent;
+    width: 60px;
 
-.control-group.color-picker-preval .thumbnail {
-  width:30px;
-  border:none;
+    &.active {
+        .check_circle {
+            opacity: 1;
+        }
+    }
+
+    .thumbnail{
+        min-width: auto;
+        width: inherit;
+        padding: 0;
+    }
+
+    a {
+        height: 50px;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        cursor:pointer;
+        margin: 0 0 5px;
+    }
 }
 
 /* pre-value editor */
-/*.control-group.color-picker-preval:before {
-    content: "";
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-}*/
+.control-group.color-picker-preval {
+    .thumbnail {
+        width: 36px;
+        min-width: auto;
+        border: none;
+        cursor: move;
+        border-radius: 3px;
+    }
 
-/*.control-group.color-picker-preval div.thumbnail {
-    display: inline-block;
-    vertical-align: middle;
-}*/
-.control-group.color-picker-preval div.color-picker-prediv {
-    display: inline-block;
-    width: 60%;
-}
+    .handle {
+        float: left;
+        display: inline-flex;
+        margin: 5px 3px 5px 0;
+    }
 
-.control-group.color-picker-preval pre {
-    display: inline;
-    margin-right: 20px;
-    margin-left: 10px;
-    width: 50%;
-    white-space: nowrap;
-    overflow: hidden;
-    margin-bottom: 0;
-    vertical-align: middle;
-}
+    div.color-picker-prediv {
+        display: inline-flex;
+        align-items: center;
+        max-width: 80%;
 
-.control-group.color-picker-preval btn {
-    //vertical-align: middle;
-}
+        pre {
+            display: inline-flex;
+            font-family: monospace;
+            margin-right: 10px;
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 0;
+            vertical-align: middle;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            background: #f7f7f7;
+            flex: 0 0 auto;
+        }
 
-.control-group.color-picker-preval input[type="text"] {
-    min-width: 40%;
-    width: 40%;
-    display: inline-block;
-    margin-right: 20px;
-    margin-top: 1px;
-}
+        span {
+            margin-left: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 
-.control-group.color-picker-preval label {
-    border: solid @white 1px;
-    padding: 6px;
+    input[type="text"] {
+        display: flex;
+        flex: 1 1 100px;
+        margin-top: 1px;
+        margin-right: 15px;
+        min-width: auto;
+        width: auto;
+    }
+
+    .sp-replacer {
+        display: inline-flex;
+        margin-right: 18px;
+    }
+
+    label {
+        border: 1px solid #fff;
+        padding: 7px 10px;
+        font-family: monospace;
+        border: 1px solid #dfdfe1;
+        background: #f7f7f7;
+        margin: 0 15px 0 0;
+        border-radius: 3px;
+    }
 }
 
 
@@ -324,7 +391,7 @@ ul.color-picker li a  {
     > li:not(.unsortable) {
         cursor: move;
     }
-} 
+}
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
     opacity: 1;
@@ -854,10 +921,39 @@ ul.color-picker li a  {
 //
 // Tags
 // --------------------------------------------------
-.umb-tags{border: @gray-10 solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
-.umb-tags .tag{cursor: pointer;  margin: 7px; padding: 7px; background: @turquoise}
-.umb-tags .tag i{padding: 2px;}
-.umb-tags input{border: none; background: @white}
+.umb-tags{
+    border: @gray-10 solid 1px;
+    padding: 10px;
+    font-size: 13px;
+    text-shadow: none;
+
+    .tag{
+        cursor: default;
+        margin: 7px;
+        padding: 10px;
+        background: @turquoise;
+        position: relative;
+
+        .icon-trash{
+            cursor: pointer;
+            padding: 2px;
+            font-size: 12px;
+            position: relative;
+            right: -6px;
+        }
+
+        .umb_confirm-action__overlay.-left{
+            top: 6px;
+            left: auto;
+            right: 15px;
+        }
+    }
+
+    input{
+        border: none;
+        background: @white;
+    }
+}
 
 //
 // Date/time picker

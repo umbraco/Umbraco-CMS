@@ -26,7 +26,6 @@ namespace Umbraco.Tests
         [Test]
         public void Quits_On_Success_Count()
         {
-            var maxTries = 5;
             var totalTries = 0;
             DelegateExtensions.RetryUntilSuccessOrMaxAttempts((currentTry) =>
             {

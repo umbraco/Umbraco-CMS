@@ -2,7 +2,7 @@
 <language alias="it" intName="Italian" localName="italiano" lcid="16" culture="it-IT">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Gestisci hostnames</key>
@@ -127,38 +127,38 @@
     <key alias="welcome">Benvenuto</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Rimani</key>
+    <key alias="discardChanges">Scarta le modifiche</key>
+    <key alias="unsavedChanges">Hai delle modifiche non salvate</key>
+    <key alias="unsavedChangesWarning">Sei sicuro di voler lasciare questa pagina? - hai delle modifiche non salvate</key>
   </area>
   <area alias="bulk">
-    <key alias="done">Done</key>
+    <key alias="done">Fatto</key>
 
-    <key alias="deletedItem">Deleted %0% item</key>
-    <key alias="deletedItems">Deleted %0% items</key>
-    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
-    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+    <key alias="deletedItem">Elimianto %0% elemento</key>
+    <key alias="deletedItems">Elimianto %0% elementi</key>
+    <key alias="deletedItemOfItem">Eliminato %0% su %1% elemento</key>
+    <key alias="deletedItemOfItems">Eliminato %0% su %1% elementi</key>
 
-    <key alias="publishedItem">Published %0% item</key>
-    <key alias="publishedItems">Published %0% items</key>
-    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
-    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+    <key alias="publishedItem">Pubblicato %0% elemento</key>
+    <key alias="publishedItems">Pubblicato %0% elementi</key>
+    <key alias="publishedItemOfItem">Pubblicato %0% su %1% elemento</key>
+    <key alias="publishedItemOfItems">Pubblicato %0% su %1% elementi</key>
 
-    <key alias="unpublishedItem">Unpublished %0% item</key>
-    <key alias="unpublishedItems">Unpublished %0% items</key>
-    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
-    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+    <key alias="unpublishedItem">%0% elemento non pubblicato</key>
+    <key alias="unpublishedItems">%0% elementi non pubblicati</key>
+    <key alias="unpublishedItemOfItem">Elementi non pubblicati - %0% su %1%</key>
+    <key alias="unpublishedItemOfItems">Elementi non pubblicati - %0% su %1%</key>
 
-    <key alias="movedItem">Moved %0% item</key>
-    <key alias="movedItems">Moved %0% items</key>
-    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
-    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+    <key alias="movedItem">Spostato %0% elemento</key>
+    <key alias="movedItems">Spsotato %0% elementi</key>
+    <key alias="movedItemOfItem">Spostato %0% su %1% elemento</key>
+    <key alias="movedItemOfItems">Spostato %0% su %1% elementi</key>
 
-    <key alias="copiedItem">Copied %0% item</key>
-    <key alias="copiedItems">Copied %0% items</key>
-    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
-    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+    <key alias="copiedItem">Copiato %0% elemento</key>
+    <key alias="copiedItems">Copiato %0% elementi</key>
+    <key alias="copiedItemOfItem">Copiato %0% su %1% elemento</key>
+    <key alias="copiedItemOfItems">Copiato %0% su %1% elementi</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="nodeNameLinkPicker">Titolo del Link</key>
@@ -381,7 +381,7 @@
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% è stato copiato nel tuo database. Premi <strong>Avanti</strong> per proseguire.]]></key>
     <key alias="databaseNotFound">
       <![CDATA[<p>Database non trovato! Perfavore, controlla che le informazioni della stringa di connessione nel file "web.config" siano corrette.</p>
-<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]>
+<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Maggiori dettagli per la modifica del file web.config qui.</a></p>]]>
     </key>
     <key alias="databaseText"><![CDATA[Per completare questo passaggio, devi conoscere alcune informazioni riguardanti il tuo database server ("connection string"). Se è necessario contatta il tuo ISP per reperire le informazioni necessarie. Se stai effettuando l'installazione in locale o su un server, puoi richiederle al tuo amministratore di sistema]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Premi il tasto <strong>aggiorna</strong> per aggiornare il database ad Umbraco %0%</p><p>Non preoccuparti, il contenuto non verrà perso e tutto continuerà a funzionare dopo l'aggiornamento!</p>]]></key>
@@ -738,43 +738,43 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="embed">Embed</key>
     <key alias="headline">Headline</key>
     <key alias="quote">Quote</key>  
-    <key alias="insertControl">Choose type of content</key>
-    <key alias="chooseLayout">Choose a layout</key>
-    <key alias="addRows">Add a row</key>
-    <key alias="addElement">Add content</key>
-    <key alias="dropElement">Drop content</key>
-    <key alias="settingsApplied">Settings applied</key>
+    <key alias="insertControl">Seleziona il tipo di contenuto</key>
+    <key alias="chooseLayout">Seleziona un layout</key>
+    <key alias="addRows">Aggiungi una riga</key>
+    <key alias="addElement">Aggiungi contenuto</key>
+    <key alias="dropElement">Elimina contenuto</key>
+    <key alias="settingsApplied">Impostazioni applicati</key>
 
-    <key alias="contentNotAllowed">This content is not allowed here</key>
-    <key alias="contentAllowed">This content is allowed here</key>
+    <key alias="contentNotAllowed">Questo contenuto non è consentito qui</key>
+    <key alias="contentAllowed">Questo contenuto è consentito qui</key>
 
-    <key alias="clickToEmbed">Click to embed</key>
-    <key alias="clickToInsertImage">Click to insert image</key>
-    <key alias="placeholderImageCaption">Image caption...</key>
-    <key alias="placeholderWriteHere">Write here...</key>
+    <key alias="clickToEmbed">Clicca per incorporare</key>
+    <key alias="clickToInsertImage">Clicca per inserire l'immagine</key>
+    <key alias="placeholderImageCaption">Didascalia dell'immagine...</key>
+    <key alias="placeholderWriteHere">Scrivi qui...</key>
 
-    <key alias="gridLayouts">Grid Layouts</key>
-    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
-    <key alias="addGridLayout">Add Grid Layout</key>
-    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
-    <key alias="rowConfigurations">Row configurations</key>
-    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
-    <key alias="addRowConfiguration">Add row configuration</key>
-    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+    <key alias="gridLayouts">I Grid Layout</key>
+    <key alias="gridLayoutsDetail">I layout sono l'area globale di lavoro per il grid editor, di solito ti serve solo uno o due layout differenti</key>
+    <key alias="addGridLayout">Aggiungi un Grid Layout</key>
+    <key alias="addGridLayoutDetail">Sistema il layout impostando la larghezza della colonna ed aggiungendo ulteriori sezioni</key>
+    <key alias="rowConfigurations">Configurazioni della riga</key>
+    <key alias="rowConfigurationsDetail">Le righe sono le colonne predefinite disposte orizzontalmente</key>
+    <key alias="addRowConfiguration">Aggiungi configurazione della riga</key>
+    <key alias="addRowConfigurationDetail">Sistema la riga impostando la larghezza della colonna ed aggiungendo ulteriori colonne</key>
 
-    <key alias="columns">Columns</key>
-    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+    <key alias="columns">Colonne</key>
+    <key alias="columnsDetails">Totale combinazioni delle colonne nel grid layout</key>
 
-    <key alias="settings">Settings</key>
-    <key alias="settingsDetails">Configure what settings editors can change</key>
+    <key alias="settings">Impostazioni</key>
+    <key alias="settingsDetails">Configura le impostazioni che possono essere cambiate dai editori</key>
 
-    <key alias="styles">Styles</key>
-    <key alias="stylesDetails">Configure what styling editors can change</key>
+    <key alias="styles">Stili</key>
+    <key alias="stylesDetails">Configura i stili che possono essere cambiati dai editori</key>
 
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+    <key alias="settingDialogDetails">Le impostazioni verranno salvate soltanto se è valido il json inserito</key>
 
-    <key alias="allowAllEditors">Allow all editors</key>
-    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+    <key alias="allowAllEditors">Permetti tutti i editor</key>
+    <key alias="allowAllRowConfigurations">Permetti tutte le configurazioni della riga</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField"><![CDATA[Campo alternativo]]></key>

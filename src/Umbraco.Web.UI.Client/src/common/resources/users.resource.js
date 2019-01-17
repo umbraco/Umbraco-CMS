@@ -280,7 +280,7 @@
           *    });
           * </pre>
           * 
-          * @param {Array} id user id.
+          * @param {Int} userId user id.
           * @returns {Promise} resourcePromise object containing the user.
           *
           */
@@ -406,6 +406,36 @@
                 "Failed to save user");
         }
 
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.usersResource#deleteNonLoggedInUser
+          * @methodOf umbraco.resources.usersResource
+          *
+          * @description
+          * Deletes a user that hasn't already logged in (and hence we know has made no content updates that would create related records)
+          *
+          * ##usage
+          * <pre>
+          * usersResource.deleteNonLoggedInUser(1)
+          *    .then(function() {
+          *        alert("user was deleted");
+          *    });
+          * </pre>
+          * 
+          * @param {Int} userId user id.
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+        function deleteNonLoggedInUser(userId) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostDeleteNonLoggedInUser", { id: userId })),
+                'Failed to delete the user ' + userId);
+        }
+
 
         var resource = {
             disableUsers: disableUsers,
@@ -417,6 +447,7 @@
             createUser: createUser,
             inviteUser: inviteUser,
             saveUser: saveUser,
+            deleteNonLoggedInUser: deleteNonLoggedInUser,
             clearAvatar: clearAvatar
         };
 

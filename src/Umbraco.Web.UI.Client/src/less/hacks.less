@@ -20,12 +20,17 @@
 }
 
 .thumbnail {
-    border-radius: 0px;
-}
+    border-radius: 0;
+    min-width: 150px;
 
-.thumbnail img {
-	max-width: 100% !important;
-    width: 100%;
+    > a {
+        display: block;
+    }
+
+    img {
+	    max-width: 100% !important;
+        width: 100%;
+    }
 }
 
 #mapCanvas img {

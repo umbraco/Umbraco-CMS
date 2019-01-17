@@ -26,7 +26,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //Some trees can have no items (dictionary & forms email templates)
         $scope.hasItems = true;
         $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
-
+        var node = dialogOptions.currentNode;
 
         //This is called from ng-init
         //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init. 
@@ -161,6 +161,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             $scope.hasItems = args.tree.root.children.length > 0;
 
             tree = args.tree;
+
+            if (node && node.path) {
+                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
+            }
+
         }
 
         //wires up selection

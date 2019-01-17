@@ -2,7 +2,7 @@
 <language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
   <creator>
     <name>黄仁祥(wanddy@163.com)</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">管理主机名</key>
@@ -176,7 +176,7 @@
     <key alias="childItems" version="7.0">子项</key>
     <key alias="target" version="7.0">目标</key>
     <key alias="scheduledPublishServerTime">这将转换到服务器上的以下时间:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">这是什么意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">这是什么意思？</a>]]></key>
     <key alias="addTextBox">添加其他文本框</key>
     <key alias="removeTextBox">删除此文本框</key>
   </area>
@@ -613,7 +613,7 @@
       <![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
               <p>您可以自行编辑“web.config”文件，键名为 “UmbracoDbDSN”</p>
               <p>
-             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">。
+             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">。
                                     如何编辑web.config</a></p>
     ]]>
     </key>

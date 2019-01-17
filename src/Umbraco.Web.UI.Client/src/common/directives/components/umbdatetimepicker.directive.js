@@ -7,7 +7,7 @@
 @description
 <b>Added in Umbraco version 7.6</b>
 This directive is a wrapper of the bootstrap datetime picker version 3.1.3. Use it to render a date time picker.
-For extra details about options and events take a look here: http://eonasdan.github.io/bootstrap-datetimepicker/
+For extra details about options and events take a look here: https://eonasdan.github.io/bootstrap-datetimepicker/
 
 Use this directive to render a date time picker
 

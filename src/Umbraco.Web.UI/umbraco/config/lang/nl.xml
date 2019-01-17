@@ -2,7 +2,7 @@
 <language alias="nl" intName="Dutch" localName="Nederlands" lcid="19" culture="nl-NL">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Beheer domeinnamen</key>
@@ -36,6 +36,10 @@
     <key alias="sort">Sorteren</key>
     <key alias="translate">Vertalen</key>
     <key alias="update">Bijwerken</key>
+    <key alias="setPermissions">Rechten instellen</key>
+    <key alias="unlock">Deblokkeer</key>
+    <key alias="createblueprint">Content sjabloon aanmaken</key>
+    <key alias="resendInvite">Uitnodiging opnieuw versturen</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Toegang geweigerd.</key>
@@ -171,7 +175,14 @@
     <key alias="childItems" version="7.0">Subitems</key>
     <key alias="target" version="7.0">Doel</key>
 	<key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Ben je er zeker van dat je dit item wilt verwijderen?</key>
+    <key alias="nestedContentEditorNotSupported">Eigenschap %0% gebruikt editor %1% welke niet wordt ondersteund door Nested Content.</key>
+    <key alias="addTextBox">Voeg nog een tekstvak toe</key>
+    <key alias="removeTextBox">Verwijder dit tekstvak</key>
+    <key alias="contentRoot">Content root</key>
+    <key alias="isSensitiveValue">Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken, contacteer dan uw website administrator.</key>
+    <key alias="isSensitiveValue_short">Deze waarde is verborgen</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klik om te uploaden</key>
@@ -214,6 +225,7 @@
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
     <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
+    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggend paginas verwijderen van de site.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -506,6 +518,7 @@
     <key alias="submit">Verstuur</key>
     <key alias="type">Typen</key>
     <key alias="typeToSearch">Typ om te zoeken...</key>
+    <key alias="under">onder</key>
     <key alias="up">Omhoog</key>
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
@@ -574,7 +587,7 @@
     <key alias="databaseHeader">Database configuratie </key>
     <key alias="databaseInstall"><![CDATA[Druk op de knop <strong>installeren</strong> om de Umbraco %0% database te installeren]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% is nu gekopieerd naar je database. Druk op <strong>Volgende</strong> om door te gaan.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>De database kon niet gevonden worden! Gelieve na te kijken of de informatie in de "connection string" van het "web.config" bestand correct is.</p><p> Om door te gaan, gelieve het "web.config" bestand aan te passen (met behulp van Visual Studio of je favoriete tekstverwerker), scroll in het bestand naar beneden, voeg de connection string voor je database toe in de key met naam "umbracoDbDSN" en sla het bestand op.</p><p>Klik op de knop <strong>opnieuw proberen</strong> als je hiermee klaar bent. <br/> <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Meer informatie over het aanpassen van de web.config vind je hier.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>De database kon niet gevonden worden! Gelieve na te kijken of de informatie in de "connection string" van het "web.config" bestand correct is.</p><p> Om door te gaan, gelieve het "web.config" bestand aan te passen (met behulp van Visual Studio of je favoriete tekstverwerker), scroll in het bestand naar beneden, voeg de connection string voor je database toe in de key met naam "umbracoDbDSN" en sla het bestand op.</p><p>Klik op de knop <strong>opnieuw proberen</strong> als je hiermee klaar bent. <br/> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Meer informatie over het aanpassen van de web.config vind je hier.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Om deze stap te voltooien moet je enkele gegevens weten over je database server ("connection string").<br/> Gelieve contact op te nemen met je ISP indien nodig. Wanneer je installeert op een lokale computer of server, dan heb je waarschijnlijk informatie nodig van je systeembeheerder.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Klik de <strong>upgrade</strong> knop om je database te upgraden naar Umbraco %0%</p> <p> Maak je geen zorgen - er zal geen inhoud worden gewist en alles blijft gewoon werken! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Je database is geupgrade naar de definitieve versie %0%.<br />Klik <strong>Volgende</strong> om verder te gaan.]]></key>
@@ -1018,6 +1031,28 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="scriptErrorHeader">Script view niet opgeslagen</key>
     <key alias="scriptErrorText">Er is een fout opgetreden bij het opslaan van dit bestand.</key>
     <key alias="cssErrorText">Er is een fout opgetreden bij het opslaan van dit bestand.</key>
+    <key alias="deleteUserGroupsSuccess">%0% gebruikersgroepen verwijderd</key>
+    <key alias="deleteUserGroupSuccess">%0% is verwijderd</key>
+    <key alias="enableUsersSuccess">%0% gebruikers geactiveerd</key>
+    <key alias="enableUsersError">Er heeft zich een fout voorgedaan tijdens het activeren van de gebruikers</key>
+    <key alias="disableUsersSuccess">%0% users gedeactiveerd</key>
+    <key alias="disableUsersError">Er heeft zich een fout voorgedaan tijdens het deactiveren van de gebruikers</key>
+    <key alias="enableUserSuccess">%0% is nu geactiveerd</key>
+    <key alias="enableUserError">Er heeft zich een fout voorgedaan tijdens het activeren van de gebruiker</key>
+    <key alias="disableUserSuccess">%0% is nu gedeactiveerd</key>
+    <key alias="disableUserError">Er heeft zich een fout voorgedaan tijdens het deactiveren van de gebruiker</key>
+    <key alias="setUserGroupOnUsersSuccess">Gebruikers groepen zijn ingesteld</key>
+    <key alias="deleteUserGroupsSuccess">%0% gebruikersgroepen verwijderd</key>
+    <key alias="deleteUserGroupSuccess">%0% is verwijderd</key>
+    <key alias="unlockUsersSuccess">%0% gebruikers gedeblokkeerd</key>
+    <key alias="unlockUsersError">Er heeft zich een fout voorgedaan tijdens het deblokkeren van de gebruikers</key>
+    <key alias="unlockUserSuccess">%0% is nu gedeblokkeerd</key>
+    <key alias="unlockUserError">Er heeft zich een fout voorgedaan tijdens het deblokkeren van de gebruikers</key>
+    <key alias="memberExportedSuccess">Lid is geexporteerd naar een bestand</key>
+    <key alias="memberExportedError">Er heeft zich een fout voorgedaan tijdens het exporteren van het lid</key>
+    <key alias="deleteUserSuccess">Gebruiker %0% is verwijderd</key>
+    <key alias="resendInviteHeader">Gebruiker uitnodigen</key>
+    <key alias="resendInviteSuccess">Uitnodiging is opnieuw gestuurd naar gebruiker %0%</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Gebruik CSS syntax bijv: h1, .redHeader, .blueTex</key>
@@ -1146,7 +1181,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="thisEditorUpdateSettings">die gebruik maken van deze editor zullen geupdate worden met deze nieuwe instellingen</key>
 
     <key alias="memberCanEdit">Lid kan bewerken</key>
+    <key alias="memberCanEditDescription">Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel pagina.</key>
+    <key alias="isSensitiveData">Omvat gevoelige gegevens</key>
+    <key alias="isSensitiveDataDescription">Verberg deze eigenschap voor de content editor die geen toegang heeft tot het bekijken van gevoelige informatie.</key>
     <key alias="showOnMemberProfile">Toon in het profiel van leden</key>
+    <key alias="showOnMemberProfileDescription">Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het lid.</key>
+    
     <key alias="tabHasNoSortOrder">tab heeft geen sorteervolgorde</key>
   </area>
 
@@ -1274,23 +1314,45 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="updateNoServerError">Er is een fout opgetreden bij het zoeken naar een update. Bekijk de trace-stack voor verdere informatie.</key>
   </area>
   <area alias="user">
+    <key alias="access">Toegang</key>
+    <key alias="accessHelp">Gebaseerd op de gebruikers groepen en start pagina's heeft de bruiker toegang tot de volgende pagina's</key>
+    <key alias="assignAccess">Toegang geven</key>
     <key alias="administrators">Beheerders</key>
     <key alias="categoryField">Categorieveld</key>
+    <key alias="createDate">Gebruiker aangemaakt</key>
     <key alias="changePassword">Verander je wachtwoord</key>
+    <key alias="changePhoto">Wijzig je foto</key>
     <key alias="newPassword">Wijzig je wachtwoord</key>
+    <key alias="noLockouts">is niet gedeblokkeerd</key>
+    <key alias="noPasswordChange">Het wachtwoord is niet gewijzigd</key>
     <key alias="confirmNewPassword">Bevestig nieuw password</key>
     <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaan formulier in te vullen en op de knop 'Verander wachtwoord' te klikken </key>
     <key alias="contentChannel">Inhoudskanaal</key>
+    <key alias="createAnotherUser">Nog een gebruiker aanmaken</key>
+    <key alias="createUserHelp">Maak nieuwe gebruikers aan om hun toegang te geven tot Umbraco. Wanneer een nieuwe gebruiker wordt aangemaakt wordt er een wachtwoord gegenereerd dat je met hun kan delen.</key>
     <key alias="descriptionField">Omschrijving</key>
     <key alias="disabled">Geblokkeerde gebruiker</key>
     <key alias="documentType">Documenttype</key>
     <key alias="editors">Redacteur</key>
     <key alias="excerptField">Samenvattingsveld</key>
+    <key alias="failedPasswordAttempts">Foute wachtwoord pogingen</key>
+    <key alias="goToProfile">Ga naar gebruikersprofiel</key>
+    <key alias="groupsHelp">Voeg gebruikersgroepen toe om rechten in te stellen</key>
+    <key alias="inviteAnotherUser">Nog een gebruiker uitnodigen</key>
+    <key alias="inviteUserHelp">Nodig gebruikers uit om hen toegang te geven to Umbraco. Een uitnodiging wordt via e-mail verstuurd met instructies hoe de gebruiker kan inloggen.</key>
     <key alias="language">Taal</key>
+    <key alias="languageHelp">Stel de taal in die gebruiker zal zien in menu's en dialoog vensters</key>
+      <key alias="lastLockoutDate">Laatst geblokkeerd datu,</key>
+      <key alias="lastLogin">Laatste keer ingelogd</key>
+      <key alias="lastPasswordChangeDate">Laatste keer paswoord gewijzigd</key>
     <key alias="loginname">Loginnaam</key>
     <key alias="mediastartnode">Startnode in Mediabibliotheek</key>
+      <key alias="mediastartnodehelp">Beperk de mediabibliotheek tot een specifieke startnode</key>
+      <key alias="mediastartnodes">Startnodes in Mediabibliotheek</key>
+      <key alias="mediastartnodeshelp">Beperk de mediabibliotheek tot een specifieke startnodes</key>
     <key alias="modules">Secties</key>
     <key alias="noConsole">Blokkeer Umbraco toegang</key>
+      <key alias="noLogin">heeft nog niet ingelogd</key>
 	<key alias="oldPassword">Oude wachtwoord</key>
     <key alias="password">Wachtwoord</key>
     <key alias="resetPassword">Reset wachtwoord</key>
@@ -1305,16 +1367,151 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="permissionReplaceChildren">Vervang rechten op de subitems</key>
     <key alias="permissionSelectedPages">U bent momenteel rechten aan het aanpassen voor volgende pagina's:</key>
     <key alias="permissionSelectPages">Selecteer pagina's om hun rechten aan te passen</key>
-    <key alias="searchAllChildren">Doorzoek alle subitems</key>
-    <key alias="startnode">Startnode in Content</key>
+      <key alias="removePhoto">Verwijder je foto</key>
+      <key alias="permissionsDefault">Standaard rechten</key>
+      <key alias="permissionsGranular">Specifieke rechten</key>
+      <key alias="permissionsGranularHelp">Geef rechten op specifieke nodes</key>
+      <key alias="profile">Profiel</key>
+    <key alias="searchAllChildren">Doorzoek alle subitems</key>   
+      <key alias="sectionsHelp">Geef de gebruiker toegang tot secties</key>
+      <key alias="selectUserGroups">Selecteer een gebruikersgroep</key>
+      <key alias="noStartNode">Geen startnode geselecteerd</key>
+      <key alias="noStartNodes">Geen startnodes geselecteerd</key>
+      <key alias="stateActive">Actief</key>
+      <key alias="stateAll">Alles</key>
+      <key alias="stateDisabled">Gedeactiveerd</key>
+      <key alias="stateLockedOut">Geblokkeerd</key>
+      <key alias="stateInvited">Uitgenodigd</key>
+      <key alias="startnode">Startnode in Content</key>
+      <key alias="startnodehelp">Beperk de content toegan een specifieke start node</key>
+      <key alias="startnodes">Startnodes in Content</key>
+      <key alias="startnodeshelp">Beperk de content toegan een specifieke start nodes</key>
+      <key alias="sortNameAscending">Naam (A-Z)</key>
+      <key alias="sortNameDescending">Naam (Z-A)</key>
+      <key alias="sortCreateDateDescending">Nieuwste</key>
+      <key alias="sortCreateDateAscending">Oudste</key>
+      <key alias="sortLastLoginDateDescending">Laatste inlog</key>
+      <key alias="updateDate">Laatste keer bijgewerkt</key>
+      <key alias="userCreated">is aangemaakt</key>
+      <key alias="userCreatedSuccessHelp">De gebruiker is aangemaakt. Om in te loggen in Umbraco gebruik je onderstaand wachtwoord.</key>
+      <key alias="userManagement">Gebruikers beheren</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="userPermissions">Gebruikersrechten</key>
+      <key alias="userGroupPermissions">Gebruikersgroep rechten</key>
+      <key alias="usergroup">Gebruikersgroep</key>
+      <key alias="userGroups">Gebruikersgroepen</key>
+      <key alias="userInvited">is uitgenodigd</key>
+      <key alias="userInvitedSuccessHelp">Een uitnodiging is gestuurd naar de nieuwe gebruiker met informatie over hoe in te loggen in Umbraco</key>
+      <key alias="userinviteWelcomeMessage">Hallo en welk in Umbraco! Binnen ongeveer 1 minuut kan je aan de slag. Je moet enkel je wachtwoord instellen en een foto toevoegen.</key>
+      <key alias="userinviteAvatarMessage">Wijzig je foto zodat andere gebruikers je makkelijk kunnen herkennen.</key>
     <key alias="writer">Auteur</key>
 	<key alias="translator">Vertaler</key>
     <key alias="change">Wijzig</key>
     <key alias="yourProfile" version="7.0">Je profiel</key>
     <key alias="yourHistory" version="7.0">Je recente historie</key>
     <key alias="sessionExpires" version="7.0">Sessie verloopt over</key>
+      <key alias="inviteUser">Gebruiker uitnodigen</key>
+      <key alias="createUser">Gebruiker aanmaken</key>
+      <key alias="sendInvite">Uitnodiging versturen</key>
+      <key alias="backToUsers">Terug naar gebruikers</key>
+      <key alias="inviteEmailCopySubject">Umbraco: Uitnodiging</key>
+      <key alias="inviteEmailCopyFormat">
+          <![CDATA[
+        <html> 
+			<head> 
+				<meta name='viewport' content='width=device-width'> 
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'> 
+			</head> 
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'> 
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style> 
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr> 
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top"> 
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr> 
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;"> 
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]--> 
+										<div> </div> 
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]--> 
+									</td> 
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td> 
+								</tr>
+							</table> 
+						</td> 
+					</tr>
+				</table> 
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'> 
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr> 
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'> 
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr> 
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>     
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Hallo %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															U bent uitgenodigd door <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> om in te loggen in de Umbraco Backoffice.
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Bericht van <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
+															<br/>
+															<em>%2%</em>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																			<tbody>
+																				<tr> 
+																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'> 
+																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							Klik hier om de uitnodiging te accepteren
+																						</a> 
+																					</td> 
+																				</tr>
+																			</tbody>
+																		</table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Als je niet op de link kunt klikken, kopieer deze dan in de adresbalk van je browser:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+																		</font>
+																	</td> 
+																</tr>
+															</table>
+														</p>
+													</td> 
+												</tr>
+											</table> 
+										</td> 
+									</tr>
+								</table> 
+								<br><br><br> 
+							</div> 
+						</td> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+					</tr>
+				</table> 
+			</body>
+    </html>]]>
+      </key>
+      <key alias="invite">Uitnodigen</key>
+      <key alias="defaultInvitationMessage">Uitnodiging opnieuw aan het versturen...</key>
+      <key alias="deleteUser">Verwijder gebruiker</key>
+      <key alias="deleteUserConfirmation">Ben je zeker dat je deze gebruiker wil verwijderen?</key>
   </area>
 	 <area alias="validation">
     <key alias="validation">Validatie</key>
@@ -1444,4 +1641,11 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="enabledConfirm">URL tracker staat nu aan.</key>
     <key alias="enableError">Fout bij het aanzetten van de URL tracker. Meer informatie kan gevonden worden in de log file.</key>
   </area>
+    <area alias="recycleBin">
+        <key alias="contentTrashed">Content verwijderd met id : {0} gerelateerd aan aan bovenliggend item met Id: {1}</key>
+        <key alias="mediaTrashed">Media verwijderd met id: {0} gerelateerd aan aan bovenliggend item met Id: {1}</key>
+        <key alias="itemCannotBeRestored">Kan dit item niet automatisch herstellen</key>
+        <key alias="noRestoreRelation">Er is geen 'herstel' relatie gevonden voor dit item. Gebruik de "Verplaats" optie om het manueel terug te zetten</key>
+        <key alias="restoreUnderRecycled">Het item dat u wil herstellen onder ('%0%') zit in de prullenbak. Gebruik de "Verplaats" optie om het manueel terug te zetten</key>
+    </area>
 </language>

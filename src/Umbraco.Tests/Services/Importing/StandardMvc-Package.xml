@@ -177,7 +177,7 @@
       <name>StandardWebsiteMVC</name>
       <version>2.0</version>
       <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://our.umbraco.org/projects/starter-kits/standard-website-mvc</url>
+      <url>https://our.umbraco.com/projects/starter-kits/standard-website-mvc</url>
       <requirements>
         <major>3</major>
         <minor>0</minor>
@@ -218,7 +218,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
         </panelContent2>
         <panelContent3>
           <![CDATA[<h2>Contact Us</h2>
-<p><a href="http://www.twitter.com/chriskoiak" target="_blank"><img src="/images/twitter_square.png" alt="Contact Us on Twitter" class="fr"/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href="http://our.umbraco.org/projects/starter-kits/standard-website-mvc" target="_blank">project website</a> or via <a href="http://www.twitter.com/chriskoiak" target="_blank">twitter</a></p>]]>
+<p><a href="http://www.twitter.com/chriskoiak" target="_blank"><img src="/images/twitter_square.png" alt="Contact Us on Twitter" class="fr"/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href="https://our.umbraco.com/projects/starter-kits/standard-website-mvc" target="_blank">project website</a> or via <a href="http://www.twitter.com/chriskoiak" target="_blank">twitter</a></p>]]>
         </panelContent3>
         <primaryNavigation><![CDATA[1072,1073,1077,1079,1080]]></primaryNavigation>
         <address>Standard Website MVC, Company Address, Glasgow, Postcode</address>

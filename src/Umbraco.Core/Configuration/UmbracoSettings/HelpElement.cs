@@ -9,7 +9,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     [Obsolete("This is no longer used and will be removed in future versions")]
     internal class HelpElement : ConfigurationElement, IHelpSection
     {
-        [ConfigurationProperty("defaultUrl", DefaultValue = "http://our.umbraco.org/wiki/umbraco-help/{0}/{1}")]
+        [ConfigurationProperty("defaultUrl", DefaultValue = "https://our.umbraco.com/wiki/umbraco-help/{0}/{1}")]
         public string DefaultUrl
         {
             get { return (string) base["defaultUrl"]; }

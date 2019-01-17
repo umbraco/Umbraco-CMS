@@ -2,7 +2,7 @@
 <language alias="es" intName="Spanish" localName="español" lcid="10" culture="es-ES">
     <creator>
         <name>The Umbraco community</name>
-        <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+        <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
     </creator>
     <area alias="actions">
         <key alias="assignDomain">Administrar hostnames</key>
@@ -213,7 +213,7 @@
         <key alias="childItems" version="7.0">Nodos hijo</key>
         <key alias="target" version="7.0">Target</key>
         <key alias="scheduledPublishServerTime">Esto se traduce en la siguiente hora en el servidor:</key>
-        <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">¿Esto qué significa?</a>]]></key>
+        <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">¿Esto qué significa?</a>]]></key>
         <key alias="nestedContentDeleteItem">¿Estás seguro que quieres eliminar este elemento?</key>
         <key alias="nestedContentEditorNotSupported">Propiedad %0% utiliza editor %1% que no está soportado por Nested Content.</key>
         <key alias="addTextBox">Añadir otra caja de texto</key>
@@ -698,7 +698,7 @@
         <key alias="databaseHeader">Configuración de la base de datos</key>
         <key alias="databaseInstall"><![CDATA[Pulse el botón <strong> instalar </ strong> para instalar %0% la base de datos de Umbraco]]></key>
         <key alias="databaseInstallDone"><![CDATA[Se ha copiado Umbraco %0% a la base de datos. Pulse <strong>Próximo</strong> para continuar]]></key>
-        <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la "connection string" del “web.config” es correcta.</p> <p>Para continuar, edite el "web.config" (bien sea usando Visual Studio o su editor de texto preferido), vaya al final del archivo y añada la cadena de conexión para la base de datos con el nombre (key) "umbracoDbDSN" y guarde el archivo. </p> <p>Pinche en <strong>reintentar</strong> cuando haya terminado.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Pinche aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
+        <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la "connection string" del “web.config” es correcta.</p> <p>Para continuar, edite el "web.config" (bien sea usando Visual Studio o su editor de texto preferido), vaya al final del archivo y añada la cadena de conexión para la base de datos con el nombre (key) "umbracoDbDSN" y guarde el archivo. </p> <p>Pinche en <strong>reintentar</strong> cuando haya terminado.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Pinche aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
         <key alias="databaseText"><![CDATA[Para completar este paso, debes conocer la información correspondiente a tu servidor de base de datos ("cadena de conexión").<br /> Por favor, contacta con tu ISP si es necesario. Si estás realizando la instalación en una máquina o servidor local, quizás necesites información de tu administrador de sistemas.]]></key>
         <key alias="databaseUpgrade"><![CDATA[<p> Pinche en <strong>actualizar</strong> para actualizar la base de datos a Umbraco %0%</p> <p> Ningún contenido será borrado de la base de datos y seguirá funcionando después de la actualización </p> ]]></key>
         <key alias="databaseUpgradeDone"><![CDATA[La base de datos ha sido actualizada a la versión 0%.<br />Pinche en <strong>Próximo</strong> para continuar. ]]></key>

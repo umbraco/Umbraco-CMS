@@ -40,7 +40,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // splitting by newline
             //
             //   RS: SD/Stephan Please consider post before deciding to remove 
-            //// https://our.umbraco.org/forum/contributing-to-umbraco-cms/76989-keep-the-xml-values-in-the-multipletextstringvalueconverter
+            //// https://our.umbraco.com/forum/contributing-to-umbraco-cms/76989-keep-the-xml-values-in-the-multipletextstringvalueconverter
             var values = new List<string>();
             var pos = sourceString.IndexOf("<value>", StringComparison.Ordinal);
             while (pos >= 0)

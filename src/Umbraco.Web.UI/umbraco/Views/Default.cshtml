@@ -1,19 +1,10 @@
-﻿@using System.Collections
-@using System.Net.Http
-@using System.Web.Mvc.Html
-@using Umbraco.Core
+﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
-@using Microsoft.Owin.Security
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
 @using Umbraco.Core.IO
 @using Umbraco.Web
-@using Umbraco.Web.Editors
 @using umbraco
-
 @inherits System.Web.Mvc.WebViewPage
-
 @{
     var isDebug = false;
     if (Request.RawUrl.IndexOf('?') >= 0)
@@ -32,9 +23,7 @@
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
@@ -51,20 +40,27 @@
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 </head>
-<noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <div ng-hide="!authenticated" ng-cloak>
-    
+
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
-        
+
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
             <umb-navigation></umb-navigation>
 
             <section id="contentwrapper">
-                <div id="contentcolumn" ng-view></div>
+                <div id="contentcolumn" ng-view>
+                    <noscript>
+                        <div>
+                            <h3><img src="assets/img/application/logo.png" alt="Umbraco logo" style="vertical-align: text-bottom;" /> Umbraco</h3>
+                            <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
+                            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+                        </div>
+                    </noscript>
+                </div>
             </section>
 
             <umb-tour
@@ -75,7 +71,7 @@
             <umb-notifications></umb-notifications>
 
         </div>
-        
+
     </div>
 
     <umb-backdrop
@@ -93,26 +89,22 @@
         view="ysodOverlay.view">
     </umb-overlay>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
+    @Html.BareMinimumServerVariablesScript(Url, ApplicationContext.Current, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
-    <script type="text/javascript">
+    <script>
         document.angularReady = function(app) {
-
             @Html.AngularValueExternalLoginInfoScript((IEnumerable<string>)ViewBag.ExternalSignInError)
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
         }
     </script>
 
-
-    @*And finally we can load in our angular app*@
-    <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
-    <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
+    <script src="lib/rgrove-lazyload/lazyload.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
     @if (isDebug)
     {
-        <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+        <script src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
-
 </body>
 </html>

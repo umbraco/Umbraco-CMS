@@ -412,6 +412,8 @@ namespace Umbraco.Web.Editors
 
             await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
 
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/resendInviteHeader"), Services.TextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
+
             return display;
         }
 
@@ -697,6 +699,36 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(users);
             return Request.CreateNotificationSuccessResponse(
                 Services.TextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+        }
+
+        /// <summary>
+        /// Deletes the non-logged in user provided id
+        /// </summary>
+        /// <param name="id">User Id</param>
+        /// <remarks>
+        /// Limited to users that haven't logged in to avoid issues with related records constrained
+        /// with a foreign key on the user Id
+        /// </remarks>
+        public async Task<HttpResponseMessage> PostDeleteNonLoggedInUser(int id)
+        {
+            var user = Services.UserService.GetUserById(id);
+            if (user == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            // Check user hasn't logged in.  If they have they may have made content changes which will mean
+            // the Id is associated with audit trails, versions etc. and can't be removed.
+            if (user.LastLoginDate != default(DateTime))
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
+            var userName = user.Name;
+            Services.UserService.Delete(user, true);
+            
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
         }
 
         public class PagedUserResult : PagedResult<UserBasic>

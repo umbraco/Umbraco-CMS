@@ -64,7 +64,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     throw new FormatException("Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new FormatException("Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
             }

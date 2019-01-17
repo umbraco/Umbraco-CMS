@@ -10,26 +10,30 @@
 // Grays
 // -------------------------
 @black:                 #000;
-@blackLight:			#1d1d1d;
+@blackLight:			#1D1D1D;
 @grayDarker:            #222;
 @grayDark:              #343434;
 @gray:                  #555;
-@grayMed:               #7f7f7f;
-@grayLight:             #d9d9d9;
-@grayLighter:           #f8f8f8;
-@white:                 #fff;
-
+@grayMed:               #7F7F7F;
+@blueGrey:              #607D8B;
+@grayLight:             #D9D9D9;
+@grayLighter:           #F8F8F8;
+@white:                 #FFF;
+@grayIcon:              #9E9E9E;
 
 // Accent colors
 // -------------------------
-@blue:                  #2e8aea;
-@blueDark:              #0064cd;
-@blueLight:             #add8e6;
-@green:                 #46a546;
-@red:                   #9d261d;
-@yellow:                #ffc40d;
+
+
+
+@blue:                  #2E8AEA;
+@blueDark:              #0064CD;
+@blueLight:             #ADD8E6;
+@green:                 #46A546;
+@red:                   #9D261D;
+@yellow:                #FFC40D;
 @orange:                #DF7F48;
-@pink:                  #c3325f;
+@pink:                  #C3325F;
 
 
 // Colors
@@ -40,7 +44,7 @@
 @turquoise-l1:			#42CFC5;
 @turquoise-l2:			#81DED8;
 @turquoise-l3:			#C0F0ED;
-@turquoise-washed:		#F3FDFC; 
+@turquoise-washed:		#F3FDFC;
 
 @purple-d2:			    #1D1333;
 @purple-d1:			    #2E2246;
@@ -86,6 +90,28 @@
 @gray-10:               #F3F3F5;
 
 
+// Additional Icon Colours
+@brownIcon:             #795548;
+@blueIcon:              #2196F3;
+@lightBlueIcon:         #03A9F4;
+@cyanIcon:              #00BCD4;
+@greenIcon:             #4CAF50;
+@lightGreenIcon:        #8BC34A;
+@limeIcon:              #CDDC39;
+@yellowIcon:            #FFEB3B;
+@amberIcon:             #FFC107;
+@orangeIcon:            #FF9800;
+@deepOrangeIcon:        #FF5722;
+@redIcon:               #F44336;
+@pinkIcon:              #E91E63;
+@purpleIcon:            #9C27B0;
+@deepPurpleIcon:        #673AB7;
+@indigoIcon:            #3F51B5;
+
+
+
+
+
 .red{color: @red;}
 .blue{color: @blue;}
 .black{color: @black;}
@@ -96,30 +122,71 @@
 //icon colors for tree icons
 .color-red, .color-red i{color: @red-d1 !important;}
 .color-blue, .color-blue i{color: @turquoise-d1 !important;}
-.color-orange, .color-orange i{color: #d9631e !important;}
+.color-orange, .color-orange i{color: @orange !important;}
 .color-green, .color-green i{color: @green-d1 !important;}
-.color-yellow, .color-yellow i{color: @yellow-d1 !important;}
+.color-yellow, .color-yellow i{color: @yellowIcon !important;}
 
-/* Colors based on http://zavoloklom.github.io/material-design-color-palette/colors.html */
-.color-black, .color-black i { color: #000 !important; }
-.color-blue-grey, .color-blue-grey i { color: #607d8b !important; }
-.color-grey, .color-grey i { color: #9e9e9e !important; }
-.color-brown, .color-brown i { color: #795548 !important; }
-.color-blue, .color-blue i { color: #2196f3 !important; }
-.color-light-blue, .color-light-blue i {color: #03a9f4 !important; }
-.color-cyan, .color-cyan i { color: #00bcd4 !important; }
-.color-green, .color-green i { color: #4caf50 !important; }
-.color-light-green, .color-light-green i {color: #8bc34a !important; }
-.color-lime, .color-lime i { color: #cddc39 !important; }
-.color-yellow, .color-yellow i { color: #ffeb3b !important; }
-.color-amber, .color-amber i { color: #ffc107 !important; }
-.color-orange, .color-orange i { color: #ff9800 !important; }
-.color-deep-orange, .color-deep-orange i { color: #ff5722 !important; }
-.color-red, .color-red i { color: #f44336 !important; }
-.color-pink, .color-pink i { color: #e91e63 !important; }
-.color-purple,.color-purple i { color: #9c27b0 !important; }
-.color-deep-purple, .color-deep-purple i { color: #673ab7 !important; }
-.color-indigo, .color-indigo i { color: #3f51b5 !important; }
+/* Colors based on https://zavoloklom.github.io/material-design-color-palette/colors.html */
+.btn-color-black {background-color: @black;}
+.color-black i { color: @black;}
+
+
+.btn-color-blue-grey {background-color: @blueGrey;}
+.color-blue-grey, .color-blue-grey i { color: @blueGrey !important;}
+
+
+.btn-color-grey{background-color: @grayIcon;}
+.color-grey, .color-grey i { color: @grayIcon !important; }
+
+
+.btn-color-brown{background-color: @brownIcon;}
+.color-brown, .color-brown i { color: @brownIcon !important; }
+
+.btn-color-blue{background-color: @blueIcon;}
+.color-blue, .color-blue i { color: @blueIcon !important; }
+
+.btn-color-light-blue{background-color: @lightBlueIcon;}
+.color-light-blue, .color-light-blue i {color: @lightBlueIcon !important;}
+
+.btn-color-cyan{background-color: @cyanIcon;}
+.color-cyan, .color-cyan i { color: @cyanIcon !important; }
+
+.btn-color-green{background-color: @greenIcon;}
+.color-green, .color-green i { color: @greenIcon !important; }
+
+.btn-color-light-green{background-color: @lightGreenIcon;}
+.color-light-green, .color-light-green i {color: @lightGreenIcon !important; }
+
+.btn-color-lime{background-color: @limeIcon;}
+.color-lime, .color-lime i { color: @limeIcon !important; }
+
+.btn-color-yellow{background-color: @yellowIcon;}
+.color-yellow, .color-yellow i { color: @yellowIcon !important; }
+
+.btn-color-amber{background-color: @amberIcon;}
+.color-amber, .color-amber i { color: @amberIcon !important; }
+
+.btn-color-orange{background-color: @orangeIcon;}
+.color-orange, .color-orange i { color: @orangeIcon !important; }
+
+.btn-color-deep-orange{background-color: @deepOrangeIcon;}
+.color-deep-orange, .color-deep-orange i { color: @deepOrangeIcon !important; }
+
+.btn-color-red{background-color: @redIcon;}
+.color-red, .color-red i { color: @redIcon !important; }
+
+.btn-color-pink{background-color: @pinkIcon;}
+.color-pink, .color-pink i { color: @pinkIcon !important; }
+
+.btn-color-purple{background-color: @purpleIcon;}
+.color-purple, .color-purple i { color: @purpleIcon !important; }
+
+.btn-color-deep-purple{background-color: @deepPurpleIcon;}
+.color-deep-purple, .color-deep-purple i { color: @deepPurpleIcon !important; }
+
+.btn-color-indigo{background-color: @indigoIcon;}
+.color-indigo, .color-indigo i { color: @indigoIcon !important; }
+
 
 
 // Scaffolding

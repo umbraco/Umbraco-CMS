@@ -27,7 +27,7 @@
         vm.page.keyboardShortcutsOverview.push(templateHelper.getTemplateEditorShortcuts());
 
         
-        vm.save = function () {
+        vm.save = function (suppressNotification) {
             vm.page.saveButtonState = "busy";
 
             vm.template.content = vm.editor.getValue();
@@ -44,11 +44,13 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
+							if (!suppressNotification) {
                 localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
                     notificationsService.success(header, message);
                 });
+							}
 
 
                 vm.page.saveButtonState = "success";
@@ -134,6 +136,21 @@
         	vm.page.loading = false;
             vm.template = template;
 
+						// if this is a new template, bind to the blur event on the name
+						if ($routeParams.create) {
+							$timeout(function() {
+								var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
+								if (nameField) {
+									nameField.bind('blur', function(event) {
+										if (event.target.value) {
+											vm.save(true);
+										}
+									});
+								}
+							});
+						}
+					
+					
             //sync state
             editorState.set(vm.template);
             navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {

@@ -201,39 +201,52 @@
     }
 
 
-    $scope.unPublish = function () {
+    $scope.unPublish = function () {								
+			// raising the event triggers the confirmation dialog			
+			if (!notificationsService.hasView()) {
+				notificationsService.add({ view: "confirmunpublish" });
+			}				
+				
+			$scope.page.buttonGroupState = "busy";
 
-      if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
+			// actioning the dialog raises the confirmUnpublish event, act on it here
+			var actioned = $rootScope.$on("content.confirmUnpublish", function(event, confirmed) {
+				if (confirmed && formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
+							
+					eventsService.emit("content.unpublishing", { content: $scope.content });
 
-        $scope.page.buttonGroupState = "busy";
+					contentResource.unPublish($scope.content.id)
+						.then(function (data) {
 
-        eventsService.emit("content.unpublishing", { content: $scope.content });
+							formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-        contentResource.unPublish($scope.content.id)
-          .then(function (data) {
+							contentEditingHelper.handleSuccessfulSave({
+								scope: $scope,
+								savedContent: data,
+								rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+							});
 
-            formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+							init($scope.content);
 
-            contentEditingHelper.handleSuccessfulSave({
-              scope: $scope,
-              savedContent: data,
-              rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-            });
+							syncTreeNode($scope.content, data.path);
 
-            init($scope.content);
+							$scope.page.buttonGroupState = "success";
+							eventsService.emit("content.unpublished", { content: $scope.content });
 
-            syncTreeNode($scope.content, data.path);
-
-            $scope.page.buttonGroupState = "success";
-
-            eventsService.emit("content.unpublished", { content: $scope.content });
-
-          }, function(err) {
-            formHelper.showNotifications(err.data);
-            $scope.page.buttonGroupState = 'error';
-          });
-      }
-
+						}, function(err) {
+							formHelper.showNotifications(err.data);
+							$scope.page.buttonGroupState = 'error';
+						});	
+					
+				} else {
+					$scope.page.buttonGroupState = "init";
+				}
+				
+				// unsubscribe to avoid queueing notifications
+				// listener is re-bound when the unpublish button is clicked so it is created just-in-time				
+				actioned();
+				
+			}); 
     };
 
     $scope.sendToPublish = function () {

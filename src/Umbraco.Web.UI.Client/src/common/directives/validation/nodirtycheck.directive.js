@@ -2,7 +2,7 @@
 * @ngdoc directive
 * @name umbraco.directives.directive:noDirtyCheck
 * @restrict A
-* @description Can be attached to form inputs to prevent them from setting the form as dirty (http://stackoverflow.com/questions/17089090/prevent-input-from-setting-form-dirty-angularjs)
+* @description Can be attached to form inputs to prevent them from setting the form as dirty (https://stackoverflow.com/questions/17089090/prevent-input-from-setting-form-dirty-angularjs)
 **/
 function noDirtyCheck() {
     return {

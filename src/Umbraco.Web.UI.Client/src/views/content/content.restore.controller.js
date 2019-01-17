@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController",
-	function ($scope, relationResource, contentResource, navigationService, appState, treeService) {
+    function ($scope, relationResource, contentResource, navigationService, appState, treeService, localizationService) {
 		var dialogOptions = $scope.dialogOptions;
 
 		var node = dialogOptions.currentNode;
@@ -12,9 +12,9 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
             if (data.length == 0) {
                 $scope.success = false;
                 $scope.error = {
-                    errorMsg: "Cannot automatically restore this item",
+                    errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
                     data: {
-                        Message: "There is no 'restore' relation found for this node. Use the Move menu item to move it manually."
+                        Message: localizationService.localize('recycleBin_noRestoreRelation')
                     }
                 }
                 return;
@@ -32,9 +32,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 					// make sure the target item isn't in the recycle bin
 					if($scope.target.path.indexOf("-20") !== -1) {
 						$scope.error = {
-							errorMsg: "Cannot automatically restore this item",
+                            errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
 							data: {
-								Message: "The item you want to restore it under (" + $scope.target.name + ") is in the recycle bin. Use the Move menu item to move the item manually."								
+                                Message: localizationService.localize('recycleBin_restoreUnderRecycled').then(function (value) {
+                                    value.replace('%0%', $scope.target.name);
+                                })
 							}
 						};
 						$scope.success = false;

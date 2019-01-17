@@ -27,7 +27,7 @@ namespace Umbraco.Core.Packaging.Models
             set { _runAt = value; }
         }
 
-        public bool Undo //NOTE: Should thid default to "False"? but the documentation says default "True" (http://our.umbraco.org/wiki/reference/packaging/package-actions)
+        public bool Undo //NOTE: Should thid default to "False"? but the documentation says default "True" (https://our.umbraco.com/wiki/reference/packaging/package-actions)
         {
             get { return _undo ?? true; }
             set { _undo = value; }

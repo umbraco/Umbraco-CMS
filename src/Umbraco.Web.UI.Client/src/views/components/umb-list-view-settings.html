@@ -1,9 +1,11 @@
 <div class="umb-list-view-settings">
 
   <div class="umb-list-view-settings__trigger">
-    <label class="checkbox no-indent">
-        <input type="checkbox" ng-model="enableListView" hotkey="alt+shift+l" />
-        <localize key="general_yes"></localize> - <localize key="contentTypeEditor_enableListViewHeading"></localize>
+        <umb-toggle
+            checked="enableListView"
+            on-click="toggle()"
+            hotkey="alt+shift+l">
+        </umb-toggle>
   </div>
 
   <!-- list view enabled -->

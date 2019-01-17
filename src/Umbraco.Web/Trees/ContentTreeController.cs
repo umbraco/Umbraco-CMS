@@ -68,16 +68,17 @@ namespace Umbraco.Web.Trees
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
             {
-
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
+                var hasChildren = ShouldRenderChildrenOfContainer(e);
+                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.DocumentGuid,
                     parentId,
                     queryStrings,
-                    entity.HasChildren && (isContainer == false));
+                    hasChildren);
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 

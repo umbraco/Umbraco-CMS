@@ -241,7 +241,7 @@
                 </div>
 
                 <div style="margin-bottom: 10px;">
-                    <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && !model.user.isCurrentUser"
+                    <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && model.user.userDisplayState.key !== 'Invited' && !model.user.isCurrentUser"
                                 type="button"
                                 button-style="[info,block]"
                                 action="model.disableUser()"
@@ -252,13 +252,22 @@
                     </umb-button>
                 </div>
 
-                <umb-button type="button"
+                <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
                             button-style="[info,block]"
                             action="model.toggleChangePassword()"
                             label="Change password"
                             label-key="general_changePassword"
                             state="changePasswordButtonState"
                             ng-if="model.changePasswordModel.isChanging === false"
+                            size="s">
+                </umb-button>
+
+                <umb-button type="button" ng-if="!model.user.lastLoginDate"
+                            button-style="[danger,block]"
+                            action="model.deleteNonLoggedInUser()"
+                            label="Delete"
+                            label-key="user_deleteUser"
+                            state="deleteNotLoggedInUserButtonState"
                             size="s">
                 </umb-button>
 
@@ -293,6 +302,25 @@
                         {{model.user.userDisplayState.name}}
                     </umb-badge>
                 </div>
+            </div>
+
+            <div style="margin-bottom: 10px;" ng-if="model.user.userDisplayState.key === 'Invited' && !model.user.isCurrentUser">
+                <textarea name="resendInviteMessage"
+                    type="text"
+                    class="input-block-level"
+                    localize="placeholder"
+                    placeholder="@placeholders_enterMessage"
+                    ng-model="model.resendInviteMessage"
+                    rows="4">
+                </textarea>                    
+                <umb-button type="button"
+                            button-style="[info,block]"
+                            action="model.resendInvite()"
+                            state="model.resendInviteButtonState"
+                            label="Resend Invite"
+                            label-key="actions_resendInvite"
+                            size="s">
+                </umb-button>
             </div>
 
             <div class="umb-package-details__information-item">

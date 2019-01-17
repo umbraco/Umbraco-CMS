@@ -338,10 +338,12 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
+    <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
@@ -528,7 +530,7 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
-    <Compile Include="Trees\DictionaryBaseController.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\MacroTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
@@ -1988,10 +1990,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">
+    <WebReferenceUrl Include="https://our.umbraco.com/umbraco/webservices/api/repository.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\org.umbraco.our\</RelPath>
-      <UpdateFromURL>http://our.umbraco.org/umbraco/webservices/api/repository.asmx</UpdateFromURL>
+      <UpdateFromURL>https://our.umbraco.com/umbraco/webservices/api/repository.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

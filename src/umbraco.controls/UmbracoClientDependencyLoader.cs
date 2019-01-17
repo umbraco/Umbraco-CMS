@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.UI;
+﻿using System.Web.UI;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core.IO;
 
 namespace umbraco.uicontrols
 {
-
     /// <summary>
     /// Used to load in all client dependencies for Umbraco.
     /// Ensures that both UmbracoClient and UmbracoRoot paths are added to the loader.
@@ -28,7 +23,7 @@ namespace umbraco.uicontrols
             
         }
 
-        public static new ClientDependencyLoader TryCreate(Control parent, out bool isNew)
+        public static ClientDependencyLoader TryCreate(Control parent, out bool isNew)
         {
             if (ClientDependencyLoader.Instance == null)
             {

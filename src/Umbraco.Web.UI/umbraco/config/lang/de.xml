@@ -2,7 +2,7 @@
 <language alias="de" intName="German (DE)" localName="Deutsch (DE)" lcid="7" culture="de-DE">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Hostnamen verwalten</key>
@@ -465,7 +465,7 @@
     <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
     <key alias="databaseNotFound">&lt;p&gt;Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.&lt;/p&gt;
 &lt;p&gt;Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.&lt;/p&gt;
-&lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="http://our.Umbraco.org/wiki" target="_blank"&gt;The Umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Klicken Sie nach erfolgter Anpassung auf &lt;strong&gt;Wiederholen&lt;/strong&gt;.&lt;br /&gt;Wenn Sie weitere technische Informationen benötigen, besuchen Sie &lt;a href="https://our.umbraco.com/wiki" target="_blank"&gt;The Umbraco documentation wiki&lt;/a&gt;.&lt;/p&gt;
 </key>
     <key alias="databaseText">Um diesen Schritt abzuschließen, müssen Sie die notwendigen Informationen zur Datenbankverbindung angeben.&lt;br /&gt;Bitte kontaktieren Sie Ihren Provider bzw. Server-Administrator für weitere Informationen.</key>
     <key alias="databaseUpgrade">

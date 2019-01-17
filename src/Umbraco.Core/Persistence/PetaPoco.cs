@@ -337,7 +337,7 @@ namespace Umbraco.Core.Persistence
 			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
 			    }
 
-			    catch (Exception e)
+			    catch (Exception)
 			    {
 			        throw;
 			    }
@@ -2494,9 +2494,9 @@ namespace Umbraco.Core.Persistence
 			// Now do rhs
 			if (_rhs != null)
 				_rhs.Build(sb, args, this);
-		}
+        }
 
-		public Sql Where(string sql, params object[] args)
+        public Sql Where(string sql, params object[] args)
 		{
 			return Append(new Sql("WHERE (" + sql + ")", args));
 		}
@@ -2509,9 +2509,14 @@ namespace Umbraco.Core.Persistence
 		public Sql Select(params object[] columns)
 		{
 			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
-		}
+        }
 
-		public Sql From(params object[] tables)
+        public Sql AndSelect(params object[] columns)
+        {
+            return Append(new Sql(", " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+        }
+
+        public Sql From(params object[] tables)
 		{
 			return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
 		}

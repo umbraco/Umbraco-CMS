@@ -130,7 +130,7 @@
 
                             contentTypeHelper.generateModels().then(function (result) {
 
-                                if (result.success) {
+                                if (!result.lastError) {
 
                                     //re-check model status
                                     contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {

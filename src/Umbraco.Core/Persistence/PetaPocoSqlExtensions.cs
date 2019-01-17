@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -15,6 +14,32 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public static class PetaPocoSqlExtensions
     {
+        /// <summary>
+        /// Defines the column to select in the generated SQL query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql">Sql object</param>
+        /// <param name="sqlSyntax">Sql syntax</param>
+        /// <param name="fields">Columns to select</param>
+        /// <returns></returns>
+        public static Sql Select<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            return sql.Select(GetFieldNames(sqlSyntax, fields));
+        }
+        
+        /// <summary>
+        /// Adds another set of field to select. This method must be used with "Select" when fecthing fields from different tables.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql">Sql object</param>
+        /// <param name="sqlSyntax">Sql syntax</param>
+        /// <param name="fields">Additional columns to select</param>
+        /// <returns></returns>
+        public static Sql AndSelect<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            return sql.AndSelect(GetFieldNames(sqlSyntax, fields));
+        }
+
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql From<T>(this Sql sql)
         {
@@ -53,6 +78,16 @@ namespace Umbraco.Core.Persistence
             var tableName = type.GetTableName();
 
             return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
+        }
+
+        private static string[] GetFieldNames<T>(ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            if (fields.Length == 0)
+            {
+                return new[] { string.Format("{0}.*", sqlSyntax.GetQuotedTableName(typeof(T).GetTableName())) };
+            }
+
+            return fields.Select(field => GetFieldName(field, sqlSyntax)).ToArray();
         }
 
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]

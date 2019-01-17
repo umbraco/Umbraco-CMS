@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// Ensures macro syntax is parsed for the macro container which will work when getting the field
     /// values in any way (i.e. dynamically, using Field(), or IPublishedContent)
     /// </summary>
-    [PropertyValueType(typeof (IHtmlString))]
+    [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     [DefaultPropertyValueConverter]
     public class MacroContainerValueConverter : PropertyValueConverterBase
@@ -64,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderMacros(sourceString, preview);
 
-            return sourceString;
+            return new HtmlString(sourceString);
         }
     }
 }

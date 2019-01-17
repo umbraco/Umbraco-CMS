@@ -279,16 +279,34 @@ namespace Umbraco.Core
         {
             get
             {
-                string dbtype = Database.Connection == null ? ProviderName : Database.Connection.GetType().Name;
+                if (Database.Connection == null)
+                {
+                    string dbtype = ProviderName;
 
-                if (dbtype.StartsWith("MySql")) return DatabaseProviders.MySql;
-                if (dbtype.StartsWith("SqlCe") || dbtype.Contains("SqlServerCe")) return DatabaseProviders.SqlServerCE;
-                if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
-                if (dbtype.StartsWith("Oracle") || dbtype.Contains("OracleClient")) return DatabaseProviders.Oracle;
-                if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;
-                if (dbtype.Contains("Azure")) return DatabaseProviders.SqlAzure;
+                    if (dbtype.StartsWith("MySql")) return DatabaseProviders.MySql;
+                    if (dbtype.StartsWith("SqlCe") || dbtype.Contains("SqlServerCe")) return DatabaseProviders.SqlServerCE;
+                    if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
+                    if (dbtype.StartsWith("Oracle") || dbtype.Contains("OracleClient")) return DatabaseProviders.Oracle;
+                    if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;
+                    if (dbtype.Contains("Azure")) return DatabaseProviders.SqlAzure;
 
-                return DatabaseProviders.SqlServer;
+                    return DatabaseProviders.SqlServer;
+                }
+                else
+                {
+                    Database.DBType dbType = Database.DatabaseType;
+                    
+                    switch (dbType)
+                    {
+                        case Persistence.Database.DBType.SqlServer: return DatabaseProviders.SqlServer;
+                        case Persistence.Database.DBType.SqlServerCE: return DatabaseProviders.SqlServerCE;
+                        case Persistence.Database.DBType.MySql: return DatabaseProviders.MySql;
+                        case Persistence.Database.DBType.PostgreSQL: return DatabaseProviders.PostgreSQL;
+                        case Persistence.Database.DBType.Oracle: return DatabaseProviders.Oracle;
+                        case Persistence.Database.DBType.SQLite: return DatabaseProviders.SQLite;
+                        default: return (ProviderName.Contains("Azure"))? DatabaseProviders.SqlAzure : DatabaseProviders.SqlServer;
+                    } 
+                }
             }
         }
 

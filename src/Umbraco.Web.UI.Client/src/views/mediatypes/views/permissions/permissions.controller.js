@@ -13,6 +13,7 @@
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
+        vm.toggle = toggle;
 
         /* ---------- INIT ---------- */
 
@@ -63,6 +64,18 @@
            // remove from content type model
            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+        }
+
+        /**
+         * Toggle the $scope.model.allowAsRoot value to either true or false
+         */
+        function toggle(){
+            if($scope.model.allowAsRoot){
+                $scope.model.allowAsRoot = false;
+                return;
+            }
+
+            $scope.model.allowAsRoot = true;
         }
 
     }

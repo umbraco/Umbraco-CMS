@@ -161,7 +161,7 @@
                 /**
                  * ACE editor session.
                  * @type object
-                 * @see [EditSession]{@link http://ace.c9.io/#nav=api&api=edit_session}
+                 * @see [EditSession]{@link https://ace.c9.io/#nav=api&api=edit_session}
                  */
                 var session = acee.getSession();
 

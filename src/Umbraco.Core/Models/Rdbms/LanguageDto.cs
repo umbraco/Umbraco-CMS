@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("languageISOCode")]
         [Index(IndexTypes.UniqueNonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(10)]
+        [Length(14)]
         public string IsoCode { get; set; }
 
         [Column("languageCultureName")]
