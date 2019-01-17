@@ -562,7 +562,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(deleteDocumentVariations);
 
                 // todo NPoco InsertBulk issue?
-                // we should use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios)
+                // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
                 // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
                 // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
                 // (same in PersistNewItem above)
@@ -1333,7 +1333,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // variant content = update with default culture or anything really
             EnsureInvariantNameExists(content);
 
-            // ensure that that invariant name is unique
+            // ensure that invariant name is unique
             EnsureInvariantNameIsUnique(content);
 
             // and finally,
@@ -1352,7 +1352,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (content.CultureInfos.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
-                // and then, we need to set the invariant name implicitely,
+                // and then, we need to set the invariant name implicitly,
                 // using the default culture if it has a name, otherwise anything we can
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)

@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services.Implement
         /// Gets a <see cref="IDataType"/> by its control Id
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
-        /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
+        /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

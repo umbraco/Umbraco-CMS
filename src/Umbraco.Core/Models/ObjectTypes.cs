@@ -76,7 +76,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the Clr type corresponding to an object type Guid.
+        /// Gets the common language runtime type corresponding to an object type Guid.
         /// </summary>
         public static Type GetClrType(Guid objectType)
         {
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the Clr type corresponding to this Umbraco object type.
+        /// Gets the common language runtime type corresponding to this Umbraco object type.
         /// </summary>
         public static Type GetClrType(this UmbracoObjectTypes objectType)
         {

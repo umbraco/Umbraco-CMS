@@ -92,7 +92,7 @@ namespace Umbraco.Core.Logging.Serilog
 
         /// <summary>
         /// Reads settings from /config/serilog.user.config
-        /// That allows a separate logging pipeline to be configured that wil not affect the main Umbraco log
+        /// That allows a separate logging pipeline to be configured that will not affect the main Umbraco log
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         public static LoggerConfiguration ReadFromUserConfigFile(this LoggerConfiguration logConfig)

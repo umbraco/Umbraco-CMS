@@ -264,7 +264,7 @@ namespace Umbraco.Core.Services
         UmbracoObjectTypes GetObjectType(IUmbracoEntity entity);
 
         /// <summary>
-        /// Gets the Clr type of an entity.
+        /// Gets the common language runtime type of an entity.
         /// </summary>
         Type GetEntityType(int id);
 

@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services.Implement
             MemberGroupRepository.SavingMemberGroup += MemberGroupRepository_SavingMemberGroup;
         }
 
-        #region Proxied event handlers
+        #region Proxy event handlers
 
         void MemberGroupRepository_SavingMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {

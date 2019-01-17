@@ -65,7 +65,7 @@ namespace Umbraco.Core.PropertyEditors
         public string PropertyName { get; set; }
 
         /// <summary>
-        /// Gets or sets the property clr type of the field.
+        /// Gets or sets the property common language runtime type of the field.
         /// </summary>
         [JsonIgnore]
         public Type PropertyType { get; set; }

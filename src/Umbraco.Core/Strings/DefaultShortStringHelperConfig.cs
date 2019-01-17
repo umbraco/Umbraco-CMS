@@ -188,7 +188,7 @@ namespace Umbraco.Core.Strings
             public bool GreedyAcronyms { get; set; }
 
             // the separator char
-            // but then how can we tell we dont want any?
+            // but then how can we tell we don't want any?
             public char Separator { get; set; }
 
             // extends the config

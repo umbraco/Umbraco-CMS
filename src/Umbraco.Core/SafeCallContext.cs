@@ -45,8 +45,8 @@ namespace Umbraco.Core
         //
         // note
         // see System.Transactions
-        // pre 4.5.1, the TransactionScope would not flow in async, and then then introduced
-        // an option to store in in the LLC so that it flows
+        // pre 4.5.1, the TransactionScope would not flow in async, and then introduced
+        // an option to store in the LLC so that it flows
         // they are using a conditional weak table to store the data, and what they store in
         // LLC is the key - which is just an empty MarshalByRefObject that is created with
         // the transaction scope - that way, they can "clear current data" provided that

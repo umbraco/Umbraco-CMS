@@ -128,7 +128,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual IValueFormatValidator FormatValidator => new RegexValidator();
 
         /// <summary>
-        /// If this is is true than the editor will be displayed full width without a label
+        /// If this is true than the editor will be displayed full width without a label
         /// </summary>
         [JsonProperty("hideLabel")]
         public bool HideLabel { get; set; }
@@ -196,7 +196,7 @@ namespace Umbraco.Core.PropertyEditors
         ///  </summary>
         ///  <param name="editorValue"></param>
         ///  <param name="currentValue">
-        ///  The current value that has been persisted to the database for this editor. This value may be usesful for
+        ///  The current value that has been persisted to the database for this editor. This value may be useful for
         ///  how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
         ///  </param>
         /// <param name="languageId"></param>
@@ -318,7 +318,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>
         /// <para>By default, this returns the value of ConvertDbToString but ensures that if the db value type is
-        /// NVarchar or NText, the value is returned as a CDATA fragment - elxe it's a Text fragment.</para>
+        /// NVarchar or NText, the value is returned as a CDATA fragment - else it's a Text fragment.</para>
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>

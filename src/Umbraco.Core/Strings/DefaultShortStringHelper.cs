@@ -47,7 +47,7 @@ namespace Umbraco.Core.Strings
 
         #region Filters
 
-        // ok to be static here because it's not configureable in any way
+        // ok to be static here because it's not configurable in any way
         private static readonly char[] InvalidFileNameChars =
             Path.GetInvalidFileNameChars()
             .Union("!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ".ToCharArray())
@@ -574,7 +574,7 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="text">The text to split.</param>
         /// <param name="separator">The separator, which defaults to a whitespace.</param>
-        /// <returns>The splitted text.</returns>
+        /// <returns>The split text.</returns>
         /// <remarks>Supports Utf8 and Ascii strings, not Unicode strings.</remarks>
         // NOTE does not support surrogates pairs at the moment
         public virtual string SplitPascalCasing(string text, char separator)

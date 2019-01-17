@@ -287,7 +287,7 @@ namespace Umbraco.Core.Models
         /// Converts a value assigned to a property.
         /// </summary>
         /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual Clr type
+        /// <para>The input value can be pretty much anything, and is converted to the actual common language runtime type
         /// expected by the property (eg an integer if the property values are integers).</para>
         /// <para>Throws if the value cannot be converted.</para>
         /// </remarks>
@@ -345,7 +345,7 @@ namespace Umbraco.Core.Models
                     var convDecimal = value.TryConvertTo<decimal>();
                     if (convDecimal)
                     {
-                        // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                        // need to normalize the value (change the scaling factor and remove trailing zeros)
                         // because the underlying database is going to mess with the scaling factor anyways.
                         converted = convDecimal.Result.Normalize();
                         return true;
