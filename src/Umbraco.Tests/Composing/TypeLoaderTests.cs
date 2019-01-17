@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Composing
             // this ensures it's reset
             _typeLoader = new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            foreach (var file in Directory.GetFiles(IOHelper.MapPath("~/App_Data/TEMP/TypesCache")))
+            foreach (var file in Directory.GetFiles(IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "TypesCache")))
                 File.Delete(file);
 
             // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver

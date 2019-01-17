@@ -3,20 +3,13 @@ using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Events
 {
-    public class UninstallPackageEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+    public class UninstallPackageEventArgs: CancellableObjectEventArgs<IEnumerable<UninstallationSummary>>
     {
-        public UninstallPackageEventArgs(TEntity eventObject, bool canCancel)
-            : base(new[] { eventObject }, canCancel)
-        { }
-
-        public UninstallPackageEventArgs(TEntity eventObject, MetaData packageMetaData)
-            : base(new[] { eventObject })
+        public UninstallPackageEventArgs(IEnumerable<UninstallationSummary> eventObject, bool canCancel)
+            : base(eventObject, canCancel)
         {
-            PackageMetaData = packageMetaData;
         }
 
-        public MetaData PackageMetaData { get; }
-
-        public IEnumerable<TEntity> UninstallationSummary => EventObject;
+        public IEnumerable<UninstallationSummary> UninstallationSummary => EventObject;
     }
 }

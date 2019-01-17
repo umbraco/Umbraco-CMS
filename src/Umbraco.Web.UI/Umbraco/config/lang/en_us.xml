@@ -1140,7 +1140,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUpgradeInstructions">Upgrade instructions</key>
     <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the Umbraco package repository.</key>
     <key alias="packageVersion">Package version</key>
-    <key alias="packageVersionHistory">Package version history</key>
+    <key alias="packageVersionUpgrade">Upgrading from version</key>
     <key alias="viewPackageWebsite">View package website</key>
     <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</key>
@@ -1559,6 +1559,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="variantsHeading">Allow varying by culture</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="elementHeading">Is an Element type</key>
+    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

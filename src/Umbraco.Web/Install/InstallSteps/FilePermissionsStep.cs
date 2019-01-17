@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -13,7 +14,7 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class FilePermissionsStep : InstallSetupStep<object>
     {
-        public override InstallSetupResult Execute(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             // validate file permissions
             Dictionary<string, IEnumerable<string>> report;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (permissionsOk == false)
                 throw new InstallException("Permission check failed", "permissionsreport", new { errors = report });
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         public override bool RequiresExecution(object model)

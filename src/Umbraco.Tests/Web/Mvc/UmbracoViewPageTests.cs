@@ -419,11 +419,13 @@ namespace Umbraco.Tests.Web.Mvc
             //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
             var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var factory = Mock.Of<IPublishedContentTypeFactory>();
-            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(),
+            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, 
                 null, null,
                 null, null, null,
                 new TestDefaultCultureAccessor(),
-                Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), null, true, false); // no events
+                Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
+                Factory.GetInstance<IEntityXmlSerializer>(),
+                null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 

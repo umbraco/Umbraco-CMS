@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Xml;
@@ -6,46 +7,36 @@ using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Web._Legacy.PackageActions
 {
-    public class addProxyFeedHost : IPackageAction
+    public class AddProxyFeedHost : IPackageAction
     {
         #region IPackageAction Members
 
-        public bool Execute(string packageName, XmlNode xmlData)
+        public bool Execute(string packageName, XElement xmlData)
         {
-            var hostname = xmlData.Attributes["host"].Value;
+            var hostname = xmlData.AttributeValue<string>("host");
             if (string.IsNullOrEmpty(hostname))
                 return false;
 
-            var xdoc = XmlHelper.OpenAsXmlDocument(SystemFiles.FeedProxyConfig);
+            var xdoc = XDocument.Load(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
 
-            xdoc.PreserveWhitespace = true;
+            var insert = true;
 
-            var xn = xdoc.SelectSingleNode("//feedProxy");
-            if (xn != null)
+            if (xdoc.Root.HasElements)
             {
-                var insert = true;
-
-                if (xn.HasChildNodes)
+                foreach (var node in xdoc.Root.Elements("allow"))
                 {
-                    foreach (XmlNode node in xn.SelectNodes("//allow"))
-                    {
-                        if (node.Attributes["host"] != null && node.Attributes["host"].Value == hostname)
-                            insert = false;
-                    }
-                }
-
-                if (insert)
-                {
-                    var newHostname = XmlHelper.AddTextNode(xdoc, "allow", string.Empty);
-                    newHostname.Attributes.Append(XmlHelper.AddAttribute(xdoc, "host", hostname));
-                    xn.AppendChild(newHostname);
-
-                    xdoc.Save(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-
-                    return true;
+                    if (node.AttributeValue<string>("host") != null && node.AttributeValue<string>("host") == hostname)
+                        insert = false;
                 }
             }
 
+            if (insert)
+            {
+                xdoc.Root.Add(new XElement("allow", new XAttribute("host", hostname)));
+                xdoc.Save(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
+
+                return true;
+            }
             return false;
         }
 
@@ -54,47 +45,37 @@ namespace Umbraco.Web._Legacy.PackageActions
             return "addProxyFeedHost";
         }
 
-        public bool Undo(string packageName, XmlNode xmlData)
+        public bool Undo(string packageName, XElement xmlData)
         {
-            var hostname = xmlData.Attributes["host"].Value;
+            var hostname = xmlData.AttributeValue<string>("host");
             if (string.IsNullOrEmpty(hostname))
                 return false;
 
-            var xdoc = XmlHelper.OpenAsXmlDocument(SystemFiles.FeedProxyConfig);
-            xdoc.PreserveWhitespace = true;
+            var xdoc = XDocument.Load(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
 
-            var xn = xdoc.SelectSingleNode("//feedProxy");
-            if (xn != null)
+            bool inserted = false;
+            if (xdoc.Root.HasElements)
             {
-                bool inserted = false;
-                if (xn.HasChildNodes)
+                foreach (var node in xdoc.Root.Elements("allow"))
                 {
-                    foreach (XmlNode node in xn.SelectNodes("//allow"))
+                    if (node.AttributeValue<string>("host") != null && node.AttributeValue<string>("host") == hostname)
                     {
-                        if (node.Attributes["host"] != null && node.Attributes["host"].Value == hostname)
-                        {
-                            xn.RemoveChild(node);
-                            inserted = true;
-                        }
+                        node.Remove();
+                        inserted = true;
                     }
                 }
+            }
 
-                if (inserted)
-                {
-                    xdoc.Save(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                    return true;
-                }
+            if (inserted)
+            {
+                xdoc.Save(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
+                return true;
             }
 
             return false;
         }
 
         #endregion
-
-        public XmlNode SampleXml()
-        {
-            string sample = "<Action runat=\"install\" undo=\"true\" alias=\"addProxyFeedHost\" host=\"umbraco.com\"/>";
-            return PackageHelper.ParseStringToXmlNode(sample);
-        }
+        
     }
 }

@@ -1,5 +1,5 @@
 ﻿namespace Umbraco.Core.Persistence.Repositories
 {
-    interface IDocumentTypeContainerRepository : IEntityContainerRepository
+    public interface IDocumentTypeContainerRepository : IEntityContainerRepository
     { }
 }

@@ -33,13 +33,13 @@ namespace Umbraco.Web.Search
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
+                    factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
+                    factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
