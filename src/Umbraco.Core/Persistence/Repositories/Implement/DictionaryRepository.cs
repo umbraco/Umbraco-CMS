@@ -224,13 +224,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, GlobalCache, Logger);
+            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches, Logger);
             return uniqueIdRepo.Get(uniqueId);
         }
 
         public IDictionaryItem Get(string key)
         {
-            var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, GlobalCache, Logger);
+            var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches, Logger);
             return keyRepo.Get(key);
         }
 

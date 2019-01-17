@@ -29,16 +29,17 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IAppPolicedCache cache, ManifestValueValidatorCollection validators, ILogger logger)
-            : this(cache, validators, "~/App_Plugins", logger)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ILogger logger)
+            : this(appCaches, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(IAppPolicedCache cache, ManifestValueValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, string path, ILogger logger)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
+            _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
             Path = path;

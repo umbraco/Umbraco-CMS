@@ -31,7 +31,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the internal memory cache, for tests only!
         /// </summary>
-        internal readonly ObjectCache MemoryCache;
+        internal ObjectCache MemoryCache { get; private set; }
 
         /// <inheritdoc />
         public object Get(string key)

@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.Mapping
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         public UserMapperProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            IAppPolicedCache runtimeCache, ActionCollection actions, IGlobalSettings globalSettings)
+            AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings)
         {
             var userGroupDefaultPermissionsResolver = new UserGroupDefaultPermissionsResolver(textService, actions);
 
@@ -243,7 +243,7 @@ namespace Umbraco.Web.Models.Mapping
             //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
             CreateMap<IUser, UserDisplay>()
-                .ForMember(dest => dest.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(runtimeCache)))
+                .ForMember(dest => dest.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(appCaches.RuntimeCache)))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(dest => dest.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?)user.LastLoginDate))
                 .ForMember(dest => dest.UserGroups, opt => opt.MapFrom(user => user.Groups))
@@ -293,7 +293,7 @@ namespace Umbraco.Web.Models.Mapping
                 //like the load time is waiting.
                 .ForMember(detail =>
                     detail.Avatars,
-                    opt => opt.MapFrom(user => user.GetUserAvatarUrls(runtimeCache)))
+                    opt => opt.MapFrom(user => user.GetUserAvatarUrls(appCaches.RuntimeCache)))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(dest => dest.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(dest => dest.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?)user.LastLoginDate))
@@ -313,7 +313,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             CreateMap<IUser, UserDetail>()
-                .ForMember(dest => dest.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(runtimeCache)))
+                .ForMember(dest => dest.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(appCaches.RuntimeCache)))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(dest => dest.StartContentIds, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(entityService)))
                 .ForMember(dest => dest.StartMediaIds, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(entityService)))

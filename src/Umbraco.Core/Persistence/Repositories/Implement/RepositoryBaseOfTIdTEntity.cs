@@ -19,18 +19,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
 
-        protected RepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        protected RepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger)
         {
             ScopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            GlobalCache = cache ?? throw new ArgumentNullException(nameof(cache));
+            AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
         protected ILogger Logger { get; }
 
-        protected AppCaches GlobalCache { get; }
+        protected AppCaches AppCaches { get; }
 
-        protected IAppPolicedCache GlobalIsolatedCache => GlobalCache.IsolatedCaches.GetOrCreate<TEntity>();
+        protected IAppPolicedCache GlobalIsolatedCache => AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
 
         protected IScopeAccessor ScopeAccessor { get; }
 
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
-                        return GlobalCache.IsolatedCaches.GetOrCreate<TEntity>();
+                        return AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.Scoped:
                         return AmbientScope.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.None:
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             get
             {
-                if (GlobalCache == AppCaches.NoCache)
+                if (AppCaches == AppCaches.NoCache)
                     return NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
 
                 // create the cache policy using IsolatedCache which is either global

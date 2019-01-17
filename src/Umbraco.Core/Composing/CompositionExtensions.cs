@@ -28,7 +28,6 @@ namespace Umbraco.Core.Composing
             composition.RegisterUnique(profilingLogger);
             composition.RegisterUnique(mainDom);
             composition.RegisterUnique(appCaches);
-            composition.RegisterUnique(factory => factory.GetInstance<AppCaches>().RuntimeCache);
             composition.RegisterUnique(databaseFactory);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
             composition.RegisterUnique(typeLoader);

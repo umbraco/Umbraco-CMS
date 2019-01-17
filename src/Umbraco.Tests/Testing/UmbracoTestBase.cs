@@ -125,9 +125,9 @@ namespace Umbraco.Tests.Testing
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
-            var cacheHelper = GetCacheHelper();
+            var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var typeLoader = GetTypeLoader(cacheHelper.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
+            var typeLoader = GetTypeLoader(appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
 
             var register = RegisterFactory.Create();
 
@@ -137,8 +137,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
-            Composition.RegisterUnique(cacheHelper);
-            Composition.RegisterUnique(cacheHelper.RuntimeCache);
+            Composition.RegisterUnique(appCaches);
 
             TestObjects = new TestObjects(register);
             Compose();
@@ -199,7 +198,7 @@ namespace Umbraco.Tests.Testing
             return (logger, profiler);
         }
 
-        protected virtual AppCaches GetCacheHelper()
+        protected virtual AppCaches GetAppCaches()
         {
             return AppCaches.Disabled;
         }

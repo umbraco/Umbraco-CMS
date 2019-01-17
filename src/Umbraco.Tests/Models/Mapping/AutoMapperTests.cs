@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Models.Mapping
             base.Compose();
 
             var manifestBuilder = new ManifestParser(
-                AppCaches.Disabled.RuntimeCache,
+                AppCaches.Disabled,
                 new ManifestValueValidatorCollection(Enumerable.Empty<IManifestValueValidator>()),
                 Composition.Logger)
             {

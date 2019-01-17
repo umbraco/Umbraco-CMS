@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Scoping
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
-        protected override AppCaches GetCacheHelper()
+        protected override AppCaches GetAppCaches()
         {
             // this is what's created core web runtime
             return new AppCaches(

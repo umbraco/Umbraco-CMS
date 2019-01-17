@@ -37,16 +37,16 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="supplementFileSources"></param>
         public LocalizedTextServiceFileSources(
             ILogger logger,
-            IAppPolicedCache cache,
+            AppCaches appCaches,
             DirectoryInfo fileSourceFolder,
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
         {
             if (logger == null) throw new ArgumentNullException("logger");
-            if (cache == null) throw new ArgumentNullException("cache");
+            if (appCaches == null) throw new ArgumentNullException("cache");
             if (fileSourceFolder == null) throw new ArgumentNullException("fileSourceFolder");
 
             _logger = logger;
-            _cache = cache;
+            _cache = appCaches.RuntimeCache;
 
             //Create the lazy source for the _xmlSources
             _xmlSources = new Lazy<Dictionary<CultureInfo, Lazy<XDocument>>>(() =>
@@ -137,14 +137,9 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="cache"></param>
-        /// <param name="fileSourceFolder"></param>
-        public LocalizedTextServiceFileSources(ILogger logger, IAppPolicedCache cache, DirectoryInfo fileSourceFolder)
-            : this(logger, cache, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
-        {
-
-        }
+        public LocalizedTextServiceFileSources(ILogger logger, AppCaches appCaches, DirectoryInfo fileSourceFolder)
+            : this(logger, appCaches, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
+        { }
 
         /// <summary>
         /// returns all xml sources for all culture files found in the folder

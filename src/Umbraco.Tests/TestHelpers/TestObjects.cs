@@ -140,7 +140,7 @@ namespace Umbraco.Tests.TestHelpers
 
                         return new LocalizedTextServiceFileSources(
                             logger,
-                            cache.RuntimeCache,
+                            cache,
                             mainLangFolder,
                             pluginLangFolders.Concat(userLangFolders));
 
