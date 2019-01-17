@@ -50,7 +50,7 @@ namespace Umbraco.Tests.PublishedContent
                     new PublishedPropertyType("creatorName", 0, "?"), 
                     new PublishedPropertyType("blah", 0, "?"), // ugly error when that one is missing...
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            var type = new AutoPublishedContentType(0, "anything", "anything", "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
 
         }

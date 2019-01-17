@@ -25,6 +25,8 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             Id = contentType.Id;
             Alias = contentType.Alias;
+            Name = contentType.Name;
+            Description = contentType.Description;
             _compositionAliases = new HashSet<string>(contentType.CompositionAliases(), StringComparer.InvariantCultureIgnoreCase);
             _propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => new PublishedPropertyType(this, x))
@@ -33,10 +35,12 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+        internal PublishedContentType(int id, string alias, string name, string description, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
         {
             Id = id;
             Alias = alias;
+            Name = name;
+            Description = description;
             _compositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
             _propertyTypes = propertyTypes.ToArray();
             foreach (var propertyType in _propertyTypes)
@@ -46,7 +50,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         // create detached content type - ie does not match anything in the DB
         internal PublishedContentType(string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
-            : this(0, alias, compositionAliases, propertyTypes)
+            : this(0, alias, string.Empty, string.Empty, compositionAliases, propertyTypes)
         { }
 
         private void InitializeIndexes()
@@ -63,6 +67,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public int Id { get; private set; }
         public string Alias { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
         public HashSet<string> CompositionAliases { get { return _compositionAliases; } }
 
         #endregion
