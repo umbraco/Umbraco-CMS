@@ -73,44 +73,44 @@ namespace Umbraco.Tests.PublishedContent
             Umbraco.Web.PublishedContentExtensions.GetPropertyAliasesAndNames = null;
         }
 
-//        [Test]
-//        public void To_DataTable()
-//        {
-//            var doc = GetContent(true, 1);
-//            var dt = doc.ChildrenAsTable(Current.Services);
-//
-//            Assert.AreEqual(11, dt.Columns.Count);
-//            Assert.AreEqual(3, dt.Rows.Count);
-//            Assert.AreEqual("value4", dt.Rows[0]["Property 1"]);
-//            Assert.AreEqual("value5", dt.Rows[0]["Property 2"]);
-//            Assert.AreEqual("value6", dt.Rows[0]["Property 4"]);
-//            Assert.AreEqual("value7", dt.Rows[1]["Property 1"]);
-//            Assert.AreEqual("value8", dt.Rows[1]["Property 2"]);
-//            Assert.AreEqual("value9", dt.Rows[1]["Property 4"]);
-//            Assert.AreEqual("value10", dt.Rows[2]["Property 1"]);
-//            Assert.AreEqual("value11", dt.Rows[2]["Property 2"]);
-//            Assert.AreEqual("value12", dt.Rows[2]["Property 4"]);
-//        }
+        [Test]
+        public void To_DataTable()
+        {
+            var doc = GetContent(true, 1);
+            var dt = doc.ChildrenAsTable(Current.Services);
 
-//        [Test]
-//        public void To_DataTable_With_Filter()
-//        {
-//            var doc = GetContent(true, 1);
-//            //change a doc type alias
-//            var c = (TestPublishedContent) doc.Children.ElementAt(0);
-//            c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
-//
-//            var dt = doc.ChildrenAsTable(Current.Services, "Child");
-//
-//            Assert.AreEqual(11, dt.Columns.Count);
-//            Assert.AreEqual(2, dt.Rows.Count);
-//            Assert.AreEqual("value7", dt.Rows[0]["Property 1"]);
-//            Assert.AreEqual("value8", dt.Rows[0]["Property 2"]);
-//            Assert.AreEqual("value9", dt.Rows[0]["Property 4"]);
-//            Assert.AreEqual("value10", dt.Rows[1]["Property 1"]);
-//            Assert.AreEqual("value11", dt.Rows[1]["Property 2"]);
-//            Assert.AreEqual("value12", dt.Rows[1]["Property 4"]);
-//        }
+            Assert.AreEqual(11, dt.Columns.Count);
+            Assert.AreEqual(3, dt.Rows.Count);
+            Assert.AreEqual("value4", dt.Rows[0]["Property 1"]);
+            Assert.AreEqual("value5", dt.Rows[0]["Property 2"]);
+            Assert.AreEqual("value6", dt.Rows[0]["Property 4"]);
+            Assert.AreEqual("value7", dt.Rows[1]["Property 1"]);
+            Assert.AreEqual("value8", dt.Rows[1]["Property 2"]);
+            Assert.AreEqual("value9", dt.Rows[1]["Property 4"]);
+            Assert.AreEqual("value10", dt.Rows[2]["Property 1"]);
+            Assert.AreEqual("value11", dt.Rows[2]["Property 2"]);
+            Assert.AreEqual("value12", dt.Rows[2]["Property 4"]);
+        }
+
+        [Test]
+        public void To_DataTable_With_Filter()
+        {
+            var doc = GetContent(true, 1);
+            //change a doc type alias
+            var c = (TestPublishedContent)doc.Children.ElementAt(0);
+            c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
+
+            var dt = doc.ChildrenAsTable(Current.Services, "Child");
+
+            Assert.AreEqual(11, dt.Columns.Count);
+            Assert.AreEqual(2, dt.Rows.Count);
+            Assert.AreEqual("value7", dt.Rows[0]["Property 1"]);
+            Assert.AreEqual("value8", dt.Rows[0]["Property 2"]);
+            Assert.AreEqual("value9", dt.Rows[0]["Property 4"]);
+            Assert.AreEqual("value10", dt.Rows[1]["Property 1"]);
+            Assert.AreEqual("value11", dt.Rows[1]["Property 2"]);
+            Assert.AreEqual("value12", dt.Rows[1]["Property 4"]);
+        }
 
         [Test]
         public void To_DataTable_No_Rows()

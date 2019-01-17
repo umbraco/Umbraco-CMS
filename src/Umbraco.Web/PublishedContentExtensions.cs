@@ -267,19 +267,20 @@ namespace Umbraco.Web
             => content.Cultures.ContainsKey(culture);
 
         /// <summary>
-        /// Filter by the specific culture or invariant. If null is provided, the method uses the current culture instead.
+        /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
         /// </summary>
-        /// <param name="contents">The content.</param>
-        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <returns>These of the inputs that has the specified culture or are invariant.</returns>
-        internal static IEnumerable<IPublishedContent> WhereHasCultureOrInvariant(this IEnumerable<IPublishedContent> contents, string culture = null)
+        /// <param name="contents">The content items.</param>
+        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
+        internal static IEnumerable<IPublishedContent> WhereIsInvariantOrHasCulture(this IEnumerable<IPublishedContent> contents, string culture = null)
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
 
-            var actualCulture = culture ?? Current.VariationContextAccessor.VariationContext.Culture;
+            culture = culture ?? Current.VariationContextAccessor.VariationContext?.Culture ?? "";
 
-            return contents.Where(x=>x.HasCulture(actualCulture) || !x.Cultures.Any());
+            // either does not vary by culture, or has the specified culture
+            return contents.Where(x => !x.ContentType.VariesByCulture() || x.HasCulture(culture));
         }
+
         #endregion
 
         #region Search
@@ -1036,7 +1037,6 @@ namespace Umbraco.Web
 
         #region Axes: children
 
-
         /// <summary>
         /// Gets the children of the content.
         /// </summary>
@@ -1050,7 +1050,16 @@ namespace Umbraco.Web
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return content.Children.WhereHasCultureOrInvariant(culture);
+
+            //
+            return content.Children.Where(x =>
+            {
+                if (!x.ContentType.VariesByCulture()) return true; // invariant = always ok
+                return x.HasCulture(culture);
+                return false;
+            });
+
+            return content.Children.WhereIsInvariantOrHasCulture(culture);
         }
 
         /// <summary>

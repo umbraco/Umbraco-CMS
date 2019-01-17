@@ -8,10 +8,6 @@ namespace Umbraco.Tests.Testing.Objects.Accessors
     public class TestVariationContextAccessor : IVariationContextAccessor
     {
         /// <inheritdoc />
-        public VariationContext VariationContext
-        {
-            get;
-            set;
-        } = new VariationContext();
+        public VariationContext VariationContext { get; set; }
     }
 }
