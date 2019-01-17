@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -8,6 +9,6 @@ namespace Umbraco.Web.PropertyEditors
         public bool ShowOpenButton { get; set; }
 
         [ConfigurationField("startNodeId", "Start node", "treepicker")] // + config in configuration editor ctor
-        public string StartNodeId { get; set; }
+        public Udi StartNodeId { get; set; }
     }
 }
