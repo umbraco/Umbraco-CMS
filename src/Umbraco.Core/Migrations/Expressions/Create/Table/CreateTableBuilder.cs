@@ -94,6 +94,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
         {
             CurrentColumn.IsPrimaryKey = true;
 
+            // SQL Server, the PK get's created in a different Alter table expression afterwords.
+            // MySQL will choke if the same constraint is again added afterword
             var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
             {
                 Constraint =
@@ -113,6 +115,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
 
+            // SQL Server, the PK get's created in a different Alter table expression afterwords.
+            // MySQL will choke if the same constraint is again added afterword
             var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
             {
                 Constraint =

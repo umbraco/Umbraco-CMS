@@ -519,7 +519,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetAncestors(int id)
         {
-            // intentionnaly not locking
+            // intentionally not locking
             var content = GetById(id);
             return GetAncestors(content);
         }
@@ -628,7 +628,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>Parent <see cref="IContent"/> object</returns>
         public IContent GetParent(int id)
         {
-            // intentionnaly not locking
+            // intentionally not locking
             var content = GetById(id);
             return GetParent(content);
         }
@@ -722,9 +722,9 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
+        /// Checks if the passed in <see cref="IContent"/> can be published based on the ancestors publish state.
         /// </summary>
-        /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
+        /// <param name="content"><see cref="IContent"/> to check if ancestors are published</param>
         /// <returns>True if the Content can be published, otherwise False</returns>
         public bool IsPathPublishable(IContent content)
         {
@@ -875,7 +875,7 @@ namespace Umbraco.Core.Services.Implement
             // if culture is specific, first publish the invariant values, then publish the culture itself.
             // if culture is '*', then publish them all (including variants)
 
-            // explicitely SaveAndPublish a specific culture also publishes invariant values
+            // explicitly SaveAndPublish a specific culture also publishes invariant values
             if (!culture.IsNullOrWhiteSpace() && culture != "*")
             {
                 // publish the invariant values
@@ -1112,7 +1112,7 @@ namespace Umbraco.Core.Services.Implement
                     }
 
                     // if was not published and now is... descendants that were 'published' (but
-                    // had an unpublished ancestor) are 're-published' ie not explicitely published
+                    // had an unpublished ancestor) are 're-published' ie not explicitly published
                     // but back as 'published' nevertheless
                     if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
@@ -1833,7 +1833,7 @@ namespace Umbraco.Core.Services.Implement
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                // emptying the recycle bin means deleting whetever is in there - do it properly!
+                // emptying the recycle bin means deleting whatever is in there - do it properly!
                 var query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
                 var contents = _documentRepository.Get(query).ToArray();
                 foreach (var content in contents)
@@ -1983,8 +1983,8 @@ namespace Umbraco.Core.Services.Implement
         /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
-        /// <param name="userId">Optional Id of the User issueing the send to publication</param>
-        /// <returns>True if sending publication was succesfull otherwise false</returns>
+        /// <param name="userId">Optional Id of the User issuing the send to publication</param>
+        /// <returns>True if sending publication was successful otherwise false</returns>
         public bool SendToPublication(IContent content, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -2550,7 +2550,7 @@ namespace Umbraco.Core.Services.Implement
         /// inheritance and compositions, which need to be managed outside of this method.</para>
         /// </remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
-        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        /// <param name="userId">Optional Id of the user issuing the delete operation</param>
         public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
         {
             //TODO: This currently this is called from the ContentTypeService but that needs to change,

@@ -54,7 +54,7 @@ namespace Umbraco.Core.PropertyEditors
                     continue;
                 }
 
-                // if the field has its own type, instanciate it
+                // if the field has its own type, instantiate it
                 try
                 {
                     field = (ConfigurationField) Activator.CreateInstance(attribute.Type);
