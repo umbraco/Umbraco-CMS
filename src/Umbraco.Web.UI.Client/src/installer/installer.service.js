@@ -17,7 +17,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 
 	//add to umbraco installer facts here
 	var facts = ['Umbraco helped millions of people watch a man jump from the edge of space',
-					'Over 440 000 websites are currently powered by Umbraco',
+					'Over 500 000 websites are currently powered by Umbraco',
 					"At least 2 people have named their cat 'Umbraco'",
 					'On an average day, more than 1000 people download Umbraco',
 					'<a target="_blank" href="https://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
