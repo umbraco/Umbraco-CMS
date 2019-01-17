@@ -1,5 +1,8 @@
 ﻿namespace Umbraco.Core.Migrations.Upgrade.V_7_14_0
 {
+    /// <summary>
+    /// Migrates member group picker properties from NVarchar to NText. See https://github.com/umbraco/Umbraco-CMS/issues/3268.
+    /// </summary>
     public class UpdateMemberGroupPickerData : MigrationBase
     {
         /// <summary>
