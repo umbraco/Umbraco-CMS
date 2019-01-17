@@ -33,11 +33,11 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             foreach (var prefix in GetAllMacroCacheKeys())
-                AppCaches.RuntimeCache.ClearCacheByKeySearch(prefix);
+                AppCaches.RuntimeCache.ClearByKey(prefix);
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
 
-            AppCaches.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
+            AppCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
 
             base.RefreshAll();
         }
@@ -49,12 +49,12 @@ namespace Umbraco.Web.Cache
             foreach (var payload in payloads)
             {
                 foreach (var alias in GetCacheKeysForAlias(payload.Alias))
-                    AppCaches.RuntimeCache.ClearCacheByKeySearch(alias);
+                    AppCaches.RuntimeCache.ClearByKey(alias);
 
-                var macroRepoCache = AppCaches.IsolatedRuntimeCache.GetCache<IMacro>();
+                var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
                 if (macroRepoCache)
                 {
-                    macroRepoCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
+                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
                 }
             };
 
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Cache
 
         public static void ClearMacroContentCache(AppCaches appCaches)
         {
-            appCaches.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
+            appCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
         }
 
         #endregion

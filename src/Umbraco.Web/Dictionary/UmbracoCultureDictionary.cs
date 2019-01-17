@@ -21,7 +21,7 @@ namespace Umbraco.Web.Dictionary
     public class DefaultCultureDictionary : Core.Dictionary.ICultureDictionary
     {
         private readonly ILocalizationService _localizationService;
-        private readonly ICacheProvider _requestCacheProvider;
+        private readonly IAppCache _requestCacheProvider;
         private readonly CultureInfo _specificCulture;
 
         public DefaultCultureDictionary()
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Dictionary
 
         }
 
-        public DefaultCultureDictionary(ILocalizationService localizationService, ICacheProvider requestCacheProvider)
+        public DefaultCultureDictionary(ILocalizationService localizationService, IAppCache requestCacheProvider)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _requestCacheProvider = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Dictionary
             _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
         }
 
-        public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, ICacheProvider requestCacheProvider)
+        public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, IAppCache requestCacheProvider)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _requestCacheProvider = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));

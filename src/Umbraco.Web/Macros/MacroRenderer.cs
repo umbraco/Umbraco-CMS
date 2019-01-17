@@ -152,7 +152,7 @@ namespace Umbraco.Web.Macros
             macroContent.Date = DateTime.Now;
 
             var cache = Current.ApplicationCache.RuntimeCache;
-            cache.InsertCacheItem(
+            cache.Insert(
                 CacheKeys.MacroContentCacheKey + model.CacheIdentifier,
                 () => macroContent,
                 new TimeSpan(0, 0, model.CacheDuration),

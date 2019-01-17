@@ -7,17 +7,17 @@ namespace Umbraco.Tests.Cache
     [TestFixture]
     public class HttpRequestCacheProviderTests : CacheProviderTests
     {
-        private HttpRequestCacheProvider _provider;
+        private HttpRequestAppCache _provider;
         private FakeHttpContextFactory _ctx;
 
         public override void Setup()
         {
             base.Setup();
             _ctx = new FakeHttpContextFactory("http://localhost/test");
-            _provider = new HttpRequestCacheProvider(_ctx.HttpContext);
+            _provider = new HttpRequestAppCache(_ctx.HttpContext);
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache Provider
         {
             get { return _provider; }
         }
@@ -31,22 +31,22 @@ namespace Umbraco.Tests.Cache
     [TestFixture]
     public class StaticCacheProviderTests : CacheProviderTests
     {
-        private StaticCacheProvider _provider;
+        private DictionaryCacheProvider _provider;
 
         public override void Setup()
         {
             base.Setup();
-            _provider = new StaticCacheProvider();
+            _provider = new DictionaryCacheProvider();
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache Provider
         {
             get { return _provider; }
         }
 
         protected override int GetTotalItemCount
         {
-            get { return _provider.StaticCache.Count; }
+            get { return _provider.Items.Count; }
         }
     }
 }

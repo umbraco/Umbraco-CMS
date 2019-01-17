@@ -245,7 +245,7 @@ namespace Umbraco.Tests.Testing
                 .ComposeWebMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IAppPolicedCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
@@ -260,13 +260,13 @@ namespace Umbraco.Tests.Testing
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected virtual TypeLoader CreateTypeLoader(IAppPolicedCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             return CreateCommonTypeLoader(runtimeCache, globalSettings, logger);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        private static TypeLoader CreateCommonTypeLoader(IAppPolicedCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             return new TypeLoader(runtimeCache, globalSettings.LocalTempStorageLocation, logger, false)
             {

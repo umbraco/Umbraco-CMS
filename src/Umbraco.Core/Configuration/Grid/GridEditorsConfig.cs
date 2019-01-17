@@ -13,11 +13,11 @@ namespace Umbraco.Core.Configuration.Grid
     internal class GridEditorsConfig : IGridEditorsConfig
     {
         private readonly ILogger _logger;
-        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly IAppPolicedCache _runtimeCache;
         private readonly DirectoryInfo _configFolder;
         private readonly bool _isDebug;
 
-        public GridEditorsConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo configFolder, bool isDebug)
+        public GridEditorsConfig(ILogger logger, IAppPolicedCache runtimeCache, DirectoryInfo configFolder, bool isDebug)
         {
             _logger = logger;
             _runtimeCache = runtimeCache;

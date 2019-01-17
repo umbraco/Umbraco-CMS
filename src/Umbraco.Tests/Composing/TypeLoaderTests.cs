@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            _typeLoader = new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            _typeLoader = new TypeLoader(NoAppCache.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             foreach (var file in Directory.GetFiles(IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "TypesCache")))
                 File.Delete(file);

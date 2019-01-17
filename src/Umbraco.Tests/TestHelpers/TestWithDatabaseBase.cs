@@ -246,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var cache = NullCacheProvider.Instance;
+            var cache = NoAppCache.Instance;
 
             ContentTypesCache = new PublishedContentTypeCache(
                 Factory.GetInstance<IContentTypeService>(),

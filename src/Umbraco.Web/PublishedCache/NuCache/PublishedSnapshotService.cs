@@ -932,7 +932,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Create, Get Published Snapshot
 
         private long _contentGen, _mediaGen, _domainGen;
-        private ICacheProvider _elementsCache;
+        private IAppCache _elementsCache;
 
         public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
@@ -960,7 +960,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
-            ICacheProvider elementsCache;
+            IAppCache elementsCache;
             lock (_storesLock)
             {
                 var scopeContext = _scopeProvider.Context;
@@ -998,11 +998,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    elementsCache = _elementsCache = new DictionaryCacheProvider();
+                    elementsCache = _elementsCache = new FastDictionaryCacheProvider();
                 }
             }
 
-            var snapshotCache = new StaticCacheProvider();
+            var snapshotCache = new DictionaryCacheProvider();
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 

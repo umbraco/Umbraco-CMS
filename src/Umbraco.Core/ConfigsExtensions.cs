@@ -46,7 +46,7 @@ namespace Umbraco.Core
             configs.Add(() => new CoreDebug());
 
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
-            configs.Add<IGridConfig>(factory => new GridConfig(factory.GetInstance<ILogger>(), factory.GetInstance<IRuntimeCacheProvider>(), configDir, factory.GetInstance<IRuntimeState>().Debug));
+            configs.Add<IGridConfig>(factory => new GridConfig(factory.GetInstance<ILogger>(), factory.GetInstance<IAppPolicedCache>(), configDir, factory.GetInstance<IRuntimeState>().Debug));
         }
     }
 }

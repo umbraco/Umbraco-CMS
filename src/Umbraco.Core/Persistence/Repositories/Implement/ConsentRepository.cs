@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Update(dto);
             entity.ResetDirtyProperties();
 
-            IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IConsent>(entity.Id));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent>(entity.Id));
         }
 
         /// <inheritdoc />

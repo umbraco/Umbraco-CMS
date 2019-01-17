@@ -74,7 +74,7 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
-        protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected override TypeLoader CreateTypeLoader(IAppPolicedCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 

@@ -15,7 +15,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
     {
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IAppCache _cacheProvider;
         private readonly IGlobalSettings _globalSettings;
         private readonly RoutesCache _routesCache;
         private readonly IDomainCache _domainCache;
@@ -30,7 +30,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public PublishedContentCache(
             XmlStore xmlStore, // an XmlStore containing the master xml
             IDomainCache domainCache, // an IDomainCache implementation
-            ICacheProvider cacheProvider, // an ICacheProvider that should be at request-level
+            IAppCache cacheProvider, // an ICacheProvider that should be at request-level
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
@@ -517,7 +517,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // clear recursive properties cached by XmlPublishedContent.GetProperty
             // assume that nothing else is going to cache IPublishedProperty items (else would need to do ByKeySearch)
             // NOTE also clears all the media cache properties, which is OK (see media cache)
-            _cacheProvider.ClearCacheObjectTypes<IPublishedProperty>();
+            _cacheProvider.ClearOfType<IPublishedProperty>();
             //_cacheProvider.ClearCacheByKeySearch("XmlPublishedCache.PublishedContentCache:RecursiveProperty-");
         }
 

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Manifest
     {
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
-        private readonly IRuntimeCacheProvider _cache;
+        private readonly IAppPolicedCache _cache;
         private readonly ILogger _logger;
         private readonly ManifestValueValidatorCollection _validators;
 
@@ -29,14 +29,14 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger)
+        public ManifestParser(IAppPolicedCache cache, ManifestValueValidatorCollection validators, ILogger logger)
             : this(cache, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(IAppPolicedCache cache, ManifestValueValidatorCollection validators, string path, ILogger logger)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));

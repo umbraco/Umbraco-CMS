@@ -19,12 +19,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         public readonly IVariationContextAccessor VariationContextAccessor;
         private readonly IEntityXmlSerializer _entitySerializer;
-        private readonly ICacheProvider _snapshotCache;
+        private readonly IAppCache _snapshotCache;
         private readonly IMemberService _memberService;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly bool _previewDefault;
 
-        public MemberCache(bool previewDefault, ICacheProvider snapshotCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IEntityXmlSerializer entitySerializer)
+        public MemberCache(bool previewDefault, IAppCache snapshotCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IEntityXmlSerializer entitySerializer)
         {
             _snapshotCache = snapshotCache;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;

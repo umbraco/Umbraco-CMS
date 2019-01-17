@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             Func<int, IPublishedContent> getParent,
             Func<int, XPathNavigator, IEnumerable<IPublishedContent>> getChildren,
             Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
-            ICacheProvider cacheProvider,
+            IAppCache cacheProvider,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
             bool fromExamine)
@@ -133,7 +133,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         //private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
         private readonly Lazy<IEnumerable<IPublishedContent>> _getChildren;
         private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IAppCache _cacheProvider;
 
         /// <summary>
         /// Returns 'Media' as the item type

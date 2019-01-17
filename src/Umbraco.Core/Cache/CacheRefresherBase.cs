@@ -102,7 +102,7 @@ namespace Umbraco.Core.Cache
         protected void ClearAllIsolatedCacheByEntityType<TEntity>()
             where TEntity : class, IEntity
         {
-            AppCaches.IsolatedRuntimeCache.ClearCache<TEntity>();
+            AppCaches.IsolatedCaches.ClearCache<TEntity>();
         }
 
         /// <summary>

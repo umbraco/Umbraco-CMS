@@ -1,147 +1,97 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
 {
-    internal class DictionaryCacheProvider : ICacheProvider
+    /// <summary>
+    /// Implements <see cref="IAppCache"/> on top of a concurrent dictionary.
+    /// </summary>
+    public class DictionaryCacheProvider : IAppCache
     {
-        private readonly ConcurrentDictionary<string, Lazy<object>> _items
-            = new ConcurrentDictionary<string, Lazy<object>>();
+        /// <summary>
+        /// Gets the internal items dictionary, for tests only!
+        /// </summary>
+        internal readonly ConcurrentDictionary<string, object> Items = new ConcurrentDictionary<string, object>();
 
-        // for tests
-        internal ConcurrentDictionary<string, Lazy<object>> Items => _items;
-
-        public void ClearAllCache()
+        /// <inheritdoc />
+        public virtual object Get(string key)
         {
-            _items.Clear();
+            // fixme throws if non-existing, shouldn't it return null?
+            return Items[key];
         }
 
-        public void ClearCacheItem(string key)
+        /// <inheritdoc />
+        public virtual object Get(string key, Func<object> factory)
         {
-            _items.TryRemove(key, out _);
+            return Items.GetOrAdd(key, _ => factory());
         }
 
-        public void ClearCacheObjectTypes(string typeName)
+        /// <inheritdoc />
+        public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
         {
-            var type = TypeFinder.GetTypeByName(typeName);
-            if (type == null) return;
-            var isInterface = type.IsInterface;
-
-            foreach (var kvp in _items
-                .Where(x =>
-                {
-                    // entry.Value is Lazy<object> and not null, its value may be null
-                    // remove null values as well, does not hurt
-                    // get non-created as NonCreatedValue & exceptions as null
-                    var value = DictionaryCacheProviderBase.GetSafeLazyValue(x.Value, true);
-
-                    // if T is an interface remove anything that implements that interface
-                    // otherwise remove exact types (not inherited types)
-                    return value == null || (isInterface ? (type.IsInstanceOfType(value)) : (value.GetType() == type));
-                }))
-                _items.TryRemove(kvp.Key, out _);
+            var items = new List<object>();
+            foreach (var (key, value) in Items)
+                if (key.InvariantStartsWith(keyStartsWith))
+                    items.Add(value);
+            return items;
         }
 
-        public void ClearCacheObjectTypes<T>()
+        /// <inheritdoc />
+        public IEnumerable<object> SearchByRegex(string regex)
+        {
+            var compiled = new Regex(regex, RegexOptions.Compiled);
+            var items = new List<object>();
+            foreach (var (key, value) in Items)
+                if (compiled.IsMatch(key))
+                    items.Add(value);
+            return items;
+        }
+
+        /// <inheritdoc />
+        public virtual void Clear()
+        {
+            Items.Clear();
+        }
+
+        /// <inheritdoc />
+        public virtual void Clear(string key)
+        {
+            Items.TryRemove(key, out _);
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearOfType(string typeName)
+        {
+            Items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearOfType<T>()
         {
             var typeOfT = typeof(T);
-            var isInterface = typeOfT.IsInterface;
-
-            foreach (var kvp in _items
-                .Where(x =>
-                {
-                    // entry.Value is Lazy<object> and not null, its value may be null
-                    // remove null values as well, does not hurt
-                    // compare on exact type, don't use "is"
-                    // get non-created as NonCreatedValue & exceptions as null
-                    var value = DictionaryCacheProviderBase.GetSafeLazyValue(x.Value, true);
-
-                    // if T is an interface remove anything that implements that interface
-                    // otherwise remove exact types (not inherited types)
-                    return value == null || (isInterface ? (value is T) : (value.GetType() == typeOfT));
-                }))
-                _items.TryRemove(kvp.Key, out _);
+            Items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
         }
 
-        public void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        /// <inheritdoc />
+        public virtual void ClearOfType<T>(Func<string, T, bool> predicate)
         {
             var typeOfT = typeof(T);
-            var isInterface = typeOfT.IsInterface;
-
-            foreach (var kvp in _items
-                .Where(x =>
-                {
-                    // entry.Value is Lazy<object> and not null, its value may be null
-                    // remove null values as well, does not hurt
-                    // compare on exact type, don't use "is"
-                    // get non-created as NonCreatedValue & exceptions as null
-                    var value = DictionaryCacheProviderBase.GetSafeLazyValue(x.Value, true);
-                    if (value == null) return true;
-
-                    // if T is an interface remove anything that implements that interface
-                    // otherwise remove exact types (not inherited types)
-                    return (isInterface ? (value is T) : (value.GetType() == typeOfT))
-                            // run predicate on the 'public key' part only, ie without prefix
-                            && predicate(x.Key, (T)value);
-                }))
-                _items.TryRemove(kvp.Key, out _);
+            Items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
-        public void ClearCacheByKeySearch(string keyStartsWith)
+        /// <inheritdoc />
+        public virtual void ClearByKey(string keyStartsWith)
         {
-            foreach (var ikvp in _items
-                .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith)))
-                _items.TryRemove(ikvp.Key, out _);
+            Items.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
         }
 
-        public void ClearCacheByKeyExpression(string regexString)
+        /// <inheritdoc />
+        public virtual void ClearByRegex(string regex)
         {
-            foreach (var ikvp in _items
-                .Where(kvp => Regex.IsMatch(kvp.Key, regexString)))
-                _items.TryRemove(ikvp.Key, out _);
-        }
-
-        public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
-        {
-            return _items
-                .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith))
-                .Select(kvp => DictionaryCacheProviderBase.GetSafeLazyValue(kvp.Value))
-                .Where(x => x != null);
-        }
-
-        public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
-        {
-            return _items
-                .Where(kvp => Regex.IsMatch(kvp.Key, regexString))
-                .Select(kvp => DictionaryCacheProviderBase.GetSafeLazyValue(kvp.Value))
-                .Where(x => x != null);
-        }
-
-        public object GetCacheItem(string cacheKey)
-        {
-            _items.TryGetValue(cacheKey, out var result); // else null
-            return result == null ? null : DictionaryCacheProviderBase.GetSafeLazyValue(result); // return exceptions as null
-        }
-
-        public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
-        {
-            var result = _items.GetOrAdd(cacheKey, k => DictionaryCacheProviderBase.GetSafeLazy(getCacheItem));
-
-            var value = result.Value; // will not throw (safe lazy)
-            if (!(value is DictionaryCacheProviderBase.ExceptionHolder eh))
-                return value;
-
-            // and... it's in the cache anyway - so contrary to other cache providers,
-            // which would trick with GetSafeLazyValue, we need to remove by ourselves,
-            // in order NOT to cache exceptions
-
-            _items.TryRemove(cacheKey, out result);
-            eh.Exception.Throw(); // throw once!
-            return null; // never reached
+            var compiled = new Regex(regex, RegexOptions.Compiled);
+            Items.RemoveAll(kvp => compiled.IsMatch(kvp.Key));
         }
     }
 }

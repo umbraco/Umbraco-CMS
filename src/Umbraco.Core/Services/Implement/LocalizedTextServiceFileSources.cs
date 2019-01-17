@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services.Implement
     public class LocalizedTextServiceFileSources
     {
         private readonly ILogger _logger;
-        private readonly IRuntimeCacheProvider _cache;
+        private readonly IAppPolicedCache _cache;
         private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource> _supplementFileSources;
         private readonly DirectoryInfo _fileSourceFolder;
 
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="supplementFileSources"></param>
         public LocalizedTextServiceFileSources(
             ILogger logger,
-            IRuntimeCacheProvider cache,
+            IAppPolicedCache cache,
             DirectoryInfo fileSourceFolder,
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
         {
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="logger"></param>
         /// <param name="cache"></param>
         /// <param name="fileSourceFolder"></param>
-        public LocalizedTextServiceFileSources(ILogger logger, IRuntimeCacheProvider cache, DirectoryInfo fileSourceFolder)
+        public LocalizedTextServiceFileSources(ILogger logger, IAppPolicedCache cache, DirectoryInfo fileSourceFolder)
             : this(logger, cache, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
         {
 

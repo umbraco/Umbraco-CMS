@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.Mapping
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         public UserMapperProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            IRuntimeCacheProvider runtimeCache, ActionCollection actions, IGlobalSettings globalSettings)
+            IAppPolicedCache runtimeCache, ActionCollection actions, IGlobalSettings globalSettings)
         {
             var userGroupDefaultPermissionsResolver = new UserGroupDefaultPermissionsResolver(textService, actions);
 

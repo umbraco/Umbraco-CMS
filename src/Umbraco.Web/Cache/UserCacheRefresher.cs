@@ -40,9 +40,9 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var userCache = AppCaches.IsolatedRuntimeCache.GetCache<IUser>();
+            var userCache = AppCaches.IsolatedCaches.Get<IUser>();
             if (userCache)
-                userCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IUser>(id));
+                userCache.Result.Clear(RepositoryCacheKeys.GetKey<IUser>(id));
 
             base.Remove(id);
         }

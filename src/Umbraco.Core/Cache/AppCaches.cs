@@ -4,47 +4,41 @@ using System.Web;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Represents the application-wide caches.
+    /// Represents the application caches.
     /// </summary>
     public class AppCaches
     {
         /// <summary>
-        /// Initializes a new instance for use in the web
+        /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
         /// </summary>
         public AppCaches()
-            : this(
-                new HttpRuntimeCacheProvider(HttpRuntime.Cache),
-                new StaticCacheProvider(),
-                new HttpRequestCacheProvider(),
-                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
-        {
-        }
+            : this(HttpRuntime.Cache)
+        { }
 
         /// <summary>
-        /// Initializes a new instance for use in the web
+        /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
         /// </summary>
         public AppCaches(System.Web.Caching.Cache cache)
             : this(
-                new HttpRuntimeCacheProvider(cache),
-                new StaticCacheProvider(),
-                new HttpRequestCacheProvider(),
-                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
-        {
-        }
+                new WebCachingAppCache(cache),
+                new DictionaryCacheProvider(),
+                new HttpRequestAppCache(),
+                new IsolatedCaches(t => new ObjectCacheAppCache()))
+        { }
 
         /// <summary>
-        /// Initializes a new instance based on the provided providers
+        /// Initializes a new instance of the <see cref="AppCaches"/> with cache providers.
         /// </summary>
         public AppCaches(
-            IRuntimeCacheProvider httpCacheProvider,
-            ICacheProvider staticCacheProvider,
-            ICacheProvider requestCacheProvider,
-            IsolatedRuntimeCache isolatedCacheManager)
+            IAppPolicedCache runtimeCache,
+            IAppCache staticCacheProvider,
+            IAppCache requestCache,
+            IsolatedCaches isolatedCaches)
         {
-            RuntimeCache = httpCacheProvider ?? throw new ArgumentNullException(nameof(httpCacheProvider));
+            RuntimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             StaticCache = staticCacheProvider ?? throw new ArgumentNullException(nameof(staticCacheProvider));
-            RequestCache = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
-            IsolatedRuntimeCache = isolatedCacheManager ?? throw new ArgumentNullException(nameof(isolatedCacheManager));
+            RequestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
+            IsolatedCaches = isolatedCaches ?? throw new ArgumentNullException(nameof(isolatedCaches));
         }
 
         /// <summary>
@@ -54,7 +48,7 @@ namespace Umbraco.Core.Cache
         /// <para>When used by repositories, all cache policies apply, but the underlying caches do not cache anything.</para>
         /// <para>Used by tests.</para>
         /// </remarks>
-        public static AppCaches Disabled { get; } = new AppCaches(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
+        public static AppCaches Disabled { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
 
         /// <summary>
         /// Gets the special no-cache instance.
@@ -63,27 +57,42 @@ namespace Umbraco.Core.Cache
         /// <para>When used by repositories, all cache policies are bypassed.</para>
         /// <para>Used by repositories that do no cache.</para>
         /// </remarks>
-        public static AppCaches NoCache { get; } = new AppCaches(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
+        public static AppCaches NoCache { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
 
         /// <summary>
-        /// Returns the current Request cache
+        /// Gets the per-request cache.
         /// </summary>
-        public ICacheProvider RequestCache { get; internal set; }
+        /// <remarks>
+        /// <para>The per-request caches works on top of the current HttpContext items.</para>
+        /// fixme - what about non-web applications?
+        /// </remarks>
+        public IAppCache RequestCache { get; }
 
         /// <summary>
         /// Returns the current Runtime cache
         /// </summary>
-        public ICacheProvider StaticCache { get; internal set; }
+        /// <remarks>
+        /// fixme - what is this? why not use RuntimeCache?
+        /// </remarks>
+        public IAppCache StaticCache { get; }
 
         /// <summary>
-        /// Returns the current Runtime cache
+        /// Gets the runtime cache.
         /// </summary>
-        public IRuntimeCacheProvider RuntimeCache { get; internal set; }
+        /// <remarks>
+        /// <para>The runtime cache is the main application cache.</para>
+        /// </remarks>
+        public IAppPolicedCache RuntimeCache { get; }
 
         /// <summary>
-        /// Returns the current Isolated Runtime cache manager
+        /// Gets the isolated caches.
         /// </summary>
-        public IsolatedRuntimeCache IsolatedRuntimeCache { get; internal set; }
+        /// <remarks>
+        /// <para>Isolated caches are used by e.g. repositories, to ensure that each cached entity
+        /// type has its own cache, so that lookups are fast and the repository does not need to
+        /// search through all keys on a global scale.</para>
+        /// </remarks>
+        public IsolatedCaches IsolatedCaches { get; }
 
     }
 

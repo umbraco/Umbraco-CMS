@@ -60,9 +60,9 @@ namespace Umbraco.Web.Cache
             _idkMap.ClearCache(id);
             AppCaches.ClearPartialViewCache();
 
-            var memberCache = AppCaches.IsolatedRuntimeCache.GetCache<IMember>();
+            var memberCache = AppCaches.IsolatedCaches.Get<IMember>();
             if (memberCache)
-                memberCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMember>(id));
+                memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(id));
         }
 
         #endregion
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshMemberTypes(AppCaches appCaches)
         {
-            appCaches.IsolatedRuntimeCache.ClearCache<IMember>();
+            appCaches.IsolatedCaches.ClearCache<IMember>();
         }
 
         #endregion

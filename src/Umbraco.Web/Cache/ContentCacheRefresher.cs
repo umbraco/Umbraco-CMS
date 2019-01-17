@@ -44,14 +44,14 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(JsonPayload[] payloads)
         {
-            AppCaches.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
 
             var idsRemoved = new HashSet<int>();
-            var isolatedCache = AppCaches.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
+            var isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
             foreach (var payload in payloads)
             {
-                isolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
 
                 _idkMap.ClearCache(payload.Id);
 
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Cache
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                 {
                     var pathid = "," + payload.Id + ",";
-                    isolatedCache.ClearCacheObjectTypes<IContent>((k, v) => v.Path.Contains(pathid));
+                    isolatedCache.ClearOfType<IContent>((k, v) => v.Path.Contains(pathid));
                 }
 
                 //if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
@@ -162,8 +162,8 @@ namespace Umbraco.Web.Cache
             appCaches.ClearPartialViewCache();
             MacroCacheRefresher.ClearMacroContentCache(appCaches); // just the content
 
-            appCaches.IsolatedRuntimeCache.ClearCache<PublicAccessEntry>();
-            appCaches.IsolatedRuntimeCache.ClearCache<IContent>();
+            appCaches.IsolatedCaches.ClearCache<PublicAccessEntry>();
+            appCaches.IsolatedCaches.ClearCache<IContent>();
         }
 
         #endregion

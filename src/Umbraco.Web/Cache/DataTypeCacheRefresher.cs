@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
 
-            var dataTypeCache = AppCaches.IsolatedRuntimeCache.GetCache<IDataType>();
+            var dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
 
             foreach (var payload in payloads)
             {

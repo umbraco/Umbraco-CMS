@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected AppCaches GlobalCache { get; }
 
-        protected IRuntimeCacheProvider GlobalIsolatedCache => GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+        protected IAppPolicedCache GlobalIsolatedCache => GlobalCache.IsolatedCaches.GetOrCreate<TEntity>();
 
         protected IScopeAccessor ScopeAccessor { get; }
 
@@ -60,18 +60,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// Gets the isolated cache.
         /// </summary>
         /// <remarks>Depends on the ambient scope cache mode.</remarks>
-        protected IRuntimeCacheProvider IsolatedCache
+        protected IAppPolicedCache IsolatedCache
         {
             get
             {
                 switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
-                        return GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                        return GlobalCache.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.Scoped:
-                        return AmbientScope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                        return AmbientScope.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.None:
-                        return NullCacheProvider.Instance;
+                        return NoAppCache.Instance;
                     default:
                         throw new Exception("oops: cache mode.");
                 }
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Adds or Updates an entity of type TEntity
         /// </summary>
-        /// <remarks>This method is backed by an <see cref="IRuntimeCacheProvider"/> cache</remarks>
+        /// <remarks>This method is backed by an <see cref="IAppPolicedCache"/> cache</remarks>
         /// <param name="entity"></param>
         public void Save(TEntity entity)
         {

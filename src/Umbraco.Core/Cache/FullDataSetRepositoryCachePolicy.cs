@@ -24,7 +24,7 @@ namespace Umbraco.Core.Cache
         private readonly Func<TEntity, TId> _entityGetId;
         private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
+        public FullDataSetRepositoryCachePolicy(IAppPolicedCache cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
             : base(cache, scopeAccessor)
         {
             _entityGetId = entityGetId;
@@ -55,11 +55,11 @@ namespace Umbraco.Core.Cache
 
             if (_expires)
             {
-                Cache.InsertCacheItem(key, () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
+                Cache.Insert(key, () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
             }
             else
             {
-                Cache.InsertCacheItem(key, () => new DeepCloneableList<TEntity>(entities));
+                Cache.Insert(key, () => new DeepCloneableList<TEntity>(entities));
             }
         }
 
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void ClearAll()
         {
-            Cache.ClearCacheItem(GetEntityTypeCacheKey());
+            Cache.Clear(GetEntityTypeCacheKey());
         }
     }
 }

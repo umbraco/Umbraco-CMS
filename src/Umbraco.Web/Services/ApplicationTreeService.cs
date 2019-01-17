@@ -357,7 +357,7 @@ namespace Umbraco.Web.Services
 
                         //remove the cache now that it has changed  SD: I'm leaving this here even though it
                         // is taken care of by events as well, I think unit tests may rely on it being cleared here.
-                        _cache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+                        _cache.RuntimeCache.Clear(CacheKeys.ApplicationTreeCacheKey);
                     }
                 }
             }

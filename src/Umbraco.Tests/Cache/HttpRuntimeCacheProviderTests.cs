@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Cache
     [TestFixture]
     public class HttpRuntimeCacheProviderTests : RuntimeCacheProviderTests
     {
-        private HttpRuntimeCacheProvider _provider;
+        private WebCachingAppCache _provider;
 
         protected override int GetTotalItemCount
         {
@@ -19,15 +19,15 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            _provider = new HttpRuntimeCacheProvider(HttpRuntime.Cache);
+            _provider = new WebCachingAppCache(HttpRuntime.Cache);
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache Provider
         {
             get { return _provider; }
         }
 
-        internal override IRuntimeCacheProvider RuntimeProvider
+        internal override IAppPolicedCache RuntimeProvider
         {
             get { return _provider; }
         }
@@ -36,15 +36,15 @@ namespace Umbraco.Tests.Cache
         public void DoesNotCacheExceptions()
         {
             string value;
-            Assert.Throws<Exception>(() => { value = (string)_provider.GetCacheItem("key", () => GetValue(1)); });
-            Assert.Throws<Exception>(() => { value = (string)_provider.GetCacheItem("key", () => GetValue(2)); });
+            Assert.Throws<Exception>(() => { value = (string)_provider.Get("key", () => GetValue(1)); });
+            Assert.Throws<Exception>(() => { value = (string)_provider.Get("key", () => GetValue(2)); });
 
             // does not throw
-            value = (string)_provider.GetCacheItem("key", () => GetValue(3));
+            value = (string)_provider.Get("key", () => GetValue(3));
             Assert.AreEqual("succ3", value);
 
             // cache
-            value = (string)_provider.GetCacheItem("key", () => GetValue(4));
+            value = (string)_provider.Get("key", () => GetValue(4));
             Assert.AreEqual("succ3", value);
         }
 

@@ -52,7 +52,7 @@ namespace Umbraco.Web.Cache
         private void RemoveFromCache(int id)
         {
             _idkMap.ClearCache(id);
-            AppCaches.RuntimeCache.ClearCacheItem($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
+            AppCaches.RuntimeCache.Clear($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
 
             //need to clear the runtime cache for templates
             ClearAllIsolatedCacheByEntityType<ITemplate>();

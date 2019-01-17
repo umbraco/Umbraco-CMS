@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
             {
                 Current.ApplicationCache.ClearPartialViewCache();
 
-                var mediaCache = AppCaches.IsolatedRuntimeCache.GetCache<IMedia>();
+                var mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
                 foreach (var payload in payloads)
                 {
@@ -61,13 +61,13 @@ namespace Umbraco.Web.Cache
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
-                    mediaCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMedia>(payload.Id));
+                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Id));
 
                     // remove those that are in the branch
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                     {
                         var pathid = "," + payload.Id + ",";
-                        mediaCache.Result.ClearCacheObjectTypes<IMedia>((_, v) => v.Path.Contains(pathid));
+                        mediaCache.Result.ClearOfType<IMedia>((_, v) => v.Path.Contains(pathid));
                     }
                 }
             }
@@ -121,7 +121,7 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshMediaTypes(AppCaches appCaches)
         {
-            appCaches.IsolatedRuntimeCache.ClearCache<IMedia>();
+            appCaches.IsolatedCaches.ClearCache<IMedia>();
         }
 
         #endregion

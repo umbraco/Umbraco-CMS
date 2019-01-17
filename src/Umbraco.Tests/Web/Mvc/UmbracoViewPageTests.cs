@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Web.Mvc
             //    CacheHelper.CreateDisabledCacheHelper(),
             //    new ProfilingLogger(logger, Mock.Of<IProfiler>())) { /*IsReady = true*/ };
 
-            var cache = NullCacheProvider.Instance;
+            var cache = NoAppCache.Instance;
             //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
             var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var factory = Mock.Of<IPublishedContentTypeFactory>();

@@ -63,7 +63,7 @@ namespace Umbraco.Web.Editors
             return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache staticCache, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {

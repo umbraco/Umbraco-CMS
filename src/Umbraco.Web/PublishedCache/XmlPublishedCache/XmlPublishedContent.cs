@@ -20,7 +20,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
     internal class XmlPublishedContent : PublishedContentBase
     {
-        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, IAppCache cacheProvider, PublishedContentTypeCache contentTypeCache)
         {
             _xmlNode = xmlNode;
             _isPreviewing = isPreviewing;
@@ -31,7 +31,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
-        private readonly ICacheProvider _cacheProvider; // at snapshot/request level (see PublishedContentCache)
+        private readonly IAppCache _cacheProvider; // at snapshot/request level (see PublishedContentCache)
         private readonly PublishedContentTypeCache _contentTypeCache;
 
 	    private readonly object _initializeLock = new object();
@@ -426,7 +426,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <remarks>Maintains a per-request cache of IPublishedContent items in order to make
         /// sure that we create only one instance of each for the duration of a request. The
         /// returned IPublishedContent is a model, if models are enabled.</remarks>
-        public static IPublishedContent Get(XmlNode node, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache cacheProvider, PublishedContentTypeCache contentTypeCache)
         {
             // only 1 per request
 
@@ -434,12 +434,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) cacheProvider.GetCacheItem(key, () => (new XmlPublishedContent(node, isPreviewing, cacheProvider, contentTypeCache)).CreateModel());
+            return (IPublishedContent) cacheProvider.Get(key, () => (new XmlPublishedContent(node, isPreviewing, cacheProvider, contentTypeCache)).CreateModel());
         }
 
         public static void ClearRequest()
         {
-            Current.ApplicationCache.RequestCache.ClearCacheByKeySearch(CacheKeyPrefix);
+            Current.ApplicationCache.RequestCache.ClearByKey(CacheKeyPrefix);
         }
 
         private const string CacheKeyPrefix = "CONTENTCACHE_XMLPUBLISHEDCONTENT_";

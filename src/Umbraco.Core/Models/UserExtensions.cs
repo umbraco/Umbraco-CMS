@@ -54,7 +54,7 @@ namespace Umbraco.Core.Models
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        internal static string[] GetUserAvatarUrls(this IUser user, ICacheProvider staticCache)
+        internal static string[] GetUserAvatarUrls(this IUser user, IAppCache staticCache)
         {
             // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception

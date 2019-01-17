@@ -11,31 +11,142 @@ using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Represents a cache provider that caches item in a <see cref="MemoryCache"/>.
-    /// A cache provider that wraps the logic of a System.Runtime.Caching.ObjectCache
+    /// Implements <see cref="IAppPolicedCache"/> on top of a <see cref="ObjectCache"/>.
     /// </summary>
-    /// <remarks>The <see cref="MemoryCache"/> is created with name "in-memory". That name is
-    /// used to retrieve configuration options. It does not identify the memory cache, i.e.
-    /// each instance of this class has its own, independent, memory cache.</remarks>
-    public class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
+    public class ObjectCacheAppCache : IAppPolicedCache
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        internal ObjectCache MemoryCache;
 
         /// <summary>
-        /// Used for debugging
+        /// Initializes a new instance of the <see cref="ObjectCacheAppCache"/>.
         /// </summary>
-        internal Guid InstanceId { get; private set; }
-
-        public ObjectCacheRuntimeCacheProvider()
+        public ObjectCacheAppCache()
         {
+            // the MemoryCache is created with name "in-memory". That name is
+            // used to retrieve configuration options. It does not identify the memory cache, i.e.
+            // each instance of this class has its own, independent, memory cache.
             MemoryCache = new MemoryCache("in-memory");
-            InstanceId = Guid.NewGuid();
         }
 
-        #region Clear
+        /// <summary>
+        /// Gets the internal memory cache, for tests only!
+        /// </summary>
+        internal readonly ObjectCache MemoryCache;
 
-        public virtual void ClearAllCache()
+        /// <inheritdoc />
+        public object Get(string key)
+        {
+            Lazy<object> result;
+            try
+            {
+                _locker.EnterReadLock();
+                result = MemoryCache.Get(key) as Lazy<object>; // null if key not found
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
+            }
+            return result == null ? null : FastDictionaryAppCacheBase.GetSafeLazyValue(result); // return exceptions as null
+        }
+
+        /// <inheritdoc />
+        public object Get(string key, Func<object> factory)
+        {
+            return Get(key, factory, null);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<object> SearchByKey(string keyStartsWith)
+        {
+            KeyValuePair<string, object>[] entries;
+            try
+            {
+                _locker.EnterReadLock();
+                entries = MemoryCache
+                    .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
+                    .ToArray(); // evaluate while locked
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
+            }
+            return entries
+                .Select(x => FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Where(x => x != null) // backward compat, don't store null values in the cache
+                .ToList();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<object> SearchByRegex(string regex)
+        {
+            var compiled = new Regex(regex, RegexOptions.Compiled);
+
+            KeyValuePair<string, object>[] entries;
+            try
+            {
+                _locker.EnterReadLock();
+                entries = MemoryCache
+                    .Where(x => compiled.IsMatch(x.Key))
+                    .ToArray(); // evaluate while locked
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
+            }
+            return entries
+                .Select(x => FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Where(x => x != null) // backward compat, don't store null values in the cache
+                .ToList();
+        }
+
+        /// <inheritdoc />
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        {
+            // see notes in HttpRuntimeCacheProvider
+
+            Lazy<object> result;
+
+            using (var lck = new UpgradeableReadLock(_locker))
+            {
+                result = MemoryCache.Get(key) as Lazy<object>;
+                if (result == null || FastDictionaryAppCacheBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                {
+                    result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                    var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+
+                    lck.UpgradeToWriteLock();
+                    //NOTE: This does an add or update
+                    MemoryCache.Set(key, result, policy);
+                }
+            }
+
+            //return result.Value;
+
+            var value = result.Value; // will not throw (safe lazy)
+            if (value is FastDictionaryAppCacheBase.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            return value;
+        }
+
+        /// <inheritdoc />
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        {
+            // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
+            // and make sure we don't store a null value.
+
+            var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+            var value = result.Value; // force evaluation now
+            if (value == null) return; // do not store null values (backward compat)
+
+            var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            //NOTE: This does an add or update
+            MemoryCache.Set(key, result, policy);
+        }
+
+        /// <inheritdoc />
+        public virtual void Clear()
         {
             try
             {
@@ -50,7 +161,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheItem(string key)
+        /// <inheritdoc />
+        public virtual void Clear(string key)
         {
             try
             {
@@ -65,7 +177,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes(string typeName)
+        /// <inheritdoc />
+        public virtual void ClearOfType(string typeName)
         {
             var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
@@ -79,7 +192,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -96,12 +209,13 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes<T>()
+        /// <inheritdoc />
+        public virtual void ClearOfType<T>()
         {
             try
             {
                 _locker.EnterWriteLock();
-                var typeOfT = typeof (T);
+                var typeOfT = typeof(T);
                 var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
                     .Where(x =>
@@ -109,7 +223,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -127,7 +241,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        /// <inheritdoc />
+        public virtual void ClearOfType<T>(Func<string, T, bool> predicate)
         {
             try
             {
@@ -140,7 +255,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = FastDictionaryAppCacheBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
 
                         // if T is an interface remove anything that implements that interface
@@ -159,7 +274,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheByKeySearch(string keyStartsWith)
+        /// <inheritdoc />
+        public virtual void ClearByKey(string keyStartsWith)
         {
             try
             {
@@ -177,13 +293,16 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheByKeyExpression(string regexString)
+        /// <inheritdoc />
+        public virtual void ClearByRegex(string regex)
         {
+            var compiled = new Regex(regex, RegexOptions.Compiled);
+
             try
             {
                 _locker.EnterWriteLock();
                 foreach (var key in MemoryCache
-                    .Where(x => Regex.IsMatch(x.Key, regexString))
+                    .Where(x => compiled.IsMatch(x.Key))
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
@@ -194,120 +313,6 @@ namespace Umbraco.Core.Cache
                     _locker.ExitWriteLock();
             }
         }
-
-        #endregion
-
-        #region Get
-
-        public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
-        {
-            KeyValuePair<string, object>[] entries;
-            try
-            {
-                _locker.EnterReadLock();
-                entries = MemoryCache
-                    .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
-                    .ToArray(); // evaluate while locked
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
-            }
-            return entries
-                .Select(x => DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
-                .Where(x => x != null) // backward compat, don't store null values in the cache
-                .ToList();
-        }
-
-        public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
-        {
-            KeyValuePair<string, object>[] entries;
-            try
-            {
-                _locker.EnterReadLock();
-                entries = MemoryCache
-                    .Where(x => Regex.IsMatch(x.Key, regexString))
-                    .ToArray(); // evaluate while locked
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
-            }
-            return entries
-                .Select(x => DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
-                .Where(x => x != null) // backward compat, don't store null values in the cache
-                .ToList();
-        }
-
-        public object GetCacheItem(string cacheKey)
-        {
-            Lazy<object> result;
-            try
-            {
-                _locker.EnterReadLock();
-                result = MemoryCache.Get(cacheKey) as Lazy<object>; // null if key not found
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
-            }
-            return result == null ? null : DictionaryCacheProviderBase.GetSafeLazyValue(result); // return exceptions as null
-        }
-
-        public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
-        {
-            return GetCacheItem(cacheKey, getCacheItem, null);
-        }
-
-        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
-        {
-            // see notes in HttpRuntimeCacheProvider
-
-            Lazy<object> result;
-
-            using (var lck = new UpgradeableReadLock(_locker))
-            {
-                result = MemoryCache.Get(cacheKey) as Lazy<object>;
-                if (result == null || DictionaryCacheProviderBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
-                {
-                    result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
-                    var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
-
-                    lck.UpgradeToWriteLock();
-                    //NOTE: This does an add or update
-                    MemoryCache.Set(cacheKey, result, policy);
-                }
-            }
-
-            //return result.Value;
-
-            var value = result.Value; // will not throw (safe lazy)
-            if (value is DictionaryCacheProviderBase.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
-            return value;
-        }
-
-        #endregion
-
-        #region Insert
-
-        public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
-        {
-            // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
-            // and make sure we don't store a null value.
-
-            var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
-            var value = result.Value; // force evaluation now
-            if (value == null) return; // do not store null values (backward compat)
-
-            var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
-            //NOTE: This does an add or update
-            MemoryCache.Set(cacheKey, result, policy);
-        }
-
-        #endregion
 
         private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {

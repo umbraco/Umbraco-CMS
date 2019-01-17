@@ -47,10 +47,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             MediaTypeRepository mediaTypeRepository;
 
             var realCache = new AppCaches(
-                new ObjectCacheRuntimeCacheProvider(),
-                new StaticCacheProvider(),
-                new StaticCacheProvider(),
-                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()));
+                new ObjectCacheAppCache(),
+                new DictionaryCacheProvider(),
+                new DictionaryCacheProvider(),
+                new IsolatedCaches(t => new ObjectCacheAppCache()));
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())

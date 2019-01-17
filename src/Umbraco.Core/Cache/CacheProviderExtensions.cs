@@ -10,7 +10,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public static class CacheProviderExtensions
     {
-        public static T GetCacheItem<T>(this IRuntimeCacheProvider provider,
+        public static T GetCacheItem<T>(this IAppPolicedCache provider,
             string cacheKey,
             Func<T> getCacheItem,
             TimeSpan? timeout,
@@ -19,11 +19,11 @@ namespace Umbraco.Core.Cache
             CacheItemRemovedCallback removedCallback = null,
             string[] dependentFiles = null)
         {
-            var result = provider.GetCacheItem(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
             return result == null ? default(T) : result.TryConvertTo<T>().Result;
         }
 
-        public static void InsertCacheItem<T>(this IRuntimeCacheProvider provider,
+        public static void InsertCacheItem<T>(this IAppPolicedCache provider,
             string cacheKey,
             Func<T> getCacheItem,
             TimeSpan? timeout = null,
@@ -32,24 +32,24 @@ namespace Umbraco.Core.Cache
             CacheItemRemovedCallback removedCallback = null,
             string[] dependentFiles = null)
         {
-            provider.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
         }
 
-        public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this ICacheProvider provider, string keyStartsWith)
+        public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
         {
-            var result = provider.GetCacheItemsByKeySearch(keyStartsWith);
+            var result = provider.SearchByKey(keyStartsWith);
             return result.Select(x => x.TryConvertTo<T>().Result);
         }
 
-        public static IEnumerable<T> GetCacheItemsByKeyExpression<T>(this ICacheProvider provider, string regexString)
+        public static IEnumerable<T> GetCacheItemsByKeyExpression<T>(this IAppCache provider, string regexString)
         {
-            var result = provider.GetCacheItemsByKeyExpression(regexString);
+            var result = provider.SearchByRegex(regexString);
             return result.Select(x => x.TryConvertTo<T>().Result);
         }
 
-        public static T GetCacheItem<T>(this ICacheProvider provider, string cacheKey)
+        public static T GetCacheItem<T>(this IAppCache provider, string cacheKey)
         {
-            var result = provider.GetCacheItem(cacheKey);
+            var result = provider.Get(cacheKey);
             if (result == null)
             {
                 return default(T);
@@ -57,9 +57,9 @@ namespace Umbraco.Core.Cache
             return result.TryConvertTo<T>().Result;
         }
 
-        public static T GetCacheItem<T>(this ICacheProvider provider, string cacheKey, Func<T> getCacheItem)
+        public static T GetCacheItem<T>(this IAppCache provider, string cacheKey, Func<T> getCacheItem)
         {
-            var result = provider.GetCacheItem(cacheKey, () => getCacheItem());
+            var result = provider.Get(cacheKey, () => getCacheItem());
             if (result == null)
             {
                 return default(T);

@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Cache
     public abstract class RuntimeCacheProviderTests : CacheProviderTests
     {
 
-        internal abstract IRuntimeCacheProvider RuntimeProvider { get; }
+        internal abstract IAppPolicedCache RuntimeProvider { get; }
 
 
         [Test]
@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Cache
         public void Can_Add_And_Expire_Struct_Strongly_Typed_With_Null()
         {
             var now = DateTime.Now;
-            RuntimeProvider.InsertCacheItem("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 200));
+            RuntimeProvider.Insert("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 200));
             Assert.AreEqual(now, Provider.GetCacheItem<DateTime>("DateTimeTest"));
             Assert.AreEqual(now, Provider.GetCacheItem<DateTime?>("DateTimeTest"));
 
