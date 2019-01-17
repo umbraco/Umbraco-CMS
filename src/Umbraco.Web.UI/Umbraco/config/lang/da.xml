@@ -1227,7 +1227,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
     <key alias="elementHeading">Er en Element-type</key>
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
-    <key alias="elementHasNoTemplates">En Element-type kan ikke have nogen skabeloner</key>
+    <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>

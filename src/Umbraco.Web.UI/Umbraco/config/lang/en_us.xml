@@ -1561,7 +1561,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="allowVaryByCulture">Allow varying by culture</key>
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
-    <key alias="elementHasNoTemplates">An Element type can't have any templates</key>
+    <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
