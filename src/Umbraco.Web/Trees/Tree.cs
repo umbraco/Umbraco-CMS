@@ -6,9 +6,9 @@ using Umbraco.Web.Models.Trees;
 namespace Umbraco.Web.Trees
 {
     [DebuggerDisplay("Tree - {TreeAlias} ({ApplicationAlias})")]
-    public class ApplicationTree : ITree
+    public class Tree : ITree
     {
-        public ApplicationTree(int sortOrder, string applicationAlias, string alias, string title, Type treeControllerType, bool isSingleNodeTree)
+        public Tree(int sortOrder, string applicationAlias, string alias, string title, Type treeControllerType, bool isSingleNodeTree)
         {
             SortOrder = sortOrder;
             ApplicationAlias = applicationAlias;

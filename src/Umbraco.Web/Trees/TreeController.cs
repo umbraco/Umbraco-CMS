@@ -28,7 +28,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <inheritdoc />
-        public override string RootNodeDisplayName => ApplicationTree.GetRootNodeDisplayName(this, Services.TextService);
+        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, Services.TextService);
 
         /// <inheritdoc />
         public override string TreeAlias => _attribute.TreeAlias;

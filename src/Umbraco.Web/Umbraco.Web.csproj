@@ -174,7 +174,7 @@
     <Compile Include="Trees\TranslationBackOfficeSection.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\UsersBackOfficeSection.cs" />
-    <Compile Include="Trees\ApplicationTree.cs" />
+    <Compile Include="Trees\Tree.cs" />
     <Compile Include="Models\Trees\IBackOfficeSection.cs" />
     <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />

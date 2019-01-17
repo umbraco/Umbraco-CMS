@@ -211,7 +211,7 @@ namespace Umbraco.Web.Runtime
             {
                 var attribute = treeControllerType.GetCustomAttribute<TreeAttribute>(false);
                 if (attribute == null) continue;
-                var tree = new ApplicationTree(attribute.SortOrder, attribute.ApplicationAlias, attribute.TreeAlias, attribute.TreeTitle, treeControllerType, attribute.IsSingleNodeTree);
+                var tree = new Tree(attribute.SortOrder, attribute.ApplicationAlias, attribute.TreeAlias, attribute.TreeTitle, treeControllerType, attribute.IsSingleNodeTree);
                 composition.WithCollectionBuilder<TreeCollectionBuilder>().AddTree(tree);
             }
         }

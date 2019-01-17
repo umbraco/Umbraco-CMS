@@ -10,9 +10,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Trees
 {
-    public class TreeCollection : BuilderCollectionBase<ApplicationTree>
+    public class TreeCollection : BuilderCollectionBase<Tree>
     {
-        public TreeCollection(IEnumerable<ApplicationTree> items)
+        public TreeCollection(IEnumerable<Tree> items)
             : base(items)
         { }
     }

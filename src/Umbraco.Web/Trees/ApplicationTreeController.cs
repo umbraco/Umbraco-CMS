@@ -160,7 +160,7 @@ namespace Umbraco.Web.Trees
         /// <param name="tree"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        private async Task<TreeNode> GetRootForMultipleAppTree(ApplicationTree tree, FormDataCollection queryStrings)
+        private async Task<TreeNode> GetRootForMultipleAppTree(Tree tree, FormDataCollection queryStrings)
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
             try
@@ -189,7 +189,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="application"></param>
         /// <returns></returns>
-        private async Task<TreeRootNode> GetRootForSingleAppTree(ApplicationTree tree, string id, FormDataCollection queryStrings, string application)
+        private async Task<TreeRootNode> GetRootForSingleAppTree(Tree tree, string id, FormDataCollection queryStrings, string application)
         {
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
             if (tree == null) throw new ArgumentNullException(nameof(tree));
@@ -234,7 +234,7 @@ namespace Umbraco.Web.Trees
         /// <remarks>
         /// This ensures that authorization filters are applied to the sub request
         /// </remarks>
-        private async Task<Attempt<TreeNode>> TryGetRootNodeFromControllerTree(ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        private async Task<Attempt<TreeNode>> TryGetRootNodeFromControllerTree(Tree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             //instantiate it, since we are proxying, we need to setup the instance with our current context
             var instance = (TreeController)DependencyResolver.Current.GetService(appTree.TreeControllerType);
@@ -290,7 +290,7 @@ namespace Umbraco.Web.Trees
         /// <param name="formCollection"></param>
         /// <param name="controllerContext"></param>
         /// <returns></returns>
-        private Attempt<TreeNodeCollection> TryLoadFromControllerTree(ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        private Attempt<TreeNodeCollection> TryLoadFromControllerTree(Tree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             // instantiate it, since we are proxying, we need to setup the instance with our current context
             var instance = (TreeController)DependencyResolver.Current.GetService(appTree.TreeControllerType);

@@ -18,29 +18,29 @@ namespace Umbraco.Web.Services
         }
 
         /// <inheritdoc />
-        public ApplicationTree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(t => t.TreeAlias == treeAlias);
+        public Tree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(t => t.TreeAlias == treeAlias);
 
         /// <inheritdoc />
-        public IEnumerable<ApplicationTree> GetAll() => _treeCollection;
+        public IEnumerable<Tree> GetAll() => _treeCollection;
 
         /// <inheritdoc />
-        public IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias)
+        public IEnumerable<Tree> GetApplicationTrees(string applicationAlias)
             => GetAll().Where(x => x.ApplicationAlias.InvariantEquals(applicationAlias)).OrderBy(x => x.SortOrder).ToList();
 
-        public IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias)
+        public IDictionary<string, IEnumerable<Tree>> GetGroupedApplicationTrees(string applicationAlias)
         {
-            var result = new Dictionary<string, IEnumerable<ApplicationTree>>();
+            var result = new Dictionary<string, IEnumerable<Tree>>();
             var foundTrees = GetApplicationTrees(applicationAlias).ToList();
             foreach(var treeGroup in _groupedTrees.Value)
             {
-                List<ApplicationTree> resultGroup = null;
+                List<Tree> resultGroup = null;
                 foreach(var tree in foundTrees)
                 { 
                     foreach(var treeAliasInGroup in treeGroup)
                     {
                         if (tree.TreeAlias != treeAliasInGroup) continue;
 
-                        if (resultGroup == null) resultGroup = new List<ApplicationTree>();
+                        if (resultGroup == null) resultGroup = new List<Tree>();
                         resultGroup.Add(tree);
                     }  
                 }

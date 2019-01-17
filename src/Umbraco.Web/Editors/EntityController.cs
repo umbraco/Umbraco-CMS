@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
 
                     var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
 
-                    result[ApplicationTree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
+                    result[Tree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
                     {
                         Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,
