@@ -44,10 +44,10 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
-        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
+        public PackageInstallController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
             ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
             IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
         {
         }
 

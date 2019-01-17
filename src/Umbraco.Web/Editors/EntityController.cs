@@ -16,11 +16,16 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Examine;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Search;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -37,6 +42,15 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+        private readonly IApplicationTreeService _treeService;
+
+        public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState,
+            IApplicationTreeService treeService)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+            _treeService = treeService;
+        }
+
         /// <summary>
         /// Configures this controller with a custom action selector
         /// </summary>
@@ -129,7 +143,7 @@ namespace Umbraco.Web.Editors
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
-                    var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.Key);
+                    var tree = _treeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
 
                     var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);

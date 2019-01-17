@@ -29,12 +29,14 @@ namespace Umbraco.Web.UI.Pages
             var treeAuth = this.GetType().GetCustomAttribute<WebformsPageTreeAuthorizeAttribute>(true);
             if (treeAuth != null)
             {
-                var treeByAlias = Current.Services.ApplicationTreeService
-                    .GetByAlias(treeAuth.TreeAlias);
-                if (treeByAlias != null)
-                {
-                    CurrentApp = treeByAlias.ApplicationAlias;
-                }
+                throw new NotImplementedException();
+
+                //var treeByAlias = Current.Services.ApplicationTreeService
+                //    .GetByAlias(treeAuth.TreeAlias);
+                //if (treeByAlias != null)
+                //{
+                //    CurrentApp = treeByAlias.ApplicationAlias;
+                //}
             }
         }
 

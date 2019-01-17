@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search

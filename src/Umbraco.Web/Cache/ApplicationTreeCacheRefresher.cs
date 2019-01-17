@@ -1,46 +1,46 @@
-﻿using System;
-using Umbraco.Core.Cache;
+﻿//using System;
+//using Umbraco.Core.Cache;
 
-namespace Umbraco.Web.Cache
-{
-    public sealed class ApplicationTreeCacheRefresher : CacheRefresherBase<ApplicationTreeCacheRefresher>
-    {
-        public ApplicationTreeCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
-        { }
+//namespace Umbraco.Web.Cache
+//{
+//    public sealed class ApplicationTreeCacheRefresher : CacheRefresherBase<ApplicationTreeCacheRefresher>
+//    {
+//        public ApplicationTreeCacheRefresher(CacheHelper cacheHelper)
+//            : base(cacheHelper)
+//        { }
 
-        #region Define
+//        #region Define
 
-        protected override ApplicationTreeCacheRefresher This => this;
+//        protected override ApplicationTreeCacheRefresher This => this;
 
-        public static readonly Guid UniqueId = Guid.Parse("0AC6C028-9860-4EA4-958D-14D39F45886E");
+//        public static readonly Guid UniqueId = Guid.Parse("0AC6C028-9860-4EA4-958D-14D39F45886E");
 
-        public override Guid RefresherUniqueId => UniqueId;
+//        public override Guid RefresherUniqueId => UniqueId;
 
-        public override string Name => "Application Tree Cache Refresher";
+//        public override string Name => "Application Tree Cache Refresher";
 
-        #endregion
+//        #endregion
 
-        #region Refresher
+//        #region Refresher
 
-        public override void RefreshAll()
-        {
-            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
-            base.RefreshAll();
-        }
+//        public override void RefreshAll()
+//        {
+//            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+//            base.RefreshAll();
+//        }
 
-        public override void Refresh(int id)
-        {
-            Remove(id);
-            base.Refresh(id);
-        }
+//        public override void Refresh(int id)
+//        {
+//            Remove(id);
+//            base.Refresh(id);
+//        }
 
-        public override void Remove(int id)
-        {
-            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
-            base.Remove(id);
-        }
+//        public override void Remove(int id)
+//        {
+//            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+//            base.Remove(id);
+//        }
 
-        #endregion
-    }
-}
+//        #endregion
+//    }
+//}

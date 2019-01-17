@@ -8,6 +8,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -21,6 +23,7 @@ using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -189,6 +192,14 @@ namespace Umbraco.Web.Runtime
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
                 .Append<ContentInfoContentAppFactory>();
+
+            // register back office sections
+            composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>()
+                .Add(() => composition.TypeLoader.GetTypes<IBackOfficeSection>());
+
+            // register back office trees
+            composition.WithCollectionBuilder<TreeCollectionBuilder>()
+                .Add(() => composition.TypeLoader.GetTypes<ApplicationTree>());
         }
     }
 }

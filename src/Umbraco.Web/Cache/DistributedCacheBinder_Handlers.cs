@@ -46,19 +46,19 @@ namespace Umbraco.Web.Cache
 
             _logger.Info<DistributedCacheBinderComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
 
-            // bind to application tree events
-            Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
-                () => ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted);
-            Bind(() => ApplicationTreeService.Updated += ApplicationTreeService_Updated,
-                () => ApplicationTreeService.Updated -= ApplicationTreeService_Updated);
-            Bind(() => ApplicationTreeService.New += ApplicationTreeService_New,
-                () => ApplicationTreeService.New -= ApplicationTreeService_New);
+            //// bind to application tree events
+            //Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
+            //    () => ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted);
+            //Bind(() => ApplicationTreeService.Updated += ApplicationTreeService_Updated,
+            //    () => ApplicationTreeService.Updated -= ApplicationTreeService_Updated);
+            //Bind(() => ApplicationTreeService.New += ApplicationTreeService_New,
+            //    () => ApplicationTreeService.New -= ApplicationTreeService_New);
 
-            // bind to application events
-            Bind(() => SectionService.Deleted += SectionService_Deleted,
-                () => SectionService.Deleted -= SectionService_Deleted);
-            Bind(() => SectionService.New += SectionService_New,
-                () => SectionService.New -= SectionService_New);
+            //// bind to application events
+            //Bind(() => SectionService.Deleted += SectionService_Deleted,
+            //    () => SectionService.Deleted -= SectionService_Deleted);
+            //Bind(() => SectionService.New += SectionService_New,
+            //    () => SectionService.New -= SectionService_New);
 
             // bind to user and user group events
             Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
@@ -231,38 +231,38 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region ApplicationTreeService
+        //#region ApplicationTreeService
 
-        private void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
+        //private void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
+        //{
+        //    _distributedCache.RefreshAllApplicationTreeCache();
+        //}
 
-        private void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
+        //private void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
+        //{
+        //    _distributedCache.RefreshAllApplicationTreeCache();
+        //}
 
-        private void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
+        //private void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
+        //{
+        //    _distributedCache.RefreshAllApplicationTreeCache();
+        //}
 
-        #endregion
+        //#endregion
 
-        #region Application event handlers
+        //#region Application event handlers
 
-        private void SectionService_New(ISectionService sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationCache();
-        }
+        //private void SectionService_New(ISectionService sender, EventArgs e)
+        //{
+        //    _distributedCache.RefreshAllApplicationCache();
+        //}
 
-        private void SectionService_Deleted(ISectionService sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationCache();
-        }
+        //private void SectionService_Deleted(ISectionService sender, EventArgs e)
+        //{
+        //    _distributedCache.RefreshAllApplicationCache();
+        //}
 
-        #endregion
+        //#endregion
 
         #region LocalizationService / Dictionary
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -40,16 +41,18 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            var apps = _treeAliases.Select(x => Current.Services.ApplicationTreeService
-                .GetByAlias(x))
-                .WhereNotNull()
-                .Select(x => x.ApplicationAlias)
-                .Distinct()
-                .ToArray();
+            throw new NotImplementedException();
 
-            return Current.UmbracoContext.Security.CurrentUser != null
-                   && apps.Any(app => Current.UmbracoContext.Security.UserHasSectionAccess(
-                       app, Current.UmbracoContext.Security.CurrentUser));
+            //var apps = _treeAliases.Select(x => Current.Services.ApplicationTreeService
+            //    .GetByAlias(x))
+            //    .WhereNotNull()
+            //    .Select(x => x.ApplicationAlias)
+            //    .Distinct()
+            //    .ToArray();
+
+            //return Current.UmbracoContext.Security.CurrentUser != null
+            //       && apps.Any(app => Current.UmbracoContext.Security.UserHasSectionAccess(
+            //           app, Current.UmbracoContext.Security.CurrentUser));
         }
     }
 }

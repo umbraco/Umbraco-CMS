@@ -18,23 +18,23 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region ApplicationTreeCache
+        //#region ApplicationTreeCache
 
-        public static void RefreshAllApplicationTreeCache(this DistributedCache dc)
-        {
-            dc.RefreshAll(ApplicationTreeCacheRefresher.UniqueId);
-        }
+        //public static void RefreshAllApplicationTreeCache(this DistributedCache dc)
+        //{
+        //    dc.RefreshAll(ApplicationTreeCacheRefresher.UniqueId);
+        //}
 
-        #endregion
+        //#endregion
 
-        #region ApplicationCache
+        //#region ApplicationCache
 
-        public static void RefreshAllApplicationCache(this DistributedCache dc)
-        {
-            dc.RefreshAll(ApplicationCacheRefresher.UniqueId);
-        }
+        //public static void RefreshAllApplicationCache(this DistributedCache dc)
+        //{
+        //    dc.RefreshAll(ApplicationCacheRefresher.UniqueId);
+        //}
 
-        #endregion
+        //#endregion
 
         #region User cache
 

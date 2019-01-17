@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Services
 {
@@ -14,24 +15,20 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class SectionServiceTests : TestWithSomeContentBase
     {
-        public override void CreateTestData()
-        {
-            base.CreateTestData();
+        //fixme
+        private ISectionService SectionService => new SectionService(ServiceContext.UserService, null, null);
 
-            ServiceContext.SectionService.MakeNew("Content", "content", "icon-content");
-            ServiceContext.SectionService.MakeNew("Media", "media", "icon-media");
-            ServiceContext.SectionService.MakeNew("Settings", "settings", "icon-settings");
-            ServiceContext.SectionService.MakeNew("Developer", "developer", "icon-developer");
-        }
-
+       
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
         {
+            //fixme - need to mock
+
             // Arrange
             var user = CreateTestUser();
 
             // Act
-            var result = ServiceContext.SectionService.GetAllowedSections(user.Id).ToList();
+            var result = SectionService.GetAllowedSections(user.Id).ToList();
 
             // Assert
             Assert.AreEqual(3, result.Count);

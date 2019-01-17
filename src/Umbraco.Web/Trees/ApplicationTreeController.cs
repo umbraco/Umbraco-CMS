@@ -7,10 +7,17 @@ using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Services;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -20,7 +27,19 @@ namespace Umbraco.Web.Trees
     [AngularJsonOnlyConfiguration]
     [PluginController("UmbracoTrees")]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
-    {        
+    {
+        private readonly TreeControllerResolver _treeControllerResolver;
+        private readonly IApplicationTreeService _treeService;
+
+        public ApplicationTreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+            ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger,
+            IRuntimeState runtimeState, TreeControllerResolver treeControllerResolver, IApplicationTreeService treeService)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+            _treeControllerResolver = treeControllerResolver;
+            _treeService = treeService;
+        }
+
         /// <summary>
         /// Returns the tree nodes for an application
         /// </summary>
@@ -30,14 +49,14 @@ namespace Umbraco.Web.Trees
         /// <param name="onlyInitialized">An optional bool (defaults to true), if set to false it will also load uninitialized trees</param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings/*, bool onlyInitialized = true*/)
         {
             application = application.CleanForXss();
 
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //find all tree definitions that have the current application alias
-            var groupedTrees = Services.ApplicationTreeService.GetGroupedApplicationTrees(application, onlyInitialized);
+            var groupedTrees = _treeService.GetGroupedApplicationTrees(application);
             var allTrees = groupedTrees.Values.SelectMany(x => x).ToList();
 
             if (string.IsNullOrEmpty(tree) == false || allTrees.Count == 1)
@@ -142,7 +161,7 @@ namespace Umbraco.Web.Trees
             if (configTree == null) throw new ArgumentNullException(nameof(configTree));
             try
             {
-                var byControllerAttempt = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
+                var byControllerAttempt = await _treeControllerResolver.TryGetRootNodeFromControllerTree(configTree, queryStrings, ControllerContext);
                 if (byControllerAttempt.Success)
                 {
                     return byControllerAttempt.Result;
@@ -170,17 +189,17 @@ namespace Umbraco.Web.Trees
         {
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
             if (configTree == null) throw new ArgumentNullException(nameof(configTree));
-            var byControllerAttempt = configTree.TryLoadFromControllerTree(id, queryStrings, ControllerContext);
+            var byControllerAttempt = _treeControllerResolver.TryLoadFromControllerTree(configTree, id, queryStrings, ControllerContext);
             if (byControllerAttempt.Success)
             {
-                var rootNode = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
+                var rootNode = await _treeControllerResolver.TryGetRootNodeFromControllerTree(configTree, queryStrings, ControllerContext);
                 if (rootNode.Success == false)
                 {
                     //This should really never happen if we've successfully got the children above.
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
-                var treeAttribute = configTree.GetTreeAttribute();
+                var treeAttribute = _treeControllerResolver.GetTreeAttribute(configTree);
 
                 var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
                     rootId,

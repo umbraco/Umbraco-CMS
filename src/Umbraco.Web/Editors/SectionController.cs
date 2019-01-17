@@ -2,10 +2,17 @@
 using AutoMapper;
 using Umbraco.Web.Mvc;
 using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -16,21 +23,32 @@ namespace Umbraco.Web.Editors
     public class SectionController : UmbracoAuthorizedJsonController
     {
         private readonly Dashboards _dashboards;
+        private readonly ISectionService _sectionService;
+        private readonly TreeControllerResolver _treeControllerResolver;
+        private readonly IApplicationTreeService _treeService;
 
-        public SectionController(Dashboards dashboards)
+        public SectionController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState,
+            Dashboards dashboards, ISectionService sectionService, TreeControllerResolver treeControllerResolver, IApplicationTreeService treeService)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
         {
             _dashboards = dashboards;
+            _sectionService = sectionService;
+            _treeControllerResolver = treeControllerResolver;
+            _treeService = treeService;
         }
 
         public IEnumerable<Section> GetSections()
         {
-            var sections =  Services.SectionService.GetAllowedSections(Security.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(Security.GetUserId().ResultOr(0));
 
-            var sectionModels = sections.Select(Mapper.Map<Core.Models.Section, Section>).ToArray();
+            var sectionModels = sections.Select(Mapper.Map<Section>).ToArray();
             
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data
-            var appTreeController = new ApplicationTreeController { ControllerContext = ControllerContext };
+            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContext, SqlContext, Services, ApplicationCache, Logger, RuntimeState, _treeControllerResolver, _treeService)
+            {
+                ControllerContext = ControllerContext
+            };
 
             var dashboards = _dashboards.GetDashboards(Security.CurrentUser);
 
@@ -76,8 +94,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<Section> GetAllSections()
         {
-            var sections = Services.SectionService.GetSections();
-            var mapped = sections.Select(Mapper.Map<Core.Models.Section, Section>);
+            var sections = _sectionService.GetSections();
+            var mapped = sections.Select(Mapper.Map<Section>);
             if (Security.CurrentUser.IsAdmin())
                 return mapped;
 

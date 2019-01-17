@@ -14,16 +14,25 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Composing;
-using Current = Umbraco.Web.Composing.Current;
-using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
+using ApplicationTree = Umbraco.Web.Models.ContentEditing.ApplicationTree;
 
 namespace Umbraco.Web.Trees
 {
-    internal static class ApplicationTreeExtensions
+    public class TreeControllerResolver
     {
-        private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
+        private readonly TreeCollection _trees;
+        private readonly UmbracoApiControllerTypeCollection _apiControllers;
 
-        internal static TreeAttribute GetTreeAttribute(this Type treeControllerType)
+        public TreeControllerResolver(TreeCollection trees, UmbracoApiControllerTypeCollection apiControllers)
+        {
+            _trees = trees;
+            _apiControllers = apiControllers;
+        }
+
+        private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
+        private static readonly ConcurrentDictionary<string, Type> ResolvedControllerTypes = new ConcurrentDictionary<string, Type>();
+
+        private TreeAttribute GetTreeAttribute(Type treeControllerType)
         {
             return TreeAttributeCache.GetOrAdd(treeControllerType, type =>
             {
@@ -42,25 +51,41 @@ namespace Umbraco.Web.Trees
             });
         }
 
-        internal static TreeAttribute GetTreeAttribute(this ApplicationTree tree)
+        internal TreeAttribute GetTreeAttribute(ApplicationTree tree)
         {
-            return tree.GetRuntimeType().GetTreeAttribute();
+            throw new NotImplementedException();
+            //return ResolvedControllerTypes.GetOrAdd(tree.Alias, s =>
+            //{
+            //    var controllerType = _apiControllers
+            //        .OfType<ApplicationTreeController>()
+            //        .FirstOrDefault(x => x.)
+            //});
+
+            //return GetTreeAttribute(tree.GetRuntimeType());
         }
 
-        internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
+        private Type GetControllerType(ApplicationTree tree)
         {
-            //get reference to all TreeApiControllers
-            var controllerTrees = Current.UmbracoApiControllerTypes
-                .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
-                .ToArray();
+            throw new NotImplementedException();
+        }
+        
 
-            //find the one we're looking for
-            var foundControllerTree = controllerTrees.FirstOrDefault(x => x == appTree.GetRuntimeType());
-            if (foundControllerTree == null)
-            {
-                return Attempt<Type>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Type + " in any loaded DLLs"));
-            }
-            return Attempt.Succeed(foundControllerTree);
+        internal Attempt<Type> TryGetControllerTree(ApplicationTree appTree)
+        {
+            throw new NotImplementedException();
+
+            ////get reference to all TreeApiControllers
+            //var controllerTrees = _apiControllers
+            //    .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
+            //    .ToArray();
+
+            ////find the one we're looking for
+            //var foundControllerTree = controllerTrees.FirstOrDefault(x => x == appTree.GetRuntimeType());
+            //if (foundControllerTree == null)
+            //{
+            //    return Attempt<Type>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Type + " in any loaded DLLs"));
+            //}
+            //return Attempt.Succeed(foundControllerTree);
         }
 
         /// <summary>
@@ -73,9 +98,9 @@ namespace Umbraco.Web.Trees
         /// <remarks>
         /// This ensures that authorization filters are applied to the sub request
         /// </remarks>
-        internal static async Task<Attempt<TreeNode>> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        internal async Task<Attempt<TreeNode>> TryGetRootNodeFromControllerTree(ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
-            var foundControllerTreeAttempt = appTree.TryGetControllerTree();
+            var foundControllerTreeAttempt = TryGetControllerTree(appTree);
             if (foundControllerTreeAttempt.Success == false)
             {
                 return Attempt<TreeNode>.Fail(foundControllerTreeAttempt.Exception);
@@ -110,12 +135,15 @@ namespace Umbraco.Web.Trees
 
             if (WebApiVersionCheck.WebApiVersion >= Version.Parse("5.0.0"))
             {
-                //In WebApi2, this is required to be set:
-                //      proxiedControllerContext.RequestContext = controllerContext.RequestContext
-                // but we need to do this with reflection because of codebase changes between version 4/5
-                //NOTE: Use TypeHelper here since the reflection is cached
-                var controllerContextRequestContext = TypeHelper.GetProperty(controllerContext.GetType(), "RequestContext").GetValue(controllerContext);
-                TypeHelper.GetProperty(proxiedControllerContext.GetType(), "RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);
+                //fixme - will this 'just' work now?
+                proxiedControllerContext.RequestContext = controllerContext.RequestContext;
+
+                ////In WebApi2, this is required to be set:
+                ////      proxiedControllerContext.RequestContext = controllerContext.RequestContext
+                //// but we need to do this with reflection because of codebase changes between version 4/5
+                ////NOTE: Use TypeHelper here since the reflection is cached
+                //var controllerContextRequestContext = TypeHelper.GetProperty(controllerContext.GetType(), "RequestContext").GetValue(controllerContext);
+                //TypeHelper.GetProperty(proxiedControllerContext.GetType(), "RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);
             }
 
             instance.ControllerContext = proxiedControllerContext;
@@ -123,13 +151,17 @@ namespace Umbraco.Web.Trees
 
             if (WebApiVersionCheck.WebApiVersion >= Version.Parse("5.0.0"))
             {
-                //now we can change the request context's route data to be the proxied route data - NOTE: we cannot do this directly above
-                // because it will detect that the request context is different throw an exception. This is a change in webapi2 and we need to set
-                // this with reflection due to codebase changes between version 4/5
-                //      instance.RequestContext.RouteData = proxiedRouteData;
-                //NOTE: Use TypeHelper here since the reflection is cached
-                var instanceRequestContext = TypeHelper.GetProperty(typeof(ApiController), "RequestContext").GetValue(instance);
-                TypeHelper.GetProperty(instanceRequestContext.GetType(), "RouteData").SetValue(instanceRequestContext, proxiedRouteData);
+                
+                //fixme - will this 'just' work now?
+                instance.RequestContext.RouteData = proxiedRouteData;
+
+                ////now we can change the request context's route data to be the proxied route data - NOTE: we cannot do this directly above
+                //// because it will detect that the request context is different throw an exception. This is a change in webapi2 and we need to set
+                //// this with reflection due to codebase changes between version 4/5
+                ////      instance.RequestContext.RouteData = proxiedRouteData;
+                ////NOTE: Use TypeHelper here since the reflection is cached
+                //var instanceRequestContext = TypeHelper.GetProperty(typeof(ApiController), "RequestContext").GetValue(instance);
+                //TypeHelper.GetProperty(instanceRequestContext.GetType(), "RouteData").SetValue(instanceRequestContext, proxiedRouteData);
             }
 
             //invoke auth filters for this sub request
@@ -143,13 +175,13 @@ namespace Umbraco.Web.Trees
             //return the root
             var node = instance.GetRootNode(formCollection);
             return node == null
-                ? Attempt<TreeNode>.Fail(new InvalidOperationException("Could not return a root node for tree " + appTree.Type))
+                ? Attempt<TreeNode>.Fail(new InvalidOperationException("Could not return a root node for tree " + appTree.Alias))
                 : Attempt<TreeNode>.Succeed(node);
         }
 
-        internal static Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        internal Attempt<TreeNodeCollection> TryLoadFromControllerTree(ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
-            var foundControllerTreeAttempt = appTree.TryGetControllerTree();
+            var foundControllerTreeAttempt = TryGetControllerTree(appTree);
             if (foundControllerTreeAttempt.Success == false)
                 return Attempt<TreeNodeCollection>.Fail(foundControllerTreeAttempt.Exception);
 

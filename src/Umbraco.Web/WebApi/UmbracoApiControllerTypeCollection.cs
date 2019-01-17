@@ -8,6 +8,8 @@ namespace Umbraco.Web.WebApi
     // which we are not doing at the moment
     // we can inherit from BuilderCollectionBase and just be enumerable
 
+    //fixme: this should be LazyCollectionBuilderBase ?
+
     public class UmbracoApiControllerTypeCollection : BuilderCollectionBase<Type>
     {
         public UmbracoApiControllerTypeCollection(IEnumerable<Type> items)

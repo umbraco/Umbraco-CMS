@@ -73,10 +73,6 @@ namespace Umbraco.Core.Composing.Composers
                     factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
                     new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
 
-            //TODO: These are replaced in the web project - we need to declare them so that
-            // something is wired up, just not sure this is very nice but will work for now.
-            composition.RegisterUnique<IApplicationTreeService, EmptyApplicationTreeService>();
-            composition.RegisterUnique<ISectionService, EmptySectionService>();
 
             return composition;
         }

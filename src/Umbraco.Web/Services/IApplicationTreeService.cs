@@ -2,33 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Web.Services
 {
     public interface IApplicationTreeService
     {
-        /// <summary>
-        /// Creates a new application tree.
-        /// </summary>
-        /// <param name="initialize">if set to <c>true</c> [initialize].</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <param name="applicationAlias">The application alias.</param>
-        /// <param name="alias">The alias.</param>
-        /// <param name="title">The title.</param>
-        /// <param name="iconClosed">The icon closed.</param>
-        /// <param name="iconOpened">The icon opened.</param>
-        /// <param name="type">The type.</param>
-        void MakeNew(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type);
+        ///// <summary>
+        ///// Creates a new application tree.
+        ///// </summary>
+        ///// <param name="initialize">if set to <c>true</c> [initialize].</param>
+        ///// <param name="sortOrder">The sort order.</param>
+        ///// <param name="applicationAlias">The application alias.</param>
+        ///// <param name="alias">The alias.</param>
+        ///// <param name="title">The title.</param>
+        ///// <param name="iconClosed">The icon closed.</param>
+        ///// <param name="iconOpened">The icon opened.</param>
+        ///// <param name="type">The type.</param>
+        //void MakeNew(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type);
 
-        /// <summary>
-        /// Saves this instance.
-        /// </summary>
-        void SaveTree(ApplicationTree tree);
+        ///// <summary>
+        ///// Saves this instance.
+        ///// </summary>
+        //void SaveTree(ApplicationTree tree);
 
-        /// <summary>
-        /// Deletes this instance.
-        /// </summary>
-        void DeleteTree(ApplicationTree tree);
+        ///// <summary>
+        ///// Deletes this instance.
+        ///// </summary>
+        //void DeleteTree(ApplicationTree tree);
 
         /// <summary>
         /// Gets an ApplicationTree by it's tree alias.
@@ -50,21 +52,20 @@ namespace Umbraco.Core.Services
         /// <returns>Returns a ApplicationTree Array</returns>
         IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias);
 
-        /// <summary>
-        /// Gets the application tree for the applcation with the specified alias
-        /// </summary>
-        /// <param name="applicationAlias">The application alias.</param>
-        /// <param name="onlyInitialized"></param>
-        /// <returns>Returns a ApplicationTree Array</returns>
-        IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias, bool onlyInitialized);
+        ///// <summary>
+        ///// Gets the application tree for the applcation with the specified alias
+        ///// </summary>
+        ///// <param name="applicationAlias">The application alias.</param>
+        ///// <param name="onlyInitialized"></param>
+        ///// <returns>Returns a ApplicationTree Array</returns>
+        //IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias, bool onlyInitialized);
 
         /// <summary>
         /// Gets the grouped application trees for the application with the specified alias
         /// </summary>
         /// <param name="applicationAlias"></param>
-        /// <param name="onlyInitialized"></param>
         /// <returns></returns>
-        IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias, bool onlyInitialized);
+        IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias);
     }
 
     /// <summary>
@@ -72,37 +73,37 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class EmptyApplicationTreeService : IApplicationTreeService
     {
-        /// <summary>
-        /// Creates a new application tree.
-        /// </summary>
-        /// <param name="initialize">if set to <c>true</c> [initialize].</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <param name="applicationAlias">The application alias.</param>
-        /// <param name="alias">The alias.</param>
-        /// <param name="title">The title.</param>
-        /// <param name="iconClosed">The icon closed.</param>
-        /// <param name="iconOpened">The icon opened.</param>
-        /// <param name="type">The type.</param>
-        public void MakeNew(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
-        {
-            throw new System.NotImplementedException();
-        }
+        ///// <summary>
+        ///// Creates a new application tree.
+        ///// </summary>
+        ///// <param name="initialize">if set to <c>true</c> [initialize].</param>
+        ///// <param name="sortOrder">The sort order.</param>
+        ///// <param name="applicationAlias">The application alias.</param>
+        ///// <param name="alias">The alias.</param>
+        ///// <param name="title">The title.</param>
+        ///// <param name="iconClosed">The icon closed.</param>
+        ///// <param name="iconOpened">The icon opened.</param>
+        ///// <param name="type">The type.</param>
+        //public void MakeNew(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
-        /// <summary>
-        /// Saves this instance.
-        /// </summary>
-        public void SaveTree(ApplicationTree tree)
-        {
-            throw new System.NotImplementedException();
-        }
+        ///// <summary>
+        ///// Saves this instance.
+        ///// </summary>
+        //public void SaveTree(ApplicationTree tree)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
-        /// <summary>
-        /// Deletes this instance.
-        /// </summary>
-        public void DeleteTree(ApplicationTree tree)
-        {
-            throw new System.NotImplementedException();
-        }
+        ///// <summary>
+        ///// Deletes this instance.
+        ///// </summary>
+        //public void DeleteTree(ApplicationTree tree)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
         /// <summary>
         /// Gets an ApplicationTree by it's tree alias.
@@ -123,7 +124,7 @@ namespace Umbraco.Core.Services
             throw new System.NotImplementedException();
         }
 
-        public IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias, bool onlyInitialized)
+        public IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias)
         {
             throw new System.NotImplementedException();
         }
