@@ -792,29 +792,6 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsTrue(customDoc3.IsDescendantOrSelf(customDoc3));
         }
 
-        [Test]
-        public void Up()
-        {
-            var doc = GetNode(1173);
-
-            var result = doc.Up();
-
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(1046, result.Id);
-        }
-
-        [Test]
-        public void Down()
-        {
-            var doc = GetNode(1173);
-
-            var result = doc.Down();
-
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(1174, result.Id);
-        }
 
         [Test]
         public void FragmentProperty()
