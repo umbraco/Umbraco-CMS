@@ -180,8 +180,8 @@ namespace Umbraco.Core.Composing
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Factory.GetInstance<ICultureDictionaryFactory>();
 
-        public static CacheHelper ApplicationCache
-            => Factory.GetInstance<CacheHelper>();
+        public static AppCaches ApplicationCache
+            => Factory.GetInstance<AppCaches>();
 
         public static ServiceContext Services
             => Factory.GetInstance<ServiceContext>();

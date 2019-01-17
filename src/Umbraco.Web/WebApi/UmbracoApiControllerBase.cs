@@ -39,7 +39,7 @@ namespace Umbraco.Web.WebApi
                 Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                 Current.Factory.GetInstance<ISqlContext>(),
                 Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<CacheHelper>(),
+                Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
                 Current.Factory.GetInstance<IRuntimeState>()
             )
@@ -48,7 +48,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
         {
             GlobalSettings = globalSettings;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -88,7 +88,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get; }
+        public AppCaches ApplicationCache { get; }
 
         /// <summary>
         /// Gets the logger.

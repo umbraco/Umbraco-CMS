@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Templates
     [TestFixture]
     public class TemplateRepositoryTests
     {
-        private readonly Mock<CacheHelper> _cacheMock = new Mock<CacheHelper>();
+        private readonly Mock<AppCaches> _cacheMock = new Mock<AppCaches>();
         private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<ITemplatesSection>();
         private readonly IFileSystems _fileSystems = Mock.Of<IFileSystems>();
         private TemplateRepository _templateRepository;

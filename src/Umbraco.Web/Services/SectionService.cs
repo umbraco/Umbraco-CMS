@@ -23,7 +23,7 @@ namespace Umbraco.Web.Services
         private readonly Lazy<IEnumerable<Section>> _allAvailableSections;
         private readonly IApplicationTreeService _applicationTreeService;
         private readonly IScopeProvider _scopeProvider;
-        private readonly CacheHelper _cache;
+        private readonly AppCaches _cache;
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
         private static readonly object Locker = new object();
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Services
             IUserService userService,
             IApplicationTreeService applicationTreeService,
             IScopeProvider scopeProvider,
-            CacheHelper cache)
+            AppCaches cache)
         {
             _applicationTreeService = applicationTreeService ?? throw new ArgumentNullException(nameof(applicationTreeService));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));

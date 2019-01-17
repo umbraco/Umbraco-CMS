@@ -20,8 +20,8 @@ namespace Umbraco.Web.Cache
         private readonly IdkMap _idkMap;
         private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
-            : base(cacheHelper)
+        public ContentCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
@@ -44,10 +44,10 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(JsonPayload[] payloads)
         {
-            CacheHelper.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            AppCaches.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
 
             var idsRemoved = new HashSet<int>();
-            var isolatedCache = CacheHelper.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
+            var isolatedCache = AppCaches.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
 
             foreach (var payload in payloads)
             {
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Cache
             {
                 // when a public version changes
                 Current.ApplicationCache.ClearPartialViewCache();
-                MacroCacheRefresher.ClearMacroContentCache(CacheHelper); // just the content
+                MacroCacheRefresher.ClearMacroContentCache(AppCaches); // just the content
             }
 
             base.Refresh(payloads);
@@ -153,17 +153,17 @@ namespace Umbraco.Web.Cache
 
         #region Indirect
 
-        public static void RefreshContentTypes(CacheHelper cacheHelper)
+        public static void RefreshContentTypes(AppCaches appCaches)
         {
             // we could try to have a mechanism to notify the PublishedCachesService
             // and figure out whether published items were modified or not... keep it
             // simple for now, just clear the whole thing
 
-            cacheHelper.ClearPartialViewCache();
-            MacroCacheRefresher.ClearMacroContentCache(cacheHelper); // just the content
+            appCaches.ClearPartialViewCache();
+            MacroCacheRefresher.ClearMacroContentCache(appCaches); // just the content
 
-            cacheHelper.IsolatedRuntimeCache.ClearCache<PublicAccessEntry>();
-            cacheHelper.IsolatedRuntimeCache.ClearCache<IContent>();
+            appCaches.IsolatedRuntimeCache.ClearCache<PublicAccessEntry>();
+            appCaches.IsolatedRuntimeCache.ClearCache<IContent>();
         }
 
         #endregion

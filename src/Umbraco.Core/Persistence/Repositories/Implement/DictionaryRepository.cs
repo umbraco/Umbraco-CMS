@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DictionaryRepository : NPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
-        public DictionaryRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _dictionaryRepository = dictionaryRepository;
@@ -343,7 +343,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _dictionaryRepository = dictionaryRepository;

@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationController"/> class with all its dependencies.
         /// </summary>
-        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         { }
 

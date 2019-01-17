@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger logger)
-            : base(scopeAccessor, CacheHelper.NoCache, logger)
+            : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy()

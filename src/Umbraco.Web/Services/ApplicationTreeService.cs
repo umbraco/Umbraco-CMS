@@ -19,7 +19,7 @@ namespace Umbraco.Web.Services
     internal class ApplicationTreeService : IApplicationTreeService
     {
         private readonly ILogger _logger;
-        private readonly CacheHelper _cache;
+        private readonly AppCaches _cache;
         private readonly TypeLoader _typeLoader;
         private Lazy<IEnumerable<ApplicationTree>> _allAvailableTrees;
         internal const string TreeConfigFileName = "trees.config";
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Services
         private static readonly object Locker = new object();
         private readonly Lazy<IReadOnlyCollection<IGrouping<string, string>>> _groupedTrees;
 
-        public ApplicationTreeService(ILogger logger, CacheHelper cache, TypeLoader typeLoader)
+        public ApplicationTreeService(ILogger logger, AppCaches cache, TypeLoader typeLoader)
         {
             _logger = logger;
             _cache = cache;

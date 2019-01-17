@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
 
-        protected RepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
         {
             ScopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILogger Logger { get; }
 
-        protected CacheHelper GlobalCache { get; }
+        protected AppCaches GlobalCache { get; }
 
         protected IRuntimeCacheProvider GlobalIsolatedCache => GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
 
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             get
             {
-                if (GlobalCache == CacheHelper.NoCache)
+                if (GlobalCache == AppCaches.NoCache)
                     return NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
 
                 // create the cache policy using IsolatedCache which is either global

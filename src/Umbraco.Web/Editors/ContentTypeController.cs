@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
-            ServiceContext services, CacheHelper applicationCache,
+            ServiceContext services, AppCaches applicationCache,
             IProfilingLogger logger, IRuntimeState runtimeState)
             : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         {

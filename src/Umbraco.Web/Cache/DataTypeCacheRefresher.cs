@@ -15,8 +15,8 @@ namespace Umbraco.Web.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public DataTypeCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
-            : base(cacheHelper)
+        public DataTypeCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IMember>();
             ClearAllIsolatedCacheByEntityType<IMemberType>();
 
-            var dataTypeCache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataType>();
+            var dataTypeCache = AppCaches.IsolatedRuntimeCache.GetCache<IDataType>();
 
             foreach (var payload in payloads)
             {

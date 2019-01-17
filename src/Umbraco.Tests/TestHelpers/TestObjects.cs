@@ -90,7 +90,7 @@ namespace Umbraco.Tests.TestHelpers
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
         public ServiceContext GetServiceContext(
             IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
-            CacheHelper cache,
+            AppCaches cache,
             ILogger logger,
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,

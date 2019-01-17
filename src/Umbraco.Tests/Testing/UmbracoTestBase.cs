@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected CacheHelper CacheHelper => Factory.GetInstance<CacheHelper>();
+        protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
 
         protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();
 
@@ -199,9 +199,9 @@ namespace Umbraco.Tests.Testing
             return (logger, profiler);
         }
 
-        protected virtual CacheHelper GetCacheHelper()
+        protected virtual AppCaches GetCacheHelper()
         {
-            return CacheHelper.Disabled;
+            return AppCaches.Disabled;
         }
 
         protected virtual void ComposeWeb()

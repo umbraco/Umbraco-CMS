@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         {
             _dashboards = dashboards;

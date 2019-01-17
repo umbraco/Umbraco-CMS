@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplatesSection templateConfig, IFileSystems fileSystems)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, ITemplatesSection templateConfig, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
         {
             _masterpagesFileSystem = fileSystems.MasterPagesFileSystem;

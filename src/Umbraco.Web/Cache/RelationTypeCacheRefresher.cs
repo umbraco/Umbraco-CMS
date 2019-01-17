@@ -8,8 +8,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class RelationTypeCacheRefresher : CacheRefresherBase<RelationTypeCacheRefresher>
     {
-        public RelationTypeCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public RelationTypeCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IRelationType>();
+            var cache = AppCaches.IsolatedRuntimeCache.GetCache<IRelationType>();
             if (cache) cache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IRelationType>(id));
             base.Refresh(id);
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IRelationType>();
+            var cache = AppCaches.IsolatedRuntimeCache.GetCache<IRelationType>();
             if (cache) cache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IRelationType>(id));
             base.Remove(id);
         }

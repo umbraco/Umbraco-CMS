@@ -18,8 +18,8 @@ namespace Umbraco.Web.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public MediaCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
-            : base(cacheHelper)
+        public MediaCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
             {
                 Current.ApplicationCache.ClearPartialViewCache();
 
-                var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
+                var mediaCache = AppCaches.IsolatedRuntimeCache.GetCache<IMedia>();
 
                 foreach (var payload in payloads)
                 {
@@ -119,9 +119,9 @@ namespace Umbraco.Web.Cache
 
         #region Indirect
 
-        public static void RefreshMediaTypes(CacheHelper cacheHelper)
+        public static void RefreshMediaTypes(AppCaches appCaches)
         {
-            cacheHelper.IsolatedRuntimeCache.ClearCache<IMedia>();
+            appCaches.IsolatedRuntimeCache.ClearCache<IMedia>();
         }
 
         #endregion

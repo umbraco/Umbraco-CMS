@@ -6,12 +6,12 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Represents the application-wide caches.
     /// </summary>
-    public class CacheHelper
+    public class AppCaches
     {
         /// <summary>
         /// Initializes a new instance for use in the web
         /// </summary>
-        public CacheHelper()
+        public AppCaches()
             : this(
                 new HttpRuntimeCacheProvider(HttpRuntime.Cache),
                 new StaticCacheProvider(),
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance for use in the web
         /// </summary>
-        public CacheHelper(System.Web.Caching.Cache cache)
+        public AppCaches(System.Web.Caching.Cache cache)
             : this(
                 new HttpRuntimeCacheProvider(cache),
                 new StaticCacheProvider(),
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance based on the provided providers
         /// </summary>
-        public CacheHelper(
+        public AppCaches(
             IRuntimeCacheProvider httpCacheProvider,
             ICacheProvider staticCacheProvider,
             ICacheProvider requestCacheProvider,
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Cache
         /// <para>When used by repositories, all cache policies apply, but the underlying caches do not cache anything.</para>
         /// <para>Used by tests.</para>
         /// </remarks>
-        public static CacheHelper Disabled { get; } = new CacheHelper(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
+        public static AppCaches Disabled { get; } = new AppCaches(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
 
         /// <summary>
         /// Gets the special no-cache instance.
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Cache
         /// <para>When used by repositories, all cache policies are bypassed.</para>
         /// <para>Used by repositories that do no cache.</para>
         /// </remarks>
-        public static CacheHelper NoCache { get; } = new CacheHelper(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
+        public static AppCaches NoCache { get; } = new AppCaches(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
 
         /// <summary>
         /// Returns the current Request cache

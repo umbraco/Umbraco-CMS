@@ -111,7 +111,7 @@
     <Compile Include="AttemptOfTResultTStatus.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
-    <Compile Include="Cache\CacheHelper.cs" />
+    <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />

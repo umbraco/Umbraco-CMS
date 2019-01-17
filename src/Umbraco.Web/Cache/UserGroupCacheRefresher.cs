@@ -14,8 +14,8 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresher>
     {
-        public UserGroupCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public UserGroupCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             ClearAllIsolatedCacheByEntityType<IUserGroup>();
-            var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            var userGroupCache = AppCaches.IsolatedRuntimeCache.GetCache<IUserGroup>();
             if (userGroupCache)
             {
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            var userGroupCache = AppCaches.IsolatedRuntimeCache.GetCache<IUserGroup>();
             if (userGroupCache)
             {
                 userGroupCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IUserGroup>(id));

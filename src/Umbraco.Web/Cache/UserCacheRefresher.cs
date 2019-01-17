@@ -8,8 +8,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresher>
     {
-        public UserCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public UserCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var userCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUser>();
+            var userCache = AppCaches.IsolatedRuntimeCache.GetCache<IUser>();
             if (userCache)
                 userCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IUser>(id));
 

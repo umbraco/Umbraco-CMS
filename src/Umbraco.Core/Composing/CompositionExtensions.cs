@@ -18,7 +18,7 @@ namespace Umbraco.Core.Composing
         public static void RegisterEssentials(this Composition composition,
             ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
             IMainDom mainDom,
-            CacheHelper appCaches,
+            AppCaches appCaches,
             IUmbracoDatabaseFactory databaseFactory,
             TypeLoader typeLoader,
             IRuntimeState state)
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Composing
             composition.RegisterUnique(profilingLogger);
             composition.RegisterUnique(mainDom);
             composition.RegisterUnique(appCaches);
-            composition.RegisterUnique(factory => factory.GetInstance<CacheHelper>().RuntimeCache);
+            composition.RegisterUnique(factory => factory.GetInstance<AppCaches>().RuntimeCache);
             composition.RegisterUnique(databaseFactory);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
             composition.RegisterUnique(typeLoader);

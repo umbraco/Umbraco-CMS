@@ -21,7 +21,7 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected SurfaceController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
+        protected SurfaceController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches applicationCache, ILogger logger, IProfilingLogger profilingLogger)
             : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
         {
         }

@@ -11,8 +11,8 @@ namespace Umbraco.Web.Cache
     {
         private readonly IdkMap _idkMap;
 
-        public MemberCacheRefresher(CacheHelper cacheHelper, IdkMap idkMap)
-            : base(cacheHelper)
+        public MemberCacheRefresher(AppCaches appCaches, IdkMap idkMap)
+            : base(appCaches)
         {
             _idkMap = idkMap;
         }
@@ -58,9 +58,9 @@ namespace Umbraco.Web.Cache
         private void ClearCache(int id)
         {
             _idkMap.ClearCache(id);
-            CacheHelper.ClearPartialViewCache();
+            AppCaches.ClearPartialViewCache();
 
-            var memberCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMember>();
+            var memberCache = AppCaches.IsolatedRuntimeCache.GetCache<IMember>();
             if (memberCache)
                 memberCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMember>(id));
         }
@@ -69,9 +69,9 @@ namespace Umbraco.Web.Cache
 
         #region Indirect
 
-        public static void RefreshMemberTypes(CacheHelper cacheHelper)
+        public static void RefreshMemberTypes(AppCaches appCaches)
         {
-            cacheHelper.IsolatedRuntimeCache.ClearCache<IMember>();
+            appCaches.IsolatedRuntimeCache.ClearCache<IMember>();
         }
 
         #endregion

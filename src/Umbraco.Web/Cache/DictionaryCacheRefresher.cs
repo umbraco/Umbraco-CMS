@@ -6,8 +6,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class DictionaryCacheRefresher : CacheRefresherBase<DictionaryCacheRefresher>
     {
-        public DictionaryCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public DictionaryCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define

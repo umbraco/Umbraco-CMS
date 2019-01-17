@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Macros
         public void Setup()
         {
             //we DO want cache enabled for these tests
-            var cacheHelper = new CacheHelper(
+            var cacheHelper = new AppCaches(
                 new ObjectCacheRuntimeCacheProvider(),
                 new StaticCacheProvider(),
                 NullCacheProvider.Instance,

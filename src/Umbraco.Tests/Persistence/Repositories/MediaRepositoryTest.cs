@@ -30,14 +30,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private MediaRepository CreateRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository, CacheHelper cacheHelper = null)
+        private MediaRepository CreateRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository, AppCaches appCaches = null)
         {
-            cacheHelper = cacheHelper ?? CacheHelper;
+            appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
 
-            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, cacheHelper, Logger);
-            var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
-            var repository = new MediaRepository(scopeAccessor, cacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger);
+            var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
+            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
             return repository;
         }
 
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             MediaTypeRepository mediaTypeRepository;
 
-            var realCache = new CacheHelper(
+            var realCache = new AppCaches(
                 new ObjectCacheRuntimeCacheProvider(),
                 new StaticCacheProvider(),
                 new StaticCacheProvider(),
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(provider, out mediaTypeRepository, cacheHelper: realCache);
+                var repository = CreateRepository(provider, out mediaTypeRepository, appCaches: realCache);
 
                 var udb = (UmbracoDatabase)scope.Database;
 
