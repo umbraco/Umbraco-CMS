@@ -5,7 +5,6 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -14,7 +13,6 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class MultiUrlPickerPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
@@ -39,35 +37,33 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
-            {
                 return null;
-            }
 
-            if (source.ToString().Trim().StartsWith("["))
+            if (source.ToString().Trim().StartsWith("[") == false)
+                return null;
+
+            try
             {
-                try
-                {
-                    return JArray.Parse(source.ToString());
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<MultiUrlPickerPropertyConverter>("Error parsing JSON", ex);
-                }
+                return JArray.Parse(source.ToString());
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<MultiUrlPickerPropertyConverter>("Error parsing JSON", ex);
             }
             return null;
         }
 
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
-            int maxNumber;
-            bool isMultiple = IsMultipleDataType(propertyType.DataTypeId, out maxNumber);
+            var isMultiple = IsMultipleDataType(propertyType.DataTypeId, out var maxNumber);
             if (source == null)
-            {
-                return isMultiple ? Enumerable.Empty<Link>() : null;
-            }
+                return isMultiple
+                    ? Enumerable.Empty<Link>()
+                    : null;
 
             //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (UmbracoContext.Current == null) return source;
+            if (UmbracoContext.Current == null)
+                return source;
 
             var umbHelper = new UmbracoHelper(UmbracoContext.Current);
 
@@ -76,8 +72,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             foreach (var dto in dtos)
             {
-                LinkType type = LinkType.External;
-                string url = dto.Url;
+                var type = LinkType.External;
+                var url = dto.Url;
                 if (dto.Udi != null)
                 {
                     type = dto.Udi.EntityType == Constants.UdiEntityType.Media
@@ -88,18 +84,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     {
                         var media = umbHelper.TypedMedia(dto.Udi);
                         if (media == null)
-                        {
                             continue;
-                        }
                         url = media.Url;
                     }
                     else
                     {
                         var content = umbHelper.TypedContent(dto.Udi);
                         if (content == null)
-                        {
                             continue;
-                        }
                         url = content.Url;
                     }
                 }
@@ -112,22 +104,23 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     Udi = dto.Udi,
                     Url = url + dto.QueryString,
                 };
+
                 links.Add(link);
             }
 
-            if (isMultiple == false) return links.FirstOrDefault();
-            if (maxNumber > 0) return links.Take(maxNumber);
+            if (isMultiple == false)
+                return links.FirstOrDefault();
+            if (maxNumber > 0)
+                return links.Take(maxNumber);
+
             return links;
         }
 
         public Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            int maxNumber;
-            if (IsMultipleDataType(propertyType.DataTypeId, out maxNumber))
-            {
-                return typeof(IEnumerable<Link>);
-            }
-            return typeof(Link);
+            return IsMultipleDataType(propertyType.DataTypeId, out var maxNumber)
+                ? typeof(IEnumerable<Link>)
+                : typeof(Link);
         }
 
         public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
@@ -152,15 +145,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             maxNumber = Storages.GetOrAdd(dataTypeId, id =>
             {
-                var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(id).PreValuesAsDictionary;
+                var preValues = _dataTypeService.GetPreValuesCollectionByDataTypeId(id).PreValuesAsDictionary;
 
-                PreValue maxNumberPreValue;
-                if (preVals.TryGetValue("maxNumber", out maxNumberPreValue))
-                {
-                    return maxNumberPreValue.Value.TryConvertTo<int>().Result;
-                }
-
-                return 0;
+                return preValues.TryGetValue("maxNumber", out var maxNumberPreValue)
+                    ? maxNumberPreValue.Value.TryConvertTo<int>().Result
+                    : 0;
             });
 
             return maxNumber != 1;

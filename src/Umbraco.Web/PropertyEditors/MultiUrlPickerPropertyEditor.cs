@@ -15,7 +15,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultiUrlPickerAlias, "Multi Url Picker", PropertyEditorValueTypes.Json, "multiurlpicker", Group ="pickers", Icon = "icon-link", IsParameterEditor = true)]
+    [PropertyEditor(Constants.PropertyEditors.MultiUrlPickerAlias, "Multi Url Picker", PropertyEditorValueTypes.Json, "multiurlpicker", Group = "pickers", Icon = "icon-link", IsParameterEditor = true)]
     public class MultiUrlPickerPropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()
@@ -32,13 +32,13 @@ namespace Umbraco.Web.PropertyEditors
         {
             public MultiUrlPickerPreValueEditor()
             {
-                Fields.Add(new PreValueField()
+                Fields.Add(new PreValueField
                 {
                     Key = "minNumber",
                     View = "number",
                     Name = "Minimum number of items"
                 });
-                Fields.Add(new PreValueField()
+                Fields.Add(new PreValueField
                 {
                     Key = "maxNumber",
                     View = "number",
@@ -56,23 +56,19 @@ namespace Umbraco.Web.PropertyEditors
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
                 if (property.Value == null)
-                {
                     return Enumerable.Empty<object>();
-                }
 
-                string value = property.Value.ToString();
+                var value = property.Value.ToString();
 
-                if(string.IsNullOrEmpty(value))
-                {
+                if (string.IsNullOrEmpty(value))
                     return Enumerable.Empty<object>();
-                }
 
                 try
                 {
                     var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-                    ServiceContext services = ApplicationContext.Current.Services;
-                    IEntityService entityService = services.EntityService;
-                    IContentTypeService contentTypeService = services.ContentTypeService;
+                    var services = ApplicationContext.Current.Services;
+                    var entityService = services.EntityService;
+                    var contentTypeService = services.ContentTypeService;
                     string deletedLocalization = null;
                     string recycleBinLocalization = null;
 
@@ -86,7 +82,7 @@ namespace Umbraco.Web.PropertyEditors
                         link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media
                     );
 
-                    List<IUmbracoEntity> entities = new List<IUmbracoEntity>();
+                    var entities = new List<IUmbracoEntity>();
                     if (documentLinks.Count > 0)
                     {
                         entities.AddRange(
@@ -95,7 +91,7 @@ namespace Umbraco.Web.PropertyEditors
                         );
                     }
 
-                    if(mediaLinks.Count > 0)
+                    if (mediaLinks.Count > 0)
                     {
                         entities.AddRange(
                             entityService.GetAll(UmbracoObjectTypes.Media,
@@ -104,7 +100,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
 
                     var links = new List<LinkDisplay>();
-                    foreach (LinkDto dto in dtos)
+                    foreach (var dto in dtos)
                     {
                         var link = new LinkDisplay
                         {
@@ -121,87 +117,76 @@ namespace Umbraco.Web.PropertyEditors
 
                         links.Add(link);
 
-                        if (dto.Udi != null)
+                        if (dto.Udi == null)
+                            continue;
+
+                        var entity = entities.Find(e => e.Key == dto.Udi.Guid);
+                        if (entity == null)
                         {
-                            IUmbracoEntity entity = entities.Find(e => e.Key == dto.Udi.Guid);
-                            if (entity == null)
+                            if (deletedLocalization == null)
+                                deletedLocalization = services.TextService.Localize("general/deleted");
+
+                            link.Published = false;
+                            link.Trashed = true;
+                            link.Url = deletedLocalization;
+                        }
+                        else
+                        {
+                            var entityType =
+                                Equals(entity.AdditionalData["NodeObjectTypeId"], Constants.ObjectTypes.MediaGuid)
+                                    ? Constants.UdiEntityType.Media
+                                    : Constants.UdiEntityType.Document;
+
+                            var udi = new GuidUdi(entityType, entity.Key);
+
+                            var contentTypeAlias = (string)entity.AdditionalData["ContentTypeAlias"];
+                            if (entity.Trashed)
                             {
-                                if(deletedLocalization == null)
-                                {
-                                    deletedLocalization = services.TextService.Localize("general/deleted");
-                                }
-                                link.Published = false;
+                                if (recycleBinLocalization == null)
+                                    recycleBinLocalization = services.TextService.Localize("general/recycleBin");
+
                                 link.Trashed = true;
-                                link.Url = deletedLocalization;
+                                link.Url = recycleBinLocalization;
+                            }
+
+                            if (udi.EntityType == Constants.UdiEntityType.Document)
+                            {
+                                var contentType = contentTypeService.GetContentType(contentTypeAlias);
+
+                                if (contentType == null)
+                                    continue;
+
+                                link.Icon = contentType.Icon;
+                                link.Published = Equals(entity.AdditionalData["IsPublished"], true);
+
+                                if (link.Trashed == false)
+                                    link.Url = umbHelper.Url(entity.Id, UrlProviderMode.Relative);
                             }
                             else
                             {
-                                string entityType =
-                                    Equals(entity.AdditionalData["NodeObjectTypeId"], Constants.ObjectTypes.MediaGuid)
-                                        ? Constants.UdiEntityType.Media
-                                        : Constants.UdiEntityType.Document;
+                                link.IsMedia = true;
 
-                                var udi = new GuidUdi(entityType, entity.Key);
+                                var mediaType = contentTypeService.GetMediaType(contentTypeAlias);
 
-                                string contentTypeAlias = (string) entity.AdditionalData["ContentTypeAlias"];
-                                if (entity.Trashed)
-                                {
-                                    if (recycleBinLocalization == null)
-                                    {
-                                        recycleBinLocalization = services.TextService.Localize("general/recycleBin");
+                                if (mediaType == null)
+                                    continue;
 
-                                    }
-                                    link.Trashed = true;
-                                    link.Url = recycleBinLocalization;
-                                }
+                                link.Icon = mediaType.Icon;
 
-                                if (udi.EntityType == Constants.UdiEntityType.Document)
-                                {
-                                    IContentType contentType = contentTypeService.GetContentType(contentTypeAlias);
+                                if (link.Trashed)
+                                    continue;
 
-                                    if (contentType == null)
-                                    {
-                                        continue;
-                                    }
-
-                                    link.Icon = contentType.Icon;
-                                    link.Published = Equals(entity.AdditionalData["IsPublished"], true);
-
-                                    if (link.Trashed == false)
-                                    {
-                                        link.Url = umbHelper.Url(entity.Id, UrlProviderMode.Relative);
-                                    }
-                                }
-                                else
-                                {
-                                    link.IsMedia = true;
-
-                                    IMediaType mediaType = contentTypeService.GetMediaType(contentTypeAlias);
-
-                                    if (mediaType == null)
-                                    {
-                                        continue;
-                                    }
-
-                                    link.Icon = mediaType.Icon;
-
-                                    if (link.Trashed == false)
-                                    {
-                                        var media = umbHelper.TypedMedia(entity.Id);
-                                        if (media != null)
-                                        {
-                                            link.Url = media.Url;
-                                        }
-                                    }
-                                }
+                                var media = umbHelper.TypedMedia(entity.Id);
+                                if (media != null)
+                                    link.Url = media.Url;
                             }
                         }
                     }
                     return links;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    ApplicationContext.Current.ProfilingLogger.Logger.Error<MultiUrlPickerPropertyValueEditor>(string.Format("Error getting links.\r\n{0}", property.Value), ex);
+                    ApplicationContext.Current.ProfilingLogger.Logger.Error<MultiUrlPickerPropertyValueEditor>($"Error getting links.\r\n{property.Value}", ex);
                 }
 
                 return base.ConvertDbToEditor(property, propertyType, dataTypeService);
@@ -210,16 +195,12 @@ namespace Umbraco.Web.PropertyEditors
             public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null)
-                {
                     return null;
-                }
 
-                string value = editorValue.Value.ToString();
+                var value = editorValue.Value.ToString();
 
                 if (string.IsNullOrEmpty(value))
-                {
                     return null;
-                }
 
                 try
                 {
@@ -240,7 +221,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
                 catch (Exception ex)
                 {
-                    ApplicationContext.Current.ProfilingLogger.Logger.Error<MultiUrlPickerPropertyValueEditor>(string.Format("Error saving links.\r\n{0}", editorValue.Value), ex);
+                    ApplicationContext.Current.ProfilingLogger.Logger.Error<MultiUrlPickerPropertyValueEditor>($"Error saving links.\r\n{editorValue.Value}", ex);
                 }
                 return base.ConvertEditorToDb(editorValue, currentValue);
             }
