@@ -215,8 +215,14 @@
          * @param {any} selectedVariant
          */
         function openSplitView(selectedVariant) {
-
             var selectedCulture = selectedVariant.language.culture;
+
+            //Find the whole variant model based on the culture that was chosen
+            var variant = _.find(vm.content.variants, function (v) {
+                return v.language.culture === selectedCulture;
+            });
+
+            insertVariantEditor(vm.editors.length, initVariant(variant, vm.editors.length));
 
             //only the content app can be selected since no other apps are shown, and because we copy all of these apps
             //to the "editors" we need to update this across all editors
@@ -232,13 +238,6 @@
                     }
                 }
             }
-
-            //Find the whole variant model based on the culture that was chosen
-            var variant = _.find(vm.content.variants, function (v) {
-                return v.language.culture === selectedCulture;
-            });
-
-            insertVariantEditor(vm.editors.length, initVariant(variant, vm.editors.length));
 
             //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             editor.collapsed = true;
