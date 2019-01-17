@@ -25,7 +25,7 @@ namespace Umbraco.Core.Deploy
         /// <param name="dependencies">The dependencies of the property.</param>
         /// <returns>The grid cell value to be deployed.</returns>
         /// <remarks>Note that </remarks>
-        string ToArtifact(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies);
+        string GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
         /// Allows you to modify the value of a control being deployed.
@@ -33,6 +33,6 @@ namespace Umbraco.Core.Deploy
         /// <param name="gridControl">The control being deployed.</param>
         /// <remarks>Follows the pattern of the property value connectors (<see cref="IValueConnector"/>). The SetValue method is used to modify the value of the <paramref name="gridControl"/>.</remarks>
 
-        void FromArtifact(GridValue.GridControl gridControl);
+        void SetValue(GridValue.GridControl gridControl);
     }
 }
