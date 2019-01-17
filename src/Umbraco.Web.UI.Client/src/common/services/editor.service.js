@@ -4,10 +4,10 @@
  *
  * @description
  * Added in Umbraco 8.0. Application-wide service for handling infinite editing.
- * 
  *
- * 
- * 
+ *
+ *
+ *
 <h2><strong>Open a build-in infinite editor (media picker)</strong></h2>
 <h3>Markup example</h3>
 <pre>
@@ -97,7 +97,7 @@ When building a custom infinite editor view you can use the same components as a
                 hide-icon="true"
                 hide-description="true">
             </umb-editor-header>
-        
+
             <umb-editor-container>
                 <umb-box>
                     <umb-box-content>
@@ -166,7 +166,7 @@ When building a custom infinite editor view you can use the same components as a
 
         let editorsKeyboardShorcuts = [];
         var editors = [];
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.editorService#getEditors
@@ -220,7 +220,7 @@ When building a custom infinite editor view you can use the same components as a
                 editors: editors,
                 editor: editor
             };
-            
+
             eventsService.emit("appState.editors.open", args);
         }
 
@@ -245,7 +245,7 @@ When building a custom infinite editor view you can use the same components as a
 
             // emit event to let components know an editor has been removed
             eventsService.emit("appState.editors.close", args);
-            
+
             // delay required to map the properties to the correct editor due
             // to another delay in the closing animation of the editor
             $timeout(function() {
@@ -287,7 +287,7 @@ When building a custom infinite editor view you can use the same components as a
          * @param {Boolean} editor.create Create new content item
          * @param {Function} editor.submit Callback function when the publish and close button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
-         * 
+         *
          * @returns {Object} editor object
          */
         function contentEditor(editor) {
@@ -302,12 +302,12 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a content picker in infinite editing, the submit callback returns an array of selected items
-         * 
+         *
          * @param {Object} editor rendering options
          * @param {Boolean} editor.multiPicker Pick one or multiple items
          * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
-         * 
+         *
          * @returns {Object} editor object
          */
         function contentPicker(editor) {
@@ -523,7 +523,6 @@ When building a custom infinite editor view you can use the same components as a
          */
         function queryBuilder(editor) {
             editor.view = "views/common/infiniteeditors/querybuilder/querybuilder.html";
-            editor.size = "small";
             open(editor);
         }
 
@@ -699,7 +698,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the section picker in infinite editing, the submit callback returns an array of the selected items
-         * 
+         *
          * @param {Object} editor rendering options
          * @param {Array} editor.availableItems Array of available items.
          * @param {Array} editor.selectedItems Array of selected items. When passed in the selected items will be filtered from the available items.
@@ -721,7 +720,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a macro picker in infinite editing, the submit callback returns an array of the selected items
-         * 
+         *
          * @param {Callback} editor.submit Submits the editor.
          * @param {Callback} editor.close Closes the editor.
          * @returns {Object} editor object
@@ -739,7 +738,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a member group picker in infinite editing.
-         * 
+         *
          * @param {Object} editor rendering options
          * @param {Object} editor.multiPicker Pick one or multiple items.
          * @param {Callback} editor.submit Submits the editor.
@@ -753,22 +752,22 @@ When building a custom infinite editor view you can use the same components as a
         }
 
         ///////////////////////
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.editorService#storeKeyboardShortcuts
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Internal method to keep track of keyboard shortcuts registered 
+         * Internal method to keep track of keyboard shortcuts registered
          * to each editor so they can be rebound when an editor closes
-         * 
+         *
          */
         function unbindKeyboardShortcuts() {
             const shortcuts = angular.copy(keyboardService.keyboardEvent);
             editorsKeyboardShorcuts.push(shortcuts);
 
-            // unbind the current shortcuts because we only want to 
+            // unbind the current shortcuts because we only want to
             // shortcuts from the newly opened editor working
             for (let [key, value] of Object.entries(shortcuts)) {
                 keyboardService.unbind(key);
@@ -782,7 +781,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Internal method to rebind keyboard shortcuts for the editor in focus
-         * 
+         *
          */
         function rebindKeyboardShortcuts() {
             // find the shortcuts from the previous editor

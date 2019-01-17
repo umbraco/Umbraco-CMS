@@ -942,65 +942,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Axes: following-sibling, preceding-sibling, following, preceding + pseudo-axes up, down, next, previous
-
-        // up pseudo-axe ~ ancestors
-        // bogus, kept for backward compatibility but we should get rid of it
-        // better use ancestors
-
-        public static IPublishedContent Up(this IPublishedContent content)
-        {
-            return content.Parent;
-        }
-
-        public static IPublishedContent Up(this IPublishedContent content, int number)
-        {
-            if (number < 0)
-                throw new ArgumentOutOfRangeException(nameof(number), "Must be greater than, or equal to, zero.");
-            return number == 0 ? content : content.EnumerateAncestors(false).Skip(number).FirstOrDefault();
-        }
-
-        public static IPublishedContent Up(this IPublishedContent content, string contentTypeAlias)
-        {
-            return string.IsNullOrEmpty(contentTypeAlias)
-                ? content.Parent
-                : content.Ancestor(contentTypeAlias);
-        }
-
-        // down pseudo-axe ~ children (not descendants)
-        // bogus, kept for backward compatibility but we should get rid of it
-        // better use descendants
-
-        public static IPublishedContent Down(this IPublishedContent content)
-        {
-            return content.Children.FirstOrDefault();
-        }
-
-        public static IPublishedContent Down(this IPublishedContent content, int number)
-        {
-            if (number < 0)
-                throw new ArgumentOutOfRangeException(nameof(number), "Must be greater than, or equal to, zero.");
-            if (number == 0) return content;
-
-            content = content.Children.FirstOrDefault();
-            while (content != null && --number > 0)
-                content = content.Children.FirstOrDefault();
-
-            return content;
-        }
-
-        public static IPublishedContent Down(this IPublishedContent content, string contentTypeAlias)
-        {
-            if (string.IsNullOrEmpty(contentTypeAlias))
-                return content.Children.FirstOrDefault();
-
-            // note: this is what legacy did, but with a broken Descendant
-            // so fixing Descendant will change how it works...
-            return content.Descendant(contentTypeAlias);
-        }
-
-        #endregion
-
         #region Axes: parent
 
         // Parent is native
@@ -1034,6 +975,7 @@ namespace Umbraco.Web
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
+
             return content.Children;
         }
 
@@ -1096,6 +1038,11 @@ namespace Umbraco.Web
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
         {
             return content.Children(predicate).FirstOrDefault();
+        }
+
+        public static IPublishedContent FirstChild(this IPublishedContent content, Guid uniqueId)
+        {
+            return content.Children(x=>x.Key == uniqueId).FirstOrDefault();
         }
 
         public static T FirstChild<T>(this IPublishedContent content)
