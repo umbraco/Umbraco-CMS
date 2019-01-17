@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
@@ -15,15 +16,11 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class SectionServiceTests : TestWithSomeContentBase
     {
-        //fixme
-        private ISectionService SectionService => new SectionService(ServiceContext.UserService, null);
-
+        private ISectionService SectionService => Factory.GetInstance<ISectionService>();
        
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
         {
-            //fixme - need to mock
-
             // Arrange
             var user = CreateTestUser();
 
@@ -60,7 +57,7 @@ namespace Umbraco.Tests.Services
                 Name = "Group B"
             };
             userGroupB.AddAllowedSection("settings");
-            userGroupB.AddAllowedSection("developer");
+            userGroupB.AddAllowedSection("member");
             ServiceContext.UserService.Save(userGroupB, new[] { user.Id }, false);
 
             return ServiceContext.UserService.GetUserById(user.Id);

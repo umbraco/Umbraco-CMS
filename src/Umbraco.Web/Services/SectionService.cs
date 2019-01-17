@@ -16,8 +16,8 @@ namespace Umbraco.Web.Services
             IUserService userService,
             BackOfficeSectionCollection sectionCollection)
         {
-            _userService = userService;
-            _sectionCollection = sectionCollection;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _sectionCollection = sectionCollection ?? throw new ArgumentNullException(nameof(sectionCollection));
         }
         
         /// <summary>
