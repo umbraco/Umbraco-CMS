@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Cache
     public abstract class RuntimeCacheProviderTests : CacheProviderTests
     {
 
-        internal abstract IAppPolicedCache RuntimeProvider { get; }
+        internal abstract IAppPolicyCache RuntimeProvider { get; }
 
 
         [Test]

@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Cache
             get { return _provider; }
         }
 
-        internal override IAppPolicedCache RuntimeProvider
+        internal override IAppPolicyCache RuntimeProvider
         {
             get { return _provider; }
         }

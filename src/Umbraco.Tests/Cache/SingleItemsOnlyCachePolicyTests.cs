@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Cache
         public void Get_All_Doesnt_Cache()
         {
             var cached = new List<string>();
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Cache
         public void Caches_Single()
         {
             var isCached = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback(() =>

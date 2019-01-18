@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected AppCaches AppCaches { get; }
 
-        protected IAppPolicedCache GlobalIsolatedCache => AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
+        protected IAppPolicyCache GlobalIsolatedCache => AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
 
         protected IScopeAccessor ScopeAccessor { get; }
 
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// Gets the isolated cache.
         /// </summary>
         /// <remarks>Depends on the ambient scope cache mode.</remarks>
-        protected IAppPolicedCache IsolatedCache
+        protected IAppPolicyCache IsolatedCache
         {
             get
             {
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Adds or Updates an entity of type TEntity
         /// </summary>
-        /// <remarks>This method is backed by an <see cref="IAppPolicedCache"/> cache</remarks>
+        /// <remarks>This method is backed by an <see cref="IAppPolicyCache"/> cache</remarks>
         /// <param name="entity"></param>
         public void Save(TEntity entity)
         {

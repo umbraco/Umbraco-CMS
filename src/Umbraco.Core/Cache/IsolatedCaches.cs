@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Represents a dictionary of <see cref="IAppPolicedCache"/> for types.
+    /// Represents a dictionary of <see cref="IAppPolicyCache"/> for types.
     /// </summary>
     /// <remarks>
     /// <para>Isolated caches are used by e.g. repositories, to ensure that each cached entity
@@ -16,20 +16,20 @@ namespace Umbraco.Core.Cache
         /// Initializes a new instance of the <see cref="IsolatedCaches"/> class.
         /// </summary>
         /// <param name="cacheFactory"></param>
-        public IsolatedCaches(Func<Type, IAppPolicedCache> cacheFactory)
+        public IsolatedCaches(Func<Type, IAppPolicyCache> cacheFactory)
             : base(cacheFactory)
         { }
 
         /// <summary>
         /// Gets a cache.
         /// </summary>
-        public IAppPolicedCache GetOrCreate<T>()
+        public IAppPolicyCache GetOrCreate<T>()
             => GetOrCreate(typeof(T));
 
         /// <summary>
         /// Tries to get a cache.
         /// </summary>
-        public Attempt<IAppPolicedCache> Get<T>()
+        public Attempt<IAppPolicyCache> Get<T>()
             => Get(typeof(T));
 
         /// <summary>

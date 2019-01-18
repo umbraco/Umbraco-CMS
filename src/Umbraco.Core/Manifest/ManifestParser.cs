@@ -20,7 +20,7 @@ namespace Umbraco.Core.Manifest
     {
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
-        private readonly IAppPolicedCache _cache;
+        private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
         private readonly ManifestValueValidatorCollection _validators;
 

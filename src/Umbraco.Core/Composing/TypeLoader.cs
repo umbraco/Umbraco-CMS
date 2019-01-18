@@ -29,7 +29,7 @@ namespace Umbraco.Core.Composing
     {
         private const string CacheKey = "umbraco-types.list";
 
-        private readonly IAppPolicedCache _runtimeCache;
+        private readonly IAppPolicyCache _runtimeCache;
         private readonly IProfilingLogger _logger;
 
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(IAppPolicedCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
+        public TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
             : this(runtimeCache, localTempStorage, logger, true)
         { }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IAppPolicedCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
+        internal TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempStorage = localTempStorage == LocalTempStorage.Unknown ? LocalTempStorage.Default : localTempStorage;

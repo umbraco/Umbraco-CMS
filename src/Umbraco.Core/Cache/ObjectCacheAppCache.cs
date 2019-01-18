@@ -11,9 +11,9 @@ using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Implements <see cref="IAppPolicedCache"/> on top of a <see cref="ObjectCache"/>.
+    /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="ObjectCache"/>.
     /// </summary>
-    public class ObjectCacheAppCache : IAppPolicedCache
+    public class ObjectCacheAppCache : IAppPolicyCache
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 

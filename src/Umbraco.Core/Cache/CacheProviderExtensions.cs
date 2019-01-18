@@ -10,7 +10,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public static class CacheProviderExtensions
     {
-        public static T GetCacheItem<T>(this IAppPolicedCache provider,
+        public static T GetCacheItem<T>(this IAppPolicyCache provider,
             string cacheKey,
             Func<T> getCacheItem,
             TimeSpan? timeout,
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Cache
             return result == null ? default(T) : result.TryConvertTo<T>().Result;
         }
 
-        public static void InsertCacheItem<T>(this IAppPolicedCache provider,
+        public static void InsertCacheItem<T>(this IAppPolicyCache provider,
             string cacheKey,
             Func<T> getCacheItem,
             TimeSpan? timeout = null,

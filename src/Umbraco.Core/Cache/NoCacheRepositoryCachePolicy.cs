@@ -13,7 +13,7 @@ namespace Umbraco.Core.Cache
 
         public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new NoCacheRepositoryCachePolicy<TEntity, TId>();
 
-        public IRepositoryCachePolicy<TEntity, TId> Scoped(IAppPolicedCache runtimeCache, IScope scope)
+        public IRepositoryCachePolicy<TEntity, TId> Scoped(IAppPolicyCache runtimeCache, IScope scope)
         {
             throw new NotImplementedException();
         }

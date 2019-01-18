@@ -17,7 +17,7 @@ namespace Umbraco.Core.Services.Implement
     public class LocalizedTextServiceFileSources
     {
         private readonly ILogger _logger;
-        private readonly IAppPolicedCache _cache;
+        private readonly IAppPolicyCache _cache;
         private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource> _supplementFileSources;
         private readonly DirectoryInfo _fileSourceFolder;
 

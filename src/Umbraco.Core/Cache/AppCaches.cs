@@ -30,7 +30,7 @@ namespace Umbraco.Core.Cache
         /// Initializes a new instance of the <see cref="AppCaches"/> with cache providers.
         /// </summary>
         public AppCaches(
-            IAppPolicedCache runtimeCache,
+            IAppPolicyCache runtimeCache,
             IAppCache staticCacheProvider,
             IAppCache requestCache,
             IsolatedCaches isolatedCaches)
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Cache
         /// <remarks>
         /// <para>The runtime cache is the main application cache.</para>
         /// </remarks>
-        public IAppPolicedCache RuntimeCache { get; }
+        public IAppPolicyCache RuntimeCache { get; }
 
         /// <summary>
         /// Gets the isolated caches.

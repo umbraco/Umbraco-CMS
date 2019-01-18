@@ -22,7 +22,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
-        private readonly IAppPolicedCache _runtimeCache;
+        private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
 

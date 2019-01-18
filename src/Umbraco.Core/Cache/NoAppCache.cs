@@ -6,9 +6,9 @@ using System.Web.Caching;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Implements <see cref="IAppPolicedCache"/> and do not cache.
+    /// Implements <see cref="IAppPolicyCache"/> and do not cache.
     /// </summary>
-    public class NoAppCache : IAppPolicedCache
+    public class NoAppCache : IAppPolicyCache
     {
         private NoAppCache() { }
 

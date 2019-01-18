@@ -10,7 +10,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     /// <remarks>A cache policy can be used to cache with timeouts,
     /// or depending on files, and with a remove callback, etc.</remarks>
-    public interface IAppPolicedCache : IAppCache
+    public interface IAppPolicyCache : IAppCache
     {
         /// <summary>
         /// Gets an item identified by its key.

@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Cache
             };
 
             var isCached = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback(() =>
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Cache
                 new AuditItem(2, AuditType.Copy, 123, "test", "blah2")
             };
 
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah"));
 
             var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Cache
 
             IList list = null;
 
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Cache
             var cached = new List<string>();
             IList list = null;
 
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Cache
         {
             var getAll = new[] { (AuditItem)null };
 
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
 
             cache.Setup(x => x.Get(It.IsAny<string>())).Returns(() => new DeepCloneableList<AuditItem>(ListCloneBehavior.CloneOnce)
             {
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Cache
             };
 
             var cacheCleared = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Clear(It.IsAny<string>()))
                 .Callback(() =>
                 {
@@ -201,7 +201,7 @@ namespace Umbraco.Tests.Cache
             };
 
             var cacheCleared = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Clear(It.IsAny<string>()))
                 .Callback(() =>
                 {

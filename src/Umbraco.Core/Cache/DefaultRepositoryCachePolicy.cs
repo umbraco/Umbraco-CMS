@@ -23,7 +23,7 @@ namespace Umbraco.Core.Cache
         private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;
 
-        public DefaultRepositoryCachePolicy(IAppPolicedCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
+        public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
             : base(cache, scopeAccessor)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));

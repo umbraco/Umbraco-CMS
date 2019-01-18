@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Cache
         public void Caches_Single()
         {
             var isCached = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback(() =>
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Get_Single_From_Cache()
         {
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah"));
 
             var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Cache
         public void Caches_Per_Id_For_Get_All()
         {
             var cached = new List<string>();
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Get_All_Without_Ids_From_Cache()
         {
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.SearchByKey(It.IsAny<string>())).Returns(new[]
             {
                 new AuditItem(1, AuditType.Copy, 123, "test", "blah"),
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Cache
         public void If_CreateOrUpdate_Throws_Cache_Is_Removed()
         {
             var cacheCleared = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Clear(It.IsAny<string>()))
                 .Callback(() =>
                 {
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Cache
         public void If_Removes_Throws_Cache_Is_Removed()
         {
             var cacheCleared = false;
-            var cache = new Mock<IAppPolicedCache>();
+            var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Clear(It.IsAny<string>()))
                 .Callback(() =>
                 {

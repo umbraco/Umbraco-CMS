@@ -4,18 +4,18 @@ using System.Collections.Concurrent;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Provides a base class for implementing a dictionary of <see cref="IAppPolicedCache"/>.
+    /// Provides a base class for implementing a dictionary of <see cref="IAppPolicyCache"/>.
     /// </summary>
     /// <typeparam name="TKey">The type of the dictionary key.</typeparam>
     public abstract class AppPolicedCacheDictionary<TKey>
     {
-        private readonly ConcurrentDictionary<TKey, IAppPolicedCache> _caches = new ConcurrentDictionary<TKey, IAppPolicedCache>();
+        private readonly ConcurrentDictionary<TKey, IAppPolicyCache> _caches = new ConcurrentDictionary<TKey, IAppPolicyCache>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppPolicedCacheDictionary{TKey}"/> class.
         /// </summary>
         /// <param name="cacheFactory"></param>
-        protected AppPolicedCacheDictionary(Func<TKey, IAppPolicedCache> cacheFactory)
+        protected AppPolicedCacheDictionary(Func<TKey, IAppPolicyCache> cacheFactory)
         {
             CacheFactory = cacheFactory;
         }
@@ -23,19 +23,19 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the internal cache factory, for tests only!
         /// </summary>
-        internal readonly Func<TKey, IAppPolicedCache> CacheFactory;
+        internal readonly Func<TKey, IAppPolicyCache> CacheFactory;
 
         /// <summary>
         /// Gets or creates a cache.
         /// </summary>
-        public IAppPolicedCache GetOrCreate(TKey key)
+        public IAppPolicyCache GetOrCreate(TKey key)
             => _caches.GetOrAdd(key, k => CacheFactory(k));
 
         /// <summary>
         /// Tries to get a cache.
         /// </summary>
-        public Attempt<IAppPolicedCache> Get(TKey key)
-            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicedCache>();
+        public Attempt<IAppPolicyCache> Get(TKey key)
+            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache>();
 
         /// <summary>
         /// Removes a cache.

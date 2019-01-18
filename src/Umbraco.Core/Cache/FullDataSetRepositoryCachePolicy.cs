@@ -24,7 +24,7 @@ namespace Umbraco.Core.Cache
         private readonly Func<TEntity, TId> _entityGetId;
         private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IAppPolicedCache cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
+        public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
             : base(cache, scopeAccessor)
         {
             _entityGetId = entityGetId;

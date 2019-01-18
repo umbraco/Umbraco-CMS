@@ -8,16 +8,16 @@ using Umbraco.Core.Models.Entities;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Implements <see cref="IAppPolicedCache"/> by wrapping an inner other <see cref="IAppPolicedCache"/>
+    /// Implements <see cref="IAppPolicyCache"/> by wrapping an inner other <see cref="IAppPolicyCache"/>
     /// instance, and ensuring that all inserts and returns are deep cloned copies of the cache item,
     /// when the item is deep-cloneable.
     /// </summary>
-    internal class DeepCloneAppCache : IAppPolicedCache
+    internal class DeepCloneAppCache : IAppPolicyCache
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DeepCloneAppCache"/> class.
         /// </summary>
-        public DeepCloneAppCache(IAppPolicedCache innerCache)
+        public DeepCloneAppCache(IAppPolicyCache innerCache)
         {
             var type = typeof (DeepCloneAppCache);
 
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the inner cache.
         /// </summary>
-        public IAppPolicedCache InnerCache { get; }
+        public IAppPolicyCache InnerCache { get; }
 
         /// <inheritdoc />
         public object Get(string key)

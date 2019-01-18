@@ -131,7 +131,7 @@
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\IPayloadCacheRefresher.cs" />
     <Compile Include="Cache\IRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\IAppPolicedCache.cs" />
+    <Compile Include="Cache\IAppPolicyCache.cs" />
     <Compile Include="Cache\IsolatedCaches.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NoCacheRepositoryCachePolicy.cs" />

@@ -13,16 +13,16 @@ namespace Umbraco.Core.Cache
     internal abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity
     {
-        private readonly IAppPolicedCache _globalCache;
+        private readonly IAppPolicyCache _globalCache;
         private readonly IScopeAccessor _scopeAccessor;
 
-        protected RepositoryCachePolicyBase(IAppPolicedCache globalCache, IScopeAccessor scopeAccessor)
+        protected RepositoryCachePolicyBase(IAppPolicyCache globalCache, IScopeAccessor scopeAccessor)
         {
             _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
             _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
         }
 
-        protected IAppPolicedCache Cache
+        protected IAppPolicyCache Cache
         {
             get
             {

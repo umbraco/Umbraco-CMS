@@ -8,11 +8,11 @@ using System.Web.Caching;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Implements <see cref="IAppPolicedCache"/> on top of a <see cref="System.Web.Caching.Cache"/>.
+    /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="System.Web.Caching.Cache"/>.
     /// A CacheProvider that wraps the logic of the HttpRuntime.Cache
     /// </summary>
     /// <remarks>The underlying cache is expected to be HttpRuntime.Cache.</remarks>
-    internal class WebCachingAppCache : FastDictionaryAppCacheBase, IAppPolicedCache
+    internal class WebCachingAppCache : FastDictionaryAppCacheBase, IAppPolicyCache
     {
         // locker object that supports upgradeable read locking
         // does not need to support recursion if we implement the cache correctly and ensure
