@@ -125,6 +125,8 @@ body.touch .umb-tree {
     position: inherit;
     display: inherit;
 
+    list-style: none;
+
     h6 {
         padding: 10px 0 10px 20px;
         font-weight: inherit;
@@ -137,7 +139,15 @@ body.touch .umb-tree {
     }
 
     &-item {
-        padding-left: 20px;
+        padding: 4px 0;
+
+        &:hover {
+            background-color: @gray-10;
+        }
+
+        &-link {
+            display: block;
+        }
     }
 
     &-link {

@@ -1,4 +1,4 @@
-angular.module("umbraco.install").factory('installerService', function($rootScope, $q, $timeout, $http, $location, $log){
+angular.module("umbraco.install").factory('installerService', function ($rootScope, $q, $timeout, $http, $templateRequest){
 
 	var _status = {
 		index: 0,
@@ -106,19 +106,26 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 		//loads the needed steps and sets the intial state
 		init : function(){
 			service.status.loading = true;
-			if(!_status.all){
-				service.getSteps().then(function(response){
-					service.status.steps = response.data.steps;
-					service.status.index = 0;
-					_installerModel.installId = response.data.installId;
-					service.findNextStep();
+            if (!_status.all) {
+                //pre-load the error page, if an error occurs, the page might not be able to load
+                // so we want to make sure it's available in the templatecache first
+                $templateRequest("views/install/error.html").then(x => {
+                    service.getSteps().then(response => {
+                        service.status.steps = response.data.steps;
+                        service.status.index = 0;
+                        _installerModel.installId = response.data.installId;
+                        service.findNextStep();
 
-					$timeout(function(){
-						service.status.loading = false;
-						service.status.configuring = true;
-					}, 2000);
-				});
-			}
+                        $timeout(function() {
+                                service.status.loading = false;
+                                service.status.configuring = true;
+                            },
+                            2000);
+                    });
+                });
+
+
+            }
 		},
 
 		//loads available packages from our.umbraco.com

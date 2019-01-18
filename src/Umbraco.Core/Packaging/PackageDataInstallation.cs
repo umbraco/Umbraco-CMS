@@ -1234,10 +1234,7 @@ namespace Umbraco.Core.Packaging
                 var alias = templateElement.Element("Alias").Value;
                 var design = templateElement.Element("Design").Value;
                 var masterElement = templateElement.Element("Master");
-
-                var isMasterPage = IsMasterPageSyntax(design);
-                var path = isMasterPage ? MasterpagePath(alias) : ViewPath(alias);
-
+                
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
                 var template = existingTemplate ?? new Template(templateName, alias);
                 template.Content = design;
@@ -1257,21 +1254,9 @@ namespace Umbraco.Core.Packaging
             return templates;
         }
 
-
-        private bool IsMasterPageSyntax(string code)
-        {
-            return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
-                   code.InvariantContains("<umbraco:Item") || code.InvariantContains("<asp:") || code.InvariantContains("<umbraco:Macro");
-        }
-
         private string ViewPath(string alias)
         {
             return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
-        }
-
-        private string MasterpagePath(string alias)
-        {
-            return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
         }
 
         #endregion

@@ -6,7 +6,7 @@ _Ready to try out Version 8? [See the quick start guide](V8_GETTING_STARTED.md).
 
 When is Umbraco 8 coming?
 =========================
-When it's ready. We're done with the major parts of the architecture work and are focusing on three seperate tracks to prepare Umbraco 8 for release:
+When it's ready. We're done with the major parts of the architecture work and are focusing on three separate tracks to prepare Umbraco 8 for release:
 1) Editor Track (_currently in progress_). Without editors, there's no market for Umbraco. So we want to make sure that Umbraco 8 is full of love for editors.
 2) Partner Track. Without anyone implementing Umbraco, there's nothing for editors to update. So we want to make sure that Umbraco 8 is a joy to implement
 3) Contributor Track. Without our fabulous ecosystem of both individual Umbracians and 3rd party ISVs, Umbraco wouldn't be as rich a platform as it is today. We want to make sure that it's easy, straight forward and as backwards-compatible as possible to create packages for Umbraco

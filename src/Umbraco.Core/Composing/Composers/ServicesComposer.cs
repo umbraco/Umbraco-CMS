@@ -67,17 +67,11 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
             composition.RegisterUnique<PackageDataInstallation>();
             composition.RegisterUnique<PackageFileInstallation>();
-            var appRoot = new DirectoryInfo(IOHelper.GetRootDirectorySafe());
             composition.RegisterUnique<IPackageInstallation>(factory => //factory required because we need to pass in a string path
                 new PackageInstallation(
                     factory.GetInstance<PackageDataInstallation>(), factory.GetInstance<PackageFileInstallation>(),
                     factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
-                    appRoot, appRoot));
-
-            //TODO: These are replaced in the web project - we need to declare them so that
-            // something is wired up, just not sure this is very nice but will work for now.
-            composition.RegisterUnique<IApplicationTreeService, EmptyApplicationTreeService>();
-            composition.RegisterUnique<ISectionService, EmptySectionService>();
+                    new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
 
             return composition;
         }
@@ -89,7 +83,7 @@ namespace Umbraco.Core.Composing.Composers
         /// <param name="packageRepoFileName"></param>
         /// <returns></returns>
         private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
-            => new PackagesRepository( 
+            => new PackagesRepository(
                 factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(), factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(), factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>(),
                 packageRepoFileName);
 
