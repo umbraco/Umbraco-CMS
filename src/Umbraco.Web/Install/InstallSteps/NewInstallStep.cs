@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
 using Newtonsoft.Json;
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        public override InstallSetupResult Execute(UserModel user)
+        public override Task<InstallSetupResult> ExecuteAsync(UserModel user)
         {
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
@@ -99,7 +100,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 catch { /* fail in silence */ }
             }
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType"/>
     /// </summary>
-    internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
+    public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
         public ContentTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
             IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository)

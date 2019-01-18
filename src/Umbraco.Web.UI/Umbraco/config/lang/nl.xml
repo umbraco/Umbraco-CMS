@@ -723,7 +723,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="packageUpgradeInstructions">Upgrade instructies</key>
     <key alias="packageUpgradeText"> Er is een upgrade beschikbaar voor deze package. Je kunt het direct downloaden uit de Umbraco package repository.</key>
     <key alias="packageVersion">Package versie</key>
-    <key alias="packageVersionHistory">Package versiehistorie</key>
     <key alias="viewPackageWebsite">Bekijk de package website</key>
     <key alias="packageAlreadyInstalled">Package reeds geinstalleerd</key>
     <key alias="targetVersionMismatch">Deze package kan niet worden geinstalleerd omdat minimaal Umbraco versie %0% benodigd is.</key>

@@ -832,7 +832,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Joins any number of int/string/objects into one string and seperates them with the string seperator parameter.
+        /// Joins any number of int/string/objects into one string and separates them with the string separator parameter.
         /// </summary>
         public string Join(string separator, params object[] args)
         {

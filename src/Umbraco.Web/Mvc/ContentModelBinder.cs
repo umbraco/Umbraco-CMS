@@ -150,7 +150,7 @@ namespace Umbraco.Web.Mvc
                 if (context == null)
                     AppDomain.Unload(AppDomain.CurrentDomain);
                 else
-                    Current.RestartAppPool(new HttpContextWrapper(context));
+                    UmbracoApplication.Restart(new HttpContextWrapper(context));
             }
 
             throw new ModelBindingException(msg.ToString());
