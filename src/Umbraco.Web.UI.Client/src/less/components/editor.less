@@ -88,8 +88,7 @@
 }
 
 input.umb-editor-header__name-input {
-	border-color: transparent;
-	background-color: @white;
+	
 	font-size: 15px;
 	color: @black;
 	margin-bottom: 0;
@@ -98,11 +97,13 @@ input.umb-editor-header__name-input {
 	height: 32px;
 	line-height: 32px;
 	width: 100%;
-	padding: 0 10px;
-	background: @white;
-	border: 1px solid @gray-8;
-	&:hover {
-		border-color: @turquoise-d1;
+	padding-left: 10px;
+    
+	background-color: @white;
+	border: 1px solid @inputBorder;
+    
+	&:focus {
+		border-color: @inputBorderFocus;
 	}
 }
 
