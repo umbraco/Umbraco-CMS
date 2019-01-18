@@ -16,7 +16,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
         var mediaPicker = {
             disableFolderSelect: true,
             submit: function(model) {
-                var selectedImagePath = model.selectedImages[0].image;
+                var selectedImagePath = model.selection[0].image;
                 callback(selectedImagePath);
                 editorService.close();
             },
