@@ -1,6 +1,5 @@
 ﻿using Umbraco.Core;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
+using Umbraco.Core.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {

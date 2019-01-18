@@ -1,6 +1,5 @@
 ﻿using Umbraco.Core;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
+using Umbraco.Core.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -9,7 +8,10 @@ namespace Umbraco.Web.Trees
     /// </summary>
     public class TranslationBackOfficeSection : IBackOfficeSection
     {
+        /// <inheritdoc />
         public string Alias => Constants.Applications.Translation;
+
+        /// <inheritdoc />
         public string Name => "Translation";
     }
 }

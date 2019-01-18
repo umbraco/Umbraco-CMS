@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Trees;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Models.Mapping
 {

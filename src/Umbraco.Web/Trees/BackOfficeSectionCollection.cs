@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
+using Umbraco.Core.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -11,6 +9,5 @@ namespace Umbraco.Web.Trees
         public BackOfficeSectionCollection(IEnumerable<IBackOfficeSection> items)
             : base(items)
         { }
-        
     }
 }

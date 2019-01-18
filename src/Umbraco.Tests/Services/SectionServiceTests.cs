@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Services
     public class SectionServiceTests : TestWithSomeContentBase
     {
         private ISectionService SectionService => Factory.GetInstance<ISectionService>();
-       
+
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
         {

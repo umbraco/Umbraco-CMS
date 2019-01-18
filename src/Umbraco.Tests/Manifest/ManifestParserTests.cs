@@ -433,19 +433,17 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         [Test]
         public void CanParseManifest_Sections()
         {
-            const string json = @"{'sections': {
-    'content': 'Content',
-    'hello': 'World'
-    }
-}";
+            const string json = @"{'sections': [
+    { ""alias"": ""content"", ""name"": ""Content"" },
+    { ""alias"": ""hello"", ""name"": ""World"" }
+]}";
 
             var manifest = _parser.ParseManifest(json);
-            Assert.AreEqual(2, manifest.Sections.Count);
-            Assert.AreEqual("content", manifest.Sections.Keys.ElementAt(0));
-            Assert.AreEqual("hello", manifest.Sections.Keys.ElementAt(1));
-            Assert.AreEqual("Content", manifest.Sections["content"]);
-            Assert.AreEqual("World", manifest.Sections["hello"]);
-
+            Assert.AreEqual(2, manifest.Sections.Length);
+            Assert.AreEqual("content", manifest.Sections[0].Alias);
+            Assert.AreEqual("hello", manifest.Sections[1].Alias);
+            Assert.AreEqual("Content", manifest.Sections[0].Name);
+            Assert.AreEqual("World", manifest.Sections[1].Name);
         }
     }
 }

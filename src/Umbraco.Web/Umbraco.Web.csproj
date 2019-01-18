@@ -175,7 +175,6 @@
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\UsersBackOfficeSection.cs" />
     <Compile Include="Trees\Tree.cs" />
-    <Compile Include="Models\Trees\IBackOfficeSection.cs" />
     <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
     <Compile Include="Models\ContentEditing\ObjectType.cs" />

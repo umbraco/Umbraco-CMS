@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
+using Umbraco.Core.Models.Trees;
 
 namespace Umbraco.Web.Services
 {
@@ -26,7 +23,5 @@ namespace Umbraco.Web.Services
         /// <param name="appAlias">The application alias.</param>
         /// <returns></returns>
         IBackOfficeSection GetByAlias(string appAlias);
-        
     }
-    
 }
