@@ -115,11 +115,18 @@ namespace Umbraco.Web.Editors
             return response;
         }
 
+        public PackageDefinition GetInstalledPackageById(int id)
+        {
+            var pack = Services.PackagingService.GetInstalledPackageById(id);
+            if (pack == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            return pack;
+        }
+
         /// <summary>
         /// Returns all installed packages - only shows their latest versions
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<InstalledPackageModel> GetInstalled()
+        public IEnumerable<PackageDefinition> GetInstalled()
         {
             return Services.PackagingService.GetAllInstalledPackages()
                 .GroupBy(
@@ -135,19 +142,6 @@ namespace Umbraco.Web.Editors
                     var maxVersion = grouping.Max(x => x.version);
                     //only return the first package with this version
                     return grouping.First(x => x.version == maxVersion).package;
-                })
-                .Select(pack => new InstalledPackageModel
-                {
-                    Name = pack.Name,
-                    Id = pack.Id,
-                    Author = pack.Author,
-                    Version = pack.Version,
-                    Url = pack.Url,
-                    License = pack.License,
-                    LicenseUrl = pack.LicenseUrl,
-                    Files = pack.Files,
-                    IconUrl = pack.IconUrl,
-                    Readme = pack.Readme
                 })
                 .ToList();
         }

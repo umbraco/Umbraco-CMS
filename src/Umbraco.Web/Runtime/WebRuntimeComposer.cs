@@ -1,11 +1,11 @@
-﻿using System.Web;
+﻿using System.Linq;
+using System.Web;
 using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Runtime
             // replace some services
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
@@ -122,9 +122,11 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<ActionCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
+            //we need to eagerly scan controller types since they will need to be routed
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(composition.TypeLoader.GetSurfaceControllers());
             composition.RegisterUnique(surfaceControllerTypes);
 
+            //we need to eagerly scan controller types since they will need to be routed
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(composition.TypeLoader.GetUmbracoApiControllers());
             composition.RegisterUnique(umbracoApiControllerTypes);
 
@@ -189,6 +191,26 @@ namespace Umbraco.Web.Runtime
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
                 .Append<ContentInfoContentAppFactory>();
+
+            // register back office sections in the order we want them rendered
+            composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>()
+                .Append<ContentBackOfficeSection>()
+                .Append<MediaBackOfficeSection>()
+                .Append<SettingsBackOfficeSection>()
+                .Append<PackagesBackOfficeSection>()
+                .Append<UsersBackOfficeSection>()
+                .Append<MembersBackOfficeSection>()
+                .Append<TranslationBackOfficeSection>();
+
+            // register back office trees
+            foreach (var treeControllerType in umbracoApiControllerTypes
+                .Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)))
+            {
+                var attribute = treeControllerType.GetCustomAttribute<TreeAttribute>(false);
+                if (attribute == null) continue;
+                var tree = new Tree(attribute.SortOrder, attribute.ApplicationAlias, attribute.TreeAlias, attribute.TreeTitle, treeControllerType, attribute.IsSingleNodeTree);
+                composition.WithCollectionBuilder<TreeCollectionBuilder>().Trees.Add(tree);
+            }
         }
     }
 }

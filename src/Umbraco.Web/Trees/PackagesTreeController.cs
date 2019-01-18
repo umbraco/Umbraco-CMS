@@ -22,7 +22,7 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/overview";
+            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/repo";
             root.Icon = "icon-box";
 
             root.HasChildren = false;

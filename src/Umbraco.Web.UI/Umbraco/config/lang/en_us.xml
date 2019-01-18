@@ -1117,14 +1117,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Documentation</key>
     <key alias="packageMetaData">Package meta data</key>
     <key alias="packageName">Package name</key>
     <key alias="packageNoItemsHeader">Package doesn't contain any items</key>
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
-    <key alias="packageNoUpgrades">No upgrades available</key>
     <key alias="packageOptions">Package options</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Package repository</key>
@@ -1135,13 +1133,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUninstallText"><![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
       <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,
       so uninstall with caution. If in doubt, contact the package author.]]></key>
-    <key alias="packageUpgradeDownload">Download update from the repository</key>
-    <key alias="packageUpgradeHeader">Upgrade package</key>
-    <key alias="packageUpgradeInstructions">Upgrade instructions</key>
-    <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the Umbraco package repository.</key>
     <key alias="packageVersion">Package version</key>
     <key alias="packageVersionUpgrade">Upgrading from version</key>
-    <key alias="viewPackageWebsite">View package website</key>
     <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</key>
     <key alias="installStateUninstalling">Uninstalling...</key>

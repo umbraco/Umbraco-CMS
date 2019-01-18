@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($scope, $location, $routeParams, umbRequestHelper, entityResource, stylesheetResource, languageResource, packageResource, dictionaryResource, editorService, formHelper) {
+    function EditController($scope, $location, $routeParams, umbRequestHelper, entityResource, packageResource, editorService, formHelper) {
 
         const vm = this;
 
@@ -19,8 +19,8 @@
         vm.openContentPicker = openContentPicker;
         vm.openFilePicker = openFilePicker;
         vm.removeFile = removeFile;
-        vm.openControlPicker = openControlPicker;
-        vm.removeControl = removeControl;
+        vm.openViewPicker = openViewPicker;
+        vm.removePackageView = removePackageView;
         vm.downloadFile = downloadFile;
 
         const packageId = $routeParams.id;
@@ -73,7 +73,7 @@
             });
 
             // get all stylesheets
-            stylesheetResource.getAll().then(stylesheets => {
+            entityResource.getAll("Stylesheet").then(stylesheets => {
                 vm.stylesheets = stylesheets;
             });
 
@@ -87,7 +87,7 @@
             });
 
             // get all languages
-            languageResource.getAll().then(languages => {
+            entityResource.getAll("Language").then(languages => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 languages.forEach(language => {
@@ -97,7 +97,7 @@
             });
 
             // get all dictionary items
-            dictionaryResource.getList().then(dictionaryItems => {
+            entityResource.getAll("DictionaryItem").then(dictionaryItems => {
                 // a package stores the id as a string so we 
                 // need to convert all ids to string for comparison
                 dictionaryItems.forEach(dictionaryItem => {
@@ -130,7 +130,7 @@
         }
 
         function back() {
-            $location.path("packages/packages/overview").search('create', null);;
+            $location.path("packages/packages/created").search("create", null).search("packageId", null);
         }
 
         function createOrUpdatePackage(editPackageForm) {
@@ -148,7 +148,7 @@
 
                     if (create) {
                         //if we are creating, then redirect to the correct url and reload
-                        $location.path("packages/packages/edit/" + vm.package.id).search("subview", "created").search("create", null);
+                        $location.path("packages/packages/edit/" + vm.package.id).search("create", null);
                         //don't add a browser history for this
                         $location.replace();
                     }
@@ -220,16 +220,16 @@
             vm.package.files.splice(index, 1);
         }
 
-        function openControlPicker() {
+        function openViewPicker() {
             const controlPicker = {
-                title: "Select control",
+                title: "Select view",
                 section: "settings",
                 treeAlias: "files",
                 entityType: "file",
                 onlyInitialized: false,
                 select: function(node) {
                     const id = unescape(node.id);
-                    vm.package.loadControl = id;
+                    vm.package.packageView = id;
                     editorService.close();
                 },
                 close: function() {
@@ -239,8 +239,8 @@
             editorService.treePicker(controlPicker);
         }
 
-        function removeControl() {
-            vm.package.loadControl = null;
+        function removePackageView() {
+            vm.package.packageView = null;
         }
 
         onInit();

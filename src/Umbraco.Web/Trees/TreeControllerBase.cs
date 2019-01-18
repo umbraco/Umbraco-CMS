@@ -4,9 +4,14 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -14,12 +19,23 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     /// <summary>
-    /// A base controller reference for non-attributed trees (un-registered). Developers should inherit from
-    /// TreeController.
+    /// A base controller reference for non-attributed trees (un-registered). 
     /// </summary>
+    /// <remarks>
+    /// Developers should generally inherit from TreeController.
+    /// </remarks>
     [AngularJsonOnlyConfiguration]
-    public abstract class TreeControllerBase : UmbracoAuthorizedApiController
+    public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
+        protected TreeControllerBase()
+        {
+        }
+
+        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+        }
+
+
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -46,10 +62,16 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public abstract string RootNodeDisplayName { get; }
 
-        /// <summary>
-        /// Gets the current tree alias from the attribute assigned to it.
-        /// </summary>
+        /// <inheritdoc />
         public abstract string TreeAlias { get; }
+        /// <inheritdoc />
+        public abstract string TreeTitle { get; }
+        /// <inheritdoc />
+        public abstract string ApplicationAlias { get; }
+        /// <inheritdoc />
+        public abstract int SortOrder { get; }
+        /// <inheritdoc />
+        public abstract bool IsSingleNodeTree { get; }
 
         /// <summary>
         /// Returns the root node for the tree
@@ -351,7 +373,7 @@ namespace Umbraco.Web.Trees
         private static void OnTreeNodesRendering(TreeControllerBase instance, TreeNodesRenderingEventArgs e)
         {
             var handler = TreeNodesRendering;
-            if (handler != null) handler(instance, e);
+            handler?.Invoke(instance, e);
         }
 
         /// <summary>
@@ -363,7 +385,7 @@ namespace Umbraco.Web.Trees
         internal static void OnRootNodeRendering(TreeControllerBase instance, TreeNodeRenderingEventArgs e)
         {
             var handler = RootNodeRendering;
-            if (handler != null) handler(instance, e);
+            handler?.Invoke(instance, e);
         }
 
         /// <summary>
@@ -377,80 +399,8 @@ namespace Umbraco.Web.Trees
         private static void OnMenuRendering(TreeControllerBase instance, MenuRenderingEventArgs e)
         {
             var handler = MenuRendering;
-            if (handler != null) handler(instance, e);
+            handler?.Invoke(instance, e);
         }
     }
 
-    internal class TreeControllerBaseStuffForLegacy
-    {
-        private readonly string _treeAlias;
-        private readonly string _rootNodeDisplayName;
-        private readonly UrlHelper _url;
-
-        public TreeControllerBaseStuffForLegacy(string treeAlias, string rootNodeDisplayName, UrlHelper url)
-        {
-            _treeAlias = treeAlias;
-            _rootNodeDisplayName = rootNodeDisplayName;
-            _url = url;
-        }
-
-        public TreeNode GetRootNode(FormDataCollection queryStrings)
-        {
-            if (queryStrings == null) queryStrings = new FormDataCollection("");
-            var node = CreateRootNode(queryStrings);
-
-            //add the tree alias to the root
-            node.AdditionalData["treeAlias"] = _treeAlias;
-
-            AddQueryStringsToAdditionalData(node, queryStrings);
-
-            //check if the tree is searchable and add that to the meta data as well
-            if (this is ISearchableTree)
-            {
-                node.AdditionalData.Add("searchable", "true");
-            }
-
-            //now update all data based on some of the query strings, like if we are running in dialog mode
-            if (IsDialog(queryStrings))
-            {
-                node.RoutePath = "#";
-            }
-
-            TreeControllerBase.OnRootNodeRendering(null, new TreeNodeRenderingEventArgs(node, queryStrings));
-
-            return node;
-        }
-
-        protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
-            var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
-
-            var node = new TreeNode(
-                rootNodeAsString,
-                null, //this is a root node, there is no parent
-                _url.GetTreeUrl(GetType(), rootNodeAsString, queryStrings),
-                _url.GetMenuUrl(GetType(), rootNodeAsString, queryStrings))
-            {
-                HasChildren = true,
-                RoutePath = currApp,
-                Name = _rootNodeDisplayName
-            };
-
-            return node;
-        }
-
-        protected void AddQueryStringsToAdditionalData(TreeNode node, FormDataCollection queryStrings)
-        {
-            foreach (var q in queryStrings.Where(x => node.AdditionalData.ContainsKey(x.Key) == false))
-            {
-                node.AdditionalData.Add(q.Key, q.Value);
-            }
-        }
-
-        protected bool IsDialog(FormDataCollection queryStrings)
-        {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
-        }
-    }
 }

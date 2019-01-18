@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models.Packaging
                 Actions = compiled.Actions,
                 Author = compiled.Author,
                 AuthorUrl = compiled.AuthorUrl,
-                Control = compiled.Control,
+                PackageView = compiled.PackageView,
                 IconUrl = compiled.IconUrl,
                 License = compiled.License,
                 LicenseUrl = compiled.LicenseUrl,
@@ -115,9 +115,9 @@ namespace Umbraco.Core.Models.Packaging
         [DataMember(Name = "files")]
         public IList<string> Files { get; set; } = new List<string>();
 
-        //fixme: Change this to angular view
-        [DataMember(Name = "loadControl")]
-        public string Control { get; set; } = string.Empty;
+        /// <inheritdoc />
+        [DataMember(Name = "packageView")]
+        public string PackageView { get; set; } = string.Empty;
 
         [DataMember(Name = "actions")]
         public string Actions { get; set; } = "<actions></actions>";
@@ -127,38 +127,7 @@ namespace Umbraco.Core.Models.Packaging
 
         [DataMember(Name = "iconUrl")]
         public string IconUrl { get; set; } = string.Empty;
-
-        public PackageDefinition Clone()
-        {
-            return new PackageDefinition
-            {
-                Id = Id,
-                PackagePath = PackagePath,
-                Name = Name,
-                Files = new List<string>(Files),
-                UmbracoVersion = (Version) UmbracoVersion.Clone(),
-                Version = Version,
-                Url = Url,
-                Readme = Readme,
-                AuthorUrl = AuthorUrl,
-                Author = Author,
-                LicenseUrl = LicenseUrl,
-                Actions = Actions,
-                PackageId = PackageId,
-                Control = Control,
-                DataTypes = new List<string>(DataTypes),
-                IconUrl = IconUrl,
-                License = License,
-                Templates = new List<string>(Templates),
-                Languages = new List<string>(Languages),
-                Macros = new List<string>(Macros),
-                Stylesheets = new List<string>(Stylesheets),
-                DocumentTypes = new List<string>(DocumentTypes),
-                DictionaryItems = new List<string>(DictionaryItems),
-                ContentNodeId = ContentNodeId,
-                ContentLoadChildNodes = ContentLoadChildNodes
-            };
-        }
+        
 
     }
 

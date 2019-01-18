@@ -532,14 +532,12 @@
        Umbraco 패키지는 보통 ".umb" 나 ".zip" 확장자를 가집니다.
     ]]></key>
     <key alias="packageAuthor">저자</key>
-    <key alias="packageDemonstration">데모</key>
     <key alias="packageDocumentation">문서화</key>
     <key alias="packageMetaData">패키지 메타데이터</key>
     <key alias="packageName">패키지 이름</key>
     <key alias="packageNoItemsHeader">패키지가 포함한 아이템이 없습니다.</key>
     <key alias="packageNoItemsText"><![CDATA[이 패키지엔 삭제할 아이템이 포함되어 있지 않습니다.<br/><br/>
     아래 "패키지 삭제"를 클릭하시면 안전하게 시스템에서 삭제하실 수 있습니다.]]></key>
-    <key alias="packageNoUpgrades">업그레이드할 패키지가 없습니다.</key>
     <key alias="packageOptions">패키지 옵션</key>
     <key alias="packageReadme">패키지 정보</key>
     <key alias="packageRepository">패키지 저장소</key>
@@ -550,12 +548,7 @@
     <key alias="packageUninstallText"><![CDATA[삭제하시려는 항목은 선택하지 않을 수 있습니다. "삭제 확인" 버튼을 누를때 체크되어있지 항목은 모두 삭제됩니다.<br />
     <span style="color: Red; font-weight: bold;">알림:</span> 문서, 미디어등 삭제항목에 관련된 모든 항목이 삭제됩니다, 작업을 중단하면 시스템이 불안정적으로 동작할 수 있습니다.
     삭제는 매우 주의를 요하기 때문에 의심스러운항목은 패키지 제작자에게 문의하시기 바랍니다.]]></key>
-    <key alias="packageUpgradeDownload">저장소에서 업데이트 다운로드</key>
-    <key alias="packageUpgradeHeader">업그레이드 패키지</key>
-    <key alias="packageUpgradeInstructions">업그레이드 지시사항</key>
-    <key alias="packageUpgradeText">업그레이드할 패키지가 없습니다. Umbraco패키지 저장소에서 직접다운로드하실 수 있습니다.</key>
     <key alias="packageVersion">패키지 버전</key>
-    <key alias="viewPackageWebsite">패키지 웹사이트 보기</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">포맷을 포함여하 붙여넣기(권장하지 않음)</key>

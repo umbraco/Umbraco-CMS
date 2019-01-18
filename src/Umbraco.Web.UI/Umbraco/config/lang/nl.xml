@@ -698,7 +698,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   <area alias="packager">
     <key alias="chooseLocalPackageText">Kies een package op je computer door op "Bladeren" te klikken en de package te selecteren. Umbraco packages hebben meestal ".umb" of ".zip" als extensie.</key>
     <key alias="packageAuthor">Auteur</key>
-    <key alias="packageDemonstration">Demonstratie</key>
     <key alias="packageDocumentation">Documentatie</key>
     <key alias="packageMetaData">Package meta data</key>
     <key alias="packageName">Package naam</key>
@@ -706,7 +705,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="packageNoItemsText"><![CDATA[Deze package bevat geen inhoud om te verwijderen.<br/><br/>
       Je kunt deze package veilig verwijderen door op 'verwijder package' te klikken.
     ]]></key>
-    <key alias="packageNoUpgrades">Geen upgrades beschikbaar</key>
     <key alias="packageOptions">Package opties</key>
     <key alias="packageReadme">Package lees mij</key>
     <key alias="packageRepository">Package repository</key>
@@ -718,12 +716,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <span style="color: Red; font-weight: bold;">Waarschuwing:</span> alle documenten, media etc, die afhankelijk zijn van de items die je verwijderd, zullen niet meer werken en kan leiden tot een instabiele installatie,
       wees dus voorzichtig met verwijderen. Als je het niet zeker weet, neem dan contact op met de auteur van de package.
     ]]></key>
-    <key alias="packageUpgradeDownload">Download update uit de repository</key>
-    <key alias="packageUpgradeHeader">Upgrade package</key>
-    <key alias="packageUpgradeInstructions">Upgrade instructies</key>
-    <key alias="packageUpgradeText"> Er is een upgrade beschikbaar voor deze package. Je kunt het direct downloaden uit de Umbraco package repository.</key>
     <key alias="packageVersion">Package versie</key>
-    <key alias="viewPackageWebsite">Bekijk de package website</key>
     <key alias="packageAlreadyInstalled">Package reeds geinstalleerd</key>
     <key alias="targetVersionMismatch">Deze package kan niet worden geinstalleerd omdat minimaal Umbraco versie %0% benodigd is.</key>
     <key alias="installStateUninstalling">Aan het deinstalleren...</key>

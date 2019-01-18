@@ -40,6 +40,7 @@ using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Testing
 {
@@ -216,6 +217,16 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
+
+            // register back office sections in the order we want them rendered
+            Composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>().Append<ContentBackOfficeSection>()
+                .Append<MediaBackOfficeSection>()
+                .Append<SettingsBackOfficeSection>()
+                .Append<PackagesBackOfficeSection>()
+                .Append<UsersBackOfficeSection>()
+                .Append<MembersBackOfficeSection>()
+                .Append<TranslationBackOfficeSection>();
+            Composition.RegisterUnique<ISectionService, SectionService>();
         }
 
         protected virtual void ComposeWtf()
@@ -304,7 +315,6 @@ namespace Umbraco.Tests.Testing
 
             // register basic stuff that might need to be there for some container resolvers to work
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
             Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
@@ -342,7 +352,7 @@ namespace Umbraco.Tests.Testing
             Composition.ComposeServices();
 
             // composition root is doing weird things, fix
-            Composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            Composition.RegisterUnique<ITreeService, TreeService>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this

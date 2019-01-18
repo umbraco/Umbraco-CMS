@@ -1,11 +1,9 @@
-﻿using System;
-using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Defines a Template File (Masterpage or Mvc View)
+    /// Defines a Template File (Mvc View)
     /// </summary>
     public interface ITemplate : IFile, IRememberBeingDirty, ICanBeDirty
     {
