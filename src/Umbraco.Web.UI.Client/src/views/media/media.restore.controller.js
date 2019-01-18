@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
-    function ($scope, relationResource, mediaResource, navigationService, appState, treeService, userService) {
+    function ($scope, relationResource, mediaResource, navigationService, appState, treeService, userService, localizationService) {
 		var dialogOptions = $scope.dialogOptions;
 
         $scope.source = _.clone(dialogOptions.currentNode);
@@ -20,6 +20,10 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
         }
         userService.getCurrentUser().then(function (userData) {
             $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
+        });
+        $scope.labels = {};
+        localizationService.localizeMany(["treeHeaders_media"]).then(function (data) {
+            $scope.labels.treeRoot = data[0];
         });
 
         function nodeSelectHandler(ev, args) {
@@ -96,7 +100,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
 		    $scope.relation = data[0];
 
 			if ($scope.relation.parentId == -1) {
-				$scope.target = { id: -1, name: "Root" };
+                $scope.target = { id: -1, name: $scope.labels.treeRoot };
 
 			} else {
                 $scope.loading = true;
