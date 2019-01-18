@@ -840,13 +840,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageCompatibilityDescription">Denne pakke er kompatibel med de følgende versioner af Umbraco, som rapporteret af community-medlemmer. Fuld kompatibilitet kan ikke garanteres for versioner rapporteret nedenfor 100%</key>
     <key alias="packageExternalSources">Eksterne kilder</key>
     <key alias="packageAuthor">Forfatter</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Pakke meta data</key>
     <key alias="packageName">Pakkenavn</key>
     <key alias="packageNoItemsHeader">Pakken indeholder ingen elementer</key>
     <key alias="packageNoItemsText"><![CDATA[Denne pakkefil indeholder ingen elementer som kan af-installeres.<br/><br/>Du kan roligt fjerne denne fra systemet ved at klikke på "Fjern pakke" nedenfor.]]></key>
-    <key alias="packageNoUpgrades">Ingen opdateringer tilgængelige</key>
     <key alias="packageOptions">Pakkevalg</key>
     <key alias="packageReadme">Pakke læs mig</key>
     <key alias="packageRepository">Pakke opbevaringsbase</key>
@@ -856,12 +854,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageUninstallHeader">Afinstallér pakke</key>
     <key alias="packageUninstallText"><![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
 <span style="color: Red; font-weight: bold;">Bemærk:</span> at dokumenter og medier som afhænger af denne pakke vil muligvis holde op med at virke, så vær forsigtig. Hvis i tvivl, kontakt personen som har udviklet pakken.]]></key>
-    <key alias="packageUpgradeDownload">Download opdatering fra opbevaringsbasen</key>
-    <key alias="packageUpgradeHeader">Opdatér pakke</key>
-    <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
-    <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra Umbracos pakke opbevaringsbase.</key>
     <key alias="packageVersion">Pakke version</key>
-    <key alias="viewPackageWebsite">Se pakkeudviklerens website</key>
     <key alias="packageAlreadyInstalled">Pakke allerede installeret</key>
     <key alias="targetVersionMismatch">Denne pakke kan ikke installeres, den kræver en minimum Umbraco version af</key>
     <key alias="installStateUninstalling">Afinstallerer...</key>

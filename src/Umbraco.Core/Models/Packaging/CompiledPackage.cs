@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models.Packaging
         public string Author { get; set; }
         public string AuthorUrl { get; set; }
         public string Readme { get; set; }
-        public string Control { get; set; }
+        public string PackageView { get; set; }
         public string IconUrl { get; set; }
 
         public string Actions { get; set; } //fixme: Should we make this strongly typed to IEnumerable<PackageAction> ?

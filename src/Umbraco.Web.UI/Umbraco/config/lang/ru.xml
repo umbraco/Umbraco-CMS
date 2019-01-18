@@ -1182,14 +1182,12 @@
     <key alias="packageCompatibilityDescription">Этот пакет совместим со следующими версиями Umbraco, по сообщениям участников сообщества. Полная совместимость не гарантируется для версий со значением ниже 100%</key>
     <key alias="packageExternalSources">Внешние источники</key>
     <key alias="packageAuthor">Автор</key>
-    <key alias="packageDemonstration">Демонстрация</key>
     <key alias="packageDocumentation">Документация (описание)</key>
     <key alias="packageMetaData">Мета-данные пакета</key>
     <key alias="packageName">Название пакета</key>
     <key alias="packageNoItemsHeader">Пакет ничего не содержит</key>
     <key alias="packageNoItemsText"><![CDATA[Этот файл пакета не содержит ни одного элемента
 		для удаления.<br/><br/>Вы можете безопасно удалить данный пакет из системы, нажав на кнопку "Деинсталлировать пакет".]]></key>
-    <key alias="packageNoUpgrades">Нет доступных обновлений</key>
     <key alias="packageOptions">Опции пакета</key>
     <key alias="packageReadme">Краткий обзор пакета</key>
     <key alias="packageRepository">Репозиторий пакета</key>
@@ -1200,12 +1198,7 @@
     <key alias="packageUninstallText"><![CDATA[Сейчас Вы можете снять отметки с тех опций пакета, которые НЕ хотите удалять. После нажатия кнопки "Подтверждение деинсталляции" все отмеченные опции будут удалены.<br />
 		<span style="color: Red; font-weight: bold;">Обратите внимание:</span> все документы, медиа-файлы и другой контент, зависящий от этого пакета, перестанет нормально работать, что может привести к нестабильному поведению системы,
 		поэтому удаляйте пакеты очень осторожно. При наличии сомнений, свяжитесь с автором пакета.]]></key>
-    <key alias="packageUpgradeDownload">Скачать обновление из репозитория</key>
-    <key alias="packageUpgradeHeader">Обновление пакета</key>
-    <key alias="packageUpgradeInstructions">Руководство по обновлению</key>
-    <key alias="packageUpgradeText">Для данного пакета доступно обновление. Вы можете загрузить это обновление непосредственно из центрального репозитория пакетов Umbraco.</key>
     <key alias="packageVersion">Версия пакета</key>
-    <key alias="viewPackageWebsite">Перейти на веб-сайт пакета</key>
     <key alias="packageAlreadyInstalled">Этот пакет уже установлен в системе</key>
     <key alias="targetVersionMismatch">Этот пакет не может быть установлен, он требует наличия Umbraco версии как минимум</key>
     <key alias="installStateUninstalling">Удаление...</key>

@@ -12,6 +12,18 @@ namespace Umbraco.Web.Models.Mapping
     {
         public LanguageMapperProfile()
         {
+            CreateMap<ILanguage, EntityBasic>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.CultureName))
+                .ForMember(dest => dest.Key, opt => opt.MapFrom(x => x.Key))
+                .ForMember(dest => dest.Alias, opt => opt.MapFrom(x => x.IsoCode))
+                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.Path, opt => opt.Ignore())
+                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.Udi, opt => opt.Ignore())
+                .ForMember(dest => dest.Icon, opt => opt.Ignore());
+
             CreateMap<ILanguage, Language>()
                 .ForMember(l => l.Name, expression => expression.MapFrom(x => x.CultureInfo.DisplayName));
 

@@ -863,14 +863,11 @@
     <key alias="packageCompatibilityDescription">Este paquete es compatible con las siguientes versiones de Umbraco, declaradas según miembros de la comunidad. No se puede garantizar compatibilidad completa para versiones declaradas debajo del 100%</key>
     <key alias="packageExternalSources">Fuentes externas</key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration"><![CDATA[Demostración
-]]></key>
     <key alias="packageDocumentation">Documentación</key>
     <key alias="packageMetaData">Meta datos del paquete</key>
     <key alias="packageName">Nombre del paquete</key>
     <key alias="packageNoItemsHeader">El paquete no contiene ningún elemento</key>
     <key alias="packageNoItemsText"><![CDATA[Este archivo de paquete no contiene ningún elemento para desinstalar.<br /><br />Puedes eliminarlo del sistema de forma segura seleccionando la opción "desinstalar paquete" de abajo.]]></key>
-    <key alias="packageNoUpgrades">No hay actualizaciones disponibles</key>
     <key alias="packageOptions">Opciones del paquete</key>
         <key alias="packageReadme">Léeme del paquete</key>
     <key alias="packageRepository">Repositorio de paquetes</key>
@@ -879,12 +876,7 @@
     <key alias="packageUninstalledText">El paquete se ha desinstalado correctamente</key>
     <key alias="packageUninstallHeader">Desinstalar paquete</key>
         <key alias="packageUninstallText"><![CDATA[Debajo puedes deseleccionar elementos que no desees eliminar en este momento. Cuando eliges "confirmar la desinstalación" todos los elementos marcados serán eliminados.<br /> <span style="color: Red; font-weight: bold;">Nota:</span> cualquier documento, archivo etc dependiente de los elementos eliminados, dejará de funcionar, y puede conllevar inestabilidad en el sistema, por lo que lleva cuidado al desinstalar elementos. En caso de duda, contacta con el autor del paquete.]]></key>
-    <key alias="packageUpgradeDownload">Descargar actualización del repositorio</key>
-    <key alias="packageUpgradeHeader">Actualizar paquete</key>
-    <key alias="packageUpgradeInstructions">Instrucciones de actualización</key>
-    <key alias="packageUpgradeText">Hay una actualización disponible para este paquete. Puedes descargarla directamente del repositorio de paquetes de Umbraco.</key>
     <key alias="packageVersion">Versión del paquete</key>
-    <key alias="viewPackageWebsite">Ver página web del paquete</key>
     <key alias="packageAlreadyInstalled">Paquete ya instalado</key>
     <key alias="targetVersionMismatch">Este paquete no se puede instalar, requiere un versión mínima de Umbraco de </key>
     <key alias="installStateUninstalling">Desinstalando...</key>

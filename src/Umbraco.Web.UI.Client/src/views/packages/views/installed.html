@@ -23,12 +23,19 @@
                             </div>
                         </td>
                         <td style="text-align: right;">
-                            <umb-button
-                                type="button"
-                                button-style="danger"
-                                size="xxs"
-                                label-key="packager_packageUninstallHeader"
-                                action="vm.confirmUninstall(installedPackage)">
+                            <umb-button ng-show="installedPackage.packageView"
+                                        type="button"
+                                        button-style="info"
+                                        size="xxs"
+                                        label-key="packager_packageOptions"
+                                        action="vm.packageOptions(installedPackage)">
+                            </umb-button>
+
+                            <umb-button type="button"
+                                        button-style="danger"
+                                        size="xxs"
+                                        label-key="packager_packageUninstallHeader"
+                                        action="vm.confirmUninstall(installedPackage)">
                             </umb-button>
                         </td>
                     </tr>
