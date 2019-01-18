@@ -185,9 +185,7 @@ namespace Umbraco.Core.Composing
                         // the app code folder and everything in it
                         new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath("~/App_Code")), false),
                         // global.asax (the app domain also monitors this, if it changes will do a full restart)
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
-                        // trees.config - use the contents to create the hash since this gets resaved on every app startup!
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
+                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false)
                     }, _logger);
 
                 return _currentAssembliesHash;

@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -6,15 +7,15 @@ namespace Umbraco.Web.Trees
     /// Identifies an application tree
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class TreeAttribute : Attribute
+    public class TreeAttribute : Attribute, ITree
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TreeAttribute"/> class.
         /// </summary>
         /// <param name="appAlias">The app alias.</param>
-        /// <param name="alias">The alias.</param>
+        /// <param name="treeAlias"></param>
         public TreeAttribute(string appAlias,
-            string alias) : this(appAlias, alias, null)
+            string treeAlias) : this(appAlias, treeAlias, null)
         {
         }
 
@@ -22,16 +23,16 @@ namespace Umbraco.Web.Trees
         /// Initializes a new instance of the <see cref="TreeAttribute"/> class.
         /// </summary>
         /// <param name="appAlias">The app alias.</param>
-        /// <param name="alias">The alias.</param>
-        /// <param name="title">The title.</param>
+        /// <param name="treeAlias"></param>
+        /// <param name="treeTitle"></param>
         /// <param name="iconClosed">The icon closed.</param>
         /// <param name="iconOpen">The icon open.</param>
         /// <param name="initialize">if set to <c>true</c> [initialize].</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <param name="isSingleNodeTree">Flag to define if this tree is a single node tree (will never contain child nodes, full screen app)</param>
         public TreeAttribute(string appAlias,
-            string alias,
-            string title,
+            string treeAlias,
+            string treeTitle,
             string iconClosed = "icon-folder",
             string iconOpen = "icon-folder-open",
             bool initialize = true,
@@ -39,8 +40,8 @@ namespace Umbraco.Web.Trees
             bool isSingleNodeTree = false)
         {
             ApplicationAlias = appAlias;
-            Alias = alias;
-            Title = title;
+            TreeAlias = treeAlias;
+            TreeTitle = treeTitle;
             IconClosed = iconClosed;
             IconOpen = iconOpen;
             Initialize = initialize;
@@ -48,17 +49,17 @@ namespace Umbraco.Web.Trees
             IsSingleNodeTree = isSingleNodeTree;
         }
 
-        public string ApplicationAlias { get; private set; }
-        public string Alias { get; private set; }
-        public string Title { get; private set; }
-        public string IconClosed { get; private set; }
-        public string IconOpen { get; private set; }
-        public bool Initialize { get; private set; }
-        public int SortOrder { get; private set; }
+        public string ApplicationAlias { get; }
+        public string TreeAlias { get; }
+        public string TreeTitle { get; }
+        public string IconClosed { get; }
+        public string IconOpen { get; }
+        public bool Initialize { get; }
+        public int SortOrder { get; }
 
         /// <summary>
         /// Flag to define if this tree is a single node tree (will never contain child nodes, full screen app)
         /// </summary>
-        public bool IsSingleNodeTree { get; private set; }
+        public bool IsSingleNodeTree { get; }
     }
 }

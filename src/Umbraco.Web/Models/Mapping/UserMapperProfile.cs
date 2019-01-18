@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Web.Services;
 
 
 namespace Umbraco.Web.Models.Mapping

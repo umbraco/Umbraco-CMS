@@ -353,6 +353,7 @@
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
+    <Compile Include="Manifest\ManifestBackOfficeSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
@@ -447,6 +448,7 @@
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
+    <Compile Include="Models\Trees\IBackOfficeSection.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
@@ -676,7 +678,6 @@
     <Compile Include="Migrations\Upgrade\UmbracoUpgrader.cs" />
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
-    <Compile Include="Models\ApplicationTree.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\Content.cs" />
@@ -873,7 +874,6 @@
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
-    <Compile Include="Models\Section.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\Stylesheet.cs" />
     <Compile Include="Models\StylesheetProperty.cs" />
@@ -1388,7 +1388,6 @@
     <Compile Include="Services\Implement\EntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\ExternalLoginService.cs" />
     <Compile Include="Services\Implement\FileService.cs" />
-    <Compile Include="Services\IApplicationTreeService.cs" />
     <Compile Include="Services\IAuditService.cs" />
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
@@ -1418,7 +1417,6 @@
     <Compile Include="Services\IPublicAccessService.cs" />
     <Compile Include="Services\IRedirectUrlService.cs" />
     <Compile Include="Services\IRelationService.cs" />
-    <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IServerRegistrationService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />

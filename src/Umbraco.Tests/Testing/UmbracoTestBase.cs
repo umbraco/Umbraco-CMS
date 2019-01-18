@@ -40,6 +40,7 @@ using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Testing
 {
@@ -216,6 +217,16 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
+
+            // register back office sections in the order we want them rendered
+            Composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>().Append<ContentBackOfficeSection>()
+                .Append<MediaBackOfficeSection>()
+                .Append<SettingsBackOfficeSection>()
+                .Append<PackagesBackOfficeSection>()
+                .Append<UsersBackOfficeSection>()
+                .Append<MembersBackOfficeSection>()
+                .Append<TranslationBackOfficeSection>();
+            Composition.RegisterUnique<ISectionService, SectionService>();
         }
 
         protected virtual void ComposeWtf()
@@ -341,7 +352,7 @@ namespace Umbraco.Tests.Testing
             Composition.ComposeServices();
 
             // composition root is doing weird things, fix
-            Composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            Composition.RegisterUnique<ITreeService, TreeService>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this

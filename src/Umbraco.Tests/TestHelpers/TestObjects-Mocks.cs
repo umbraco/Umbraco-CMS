@@ -73,8 +73,6 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IMemberTypeService>(container),
                 MockService<IMemberService>(container),
                 MockService<IUserService>(container),
-                MockService<ISectionService>(container),
-                MockService<IApplicationTreeService>(container),
                 MockService<ITagService>(container),
                 MockService<INotificationService>(container),
                 MockService<ILocalizedTextService>(container),
