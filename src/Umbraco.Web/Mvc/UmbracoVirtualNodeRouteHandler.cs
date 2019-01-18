@@ -11,7 +11,7 @@ namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
-        // todo - try lazy property injection?
+        // TODO: - try lazy property injection?
         private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
 
         /// <summary>
@@ -54,20 +54,21 @@ namespace Umbraco.Web.Mvc
             request.PublishedContent = found;
             umbracoContext.PublishedRequest = request;
 
-            //allows inheritors to change the pcr
+            // allows inheritors to change the published content request
             PreparePublishedContentRequest(umbracoContext.PublishedRequest);
 
-            //create the render model
+            // create the render model
             var renderModel = new ContentModel(umbracoContext.PublishedRequest.PublishedContent);
 
-            //assigns the required tokens to the request
+            // assigns the required tokens to the request
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, renderModel);
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, umbracoContext.PublishedRequest);
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
-            //this is used just for a flag that this is an umbraco custom route
+
+            // this is used just for a flag that this is an umbraco custom route
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.CustomRouteDataToken, true);
 
-            //Here we need to detect if a SurfaceController has posted
+            // Here we need to detect if a SurfaceController has posted
             var formInfo = RenderRouteHandler.GetFormInfo(requestContext);
             if (formInfo != null)
             {
@@ -78,7 +79,7 @@ namespace Umbraco.Web.Mvc
                     PublishedRequest = umbracoContext.PublishedRequest
                 };
 
-                //set the special data token to the current route definition
+                // set the special data token to the current route definition
                 requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
                 return RenderRouteHandler.HandlePostedValues(requestContext, formInfo);

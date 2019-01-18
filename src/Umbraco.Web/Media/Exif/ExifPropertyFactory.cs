@@ -17,7 +17,7 @@ namespace Umbraco.Web.Media.Exif
         /// <param name="count">Byte or component count.</param>
         /// <param name="value">Field data as an array of bytes.</param>
         /// <param name="byteOrder">Byte order of value.</param>
-        /// <param name="ifd">IFD section containing this propery.</param>
+        /// <param name="ifd">IFD section containing this proper.</param>
         /// <param name="encoding">The encoding to be used for text metadata when the source encoding is unknown.</param>
         /// <returns>an ExifProperty initialized from the interoperability parameters.</returns>
         public static ExifProperty Get(ushort tag, ushort type, uint count, byte[] value, BitConverterEx.ByteOrder byteOrder, IFD ifd, Encoding encoding)

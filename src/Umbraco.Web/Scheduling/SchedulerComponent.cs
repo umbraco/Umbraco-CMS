@@ -65,7 +65,7 @@ namespace Umbraco.Web.Scheduling
 
         public void Terminate()
         {
-            // the appdomain / maindom / whatever takes care of stopping background task runners
+            // the AppDomain / maindom / whatever takes care of stopping background task runners
         }
 
         private void RegisterBackgroundTasksOnce(object sender, RoutableAttemptEventArgs e)

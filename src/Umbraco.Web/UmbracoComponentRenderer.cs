@@ -132,7 +132,7 @@ namespace Umbraco.Web
                 // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
 
 
-                //NOTE: the value could have html encoded values, so we need to deal with that
+                //NOTE: the value could have HTML encoded values, so we need to deal with that
                 macroProps.Add(i.Key.ToLowerInvariant(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
             var renderer = new MacroRenderer(Current.ProfilingLogger);

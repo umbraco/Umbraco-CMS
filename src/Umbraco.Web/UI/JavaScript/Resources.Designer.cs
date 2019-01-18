@@ -64,7 +64,7 @@ namespace Umbraco.Web.UI.JavaScript {
         ///   Looks up a localized string similar to [
         ///    &apos;lib/jquery/jquery.min.js&apos;,
         ///    &apos;lib/jquery-ui/jquery-ui.min.js&apos;,
-        ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js&apos;,
+        ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js&apos;,
         ///
         ///    &apos;lib/angular/angular.js&apos;,
         ///    &apos;lib/underscore/underscore-min.js&apos;,
@@ -77,8 +77,7 @@ namespace Umbraco.Web.UI.JavaScript {
         ///    &apos;lib/angular-cookies/angular-cookies.js&apos;,
         ///    &apos;lib/angular-touch/angular-touch.js&apos;,
         ///    &apos;lib/angular-sanitize/angular-sanitize.js&apos;,
-        ///    &apos;lib/angular-animate/angular-animate.js&apos;,
-        ///    [rest of string was truncated]&quot;;.
+        ///    &apos;lib/angular-animate/angular-animate.js&apos;,        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string JsInitialize {
             get {
@@ -89,11 +88,13 @@ namespace Umbraco.Web.UI.JavaScript {
         /// <summary>
         ///   Looks up a localized string similar to LazyLoad.js(&quot;##JsInitialize##&quot;, function () {
         ///    //we need to set the legacy UmbClientMgr path
-        ///    UmbClientMgr.setUmbracoPath(&apos;&quot;##UmbracoPath##&quot;&apos;);
+        ///    if ((typeof UmbClientMgr) !== &quot;undefined&quot;) {
+        ///        UmbClientMgr.setUmbracoPath(&apos;&quot;##UmbracoPath##&quot;&apos;);
+        ///    }
         ///
         ///    jQuery(document).ready(function () {
         ///
-        ///        angular.bootstrap(document, [&apos;##AngularModule##&apos;]);
+        ///        angular.bootstrap(document, [&apos;&quot;##AngularModule##&quot;&apos;]);
         ///
         ///    });
         ///});
@@ -118,7 +119,7 @@ namespace Umbraco.Web.UI.JavaScript {
         ///    &apos;../ServerVariables&apos;,
         ///    &apos;../lib/signalr/jquery.signalR.js&apos;,
         ///    &apos;../BackOffice/signalr/hubs&apos;,
-        ///    &apos;../js/umbraco.canvasdesigner.js&apos;
+        ///    &apos;../js/umbraco.preview.js&apos;
         ///]
         ///.
         /// </summary>

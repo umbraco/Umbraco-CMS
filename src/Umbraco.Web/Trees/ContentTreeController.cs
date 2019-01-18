@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, culture))
             {
-                //Special check to see if it ia a container, if so then we'll hide children.
+                //Special check to see if it is a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
@@ -235,6 +235,7 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionSort>(item, menu, true);
             AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
+            //fixme - conver this editor to angular
             AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
             if (EmailSender.CanSendRequiredEmail)
             {

@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
 
             // if the parentId is root (-1) then we just need an empty string as we are
-            // creating the path below and we don't wan't -1 in the path
+            // creating the path below and we don't want -1 in the path
             if (parentId == Core.Constants.System.Root.ToInvariantString())
             {
                 parentId = string.Empty;
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to get a list of available templates/snippets to base a new Partial View og Partial View Macro from
+        /// Used to get a list of available templates/snippets to base a new Partial View or Partial View Macro from
         /// </summary>
         /// <param name="type">This is a string but will be 'partialViews', 'partialViewMacros'</param>
         /// <returns>Returns a list of <see cref="SnippetDisplay"/> if a correct type is sent</returns>

@@ -195,7 +195,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     // handle property groups and property types
                     // note that ContentTypeSave has
-                    // - all groups, inherited and local; only *one* occurence per group *name*
+                    // - all groups, inherited and local; only *one* occurrence per group *name*
                     // - potentially including the generic properties group
                     // - all properties, inherited and local
                     //
@@ -296,7 +296,7 @@ namespace Umbraco.Web.Models.Mapping
             PropertyType destProperty;
             if (sourceProperty.Id > 0)
             {
-                // updateg an existing property
+                // updating an existing property
                 // ensure it is still there, then map/update
                 destProperty = destOrigProperties.FirstOrDefault(x => x.Id == sourceProperty.Id);
                 if (destProperty != null)
@@ -310,7 +310,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             // insert a new property, or update an existing property that has
-            // been deletedin the meantime and we need to re-create
+            // been deleted in the meantime and we need to re-create
             // map/create
             destProperty = Mapper.Map<PropertyType>(sourceProperty);
             return destProperty;

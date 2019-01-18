@@ -338,7 +338,7 @@ namespace Umbraco.Web.Media.Exif
             // Create a memory stream to write the APP0 section to
             MemoryStream ms = new MemoryStream();
 
-            // JFIF identifer
+            // JFIF identifier
             ms.Write(Encoding.ASCII.GetBytes("JFIF\0"), 0, 5);
 
             // Write tags
@@ -431,7 +431,7 @@ namespace Umbraco.Web.Media.Exif
             // Create a memory stream to write the APP0 section to
             MemoryStream ms = new MemoryStream();
 
-            // JFIF identifer
+            // JFIF identifier
             ms.Write(Encoding.ASCII.GetBytes("JFXX\0"), 0, 5);
 
             // Write tags
@@ -704,13 +704,13 @@ namespace Umbraco.Web.Media.Exif
                 return false;
             }
 
-            // We will need these bitconverter to write byte-ordered data
+            // We will need these bit converters to write byte-ordered data
             BitConverterEx bceExif = new BitConverterEx(BitConverterEx.SystemByteOrder, ByteOrder);
 
             // Create a memory stream to write the APP1 section to
             MemoryStream ms = new MemoryStream();
 
-            // Exif identifer
+            // Exif identifier
             ms.Write(Encoding.ASCII.GetBytes("Exif\0\0"), 0, 6);
 
             // TIFF header
@@ -802,7 +802,7 @@ namespace Umbraco.Web.Media.Exif
 
                 uint fillerbytecount = 0;
 
-                // Try to preserve the makernote data offset
+                // Try to preserve the creator's note data offset
                 if (!makernotewritten &&
                     !makerNoteProcessed &&
                     makerNoteOffset != 0 &&
@@ -812,7 +812,7 @@ namespace Umbraco.Web.Media.Exif
                     currentdataoffset + interop.Data.Length > makerNoteOffset &&
                     ifd.ContainsKey(ExifTag.MakerNote))
                 {
-                    // Delay writing this field until we write makernote data
+                    // Delay writing this field until we write the creator's note data
                     fieldqueue.Enqueue(field);
                     continue;
                 }
@@ -847,7 +847,7 @@ namespace Umbraco.Web.Media.Exif
                 }
 
                 // Fields containing offsets to other IFDs
-                // Just store their offets, we will write the values later on when we know the lengths of IFDs
+                // Just store their offsets, we will write the values later on when we know the lengths of IFDs
                 if (ifdtype == IFD.Zeroth && interop.TagID == 0x8769)
                     exifIFDFieldOffset = stream.Position;
                 else if (ifdtype == IFD.Zeroth && interop.TagID == 0x8825)

@@ -72,7 +72,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             // if _released is false then we're going to setup a timer
             //  then the runner wants to shutdown & run immediately
-            //  this sets _released to true & the timer will trigger eventualy & who cares?
+            //  this sets _released to true & the timer will trigger eventually & who cares?
             // if _released is true, either it's a normal release, or
             //  a runner shutdown, in which case we won't be able to
             //  add a new task, and so we'll run immediately

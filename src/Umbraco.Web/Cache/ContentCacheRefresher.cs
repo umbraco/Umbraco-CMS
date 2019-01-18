@@ -75,7 +75,7 @@ namespace Umbraco.Web.Cache
 
                 if (assignedDomains.Count > 0)
                 {
-                    // todo - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
+                    //fixme - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
                     // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
                     // DomainCacheRefresher?
 

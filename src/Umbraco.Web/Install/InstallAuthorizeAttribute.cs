@@ -9,7 +9,7 @@ namespace Umbraco.Web.Install
 {
     /// <summary>
     /// Ensures authorization occurs for the installer if it has already completed.
-    /// If install has not yet occured then the authorization is successful
+    /// If install has not yet occurred then the authorization is successful
     /// </summary>
     internal class InstallAuthorizeAttribute : AuthorizeAttribute
     {

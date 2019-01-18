@@ -15,5 +15,6 @@ namespace Umbraco.Web.Trees
         protected override string[] Extensions => ExtensionsStatic;
 
         protected override string FileIcon => "icon-document";
+            //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
     }
 }

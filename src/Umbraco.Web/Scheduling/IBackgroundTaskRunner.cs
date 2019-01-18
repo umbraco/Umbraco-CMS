@@ -7,7 +7,7 @@ namespace Umbraco.Web.Scheduling
     /// Defines a service managing a queue of tasks of type <typeparamref name="T"/> and running them in the background.
     /// </summary>
     /// <typeparam name="T">The type of the managed tasks.</typeparam>
-    /// <remarks>The interface is not complete and exists only to have the contravariance on T.</remarks>
+    /// <remarks>The interface is not complete and exists only to have the contra variance on T.</remarks>
     public interface IBackgroundTaskRunner<in T> : IDisposable, IRegisteredObject
         where T : class, IBackgroundTask
     {

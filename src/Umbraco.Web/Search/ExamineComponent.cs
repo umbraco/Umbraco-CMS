@@ -71,7 +71,7 @@ namespace Umbraco.Web.Search
 
         public void Initialize()
         {
-            //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
+            //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the AppDomain
             //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
             //which simply checks the existence of the lock file
             DirectoryFactory.DefaultLockFactory = d =>
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
+                _logger.Debug<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
@@ -174,7 +174,7 @@ namespace Umbraco.Web.Search
 
             lock (IsConfiguredLocker)
             {
-                //double chekc
+                //double check
                 if (_isConfigured) return;
 
                 _isConfigured = true;
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Search
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
                     // don't try to be too clever - refresh entirely
-                    // there has to be race conds in there ;-(
+                    // there has to be race conditions in there ;-(
 
                     var content = contentService.GetById(payload.Id);
                     if (content == null)
@@ -585,7 +585,7 @@ namespace Umbraco.Web.Search
         }
         #endregion
 
-        #region Defered Actions
+        #region Deferred Actions
         private class DeferedActions
         {
             private readonly List<DeferedAction> _actions = new List<DeferedAction>();

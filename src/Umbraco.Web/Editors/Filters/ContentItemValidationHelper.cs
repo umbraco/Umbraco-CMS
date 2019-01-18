@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="modelState"></param>
         /// <returns></returns>
         /// <remarks>
-        /// All property data validation goes into the modelstate with a prefix of "Properties"
+        /// All property data validation goes into the model state with a prefix of "Properties"
         /// </remarks>
         public virtual bool ValidatePropertyData(
             TModelSave model,

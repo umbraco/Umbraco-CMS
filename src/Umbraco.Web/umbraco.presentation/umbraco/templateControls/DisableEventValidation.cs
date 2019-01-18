@@ -8,7 +8,7 @@ using System.ComponentModel;
 namespace umbraco.presentation.templateControls
 {
     /// <summary>
-    /// This control disables request validation (equalevant of setting validateRequest to false in page directive)
+    /// This control disables request validation (equivalent of setting validateRequest to false in page directive)
     /// </summary>
     [ToolboxData("<{0}:DisableRequestValidation runat=\"server\"></{0}:Item>")]
     [Designer("umbraco.presentation.templateControls.ItemDesigner, Umbraco.Web")]

@@ -57,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Gets a value indicating whether a property is an image cropper field.
         /// </summary>
         /// <param name="property">The property.</param>        
-        /// <returns>A value indicating whether a property is an image cropper field, and (optionaly) has a non-empty value.</returns>
+        /// <returns>A value indicating whether a property is an image cropper field, and (optionally) has a non-empty value.</returns>
         private static bool IsCropperField(Property property)
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper;
@@ -69,7 +69,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="value">The property value.</param>
         /// <param name="writeLog">A value indicating whether to log the error.</param>
         /// <returns>The json object corresponding to the property value.</returns>
-        /// <remarks>In case of an error, optionaly logs the error and returns null.</remarks>
+        /// <remarks>In case of an error, optionally logs the error and returns null.</remarks>
         private JObject GetJObject(string value, bool writeLog)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -100,7 +100,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <summary>
-        /// Look through all propery values stored against the property and resolve any file paths stored
+        /// Look through all property values stored against the property and resolve any file paths stored
         /// </summary>
         /// <param name="prop"></param>
         /// <returns></returns>

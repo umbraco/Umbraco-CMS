@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors
 
             var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
                 //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
-                // in the back office requres the delimiter to be a '_' so we'll just replace it
+                // in the back office requires the delimiter to be a '_' so we'll just replace it
                 .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
 
             return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
@@ -416,7 +416,7 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
-                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" };
                 }
 
                 //Remove the cookie otherwise this message will keep appearing

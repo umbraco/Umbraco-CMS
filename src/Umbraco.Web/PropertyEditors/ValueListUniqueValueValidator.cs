@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
             if (!(value is JArray json)) yield break;
 
             // we ensure that values are unique
-            // (those are are not empty - empty values are removed when persisting anyways)
+            // (those are not empty - empty values are removed when persisting anyways)
 
             var groupedValues = json.OfType<JObject>()
                 .Where(x => x["value"] != null)
