@@ -380,6 +380,9 @@ angular.module("umbraco")
                     if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
                         $scope.model.value = tinyMceEditor.getContent();
                     }
+					                    
+                    //Allow RTE to set form dirty again
+                    alreadyDirty = false;
                 });
 
                 //when the element is disposed we need to unsubscribe!
