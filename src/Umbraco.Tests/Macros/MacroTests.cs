@@ -23,7 +23,6 @@ namespace Umbraco.Tests.Macros
             //we DO want cache enabled for these tests
             var cacheHelper = new AppCaches(
                 new ObjectCacheAppCache(),
-                new DictionaryAppCache(),
                 NoAppCache.Instance,
                 new IsolatedCaches(type => new ObjectCacheAppCache()));
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

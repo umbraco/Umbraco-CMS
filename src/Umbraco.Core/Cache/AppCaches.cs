@@ -21,7 +21,6 @@ namespace Umbraco.Core.Cache
         public AppCaches(System.Web.Caching.Cache cache)
             : this(
                 new WebCachingAppCache(cache),
-                new DictionaryAppCache(),
                 new HttpRequestAppCache(),
                 new IsolatedCaches(t => new ObjectCacheAppCache()))
         { }
@@ -31,12 +30,10 @@ namespace Umbraco.Core.Cache
         /// </summary>
         public AppCaches(
             IAppPolicyCache runtimeCache,
-            IAppCache staticCache,
             IAppCache requestCache,
             IsolatedCaches isolatedCaches)
         {
             RuntimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
-            StaticCache = staticCache ?? throw new ArgumentNullException(nameof(staticCache));
             RequestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
             IsolatedCaches = isolatedCaches ?? throw new ArgumentNullException(nameof(isolatedCaches));
         }
@@ -48,7 +45,7 @@ namespace Umbraco.Core.Cache
         /// <para>When used by repositories, all cache policies apply, but the underlying caches do not cache anything.</para>
         /// <para>Used by tests.</para>
         /// </remarks>
-        public static AppCaches Disabled { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
+        public static AppCaches Disabled { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
 
         /// <summary>
         /// Gets the special no-cache instance.
@@ -57,7 +54,7 @@ namespace Umbraco.Core.Cache
         /// <para>When used by repositories, all cache policies are bypassed.</para>
         /// <para>Used by repositories that do no cache.</para>
         /// </remarks>
-        public static AppCaches NoCache { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
+        public static AppCaches NoCache { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
 
         /// <summary>
         /// Gets the per-request cache.
@@ -67,14 +64,6 @@ namespace Umbraco.Core.Cache
         /// fixme - what about non-web applications?
         /// </remarks>
         public IAppCache RequestCache { get; }
-
-        /// <summary>
-        /// Returns the current Runtime cache
-        /// </summary>
-        /// <remarks>
-        /// fixme - what is this? why not use RuntimeCache?
-        /// </remarks>
-        public IAppCache StaticCache { get; }
 
         /// <summary>
         /// Gets the runtime cache.
@@ -93,7 +82,5 @@ namespace Umbraco.Core.Cache
         /// search through all keys on a global scale.</para>
         /// </remarks>
         public IsolatedCaches IsolatedCaches { get; }
-
     }
-
 }

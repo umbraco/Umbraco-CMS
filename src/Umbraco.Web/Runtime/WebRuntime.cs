@@ -63,7 +63,6 @@ namespace Umbraco.Web.Runtime
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
                 new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache)),
-                new DictionaryAppCache(),
                 // we need request based cache when running in web-based context
                 new HttpRequestAppCache(),
                 new IsolatedCaches(type =>
