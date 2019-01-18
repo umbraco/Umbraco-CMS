@@ -548,14 +548,12 @@ To manage your website, simply open the Umbraco back office and start adding con
          ויש לבחור את החבילה הרצויה. לחבילות Umbraco יש בד"כ יש סיומות בשם ".umb" או ".zip".
       ]]></key>
     <key alias="packageAuthor">יוצר החבילה</key>
-    <key alias="packageDemonstration">הדגמה</key>
     <key alias="packageDocumentation">תיעוד</key>
     <key alias="packageMetaData">מטה דטה עבור החבילה</key>
     <key alias="packageName">שם החבילה</key>
     <key alias="packageNoItemsHeader">החבילה לא מכילה אף פריט</key>
     <key alias="packageNoItemsText"><![CDATA[החבילה אינה מכילה פריטים למחיקה.<br/><br/>
       ניתן למחוק בבטיחות רבה את החבילה מהמערכת על ידי לחיצה על "הסר חבילה".]]></key>
-    <key alias="packageNoUpgrades">אין עידכונים זמינים</key>
     <key alias="packageOptions">אפשרויות חבילה</key>
     <key alias="packageReadme">תיאור החבילה</key>
     <key alias="packageRepository">מאגר חבילות</key>
@@ -566,12 +564,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUninstallText"><![CDATA[ניתן להוריד סימון מפריטים שאותם אינך רוצה להסיר, בזמן זה. כשילחץ כפתור "אשר הסרה" כל הפריטים המסומנים ימחקו.<br />
       <span style="color: Red; font-weight: bold;">הערה:</span>כל מסמך, מדיה וכו' התלוים בפריטים שהסרת יפסיקו לעבוד, ויכולים להביא למצב של אי יציבות למערכת,
       יש למחוק קבצים עם זהירות יתרה, אם יש ספק יש לפנות ליוצר החבילה.]]></key>
-    <key alias="packageUpgradeDownload">הורד עידכון מהמאגר</key>
-    <key alias="packageUpgradeHeader">שידרוג חבילה</key>
-    <key alias="packageUpgradeInstructions">הורדות שידרוג</key>
-    <key alias="packageUpgradeText"> קיים עידכון זמין עבור חבילה זו. ניתן להוריד אותו ישירות ממאגר החבילות של אומברקו.</key>
     <key alias="packageVersion">גירסת החבילה</key>
-    <key alias="viewPackageWebsite">צפה באתר החבילה</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">שמור עיצוב בהדבקה (לא מומלץ)</key>

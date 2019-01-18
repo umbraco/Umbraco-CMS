@@ -73,11 +73,6 @@ namespace Umbraco.Core.Composing.Composers
                     factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
                     new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
 
-            //TODO: These are replaced in the web project - we need to declare them so that
-            // something is wired up, just not sure this is very nice but will work for now.
-            composition.RegisterUnique<IApplicationTreeService, EmptyApplicationTreeService>();
-            composition.RegisterUnique<ISectionService, EmptySectionService>();
-
             return composition;
         }
 
@@ -88,7 +83,7 @@ namespace Umbraco.Core.Composing.Composers
         /// <param name="packageRepoFileName"></param>
         /// <returns></returns>
         private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
-            => new PackagesRepository( 
+            => new PackagesRepository(
                 factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(), factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(), factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>(),
                 packageRepoFileName);
 

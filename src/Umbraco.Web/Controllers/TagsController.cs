@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.WebServices
+namespace Umbraco.Web.Controllers
 {
     /// <summary>
     /// A public web service for querying tags
@@ -29,8 +29,8 @@ namespace Umbraco.Web.WebServices
         /// <summary>
         /// Initializes a new instance of the <see cref="TagsController"/> with all its dependencies.
         /// </summary>
-        public TagsController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        public TagsController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
         { }
 
         /// <summary>

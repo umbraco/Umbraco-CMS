@@ -4,6 +4,7 @@
     "test": "karma start test/config/karma.conf.js --singlerun",
     "build": "gulp build",
     "dev": "gulp dev",
+    "fastdev": "gulp fastdev",
     "docs": "gulp docs"
   },
   "dependencies": {

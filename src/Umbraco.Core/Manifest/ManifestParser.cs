@@ -9,6 +9,7 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Trees;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -102,6 +103,7 @@ namespace Umbraco.Core.Manifest
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<ManifestContentAppDefinition>();
             var dashboards = new List<ManifestDashboardDefinition>();
+            var sections = new List<ManifestBackOfficeSection>();
 
             foreach (var manifest in manifests)
             {
@@ -112,6 +114,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
                 if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
+                if (manifest.Sections != null) sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias.ToLowerInvariant()));
             }
 
             return new PackageManifest
@@ -122,7 +125,8 @@ namespace Umbraco.Core.Manifest
                 ParameterEditors = parameterEditors.ToArray(),
                 GridEditors = gridEditors.ToArray(),
                 ContentApps = contentApps.ToArray(),
-                Dashboards = dashboards.ToArray()
+                Dashboards = dashboards.ToArray(),
+                Sections = sections.ToArray()
             };
         }
 

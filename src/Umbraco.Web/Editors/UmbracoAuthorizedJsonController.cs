@@ -31,13 +31,13 @@ namespace Umbraco.Web.Editors
         /// Initializes a new instance of the <see cref="UmbracoAuthorizedJsonController"/> class with all its dependencies.
         /// </summary>
         /// <param name="globalSettings"></param>
-        /// <param name="umbracoContextAccessor"></param>
+        /// <param name="umbracoContext"></param>
         /// <param name="sqlContext"></param>
         /// <param name="services"></param>
         /// <param name="applicationCache"></param>
         /// <param name="logger"></param>
         /// <param name="runtimeState"></param>
-        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
         {
         }
     }

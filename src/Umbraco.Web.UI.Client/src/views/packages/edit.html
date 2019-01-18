@@ -255,23 +255,23 @@
                         </umb-control-group>
 
                         <umb-control-group
-                            label="Control after installation"
-                            description="Load control after installation (ex: /usercontrols/installer.ascx)">
+                            label="Package options view"
+                            description="Load this view after installation (ex: App_Plugins/MyApp/MyPackageOptions.html). It can be used to configure your package at any time by clicking Options on the installed package listing">
 
                             <umb-node-preview
-                                ng-if="vm.package.loadControl"
+                                ng-if="vm.package.packageView"
                                 icon="'icon-box'"
-                                name="vm.package.loadControl"
+                                name="vm.package.packageView"
                                 allow-edit="true"
                                 allow-remove="true"
-                                on-edit="vm.openControlPicker()"
-                                on-remove="vm.removeControl()">
+                                on-edit="vm.openViewPicker()"
+                                on-remove="vm.removePackageView()">
                             </umb-node-preview>
 
                             <a href=""
-                                ng-if="!vm.package.loadControl"
+                                ng-show="!vm.package.packageView"
                                 class="umb-node-preview-add"
-                                ng-click="vm.openControlPicker()"
+                                ng-click="vm.openViewPicker()"
                                 prevent-default>
                                 <localize key="general_add">Add</localize>
                             </a>

@@ -21,7 +21,6 @@ namespace Umbraco.Web.WebApi
     [FeatureAuthorize]
     public abstract class UmbracoApiControllerBase : ApiController
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private UmbracoHelper _umbracoHelper;
 
         // note: all Umbraco controllers have two constructors: one with all dependencies, which should be used,
@@ -36,7 +35,7 @@ namespace Umbraco.Web.WebApi
         protected UmbracoApiControllerBase()
             : this(
                 Current.Factory.GetInstance<IGlobalSettings>(),
-                Current.Factory.GetInstance<IUmbracoContextAccessor>(),
+                Current.Factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext,
                 Current.Factory.GetInstance<ISqlContext>(),
                 Current.Factory.GetInstance<ServiceContext>(),
                 Current.Factory.GetInstance<AppCaches>(),
@@ -48,15 +47,15 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
         {
             GlobalSettings = globalSettings;
-            _umbracoContextAccessor = umbracoContextAccessor;
             SqlContext = sqlContext;
             Services = services;
             ApplicationCache = applicationCache;
             Logger = logger;
             RuntimeState = runtimeState;
+            UmbracoContext = umbracoContext;
         }
 
         /// <summary>
@@ -73,8 +72,8 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
-
+        public virtual UmbracoContext UmbracoContext { get; }
+    
         /// <summary>
         /// Gets the sql context.
         /// </summary>

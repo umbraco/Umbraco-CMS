@@ -25,6 +25,7 @@ using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
 using Umbraco.Web.WebApi;
 
 using CoreCurrent = Umbraco.Core.Composing.Current;
@@ -134,6 +135,12 @@ namespace Umbraco.Web.Composing
 
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Factory.GetInstance<IPublishedSnapshotService>();
+
+        public static ITreeService TreeService
+            => Factory.GetInstance<ITreeService>();
+
+        public static ISectionService SectionService
+            => Factory.GetInstance<ISectionService>();
 
         #endregion
 

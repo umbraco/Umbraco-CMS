@@ -429,5 +429,21 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(1, db1.Sections.Length);
             Assert.AreEqual("forms", db1.Sections[0]);
         }
+
+        [Test]
+        public void CanParseManifest_Sections()
+        {
+            const string json = @"{'sections': [
+    { ""alias"": ""content"", ""name"": ""Content"" },
+    { ""alias"": ""hello"", ""name"": ""World"" }
+]}";
+
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Sections.Length);
+            Assert.AreEqual("content", manifest.Sections[0].Alias);
+            Assert.AreEqual("hello", manifest.Sections[1].Alias);
+            Assert.AreEqual("Content", manifest.Sections[0].Name);
+            Assert.AreEqual("World", manifest.Sections[1].Name);
+        }
     }
 }

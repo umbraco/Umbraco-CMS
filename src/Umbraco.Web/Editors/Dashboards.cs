@@ -8,6 +8,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {

@@ -175,7 +175,17 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "packageApiBaseUrl",
                         "GetCreatedPackageById", 
-                        [{ id: id }])),
+                        { id: id })),
+                'Failed to get package');
+        },
+
+        getInstalledById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "packageApiBaseUrl",
+                        "GetInstalledPackageById",
+                        { id: id })),
                 'Failed to get package');
         },
 
