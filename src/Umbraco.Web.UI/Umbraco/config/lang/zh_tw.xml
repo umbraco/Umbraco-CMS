@@ -737,7 +737,6 @@
     <key alias="packageUpgradeInstructions">更新說明</key>
     <key alias="packageUpgradeText">擴展包有可用的更新，您可以從程式庫網站更新。</key>
     <key alias="packageVersion">版本</key>
-    <key alias="packageVersionHistory">版本歷史</key>
     <key alias="viewPackageWebsite">訪問擴展包網站</key>
     <key alias="packageAlreadyInstalled">擴展包已安裝</key>
     <key alias="targetVersionMismatch">這個擴展包無法安裝，它需要Umbraco至少是版本 %0%</key>

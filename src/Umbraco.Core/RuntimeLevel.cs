@@ -1,5 +1,8 @@
 ﻿namespace Umbraco.Core
 {
+    /// <summary>
+    /// Describes the levels in which the runtime can run.
+    /// </summary>
     public enum RuntimeLevel
     {
         /// <summary>

@@ -4,13 +4,9 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Models.Packaging
 {
-    public enum ActionRunAt
-    {
-        Undefined = 0,
-        Install,
-        Uninstall
-    }
-
+    /// <summary>
+    /// Defines a package action declared within a package manifest
+    /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     public class PackageAction
