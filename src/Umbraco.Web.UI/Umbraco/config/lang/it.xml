@@ -197,8 +197,6 @@
     <key alias="siterepublishHelp"><![CDATA[La cache del sito sarà ricreata. Tutti gli elementi pubblicati saranno aggiornati, tutti quelli non pubblicati rimarranno tali.]]></key>
     <key alias="tableColumns">Numero di colonne</key>
     <key alias="tableRows">Numero di righe</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Imposta identificativo del placeholder</strong>. Settando tale ID puoi inserire il contenuto in questo template dai template figli, facendo riferimento a questo ID usando il codice <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Seleziona Identificativo del placeholder</strong> dalla lista seguente. Puoi scegliere solo l'ID appartenente al template master corrente.]]></key>
     <key alias="thumbnailimageclickfororiginal"><![CDATA[Clicca sull'immmagine per ingrandirla]]></key>
     <key alias="treepicker">Seleziona elemento</key>
     <key alias="viewCacheItem">Visualizza gli elementi in cache</key>
@@ -318,7 +316,6 @@
     <key alias="or">o</key>
     <key alias="password">Password</key>
     <key alias="path">Percorso</key>
-    <key alias="placeHolderID"><![CDATA[Identificativo "Placeholder"]]></key>
     <key alias="pleasewait"><![CDATA[Attendere prego...]]></key>
     <key alias="previous">Precedente</key>
     <key alias="properties"><![CDATA[Proprietà]]></key>

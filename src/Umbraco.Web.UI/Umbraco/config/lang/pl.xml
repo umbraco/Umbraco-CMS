@@ -334,10 +334,6 @@
     <key alias="siterepublishHelp">Cache strony zostanie odświeżone. Cała zawartość opublikowana będzie aktualna, lecz nieopublikowana zawartość pozostanie niewidoczna</key>
     <key alias="tableColumns">Liczba kolumn</key>
     <key alias="tableRows">Liczba wierszy</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Ustaw zastępczy ID</strong> Ustawiając ID na tym elemencie możesz później łączyć treść z podrzędnych szablonów,
-      ustawiając dowiązanie do tego ID na elemencie <code>&lt;asp:treści /&gt;</code>]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Wybierz zastępczy ID</strong> z poniższej listy. Możesz wybierać tylko
-      spośród ID na szablonie nadrzędnym tego formularza.]]></key>
     <key alias="thumbnailimageclickfororiginal">Kliknij na obrazie, aby zobaczyć go w pełnym rozmiarze</key>
     <key alias="treepicker">Wybierz element</key>
     <key alias="viewCacheItem">Podgląd elementów Cache</key>
@@ -531,7 +527,6 @@
     <key alias="or">lub</key>
     <key alias="password">Hasło</key>
     <key alias="path">Ścieżka</key>
-    <key alias="placeHolderID">Zastępczy ID</key>
     <key alias="pleasewait">Proszę czekać...</key>
     <key alias="previous">Poprzedni</key>
     <key alias="properties">Właściwości</key>

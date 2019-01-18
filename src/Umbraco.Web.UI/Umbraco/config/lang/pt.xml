@@ -191,8 +191,6 @@
     <key alias="siterepublishHelp">O cache do website será atualizado. Todo conteúdo publicado será atualizado, enquanto o conteúdo que não foi publicado permanecerá invisível</key>
     <key alias="tableColumns">Número de colunas</key>
     <key alias="tableRows">Número de linhas</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Defina uma id de espaço reservado</strong> definindo uma ID em seu espaço reservado você pode injetar conteúdo dentro deste modelo desde modelos filhos usando esta ID como referência dentro de um elemento <code>&lt;asp:content /&gt;</code>]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Selecione uma id de espaço reservado</strong> da lista abaixo. Você pode escolher somente as IDs em seu modelo mestre atual.]]></key>
     <key alias="thumbnailimageclickfororiginal">Clique para ver a imagem em seu tamanho original</key>
     <key alias="treepicker">Escolha item</key>
     <key alias="viewCacheItem">Ver Item em Cache</key>
@@ -311,7 +309,6 @@
     <key alias="or">ou</key>
     <key alias="password">Senha</key>
     <key alias="path">Caminho</key>
-    <key alias="placeHolderID">ID do Espaço Reservado</key>
     <key alias="pleasewait">Um momento por favor...</key>
     <key alias="previous">Prévio</key>
     <key alias="properties">Propriedades</key>

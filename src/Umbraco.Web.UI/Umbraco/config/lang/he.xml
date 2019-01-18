@@ -192,10 +192,6 @@
     <key alias="siterepublishHelp">זיכרון המטמון של האתר ירוענן. כל התוכן שפורסם ירוענן בהתאם, שאר התוכן המיועד לפירסום ימתין לפירסום</key>
     <key alias="tableColumns">מספר עמודות</key>
     <key alias="tableRows">מספר שורות</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
-      choose Id's from the current template's master.]]></key>
     <key alias="thumbnailimageclickfororiginal">לחץ על התמונה לגודל מלא</key>
     <key alias="treepicker">בחר פריט</key>
     <key alias="viewCacheItem">צפה בפרטי זיכרון מטמון</key>
@@ -316,7 +312,6 @@
     <key alias="or">או</key>
     <key alias="password">סיסמה</key>
     <key alias="path">נתיב</key>
-    <key alias="placeHolderID">Placeholder קוד זיהוי</key>
     <key alias="pleasewait">אנא המתן בבקשה...</key>
     <key alias="previous">הקודם</key>
     <key alias="properties">הגדרות</key>

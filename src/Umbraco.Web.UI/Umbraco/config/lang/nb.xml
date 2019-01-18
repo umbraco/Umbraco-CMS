@@ -251,8 +251,6 @@
     <key alias="siterepublishHelp">Hurtigbufferen for siden vil bli oppdatert. Alt publisert innhold vil bli oppdatert, mens upublisert innhold vil forbli upublisert.</key>
     <key alias="tableColumns">Antall kolonner</key>
     <key alias="tableRows">Antall rader</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Sett en plassholder-ID</strong><br/>Ved å sette en ID på plassholderen kan du legge inn innhold i denne malen fra underliggende maler, ved å referere denne ID'en ved hjelp av et <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Velg en plassholder ID</strong> fra listen under. Du kan bare velge ID'er fra den gjeldende malens overordnede mal.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klikk på bildet for å se det i full størrelse</key>
     <key alias="treepicker">Velg punkt</key>
     <key alias="viewCacheItem">Se buffret node</key>
@@ -384,7 +382,6 @@
     <key alias="or">eller</key>
     <key alias="password">Passord</key>
     <key alias="path">Sti</key>
-    <key alias="placeHolderID">Plassholder ID</key>
     <key alias="pleasewait">Ett øyeblikk...</key>
     <key alias="previous">Forrige</key>
     <key alias="properties">Egenskaper</key>

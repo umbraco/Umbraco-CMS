@@ -257,10 +257,6 @@
     <key alias="siterepublishHelp">ウェブサイトのキャッシュがリフレッシュされます。 公開されているコンテンツはリフレッシュされますが、非公開のコンテンツは非公開のままです。</key>
     <key alias="tableColumns">列数</key>
     <key alias="tableRows">行数</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>プレースホルダにidを設定</strong>して、子テンプレートからもこのテンプレートをコンテントに入れられるようにできます。
-      IDは<code>&lt;asp:content /&gt;</code>エレメントとして用います。]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[このリストから<strong>プレースホルダのidを選択</strong>してください。
-      このテンプレートのマスターで使用可能なIdのみ選択可能です。]]></key>
     <key alias="thumbnailimageclickfororiginal">クリックすると画像がフルサイズで表示されます</key>
     <key alias="treepicker">項目の選択</key>
     <key alias="viewCacheItem">キャッシュされている項目の表示</key>
@@ -423,7 +419,6 @@
     <key alias="or">または</key>
     <key alias="password">パスワード</key>
     <key alias="path">パス</key>
-    <key alias="placeHolderID">プレースホルダのID</key>
     <key alias="pleasewait">しばらくお待ちください...</key>
     <key alias="previous">前へ</key>
     <key alias="properties">プロパティ</key>

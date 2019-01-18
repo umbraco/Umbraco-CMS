@@ -346,10 +346,6 @@
     <key alias="siterepublishHelp">Le cache du site va être mis à jour. Tous les contenus publiés seront mis à jour. Et tous les contenus dépubliés resteront invisibles.</key>
     <key alias="tableColumns">Nombre de colonnes</key>
     <key alias="tableRows">Nombre de lignes</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Définir un placeholder ID</strong>. En mettant un ID sur votre placeholder, vous pouvez injecter du contenu à cet endroit depuis les modèles enfants,
-      en faisant référence à cet ID au sein d'un élément <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Séléctionnez un placeholder ID</strong> dans la liste ci-dessous. Vous pouvez seulement
-      choisir un ID se trouvant dans le parent du modèle actuel.]]></key>
     <key alias="thumbnailimageclickfororiginal">Cliquez sur l'image pour la voir en taille réelle</key>
     <key alias="treepicker">Sélectionner un élément</key>
     <key alias="viewCacheItem">Voir l'élément de cache</key>
@@ -561,7 +557,6 @@
     <key alias="orderBy">Trier par</key>
     <key alias="password">Mot de passe</key>
     <key alias="path">Chemin</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">Un moment s'il vous plaît...</key>
     <key alias="previous">Précédent</key>
     <key alias="properties">Propriétés</key>

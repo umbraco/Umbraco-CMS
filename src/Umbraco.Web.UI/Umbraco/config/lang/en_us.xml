@@ -423,10 +423,6 @@
     <key alias="siterepublishHelp">The website cache will be refreshed. All published content will be updated, while unpublished content will stay unpublished.</key>
     <key alias="tableColumns">Number of columns</key>
     <key alias="tableRows">Number of rows</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by referring this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
-      choose Id's from the current template's master.]]></key>
     <key alias="thumbnailimageclickfororiginal">Click on the image to see full size</key>
     <key alias="treepicker">Pick item</key>
     <key alias="viewCacheItem">View Cache Item</key>
@@ -644,7 +640,6 @@
     <key alias="orderBy">Order by</key>
     <key alias="password">Password</key>
     <key alias="path">Path</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">One moment please...</key>
     <key alias="previous">Previous</key>
     <key alias="properties">Properties</key>
