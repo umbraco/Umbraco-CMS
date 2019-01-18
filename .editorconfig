@@ -38,4 +38,3 @@ csharp_prefer_braces = false : none
 
 [*.{js,less}]
 trim_trailing_whitespace = false
-insert_final_newline = false
