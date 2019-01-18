@@ -70,7 +70,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
         submit();
     }
 
-    function selectColor(color, $event) {
+    function selectColor(color, $index, $event) {
         $scope.model.color = color;
     }
 

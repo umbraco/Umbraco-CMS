@@ -33,10 +33,10 @@ Use this directive to generate color swatches to pick from.
                 scope.useColorClass = false;
             }
             
-            scope.setColor = function (color, $event) {
+            scope.setColor = function (color, $index, $event) {
                 scope.selectedColor = color;
                 if (scope.onSelect) {
-                    scope.onSelect(color, $event);
+                    scope.onSelect(color, $index, $event);
                     $event.stopPropagation();
                 }
             };
