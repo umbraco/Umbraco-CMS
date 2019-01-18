@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new RelationTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Mock.Of<ILogger>());
+            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
         }
 
 
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new RelationTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Mock.Of<ILogger>());
+                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
 
                 repository.Save(relateContent);//Id 2
                 repository.Save(relateContentType);//Id 3

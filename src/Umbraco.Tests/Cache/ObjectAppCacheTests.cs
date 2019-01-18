@@ -8,9 +8,9 @@ using Umbraco.Core.Cache;
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class ObjectCacheProviderTests : RuntimeCacheProviderTests
+    public class ObjectAppCacheTests : RuntimeAppCacheTests
     {
-        private ObjectCacheRuntimeCacheProvider _provider;
+        private ObjectCacheAppCache _provider;
 
         protected override int GetTotalItemCount
         {
@@ -20,15 +20,15 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            _provider = new ObjectCacheRuntimeCacheProvider();
+            _provider = new ObjectCacheAppCache();
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache AppCache
         {
             get { return _provider; }
         }
 
-        internal override IRuntimeCacheProvider RuntimeProvider
+        internal override IAppPolicyCache AppPolicyCache
         {
             get { return _provider; }
         }

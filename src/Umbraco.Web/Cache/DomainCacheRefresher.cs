@@ -10,8 +10,8 @@ namespace Umbraco.Web.Cache
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public DomainCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService)
-            : base(cacheHelper)
+        public DomainCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
         }

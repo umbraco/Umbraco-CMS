@@ -8,7 +8,10 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
 {
-    internal abstract class DictionaryCacheProviderBase : ICacheProvider
+    /// <summary>
+    /// Provides a base class to fast, dictionary-based <see cref="IAppCache"/> implementations.
+    /// </summary>
+    internal abstract class FastDictionaryAppCacheBase : IAppCache
     {
         // prefix cache keys so we know which one are ours
         protected const string CacheItemPrefix = "umbrtmche";
@@ -16,82 +19,75 @@ namespace Umbraco.Core.Cache
         // an object that represent a value that has not been created yet
         protected internal static readonly object ValueNotCreated = new object();
 
-        // manupulate the underlying cache entries
-        // these *must* be called from within the appropriate locks
-        // and use the full prefixed cache keys
-        protected abstract IEnumerable<DictionaryEntry> GetDictionaryEntries();
-        protected abstract void RemoveEntry(string key);
-        protected abstract object GetEntry(string key);
+        #region IAppCache
 
-        // read-write lock the underlying cache
-        //protected abstract IDisposable ReadLock { get; }
-        //protected abstract IDisposable WriteLock { get; }
-
-        protected abstract void EnterReadLock();
-        protected abstract void ExitReadLock();
-        protected abstract void EnterWriteLock();
-        protected abstract void ExitWriteLock();
-
-        protected string GetCacheKey(string key)
+        /// <inheritdoc />
+        public virtual object Get(string key)
         {
-            return string.Format("{0}-{1}", CacheItemPrefix, key);
-        }
-
-        protected internal static Lazy<object> GetSafeLazy(Func<object> getCacheItem)
-        {
-            // try to generate the value and if it fails,
-            // wrap in an ExceptionHolder - would be much simpler
-            // to just use lazy.IsValueFaulted alas that field is
-            // internal
-            return new Lazy<object>(() =>
-            {
-                try
-                {
-                    return getCacheItem();
-                }
-                catch (Exception e)
-                {
-                    return new ExceptionHolder(ExceptionDispatchInfo.Capture(e));
-                }
-            });
-        }
-
-        protected internal static object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
-        {
-            // if onlyIfValueIsCreated, do not trigger value creation
-            // must return something, though, to differenciate from null values
-            if (onlyIfValueIsCreated && lazy.IsValueCreated == false) return ValueNotCreated;
-
-            // if execution has thrown then lazy.IsValueCreated is false
-            // and lazy.IsValueFaulted is true (but internal) so we use our
-            // own exception holder (see Lazy<T> source code) to return null
-            if (lazy.Value is ExceptionHolder) return null;
-
-            // we have a value and execution has not thrown so returning
-            // here does not throw - unless we're re-entering, take care of it
+            key = GetCacheKey(key);
+            Lazy<object> result;
             try
             {
-                return lazy.Value;
+                EnterReadLock();
+                result = GetEntry(key) as Lazy<object>; // null if key not found
             }
-            catch (InvalidOperationException e)
+            finally
             {
-                throw new InvalidOperationException("The method that computes a value for the cache has tried to read that value from the cache.", e);
+                ExitReadLock();
             }
+            return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
         }
 
-        internal class ExceptionHolder
+        /// <inheritdoc />
+        public abstract object Get(string key, Func<object> factory);
+
+        /// <inheritdoc />
+        public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
         {
-            public ExceptionHolder(ExceptionDispatchInfo e)
+            var plen = CacheItemPrefix.Length + 1;
+            IEnumerable<DictionaryEntry> entries;
+            try
             {
-                Exception = e;
+                EnterReadLock();
+                entries = GetDictionaryEntries()
+                    .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
+                    .ToArray(); // evaluate while locked
+            }
+            finally
+            {
+                ExitReadLock();
             }
 
-            public ExceptionDispatchInfo Exception { get; }
+            return entries
+                .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Where(x => x != null); // backward compat, don't store null values in the cache
         }
 
-        #region Clear
+        /// <inheritdoc />
+        public virtual IEnumerable<object> SearchByRegex(string regex)
+        {
+            const string prefix = CacheItemPrefix + "-";
+            var compiled = new Regex(regex, RegexOptions.Compiled);
+            var plen = prefix.Length;
+            IEnumerable<DictionaryEntry> entries;
+            try
+            {
+                EnterReadLock();
+                entries = GetDictionaryEntries()
+                    .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
+                    .ToArray(); // evaluate while locked
+            }
+            finally
+            {
+                ExitReadLock();
+            }
+            return entries
+                .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Where(x => x != null); // backward compat, don't store null values in the cache
+        }
 
-        public virtual void ClearAllCache()
+        /// <inheritdoc />
+        public virtual void Clear()
         {
             try
             {
@@ -106,7 +102,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheItem(string key)
+        /// <inheritdoc />
+        public virtual void Clear(string key)
         {
             var cacheKey = GetCacheKey(key);
             try
@@ -120,7 +117,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes(string typeName)
+        /// <inheritdoc />
+        public virtual void ClearOfType(string typeName)
         {
             var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
@@ -149,7 +147,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes<T>()
+        /// <inheritdoc />
+        public virtual void ClearOfType<T>()
         {
             var typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
@@ -178,7 +177,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        /// <inheritdoc />
+        public virtual void ClearOfType<T>(Func<string, T, bool> predicate)
         {
             var typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
@@ -210,7 +210,8 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheByKeySearch(string keyStartsWith)
+        /// <inheritdoc />
+        public virtual void ClearByKey(string keyStartsWith)
         {
             var plen = CacheItemPrefix.Length + 1;
             try
@@ -227,14 +228,16 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheByKeyExpression(string regexString)
+        /// <inheritdoc />
+        public virtual void ClearByRegex(string regex)
         {
+            var compiled = new Regex(regex, RegexOptions.Compiled);
             var plen = CacheItemPrefix.Length + 1;
             try
             {
                 EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
-                    .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
+                    .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
                     .ToArray())
                     RemoveEntry((string) entry.Key);
             }
@@ -246,67 +249,80 @@ namespace Umbraco.Core.Cache
 
         #endregion
 
-        #region Get
+        #region Dictionary
 
-        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        // manipulate the underlying cache entries
+        // these *must* be called from within the appropriate locks
+        // and use the full prefixed cache keys
+        protected abstract IEnumerable<DictionaryEntry> GetDictionaryEntries();
+        protected abstract void RemoveEntry(string key);
+        protected abstract object GetEntry(string key);
+
+        // read-write lock the underlying cache
+        //protected abstract IDisposable ReadLock { get; }
+        //protected abstract IDisposable WriteLock { get; }
+
+        protected abstract void EnterReadLock();
+        protected abstract void ExitReadLock();
+        protected abstract void EnterWriteLock();
+        protected abstract void ExitWriteLock();
+
+        protected string GetCacheKey(string key)
         {
-            var plen = CacheItemPrefix.Length + 1;
-            IEnumerable<DictionaryEntry> entries;
-            try
-            {
-                EnterReadLock();
-                entries = GetDictionaryEntries()
-                    .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
-                    .ToArray(); // evaluate while locked
-            }
-            finally
-            {
-                ExitReadLock();
-            }
-
-            return entries
-                    .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
-                    .Where(x => x != null); // backward compat, don't store null values in the cache
+            return $"{CacheItemPrefix}-{key}";
         }
 
-        public virtual IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
+        protected internal static Lazy<object> GetSafeLazy(Func<object> getCacheItem)
         {
-            const string prefix = CacheItemPrefix + "-";
-            var plen = prefix.Length;
-            IEnumerable<DictionaryEntry> entries;
-            try
+            // try to generate the value and if it fails,
+            // wrap in an ExceptionHolder - would be much simpler
+            // to just use lazy.IsValueFaulted alas that field is
+            // internal
+            return new Lazy<object>(() =>
             {
-                EnterReadLock();
-                entries = GetDictionaryEntries()
-                    .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
-                    .ToArray(); // evaluate while locked
-            }
-            finally
-            {
-                ExitReadLock();
-            }
-            return entries
-                    .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
-                    .Where(x => x != null); // backward compat, don't store null values in the cache
+                try
+                {
+                    return getCacheItem();
+                }
+                catch (Exception e)
+                {
+                    return new ExceptionHolder(ExceptionDispatchInfo.Capture(e));
+                }
+            });
         }
 
-        public virtual object GetCacheItem(string cacheKey)
+        protected internal static object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
         {
-            cacheKey = GetCacheKey(cacheKey);
-            Lazy<object> result;
+            // if onlyIfValueIsCreated, do not trigger value creation
+            // must return something, though, to differentiate from null values
+            if (onlyIfValueIsCreated && lazy.IsValueCreated == false) return ValueNotCreated;
+
+            // if execution has thrown then lazy.IsValueCreated is false
+            // and lazy.IsValueFaulted is true (but internal) so we use our
+            // own exception holder (see Lazy<T> source code) to return null
+            if (lazy.Value is ExceptionHolder) return null;
+
+            // we have a value and execution has not thrown so returning
+            // here does not throw - unless we're re-entering, take care of it
             try
             {
-                EnterReadLock();
-                result = GetEntry(cacheKey) as Lazy<object>; // null if key not found
+                return lazy.Value;
             }
-            finally
+            catch (InvalidOperationException e)
             {
-                ExitReadLock();
+                throw new InvalidOperationException("The method that computes a value for the cache has tried to read that value from the cache.", e);
             }
-            return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
         }
 
-        public abstract object GetCacheItem(string cacheKey, Func<object> getCacheItem);
+        internal class ExceptionHolder
+        {
+            public ExceptionHolder(ExceptionDispatchInfo e)
+            {
+                Exception = e;
+            }
+
+            public ExceptionDispatchInfo Exception { get; }
+        }
 
         #endregion
     }

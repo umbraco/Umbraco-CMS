@@ -13,8 +13,8 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonCacheRefresherBase{TInstanceType}"/>.
         /// </summary>
-        /// <param name="cacheHelper">A cache helper.</param>
-        protected JsonCacheRefresherBase(CacheHelper cacheHelper) : base(cacheHelper)
+        /// <param name="appCaches">A cache helper.</param>
+        protected JsonCacheRefresherBase(AppCaches appCaches) : base(appCaches)
         { }
 
         /// <summary>

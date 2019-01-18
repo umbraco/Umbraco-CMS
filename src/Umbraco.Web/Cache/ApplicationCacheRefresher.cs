@@ -5,8 +5,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class ApplicationCacheRefresher : CacheRefresherBase<ApplicationCacheRefresher>
     {
-        public ApplicationCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public ApplicationCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+            AppCaches.RuntimeCache.Clear(CacheKeys.ApplicationsCacheKey);
             base.RefreshAll();
         }
 
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+            AppCaches.RuntimeCache.Clear(CacheKeys.ApplicationsCacheKey);
             base.Remove(id);
         }
 

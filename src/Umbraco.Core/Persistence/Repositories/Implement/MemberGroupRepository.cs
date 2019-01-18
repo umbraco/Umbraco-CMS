@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var result = Get(qry);
                     return result.FirstOrDefault();
                 },
-                //cache for 5 mins since that is the default in the RuntimeCacheProvider
+                //cache for 5 mins since that is the default in the Runtime app cache
                 TimeSpan.FromMinutes(5),
                 //sliding is true
                 true);

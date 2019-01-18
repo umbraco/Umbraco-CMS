@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

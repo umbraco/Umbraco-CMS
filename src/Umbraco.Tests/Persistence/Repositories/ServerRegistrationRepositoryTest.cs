@@ -16,13 +16,13 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ServerRegistrationRepositoryTest : TestWithDatabaseBase
     {
-        private CacheHelper _cacheHelper;
+        private AppCaches _appCaches;
 
         public override void SetUp()
         {
             base.SetUp();
 
-            _cacheHelper = new CacheHelper();
+            _appCaches = new AppCaches();
             CreateTestData();
         }
 

@@ -29,8 +29,8 @@ namespace Umbraco.Web.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="TagsController"/> with all its dependencies.
         /// </summary>
-        public TagsController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        public TagsController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         { }
 
         /// <summary>

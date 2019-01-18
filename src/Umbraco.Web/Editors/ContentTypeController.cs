@@ -56,9 +56,9 @@ namespace Umbraco.Web.Editors
             IGlobalSettings globalSettings,
             UmbracoContext umbracoContext,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
-            ServiceContext services, CacheHelper applicationCache,
+            ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;

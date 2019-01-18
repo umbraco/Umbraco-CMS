@@ -6,8 +6,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
     {
-        public PublicAccessCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public PublicAccessCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define

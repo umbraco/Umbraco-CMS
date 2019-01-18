@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILanguageRepository languageRepository, ILogger logger)
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;

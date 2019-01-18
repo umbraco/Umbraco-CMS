@@ -23,8 +23,8 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Initialize a new instance of the <see cref="UmbracoApiController"/> with all its dependencies.
         /// </summary>
-        protected UmbracoApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        protected UmbracoApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         { }
     }
 }

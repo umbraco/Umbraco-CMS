@@ -37,8 +37,8 @@ namespace Umbraco.Web.Editors
     [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
-        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
 

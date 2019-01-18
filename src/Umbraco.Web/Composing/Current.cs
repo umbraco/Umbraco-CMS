@@ -210,7 +210,7 @@ namespace Umbraco.Web.Composing
 
         public static IProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
 
-        public static CacheHelper ApplicationCache => CoreCurrent.ApplicationCache;
+        public static AppCaches AppCaches => CoreCurrent.AppCaches;
 
         public static ServiceContext Services => CoreCurrent.Services;
 

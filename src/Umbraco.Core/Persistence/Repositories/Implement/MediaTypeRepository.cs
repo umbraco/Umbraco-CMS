@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

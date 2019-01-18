@@ -14,9 +14,9 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="TypedCacheRefresherBase{TInstanceType, TEntityType}"/>.
         /// </summary>
-        /// <param name="cacheHelper">A cache helper.</param>
-        protected TypedCacheRefresherBase(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        /// <param name="appCaches">A cache helper.</param>
+        protected TypedCacheRefresherBase(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Refresher

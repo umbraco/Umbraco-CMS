@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, _fileSystems);
+            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems);
         }
 
         public override void SetUp()
@@ -237,10 +237,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var templateRepository = CreateRepository(ScopeProvider);
 
-                var tagRepository = new TagRepository((IScopeAccessor) ScopeProvider, CacheHelper.Disabled, Logger);
-                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) ScopeProvider, CacheHelper.Disabled, Logger, templateRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) ScopeProvider, CacheHelper.Disabled, Logger);
-                var contentRepo = new DocumentRepository((IScopeAccessor) ScopeProvider, CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+                var tagRepository = new TagRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
+                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, templateRepository);
+                var languageRepository = new LanguageRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
+                var contentRepo = new DocumentRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!

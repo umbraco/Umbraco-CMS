@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>()),
+                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<AppCaches>(), Mock.Of<ILogger>()),
                 ServiceContext.CreatePartial());
 
             var ctrl = new TestSurfaceController(umbracoContext, helper);
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Web.Mvc
         public class TestSurfaceController : SurfaceController
         {
             public TestSurfaceController(UmbracoContext ctx, UmbracoHelper helper = null)
-                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<CacheHelper>(), null, null)
+                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null)
             {
                 if (helper != null)
                 {
