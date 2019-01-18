@@ -6,7 +6,7 @@
  * @description
  * The controller for editing macros.
  */
-function MacrosEditController($scope, $q, $routeParams, macroResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, angularHelper) {
+function MacrosEditController($scope, $q, $routeParams, macroResource, editorState, navigationService, formHelper, contentEditingHelper, localizationService, angularHelper) {
 
     var vm = this;
 
@@ -25,24 +25,23 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
 
     vm.toggle = toggleValue;
 
-    function saveMacro() {
-        vm.page.saveButtonState = "busy";
+    function saveMacro() {       
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
-            console.log(vm.macro);
-            //relationTypeResource.save(vm.relationType).then(function (data) {
-            //    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-            //    bindRelationType(data);
-            //    vm.page.saveButtonState = "success";
-            //}, function (error) {
-            //    contentEditingHelper.handleSaveError({
-            //        redirectOnFailure: false,
-            //        err: error
-            //    });
+            vm.page.saveButtonState = "busy";
+            
+            macroResource.saveMacro(vm.macro).then(function (data) {
+                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                bindMacro(data);
+                vm.page.saveButtonState = "success";
+            }, function (error) {
+                contentEditingHelper.handleSaveError({
+                    redirectOnFailure: false,
+                    err: error
+                });
 
-            //    notificationsService.error(error.data.message);
-            //    vm.page.saveButtonState = "error";
-            //});
+                vm.page.saveButtonState = "error";
+            });
         }
     }
 
@@ -95,6 +94,15 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         return deferred.promise;
     }
 
+    function bindMacro(data) {
+        vm.macro = data;
+        editorState.set(vm.macro);
+
+        navigationService.syncTree({ tree: "macros", path: vm.macro.path, forceReload: true }).then(function (syncArgs) {
+            vm.page.menu.currentNode = syncArgs.node;
+        });
+    }
+
     function init() {
         vm.page.loading = true;
 
@@ -116,13 +124,8 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                     vm.parameterEditors = values[key];                    
                 }
 
-                if (keys[i] === 'macro') {                   
-                    vm.macro = values[key];
-                    editorState.set(vm.macro);
-
-                    navigationService.syncTree({ tree: "macros", path: vm.macro.path, forceReload: true }).then(function (syncArgs) {
-                        vm.page.menu.currentNode = syncArgs.node;
-                    });
+                if (keys[i] === 'macro') {
+                    bindMacro(values[key]);
                 }
             }
 

@@ -15,6 +15,7 @@
     using Umbraco.Web.Composing;
     using Umbraco.Web.Models.ContentEditing;
     using Umbraco.Web.Mvc;
+    using Umbraco.Web.UI;
     using Umbraco.Web.WebApi;
     using Umbraco.Web.WebApi.Filters;
 
@@ -48,18 +49,18 @@
 
             if (this.Services.MacroService.GetByAlias(alias) != null)
             {
-                return this.ReturnErrorResponse("Macro with this name already exists");
+                return this.ReturnErrorResponse("Macro with this alias already exists");
             }
 
             try
             {
                 var macro = new Macro
-                                {
-                                    Alias = alias,
-                                    Name = name,
-                                    MacroSource = string.Empty,
-                                    MacroType = MacroTypes.PartialView
-                                };
+                {
+                    Alias = alias,
+                    Name = name,
+                    MacroSource = string.Empty,
+                    MacroType = MacroTypes.PartialView
+                };
 
                 this.Services.MacroService.Save(macro, this.Security.CurrentUser.Id);
 
@@ -72,7 +73,7 @@
         }
 
         [HttpGet]
-        public  HttpResponseMessage GetById(int id)
+        public HttpResponseMessage GetById(int id)
         {
             var macro = this.Services.MacroService.GetById(id);
 
@@ -82,32 +83,87 @@
             }
 
             var macroDisplay = new MacroDisplay
-                                   {
-                                       Alias = macro.Alias, Id = macro.Id, Key = macro.Key, Name = macro.Name,
-                                       CacheByPage = macro.CacheByPage, CacheByUser = macro.CacheByMember,
-                                       CachePeriod = macro.CacheDuration,
-                                       View = macro.MacroSource,
-                                       RenderInEditor = !macro.DontRender,
-                                       UseInEditor = macro.UseInEditor,
-                                       Path = $"-1,{macro.Id}"
-                                   };
+            {
+                Alias = macro.Alias,
+                Id = macro.Id,
+                Key = macro.Key,
+                Name = macro.Name,
+                CacheByPage = macro.CacheByPage,
+                CacheByUser = macro.CacheByMember,
+                CachePeriod = macro.CacheDuration,
+                View = macro.MacroSource,
+                RenderInEditor = !macro.DontRender,
+                UseInEditor = macro.UseInEditor,
+                Path = $"-1,{macro.Id}"
+            };
 
             var parameters = new List<MacroParameterDisplay>();
 
             foreach (var param in macro.Properties.Values.OrderBy(x => x.SortOrder))
             {
                 parameters.Add(new MacroParameterDisplay
-                                   {
-                                       Editor = param.EditorAlias,
-                                       Key = param.Alias,
-                                       Label = param.Name,
-                                       Id = param.Id
-                                   });
+                {
+                    Editor = param.EditorAlias,
+                    Key = param.Alias,
+                    Label = param.Name,
+                    Id = param.Id
+                });
             }
 
             macroDisplay.Parameters = parameters;
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
+        }
+
+        [HttpPost]
+        public HttpResponseMessage Save(MacroDisplay macroDisplay)
+        {
+            if (macroDisplay == null)
+            {
+                return this.ReturnErrorResponse($"No macro data found in request");
+            }
+
+            var macro = this.Services.MacroService.GetById(int.Parse(macroDisplay.Id.ToString()));
+
+            if (macro == null)
+            {
+                return this.ReturnErrorResponse($"Macro with id {macroDisplay.Id} does not exist");
+            }
+
+            if (macroDisplay.Alias != macro.Alias)
+            {
+                var macroByAlias = this.Services.MacroService.GetByAlias(macroDisplay.Alias);
+
+                if (macroByAlias != null)
+                {
+                    return this.ReturnErrorResponse("Macro with this alias already exists");
+                    }
+            }
+
+            macro.Alias = macroDisplay.Alias;
+            macro.Name = macroDisplay.Name;
+            macro.CacheByMember = macroDisplay.CacheByUser;
+            macro.CacheByPage = macroDisplay.CacheByPage;
+            macro.CacheDuration = macroDisplay.CachePeriod;
+            macro.DontRender = !macroDisplay.RenderInEditor;
+            macro.UseInEditor = macroDisplay.UseInEditor;
+            macro.MacroSource = macroDisplay.View;
+            macro.MacroType = MacroTypes.PartialView;
+
+            try
+            {
+                this.Services.MacroService.Save(macro, this.Security.CurrentUser.Id);
+
+                macroDisplay.Notifications.Clear();
+
+                macroDisplay.Notifications.Add(new Models.ContentEditing.Notification("Success", "Macro saved", SpeechBubbleIcon.Success));
+
+                return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
+            }
+            catch (Exception exception)
+            {
+                return this.ReturnErrorResponse("Error creating macro", true, exception);
+            }
         }
 
         /// <summary>
@@ -245,7 +301,7 @@
         {
             var files = new List<string>();
             var dirInfo = new DirectoryInfo(path);
-           
+
             foreach (var dir in dirInfo.GetDirectories())
             {
                 files.AddRange(this.FindPartialViewFilesInFolder(orgPath, path + "/" + dir.Name, prefixVirtualPath));

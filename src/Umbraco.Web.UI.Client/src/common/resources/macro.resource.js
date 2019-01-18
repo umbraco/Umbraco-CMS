@@ -20,14 +20,14 @@ function macroResource($q, $http, umbRequestHelper) {
          * @param {int} macroId The macro id to get parameters for
          *
          */
-        getMacroParameters: function (macroId) {
+        getMacroParameters: function(macroId) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "macroRenderingApiBaseUrl",
-                       "GetMacroParameters",
-                       [{ macroId: macroId }])),
-               'Failed to retrieve macro parameters for macro with id  ' + macroId);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "macroRenderingApiBaseUrl",
+                        "GetMacroParameters",
+                        [{ macroId: macroId }])),
+                'Failed to retrieve macro parameters for macro with id  ' + macroId);
         },
 
         /**
@@ -43,13 +43,14 @@ function macroResource($q, $http, umbRequestHelper) {
          * @param {Array} macroParamDictionary A dictionary of macro parameters
          *
          */
-        getMacroResultAsHtmlForEditor: function (macroAlias, pageId, macroParamDictionary) {
+        getMacroResultAsHtmlForEditor: function(macroAlias, pageId, macroParamDictionary) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "macroRenderingApiBaseUrl",
-                        "GetMacroResultAsHtmlForEditor"), {
+                        "GetMacroResultAsHtmlForEditor"),
+                    {
                         macroAlias: macroAlias,
                         pageId: pageId,
                         macroParams: macroParamDictionary
@@ -68,10 +69,11 @@ function macroResource($q, $http, umbRequestHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "macroRenderingApiBaseUrl",
-                        "CreatePartialViewMacroWithFile"), {
-                            virtualPath: virtualPath,
-                            filename: filename
-                        }
+                        "CreatePartialViewMacroWithFile"),
+                    {
+                        virtualPath: virtualPath,
+                        filename: filename
+                    }
                 ),
                 'Failed to create macro "' + filename + '"'
             );
@@ -96,7 +98,7 @@ function macroResource($q, $http, umbRequestHelper) {
             );
         },
 
-        getParameterEditors: function () {
+        getParameterEditors: function() {
             return umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetParameterEditors"),
                     "Failed to get parameter editors")
@@ -105,10 +107,16 @@ function macroResource($q, $http, umbRequestHelper) {
 
         getById: function(id) {
             return umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetById", { "id" : id}), "Failed to get macro")
-                );
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetById", { "id": id }), "Failed to get macro")
+            );
+        },
+
+        saveMacro: function(macro) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("macroApiBaseUrl", "Save"), macro)
+            );
         }
-    };
+};
 }
 
 angular.module('umbraco.resources').factory('macroResource', macroResource);
