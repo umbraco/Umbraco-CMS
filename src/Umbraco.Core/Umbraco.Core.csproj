@@ -367,6 +367,7 @@
     <Compile Include="Migrations\Upgrade\V_7_12_0\RenameTrueFalseField.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\SetDefaultTagsStorageType.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\UpdateUmbracoConsent.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_14_0\UpdateMemberGroupPickerData.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddInstructionCountColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddMediaVersionTable.cs" />

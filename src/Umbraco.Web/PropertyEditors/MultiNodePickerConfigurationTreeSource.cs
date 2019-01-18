@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Umbraco.Core;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -15,6 +16,6 @@ namespace Umbraco.Web.PropertyEditors
         public string StartNodeQuery {get;set;}
 
         [JsonProperty("id")]
-        public int? StartNodeId {get;set;}
+        public Udi StartNodeId {get;set;}
     }
 }

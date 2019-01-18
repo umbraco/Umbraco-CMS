@@ -137,7 +137,7 @@ namespace Umbraco.Web.Trees
 
                 if (menu.Items.Any())
                 {
-                    menu.Items.Last().SeperatorBefore = true;
+                    menu.Items.Last().SeparatorBefore = true;
                 }
 
                 // add default actions for *all* users
@@ -237,14 +237,16 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
             //fixme - conver this editor to angular
             AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
-
-            menu.Items.Add(new MenuItem("notify", Services.TextService)
+            if (EmailSender.CanSendRequiredEmail)
             {
-                Icon = "megaphone",
-                SeperatorBefore = true,
-                OpensDialog = true
-            });
-
+	            menu.Items.Add(new MenuItem("notify", Services.TextService)
+	            {
+	                Icon = "megaphone",
+	                SeparatorBefore = true,
+	                OpensDialog = true
+	            });
+            }
+			
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
