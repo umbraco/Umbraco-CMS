@@ -49,8 +49,8 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
         {
             _manifestParser = manifestParser;
             _features = features;
@@ -221,7 +221,7 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? GetAssetList()
-                : ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
+                : AppCaches.RuntimeCache.GetCacheItem<JArray>(
                     "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
                     GetAssetList,
                     new TimeSpan(0, 2, 0));
@@ -252,7 +252,7 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? ServerVariablesParser.Parse(serverVars.GetServerVariables())
-                : ApplicationCache.RuntimeCache.GetCacheItem<string>(
+                : AppCaches.RuntimeCache.GetCacheItem<string>(
                     typeof(BackOfficeController) + "ServerVariables",
                     () => ServerVariablesParser.Parse(serverVars.GetServerVariables()),
                     new TimeSpan(0, 10, 0));

@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(validate);
 
             var cacheKey = "temp_indexing_op_" + indexName;
-            var found = ApplicationCache.RuntimeCache.Get(cacheKey);
+            var found = AppCaches.RuntimeCache.Get(cacheKey);
 
             //if its still there then it's not done
             return found != null
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Editors
 
                 var cacheKey = "temp_indexing_op_" + index.Name;
                 //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-                ApplicationCache.RuntimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
+                AppCaches.RuntimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
 
                 _indexRebuilder.RebuildIndex(indexName);
 

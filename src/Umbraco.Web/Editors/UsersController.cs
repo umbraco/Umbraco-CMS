@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.StaticCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.StaticCache, id);
         }
 
         internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache staticCache, int id)
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Editors
                     Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.StaticCache));
         }
 
         /// <summary>

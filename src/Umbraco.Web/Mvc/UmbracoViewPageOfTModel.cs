@@ -39,7 +39,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public AppCaches ApplicationCache { get; set; }
+        public AppCaches AppCaches { get; set; }
 
         // fixme
         // previously, Services and ApplicationCache would derive from UmbracoContext.Application, which
@@ -115,10 +115,10 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoViewPage(ServiceContext services, AppCaches applicationCache)
+        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches)
         {
             Services = services;
-            ApplicationCache = applicationCache;
+            AppCaches = appCaches;
         }
 
         // view logic below:

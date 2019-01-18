@@ -50,7 +50,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public AppCaches ApplicationCache { get;  }
+        public AppCaches AppCaches { get;  }
 
         /// <summary>
         /// Gets or sets the logger.
@@ -100,12 +100,12 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches applicationCache, ILogger logger, IProfilingLogger profilingLogger)
+        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
         {
             UmbracoContext = umbracoContext;
             DatabaseFactory = databaseFactory;
             Services = services;
-            ApplicationCache = applicationCache;
+            AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
         }

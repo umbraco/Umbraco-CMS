@@ -16,8 +16,8 @@ namespace Umbraco.Web.Controllers
         {
         }
 
-        public UmbLoginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches applicationCache, ILogger logger, IProfilingLogger profilingLogger)
-            : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+        public UmbLoginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger)
         {
         }
 

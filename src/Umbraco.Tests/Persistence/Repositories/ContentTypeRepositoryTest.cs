@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
             var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, CacheHelper.Disabled, Logger, templateRepository);
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, templateRepository);
             return contentTypeRepository;
         }
 
