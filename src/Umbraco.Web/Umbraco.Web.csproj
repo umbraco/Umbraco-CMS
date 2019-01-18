@@ -158,6 +158,8 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
     <Compile Include="Models\ContentEditing\ObjectType.cs" />
     <Compile Include="Models\ContentEditing\RelationDisplay.cs" />

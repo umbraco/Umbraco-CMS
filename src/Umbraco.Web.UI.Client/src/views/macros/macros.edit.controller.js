@@ -83,11 +83,24 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         return deferred.promise;
     }
 
+    function getMacro() {
+        var deferred = $q.defer();
+
+        macroResource.getById($routeParams.id).then(function (data) {
+            deferred.resolve(data);
+        }, function () {
+            deferred.reject();
+        });
+
+        return deferred.promise;
+    }
+
     function init() {
         vm.page.loading = true;
 
         vm.promises['partialViews'] = getPartialViews();
         vm.promises['parameterEditors'] = getParameterEditors();
+        vm.promises['macro'] = getMacro();
 
         $q.all(vm.promises).then(function (values) {
             var keys = Object.keys(values);
@@ -102,11 +115,19 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                 if (keys[i] === 'parameterEditors') {
                     vm.parameterEditors = values[key];                    
                 }
+
+                if (keys[i] === 'macro') {                   
+                    vm.macro = values[key];
+                    editorState.set(vm.macro);
+
+                    navigationService.syncTree({ tree: "macros", path: vm.macro.path, forceReload: true }).then(function (syncArgs) {
+                        vm.page.menu.currentNode = syncArgs.node;
+                    });
+                }
             }
 
             vm.page.loading = false;
         });
-
 
         vm.page.navigation = [
             {
@@ -123,31 +144,6 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                 "view": "views/macros/views/parameters.html"
             }
         ];
-
-        vm.macro = {
-            "name": "Test macro",
-            "alias": "testMacro",
-            "id": 1,
-            "key": "unique key goes here",
-            "useInEditor": true,
-            "renderInEditor": false,
-            "cachePeriod": 2400,
-            "cacheByPage": true,
-            "cacheByUser": false,
-            "view": "Second",
-            "parameters": [
-                {
-                    "key": "title",
-                    "label": "Label",
-                    "editor": "editor"
-                },
-                {
-                    "key": "link",
-                    "label": "Link",
-                    "editor": "Link picker"
-                }
-            ]
-        }        
     }
 
     init();      

@@ -2,7 +2,8 @@
     <umb-box-header title="Macro partial view"></umb-box-header>
     <umb-box-content>
         <umb-control-group label="Macro partial view">
-            <select class="input-block-level" ng-model="model.macro.view" ng-options="i as i for i in model.views"></select>
+            <select class="input-block-level" ng-model="model.macro.view" ng-options="i as i for i in model.views" required>                  
+            </select>
         </umb-control-group>
     </umb-box-content>
 </umb-box>
