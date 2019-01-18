@@ -2,7 +2,9 @@
   "private": true,
   "scripts": {
     "test": "karma start test/config/karma.conf.js --singlerun",
-    "build": "gulp"
+    "build": "gulp build",
+    "dev": "gulp dev",
+    "docs": "gulp docs"
   },
   "dependencies": {
     "ace-builds": "1.4.2",
@@ -62,6 +64,7 @@
     "gulp-watch": "5.0.1",
     "gulp-wrap": "0.14.0",
     "gulp-wrap-js": "0.4.1",
+    "gulp-notify": "^3.0.0",
     "jasmine-core": "3.3.0",
     "karma": "3.1.1",
     "karma-jasmine": "2.0.1",
@@ -70,6 +73,7 @@
     "lodash": "4.17.11",
     "marked": "^0.5.2",
     "merge-stream": "1.0.1",
-    "run-sequence": "2.2.1"
+    "run-sequence": "2.2.1",
+    "fs": "0.0.2"
   }
 }
