@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -24,16 +25,19 @@ namespace Umbraco.Web
     {
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         /// Constructor used to return results from the caches
         /// </summary>
         /// <param name="contentCache"></param>
         /// <param name="mediaCache"></param>
-        public PublishedContentQuery(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
+        /// <param name="variationContextAccessor"></param>
+        public PublishedContentQuery(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, IVariationContextAccessor variationContextAccessor)
         {
             _contentCache = contentCache ?? throw new ArgumentNullException(nameof(contentCache));
             _mediaCache = mediaCache ?? throw new ArgumentNullException(nameof(mediaCache));
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
         }
 
         #region Content
@@ -201,6 +205,9 @@ namespace Umbraco.Web
             // default to max 500 results
             var count = skip == 0 && take == 0 ? 500 : skip + take;
 
+            //set this to the specific culture or to the culture in the request
+            culture = culture ?? _variationContextAccessor.VariationContext.Culture;
+
             ISearchResults results;
             if (culture.IsNullOrWhiteSpace())
             {
@@ -209,23 +216,15 @@ namespace Umbraco.Web
             else
             {
                 //get all index fields suffixed with the culture name supplied
-                var cultureFields = new List<string>();
-                var fields = umbIndex.GetFields();
-                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, 1); //must vary by culture
-                // ReSharper disable once LoopCanBeConvertedToQuery
-                foreach (var field in fields)
-                {
-                    var match = CultureIsoCodeFieldName.Match(field);
-                    if (match.Success && match.Groups.Count == 2 && culture.InvariantEquals(match.Groups[1].Value))
-                        cultureFields.Add(field);
-                }
-
+                var cultureFields = umbIndex.GetCultureFields(culture);
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "y"); //must vary by culture
                 qry = qry.And().ManagedQuery(term, cultureFields.ToArray());
                 results = qry.Execute(count);
             }
 
             totalRecords = results.TotalItemCount;
-            return results.ToPublishedSearchResults(_contentCache);
+
+            return new CultureContextualSearchResults(results.ToPublishedSearchResults(_contentCache), _variationContextAccessor, culture);
         }
 
         /// <inheritdoc />
@@ -246,12 +245,76 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Matches a culture iso name suffix
+        /// This is used to contextualize the values in the search results when enumerating over them so that the correct culture values are used
         /// </summary>
-        /// <remarks>
-        /// myFieldName_en-us will match the "en-us"
-        /// </remarks>
-        private static readonly Regex CultureIsoCodeFieldName = new Regex("^[_\\w]+_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
+        private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
+        {
+            private readonly IEnumerable<PublishedSearchResult> _wrapped;
+            private readonly IVariationContextAccessor _variationContextAccessor;
+            private readonly string _culture;
+
+            public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, string culture)
+            {
+                _wrapped = wrapped;
+                _variationContextAccessor = variationContextAccessor;
+                _culture = culture;
+            }
+
+            public IEnumerator<PublishedSearchResult> GetEnumerator()
+            {
+                //We need to change the current culture to what is requested and then change it back
+                var originalContext = _variationContextAccessor.VariationContext;
+                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext.Culture))
+                    _variationContextAccessor.VariationContext = new VariationContext(_culture);
+
+                //now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
+                return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor, originalContext);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            /// <summary>
+            /// Resets the variation context when this is disposed
+            /// </summary>
+            private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
+            {
+                private readonly IEnumerator<PublishedSearchResult> _wrapped;
+                private readonly IVariationContextAccessor _variationContextAccessor;
+                private readonly VariationContext _originalContext;
+
+                public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
+                {
+                    _wrapped = wrapped;
+                    _variationContextAccessor = variationContextAccessor;
+                    _originalContext = originalContext;
+                }
+
+                public void Dispose()
+                {
+                    _wrapped.Dispose();
+                    //reset
+                    _variationContextAccessor.VariationContext = _originalContext;
+                }
+
+                public bool MoveNext()
+                {
+                    return _wrapped.MoveNext();
+                }
+
+                public void Reset()
+                {
+                    _wrapped.Reset();
+                }
+
+                public PublishedSearchResult Current => _wrapped.Current;
+                object IEnumerator.Current => Current;
+            }
+        }
+
+        
 
 
         #endregion

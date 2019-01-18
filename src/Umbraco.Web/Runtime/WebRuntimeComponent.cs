@@ -17,6 +17,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
@@ -34,8 +35,17 @@ namespace Umbraco.Web.Runtime
 {
     public sealed class WebRuntimeComponent : IComponent
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
+        private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly IUserService _userService;
+        private readonly IUmbracoSettingsSection _umbracoSettings;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly UrlProviderCollection _urlProviders;
+
         public WebRuntimeComponent(
-            IRuntimeState runtime,
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
@@ -43,20 +53,30 @@ namespace Umbraco.Web.Runtime
             IUserService userService,
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
-            IEntityService entityService,
             IVariationContextAccessor variationContextAccessor,
             UrlProviderCollection urlProviders)
         {
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _surfaceControllerTypes = surfaceControllerTypes;
+            _apiControllerTypes = apiControllerTypes;
+            _publishedSnapshotService = publishedSnapshotService;
+            _userService = userService;
+            _umbracoSettings = umbracoSettings;
+            _globalSettings = globalSettings;
+            _variationContextAccessor = variationContextAccessor;
+            _urlProviders = urlProviders;
+        }
+
+        public void Initialize()
+        { 
             // setup mvc and webapi services
             SetupMvcAndWebApi();
 
             // client dependency
-            ConfigureClientDependency(globalSettings);
+            ConfigureClientDependency(_globalSettings);
 
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
-
-            InstallHelper.DeleteLegacyInstaller();
 
             // wrap view engines in the profiling engine
             WrapViewEngines(ViewEngines.Engines);
@@ -65,7 +85,7 @@ namespace Umbraco.Web.Runtime
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(umbracoContextAccessor, globalSettings, surfaceControllerTypes, apiControllerTypes);
+            CreateRoutes(_umbracoContextAccessor, _globalSettings, _surfaceControllerTypes, _apiControllerTypes);
 
             // get an http context
             // at that moment, HttpContext.Current != null but its .Request property is null
@@ -75,18 +95,21 @@ namespace Umbraco.Web.Runtime
             // (also sets the accessor)
             // this is a *temp* UmbracoContext
             UmbracoContext.EnsureContext(
-                umbracoContextAccessor,
+                _umbracoContextAccessor,
                 new HttpContextWrapper(HttpContext.Current),
-                publishedSnapshotService,
-                new WebSecurity(httpContext, userService, globalSettings),
-                umbracoSettings,
-                urlProviders,
-                globalSettings,
-                variationContextAccessor);
+                _publishedSnapshotService,
+                new WebSecurity(httpContext, _userService, _globalSettings),
+                _umbracoSettings,
+                _urlProviders,
+                _globalSettings,
+                _variationContextAccessor);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
         }
+
+        public void Terminate()
+        { }
 
         private static void ConfigureGlobalFilters()
         {
@@ -221,7 +244,7 @@ namespace Umbraco.Web.Runtime
         private static void ConfigureClientDependency(IGlobalSettings globalSettings)
         {
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-            XmlFileMapper.FileMapDefaultFolder = "~/App_Data/TEMP/ClientDependency";
+            XmlFileMapper.FileMapDefaultFolder = SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
             BaseCompositeFileProcessingProvider.UrlTypeDefault = CompositeUrlType.Base64QueryStrings;
 
             // Now we need to detect if we are running umbracoLocalTempStorage as EnvironmentTemp and in that case we want to change the CDF file

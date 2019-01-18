@@ -13,6 +13,7 @@
 *.suo
 *.vs10x
 *.ndproj
+*.ignorer.*
 
 # common directories
 .DS_Store

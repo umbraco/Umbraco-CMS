@@ -282,7 +282,7 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new DocumentVersionDto
             {
                 Id = entity.VersionId,
-                TemplateId = entity.Template?.Id,
+                TemplateId = entity.TemplateId,
                 Published = false, // always building the current, unpublished one
 
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto)

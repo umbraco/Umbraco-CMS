@@ -26,7 +26,7 @@ namespace Umbraco.Web.Search
     {
         private readonly IExamineManager _examineManager;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;
-        public IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
+        private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private static bool _disableExamineIndexing = false;
@@ -36,6 +36,10 @@ namespace Umbraco.Web.Search
         private readonly ServiceContext _services;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
         private static readonly object RebuildLocker = new object();
+        private readonly IMainDom _mainDom;
+        private readonly IProfilingLogger _logger;
+        private readonly IUmbracoIndexesCreator _indexCreator;
+        private readonly IndexRebuilder _indexRebuilder;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -59,6 +63,14 @@ namespace Umbraco.Web.Search
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
 
+            _mainDom = mainDom;
+            _logger = profilingLogger;
+            _indexCreator = indexCreator;
+            _indexRebuilder = indexRebuilder;
+        }
+
+        public void Initialize()
+        {
             //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
             //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
             //which simply checks the existence of the lock file
@@ -69,9 +81,9 @@ namespace Umbraco.Web.Search
             };
 
             //let's deal with shutting down Examine with MainDom
-            var examineShutdownRegistered = mainDom.Register(() =>
+            var examineShutdownRegistered = _mainDom.Register(() =>
             {
-                using (profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
+                using (_logger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }
@@ -79,23 +91,23 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                profilingLogger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
+                _logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-                Suspendable.ExamineEvents.SuspendIndexers(profilingLogger);
+                Suspendable.ExamineEvents.SuspendIndexers(_logger);
                 _disableExamineIndexing = true;
                 return; //exit, do not continue
             }
 
             //create the indexes and register them with the manager
-            foreach(var index in indexCreator.Create())
+            foreach(var index in _indexCreator.Create())
                 _examineManager.AddIndex(index);
 
-            profilingLogger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+            _logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
-            var registeredIndexers = examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
+            var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            profilingLogger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -108,11 +120,14 @@ namespace Umbraco.Web.Search
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
 
-            EnsureUnlocked(profilingLogger, examineManager);
+            EnsureUnlocked(_logger, _examineManager);
 
             //TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
-            RebuildIndexes(indexRebuilder, profilingLogger, true, 5000);
+            RebuildIndexes(_indexRebuilder, _logger, true, 5000);
         }
+
+        public void Terminate()
+        { }
 
         /// <summary>
         /// Called to rebuild empty indexes on startup
@@ -145,8 +160,6 @@ namespace Umbraco.Web.Search
                 _rebuildOnStartupRunner.TryAdd(task);
             }
         }
-
-
 
         /// <summary>
         /// Must be called to each index is unlocked before any indexing occurs
@@ -433,13 +446,14 @@ namespace Umbraco.Web.Search
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.CreateQuery().Field("nodeType", id).Execute(maxResults: pageSize * (page + 1));
+                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 
                             foreach (var item in paged)
                                 if (int.TryParse(item.Id, out var contentId))
                                     DeleteIndexForEntity(contentId, false);
+                            page++;
                         }
                     }
                 }

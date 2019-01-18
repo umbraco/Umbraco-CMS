@@ -107,18 +107,12 @@
                  parent-scope="overlay.parentScope">
     </umb-overlay>
 
-    <umb-overlay ng-if="ysodOverlay.show"
-                 model="ysodOverlay"
-                 position="right"
-                 view="ysodOverlay.view">
-    </umb-overlay>
-
     <umb-login
         ng-if="login.show"
         on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features, Current.Config.Global())
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features, Current.Configs.Global())
 
     <script>
 

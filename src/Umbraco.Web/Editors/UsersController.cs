@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (Current.Config.Umbraco().Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).ToSHA1() + "." + ext;
@@ -195,7 +195,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
-            var hideDisabledUsers = Current.Config.Umbraco().Security.HideDisabledUsersInBackoffice;
+            var hideDisabledUsers = Current.Configs.Settings().Security.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -253,7 +253,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (Current.Config.Umbraco().Security.UsernameIsEmail)
+            if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
                 userSave.Username = userSave.Email;
@@ -345,7 +345,7 @@ namespace Umbraco.Web.Editors
             }
 
             IUser user;
-            if (Current.Config.Umbraco().Security.UsernameIsEmail)
+            if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
                 //ensure it's the same
                 userSave.Username = userSave.Email;
@@ -419,7 +419,7 @@ namespace Umbraco.Web.Editors
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
-                    Current.Config.Umbraco().Security.UsernameIsEmail ? "Email" : "Username",
+                    Current.Configs.Settings().Security.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
@@ -539,7 +539,7 @@ namespace Umbraco.Web.Editors
 
             // if the found user has his email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (Current.Config.Umbraco().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
+            if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
             }

@@ -2,7 +2,9 @@
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -29,7 +31,7 @@ namespace Umbraco.Tests.Models
             var urlName = content.GetUrlSegment(new[]{new DefaultUrlSegmentProvider() });
 
             // Act
-            XElement element = content.ToXml();
+            XElement element = content.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);
@@ -49,7 +51,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(content.GetCreatorProfile(ServiceContext.UserService).Name, (string)element.Attribute("creatorName"));
             Assert.AreEqual(content.GetWriterProfile(ServiceContext.UserService).Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
-            Assert.AreEqual(content.Template == null ? "0" : content.Template.Id.ToString(), (string)element.Attribute("template"));
+            Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
 
             Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
             Assert.AreEqual(content.Properties["bodyText"].GetValue().ToString(), element.Elements("bodyText").Single().Value);

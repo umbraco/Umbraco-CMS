@@ -6,7 +6,13 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Security;
 using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -24,6 +30,10 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]    
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
+        public MemberTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+        }
+
         private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
@@ -166,5 +176,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
+
+        
     }
 }

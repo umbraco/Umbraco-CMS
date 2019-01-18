@@ -642,7 +642,30 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has access");
+                    // grab the current member
+                    var member = membershipHelper.GetCurrentMember();
+                    // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
+                    var memberIsActive = true;
+                    if (member != null)
+                    {
+                        if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
+                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
+
+                        if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
+                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
+                    }
+
+                    if (memberIsActive == false)
+                    {
+                        _logger.Debug<PublishedRouter>("Current member is either unapproved or locked out, redirect to error page");
+                        var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+                        if (errorPageId != request.PublishedContent.Id)
+                            request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
+                    }
+                    else
+                    {
+                        _logger.Debug<PublishedRouter>("Current member has access");
+                    }
                 }
             }
             else
@@ -751,9 +774,9 @@ namespace Umbraco.Web.Routing
             }
         }
 
-        private ITemplate GetTemplateModel(int templateId)
+        private ITemplate GetTemplateModel(int? templateId)
         {
-            if (templateId <= 0)
+            if (templateId.HasValue == false)
             {
                 _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
                 return null;
@@ -761,7 +784,10 @@ namespace Umbraco.Web.Routing
 
             _logger.Debug<PublishedRouter>("GetTemplateModel: Get template id={TemplateId}", templateId);
 
-            var template = _services.FileService.GetTemplate(templateId);
+            if (templateId == null)
+                throw new InvalidOperationException("The template is not set, the page cannot render.");
+
+            var template = _services.FileService.GetTemplate(templateId.Value);
             if (template == null)
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
             _logger.Debug<PublishedRouter>("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);

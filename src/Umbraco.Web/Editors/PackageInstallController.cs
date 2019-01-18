@@ -8,14 +8,19 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
-using umbraco.cms.businesslogic.packager;
+using System.Xml.Linq;
+using Semver;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
@@ -39,6 +44,13 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
+            IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+        }
+
         /// <summary>
         /// This checks if this package & version is alraedy installed
         /// </summary>
@@ -48,9 +60,11 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult ValidateInstalled(string name, string version)
         {
-            var validate = ValidateInstalledInternal(name, version);
-            if (validate == false)
+            var installType = Services.PackagingService.GetPackageInstallType(name, SemVersion.Parse(version), out _);
+
+            if (installType == PackageInstallType.AlreadyInstalled)
                 return BadRequest();
+
             return Ok();
         }
 
@@ -59,17 +73,17 @@ namespace Umbraco.Web.Editors
         {
             try
             {
-                var pack = InstalledPackage.GetById(packageId);
-                if (pack == null) return NotFound();
+                var package = Services.PackagingService.GetInstalledPackageById(packageId);
+                if (package == null) return NotFound();
 
-                PerformUninstall(pack);
+                var summary = Services.PackagingService.UninstallPackage(package.Name, Security.GetUserId().ResultOr(0));
 
                 //now get all other packages by this name since we'll uninstall all versions
-                foreach (var installed in InstalledPackage.GetAllInstalledPackages()
-                    .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
+                foreach (var installed in Services.PackagingService.GetAllInstalledPackages()
+                    .Where(x => x.Name == package.Name && x.Id != package.Id))
                 {
-                    //remove from teh xml
-                    installed.Delete(Security.GetUserId().ResultOr(0));
+                    //remove from the xml
+                    Services.PackagingService.DeleteInstalledPackage(installed.Id, Security.GetUserId().ResultOr(0));
                 }
             }
             catch (Exception ex)
@@ -81,267 +95,37 @@ namespace Umbraco.Web.Editors
             return Ok();
         }
 
-        /// <summary>
-        /// SORRY :( I didn't have time to put this in a service somewhere - the old packager did this all manually too
-        /// </summary>
-        /// <param name="pack"></param>
-        protected void PerformUninstall(InstalledPackage pack)
-        {
-            if (pack == null) throw new ArgumentNullException("pack");
-
-            var removedTemplates = new List<ITemplate>();
-            var removedMacros = new List<IMacro>();
-            var removedContentTypes = new List<IContentType>();
-            var removedDictionaryItems = new List<IDictionaryItem>();
-            var removedDataTypes = new List<IDataType>();
-            var removedFiles = new List<string>();
-
-            //Uninstall templates
-            foreach (var item in pack.Data.Templates.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var found = Services.FileService.GetTemplate(nId);
-                if (found != null)
-                {
-                    removedTemplates.Add(found);
-                    Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId().ResultOr(0));
-                }
-                pack.Data.Templates.Remove(nId.ToString());
-            }
-
-            //Uninstall macros
-            foreach (var item in pack.Data.Macros.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var macro = Services.MacroService.GetById(nId);
-                if (macro != null)
-                {
-                    removedMacros.Add(macro);
-                    Services.MacroService.Delete(macro);
-                }
-                pack.Data.Macros.Remove(nId.ToString());
-            }
-
-            //Remove Document Types
-            var contentTypes = new List<IContentType>();
-            var contentTypeService = Services.ContentTypeService;
-            foreach (var item in pack.Data.Documenttypes.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var contentType = contentTypeService.Get(nId);
-                if (contentType == null) continue;
-                contentTypes.Add(contentType);
-                pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
-            }
-
-            //Order the DocumentTypes before removing them
-            if (contentTypes.Any())
-            {
-                //TODO: I don't think this ordering is necessary
-                var orderedTypes = from contentType in contentTypes
-                                   orderby contentType.ParentId descending, contentType.Id descending
-                                   select contentType;
-                removedContentTypes.AddRange(orderedTypes);
-                contentTypeService.Delete(orderedTypes);
-            }
-
-            //Remove Dictionary items
-            foreach (var item in pack.Data.DictionaryItems.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var di = Services.LocalizationService.GetDictionaryItemById(nId);
-                if (di != null)
-                {
-                    removedDictionaryItems.Add(di);
-                    Services.LocalizationService.Delete(di);
-                }
-                pack.Data.DictionaryItems.Remove(nId.ToString());
-            }
-
-            //Remove Data types
-            foreach (var item in pack.Data.DataTypes.ToArray())
-            {
-                int nId;
-                if (int.TryParse(item, out nId) == false) continue;
-                var dtd = Services.DataTypeService.GetDataType(nId);
-                if (dtd != null)
-                {
-                    removedDataTypes.Add(dtd);
-                    Services.DataTypeService.Delete(dtd);
-                }
-                pack.Data.DataTypes.Remove(nId.ToString());
-            }
-
-            pack.Save();
-
-            // uninstall actions
-            //TODO: We should probably report errors to the UI!!
-            // This never happened before though, but we should do something now
-            if (pack.Data.Actions.IsNullOrWhiteSpace() == false)
-            {
-                try
-                {
-                    var actionsXml = new XmlDocument();
-                    actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
-
-                    Logger.Debug<PackageInstallController>("Executing undo actions: {UndoActionsXml}", actionsXml.OuterXml);
-
-                    foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
-                    {
-                        try
-                        {
-                            global::umbraco.cms.businesslogic.packager.PackageAction
-                                .UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
-                }
-            }
-
-            //moved remove of files here so custom package actions can still undo
-            //Remove files
-            foreach (var item in pack.Data.Files.ToArray())
-            {
-                removedFiles.Add(item.GetRelativePath());
-
-                //here we need to try to find the file in question as most packages does not support the tilde char
-                var file = IOHelper.FindFile(item);
-                if (file != null)
-                {
-                    if (file.StartsWith("/") == false)
-                        file = string.Format("/{0}", file);
-                    var filePath = IOHelper.MapPath(file);
-
-                    if (File.Exists(filePath))
-                        File.Delete(filePath);
-
-                }
-                pack.Data.Files.Remove(file);
-            }
-            pack.Save();
-            pack.Delete(Security.GetUserId().ResultOr(0));
-
-            // create a summary of what was actually removed, for PackagingService.UninstalledPackage
-            var summary = new UninstallationSummary
-            {
-                MetaData = pack.GetMetaData(),
-                TemplatesUninstalled = removedTemplates,
-                MacrosUninstalled = removedMacros,
-                ContentTypesUninstalled = removedContentTypes,
-                DictionaryItemsUninstalled = removedDictionaryItems,
-                DataTypesUninstalled = removedDataTypes,
-                FilesUninstalled = removedFiles,
-                PackageUninstalled = true
-            };
-
-            // trigger the UninstalledPackage event
-            PackagingService.OnUninstalledPackage(new UninstallPackageEventArgs<UninstallationSummary>(summary, false));
-
-        }
-
-        /// <summary>
-        /// Returns all installed packages - only shows their latest versions
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<InstalledPackageModel> GetInstalled()
-        {
-            return InstalledPackage.GetAllInstalledPackages()
-                .GroupBy(
-                    //group by name
-                    x => x.Data.Name,
-                    //select the package with a parsed version
-                    pck =>
-                    {
-                        Version pckVersion;
-                        return Version.TryParse(pck.Data.Version, out pckVersion)
-                            ? new { package = pck, version = pckVersion }
-                            : new { package = pck, version = new Version(0, 0, 0) };
-                    })
-                .Select(grouping =>
-                {
-                    //get the max version for the package
-                    var maxVersion = grouping.Max(x => x.version);
-                    //only return the first package with this version
-                    return grouping.First(x => x.version == maxVersion).package;
-                })
-                .Select(pack => new InstalledPackageModel
-                {
-                    Name = pack.Data.Name,
-                    Id = pack.Data.Id,
-                    Author = pack.Data.Author,
-                    Version = pack.Data.Version,
-                    Url = pack.Data.Url,
-                    License = pack.Data.License,
-                    LicenseUrl = pack.Data.LicenseUrl,
-                    Files = pack.Data.Files,
-                    IconUrl = pack.Data.IconUrl
-                })
-                .ToList();
-        }
-
-        /// <summary>
-        /// Deletes a created package
-        /// </summary>
-        /// <param name="packageId"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [HttpDelete]
-        public IHttpActionResult DeleteCreatedPackage(int packageId)
-        {
-            var package = CreatedPackage.GetById(packageId);
-            if (package == null)
-                return NotFound();
-
-            package.Delete();
-
-            return Ok();
-        }
-
+        
+        
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
-            //this will load in all the metadata too
-            var tempDir = ins.Import(model.ZipFilePath, false);
+            var zipFile = new FileInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
 
-            model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempDir);
+            var ins = Services.PackagingService.GetCompiledPackageInfo(zipFile);
+
             model.Name = ins.Name;
             model.Author = ins.Author;
             model.AuthorUrl = ins.AuthorUrl;
             model.IconUrl = ins.IconUrl;
             model.License = ins.License;
             model.LicenseUrl = ins.LicenseUrl;
-            model.ReadMe = ins.ReadMe;
-            model.ConflictingMacroAliases = ins.ConflictingMacroAliases;
-            model.ConflictingStyleSheetNames = ins.ConflictingStyleSheetNames;
-            model.ConflictingTemplateAliases = ins.ConflictingTemplateAliases;
-            model.ContainsBinaryFileErrors = ins.ContainsBinaryFileErrors;
-            model.ContainsMacroConflict = ins.ContainsMacroConflict;
-            model.ContainsStyleSheetConflicts = ins.ContainsStyleSheeConflicts;
-            model.ContainsTemplateConflicts = ins.ContainsTemplateConflicts;
-            model.ContainsUnsecureFiles = ins.ContainsUnsecureFiles;
+            model.Readme = ins.Readme;
+            model.ConflictingMacroAliases = ins.Warnings.ConflictingMacros.ToDictionary(x => x.Name, x => x.Alias);
+            model.ConflictingStyleSheetNames = ins.Warnings.ConflictingStylesheets.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ConflictingTemplateAliases = ins.Warnings.ConflictingTemplates.ToDictionary(x => x.Name, x => x.Alias); ;
+            model.ContainsUnsecureFiles = ins.Warnings.UnsecureFiles.Any();
             model.Url = ins.Url;
             model.Version = ins.Version;
 
-            model.UmbracoVersion = ins.RequirementsType == RequirementsType.Strict
-                ? string.Format("{0}.{1}.{2}", ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch)
+            model.UmbracoVersion = ins.UmbracoVersionRequirementsType == RequirementsType.Strict
+                ? ins.UmbracoVersion.ToString(3)
                 : string.Empty;
 
             //now we need to check for version comparison
             model.IsCompatible = true;
-            if (ins.RequirementsType == RequirementsType.Strict)
+            if (ins.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
-                var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
+                var packageMinVersion = ins.UmbracoVersion;
                 if (UmbracoVersion.Current < packageMinVersion)
                 {
                     model.IsCompatible = false;
@@ -349,44 +133,14 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private bool ValidateInstalledInternal(string name, string version)
-        {
-            var allInstalled = InstalledPackage.GetAllInstalledPackages();
-            var found = allInstalled.FirstOrDefault(x =>
-            {
-                if (x.Data.Name != name) return false;
-                //match the exact version
-                if (x.Data.Version == version)
-                {
-                    return true;
-                }
-                //now try to compare the versions
-                Version installed;
-                Version selected;
-                if (Version.TryParse(x.Data.Version, out installed) && Version.TryParse(version, out selected))
-                {
-                    if (installed >= selected) return true;
-                }
-                return false;
-            });
-            if (found != null)
-            {
-                //this package is already installed
-                return false;
-            }
-            return true;
-        }
-
         [HttpPost]
         [FileUploadCleanupFilter(false)]
         public async Task<LocalPackageInstallModel> UploadLocalPackage()
         {
             if (Request.Content.IsMimeMultipartContent() == false)
-            {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -395,50 +149,50 @@ namespace Umbraco.Web.Editors
 
             //must have a file
             if (result.FileData.Count == 0)
-            {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
 
-            //TODO: App/Tree Permissions?
             var model = new LocalPackageInstallModel
             {
+                //Generate a new package Id for this, we'll use this later for tracking, when persisting, saving the file, etc...
                 PackageGuid = Guid.NewGuid()
             };
 
             //get the files
             foreach (var file in result.FileData)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
+                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
-                //TODO: Only allow .zip
                 if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))
                 {
-                    //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
-                    var packageTempDir = IOHelper.MapPath(SystemDirectories.Data);
+                    //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
+                    
+                    var packagesFolder = IOHelper.MapPath(SystemDirectories.Packages);
+                    Directory.CreateDirectory(packagesFolder);
+                    var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
+                    File.Copy(file.LocalFileName, packageFile);
 
-                    //ensure it's there
-                    Directory.CreateDirectory(packageTempDir);
+                    model.ZipFileName = Path.GetFileName(packageFile);
 
-                    //copy it - must always be '.umb' for the installer thing to work
-                    //the file name must be a GUID - this is what the packager expects (strange yes)
-                    //because essentially this is creating a temporary package Id that will be used
-                    //for unpacking/installing/etc...
-                    model.ZipFilePath = model.PackageGuid + ".umb";
-                    var packageTempFileLocation = Path.Combine(packageTempDir, model.ZipFilePath);
-                    File.Copy(file.LocalFileName, packageTempFileLocation, true);
+                    //add to the outgoing model so that all temp files are cleaned up
+                    model.UploadedFiles.Add(new ContentPropertyFile
+                    {
+                        TempFilePath = file.LocalFileName
+                    });
 
                     //Populate the model from the metadata in the package file (zip file)
                     PopulateFromPackageData(model);
 
-                    var validate = ValidateInstalledInternal(model.Name, model.Version);
+                    var installType = Services.PackagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
 
-                    if (validate == false)
+                    if (installType == PackageInstallType.AlreadyInstalled)
                     {
                         //this package is already installed
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                             Services.TextService.Localize("packager/packageAlreadyInstalled")));
                     }
+
+                    model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
 
                 }
                 else
@@ -461,33 +215,38 @@ namespace Umbraco.Web.Editors
         /// <param name="packageGuid"></param>
         /// <returns></returns>
         [HttpGet]
-        public LocalPackageInstallModel Fetch(string packageGuid)
+        public async Task<LocalPackageInstallModel> Fetch(string packageGuid)
         {
             //Default path
-            string path = Path.Combine("packages", packageGuid + ".umb");
-            if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
+            string fileName = packageGuid + ".umb";
+            if (File.Exists(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), fileName)) == false)
             {
-                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId().ResultOr(0));
+                var packageFile = await Services.PackagingService.FetchPackageFileAsync(
+                    Guid.Parse(packageGuid),
+                    UmbracoVersion.Current,
+                    Security.GetUserId().ResultOr(0));
+
+                fileName = packageFile.Name;
             }
 
             var model = new LocalPackageInstallModel
             {
                 PackageGuid = Guid.Parse(packageGuid),
-                RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66"),
-                ZipFilePath = path
+                ZipFileName = fileName
             };
 
             //Populate the model from the metadata in the package file (zip file)
             PopulateFromPackageData(model);
 
-            var validate = ValidateInstalledInternal(model.Name, model.Version);
+            var installType = Services.PackagingService.GetPackageInstallType(model.Name, SemVersion.Parse(model.Version), out var alreadyInstalled);
 
-            if (validate == false)
+            if (installType == PackageInstallType.AlreadyInstalled)
             {
-                //this package is already installed
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                     Services.TextService.Localize("packager/packageAlreadyInstalled")));
             }
+
+            model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
 
             return model;
         }
@@ -500,22 +259,42 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var zipFile = new FileInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
 
-            var tempPath = ins.Import(model.ZipFilePath);
+            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
+
             //now we need to check for version comparison
-            if (ins.RequirementsType == RequirementsType.Strict)
+            if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
-                var packageMinVersion = new System.Version(ins.RequirementsMajor, ins.RequirementsMinor, ins.RequirementsPatch);
+                var packageMinVersion = packageInfo.UmbracoVersion;
                 if (UmbracoVersion.Current < packageMinVersion)
-                {
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                        Services.TextService.Localize("packager/targetVersionMismatch", new[] { packageMinVersion.ToString() })));
-                }
+                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
             }
 
-            model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, tempPath);
-            model.Id = ins.CreateManifest(IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid.ToString(), model.RepositoryGuid.ToString());
+            var installType = Services.PackagingService.GetPackageInstallType(packageInfo.Name, SemVersion.Parse(packageInfo.Version), out var alreadyInstalled);
+
+            var packageDefinition = PackageDefinition.FromCompiledPackage(packageInfo);
+            packageDefinition.PackagePath = zipFile.FullName;
+            packageDefinition.PackageId = model.PackageGuid; //We must re-map the original package GUID that was generated
+
+            switch (installType)
+            {
+                case PackageInstallType.AlreadyInstalled:
+                    throw new InvalidOperationException("The package is already installed");
+                case PackageInstallType.NewInstall:
+                case PackageInstallType.Upgrade:
+
+                    //save to the installedPackages.config, this will create a new entry with a new Id
+                    if (!Services.PackagingService.SaveInstalledPackage(packageDefinition))
+                        throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Could not save the package"));
+
+                    model.Id = packageDefinition.Id;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
 
             return model;
         }
@@ -528,12 +307,15 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
-            ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
-            ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
+
+            var zipFile = new FileInfo(definition.PackagePath);
+
+            var installedFiles = Services.PackagingService.InstallCompiledPackageFiles(definition, zipFile, Security.GetUserId().ResultOr(0));
 
             //set a restarting marker and reset the app pool
-            Current.RestartAppPool(Request.TryGetHttpContext().Result);
+            UmbracoApplication.Restart(Request.TryGetHttpContext().Result);
 
             model.IsRestarting = true;
 
@@ -562,9 +344,13 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
-            ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
-            ins.InstallBusinessLogic(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
+
+            var zipFile = new FileInfo(definition.PackagePath);
+
+            var installSummary = Services.PackagingService.InstallCompiledPackageData(definition, zipFile, Security.GetUserId().ResultOr(0));
+
             return model;
         }
 
@@ -576,31 +362,33 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallResult CleanUp(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
-            var tempDir = IOHelper.MapPath(model.TemporaryDirectoryPath);
-            ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
-            ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+            var definition = Services.PackagingService.GetInstalledPackageById(model.Id);
+            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + model.Id);
+
+            var zipFile = new FileInfo(definition.PackagePath);
+
+            var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
+            zipFile.Delete();
 
             var redirectUrl = "";
-            if (ins.Control.IsNullOrWhiteSpace() == false)
+            if (packageInfo.Control.IsNullOrWhiteSpace() == false)
             {
-                redirectUrl = string.Format("/developer/framed/{0}",
-                    Uri.EscapeDataString(
-                        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
+                //fixme: this needs to be replaced with an angular view the installer.aspx no longer exists.
+                //redirectUrl = string.Format("/developer/framed/{0}",
+                //    Uri.EscapeDataString(
+                //        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
             }
 
             return new PackageInstallResult
             {
                 Id = model.Id,
-                ZipFilePath = model.ZipFilePath,
+                ZipFileName = model.ZipFileName,
                 PackageGuid = model.PackageGuid,
-                RepositoryGuid = model.RepositoryGuid,
-                TemporaryDirectoryPath = model.TemporaryDirectoryPath,
                 PostInstallationPath = redirectUrl
             };
 

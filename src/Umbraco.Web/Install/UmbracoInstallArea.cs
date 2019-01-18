@@ -32,14 +32,6 @@ namespace Umbraco.Web.Install
                 new { controller = "Install", action = "Index", id = UrlParameter.Optional },
                 new[] { typeof(InstallController).Namespace });
 
-            //TODO: We can remove this when we re-build the back office package installer
-            //Create the install routes
-            context.MapHttpRoute(
-                "Umbraco_install_packages",
-                "Install/PackageInstaller/{action}/{id}",
-                new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional },
-                new[] { typeof(InstallPackageController).Namespace });
-
             context.MapHttpRoute(
                 "umbraco-install-api",
                 "install/api/{action}/{id}",

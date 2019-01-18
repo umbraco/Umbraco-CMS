@@ -6,6 +6,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -56,6 +57,22 @@ namespace Umbraco.Core.Composing.Composers
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetInstance<ILogger>()));
 
+            composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
+
+            composition.RegisterUnique<IPackageActionRunner, PackageActionRunner>();
+
+            composition.RegisterUnique<ConflictingPackageData>();
+            composition.RegisterUnique<CompiledPackageXmlParser>();
+            composition.RegisterUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
+            composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
+            composition.RegisterUnique<PackageDataInstallation>();
+            composition.RegisterUnique<PackageFileInstallation>();
+            composition.RegisterUnique<IPackageInstallation>(factory => //factory required because we need to pass in a string path
+                new PackageInstallation(
+                    factory.GetInstance<PackageDataInstallation>(), factory.GetInstance<PackageFileInstallation>(),
+                    factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
+                    new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
+
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.
             composition.RegisterUnique<IApplicationTreeService, EmptyApplicationTreeService>();
@@ -63,6 +80,17 @@ namespace Umbraco.Core.Composing.Composers
 
             return composition;
         }
+
+        /// <summary>
+        /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="packageRepoFileName"></param>
+        /// <returns></returns>
+        private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
+            => new PackagesRepository( 
+                factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(), factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(), factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>(),
+                packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {

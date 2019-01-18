@@ -10,7 +10,7 @@ namespace Umbraco.Examine
 {
     public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     {
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
@@ -32,7 +32,7 @@ namespace Umbraco.Examine
                 {
                     {"icon", m.ContentType.Icon.Yield()},
                     {"id", new object[] {m.Id}},
-                    {"key", new object[] {m.Key}},
+                    {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
                     {"level", new object[] {m.Level}},
                     {"creatorID", new object[] {m.CreatorId}},

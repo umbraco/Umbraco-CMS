@@ -21,25 +21,25 @@ namespace Umbraco.Web.Search
         {
             base.Compose(composition);
 
-            // populators are not a collection: once cannot remove ours, and can only add more
+            // populators are not a collection: one cannot remove ours, and can only add more
             // the container can inject IEnumerable<IIndexPopulator> and get them all
-            composition.Register<IIndexPopulator, MemberIndexPopulator>(Lifetime.Singleton);
-            composition.Register<IIndexPopulator, ContentIndexPopulator>(Lifetime.Singleton);
-            composition.Register<IIndexPopulator, PublishedContentIndexPopulator>(Lifetime.Singleton);
-            composition.Register<IIndexPopulator, MediaIndexPopulator>(Lifetime.Singleton);
+            composition.Register<MemberIndexPopulator>(Lifetime.Singleton);
+            composition.Register<ContentIndexPopulator>(Lifetime.Singleton);
+            composition.Register<PublishedContentIndexPopulator>(Lifetime.Singleton);
+            composition.Register<MediaIndexPopulator>(Lifetime.Singleton);
 
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
             composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
+                    factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
+                    factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();

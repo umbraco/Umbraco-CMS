@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
         /// the icon (eg. <c>icon-home</c>) along with an optional CSS class name representing the
         /// color (eg. <c>icon-blue</c>). Put together, the value for this scenario would be
         /// <c>icon-home color-blue</c>.
-        /// 
+        ///
         /// If a class name for the color isn't specified, the icon color will default to black.
         /// </summary>
         string Icon { get; set; }
@@ -47,6 +47,16 @@ namespace Umbraco.Core.Models
         /// ContentType Containers doesn't show children in the tree, but rather in grid-type view.
         /// </remarks>
         bool IsContainer { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this content type is for an element.
+        /// </summary>
+        /// <remarks>
+        /// <para>By default a content type is for a true media, member or document, but
+        /// it can also be for an element, ie a subset that can for instance be used in
+        /// nested content.</para>
+        /// </remarks>
+        bool IsElement { get; set; }
 
         /// <summary>
         /// Gets or sets the content variation of the content type.

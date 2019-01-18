@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -29,10 +30,9 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void DoNotPolluteCache()
         {
-            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);

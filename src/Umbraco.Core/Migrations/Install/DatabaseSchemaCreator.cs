@@ -14,7 +14,7 @@ namespace Umbraco.Core.Migrations.Install
     /// <summary>
     /// Creates the initial database schema during install.
     /// </summary>
-    internal class DatabaseSchemaCreator
+    public class DatabaseSchemaCreator
     {
         private readonly IUmbracoDatabase _database;
         private readonly ILogger _logger;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Migrations.Install
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
 
         // all tables, in order
-        public static readonly List<Type> OrderedTables = new List<Type>
+        internal static readonly List<Type> OrderedTables = new List<Type>
         {
             typeof (UserDto),
             typeof (NodeDto),
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <summary>
         /// Validates the schema of the current database.
         /// </summary>
-        public DatabaseSchemaResult ValidateSchema()
+        internal DatabaseSchemaResult ValidateSchema()
         {
             var result = new DatabaseSchemaResult(SqlSyntax);
 
@@ -387,7 +387,7 @@ namespace Umbraco.Core.Migrations.Install
         /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
         /// attribute will be used for the table name. If the attribute is not present, the name
         /// <typeparamref name="T"/> will be used instead.
-        /// 
+        ///
         /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
         /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
         /// not do anything if the parameter is <c>false</c>.
@@ -409,14 +409,14 @@ namespace Umbraco.Core.Migrations.Install
         /// If <paramref name="modelType"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from
         /// that  attribute will be used for the table name. If the attribute is not present, the name
         /// <paramref name="modelType"/> will be used instead.
-        /// 
+        ///
         /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
         /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
         /// not do anything if the parameter is <c>false</c>.
         ///
         /// This need to execute as part of a transaction.
         /// </remarks>
-        public void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
+        internal void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
         {
             if (!_database.InTransaction)
                 throw new InvalidOperationException("Database is not in a transaction.");

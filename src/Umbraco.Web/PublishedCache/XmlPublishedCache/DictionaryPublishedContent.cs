@@ -52,7 +52,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             LoadedFromExamine = fromExamine;
 
             ValidateAndSetProperty(valueDictionary, val => _id = Int32.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
-            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
+            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key", "__key", "__Key");
             //ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
             ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");
@@ -148,15 +148,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override Guid Key => _key;
 
-        public override int TemplateId => 0;
+        public override int? TemplateId => null;
 
         public override int SortOrder => _sortOrder;
 
         public override string Name => _name;
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public override PublishedCultureInfo GetCulture(string culture = null) => null;
 
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
         public override string UrlSegment => _urlName;
 

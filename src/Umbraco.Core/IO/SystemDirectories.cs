@@ -12,6 +12,10 @@ namespace Umbraco.Core.IO
 
         public static string Data => "~/App_Data";
 
+        public static string TempData => Data + "/TEMP";
+
+        public static string TempFileUploads => TempData + "/FileUploads";
+
         public static string Install => "~/install";
 
         public static string AppCode => "~/App_Code";
@@ -39,9 +43,9 @@ namespace Umbraco.Core.IO
         [Obsolete("Only used by legacy load balancing which is obsolete and should be removed")]
         public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
 
-        public static string Packages => Data + IOHelper.DirSepChar + "packages";
+        public static string Packages => Data + "/packages";
 
-        public static string Preview => Data + IOHelper.DirSepChar + "preview";
+        public static string Preview => Data + "/preview";
 
         private static string _root;
 

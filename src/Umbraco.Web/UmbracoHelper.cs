@@ -106,7 +106,7 @@ namespace Umbraco.Web
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery => _query ??
-            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache, UmbracoContext.VariationContextAccessor));
 
         /// <summary>
         /// Gets the Umbraco context.
@@ -832,7 +832,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Joins any number of int/string/objects into one string and seperates them with the string seperator parameter.
+        /// Joins any number of int/string/objects into one string and separates them with the string separator parameter.
         /// </summary>
         public string Join(string separator, params object[] args)
         {

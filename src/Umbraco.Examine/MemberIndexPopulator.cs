@@ -17,8 +17,10 @@ namespace Umbraco.Examine
             _memberService = memberService;
             _valueSetBuilder = valueSetBuilder;
         }
-        protected override void PopulateIndexes(IEnumerable<IIndex> indexes)
+        protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
         {
+            if (indexes.Count == 0) return;
+
             const int pageSize = 1000;
             var pageIndex = 0;
 

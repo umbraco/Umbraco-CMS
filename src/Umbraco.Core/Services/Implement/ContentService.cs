@@ -2733,6 +2733,8 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        private static readonly string[] ArrayOfOneNullString = { null };
+
         public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0)
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
@@ -2744,8 +2746,23 @@ namespace Umbraco.Core.Services.Implement
             content.CreatorId = userId;
             content.WriterId = userId;
 
-            foreach (var property in blueprint.Properties)
-                content.SetValue(property.Alias, property.GetValue()); //fixme doesn't take into account variants
+            var now = DateTime.Now;
+            var cultures = blueprint.CultureInfos.Any() ? blueprint.CultureInfos.Select(x=>x.Key) : ArrayOfOneNullString;
+            foreach (var culture in cultures)
+            {
+                foreach (var property in blueprint.Properties)
+                {
+                    content.SetValue(property.Alias, property.GetValue(culture), culture);
+                }
+
+                content.Name = blueprint.Name;
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
+                }
+            }
+
+
 
             return content;
         }

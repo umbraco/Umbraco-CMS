@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // in order to provide a nice, "fluent" experience, this extension method
             // needs to access Current, which is not always initialized in tests - not
             // very elegant, but works
-            if (!Current.HasContainer) return content;
+            if (!Current.HasFactory) return content;
 
             // get model
             // if factory returns nothing, throw

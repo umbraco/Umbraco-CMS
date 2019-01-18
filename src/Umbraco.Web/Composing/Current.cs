@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -158,41 +159,6 @@ namespace Umbraco.Web.Composing
 
         #endregion
 
-        #region Web Actions
-
-        public static void RestartAppPool()
-        {
-            // see notes in overload
-
-            var httpContext = HttpContext.Current;
-            if (httpContext != null)
-            {
-                httpContext.Application.Add("AppPoolRestarting", true);
-                httpContext.User = null;
-            }
-            Thread.CurrentPrincipal = null;
-            HttpRuntime.UnloadAppDomain();
-        }
-
-        public static void RestartAppPool(HttpContextBase httpContext)
-        {
-            // we're going to put an application wide flag to show that the application is about to restart.
-            // we're doing this because if there is a script checking if the app pool is fully restarted, then
-            // it can check if this flag exists...  if it does it means the app pool isn't restarted yet.
-            httpContext.Application.Add("AppPoolRestarting", true);
-
-            // unload app domain - we must null out all identities otherwise we get serialization errors
-            // http://www.zpqrtbnk.net/posts/custom-iidentity-serialization-issue
-            httpContext.User = null;
-            if (HttpContext.Current != null)
-                HttpContext.Current.User = null;
-            Thread.CurrentPrincipal = null;
-
-            HttpRuntime.UnloadAppDomain();
-        }
-
-        #endregion
-
         #region Core Getters
 
         // proxy Core for convenience
@@ -201,7 +167,7 @@ namespace Umbraco.Web.Composing
 
         public static TypeLoader TypeLoader => CoreCurrent.TypeLoader;
 
-        public static UmbracoConfig Config => CoreCurrent.Config;
+        public static Configs Configs => CoreCurrent.Configs;
 
         public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
 
@@ -214,6 +180,8 @@ namespace Umbraco.Web.Composing
         public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;
 
         internal static ManifestValueValidatorCollection ManifestValidators => CoreCurrent.ManifestValidators;
+
+        internal static IPackageActionRunner PackageActionRunner => CoreCurrent.PackageActionRunner;
 
         internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
 

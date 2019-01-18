@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, $cookies, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -344,9 +344,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             $scope.languages = languages;
 
             if ($scope.languages.length > 1) {
-                var defaultLang = _.find($scope.languages, function (l) {
-                    return l.isDefault;
-                });
                 //if there's already one set, check if it exists
                 var currCulture = null;
                 var mainCulture = $location.search().mculture;
@@ -356,7 +353,20 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                     });
                 }
                 if (!currCulture) {
-                    $location.search("mculture", defaultLang ? defaultLang.culture : null);
+                    // no culture in the request, let's look for one in the cookie that's set when changing language
+                    var defaultCulture = $cookies.get("UMB_MCULTURE");
+                    if (!defaultCulture || !_.find($scope.languages, function (l) {
+                            return l.culture.toLowerCase() === defaultCulture.toLowerCase();
+                        })) {
+                        // no luck either, look for the default language
+                        var defaultLang = _.find($scope.languages, function (l) {
+                            return l.isDefault;
+                        });
+                        if (defaultLang) {
+                            defaultCulture = defaultLang.culture;
+                        }
+                    }
+                    $location.search("mculture", defaultCulture ? defaultCulture : null);
                 }
             }
 
@@ -391,6 +401,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     $scope.selectLanguage = function (language) {
 
         $location.search("mculture", language.culture);
+        // add the selected culture to a cookie so the user will log back into the same culture later on (cookie lifetime = one year)
+        var expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 365);
+        $cookies.put("UMB_MCULTURE", language.culture, {path: "/", expires: expireDate});
 
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;

@@ -287,24 +287,24 @@ namespace Umbraco.Tests.Testing
             // create the schema
         }
 
+        protected virtual void ComposeSettings()
+        {
+            Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+            Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+        }
+
         protected virtual void ComposeApplication(bool withApplication)
         {
-            if (withApplication == false) return;
+            ComposeSettings();
 
-            var umbracoSettings = SettingsForTests.GetDefaultUmbracoSettings();
-            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            //apply these globally
-            SettingsForTests.ConfigureSettings(umbracoSettings);
-            SettingsForTests.ConfigureSettings(globalSettings);
+            if (withApplication == false) return;
 
             // default Datalayer/Repositories/SQL/Database/etc...
             Composition.ComposeRepositories();
 
             // register basic stuff that might need to be there for some container resolvers to work
-            Composition.RegisterUnique(factory => umbracoSettings);
-            Composition.RegisterUnique(factory => globalSettings);
-            Composition.RegisterUnique(factory => umbracoSettings.Content);
-            Composition.RegisterUnique(factory => umbracoSettings.WebRouting);
+            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
+            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
             Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 

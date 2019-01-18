@@ -131,9 +131,8 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             // ensure the configuration matches the current version for tests
-            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
             globalSettingsMock.Setup(x => x.ConfigurationStatus).Returns(UmbracoVersion.Current.ToString(3));
-            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Initialize database."))
             {
@@ -269,6 +268,7 @@ namespace Umbraco.Tests.TestHelpers
                 DefaultCultureAccessor,
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 

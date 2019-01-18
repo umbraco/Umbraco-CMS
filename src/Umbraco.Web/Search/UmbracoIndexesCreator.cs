@@ -1,20 +1,11 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Examine;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.IO;
-using System.IO;
-using Lucene.Net.Store;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Analysis;
 using Examine.LuceneEngine;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Search
 {
@@ -59,8 +50,8 @@ namespace Umbraco.Web.Search
         {
             var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.InternalIndexName,
-                new UmbracoFieldDefinitionCollection(),
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
+                new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 LanguageService,
@@ -72,8 +63,8 @@ namespace Umbraco.Web.Search
         {
             var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.ExternalIndexName,
-                new UmbracoFieldDefinitionCollection(),
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
+                new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
                 LanguageService,

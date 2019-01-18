@@ -53,6 +53,16 @@ namespace Umbraco.Web.Editors.Filters
             if (currentUser.IsAdmin())
                 return Attempt<string>.Succeed();
 
+            var existingGroups = _userService.GetUserGroupsByAlias(groupAliases);
+
+            if(!existingGroups.Any())
+            {
+                // We're dealing with new groups,
+                // so authorization should be given to any user with access to Users section
+                if (currentUser.AllowedSections.Contains(Constants.Applications.Users))
+                    return Attempt<string>.Succeed();
+            }
+
             var userGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
             var missingAccess = groupAliases.Except(userGroups).ToArray();
             return missingAccess.Length == 0

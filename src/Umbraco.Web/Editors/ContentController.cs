@@ -357,7 +357,9 @@ namespace Umbraco.Web.Editors
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
-            mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if(mapped.DocumentType != null)
+                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
@@ -515,13 +517,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
 
             var content = Services.ContentService.GetById(contentId);
             if (content == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            EnsureUniqueName(name, content, "name");
+            EnsureUniqueName(name, content, nameof(name));
 
             var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId().ResultOr(0));
 
@@ -612,7 +615,7 @@ namespace Umbraco.Web.Editors
                 var msKey = $"Variants[{variantCount}].Name";
                 if (ModelState.ContainsKey(msKey))
                 {
-                    if (!variant.Save)
+                    if (!variant.Save || IsCreatingAction(contentItem.Action))
                         ModelState.Remove(msKey);
                     else
                         variantNameErrors.Add(variant.Culture);
@@ -1779,22 +1782,25 @@ namespace Umbraco.Web.Editors
                 variantIndex++;
             }
 
-            //only set the template if it didn't change
-            var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.TemplateAlias.IsNullOrWhiteSpace());
-            if (templateChanged)
+            // handle template
+            if (string.IsNullOrWhiteSpace(contentSave.TemplateAlias)) // cleared: clear if not already null
+            {
+                if (contentSave.PersistedContent.TemplateId != null)
+                {
+                    contentSave.PersistedContent.TemplateId = null;
+                }
+            }
+            else // set: update if different
             {
                 var template = Services.FileService.GetTemplate(contentSave.TemplateAlias);
-                if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
+                if (template == null)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
                     Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
-                else
+                else if (template.Id != contentSave.PersistedContent.TemplateId)
                 {
-                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentSave.PersistedContent.Template = template;
+                    contentSave.PersistedContent.TemplateId = template.Id;
                 }
             }
         }

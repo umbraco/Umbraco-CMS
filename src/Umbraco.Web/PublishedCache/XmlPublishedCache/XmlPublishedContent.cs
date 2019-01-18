@@ -109,7 +109,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override int TemplateId
+        public override int? TemplateId
         {
             get
             {
@@ -136,9 +136,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public override PublishedCultureInfo GetCulture(string culture = null) => null;
 
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
         public override string WriterName
         {

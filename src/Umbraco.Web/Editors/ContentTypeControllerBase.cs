@@ -7,9 +7,13 @@ using System.Text;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
@@ -26,7 +30,15 @@ namespace Umbraco.Web.Editors
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition
     {
+        private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
+
+        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        {
+            _cultureDictionaryFactory = cultureDictionaryFactory;
+        }
+
+        
 
         /// <summary>
         /// Returns the available composite content types for a given content type
@@ -536,6 +548,6 @@ namespace Umbraco.Web.Editors
         }
 
         private ICultureDictionary CultureDictionary
-            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
+            => _cultureDictionary ?? (_cultureDictionary = _cultureDictionaryFactory.CreateDictionary());
     }
 }

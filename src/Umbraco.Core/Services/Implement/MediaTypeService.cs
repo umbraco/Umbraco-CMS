@@ -8,7 +8,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {
-    internal class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType, IMediaTypeService>, IMediaTypeService
+    public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType, IMediaTypeService>, IMediaTypeService
     {
         public MediaTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService,
             IMediaTypeRepository mediaTypeRepository, IAuditRepository auditRepository, IMediaTypeContainerRepository entityContainerRepository,

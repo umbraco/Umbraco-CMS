@@ -630,7 +630,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="packageUpgradeInstructions">Hinweise für die Durchführung des Updates</key>
     <key alias="packageUpgradeText"> Es ist ein Update für dieses Paket verfügbar. Sie können es direkt vom Umbraco-Paket-Repository herunterladen.</key>
     <key alias="packageVersion">Version des Pakets</key>
-    <key alias="packageVersionHistory">Versionsverlauf des Pakets</key>
     <key alias="viewPackageWebsite">Paket-Webseite aufrufen</key>
   </area>
   <area alias="paste">

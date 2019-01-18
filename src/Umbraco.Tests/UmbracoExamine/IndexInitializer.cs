@@ -31,7 +31,7 @@ namespace Umbraco.Tests.UmbracoExamine
     {
         public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, GetMockUserService(), publishedValuesOnly);
+            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), publishedValuesOnly);
             return contentValueSetBuilder;
         }
 
@@ -164,8 +164,8 @@ namespace Umbraco.Tests.UmbracoExamine
 
             var i = new UmbracoContentIndex(
                 "testIndexer",
-                new UmbracoFieldDefinitionCollection(), 
                 luceneDir,
+                new UmbracoFieldDefinitionCollection(),
                 analyzer,
                 profilingLogger,
                 languageService,
