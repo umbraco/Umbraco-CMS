@@ -104,7 +104,6 @@ There's two big areas that you should know about:
   You may need to run the following commands to set up gulp properly:
   ```
   npm cache clean
-  npm install -g bower
   npm install -g gulp
   npm install -g gulp-cli
   npm install
