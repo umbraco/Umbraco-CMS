@@ -94,7 +94,7 @@ namespace Umbraco.Web.Macros
             // only if cache is enabled
             if (UmbracoContext.Current.InPreviewMode || model.CacheDuration <= 0) return null;
 
-            var cache = Current.ApplicationCache.RuntimeCache;
+            var cache = Current.AppCaches.RuntimeCache;
             var macroContent = cache.GetCacheItem<MacroContent>(CacheKeys.MacroContentCacheKey + model.CacheIdentifier);
 
             if (macroContent == null) return null;
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Macros
             // remember when we cache the content
             macroContent.Date = DateTime.Now;
 
-            var cache = Current.ApplicationCache.RuntimeCache;
+            var cache = Current.AppCaches.RuntimeCache;
             cache.Insert(
                 CacheKeys.MacroContentCacheKey + model.CacheIdentifier,
                 () => macroContent,

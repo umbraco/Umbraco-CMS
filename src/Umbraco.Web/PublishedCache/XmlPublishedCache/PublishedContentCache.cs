@@ -15,7 +15,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
     {
-        private readonly IAppCache _cacheProvider;
+        private readonly IAppCache _appCache;
         private readonly IGlobalSettings _globalSettings;
         private readonly RoutesCache _routesCache;
         private readonly IDomainCache _domainCache;
@@ -24,13 +24,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         // initialize a PublishedContentCache instance with
         // an XmlStore containing the master xml
-        // an ICacheProvider that should be at request-level
+        // an IAppCache that should be at request-level
         // a RoutesCache - need to cleanup that one
         // a preview token string (or null if not previewing)
         public PublishedContentCache(
             XmlStore xmlStore, // an XmlStore containing the master xml
             IDomainCache domainCache, // an IDomainCache implementation
-            IAppCache cacheProvider, // an ICacheProvider that should be at request-level
+            IAppCache appCache, // an IAppCache that should be at request-level
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             string previewToken) // a preview token string (or null if not previewing)
             : base(previewToken.IsNullOrWhiteSpace() == false)
         {
-            _cacheProvider = cacheProvider;
+            _appCache = appCache;
             _globalSettings = globalSettings;
             _routesCache = routesCache; // may be null for unit-testing
             _contentTypeCache = contentTypeCache;
@@ -315,13 +315,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
         {
-            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _cacheProvider, _contentTypeCache);
+            return xmlNode == null ? null : XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache);
         }
 
         private IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
             return xmlNodes.Cast<XmlNode>()
-                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _cacheProvider, _contentTypeCache));
+                .Select(xmlNode => XmlPublishedContent.Get(xmlNode, isPreviewing, _appCache, _contentTypeCache));
         }
 
         #endregion
@@ -517,8 +517,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // clear recursive properties cached by XmlPublishedContent.GetProperty
             // assume that nothing else is going to cache IPublishedProperty items (else would need to do ByKeySearch)
             // NOTE also clears all the media cache properties, which is OK (see media cache)
-            _cacheProvider.ClearOfType<IPublishedProperty>();
-            //_cacheProvider.ClearCacheByKeySearch("XmlPublishedCache.PublishedContentCache:RecursiveProperty-");
+            _appCache.ClearOfType<IPublishedProperty>();
+            //_appCache.ClearCacheByKeySearch("XmlPublishedCache.PublishedContentCache:RecursiveProperty-");
         }
 
         #endregion

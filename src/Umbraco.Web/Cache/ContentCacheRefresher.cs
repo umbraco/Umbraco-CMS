@@ -102,7 +102,7 @@ namespace Umbraco.Web.Cache
             if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
             {
                 // when a public version changes
-                Current.ApplicationCache.ClearPartialViewCache();
+                Current.AppCaches.ClearPartialViewCache();
                 MacroCacheRefresher.ClearMacroContentCache(AppCaches); // just the content
             }
 

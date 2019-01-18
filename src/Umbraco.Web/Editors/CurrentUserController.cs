@@ -157,7 +157,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.ApplicationCache.StaticCache, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.AppCaches.StaticCache, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

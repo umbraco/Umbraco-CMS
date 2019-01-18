@@ -9,7 +9,6 @@ namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="System.Web.Caching.Cache"/>.
-    /// A CacheProvider that wraps the logic of the HttpRuntime.Cache
     /// </summary>
     /// <remarks>The underlying cache is expected to be HttpRuntime.Cache.</remarks>
     internal class WebCachingAppCache : FastDictionaryAppCacheBase, IAppPolicyCache

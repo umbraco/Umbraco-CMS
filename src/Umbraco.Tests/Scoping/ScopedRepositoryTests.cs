@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Scoping
         {
             var scopeProvider = ScopeProvider;
             var service = Current.Services.UserService;
-            var globalCache = Current.ApplicationCache.IsolatedCaches.GetOrCreate(typeof(IUser));
+            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof(IUser));
 
             var user = (IUser)new User("name", "email", "username", "rawPassword");
             service.Save(user);
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Scoping
         {
             var scopeProvider = ScopeProvider;
             var service = Current.Services.LocalizationService;
-            var globalCache = Current.ApplicationCache.IsolatedCaches.GetOrCreate(typeof (ILanguage));
+            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
 
             var lang = (ILanguage) new Language("fr-FR");
             service.Save(lang);
@@ -229,7 +229,7 @@ namespace Umbraco.Tests.Scoping
         {
             var scopeProvider = ScopeProvider;
             var service = Current.Services.LocalizationService;
-            var globalCache = Current.ApplicationCache.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
+            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
 
             var lang = (ILanguage)new Language("fr-FR");
             service.Save(lang);

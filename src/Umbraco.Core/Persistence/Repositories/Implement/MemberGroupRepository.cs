@@ -124,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var result = Get(qry);
                     return result.FirstOrDefault();
                 },
-                //cache for 5 mins since that is the default in the RuntimeCacheProvider
+                //cache for 5 mins since that is the default in the Runtime app cache
                 TimeSpan.FromMinutes(5),
                 //sliding is true
                 true);

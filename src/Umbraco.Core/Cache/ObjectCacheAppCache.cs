@@ -105,7 +105,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            // see notes in HttpRuntimeCacheProvider
+            // see notes in HttpRuntimeAppCache
 
             Lazy<object> result;
 

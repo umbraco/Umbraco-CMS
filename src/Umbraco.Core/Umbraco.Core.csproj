@@ -114,7 +114,7 @@
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
-    <Compile Include="Cache\CacheProviderExtensions.cs" />
+    <Compile Include="Cache\AppCacheExtensions.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherCollection.cs" />
     <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />

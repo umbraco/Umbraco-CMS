@@ -8,7 +8,7 @@ using Umbraco.Core.Cache;
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class ObjectCacheProviderTests : RuntimeCacheProviderTests
+    public class ObjectAppCacheTests : RuntimeAppCacheTests
     {
         private ObjectCacheAppCache _provider;
 
@@ -23,12 +23,12 @@ namespace Umbraco.Tests.Cache
             _provider = new ObjectCacheAppCache();
         }
 
-        internal override IAppCache Provider
+        internal override IAppCache AppCache
         {
             get { return _provider; }
         }
 
-        internal override IAppPolicyCache RuntimeProvider
+        internal override IAppPolicyCache AppPolicyCache
         {
             get { return _provider; }
         }

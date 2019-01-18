@@ -8,7 +8,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Extensions for strongly typed access
     /// </summary>
-    public static class CacheProviderExtensions
+    public static class AppCacheExtensions
     {
         public static T GetCacheItem<T>(this IAppPolicyCache provider,
             string cacheKey,

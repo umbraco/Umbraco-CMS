@@ -8,13 +8,12 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.Collections;
 
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class DeepCloneRuntimeCacheProviderTests : RuntimeCacheProviderTests
+    public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     {
         private DeepCloneAppCache _provider;
 
@@ -29,12 +28,12 @@ namespace Umbraco.Tests.Cache
             _provider = new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache));
         }
 
-        internal override IAppCache Provider
+        internal override IAppCache AppCache
         {
             get { return _provider; }
         }
 
-        internal override IAppPolicyCache RuntimeProvider
+        internal override IAppPolicyCache AppPolicyCache
         {
             get { return _provider; }
         }

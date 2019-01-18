@@ -5,7 +5,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class HttpRequestCacheProviderTests : CacheProviderTests
+    public class HttpRequestAppCacheTests : AppCacheTests
     {
         private HttpRequestAppCache _provider;
         private FakeHttpContextFactory _ctx;
@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Cache
             _provider = new HttpRequestAppCache(_ctx.HttpContext);
         }
 
-        internal override IAppCache Provider
+        internal override IAppCache AppCache
         {
             get { return _provider; }
         }
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Cache
     }
 
     [TestFixture]
-    public class StaticCacheProviderTests : CacheProviderTests
+    public class StaticAppCacheTests : AppCacheTests
     {
         private DictionaryCacheProvider _provider;
 
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Cache
             _provider = new DictionaryCacheProvider();
         }
 
-        internal override IAppCache Provider
+        internal override IAppCache AppCache
         {
             get { return _provider; }
         }
