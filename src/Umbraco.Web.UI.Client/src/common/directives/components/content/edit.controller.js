@@ -151,6 +151,9 @@
          */
         function createButtons(content) {
 
+            // for trashed items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.trashed ? "primary" : "info";
+
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
             if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo") {
@@ -399,34 +402,6 @@
                     }
                 }
             }
-        }
-
-        function moveNode(node, target) {
-
-            contentResource.move({ "parentId": target.id, "id": node.id })
-                .then(function (path) {
-
-                    // remove the node that we're working on
-                    if ($scope.page.menu.currentNode) {
-                        treeService.removeNode($scope.page.menu.currentNode);
-                    }
-
-                    // sync the destination node
-                    if (!infiniteMode) {
-                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
-                    }
-
-                    $scope.page.buttonRestore = "success";
-                    notificationsService.success("Successfully restored " + node.name + " to " + target.name);
-
-                    // reload the node
-                    loadContent();
-
-                }, function (err) {
-                    $scope.page.buttonRestore = "error";
-                    notificationsService.error("Cannot automatically restore this item", err);
-                });
-
         }
 
         if ($scope.page.isNew) {
@@ -838,52 +813,6 @@
                     });
                 }
             }
-        };
-
-        $scope.restore = function (content) {
-
-            $scope.page.buttonRestore = "busy";
-
-            relationResource.getByChildId(content.id, "relateParentDocumentOnDelete").then(function (data) {
-
-                var relation = null;
-                var target = null;
-                var error = { headline: "Cannot automatically restore this item", content: "Use the Move menu item to move it manually" };
-
-                if (data.length === 0) {
-                    notificationsService.error(error.headline, "There is no 'restore' relation found for this node. Use the Move menu item to move it manually.");
-                    $scope.page.buttonRestore = "error";
-                    return;
-                }
-
-                relation = data[0];
-
-                if (relation.parentId === -1) {
-                    target = { id: -1, name: "Root" };
-                    moveNode(content, target);
-                } else {
-                    contentResource.getById(relation.parentId).then(function (data) {
-                        target = data;
-
-                        // make sure the target item isn't in the recycle bin
-                        if (target.path.indexOf("-20") !== -1) {
-                            notificationsService.error(error.headline, "The item you want to restore it under (" + target.name + ") is in the recycle bin. Use the Move menu item to move the item manually.");
-                            $scope.page.buttonRestore = "error";
-                            return;
-                        }
-
-                        moveNode(content, target);
-
-                    }, function (err) {
-                        $scope.page.buttonRestore = "error";
-                        notificationsService.error(error.headline, error.content);
-                    });
-                }
-
-            }, function (err) {
-                $scope.page.buttonRestore = "error";
-                notificationsService.error(error.headline, error.content);
-            });
         };
 
         /* publish method used in infinite editing */
