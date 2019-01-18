@@ -224,10 +224,6 @@
     <key alias="siterepublishHelp">Web sitesi önbelleği yenilenir olacaktır. Yayınlanmamış içerik yayınlanmamış kalacak ise tüm yayınlanan içerik, güncellenecektir.</key>
     <key alias="tableColumns">Sütün sayısı</key>
     <key alias="tableRows">Satır sayısı</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Yer tutucu kimliği ayarla</strong> senin tutucu bir kimlik ayarlayarak Çocuğunuz şablonları bu şablon içine içerik enjekte edebilir,
-      Bir kullanarak bu kimliği bakarak <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Yer tutucu kimliği seçin</strong> Aşağıdaki listeden. You can sadece
-       Geçerli şablonun ustadan kimliği sitesinin seçin.]]></key>
     <key alias="thumbnailimageclickfororiginal">Tam boyutta görmek için resmin üzerine tıklayın</key>
     <key alias="treepicker">öğeyi seçin</key>
     <key alias="viewCacheItem">Görünüm Önbellek Öğe</key>
@@ -363,7 +359,6 @@
     <key alias="or">veya</key>
     <key alias="password">Parola</key>
     <key alias="path">Yol</key>
-    <key alias="placeHolderID">Yer tutucu ID</key>
     <key alias="pleasewait">Bir dakika lütfen...</key>
     <key alias="previous">Önceki</key>
     <key alias="properties">Özellikler</key>

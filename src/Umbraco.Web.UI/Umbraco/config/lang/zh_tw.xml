@@ -267,8 +267,6 @@
     <key alias="siterepublishHelp">網站緩存將會刷新，所有已發佈的內容將會更新。</key>
     <key alias="tableColumns">表格列數</key>
     <key alias="tableRows">表格行數</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>設定預留位置代碼</strong> 以便您要在子範本中插入內容到本範本時，填入此代碼到 <code>&lt;asp:content /&gt;</code> 裡面。]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>選擇預留位置代碼</strong> 於此清單中。您只能選擇目前父範本中的代碼。]]></key>
     <key alias="thumbnailimageclickfororiginal">點擊圖片查看完整大小</key>
     <key alias="treepicker">拾取項</key>
     <key alias="viewCacheItem">查看緩存項</key>
@@ -436,7 +434,6 @@
     <key alias="or">或</key>
     <key alias="password">密碼</key>
     <key alias="path">路徑</key>
-    <key alias="placeHolderID">預留位置代碼</key>
     <key alias="pleasewait">請稍候…</key>
     <key alias="previous">上一步</key>
     <key alias="properties">屬性</key>

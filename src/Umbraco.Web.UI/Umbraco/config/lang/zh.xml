@@ -270,10 +270,6 @@
     <key alias="siterepublishHelp">网站缓存将会刷新，所有已发布的内容将会更新。</key>
     <key alias="tableColumns">表格列数</key>
     <key alias="tableRows">表格行数</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>设置一个占位符id</strong> 您可以在子模板中通过该ID来插入内容，
-       引用格式： <code>&lt;asp:content /&gt;</code>。]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[从下面的列表中<strong>选择一个
-      占位符id</strong>。]]></key>
     <key alias="thumbnailimageclickfororiginal">点击图片查看完整大小</key>
     <key alias="treepicker">拾取项</key>
     <key alias="viewCacheItem">查看缓存项</key>
@@ -445,7 +441,6 @@
     <key alias="or">或</key>
     <key alias="password">密码</key>
     <key alias="path">路径</key>
-    <key alias="placeHolderID">占位符ID</key>
     <key alias="pleasewait">请稍候…</key>
     <key alias="previous">上一步</key>
     <key alias="properties">属性</key>

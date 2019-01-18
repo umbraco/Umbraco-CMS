@@ -249,8 +249,6 @@
     <key alias="siterepublishHelp">Webbplatsens cache kommer att uppdateras. Allt innehåll som är publicerat kommer att uppdateras. Innehåll som inte är publicerat kommer att förbli opublicerat.</key>
     <key alias="tableColumns">Antal kolumner</key>
     <key alias="tableRows">Antal rader</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Ge din platshållare ett id</strong> du kan skjuta in innehåll från underordnade sidmallar i platshållaren genom att ge den ett ID. Du refererar sedan till detta ID med hjälp av en <code>&lt;asp:content /&gt;</code> tagg.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Välj ett platshållar-ID</strong> från listan nedan. Du kan bara välja de ID som finns i denna malls huvudmall.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klicka på förhandsgranskningsbilden för att se bilden i full storlek</key>
     <key alias="treepicker">Välj ett objekt</key>
     <key alias="viewCacheItem">Se cachat objekt</key>
@@ -374,7 +372,6 @@
     <key alias="or">eller</key>
     <key alias="password">Lösenord</key>
     <key alias="path">Sökväg</key>
-    <key alias="placeHolderID">Platshållar-ID</key>
     <key alias="pleasewait">Ett ögonblick...</key>
     <key alias="previous">Föregående</key>
     <key alias="properties">Egenskaper</key>

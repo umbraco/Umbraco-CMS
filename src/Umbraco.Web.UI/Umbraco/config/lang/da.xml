@@ -378,8 +378,6 @@
     <key alias="siterepublishHelp">Websitets cache vil blive genopfrisket. Alt udgivet indhold vil blive opdateret, mens upubliceret indhold vil forblive upubliceret.</key>
     <key alias="tableColumns">Antal kolonner</key>
     <key alias="tableRows">Antal rækker</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Vælg et placeholder id</strong> Ved at sætte et id på en placeholder kan du indskyde indhold fra undertemplates ved at referere til dette ID vha. et <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Vælg et placeholder id</strong> fra listen herunder. Du kan kun vælge id'er fra den nuværende masterskabelon.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klik på billedet for at se den fulde størrelse</key>
     <key alias="treepicker">Vælg</key>
     <key alias="viewCacheItem">Se cache element</key>
@@ -577,7 +575,6 @@
     <key alias="orderBy">Sortér efter</key>
     <key alias="password">Kodeord</key>
     <key alias="path">Sti</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">Et øjeblik...</key>
     <key alias="previous">Forrige</key>
     <key alias="properties">Egenskaber</key>

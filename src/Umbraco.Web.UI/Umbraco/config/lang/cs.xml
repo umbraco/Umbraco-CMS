@@ -243,8 +243,6 @@
     <key alias="siterepublishHelp">Mezipaměť webu bude obnovena. Všechen publikovaný obsah bude aktualizován, zatímco nepublikovaný obsah zůstane nepublikovaný.</key>
     <key alias="tableColumns">Počet sloupců</key>
     <key alias="tableRows">Počet řádků</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Nastavení ID zástupce</strong> Nastavením ID zástupce můžete do této šablony zavést obsah z podřízených šablon tak, že odkážete na toto ID při použití prvku <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Vyberte id zástupce</strong> ze seznamu níže. Můžete vybírat pouze z ID ze šablony nadřazené tomuto formuláři.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klikněte na obrázek pro zobrazení v plné velikosti</key>
     <key alias="treepicker">Vybrat položku</key>
     <key alias="viewCacheItem">Zobrazit položku mezipaměti</key>
@@ -374,7 +372,6 @@
     <key alias="or">nebo</key>
     <key alias="password">Heslo</key>
     <key alias="path">Cesta</key>
-    <key alias="placeHolderID">ID zástupce</key>
     <key alias="pleasewait">Moment, prosím...</key>
     <key alias="previous">Předchozí</key>
     <key alias="properties">Vlastnosti</key>

@@ -191,9 +191,6 @@
     <key alias="siterepublishHelp">웹사이트 캐쉬가 재생되었습니다. 모든 발행컨텐츠가 업데이트되었습니다. 그러나 모든 미발행 컨텐츠는 미발행상태로 남아있습니다.</key>
     <key alias="tableColumns">컬럼수</key>
     <key alias="tableRows">줄수</key>
-    <key alias="templateContentAreaHelp"><![CDATA[자식템플릿으로부터 이 템플릿에 컨텐츠를 삽입할 수 있는 Placeholder 아이디를 선택하시거나,
-    <code>&lt;asp:컨텐츠 /&gt;</code> 항목을 사용하는 아이디를 참조하여 <strong>Placeholder 아이디를 설정하세요</strong>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[아래 리스트에서 <strong>Placeholder 아이디를 선택하세요</strong>. 현재 템플릿의 마스터에 아이디들만 선택할 수 있습니다.]]></key>
     <key alias="thumbnailimageclickfororiginal">이미지를 전체크기로 보시려면 클릭하세요.</key>
     <key alias="treepicker">아이템 선택</key>
     <key alias="viewCacheItem">캐쉬 아이템 보기</key>
@@ -314,7 +311,6 @@
     <key alias="or">또는</key>
     <key alias="password">비밀번호</key>
     <key alias="path">경로</key>
-    <key alias="placeHolderID">Placeholder 아이디</key>
     <key alias="pleasewait">잠시만 기다려주세요...</key>
     <key alias="previous">이전</key>
     <key alias="properties">속성</key>

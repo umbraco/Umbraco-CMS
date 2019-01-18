@@ -384,10 +384,6 @@
     <key alias="siterepublishHelp">Кэш сайта будет полностью обновлен. Все опубликованное содержимое будет обновлено, в то время как неопубликованное содержимое по-прежнему останется неопубликованным</key>
     <key alias="tableColumns">Количество столбцов</key>
     <key alias="tableRows">Количество строк</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Идентификация контейнера (placeholder)</strong>
-		путем назначения Вашему элементу-контейнеру уникального идентификатора (ID) позволит Вам автоматически включать в шаблон содержимое из дочерних шаблонов путем указания этого идентификатора (ID) в конструкции <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Выберите идентификатор элемента-контейнера (placeholder)</strong>
-		из нижеследующего списка. Список ограничивается идентификаторами, определенными в родительском шаблоне данного шаблона.]]></key>
     <key alias="thumbnailimageclickfororiginal">Кликните на изображении, чтобы увидеть полноразмерную версию</key>
     <key alias="treepicker">Выберите элемент</key>
     <key alias="urlLinkPicker">Ссылка</key>
@@ -582,7 +578,6 @@
     <key alias="orderBy">Сортировка по</key>
     <key alias="password">Пароль</key>
     <key alias="path">Путь</key>
-    <key alias="placeHolderID">Идентификатор контейнера</key>
     <key alias="pleasewait">Минуточку...</key>
     <key alias="previous">Пред</key>
     <key alias="properties">Свойства</key>
