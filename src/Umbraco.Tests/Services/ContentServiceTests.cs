@@ -3037,7 +3037,7 @@ namespace Umbraco.Tests.Services
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
+            var templateRepository = new TemplateRepository(accessor, CacheHelper.Disabled, Logger, TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(accessor, CacheHelper.Disabled, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper.Disabled, Logger, templateRepository);
             var languageRepository = new LanguageRepository(accessor, CacheHelper.Disabled, Logger);

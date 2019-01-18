@@ -25,8 +25,6 @@ namespace Umbraco.Core.Services
         private readonly Lazy<IServerRegistrationService> _serverRegistrationService;
         private readonly Lazy<IEntityService> _entityService;
         private readonly Lazy<IRelationService> _relationService;
-        private readonly Lazy<IApplicationTreeService> _treeService;
-        private readonly Lazy<ISectionService> _sectionService;
         private readonly Lazy<IMacroService> _macroService;
         private readonly Lazy<IMemberTypeService> _memberTypeService;
         private readonly Lazy<IMemberGroupService> _memberGroupService;
@@ -38,7 +36,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContext"/> class with lazy services.
         /// </summary>
-        public ServiceContext(Lazy<IPublicAccessService> publicAccessService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IMediaTypeService> mediaTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IApplicationTreeService> treeService, Lazy<ISectionService> sectionService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService, Lazy<IRedirectUrlService> redirectUrlService, Lazy<IConsentService> consentService)
+        public ServiceContext(Lazy<IPublicAccessService> publicAccessService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IMediaTypeService> mediaTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService, Lazy<IRedirectUrlService> redirectUrlService, Lazy<IConsentService> consentService)
         {
             _publicAccessService = publicAccessService;
             _domainService = domainService;
@@ -58,8 +56,6 @@ namespace Umbraco.Core.Services
             _serverRegistrationService = serverRegistrationService;
             _entityService = entityService;
             _relationService = relationService;
-            _treeService = treeService;
-            _sectionService = sectionService;
             _macroService = macroService;
             _memberTypeService = memberTypeService;
             _memberGroupService = memberGroupService;
@@ -90,8 +86,6 @@ namespace Umbraco.Core.Services
             IMemberTypeService memberTypeService = null,
             IMemberService memberService = null,
             IUserService userService = null,
-            ISectionService sectionService = null,
-            IApplicationTreeService treeService = null,
             ITagService tagService = null,
             INotificationService notificationService = null,
             ILocalizedTextService localizedTextService = null,
@@ -125,8 +119,6 @@ namespace Umbraco.Core.Services
                 Lazy(serverRegistrationService),
                 Lazy(entityService),
                 Lazy(relationService),
-                Lazy(treeService),
-                Lazy(sectionService),
                 Lazy(macroService),
                 Lazy(memberTypeService),
                 Lazy(memberGroupService),
@@ -235,16 +227,6 @@ namespace Umbraco.Core.Services
         /// Gets the <see cref="MemberService"/>
         /// </summary>
         public IMemberService MemberService => _memberService.Value;
-
-        /// <summary>
-        /// Gets the <see cref="SectionService"/>
-        /// </summary>
-        public ISectionService SectionService => _sectionService.Value;
-
-        /// <summary>
-        /// Gets the <see cref="ApplicationTreeService"/>
-        /// </summary>
-        public IApplicationTreeService ApplicationTreeService => _treeService.Value;
 
         /// <summary>
         /// Gets the MemberTypeService

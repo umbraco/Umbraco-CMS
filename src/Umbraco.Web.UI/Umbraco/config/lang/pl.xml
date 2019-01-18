@@ -859,14 +859,12 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="packageCompatibilityDescription">Według raportów członków społeczności, ten pakiet jest zgodny z następującymi wersjami Umbraco. Pełna zgodność nie może być zagwarantowana dla wersji zaraportowanych poniżej 100%</key>
     <key alias="packageExternalSources">Zewnętrzne źródła</key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration">Demonstracja</key>
     <key alias="packageDocumentation">Dokumentacja</key>
     <key alias="packageMetaData">Metadane pakietu</key>
     <key alias="packageName">Nazwa pakietu</key>
     <key alias="packageNoItemsHeader">Pakiet nie zawiera żadnych elementów</key>
     <key alias="packageNoItemsText"><![CDATA[Ten plik pakietu nie zawiera żadnych elementów do odinstalowania<br/><br/>
       Możesz bezpiecznie go usunąć z systemu poprzez kliknięcie na przycisku "odinstaluj pakiet"]]></key>
-    <key alias="packageNoUpgrades">Nie ma dostępnych aktualizacji</key>
     <key alias="packageOptions">Opcje pakietu</key>
     <key alias="packageReadme">Opis pakietu</key>
     <key alias="packageRepository">Repozytorium pakietu</key>
@@ -877,12 +875,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="packageUninstallText"><![CDATA[Poniżej możesz odznaczyć elementy, których nie chcesz usunąć tym razem. Kiedy klikniesz "potwierdź odinstalowanie", wszystkie zaznaczone elementy zostaną usunięte.<br/>
       <span style="color: Red; font-weight: bold;">Uwaga:</span> wszystkie elementy, media, itp. w zależności od elementów, które usuwasz, przestaną działać i mogą spowodować niestabilność systemu,
       więc odinstalowuj z uwagą. W przypadku problemów skontaktuj się z autorem pakietu.]]></key>
-    <key alias="packageUpgradeDownload">Pobierz aktualizację z repozytorium</key>
-    <key alias="packageUpgradeHeader">Aktualizuj pakiet</key>
-    <key alias="packageUpgradeInstructions">Instrukcja aktualizacji</key>
-    <key alias="packageUpgradeText">Jest dostępna aktualizacja dla tego pakietu. Możesz ją pobrać wprost z repozytorium pakietów Umbraco.</key>
     <key alias="packageVersion">Wersja pakietu</key>
-    <key alias="viewPackageWebsite">Odwiedź stronę pakietu</key>
     <key alias="packageAlreadyInstalled">Pakiet jest już zainstalowany</key>
     <key alias="targetVersionMismatch">Ten pakiet nie może być zainstalowany, ponieważ wymaga Umbraco w wersji przynajmniej %0%</key>
     <key alias="installStateUninstalling">Odinstalowywanie...</key>

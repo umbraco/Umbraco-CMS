@@ -13,7 +13,6 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebServices;
 
 namespace Umbraco.Web
 {

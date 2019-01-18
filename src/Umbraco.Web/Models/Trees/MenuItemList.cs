@@ -83,7 +83,7 @@ namespace Umbraco.Web.Models.Trees
             if (item == null) return null;
             var menuItem = new MenuItem(item, name)
             {
-                SeperatorBefore = hasSeparator,
+                SeparatorBefore = hasSeparator,
                 OpensDialog = opensDialog
             };
 
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Models.Trees
 
             var menuItem = new MenuItem(item, textService.Localize($"actions/{item.Alias}"))
             {
-                SeperatorBefore = hasSeparator,
+                SeparatorBefore = hasSeparator,
                 OpensDialog = opensDialog
             };
 

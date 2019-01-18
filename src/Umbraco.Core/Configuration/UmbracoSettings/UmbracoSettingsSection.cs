@@ -1,11 +1,7 @@
-﻿using System;
-using System.ComponentModel;
-using System.Configuration;
-using System.Linq;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-
     public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
         [ConfigurationProperty("backOffice")]
@@ -32,12 +28,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (RequestHandlerElement)this["requestHandler"]; }
         }
 
-        [ConfigurationProperty("templates")]
-        internal TemplatesElement Templates
-        {
-            get { return (TemplatesElement)this["templates"]; }
-        }
-        
         [ConfigurationProperty("logging")]
         internal LoggingElement Logging
         {
@@ -77,11 +67,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return RequestHandler; }
         }
 
-        ITemplatesSection IUmbracoSettingsSection.Templates
-        {
-            get { return Templates; }
-        }
-
         IBackOfficeSection IUmbracoSettingsSection.BackOffice
         {
             get { return BackOffice; }
@@ -106,6 +91,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return WebRouting; }
         }
-
     }
 }

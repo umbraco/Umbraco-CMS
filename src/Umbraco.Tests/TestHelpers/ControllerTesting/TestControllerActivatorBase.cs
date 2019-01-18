@@ -60,8 +60,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 memberTypeService: mockedMemberTypeService,
                 dataTypeService: mockedDataTypeService,
                 contentTypeService: mockedContentTypeService,
-                localizedTextService:Mock.Of<ILocalizedTextService>(),
-                sectionService:Mock.Of<ISectionService>());
+                localizedTextService:Mock.Of<ILocalizedTextService>());
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
