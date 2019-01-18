@@ -121,7 +121,7 @@
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
     <Compile Include="Cache\DeepCloneAppCache.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FastDictionaryCacheProvider.cs" />
+    <Compile Include="Cache\FastDictionaryAppCache.cs" />
     <Compile Include="Cache\FastDictionaryAppCacheBase.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestAppCache.cs" />
@@ -141,7 +141,7 @@
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\DictionaryCacheProvider.cs" />
+    <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />

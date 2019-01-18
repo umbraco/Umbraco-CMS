@@ -21,7 +21,7 @@ namespace Umbraco.Core.Cache
         public AppCaches(System.Web.Caching.Cache cache)
             : this(
                 new WebCachingAppCache(cache),
-                new DictionaryCacheProvider(),
+                new DictionaryAppCache(),
                 new HttpRequestAppCache(),
                 new IsolatedCaches(t => new ObjectCacheAppCache()))
         { }
@@ -31,12 +31,12 @@ namespace Umbraco.Core.Cache
         /// </summary>
         public AppCaches(
             IAppPolicyCache runtimeCache,
-            IAppCache staticCacheProvider,
+            IAppCache staticCache,
             IAppCache requestCache,
             IsolatedCaches isolatedCaches)
         {
             RuntimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
-            StaticCache = staticCacheProvider ?? throw new ArgumentNullException(nameof(staticCacheProvider));
+            StaticCache = staticCache ?? throw new ArgumentNullException(nameof(staticCache));
             RequestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
             IsolatedCaches = isolatedCaches ?? throw new ArgumentNullException(nameof(isolatedCaches));
         }

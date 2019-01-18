@@ -949,14 +949,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // even though the underlying elements may not change (store snapshots)
         public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
-            // note: using ObjectCacheRuntimeCacheProvider for elements and snapshot caches
+            // note: using ObjectCacheAppCache for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
-            // thing - better use a StaticCacheProvider which "just" creates a concurrent
+            // thing - better use a dictionary-based cache which "just" creates a concurrent
             // dictionary
 
-            // for snapshot cache, StaticCacheProvider MAY be OK but it is not thread-safe,
+            // for snapshot cache, DictionaryAppCache MAY be OK but it is not thread-safe,
             // nothing like that...
-            // for elements cache, StaticCacheProvider is a No-No, use something better.
+            // for elements cache, DictionaryAppCache is a No-No, use something better.
+            // ie FastDictionaryAppCache (thread safe and all)
 
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
@@ -998,11 +999,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    elementsCache = _elementsCache = new FastDictionaryCacheProvider();
+                    elementsCache = _elementsCache = new FastDictionaryAppCache();
                 }
             }
 
-            var snapshotCache = new DictionaryCacheProvider();
+            var snapshotCache = new DictionaryAppCache();
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 

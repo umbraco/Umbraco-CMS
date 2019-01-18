@@ -421,13 +421,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         /// <param name="node">The Xml node.</param>
         /// <param name="isPreviewing">A value indicating whether we are previewing or not.</param>
-        /// <param name="cacheProvider">A cache provider.</param>
+        /// <param name="appCache">A cache.</param>
         /// <param name="contentTypeCache">A content type cache.</param>
         /// <returns>The IPublishedContent corresponding to the Xml cache node.</returns>
         /// <remarks>Maintains a per-request cache of IPublishedContent items in order to make
         /// sure that we create only one instance of each for the duration of a request. The
         /// returned IPublishedContent is a model, if models are enabled.</remarks>
-        public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache cacheProvider, PublishedContentTypeCache contentTypeCache)
+        public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache appCache, PublishedContentTypeCache contentTypeCache)
         {
             // only 1 per request
 
@@ -435,7 +435,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) cacheProvider.Get(key, () => (new XmlPublishedContent(node, isPreviewing, cacheProvider, contentTypeCache)).CreateModel());
+            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel());
         }
 
         public static void ClearRequest()

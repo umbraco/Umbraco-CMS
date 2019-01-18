@@ -27,9 +27,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Throws_On_Reentry()
         {
-            // don't run for StaticCacheProvider - not making sense
-            if (GetType() == typeof (StaticAppCacheTests))
-                Assert.Ignore("Do not run for StaticCacheProvider.");
+            // don't run for DictionaryAppCache - not making sense
+            if (GetType() == typeof (DictionaryAppCacheTests))
+                Assert.Ignore("Do not run for DictionaryAppCache.");
 
             Exception exception = null;
             var result = AppCache.Get("blah", () =>

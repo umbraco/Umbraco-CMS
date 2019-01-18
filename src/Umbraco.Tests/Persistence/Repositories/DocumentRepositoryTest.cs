@@ -77,8 +77,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var realCache = new AppCaches(
                 new ObjectCacheAppCache(),
-                new DictionaryCacheProvider(),
-                new DictionaryCacheProvider(),
+                new DictionaryAppCache(),
+                new DictionaryAppCache(),
                 new IsolatedCaches(t => new ObjectCacheAppCache()));
 
             var provider = TestObjects.GetScopeProvider(Logger);

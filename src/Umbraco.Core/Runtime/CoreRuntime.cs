@@ -332,7 +332,7 @@ namespace Umbraco.Core.Runtime
 
             return new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
-                new DictionaryCacheProvider(),
+                new DictionaryAppCache(),
                 NoAppCache.Instance,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }

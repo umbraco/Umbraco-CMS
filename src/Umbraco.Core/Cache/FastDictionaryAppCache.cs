@@ -10,7 +10,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements a fast <see cref="IAppCache"/> on top of a concurrent dictionary.
     /// </summary>
-    internal class FastDictionaryCacheProvider : IAppCache
+    internal class FastDictionaryAppCache : IAppCache
     {
         /// <summary>
         /// Gets the internal items dictionary, for tests only!

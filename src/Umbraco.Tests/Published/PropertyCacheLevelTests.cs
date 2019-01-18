@@ -118,8 +118,8 @@ namespace Umbraco.Tests.Published
                 publishedContentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
-            var elementsCache = new FastDictionaryCacheProvider();
-            var snapshotCache = new FastDictionaryCacheProvider();
+            var elementsCache = new FastDictionaryAppCache();
+            var snapshotCache = new FastDictionaryAppCache();
 
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);

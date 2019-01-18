@@ -17,9 +17,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
-        public PublishedMemberCache(XmlStore xmlStore, IAppCache requestCacheProvider, IMemberService memberService, PublishedContentTypeCache contentTypeCache)
+        public PublishedMemberCache(XmlStore xmlStore, IAppCache requestCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache)
         {
-            _requestCache = requestCacheProvider;
+            _requestCache = requestCache;
             _memberService = memberService;
             _xmlStore = xmlStore;
             _contentTypeCache = contentTypeCache;
