@@ -305,8 +305,6 @@
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\TemplateElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\TemplateElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
@@ -354,7 +352,6 @@
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
-    <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
@@ -453,7 +450,6 @@
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
-    <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />

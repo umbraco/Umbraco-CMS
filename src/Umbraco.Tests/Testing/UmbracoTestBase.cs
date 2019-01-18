@@ -304,7 +304,6 @@ namespace Umbraco.Tests.Testing
 
             // register basic stuff that might need to be there for some container resolvers to work
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
             Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);

@@ -291,7 +291,6 @@
     <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
@@ -304,7 +303,6 @@
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
@@ -631,7 +629,6 @@
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />
-    <Compile Include="IO\MasterPageHelper.cs" />
     <Compile Include="IO\MediaFileSystem.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
