@@ -183,13 +183,16 @@ namespace Umbraco.Core.PropertyEditors
             if (value is JValue)
                 value = value.ToString();
 
+            var valueStorageType = ValueTypes.ToStorageType(ValueType);
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
-            if (value is string s && string.IsNullOrWhiteSpace(s))
+            if (value is string s
+                && string.IsNullOrWhiteSpace(s)
+                && (valueStorageType != ValueStorageType.Ntext && valueStorageType != ValueStorageType.Nvarchar))
                 value = null;
 
             Type valueType;
             //convert the string to a known type
-            switch (ValueTypes.ToStorageType(ValueType))
+            switch (valueStorageType)
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:
@@ -246,7 +249,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         ///  <remarks>
         ///  By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
-        /// 
+        ///
         ///  If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
         ///  value to the DB will fail when it tries to validate the value type.
         ///  </remarks>

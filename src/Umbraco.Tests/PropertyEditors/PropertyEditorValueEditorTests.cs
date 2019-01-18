@@ -62,6 +62,8 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("INT", "123", 123)]
         [TestCase("INT", "", null)] //test empty string for int
         [TestCase("DATETIME", "", null)] //test empty string for date
+        [TestCase("STRING", "", "")] //test empty string for string must remain empty string
+        [TestCase("TEXT", "", "")] //test empty string for text must remain empty string
         public void Value_Editor_Can_Convert_To_Clr_Type(string valueType, string val, object expected)
         {
             var valueEditor = new DataValueEditor
