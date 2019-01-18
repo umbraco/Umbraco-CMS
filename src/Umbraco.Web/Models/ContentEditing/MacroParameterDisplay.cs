@@ -25,5 +25,11 @@
         /// </summary>
         [DataMember(Name = "editor")]
         public string Editor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the id.
+        /// </summary>
+        [DataMember(Name = "id")]
+        public int Id { get; set; }
     }
 }

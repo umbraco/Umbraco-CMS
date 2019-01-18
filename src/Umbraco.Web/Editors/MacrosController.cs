@@ -100,7 +100,8 @@
                                    {
                                        Editor = param.EditorAlias,
                                        Key = param.Alias,
-                                       Label = param.Name
+                                       Label = param.Name,
+                                       Id = param.Id
                                    });
             }
 
