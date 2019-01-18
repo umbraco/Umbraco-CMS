@@ -142,7 +142,7 @@ namespace Umbraco.Web.Editors
                                     continue;
                                 }
 
-                                //Find position in current comma seperate string path (so we get the correct children path)
+                                //Find position in current comma separate string path (so we get the correct children path)
                                 var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
 
                                 //Get the substring of the child & any children (descendants it may have too)

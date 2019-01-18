@@ -1316,7 +1316,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                     startNodeIsVirtual: userData.startMediaIds.length !== 1,
                     submit: function (model) {
-                        self.insertMediaInEditor(args.editor, model.selectedImages[0]);
+                        self.insertMediaInEditor(args.editor, model.selection[0]);
                         editorService.close();
                     },
                     close: function () {

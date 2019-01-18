@@ -32,6 +32,8 @@
         vm.search = search;
         vm.installCompleted = false;
 
+        var labels = {};
+
         var currSort = "Latest";
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
@@ -52,22 +54,38 @@
 
             vm.loading = true;
 
+            var labelKeys = [
+                "packager_installStateImporting",
+                "packager_installStateInstalling",
+                "packager_installStateRestarting",
+                "packager_installStateComplete",
+                "packager_installStateCompleted"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                labels.installStateImporting = values[0];
+                labels.installStateInstalling = values[1];
+                labels.installStateRestarting = values[2];
+                labels.installStateComplete = values[3];
+                labels.installStateCompleted = values[4];
+            });
+
             $q.all([
-                    ourPackageRepositoryResource.getCategories()
-                    .then(function(cats) {
+                ourPackageRepositoryResource.getCategories()
+                    .then(function (cats) {
                         vm.categories = cats;
                     }),
-                    ourPackageRepositoryResource.getPopular(8)
-                    .then(function(pack) {
+                ourPackageRepositoryResource.getPopular(8)
+                    .then(function (pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
-                    .then(function(pack) {
+                ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort)
+                    .then(function (pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                     })
-                ])
-                .then(function() {
+            ])
+                .then(function () {
                     vm.loading = false;
                 });
 
@@ -94,18 +112,18 @@
             currSort = "Latest";
 
             $q.all([
-                    ourPackageRepositoryResource.getPopular(8, searchCategory)
-                    .then(function(pack) {
+                ourPackageRepositoryResource.getPopular(8, searchCategory)
+                    .then(function (pack) {
                         vm.popular = pack.packages;
                     }),
-                    ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort, searchCategory, vm.searchQuery)
-                    .then(function(pack) {
+                ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1, vm.pagination.pageSize, currSort, searchCategory, vm.searchQuery)
+                    .then(function (pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                         vm.pagination.pageNumber = 1;
                     })
-                ])
-                .then(function() {
+            ])
+                .then(function () {
                     vm.loading = false;
                     selectedCategory.active = reset === false;
                 });
@@ -115,12 +133,12 @@
             ourPackageRepositoryResource.getDetails(selectedPackage.id)
                 .then(function (pack) {
                     packageResource.validateInstalled(pack.name, pack.latestVersion)
-                        .then(function() {
+                        .then(function () {
                             //ok, can install
                             vm.package = pack;
                             vm.package.isValid = true;
                             vm.packageViewState = "packageDetails";
-                        }, function() {
+                        }, function () {
                             //nope, cannot install
                             vm.package = pack;
                             vm.package.isValid = false;
@@ -130,7 +148,7 @@
         }
 
         function setPackageViewState(state) {
-            if(state) {
+            if (state) {
                 vm.packageViewState = state;
             }
         }
@@ -164,13 +182,13 @@
 
             packageResource
                 .fetch(selectedPackage.id)
-                .then(function(pack) {
-                        vm.packageViewState = "packageInstall";
-                        vm.loading = false;
-                        vm.localPackage = pack;
-                        vm.localPackage.allowed = true;
+                .then(function (pack) {
+                    vm.packageViewState = "packageInstall";
+                    vm.loading = false;
+                    vm.localPackage = pack;
+                    vm.localPackage.allowed = true;
                 }, function (evt, status, headers, config) {
-                    
+
                     if (status == 400) {
                         //it's a validation error
                         vm.installState.type = "error";
@@ -186,68 +204,66 @@
 
         function installPackage(selectedPackage) {
 
-            vm.installState.status = localizationService.localize("packager_installStateImporting");
+            vm.installState.status = labels.installStateImporting;
             vm.installState.progress = "0";
 
             packageResource
                 .import(selectedPackage)
-                .then(function(pack) {
-                        vm.installState.status = localizationService.localize("packager_installStateInstalling");
-                        vm.installState.progress = "25";
-                        return packageResource.installFiles(pack);
-                    },
+                .then(function (pack) {
+                    vm.installState.status = labels.installStateInstalling;
+                    vm.installState.progress = "25";
+                    return packageResource.installFiles(pack);
+                },
                     error)
-                .then(function(pack) {
-                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
-                        vm.installState.progress = "50";
-                        var deferred = $q.defer();
+                .then(function (pack) {
+                    vm.installState.status = labels.installStateRestarting;
+                    vm.installState.progress = "50";
+                    var deferred = $q.defer();
 
-                        //check if the app domain is restarted ever 2 seconds
-                        var count = 0;
-                        function checkRestart() {
-                          $timeout(function () {
+                    //check if the app domain is restarted ever 2 seconds
+                    var count = 0;
+                    function checkRestart() {
+                        $timeout(function () {
                             packageResource.checkRestart(pack).then(function (d) {
                                 count++;
                                 //if there is an id it means it's not restarted yet but we'll limit it to only check 10 times
                                 if (d.isRestarting && count < 10) {
-                                  checkRestart();
+                                    checkRestart();
                                 }
                                 else {
-                                  //it's restarted!
-                                  deferred.resolve(d);
+                                    //it's restarted!
+                                    deferred.resolve(d);
                                 }
-                              },
-                              error);
-                          }, 2000);
-                        }
+                            },
+                                error);
+                        }, 2000);
+                    }
 
-                        checkRestart();
-                        
-                        return deferred.promise;
-                    }, error)
+                    checkRestart();
+
+                    return deferred.promise;
+                }, error)
                 .then(function (pack) {
-                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
-                        vm.installState.progress = "75";
-                        return packageResource.installData(pack);
-                    },
+                    vm.installState.status = labels.installStateInstalling;
+                    vm.installState.progress = "75";
+                    return packageResource.installData(pack);
+                },
                     error)
-                .then(function(pack) {
-                        vm.installState.status = localizationService.localize("packager_installStateComplete");
-                        vm.installState.progress = "100";
-                        return packageResource.cleanUp(pack);
-                    },
+                .then(function (pack) {
+                    vm.installState.status = labels.installStateComplete;
+                    vm.installState.progress = "100";
+                    return packageResource.cleanUp(pack);
+                },
                     error)
-                .then(function(result) {
+                .then(function (result) {
 
-                        if (result.postInstallationPath) {
-                            //Put the redirect Uri in a cookie so we can use after reloading
-                            localStorageService.set("packageInstallUri", result.postInstallationPath);
-                        }
+                    //Put the package data in local storage so we can use after reloading
+                    localStorageService.set("packageInstallData", result);
 
-                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
-                        vm.installCompleted = true;
+                    vm.installState.status = labels.installStateCompleted;
+                    vm.installCompleted = true;
 
-                    },
+                },
                     error);
         }
 
@@ -265,7 +281,7 @@
         }
 
 
-        var searchDebounced = _.debounce(function(e) {
+        var searchDebounced = _.debounce(function (e) {
 
             $scope.$apply(function () {
 
@@ -281,12 +297,12 @@
                 currSort = vm.searchQuery ? "Default" : "Latest";
 
                 ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
-                        vm.pagination.pageSize,
-                        currSort,
-                        "",
-                        vm.searchQuery,
-                        canceler)
-                    .then(function(pack) {
+                    vm.pagination.pageSize,
+                    currSort,
+                    "",
+                    vm.searchQuery,
+                    canceler)
+                    .then(function (pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                         vm.pagination.pageNumber = 1;

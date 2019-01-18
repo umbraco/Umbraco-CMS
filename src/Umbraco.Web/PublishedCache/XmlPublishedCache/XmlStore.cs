@@ -44,15 +44,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IEntityXmlSerializer _entitySerializer;
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
         private bool _withRepositoryEvents;
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
-        private readonly IEnumerable<IUrlSegmentProvider> _segmentProviders;
         private readonly RoutesCache _routesCache;
-        private readonly ServiceContext _serviceContext; // fixme WHY
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IContentService _contentService;
         private readonly IScopeProvider _scopeProvider;
 
         #region Constructors
@@ -61,22 +62,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// Initializes a new instance of the <see cref="XmlStore"/> class.
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
-        public XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings)
-            : this(serviceContext, scopeProvider, routesCache, contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings)
+        public XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer)
+            : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer)
         { }
 
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
-        internal XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
-            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings)
+        internal XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
+            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
 
-            _serviceContext = serviceContext;
+            _contentTypeService = contentTypeService;
+            _contentService = contentService;
             _scopeProvider = scopeProvider;
             _routesCache = routesCache;
             _contentTypeCache = contentTypeCache;
@@ -85,8 +87,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _globalSettings = globalSettings;
+            _entitySerializer = entitySerializer;
             _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(_globalSettings));
-            _segmentProviders = segmentProviders;
 
             if (testing)
             {
@@ -399,7 +401,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             try
             {
                 var dtdInner = new StringBuilder();
-                var contentTypes = _serviceContext.ContentTypeService.GetAll();
+                var contentTypes = _contentTypeService.GetAll();
                 // though aliases should be safe and non null already?
                 var aliases = contentTypes.Select(x => x.Alias.ToSafeAlias()).WhereNotNull();
                 foreach (var alias in aliases)
@@ -556,7 +558,7 @@ AND (umbracoNode.id=@id)";
 
         public XmlDocument GetPreviewXml(int contentId, bool includeSubs)
         {
-            var content = _serviceContext.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
 
             var doc = (XmlDocument)Xml.Clone();
             if (content == null) return doc;
@@ -1065,7 +1067,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                         continue;
                     }
 
-                    var content = _serviceContext.ContentService.GetById(payload.Id);
+                    var content = _contentService.GetById(payload.Id);
                     var current = safeXml.Xml.GetElementById(payload.Id.ToInvariantString());
 
                     if (content == null || content.Published == false || content.Trashed)
@@ -1536,7 +1538,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             var entity = args.Entity;
 
             // serialize edit values for preview
-            var editXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, false).ToDataString();
+            var editXml = _entitySerializer.Serialize(entity, false).ToDataString();
 
             // change below to write only one row - not one per version
             var dto1 = new PreviewXmlDto
@@ -1565,7 +1567,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 return;
 
             // serialize published values for content cache
-            var publishedXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, true).ToDataString();
+            var publishedXml = _entitySerializer.Serialize(entity, true).ToDataString();
             var dto2 = new ContentXmlDto { NodeId = entity.Id, Xml = publishedXml };
             OnRepositoryRefreshed(db, dto2);
 
@@ -1581,7 +1583,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             if (entity.Trashed)
                 db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@id", new { id = entity.Id });
 
-            var xml = EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity).ToDataString();
+            var xml = _entitySerializer.Serialize(entity).ToDataString();
 
             var dto1 = new ContentXmlDto { NodeId = entity.Id, Xml = xml };
             OnRepositoryRefreshed(db, dto1);
@@ -1592,7 +1594,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             var db = args.Scope.Database;
             var entity = args.Entity;
 
-            var xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, entity).ToDataString();
+            var xml = _entitySerializer.Serialize(entity).ToDataString();
 
             var dto1 = new ContentXmlDto { NodeId = entity.Id, Xml = xml };
             OnRepositoryRefreshed(db, dto1);
@@ -1749,7 +1751,7 @@ WHERE cmsContentXml.nodeId IN (
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 const bool published = true; // contentXml contains published content!
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml =
-                    EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
+                    _entitySerializer.Serialize(c, published).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1824,7 +1826,7 @@ WHERE cmsPreviewXml.nodeId IN (
                 var items = descendants.Select(c => new PreviewXmlDto
                 {
                     NodeId = c.Id,
-                    Xml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString()
+                    Xml = _entitySerializer.Serialize(c, published).ToDataString()
                 }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
@@ -1894,7 +1896,7 @@ WHERE cmsContentXml.nodeId IN (
             {
                 var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml =
-                    EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, m).ToDataString() }).ToArray();
+                    _entitySerializer.Serialize(m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1962,7 +1964,7 @@ WHERE cmsContentXml.nodeId IN (
             do
             {
                 var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, m).ToDataString() }).ToArray();
+                var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = _entitySerializer.Serialize(m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);

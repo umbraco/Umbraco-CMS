@@ -544,13 +544,11 @@
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[Välj ett installationspaket, genom att klicka på utforska<br />och leta upp paketet. Umbracos installationspaket har oftast filändelsen ".umb" eller ".zip".]]></key>
     <key alias="packageAuthor">Utvecklare</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Paket metadata</key>
     <key alias="packageName">Paketnamn</key>
     <key alias="packageNoItemsHeader">Paketet innehåller inga poster</key>
     <key alias="packageNoItemsText"><![CDATA[Paketfilen innehåller inga poster som kan avinstalleras.<br/><br/>Det är säkert att ta bort den ur systemet genom att klicka på "avinstallera paket" nedan.]]></key>
-    <key alias="packageNoUpgrades">Inga uppdateringar tillgängliga</key>
     <key alias="packageOptions">Paketalternativ</key>
     <key alias="packageReadme">Paket läsmig</key>
     <key alias="packageRepository">Paketvalv</key>
@@ -559,13 +557,7 @@
     <key alias="packageUninstalledText">Paketet har avinstallerats utan problem</key>
     <key alias="packageUninstallHeader">Avinstallera paket</key>
     <key alias="packageUninstallText"><![CDATA[Nedan kan du avmarkera de poster du inte vill avinstallera just nu. När du klickar på "bekräfta avinstallation" kommer alla markerade poster att avinstalleras.<br/><span style="color: Red; font-weight: bold;">OBS!</span> dokument, media osv som använder de borttagna posterna kommer sluta fungera vilket kan leda till att systemet blir instabilt. Avinstallera därför med försiktighet. Om du är osäker, kontakta personen som skapat paketet.]]></key>
-    <key alias="packageUpgradeDownload">Hämta uppdatering från paketvalvet</key>
-    <key alias="packageUpgradeHeader">Uppdatera paket</key>
-    <key alias="packageUpgradeInstructions">Uppdateringsinstruktioner</key>
-    <key alias="packageUpgradeText">Det finns an uppdaterad version av paketet. Du kan hämta den direkt från Umbracos paketvalv.</key>
     <key alias="packageVersion">Paketversion</key>
-    <key alias="packageVersionHistory">Versionshistorik för paket</key>
-    <key alias="viewPackageWebsite">Besök paketets webbplats</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Klistra in med helt bibehållen formatering (rekommenderas ej)</key>

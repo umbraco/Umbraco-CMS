@@ -180,6 +180,11 @@
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
     <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
   </area>
+  <area alias="codefile">
+    <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
+    <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
+      <key alias="deleteItemFailed">Sletning af filen/mappen fejlede: %0%</key>
+  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Udgivet</key>
     <key alias="about">Om siden</key>
@@ -276,6 +281,7 @@
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
+    <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
@@ -834,13 +840,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageCompatibilityDescription">Denne pakke er kompatibel med de følgende versioner af Umbraco, som rapporteret af community-medlemmer. Fuld kompatibilitet kan ikke garanteres for versioner rapporteret nedenfor 100%</key>
     <key alias="packageExternalSources">Eksterne kilder</key>
     <key alias="packageAuthor">Forfatter</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Pakke meta data</key>
     <key alias="packageName">Pakkenavn</key>
     <key alias="packageNoItemsHeader">Pakken indeholder ingen elementer</key>
     <key alias="packageNoItemsText"><![CDATA[Denne pakkefil indeholder ingen elementer som kan af-installeres.<br/><br/>Du kan roligt fjerne denne fra systemet ved at klikke på "Fjern pakke" nedenfor.]]></key>
-    <key alias="packageNoUpgrades">Ingen opdateringer tilgængelige</key>
     <key alias="packageOptions">Pakkevalg</key>
     <key alias="packageReadme">Pakke læs mig</key>
     <key alias="packageRepository">Pakke opbevaringsbase</key>
@@ -850,13 +854,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageUninstallHeader">Afinstallér pakke</key>
     <key alias="packageUninstallText"><![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
 <span style="color: Red; font-weight: bold;">Bemærk:</span> at dokumenter og medier som afhænger af denne pakke vil muligvis holde op med at virke, så vær forsigtig. Hvis i tvivl, kontakt personen som har udviklet pakken.]]></key>
-    <key alias="packageUpgradeDownload">Download opdatering fra opbevaringsbasen</key>
-    <key alias="packageUpgradeHeader">Opdatér pakke</key>
-    <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
-    <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra Umbracos pakke opbevaringsbase.</key>
     <key alias="packageVersion">Pakke version</key>
-    <key alias="packageVersionHistory">Pakke versionshistorik</key>
-    <key alias="viewPackageWebsite">Se pakkeudviklerens website</key>
     <key alias="packageAlreadyInstalled">Pakke allerede installeret</key>
     <key alias="targetVersionMismatch">Denne pakke kan ikke installeres, den kræver en minimum Umbraco version af</key>
     <key alias="installStateUninstalling">Afinstallerer...</key>
@@ -1062,6 +1060,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
+    <key alias="deleteByIdFailed">Sletning af skabelonen med ID %0% fejlede</key>
     <key alias="edittemplate">Rediger skabelon</key>
     <key alias="insertSections">Sektioner</key>
     <key alias="insertContentArea">Indsæt indholdsområde</key>

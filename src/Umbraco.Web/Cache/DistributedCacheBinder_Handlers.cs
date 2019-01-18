@@ -46,20 +46,6 @@ namespace Umbraco.Web.Cache
 
             _logger.Info<DistributedCacheBinderComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
 
-            // bind to application tree events
-            Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
-                () => ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted);
-            Bind(() => ApplicationTreeService.Updated += ApplicationTreeService_Updated,
-                () => ApplicationTreeService.Updated -= ApplicationTreeService_Updated);
-            Bind(() => ApplicationTreeService.New += ApplicationTreeService_New,
-                () => ApplicationTreeService.New -= ApplicationTreeService_New);
-
-            // bind to application events
-            Bind(() => SectionService.Deleted += SectionService_Deleted,
-                () => SectionService.Deleted -= SectionService_Deleted);
-            Bind(() => SectionService.New += SectionService_New,
-                () => SectionService.New -= SectionService_New);
-
             // bind to user and user group events
             Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
                 () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
@@ -142,8 +128,8 @@ namespace Umbraco.Web.Cache
                 () => ContentService.Saved -= ContentService_Saved);
             Bind(() => ContentService.Copied += ContentService_Copied, // needed for permissions
                 () => ContentService.Copied -= ContentService_Copied);
-            Bind(() => ContentService.TreeChanged += ContentService_Changed,// handles all content changes
-                () => ContentService.TreeChanged -= ContentService_Changed);
+            Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
+                () => ContentService.TreeChanged -= ContentService_TreeChanged);
 
             // TreeChanged should also deal with this
             //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
@@ -206,7 +192,7 @@ namespace Umbraco.Web.Cache
         {
         }
 
-        private void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
+        private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
@@ -228,39 +214,6 @@ namespace Umbraco.Web.Cache
         //{
         //    _distributedCache.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
         //}
-
-        #endregion
-
-        #region ApplicationTreeService
-
-        private void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
-
-        private void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
-
-        private void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
-
-        #endregion
-
-        #region Application event handlers
-
-        private void SectionService_New(ISectionService sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationCache();
-        }
-
-        private void SectionService_Deleted(ISectionService sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationCache();
-        }
 
         #endregion
 

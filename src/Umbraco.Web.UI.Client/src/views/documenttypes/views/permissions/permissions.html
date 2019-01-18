@@ -53,9 +53,25 @@
                                 hotkey="alt+shift+v">
                     </umb-toggle>
                 </div>
-    
+
             </div>
 
-        </umb-box-content>
+            <div class="sub-view-columns">
+
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_elementHeading" /></h5>
+                    <small><localize key="contentTypeEditor_elementDescription" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-is-element"
+                                checked="model.isElement"
+                                on-click="vm.toggleIsElement()">
+                    </umb-toggle>
+                </div>
+
+            </div>
+
+            </umb-box-content>
     </umb-box>
 </div>

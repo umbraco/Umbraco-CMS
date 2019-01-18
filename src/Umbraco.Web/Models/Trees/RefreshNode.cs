@@ -10,18 +10,18 @@ namespace Umbraco.Web.Models.Trees
     {
         public override string AngularServiceName => "umbracoMenuActions";
 
-        public RefreshNode(string name, bool seperatorBefore = false)
+        public RefreshNode(string name, bool separatorBefore = false)
             : base("refreshNode", name)
         {
             Icon = "refresh";
-            SeperatorBefore = seperatorBefore;
+            SeparatorBefore = separatorBefore;
         }
 
-        public RefreshNode(ILocalizedTextService textService, bool seperatorBefore = false)
+        public RefreshNode(ILocalizedTextService textService, bool separatorBefore = false)
             : base("refreshNode", textService)
         {
             Icon = "refresh";
-            SeperatorBefore = seperatorBefore;
+            SeparatorBefore = separatorBefore;
         }
     }
 }

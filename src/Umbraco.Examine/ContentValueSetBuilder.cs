@@ -13,11 +13,11 @@ namespace Umbraco.Examine
     /// </summary>
     public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder, IPublishedContentValueSetBuilder
     {
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
 
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             IUserService userService,
             bool publishedValuesOnly)
             : base(propertyEditors, publishedValuesOnly)

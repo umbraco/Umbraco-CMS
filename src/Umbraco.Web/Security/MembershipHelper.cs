@@ -32,7 +32,7 @@ namespace Umbraco.Web.Security
         private readonly IUserService _userService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly PublishedRouter _publishedRouter;
-        private readonly CacheHelper _appCaches;
+        private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
 
         #region Constructors
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Security
             IUserService userService,
             IPublicAccessService publicAccessService,
             PublishedRouter publishedRouter,
-            CacheHelper appCaches,
+            AppCaches appCaches,
             ILogger logger
         )
         {

@@ -35,22 +35,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// Constructor
         /// </summary>
         /// <param name="scopeAccessor"></param>
-        /// <param name="cacheHelper"></param>
+        /// <param name="appCaches"></param>
         /// <param name="logger"></param>
         /// <param name="mapperCollection">
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
-            : base(scopeAccessor, cacheHelper, logger)
+        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
+            : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection;
             _globalSettings = globalSettings;
         }
 
         // for tests
-        internal UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
-            : base(scopeAccessor, cacheHelper, logger)
+        internal UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
+            : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection;
             _globalSettings = globalSettings;

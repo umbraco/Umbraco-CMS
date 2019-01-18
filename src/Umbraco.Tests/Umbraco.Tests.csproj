@@ -62,6 +62,8 @@
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Text.Encoding" />
@@ -139,6 +141,8 @@
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
+    <Compile Include="Services\EntityXmlSerializerTests.cs" />
+    <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -221,7 +225,7 @@
     <Compile Include="CoreThings\AttemptTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
-    <Compile Include="Cache\DeepCloneRuntimeCacheProviderTests.cs" />
+    <Compile Include="Cache\DeepCloneAppCacheTests.cs" />
     <Compile Include="Cache\DefaultCachePolicyTests.cs" />
     <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
@@ -282,11 +286,11 @@
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
     <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
-    <Compile Include="Cache\ObjectCacheProviderTests.cs" />
-    <Compile Include="Cache\CacheProviderTests.cs" />
-    <Compile Include="Cache\HttpRequestCacheProviderTests.cs" />
-    <Compile Include="Cache\HttpRuntimeCacheProviderTests.cs" />
-    <Compile Include="Cache\RuntimeCacheProviderTests.cs" />
+    <Compile Include="Cache\ObjectAppCacheTests.cs" />
+    <Compile Include="Cache\AppCacheTests.cs" />
+    <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
+    <Compile Include="Cache\WebCachingAppCacheTests.cs" />
+    <Compile Include="Cache\RuntimeAppCacheTests.cs" />
     <Compile Include="Configurations\DashboardSettings\DashboardSettingsTests.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementDefaultTests.cs" />
@@ -301,8 +305,6 @@
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\TemplateElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\TemplateElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
@@ -350,7 +352,6 @@
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
-    <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
@@ -419,13 +420,6 @@
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Stubs\TestProfiler.cs" />
-    <Compile Include="TreesAndSections\ResourceFiles.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ResourceFiles.resx</DependentUpon>
-    </Compile>
-    <Compile Include="TreesAndSections\SectionTests.cs" />
-    <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
     <Compile Include="CoreThings\ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
@@ -440,7 +434,7 @@
     <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Services\DataTypeServiceTests.cs" />
     <Compile Include="Services\EntityServiceTests.cs" />
-    <Compile Include="Services\Importing\PackageImportTests.cs" />
+    <Compile Include="Packaging\PackageDataInstallationTests.cs" />
     <Compile Include="Services\Importing\ImportResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -449,7 +443,6 @@
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
-    <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
@@ -521,8 +514,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <EmbeddedResource Include="TreesAndSections\applications.config" />
-    <EmbeddedResource Include="TreesAndSections\trees.config" />
     <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
@@ -556,10 +547,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TreesAndSections\ResourceFiles.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ResourceFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>

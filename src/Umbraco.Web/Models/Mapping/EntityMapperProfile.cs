@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class EntityMapperProfile : Profile
     {
-        private static string GetContentTypeIcon(EntitySlim entity)
+        private static string GetContentTypeIcon(IEntitySlim entity)
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         public EntityMapperProfile()
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
             // create, capture, cache
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
-            CreateMap<EntitySlim, EntityBasic>()
+            CreateMap<IEntitySlim, EntityBasic>()
                 .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => GetContentTypeIcon(src)))
@@ -36,6 +36,8 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         dest.Icon = "icon-user";
                     }
+
+                    dest.AdditionalData.Add("IsContainer", src.IsContainer);
                 });
 
             CreateMap<PropertyType, EntityBasic>()
@@ -186,9 +188,9 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Resolves the name for a content item/content variant
         /// </summary>
-        private class NameResolver : IValueResolver<EntitySlim, EntityBasic, string>
+        private class NameResolver : IValueResolver<IEntitySlim, EntityBasic, string>
         {
-            public string Resolve(EntitySlim source, EntityBasic destination, string destMember, ResolutionContext context)
+            public string Resolve(IEntitySlim source, EntityBasic destination, string destMember, ResolutionContext context)
             {
                 if (!(source is DocumentEntitySlim doc))
                     return source.Name;

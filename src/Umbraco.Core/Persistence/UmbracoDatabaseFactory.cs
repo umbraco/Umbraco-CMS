@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data.Common;
 using System.Threading;
+using LightInject;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Exceptions;
@@ -101,6 +102,16 @@ namespace Umbraco.Core.Persistence
 
         /// <inheritdoc />
         public bool Configured { get; private set; }
+
+        /// <inheritdoc />
+        public string ConnectionString
+        {
+            get
+            {
+                EnsureConfigured();
+                return _connectionString;
+            }
+        }
 
         /// <inheritdoc />
         public bool CanConnect

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
@@ -20,7 +21,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _databaseBuilder = databaseBuilder;
         }
 
-        public override InstallSetupResult Execute(DatabaseModel database)
+        public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
         {
             //if the database model is null then we will apply the defaults
             if (database == null)
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InstallException("Could not connect to the database");
             }
             ConfigureConnection(database);
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         private void ConfigureConnection(DatabaseModel database)

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Composing
         public static void RegisterEssentials(this Composition composition,
             ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
             IMainDom mainDom,
-            CacheHelper appCaches,
+            AppCaches appCaches,
             IUmbracoDatabaseFactory databaseFactory,
             TypeLoader typeLoader,
             IRuntimeState state)
@@ -28,7 +28,6 @@ namespace Umbraco.Core.Composing
             composition.RegisterUnique(profilingLogger);
             composition.RegisterUnique(mainDom);
             composition.RegisterUnique(appCaches);
-            composition.RegisterUnique(factory => factory.GetInstance<CacheHelper>().RuntimeCache);
             composition.RegisterUnique(databaseFactory);
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
             composition.RegisterUnique(typeLoader);
@@ -50,6 +49,13 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public static void RegisterUnique<TService, TImplementing>(this Composition composition)
             => composition.RegisterUnique(typeof(TService), typeof(TImplementing));
+
+        /// <summary>
+        /// Registers a unique service with an implementation type, for a target.
+        /// </summary>
+        public static void RegisterUniqueFor<TService, TTarget, TImplementing>(this Composition composition)
+            where TService : class
+            => composition.RegisterUniqueFor<TService, TTarget>(typeof(TImplementing));
 
         /// <summary>
         /// Registers a unique service with an implementing instance.

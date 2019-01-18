@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -24,6 +25,7 @@ using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
 using Umbraco.Web.WebApi;
 
 using CoreCurrent = Umbraco.Core.Composing.Current;
@@ -134,6 +136,12 @@ namespace Umbraco.Web.Composing
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Factory.GetInstance<IPublishedSnapshotService>();
 
+        public static ITreeService TreeService
+            => Factory.GetInstance<ITreeService>();
+
+        public static ISectionService SectionService
+            => Factory.GetInstance<ISectionService>();
+
         #endregion
 
         #region Web Constants
@@ -154,41 +162,6 @@ namespace Umbraco.Web.Composing
                     throw new ArgumentException($"Type {value.FullName} does not implement {typeof (IRenderController).FullName}.", nameof(value));
                 _defaultRenderMvcControllerType = value;
             }
-        }
-
-        #endregion
-
-        #region Web Actions
-
-        public static void RestartAppPool()
-        {
-            // see notes in overload
-
-            var httpContext = HttpContext.Current;
-            if (httpContext != null)
-            {
-                httpContext.Application.Add("AppPoolRestarting", true);
-                httpContext.User = null;
-            }
-            Thread.CurrentPrincipal = null;
-            HttpRuntime.UnloadAppDomain();
-        }
-
-        public static void RestartAppPool(HttpContextBase httpContext)
-        {
-            // we're going to put an application wide flag to show that the application is about to restart.
-            // we're doing this because if there is a script checking if the app pool is fully restarted, then
-            // it can check if this flag exists...  if it does it means the app pool isn't restarted yet.
-            httpContext.Application.Add("AppPoolRestarting", true);
-
-            // unload app domain - we must null out all identities otherwise we get serialization errors
-            // http://www.zpqrtbnk.net/posts/custom-iidentity-serialization-issue
-            httpContext.User = null;
-            if (HttpContext.Current != null)
-                HttpContext.Current.User = null;
-            Thread.CurrentPrincipal = null;
-
-            HttpRuntime.UnloadAppDomain();
         }
 
         #endregion
@@ -215,6 +188,8 @@ namespace Umbraco.Web.Composing
 
         internal static ManifestValueValidatorCollection ManifestValidators => CoreCurrent.ManifestValidators;
 
+        internal static IPackageActionRunner PackageActionRunner => CoreCurrent.PackageActionRunner;
+
         internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
 
         internal static PropertyValueConverterCollection PropertyValueConverters => CoreCurrent.PropertyValueConverters;
@@ -235,7 +210,7 @@ namespace Umbraco.Web.Composing
 
         public static IProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
 
-        public static CacheHelper ApplicationCache => CoreCurrent.ApplicationCache;
+        public static AppCaches AppCaches => CoreCurrent.AppCaches;
 
         public static ServiceContext Services => CoreCurrent.Services;
 

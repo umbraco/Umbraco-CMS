@@ -123,6 +123,7 @@
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -165,6 +166,16 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
+    <Compile Include="Trees\MediaBackOfficeSection.cs" />
+    <Compile Include="Trees\MembersBackOfficeSection.cs" />
+    <Compile Include="Trees\PackagesBackOfficeSection.cs" />
+    <Compile Include="Trees\SettingsBackOfficeSection.cs" />
+    <Compile Include="Trees\TranslationBackOfficeSection.cs" />
+    <Compile Include="Trees\TreeCollectionBuilder.cs" />
+    <Compile Include="Trees\UsersBackOfficeSection.cs" />
+    <Compile Include="Trees\Tree.cs" />
+    <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
     <Compile Include="Models\ContentEditing\ObjectType.cs" />
     <Compile Include="Models\ContentEditing\RelationDisplay.cs" />
@@ -180,6 +191,9 @@
     <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
     <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
+    <Compile Include="Services\ITreeService.cs" />
+    <Compile Include="Services\ISectionService.cs" />
+    <Compile Include="Trees\BackOfficeSectionCollection.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComposer.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
@@ -215,11 +229,14 @@
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
+    <Compile Include="Trees\FilesTreeController.cs" />
+    <Compile Include="Trees\TreeCollection.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
+    <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\Dashboards.cs" />
@@ -542,7 +559,6 @@
     <Compile Include="Trees\ScriptsTreeController.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
-    <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
@@ -582,9 +598,7 @@
     <Compile Include="Actions\ActionUpdate.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
-    <Compile Include="Models\Trees\ApplicationAttribute.cs" />
-    <Compile Include="Models\Trees\ApplicationDefinitions.cs" />
-    <Compile Include="Models\Trees\IApplication.cs" />
+    <Compile Include="Trees\ContentBackOfficeSection.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Models\Trees\TreeNode.cs" />
@@ -593,7 +607,6 @@
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\InstalledPackageModel.cs" />
     <Compile Include="Models\ContentEditing\MediaTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MediaTypeSave.cs" />
     <Compile Include="Models\ContentEditing\MemberPropertyTypeBasic.cs" />
@@ -642,7 +655,7 @@
     <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
-    <Compile Include="Services\ApplicationTreeService.cs" />
+    <Compile Include="Services\TreeService.cs" />
     <Compile Include="Security\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
@@ -666,7 +679,6 @@
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
-    <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
     <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
     <Compile Include="Cache\DataTypeCacheRefresher.cs" />
     <Compile Include="Cache\DictionaryCacheRefresher.cs" />
@@ -727,7 +739,6 @@
     <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
     <Compile Include="Install\InstallSteps\UpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
-    <Compile Include="Install\Controllers\InstallPackageController.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />
@@ -888,7 +899,6 @@
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
@@ -965,9 +975,8 @@
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
     <Compile Include="Models\ContentEditing\SearchResultEntity.cs" />
-    <Compile Include="Models\Trees\SectionRootNode.cs" />
+    <Compile Include="Models\Trees\TreeRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
-    <Compile Include="Trees\ApplicationTreeExtensions.cs" />
     <Compile Include="Models\Trees\TreeNodeCollection.cs" />
     <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
     <Compile Include="Trees\TreeNodeRenderingEventArgs.cs" />
@@ -1051,7 +1060,6 @@
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
     <Compile Include="WebApi\JsonCamelCaseFormatter.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
-    <Compile Include="WebApi\MvcVersionCheck.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\PrefixlessBodyModelValidator.cs" />
     <Compile Include="WebApi\PrefixlessBodyModelValidatorAttribute.cs" />
@@ -1123,30 +1131,14 @@
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="_Legacy\Controls\BaseTreePicker.cs" />
     <Compile Include="_Legacy\Controls\pane.cs" />
     <Compile Include="_Legacy\Controls\Panel.cs" />
     <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
     <Compile Include="_Legacy\Controls\TabPage.cs" />
     <Compile Include="_Legacy\Controls\TabView.cs" />
-    <Compile Include="_Legacy\PackageActions\addApplication.cs" />
-    <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
     <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
-    <Compile Include="_Legacy\PackageActions\addStringToHtmlElement.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
-    <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
-    <Compile Include="_Legacy\Packager\data.cs" />
-    <Compile Include="_Legacy\Packager\Installer.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\IPackageInstance.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\PackageActions.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\PackageInstance.cs" />
-    <Compile Include="_Legacy\Packager\PackageInstance\PackagerUtility.cs" />
-    <Compile Include="_Legacy\Packager\RequirementsType.cs" />
-    <Compile Include="_Legacy\Packager\Settings.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
     <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
@@ -1227,8 +1219,6 @@
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
@@ -1236,13 +1226,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
-      <DependentUpon>editPackage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.designer.cs">
-      <DependentUpon>editPackage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
@@ -1258,7 +1241,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="TagsController.cs" />
+    <Compile Include="Controllers\TagsController.cs" />
     <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
@@ -1289,9 +1272,6 @@
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />

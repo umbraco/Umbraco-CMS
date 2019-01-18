@@ -246,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var cache = NullCacheProvider.Instance;
+            var cache = NoAppCache.Instance;
 
             ContentTypesCache = new PublishedContentTypeCache(
                 Factory.GetInstance<IContentTypeService>(),
@@ -268,6 +268,7 @@ namespace Umbraco.Tests.TestHelpers
                 DefaultCultureAccessor,
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 

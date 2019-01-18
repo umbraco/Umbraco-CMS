@@ -196,6 +196,11 @@
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
     <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
   </area>
+  <area alias="codefile">
+    <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
+    <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+    <key alias="deleteItemFailed">Failed to delete item: %0%</key>
+  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Is Published</key>
     <key alias="about">About this page</key>
@@ -316,6 +321,7 @@
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
     <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
+    <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
@@ -1111,14 +1117,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Documentation</key>
     <key alias="packageMetaData">Package meta data</key>
     <key alias="packageName">Package name</key>
     <key alias="packageNoItemsHeader">Package doesn't contain any items</key>
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
-    <key alias="packageNoUpgrades">No upgrades available</key>
     <key alias="packageOptions">Package options</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Package repository</key>
@@ -1129,13 +1133,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUninstallText"><![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
       <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,
       so uninstall with caution. If in doubt, contact the package author.]]></key>
-    <key alias="packageUpgradeDownload">Download update from the repository</key>
-    <key alias="packageUpgradeHeader">Upgrade package</key>
-    <key alias="packageUpgradeInstructions">Upgrade instructions</key>
-    <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the Umbraco package repository.</key>
     <key alias="packageVersion">Package version</key>
-    <key alias="packageVersionHistory">Package version history</key>
-    <key alias="viewPackageWebsite">View package website</key>
+    <key alias="packageVersionUpgrade">Upgrading from version</key>
     <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</key>
     <key alias="installStateUninstalling">Uninstalling...</key>
@@ -1272,6 +1271,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentTypeUses">This Content Type uses</key>
     <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
+    <key alias="createMatchingTemplate">Create matching template</key>
     <key alias="addIcon">Add icon</key>
   </area>
   <area alias="sort">
@@ -1387,6 +1387,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="previewHelp">How the text will look like in the rich text editor.</key>
   </area>
   <area alias="template">
+    <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
     <key alias="edittemplate">Edit template</key>
     <key alias="insertSections">Sections</key>
     <key alias="insertContentArea">Insert content area</key>
@@ -1551,6 +1552,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="variantsHeading">Allow varying by culture</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="elementHeading">Is an Element type</key>
+    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

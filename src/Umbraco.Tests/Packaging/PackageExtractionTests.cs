@@ -12,11 +12,11 @@ namespace Umbraco.Tests.Packaging
     {
         private const string PackageFileName = "Document_Type_Picker_1.1.umb";
 
-        private static string GetTestPackagePath(string packageName)
+        private static FileInfo GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
             string path = Path.Combine(IOHelper.GetRootDirectorySafe(), testPackagesDirName, packageName);
-            return path;
+            return new FileInfo(path);
         }
 
         [Test]

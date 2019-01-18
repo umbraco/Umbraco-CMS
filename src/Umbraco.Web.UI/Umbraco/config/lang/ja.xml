@@ -692,14 +692,12 @@ Runwayをインストールして作られた新しいウェブサイトがど�
          パッケージを選択できます。Umbracoのパッケージは概ね".zip"ないしは".umb"といった拡張子です。
       ]]></key>
     <key alias="packageAuthor">作成者</key>
-    <key alias="packageDemonstration">デモ</key>
     <key alias="packageDocumentation">ヘルプ</key>
     <key alias="packageMetaData">パッケージのメタデータ</key>
     <key alias="packageName">パッケージ名</key>
     <key alias="packageNoItemsHeader">パッケージには何も含まれません</key>
     <key alias="packageNoItemsText"><![CDATA[このパッケージファイルにはアンインストールするアイテムが含まれません。<br/><br/>
       "パッケージのアンインストール"をクリックしてシステムから安全に削除できます。]]></key>
-    <key alias="packageNoUpgrades">更新はありません</key>
     <key alias="packageOptions">パッケージのオプション</key>
     <key alias="packageReadme">パッケージの取扱説明書</key>
     <key alias="packageRepository">パッケージリポジトリ</key>
@@ -710,13 +708,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="packageUninstallText"><![CDATA[今はまだ削除したくない項目の選択を解除できます。"アンインストールの確認"をクリックすると全てのチェックの外された項目を削除します。<br />
       <span style="color: Red; font-weight: bold;">注意:</span> 全ての、文書やメディアなどに依存したアイテムを削除する場合はそれらの作業を一端止めてからアンインストールしなければシステムが不安定になる恐れがあります。
       疑問点などあればパッケージの作者へ連絡してください。]]></key>
-    <key alias="packageUpgradeDownload">リポジトリからアップデートをダウンロード</key>
-    <key alias="packageUpgradeHeader">パッケージのアップグレード</key>
-    <key alias="packageUpgradeInstructions">更新の手順</key>
-    <key alias="packageUpgradeText"> このパッケージの更新があります。Umbracoのパッケージリポジトリから直接ダウンロードできます。</key>
     <key alias="packageVersion">パッケージのバージョン</key>
-    <key alias="packageVersionHistory">パッケージのバージョン履歴</key>
-    <key alias="viewPackageWebsite">パッケージのウェブサイトを見る</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">完全な書式を含んだまま貼り付け (非推奨)</key>

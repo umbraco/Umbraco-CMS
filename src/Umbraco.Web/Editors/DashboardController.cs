@@ -38,8 +38,8 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
             _dashboards = dashboards;
         }
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
-            var content = ApplicationCache.RuntimeCache.GetCacheItem<JObject>(key);
+            var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);
             var result = new JObject();
             if (content != null)
             {
@@ -75,14 +75,14 @@ namespace Umbraco.Web.Editors
                     content = JObject.Parse(json);
                     result = content;
 
-                    ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
+                    AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {
                     Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from '{Url}'", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
-                    ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
+                    AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
                 }
             }
 
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Editors
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umbraco-dynamic-dashboard-css-" + section;
 
-            var content = ApplicationCache.RuntimeCache.GetCacheItem<string>(key);
+            var content = AppCaches.RuntimeCache.GetCacheItem<string>(key);
             var result = string.Empty;
 
             if (content != null)
@@ -113,14 +113,14 @@ namespace Umbraco.Web.Editors
                     result = content;
 
                     //save server content for 30 mins
-                    ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
+                    AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {
                     Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from '{Url}'", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
-                    ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
+                    AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
                 }
             }
 

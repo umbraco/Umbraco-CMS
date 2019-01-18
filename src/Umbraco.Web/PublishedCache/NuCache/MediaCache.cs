@@ -13,12 +13,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
-        private readonly ICacheProvider _snapshotCache;
-        private readonly ICacheProvider _elementsCache;
+        private readonly IAppCache _snapshotCache;
+        private readonly IAppCache _elementsCache;
 
         #region Constructors
 
-        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache)
+        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache)
             : base(previewDefault)
         {
             _snapshot = snapshot;
@@ -63,7 +63,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return GetAtRootNoCache();
 
             // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>)cache.GetCacheItem(
+            return (IEnumerable<IPublishedContent>)cache.Get(
                 CacheKeys.MediaCacheRoots(false), // ignore preview, only 1 key!
                 () => GetAtRootNoCache().ToArray());
         }

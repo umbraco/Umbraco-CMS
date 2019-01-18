@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services.Changes
 {
-    internal class ContentTypeChange<TItem>
+    public class ContentTypeChange<TItem>
         where TItem : class, IContentTypeComposition
     {
         public ContentTypeChange(TItem item, ContentTypeChangeTypes changeTypes)

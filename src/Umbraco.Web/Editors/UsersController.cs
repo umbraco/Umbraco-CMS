@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -60,17 +60,17 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(staticCache));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Editors
                     Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache));
         }
 
         /// <summary>

@@ -14,13 +14,13 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Controllers;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
-using Umbraco.Web.WebServices;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null, true))
+                                controller => controller.GetApplicationTrees(null, null, null))
                         },
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -207,6 +207,10 @@ namespace Umbraco.Web.Editors
                         {
                             "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
                                 controller => controller.Fetch(string.Empty))
+                        },
+                        {
+                            "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
+                                controller => controller.GetCreatedPackages())
                         },
                         {
                             "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
@@ -404,7 +408,7 @@ namespace Umbraco.Web.Editors
                     let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
                     select new Dictionary<string, string>
                 {
-                    {"alias", treeAttr.Alias}, {"packageFolder", pluginAttr.AreaName}
+                    {"alias", treeAttr.TreeAlias}, {"packageFolder", pluginAttr.AreaName}
                 }).ToArray();
 
         }

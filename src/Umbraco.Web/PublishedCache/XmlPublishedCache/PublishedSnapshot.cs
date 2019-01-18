@@ -38,10 +38,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public IDomainCache Domains { get; }
 
         /// <inheritdoc />
-        public ICacheProvider SnapshotCache => null;
+        public IAppCache SnapshotCache => null;
 
         /// <inheritdoc />
-        public ICacheProvider ElementsCache => null;
+        public IAppCache ElementsCache => null;
 
         /// <inheritdoc />
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)

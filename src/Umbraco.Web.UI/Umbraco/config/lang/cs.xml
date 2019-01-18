@@ -617,14 +617,12 @@
          a výběrem balíčku. Balíčky umbraco mají obvykle přípony ".umb" nebo ".zip".
       ]]></key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration">Ukázka</key>
     <key alias="packageDocumentation">Dokumentace</key>
     <key alias="packageMetaData">Meta data balíčku</key>
     <key alias="packageName">Název balíčku</key>
     <key alias="packageNoItemsHeader">Balíček neobsahuje žádné položky</key>
     <key alias="packageNoItemsText"><![CDATA[Tento balíček neobsahuje žádné položky k odinstalování.<br/><br/>
       Můžete jej ze systému bezpečně odstranit kliknutím na "odebrat balíček" níže.]]></key>
-    <key alias="packageNoUpgrades">Žádné aktualizace nejsou dostupné</key>
     <key alias="packageOptions">Možnosti balíčku</key>
     <key alias="packageReadme">Čti mě balíčku</key>
     <key alias="packageRepository">Úložiště balíčku</key>
@@ -635,13 +633,7 @@
     <key alias="packageUninstallText"><![CDATA[Níže můžete zrušit zaškrtnutí položek, které si nepřejete nyní odebrat. Jakmile kliknete na "potvrdit odinstalování", všechny zaškrtnuté položky budou odebrány.<br />
       <span style="color: Red; font-weight: bold;">Upozornění:</span> všechny dokumenty, media atd. závislé na položkách, které odstraníte, přestanou pracovat a mohou vést k nestabilitě systému,
       takže odinstalovávejte opatrně. Jste-li na pochybách, kontaktujte autora balíčku.]]></key>
-    <key alias="packageUpgradeDownload">Stáhnout aktualizaci z úložiště</key>
-    <key alias="packageUpgradeHeader">Balíček s aktualizací</key>
-    <key alias="packageUpgradeInstructions">Pokyny pro aktualizaci</key>
-    <key alias="packageUpgradeText"> Pro tento balíček je dostupná aktualizace. Můžete si ji stáhnout přímo z úložiště balíčků umbraco.</key>
     <key alias="packageVersion">Verze balíčku</key>
-    <key alias="packageVersionHistory">Historie verzí balíčku</key>
-    <key alias="viewPackageWebsite">Zobrazit web balíčku</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Vložit s úplným formatováním (nedoporučeno)</key>
