@@ -354,6 +354,7 @@
     <key alias="insertlink">Indsæt link</key>
     <key alias="insertMacro">Indsæt makro</key>
     <key alias="inserttable">Indsæt tabel</key>
+    <key alias="languagedeletewarning">Dette vil slette sproget</key>
     <key alias="lastEdited">Sidst redigeret</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internt link:</key>
@@ -407,6 +408,7 @@
     <key alias="account">konto</key>
     <key alias="selectEditor">Vælg editor</key>
     <key alias="selectSnippet">Vælg snippet</key>
+    <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -1214,6 +1216,18 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberCanEdit">Medlem kan redigere</key>
     <key alias="showOnMemberProfile">Vis på medlemsprofil</key>
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
+  </area>
+  <area alias="languages">
+      <key alias="addLanguage">Tilføj sprog</key>
+      <key alias="mandatoryLanguage">Påkrævet sprog</key>
+      <key alias="mandatoryLanguageHelp">Egenskaber på dette sprog skal være udfyldt før noden kan blive udgivet.</key>
+      <key alias="defaultLanguage">Standard sprog</key>
+      <key alias="defaultLanguageHelp">Et Umbraco site kan kun have et standard sprog.</key>
+      <key alias="changingDefaultLanguageWarning">Ved at skifte standardsprog kan resultere i standard indhold mangler.</key>
+      <key alias="fallsbackToLabel">Fallsback til</key>
+      <key alias="noFallbackLanguageOption">Ingen fallback sprog</key>
+      <key alias="fallbackLanguageDescription">For at tillade flersproget indhold til at falde tilbage på et andet sprog, hvis det ikke er tilgængelig i det anmodet sprog, vælg det her.</key>
+      <key alias="fallbackLanguage">Fallback sprog</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>

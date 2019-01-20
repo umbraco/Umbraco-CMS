@@ -2,43 +2,41 @@
 
     <umb-editor-view footer="false">
 
-        <umb-editor-header
-            name="vm.page.name"
-            name-locked="true"
-            hide-icon="true"
-            hide-description="true"
-            hide-alias="true">
+        <umb-editor-header name="vm.page.name"
+                           name-locked="true"
+                           hide-icon="true"
+                           hide-description="true"
+                           hide-alias="true">
         </umb-editor-header>
 
         <umb-editor-container>
-            
+
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <umb-editor-sub-header>
 
                 <umb-editor-sub-header-content-left>
-                    <umb-button
-                        button-style="success"
-                        type="button" 
-                        action="vm.addLanguage()"
-                        label-key="languages_addLanguage">
+                    <umb-button button-style="success"
+                                type="button"
+                                action="vm.addLanguage()"
+                                label-key="languages_addLanguage">
                     </umb-button>
                 </umb-editor-sub-header-content-left>
 
             </umb-editor-sub-header>
-            
+
             <table class="table table-hover" ng-if="!vm.loading">
                 <thead>
                     <tr>
-                        <th>Language</th>
+                        <th><localize key="general_language">Language</localize></th>
                         <th>ISO</th>
-                        <th>Default</th>
-                        <th>Mandatory</th>
+                        <th><localize key="general_default">Default</localize></th>
+                        <th><localize key="general_mandatory">Mandatory</localize></th>
                         <th>Fallback</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="language in vm.languages" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
+                    <tr ng-repeat="language in vm.languages track by language.id" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
                         <td>
                             <i class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></i>
                             <span ng-class="{'bold': language.isDefault}">{{ language.name }}</span>
@@ -47,17 +45,15 @@
                             <span>{{ language.culture }}</span>
                         </td>
                         <td>
-                            <umb-checkmark
-                                ng-if="language.isDefault"
-                                checked="language.isDefault"
-                                size="xs">
+                            <umb-checkmark ng-if="language.isDefault"
+                                           checked="language.isDefault"
+                                           size="xs">
                             </umb-checkmark>
                         </td>
                         <td>
-                            <umb-checkmark
-                                ng-if="language.isMandatory"
-                                checked="language.isMandatory"
-                                size="xs">
+                            <umb-checkmark ng-if="language.isMandatory"
+                                           checked="language.isMandatory"
+                                           size="xs">
                             </umb-checkmark>
                         </td>
                         <td>
@@ -65,14 +61,13 @@
                             <span ng-if="!language.fallbackLanguageId">(none)</span>
                         </td>
                         <td style="text-align: right;">
-                            <umb-button
-                                ng-if="!language.isDefault"
-                                type="button"
-                                size="xxs"
-                                button-style="danger"
-                                state="language.deleteButtonState"
-                                action="vm.deleteLanguage(language, $event)"
-                                label-key="general_delete">
+                            <umb-button ng-if="!language.isDefault"
+                                        type="button"
+                                        size="xxs"
+                                        button-style="danger"
+                                        state="language.deleteButtonState"
+                                        action="vm.deleteLanguage(language, $event)"
+                                        label-key="general_delete">
                             </umb-button>
                         </td>
                     </tr>
