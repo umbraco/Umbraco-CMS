@@ -822,6 +822,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="installedPackages">Installeret pakker</key>
     <key alias="installLocal">Installér lokal</key>
     <key alias="installFinish">Afslut</key>
+    <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
     <key alias="noPackagesCreated">Der er ikke blevet oprettet nogle pakker endnu</key>
     <key alias="noPackages">Du har ingen pakker installeret</key>
     <key alias="noPackagesDescription"><![CDATA[Du har ikke nogen pakker installeret. Du kan enten installere en lokal pakke ved at vælge den fra din computer eller gennemse de tilgængelige pakker ved hjælp af ikonet <strong>'Pakker'</strong> øverst til højre på din skærm]]></key>
