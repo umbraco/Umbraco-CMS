@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EditController($scope, $location, $routeParams, umbRequestHelper, entityResource, packageResource, editorService, formHelper) {
+    function EditController($scope, $location, $routeParams, umbRequestHelper, entityResource, packageResource, editorService, formHelper, localizationService) {
 
         const vm = this;
 
@@ -23,18 +23,23 @@
         vm.removePackageView = removePackageView;
         vm.downloadFile = downloadFile;
 
+        vm.buttonLabel = "";
+
         const packageId = $routeParams.id;
         const create = $routeParams.create;
 
         function onInit() {
 
-            if(create) {
+            if (create) {
                 //pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
                     vm.package = scaffold;
                     vm.loading = false;
                 });
-                vm.buttonLabel = "Create";
+
+                localizationService.localize("general_create").then(function(value) {
+                    vm.buttonLabel = value;
+                });
             } else {
                 // load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
@@ -49,7 +54,10 @@
                     }
 
                 });
-                vm.buttonLabel = "Save";
+
+                localizationService.localize("buttons_save").then(function (value) {
+                    vm.buttonLabel = value;
+                });
             }
 
             // get all doc types

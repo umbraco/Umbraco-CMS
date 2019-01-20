@@ -606,7 +606,7 @@
     <key alias="hide">Hide</key>
     <key alias="history">History</key>
     <key alias="icon">Icon</key>
-        <key alias="id">Id</key>
+    <key alias="id">Id</key>
     <key alias="import">Import</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -657,7 +657,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
+    <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -1075,6 +1075,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notifications">Notifications</key>
   </area>
   <area alias="packager">
+    <key alias="created">Created</key>
+    <key alias="createPackage">Create package</key>
     <key alias="chooseLocalPackageText"><![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
@@ -1089,8 +1091,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
     <key alias="packageInstall">Install package</key>
-    <key alias="installFinish">Finish</key>
+    <key alias="installed">Installed</key>
     <key alias="installedPackages">Installed packages</key>
+    <key alias="installLocal">Install local</key>
+    <key alias="installFinish">Finish</key>
+    <key alias="noConfigurationView">This package has no configuration view</key>
+    <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
     <key alias="packageSearch">Search for packages</key>
@@ -1239,13 +1245,13 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="sections">
     <key alias="content">Content</key>
-    <key alias="packages">Packages</key>
+    <key alias="forms">Forms</key>
     <key alias="media">Media</key>
     <key alias="member">Members</key>
+    <key alias="packages">Packages</key>
     <key alias="settings">Settings</key>
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
-    <key alias="forms">Forms</key>
   </area>
   <area alias="help">
     <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
