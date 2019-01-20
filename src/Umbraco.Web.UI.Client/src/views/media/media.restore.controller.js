@@ -85,7 +85,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
             $scope.miniListView = node;
         }
 
-        relationResource.getByChildId($scope.source.id, "relateParentDocumentOnDelete").then(function (data) {
+        relationResource.getByChildId($scope.source.id, "relateParentMediaFolderOnDelete").then(function (data) {
             $scope.loading = false;
 
             if (!data.length) {
