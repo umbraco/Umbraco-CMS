@@ -1055,6 +1055,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
       ]]></key>
+    <key alias="deletewarning">This will delete the package</key>
     <key alias="dropHere">Drop to upload</key>
     <key alias="orClickHereToUpload">or click here to choose package file</key>
     <key alias="uploadPackage">Upload package</key>
