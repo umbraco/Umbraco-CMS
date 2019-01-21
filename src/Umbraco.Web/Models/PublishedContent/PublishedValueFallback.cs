@@ -172,7 +172,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 }
 
                 property = content?.GetProperty(alias);
-                if (property != null && noValueProperty != null)
+                if (property != null && noValueProperty == null)
                 {
                     noValueProperty = property;
                 }

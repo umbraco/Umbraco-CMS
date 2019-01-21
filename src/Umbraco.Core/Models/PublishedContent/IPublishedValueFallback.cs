@@ -117,10 +117,15 @@
         /// <param name="fallback">A fallback strategy.</param>
         /// <param name="defaultValue">An optional default value.</param>
         /// <param name="value">The fallback value.</param>
+        /// <param name="noValueProperty">The property that does not have a value.</param>
         /// <returns>A value indicating whether a fallback value could be provided.</returns>
         /// <remarks>
         /// <para>This method is called whenever getting the property value for the specified alias, culture and
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
+        /// <para>In an <see cref="IPublishedContent"/>, because walking up the tree is possible, the content itself may not even
+        /// have a property with the specified alias, but such a property may exist up in the tree. The <paramref name="noValueProperty"/>
+        /// parameter is used to return a property with no value. That can then be used to invoke a converter and get the
+        /// converter's interpretation of "no value".</para>
         /// </remarks>
         bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value, out IPublishedProperty noValueProperty);
     }
