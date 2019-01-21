@@ -1331,6 +1331,9 @@
     <key alias="smtpMailSettingsConnectionFail">SMTP伺服器 %0% : %1% 無法連接。請確認在Web.config 檔案中 system.net/mailsettings 設定正確。</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[提醒郵件已經設為 <strong>%0%</strong>。]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[提醒郵件仍為預設值<strong>%0%</strong>。]]></key>
+
+    <key alias="tlsHealthCheckSuccess">您的網站設置為使用TLS 1.2或更高版本進行傳出連接。</key>
+    <key alias="tlsHealthCheckWarn">來自您網站的傳出連接通過舊協議提供。您應該考慮將其更新為使用TLS 1.2或更高版本。</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">停止網址追蹤器</key>

@@ -1674,6 +1674,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[E-mail z powiadomieniem został wysłany do <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[E-mail do powiadomień jest nadal ustawiony na domyślną wartość <strong>%0%</strong>.]]></key>
+
+    <key alias="tlsHealthCheckSuccess">Twoja strona internetowa jest skonfigurowana do używania protokołu TLS 1.2 lub nowszego dla połączeń wychodzących.</key>
+    <key alias="tlsHealthCheckWarn">Połączenia wychodzące z Twojej witryny są obsługiwane przez stary protokół. Należy rozważyć zaktualizowanie go do korzystania z TLS w wersji 1.2 lub nowszej.</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Wyłącz śledzenie URL</key>
