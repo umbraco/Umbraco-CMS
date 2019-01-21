@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using LightInject;
+using Umbraco.Core.Composing;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             // fixme - do it differently
-            Container.Register(factory => factory.GetInstance<ServiceContext>().TextService);
+            Composition.Register(factory => factory.GetInstance<ServiceContext>().TextService);
         }
 
         [Test]

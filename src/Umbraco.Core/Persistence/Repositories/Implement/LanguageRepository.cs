@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
 
-        public LanguageRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

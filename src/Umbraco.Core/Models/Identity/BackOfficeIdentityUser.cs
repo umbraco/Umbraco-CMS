@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -66,7 +67,7 @@ namespace Umbraco.Core.Models.Identity
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
-            _culture = UmbracoConfig.For.GlobalSettings().DefaultUILanguage; //fixme inject somehow?
+            _culture = Current.Configs.Global().DefaultUILanguage; //fixme inject somehow?
             _groups = new IReadOnlyUserGroup[0];
             _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += _roles_CollectionChanged;
@@ -83,7 +84,7 @@ namespace Umbraco.Core.Models.Identity
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
-            _culture = UmbracoConfig.For.GlobalSettings().DefaultUILanguage; //fixme inject somehow?
+            _culture = Current.Configs.Global().DefaultUILanguage; //fixme inject somehow?
             _groups = groups.ToArray();
             _roles = new ObservableCollection<IdentityUserRole<string>>(_groups.Select(x => new IdentityUserRole<string>
             {
@@ -442,6 +443,6 @@ namespace Umbraco.Core.Models.Identity
                 groups => groups.GetHashCode());
 
         }
-        
+
     }
 }

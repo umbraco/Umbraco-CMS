@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -18,8 +20,8 @@ namespace Umbraco.Core
     public static class ContentExtensions
     {
         // this ain't pretty
-        private static MediaFileSystem _mediaFileSystem;
-        private static MediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.FileSystems.MediaFileSystem);
+        private static IMediaFileSystem _mediaFileSystem;
+        private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
 
         #region IContent
 
@@ -189,7 +191,21 @@ namespace Umbraco.Core
         private static void SetUploadFile(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             var property = GetProperty(content, propertyTypeAlias);
-            var oldpath = property.GetValue(culture, segment) is string svalue ? MediaFileSystem.GetRelativePath(svalue) : null;
+
+            // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
+            // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
+            string oldpath = null;
+            if (property.GetValue(culture, segment) is string svalue)
+            {
+                if (svalue.DetectIsJson())
+                {
+                    // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
+                    var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
+                    svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
+                }
+                oldpath = MediaFileSystem.GetRelativePath(svalue);
+            }
+
             var filepath = MediaFileSystem.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
             property.SetValue(MediaFileSystem.GetUrl(filepath), culture, segment);
         }
@@ -292,84 +308,45 @@ namespace Umbraco.Core
         /// Creates the full xml representation for the <see cref="IContent"/> object and all of it's descendants
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="packagingService"></param>
+        /// <param name="serializer"></param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        internal static XElement ToDeepXml(this IContent content, IPackagingService packagingService)
+        internal static XElement ToDeepXml(this IContent content, IEntityXmlSerializer serializer)
         {
-            return packagingService.Export(content, true, raiseEvents: false);
-        }
-
-
-        [Obsolete("Use the overload that declares the IPackagingService to use")]
-        public static XElement ToXml(this IContent content)
-        {
-            return Current.Services.PackagingService.Export(content, raiseEvents: false);
+            return serializer.Serialize(content, false, true);
         }
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="packagingService"></param>
+        /// <param name="serializer"></param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IContent content, IPackagingService packagingService)
+        public static XElement ToXml(this IContent content, IEntityXmlSerializer serializer)
         {
-            return packagingService.Export(content, raiseEvents: false);
+            return serializer.Serialize(content, false, false);
         }
-
-        [Obsolete("Use the overload that declares the IPackagingService to use")]
-        public static XElement ToXml(this IMedia media)
-        {
-            return Current.Services.PackagingService.Export(media, raiseEvents: false);
-        }
+        
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="packagingService"></param>
+        /// <param name="serializer"></param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IMedia media, IPackagingService packagingService)
+        public static XElement ToXml(this IMedia media, IEntityXmlSerializer serializer)
         {
-            return packagingService.Export(media, raiseEvents: false);
+            return serializer.Serialize(media);
         }
-
-        /// <summary>
-        /// Creates the full xml representation for the <see cref="IMedia"/> object and all of it's descendants
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to generate xml for</param>
-        /// <param name="packagingService"></param>
-        /// <returns>Xml representation of the passed in <see cref="IMedia"/></returns>
-        internal static XElement ToDeepXml(this IMedia media, IPackagingService packagingService)
-        {
-            return packagingService.Export(media, true, raiseEvents: false);
-        }
-
-
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="packagingService"></param>
-        /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IContent content, IPackagingService packagingService, bool isPreview)
-        {
-            //TODO Do a proper implementation of this
-            //If current IContent is published we should get latest unpublished version
-            return content.ToXml(packagingService);
-        }
-
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IMember"/> object
         /// </summary>
         /// <param name="member"><see cref="IMember"/> to generate xml for</param>
-        /// <param name="packagingService"></param>
+        /// <param name="serializer"></param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IMember member, IPackagingService packagingService)
+        public static XElement ToXml(this IMember member, IEntityXmlSerializer serializer)
         {
-            return ((PackagingService)(packagingService)).Export(member);
+            return serializer.Serialize(member);
         }
         #endregion
 

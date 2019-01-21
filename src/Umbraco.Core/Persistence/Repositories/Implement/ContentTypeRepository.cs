@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
+        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, ITemplateRepository templateRepository)
             : base(scopeAccessor, cache, logger)
         {
             _templateRepository = templateRepository;

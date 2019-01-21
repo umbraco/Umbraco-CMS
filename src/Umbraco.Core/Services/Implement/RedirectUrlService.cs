@@ -19,15 +19,15 @@ namespace Umbraco.Core.Services.Implement
             _redirectUrlRepository = redirectUrlRepository;
         }
 
-        public void Register(string url, Guid contentKey)
+        public void Register(string url, Guid contentKey, string culture = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var redir = _redirectUrlRepository.Get(url, contentKey);
+                var redir = _redirectUrlRepository.Get(url, contentKey, culture);
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
-                    redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey };
+                    redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey, Culture = culture};
                 _redirectUrlRepository.Save(redir);
                 scope.Complete();
             }

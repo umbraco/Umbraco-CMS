@@ -13,6 +13,7 @@ namespace Umbraco.Tests.Scheduling
 {
     [TestFixture]
     [Timeout(30000)]
+    [Category("Slow")]
     public class BackgroundTaskRunnerTests
     {
         private ILogger _logger;

@@ -15,8 +15,8 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="PayloadCacheRefresherBase{TInstanceType, TPayload}"/>.
         /// </summary>
-        /// <param name="cacheHelper">A cache helper.</param>
-        protected PayloadCacheRefresherBase(CacheHelper cacheHelper) : base(cacheHelper)
+        /// <param name="appCaches">A cache helper.</param>
+        protected PayloadCacheRefresherBase(AppCaches appCaches) : base(appCaches)
         { }
 
         #region Json

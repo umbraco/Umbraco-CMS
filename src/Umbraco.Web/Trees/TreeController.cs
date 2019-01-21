@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
@@ -10,32 +16,53 @@ namespace Umbraco.Web.Trees
     public abstract class TreeController : TreeControllerBase
     {
         private TreeAttribute _attribute;
-        private string _rootNodeDisplayName;
+
+        protected TreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        {
+            Initialize();
+        }
 
         protected TreeController()
         {
             Initialize();
         }
 
-        /// <summary>
-        /// The name to display on the root node
-        /// </summary>
-        public override string RootNodeDisplayName
-            => _rootNodeDisplayName
-                    ?? (_rootNodeDisplayName = Services.ApplicationTreeService.GetByAlias(_attribute.Alias)
-                            ?.GetRootNodeDisplayName(Services.TextService));
+        /// <inheritdoc />
+        public override string RootNodeDisplayName => Tree.GetRootNodeDisplayName(this, Services.TextService);
 
-        /// <summary>
-        /// Gets the current tree alias from the attribute assigned to it.
-        /// </summary>
-        public override string TreeAlias
-        {
-            get { return _attribute.Alias; }
-        }
+        /// <inheritdoc />
+        public override string TreeAlias => _attribute.TreeAlias;
+        /// <inheritdoc />
+        public override string TreeTitle => _attribute.TreeTitle;
+        /// <inheritdoc />
+        public override string ApplicationAlias => _attribute.ApplicationAlias;
+        /// <inheritdoc />
+        public override int SortOrder => _attribute.SortOrder;
+        /// <inheritdoc />
+        public override bool IsSingleNodeTree => _attribute.IsSingleNodeTree;
 
         private void Initialize()
         {
-            _attribute = GetType().GetTreeAttribute();
+            _attribute = GetTreeAttribute();
+        }
+
+        private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
+
+        private TreeAttribute GetTreeAttribute()
+        {
+            return TreeAttributeCache.GetOrAdd(GetType(), type =>
+            {
+                //Locate the tree attribute
+                var treeAttributes = type
+                    .GetCustomAttributes<TreeAttribute>(false)
+                    .ToArray();
+
+                if (treeAttributes.Length == 0)
+                    throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+
+                //assign the properties of this object to those of the metadata attribute
+                return treeAttributes[0];
+            });
         }
     }
 }

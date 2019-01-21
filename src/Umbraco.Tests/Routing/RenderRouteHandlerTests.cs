@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
@@ -13,11 +13,12 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -47,17 +48,8 @@ namespace Umbraco.Tests.Routing
                 : base(umbracoApplication)
             { }
 
-            public override void Boot(ServiceContainer container)
-            {
-                // do it before anything else - this is the only place where it's possible
-                var logger = Mock.Of<ILogger>();
-                container.RegisterInstance<ILogger>(logger);
-                var profiler = Mock.Of<IProfiler>();
-                container.RegisterInstance<IProfiler>(profiler);
-                container.RegisterInstance<ProfilingLogger>(new ProfilingLogger(logger, profiler));
-
-                base.Boot(container);
-            }
+            protected override ILogger GetLogger() => Mock.Of<ILogger>();
+            protected override IProfiler GetProfiler() => Mock.Of<IProfiler>();
         }
 
         protected override void Compose()
@@ -67,13 +59,13 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Current.TypeLoader.GetSurfaceControllers());
-            Container.RegisterInstance(surfaceControllerTypes);
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
+            Composition.RegisterUnique(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Current.TypeLoader.GetUmbracoApiControllers());
-            Container.RegisterInstance(umbracoApiControllerTypes);
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
+            Composition.RegisterUnique(umbracoApiControllerTypes);
 
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
         }
 
         public override void TearDown()
@@ -181,6 +173,11 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
+            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+                : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
+            {
+            }
+
             public ActionResult HomePage(ContentModel model)
             {
                 return View();

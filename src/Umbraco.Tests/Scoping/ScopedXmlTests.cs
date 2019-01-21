@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Xml;
 using Moq;
 using NUnit.Framework;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -34,10 +34,16 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // fixme - and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
+        }
+
+        protected override void ComposeSettings()
+        {
+            Composition.Configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
+            Composition.Configs.Add(SettingsForTests.GenerateMockGlobalSettings);
         }
 
         [TearDown]
@@ -65,7 +71,7 @@ namespace Umbraco.Tests.Scoping
         //  xmlStore.Xml - the actual main xml document
         //  publishedContentCache.GetXml() - the captured xml
 
-        private static XmlStore XmlStore => (Current.Container.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
+        private static XmlStore XmlStore => (Current.Factory.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
         private static XmlDocument XmlMaster => XmlStore.Xml;
         private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
 
@@ -80,10 +86,8 @@ namespace Umbraco.Tests.Scoping
             Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
 
             // settings
-            var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var contentMock = Mock.Get(settings.Content);
+            var contentMock = Mock.Get(Factory.GetInstance<IUmbracoSettingsSection>().Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             // create document type, document
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
@@ -201,9 +205,8 @@ namespace Umbraco.Tests.Scoping
 
             // settings
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var contentMock = Mock.Get(settings.Content);
+            var contentMock = Mock.Get(Factory.GetInstance<IUmbracoSettingsSection>().Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             // create document type
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };

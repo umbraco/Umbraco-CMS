@@ -15,6 +15,11 @@ using System;
 using System.ComponentModel;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
@@ -32,6 +37,11 @@ namespace Umbraco.Web.Editors
     [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
+        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        {
+        }
+
         /// <summary>
         /// Configures this controller with a custom action selector
         /// </summary>
@@ -302,5 +312,7 @@ namespace Umbraco.Web.Editors
                 getContentType: i => Services.MediaTypeService.Get(i),
                 doCopy: (type, i) => Services.MediaTypeService.Copy(type, i));
         }
+
+        
     }
 }

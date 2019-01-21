@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Xml;
-using LightInject;
+using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Composing
 {
@@ -14,18 +19,21 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var container = RegisterFactory.Create();
+            
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
-            container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
+            composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());
+
+            Current.Factory = composition.CreateFactory();
 
             var actions = Current.PackageActions;
             Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there
-            bool hasAction1 = actions.ElementAt(0) is PackageAction1 || actions.ElementAt(1) is PackageAction1;
-            bool hasAction2 = actions.ElementAt(0) is PackageAction2 || actions.ElementAt(1) is PackageAction2;
+            var hasAction1 = actions.ElementAt(0) is PackageAction1 || actions.ElementAt(1) is PackageAction1;
+            var hasAction2 = actions.ElementAt(0) is PackageAction2 || actions.ElementAt(1) is PackageAction2;
             Assert.IsTrue(hasAction1);
             Assert.IsTrue(hasAction2);
         }
@@ -34,7 +42,7 @@ namespace Umbraco.Tests.Composing
 
         public class PackageAction1 : IPackageAction
         {
-            public bool Execute(string packageName, XmlNode xmlData)
+            public bool Execute(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }
@@ -44,7 +52,7 @@ namespace Umbraco.Tests.Composing
                 return "pa1";
             }
 
-            public bool Undo(string packageName, XmlNode xmlData)
+            public bool Undo(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }
@@ -57,7 +65,7 @@ namespace Umbraco.Tests.Composing
 
         public class PackageAction2 : IPackageAction
         {
-            public bool Execute(string packageName, XmlNode xmlData)
+            public bool Execute(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }
@@ -67,7 +75,7 @@ namespace Umbraco.Tests.Composing
                 return "pa2";
             }
 
-            public bool Undo(string packageName, XmlNode xmlData)
+            public bool Undo(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }

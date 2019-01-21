@@ -25,20 +25,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
-        private readonly CacheHelper _cacheHelper;
+        private readonly AppCaches _appCaches;
         private PermissionRepository<IContent> _permissionRepository;
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
 
-        public DocumentRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IContentSection settings)
-            : base(scopeAccessor, cacheHelper, languageRepository, logger)
+        public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IContentSection settings)
+            : base(scopeAccessor, appCaches, languageRepository, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-            _cacheHelper = cacheHelper;
+            _appCaches = appCaches;
             _scopeAccessor = scopeAccessor;
-            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, cacheHelper, logger);
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, appCaches, logger);
             EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeAccessor, _cacheHelper, Logger));
+            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeAccessor, _appCaches, Logger));
 
         #region Repository Base
 
@@ -273,8 +273,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
 
             // ensure that the default template is assigned
-            if (entity.Template == null)
-                entity.Template = entity.ContentType.DefaultTemplate;
+            if (entity.TemplateId.HasValue == false)
+                entity.TemplateId = entity.ContentType.DefaultTemplate?.Id;
 
             // sanitize names
             SanitizeNames(content, publishing);
@@ -352,7 +352,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, content.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out var editedCultures);
+            var propertyDataDtos = PropertyFactory.BuildDtos(content.ContentType.Variations, content.VersionId, content.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out var editedCultures);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -404,7 +404,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishedState == PublishedState.Publishing)
             {
                 content.Published = true;
-                content.PublishTemplate = content.Template;
+                content.PublishTemplateId = content.TemplateId;
                 content.PublisherId = content.WriterId;
                 content.PublishName = content.Name;
                 content.PublishDate = content.UpdateDate;
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishTemplate = null;
+                content.PublishTemplateId = null;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
@@ -527,7 +527,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Execute(deletePropertyDataSql);
 
             // insert property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, publishing ? content.PublishedVersionId : 0, entity.Properties, LanguageRepository, out var edited, out var editedCultures);
+            var propertyDataDtos = PropertyFactory.BuildDtos(content.ContentType.Variations, content.VersionId, publishing ? content.PublishedVersionId : 0,
+                entity.Properties, LanguageRepository, out var edited, out var editedCultures);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -608,7 +609,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishedState == PublishedState.Publishing)
             {
                 content.Published = true;
-                content.PublishTemplate = content.Template;
+                content.PublishTemplateId = content.TemplateId;
                 content.PublisherId = content.WriterId;
                 content.PublishName = content.Name;
                 content.PublishDate = content.UpdateDate;
@@ -618,7 +619,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishTemplate = null;
+                content.PublishTemplateId = null;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
@@ -846,7 +847,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DocumentRepository _outerRepo;
 
-            public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;
@@ -1077,18 +1078,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // assign templates and properties
                 foreach (var temp in temps)
                 {
-                    // complete the item
-                    if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
-                        temp.Content.Template = template;
-                    if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
-                        temp.Content.PublishTemplate = template;
+                    // set the template ID if it matches an existing template
+                    if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
+                        temp.Content.TemplateId = temp.Template1Id;
+                    if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
+                        temp.Content.PublishTemplateId = temp.Template2Id;
 
+                    // set properties
                     if (properties.ContainsKey(temp.VersionId))
                         temp.Content.Properties = properties[temp.VersionId];
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
 
-                    //load in the schedule
+                    // load in the schedule
                     if (schedule.TryGetValue(temp.Content.Id, out var s))
                         temp.Content.ContentSchedule = s;
                 }
@@ -1122,7 +1124,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // get template
                 if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-                    content.Template = _templateRepository.Get(dto.DocumentVersionDto.TemplateId.Value);
+                    content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
                 // get properties - indexed by version id
                 var versionId = dto.DocumentVersionDto.Id;

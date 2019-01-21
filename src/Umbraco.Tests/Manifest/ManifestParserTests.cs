@@ -2,7 +2,6 @@
 using System.Linq;
 using Moq;
 using System.Text;
-using LightInject;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,27 +13,25 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
-using Umbraco.Web.ContentApps;
 
 namespace Umbraco.Tests.Manifest
 {
     [TestFixture]
     public class ManifestParserTests
     {
-
         private ManifestParser _parser;
 
         [SetUp]
         public void Setup()
         {
             Current.Reset();
-            var container = Mock.Of<IServiceContainer>();
-            Current.Container = container;
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
 
-            var serviceContext = new ServiceContext(
+            var serviceContext = ServiceContext.CreatePartial(
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
-            Mock.Get(container)
+            Mock.Get(factory)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
@@ -47,7 +44,7 @@ namespace Umbraco.Tests.Manifest
                 new RequiredValidator(Mock.Of<ILocalizedTextService>()),
                 new RegexValidator(Mock.Of<ILocalizedTextService>(), null)
             };
-            _parser = new ManifestParser(NullCacheProvider.Instance, new ManifestValueValidatorCollection(validators), Mock.Of<ILogger>());
+            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -431,6 +428,22 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/two.html", db1.View);
             Assert.AreEqual(1, db1.Sections.Length);
             Assert.AreEqual("forms", db1.Sections[0]);
+        }
+
+        [Test]
+        public void CanParseManifest_Sections()
+        {
+            const string json = @"{'sections': [
+    { ""alias"": ""content"", ""name"": ""Content"" },
+    { ""alias"": ""hello"", ""name"": ""World"" }
+]}";
+
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Sections.Length);
+            Assert.AreEqual("content", manifest.Sections[0].Alias);
+            Assert.AreEqual("hello", manifest.Sections[1].Alias);
+            Assert.AreEqual("Content", manifest.Sections[0].Name);
+            Assert.AreEqual("World", manifest.Sections[1].Name);
         }
     }
 }

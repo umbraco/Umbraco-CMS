@@ -9,6 +9,7 @@ using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -27,9 +28,9 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            _typeLoader = new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            _typeLoader = new TypeLoader(NoAppCache.Instance, LocalTempStorage.Default, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            foreach (var file in Directory.GetFiles(IOHelper.MapPath("~/App_Data/TEMP/TypesCache")))
+            foreach (var file in Directory.GetFiles(IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "TypesCache")))
                 File.Delete(file);
 
             // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver

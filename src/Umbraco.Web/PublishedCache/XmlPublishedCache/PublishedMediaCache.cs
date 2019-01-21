@@ -17,6 +17,7 @@ using Umbraco.Core.Xml;
 using Umbraco.Examine;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
@@ -37,22 +38,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // method GetExamineManagerSafe().
         //
         private readonly ISearcher _searchProvider;
-        private readonly IIndex _indexProvider;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
+        private readonly IEntityXmlSerializer _entitySerializer;
 
         // must be specified by the ctor
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IAppCache _appCache;
 
-        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
-            _cacheProvider = cacheProvider;
+            _appCache = appCache;
             _xmlStore = xmlStore;
             _contentTypeCache = contentTypeCache;
+            _entitySerializer = entitySerializer;
         }
 
         /// <summary>
@@ -61,18 +63,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="mediaService"></param>
         /// <param name="userService"></param>
         /// <param name="searchProvider"></param>
-        /// <param name="indexProvider"></param>
-        /// <param name="cacheProvider"></param>
+        /// <param name="appCache"></param>
         /// <param name="contentTypeCache"></param>
-        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        /// <param name="entitySerializer"></param>
+        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _searchProvider = searchProvider ?? throw new ArgumentNullException(nameof(searchProvider));
-            _indexProvider = indexProvider ?? throw new ArgumentNullException(nameof(indexProvider));
-            _cacheProvider = cacheProvider;
+            _appCache = appCache;
             _contentTypeCache = contentTypeCache;
+            _entitySerializer = entitySerializer;
         }
 
         static PublishedMediaCache()
@@ -239,9 +241,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                if (eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index))
-                    return index.GetSearcher();
-                throw new InvalidOperationException($"No index found by name {Constants.UmbracoIndexes.InternalIndexName}");
+                return eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
             }
             catch (FileNotFoundException)
             {
@@ -555,14 +555,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return Enumerable.Empty<IPublishedContent>();
             }
 
-            var serialized = EntityXmlSerializer.Serialize(
-                                Current.Services.MediaService,
-                                Current.Services.DataTypeService,
-                                Current.Services.UserService,
-                                Current.Services.LocalizationService,
-                                Current.UrlSegmentProviders,
-                                media,
-                                true);
+            var serialized = _entitySerializer.Serialize(media, true);
 
             var mediaIterator = serialized.CreateNavigator().Select("/");
 
@@ -605,8 +598,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // clear recursive properties cached by XmlPublishedContent.GetProperty
             // assume that nothing else is going to cache IPublishedProperty items (else would need to do ByKeySearch)
             // NOTE all properties cleared when clearing the content cache (see content cache)
-            //_cacheProvider.ClearCacheObjectTypes<IPublishedProperty>();
-            //_cacheProvider.ClearCacheByKeySearch("XmlPublishedCache.PublishedMediaCache:RecursiveProperty-");
+            //_appCache.ClearCacheObjectTypes<IPublishedProperty>();
+            //_appCache.ClearCacheByKeySearch("XmlPublishedCache.PublishedMediaCache:RecursiveProperty-");
         }
 
         #region Content types
@@ -670,7 +663,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 parentId => parentId < 0 ? null : GetUmbracoMedia(parentId),
                 GetChildrenMedia,
                 GetProperty,
-                _cacheProvider,
+                _appCache,
                 _contentTypeCache,
                 cacheValues.XPath, // though, outside of tests, that should be null
                 cacheValues.FromExamine
@@ -683,14 +676,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (_publishedMediaCacheEnabled == false)
                 return func(id);
 
-            var cache = Current.ApplicationCache.RuntimeCache;
+            var cache = Current.AppCaches.RuntimeCache;
             var key = PublishedMediaCacheKey + id;
-            return (CacheValues)cache.GetCacheItem(key, () => func(id), _publishedMediaCacheTimespan);
+            return (CacheValues)cache.Get(key, () => func(id), _publishedMediaCacheTimespan);
         }
 
         internal static void ClearCache(int id)
         {
-            var cache = Current.ApplicationCache.RuntimeCache;
+            var cache = Current.AppCaches.RuntimeCache;
             var sid = id.ToString();
             var key = PublishedMediaCacheKey + sid;
 
@@ -703,11 +696,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             //    cache.ClearCacheItem(PublishedMediaCacheKey + GetValuesValue(exist.Values, "parentID"));
 
             // clear the item
-            cache.ClearCacheItem(key);
+            cache.Clear(key);
 
             // clear all children - in case we moved and their path has changed
             var fid = "/" + sid + "/";
-            cache.ClearCacheObjectTypes<CacheValues>((k, v) =>
+            cache.ClearOfType<CacheValues>((k, v) =>
                 GetValuesValue(v.Values, "path", "__Path").Contains(fid));
         }
 

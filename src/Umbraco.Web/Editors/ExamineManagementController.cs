@@ -1,26 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Web.Http;
 using Examine;
-using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
-using Lucene.Net.Analysis;
-using Lucene.Net.QueryParsers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Search;
 using SearchResult = Umbraco.Web.Models.ContentEditing.SearchResult;
-using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Web.Editors
 {
@@ -29,17 +22,17 @@ namespace Umbraco.Web.Editors
     {
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
-        private readonly IRuntimeCacheProvider _runtimeCacheProvider;
+        private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
 
         public ExamineManagementController(IExamineManager examineManager, ILogger logger,
-            IRuntimeCacheProvider runtimeCacheProvider,
+            AppCaches appCaches,
             IndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;
-            _runtimeCacheProvider = runtimeCacheProvider;
+            _runtimeCache = appCaches.RuntimeCache;
             _indexRebuilder = indexRebuilder;
         }
 
@@ -114,7 +107,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(validate);
 
             var cacheKey = "temp_indexing_op_" + indexName;
-            var found = ApplicationCache.RuntimeCache.GetCacheItem(cacheKey);
+            var found = AppCaches.RuntimeCache.Get(cacheKey);
 
             //if its still there then it's not done
             return found != null
@@ -153,7 +146,7 @@ namespace Umbraco.Web.Editors
 
                 var cacheKey = "temp_indexing_op_" + index.Name;
                 //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-                ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
+                AppCaches.RuntimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
 
                 _indexRebuilder.RebuildIndex(indexName);
 
@@ -269,7 +262,7 @@ namespace Umbraco.Web.Editors
                 >($"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
-            _runtimeCacheProvider.ClearCacheItem(cacheKey);
+            _runtimeCache.Clear(cacheKey);
         }
     }
 }

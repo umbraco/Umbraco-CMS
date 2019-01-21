@@ -1,16 +1,22 @@
-﻿using Umbraco.Web.WebApi.Filters;
+﻿using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
     /// <summary>
-    /// Provides a base class for autorized auto-routed Umbraco API controllers.
+    /// Provides a base class for authorized auto-routed Umbraco API controllers.
     /// </summary>
     /// <remarks>
-    /// This controller will also append a custom header to the response if the user is logged in using forms authentication
-    /// which indicates the seconds remaining before their timeout expires.
+    /// This controller will also append a custom header to the response if the user
+    /// is logged in using forms authentication which indicates the seconds remaining
+    /// before their timeout expires.
     /// </remarks>
     [IsBackOffice]
     [UmbracoUserTimeoutFilter]
@@ -24,6 +30,23 @@ namespace Umbraco.Web.WebApi
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoAuthorizedApiController"/> with auto dependencies.
+        /// </summary>
+        /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
+        protected UmbracoAuthorizedApiController()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoAuthorizedApiController"/> class with all its dependencies.
+        /// </summary>
+        protected UmbracoAuthorizedApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        { }
+
+        /// <summary>
+        /// Gets the user manager.
+        /// </summary>
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
             => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
     }

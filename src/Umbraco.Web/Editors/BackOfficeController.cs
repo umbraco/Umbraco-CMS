@@ -49,7 +49,8 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IRuntimeState runtimeState)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
         {
             _manifestParser = manifestParser;
             _features = features;
@@ -85,7 +86,7 @@ namespace Umbraco.Web.Editors
                     Core.Constants.Security.BackOfficeAuthenticationType,
                     Core.Constants.Security.BackOfficeExternalAuthenticationType);
             }
-            
+
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -191,7 +192,7 @@ namespace Umbraco.Web.Editors
         {
             var initJs = new JsInitialization(_manifestParser);
             var initCss = new CssInitialization(_manifestParser);
-            
+
             var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
             var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
@@ -220,7 +221,7 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? GetAssetList()
-                : ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
+                : AppCaches.RuntimeCache.GetCacheItem<JArray>(
                     "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
                     GetAssetList,
                     new TimeSpan(0, 2, 0));
@@ -232,13 +233,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
-            var gridConfig = UmbracoConfig.For.GridConfig(
-                Logger,
-                ApplicationCache.RuntimeCache,
-                new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
-                new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
-                HttpContext.IsDebuggingEnabled);
-
+            var gridConfig = Current.Configs.Grids();
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
@@ -257,7 +252,7 @@ namespace Umbraco.Web.Editors
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? ServerVariablesParser.Parse(serverVars.GetServerVariables())
-                : ApplicationCache.RuntimeCache.GetCacheItem<string>(
+                : AppCaches.RuntimeCache.GetCacheItem<string>(
                     typeof(BackOfficeController) + "ServerVariables",
                     () => ServerVariablesParser.Parse(serverVars.GetServerVariables()),
                     new TimeSpan(0, 10, 0));
@@ -378,9 +373,9 @@ namespace Umbraco.Web.Editors
             ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
             //Here we can check if the provider associated with the request has been configured to allow
-            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // new users (auto-linked external accounts). This would never be used with public providers such as
             // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
-            // .... not likely! 
+            // .... not likely!
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
@@ -471,7 +466,7 @@ namespace Umbraco.Web.Editors
                     {
                         autoLinkUser.AddRole(userGroup.Alias);
                     }
-                            
+
                     //call the callback if one is assigned
                     if (autoLinkOptions.OnAutoLinking != null)
                     {
@@ -510,7 +505,7 @@ namespace Umbraco.Web.Editors
             }
             return true;
         }
-        
+
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

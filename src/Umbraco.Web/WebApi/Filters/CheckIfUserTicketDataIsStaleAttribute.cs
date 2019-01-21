@@ -76,7 +76,7 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService, UmbracoConfig.For.GlobalSettings());
+                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService, Current.Configs.Global());
                     return culture != null && culture.ToString() != identity.Culture;
                 },
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
@@ -111,10 +111,10 @@ namespace Umbraco.Web.WebApi.Filters
             if (owinCtx)
             {
                 var signInManager = owinCtx.Result.GetBackOfficeSignInManager();
-                
+
                 var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
                 await signInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true, rememberBrowser: false);
-                
+
                 //ensure the remainder of the request has the correct principal set
                 actionContext.Request.SetPrincipalForRequest(owinCtx.Result.Request.User);
 

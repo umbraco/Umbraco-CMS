@@ -5,17 +5,16 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Moq;
-using NUnit.Framework;
 using Umbraco.Core;
+using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
@@ -26,22 +25,15 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests : UmbracoTestBase
     {
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            var config = SettingsForTests.GetDefaultUmbracoSettings();
-            SettingsForTests.ConfigureSettings(config);
-        }
-
         protected override void Compose()
         {
             base.Compose();
 
-            Container.Register(_ => Mock.Of<ILogger>());
-            Container.Register<FileSystems>();
-            Container.Register(_ => Mock.Of<IDataTypeService>());
-            Container.Register(_ => Mock.Of<IContentSection>());
+            Composition.Register(_ => Mock.Of<ILogger>());
+            Composition.ComposeFileSystems();
+
+            Composition.Register(_ => Mock.Of<IDataTypeService>());
+            Composition.Register(_ => Mock.Of<IContentSection>());
         }
 
         [Test]
@@ -51,7 +43,7 @@ namespace Umbraco.Tests.Models
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             const string langFr = "fr-FR";
-            
+
             contentType.Variations = ContentVariation.Culture;
 
             Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //hasn't been changed
@@ -69,7 +61,7 @@ namespace Umbraco.Tests.Models
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
             Assert.IsTrue(content.IsPropertyDirty("CultureInfos"));     //it's true now since we've updated a name
         }
 
@@ -100,7 +92,7 @@ namespace Umbraco.Tests.Models
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
             content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
-            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
             Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //it's true now since we've updated a name
         }
 
@@ -206,7 +198,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(content.Properties, clone.Properties);
         }
 
-        private static ProfilingLogger GetTestProfilingLogger()
+        private static IProfilingLogger GetTestProfilingLogger()
         {
             var logger = new DebugDiagnosticsLogger();
             var profiler = new TestProfiler();
@@ -235,16 +227,13 @@ namespace Umbraco.Tests.Models
             content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             //content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var runtimeCache = new ObjectCacheRuntimeCacheProvider();
-            runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
+            var runtimeCache = new ObjectCacheAppCache();
+            runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();
 
@@ -252,7 +241,7 @@ namespace Umbraco.Tests.Models
             {
                 for (int j = 0; j < 1000; j++)
                 {
-                    var clone = runtimeCache.GetCacheItem(content.Id.ToString(CultureInfo.InvariantCulture));
+                    var clone = runtimeCache.Get(content.Id.ToString(CultureInfo.InvariantCulture));
                 }
             }
 
@@ -297,15 +286,12 @@ namespace Umbraco.Tests.Models
             content.Path = "-1,4,10";
             content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            
+
 
             // Act
             var clone = (Content)content.DeepClone();
@@ -340,8 +326,8 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
-            Assert.AreNotSame(clone.Template, content.Template);
-            Assert.AreEqual(clone.Template, content.Template);
+            Assert.AreNotSame(clone.TemplateId, content.TemplateId);
+            Assert.AreEqual(clone.TemplateId, content.TemplateId);
             Assert.AreEqual(clone.Trashed, content.Trashed);
             Assert.AreEqual(clone.UpdateDate, content.UpdateDate);
             Assert.AreEqual(clone.VersionId, content.VersionId);
@@ -402,7 +388,7 @@ namespace Umbraco.Tests.Models
             content.SetCultureName("Hello", "en-US");
             content.SetCultureName("World", "es-ES");
             content.PublishCulture("en-US");
-            
+
             var i = 200;
             foreach (var property in content.Properties)
             {
@@ -416,16 +402,12 @@ namespace Umbraco.Tests.Models
             content.Level = 3;
             content.Path = "-1,4,10";
             content.SortOrder = 5;
-            content.Template = new Template((string)"Test Template", (string)"testTemplate")
-            {
-                Id = 88
-            };
-            
+            content.TemplateId = 88;
+
             content.Trashed = true;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
-
-            content.Template.UpdateDate = DateTime.Now; //update a child object
+            
             content.ContentType.UpdateDate = DateTime.Now;  //update a child object
 
             // Act
@@ -433,18 +415,18 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.IsTrue(content.WasDirty());
-            Assert.IsTrue(content.WasPropertyDirty("Id"));
-            Assert.IsTrue(content.WasPropertyDirty("CreateDate"));
-            Assert.IsTrue(content.WasPropertyDirty("CreatorId"));
-            Assert.IsTrue(content.WasPropertyDirty("Key"));
-            Assert.IsTrue(content.WasPropertyDirty("Level"));
-            Assert.IsTrue(content.WasPropertyDirty("Path"));
-            Assert.IsTrue(content.WasPropertyDirty("ContentSchedule"));
-            Assert.IsTrue(content.WasPropertyDirty("SortOrder"));
-            Assert.IsTrue(content.WasPropertyDirty("Template"));
-            Assert.IsTrue(content.WasPropertyDirty("Trashed"));
-            Assert.IsTrue(content.WasPropertyDirty("UpdateDate"));
-            Assert.IsTrue(content.WasPropertyDirty("WriterId"));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Id)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreateDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreatorId)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Key)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Level)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Path)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ContentSchedule)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.SortOrder)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.TemplateId)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Trashed)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.UpdateDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.WriterId)));
             foreach (var prop in content.Properties)
             {
                 Assert.IsTrue(prop.WasDirty());
@@ -465,7 +447,6 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
             }
             //verify child objects were reset too
-            Assert.IsTrue(content.Template.WasPropertyDirty("UpdateDate"));
             Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 
@@ -492,10 +473,7 @@ namespace Umbraco.Tests.Models
             content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             //content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;

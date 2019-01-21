@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.ObjectModel;
 using System.Web.Routing;
 using Moq;
 using Umbraco.Core.Models.PublishedContent;
@@ -10,7 +9,8 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
-using LightInject;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -37,12 +37,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreateTypeLoader(IServiceFactory f)
+        protected override TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreateTypeLoader(f);
+            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 
             // this is so the model factory looks into the test assembly
             pluginManager.AssembliesToScan = pluginManager.AssembliesToScan

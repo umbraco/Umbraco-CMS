@@ -1,20 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
-
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -60,7 +56,7 @@ namespace Umbraco.Web.Trees
                 template.Name,
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
                 template.IsMasterTemplate,
-                GetEditorPath(template, queryStrings),
+                null,
                 Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
             )));
 
@@ -121,16 +117,6 @@ namespace Umbraco.Web.Trees
                 Path = template.Path,
                 UpdateDate = template.UpdateDate
             };
-        }
-
-        private string GetEditorPath(ITemplate template, FormDataCollection queryStrings)
-        {
-            //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
-
-            return Services.FileService.DetermineTemplateRenderingEngine(template) == RenderingEngine.WebForms
-                ? "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                  Uri.EscapeDataString("settings/editTemplate.aspx?templateID=" + template.Id)
-                : null;
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

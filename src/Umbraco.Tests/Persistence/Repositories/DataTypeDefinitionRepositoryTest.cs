@@ -6,7 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using LightInject;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
@@ -20,12 +20,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private IDataTypeRepository CreateRepository()
         {
-            return Container.GetInstance<IDataTypeRepository>();
+            return Factory.GetInstance<IDataTypeRepository>();
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
         {
-            return new EntityContainerRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, Constants.ObjectTypes.DataTypeContainer);
+            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
         }
 
         [Test]

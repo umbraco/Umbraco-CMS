@@ -5,7 +5,7 @@ using System.IO;
 namespace Umbraco.Core.IO
 {
     /// <summary>
-    /// Provides methods allowing the manipulation of files within an Umbraco application.
+    /// Provides methods allowing the manipulation of files.
     /// </summary>
     public interface IFileSystem
     {

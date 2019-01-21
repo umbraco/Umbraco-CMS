@@ -25,8 +25,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             public MediaCache MediaCache;
             public MemberCache MemberCache;
             public DomainCache DomainCache;
-            public ICacheProvider SnapshotCache;
-            public ICacheProvider ElementsCache;
+            public IAppCache SnapshotCache;
+            public IAppCache ElementsCache;
 
             public void Dispose()
             {
@@ -48,9 +48,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Caches
 
-        public ICacheProvider SnapshotCache => Elements.SnapshotCache;
+        public IAppCache SnapshotCache => Elements.SnapshotCache;
 
-        public ICacheProvider ElementsCache => Elements.ElementsCache;
+        public IAppCache ElementsCache => Elements.ElementsCache;
 
         #endregion
 

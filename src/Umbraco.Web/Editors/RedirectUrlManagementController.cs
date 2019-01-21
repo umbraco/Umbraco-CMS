@@ -13,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Editors
 {
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IHttpActionResult GetEnableState()
         {
-            var enabled = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableRedirectUrlTracking == false;
+            var enabled = Current.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false;
             var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
@@ -51,12 +52,6 @@ namespace Umbraco.Web.Editors
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
             searchResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
-            //now map the Content/published url
-            foreach (var result in searchResult.SearchResults)
-            {
-                result.DestinationUrl = result.ContentId > 0 ? Umbraco.Url(result.ContentId) : "#";
-            }
-
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;

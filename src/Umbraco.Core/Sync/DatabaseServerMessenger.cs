@@ -33,7 +33,7 @@ namespace Umbraco.Core.Sync
         private readonly IRuntimeState _runtime;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
-        private readonly ProfilingLogger _profilingLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ISqlContext _sqlContext;
         private readonly Lazy<string> _distCacheFilePath;
         private int _lastId = -1;
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, ProfilingLogger proflog, IGlobalSettings globalSettings,
+            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings,
             bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Sync
             _sqlContext = sqlContext;
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
-            Logger = proflog.Logger;
+            Logger = proflog;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
@@ -551,7 +551,7 @@ namespace Umbraco.Core.Sync
                     break;
                 case LocalTempStorage.Default:
                 default:
-                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/DistCache");
+                    var tempFolder = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "DistCache");
                     distCacheFilePath = Path.Combine(tempFolder, fileName);
                     break;
             }

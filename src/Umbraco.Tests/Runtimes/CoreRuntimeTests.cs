@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Web.Hosting;
 using Examine;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -18,13 +22,13 @@ using Umbraco.Web;
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
-    [Ignore("cannot work until we refactor IUmbracoDatabaseFactory vs UmbracoDatabaseFactory")]
     public class CoreRuntimeTests
     {
         [SetUp]
         public void SetUp()
         {
             TestComponent.Reset();
+            Current.Reset();
         }
 
         public void TearDown()
@@ -39,12 +43,28 @@ namespace Umbraco.Tests.Runtimes
             {
                 app.HandleApplicationStart(app, new EventArgs());
 
+                var e = app.Runtime.State.BootFailedException;
+                var m = "";
+                switch (e)
+                {
+                    case null:
+                        m = "";
+                        break;
+                    case BootFailedException bfe when bfe.InnerException != null:
+                        m = "BootFailed: " + bfe.InnerException.GetType() + " " + bfe.InnerException.Message + " " + bfe.InnerException.StackTrace;
+                        break;
+                    default:
+                        m = e.GetType() + " " + e.Message + " " + e.StackTrace;
+                        break;
+                }
+
+                Assert.AreNotEqual(RuntimeLevel.BootFailed, app.Runtime.State.Level, m);
+                Assert.IsTrue(TestComposer.Ctored);
+                Assert.IsTrue(TestComposer.Composed);
                 Assert.IsTrue(TestComponent.Ctored);
-                Assert.IsTrue(TestComponent.Composed);
-                Assert.IsTrue(TestComponent.Initialized1);
-                Assert.IsTrue(TestComponent.Initialized2);
                 Assert.IsNotNull(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<DebugDiagnosticsLogger>(TestComponent.ProfilingLogger.Logger);
+                Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
+                Assert.IsInstanceOf<DebugDiagnosticsLogger>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
 
                 // note: components are NOT disposed after boot
 
@@ -58,40 +78,23 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
+            public IRuntime Runtime { get; private set; }
+
             protected override IRuntime GetRuntime()
             {
-                return new TestRuntime();
+                return Runtime = new TestRuntime();
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            // the application's logger is created by the application
-            // through GetLogger, that custom application can override
-            protected override ILogger GetLogger()
-            {
-                //return Mock.Of<ILogger>();
-                return new DebugDiagnosticsLogger();
-            }
-
-            public override void Compose(ServiceContainer container)
-            {
-                base.Compose(container);
-
-                // the application's profiler and profiling logger are
-                // registered by CoreRuntime.Compose() but can be
-                // overriden afterwards - they haven't been resolved yet
-                container.RegisterSingleton<IProfiler>(_ => new TestProfiler());
-                container.RegisterSingleton(factory => new ProfilingLogger(factory.GetInstance<ILogger>(), factory.GetInstance<IProfiler>()));
-
-                // must override the database factory
-                container.RegisterSingleton(_ => GetDatabaseFactory());
-            }
+            protected override ILogger GetLogger() => new DebugDiagnosticsLogger();
+            protected override IProfiler GetProfiler() => new TestProfiler();
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
-            private static IUmbracoDatabaseFactory GetDatabaseFactory()
+            protected internal override IUmbracoDatabaseFactory GetDatabaseFactory()
             {
                 var mock = new Mock<IUmbracoDatabaseFactory>();
                 mock.Setup(x => x.Configured).Returns(true);
@@ -99,19 +102,51 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
+            protected override Configs GetConfigs()
+            {
+                var configs = new Configs();
+                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+                return configs;
+            }
+
+            // fixme so how the f* should we do it now?
+            /*
             // pretend we have the proper migration
             // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
-            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
             {
                 return true;
             }
+            */
 
-            private MainDom _mainDom;
-
-            public override void Boot(ServiceContainer container)
+            // because we don't even have the core runtime component,
+            // there are a few required stuff that we need to compose
+            public override void Compose(Composition composition)
             {
-                base.Boot(container);
-                _mainDom = container.GetInstance<MainDom>();
+                base.Compose(composition);
+
+                var scopeProvider = Mock.Of<IScopeProvider>();
+                Mock.Get(scopeProvider)
+                    .Setup(x => x.CreateScope(
+                        It.IsAny<IsolationLevel>(),
+                        It.IsAny<RepositoryCacheMode>(),
+                        It.IsAny<IEventDispatcher>(),
+                        It.IsAny<bool?>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<bool>()))
+                    .Returns(Mock.Of<IScope>());
+
+                composition.RegisterUnique(scopeProvider);
+            }
+
+            private IMainDom _mainDom;
+
+            public override IFactory Boot(IRegister container)
+            {
+                var factory = base.Boot(container);
+                _mainDom = factory.GetInstance<IMainDom>();
+                return factory;
             }
 
             public override void Terminate()
@@ -123,63 +158,74 @@ namespace Umbraco.Tests.Runtimes
             // runs with only one single component
             // UmbracoCoreComponent will be force-added too
             // and that's it
-            protected override IEnumerable<Type> GetComponentTypes()
+            protected override IEnumerable<Type> GetComposerTypes(TypeLoader typeLoader)
             {
-                return new[] { typeof(TestComponent) };
+                return new[] { typeof(TestComposer) };
             }
         }
 
 
-        public class TestComponent : UmbracoComponentBase
+        public class TestComposer : IComposer
         {
             // test flags
             public static bool Ctored;
             public static bool Composed;
-            public static bool Initialized1;
-            public static bool Initialized2;
-            public static bool Terminated;
-            public static ProfilingLogger ProfilingLogger;
 
             public static void Reset()
             {
-                Ctored = Composed = Initialized1 = Initialized2 = Terminated = false;
-                ProfilingLogger = null;
+                Ctored = Composed = false;
             }
 
-            public TestComponent()
+            public TestComposer()
             {
                 Ctored = true;
             }
 
-            public override void Compose(Composition composition)
+            public void Compose(Composition composition)
             {
-                base.Compose(composition);
-
-                composition.Container.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
-                composition.Container.RegisterSingleton<IExamineManager, TestExamineManager>();
+                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.RegisterUnique<IExamineManager, TestExamineManager>();
+                composition.Components().Append<TestComponent>();
 
                 Composed = true;
+            }
+        }
+
+        public class TestComponent : IComponent, IDisposable
+        {
+            // test flags
+            public static bool Ctored;
+            public static bool Initialized;
+            public static bool Terminated;
+            public static IProfilingLogger ProfilingLogger;
+
+            public bool Disposed;
+
+            public static void Reset()
+            {
+                Ctored = Initialized = Terminated = false;
+                ProfilingLogger = null;
+            }
+
+            public TestComponent(IProfilingLogger proflog)
+            {
+                Ctored = true;
+                ProfilingLogger = proflog;
             }
 
             public void Initialize()
             {
-                Initialized1 = true;
+                Initialized = true;
             }
 
-            public void Initialize(ILogger logger)
+            public void Terminate()
             {
-                Initialized2 = true;
-            }
-
-            public void Initialize(ProfilingLogger proflog)
-            {
-                ProfilingLogger = proflog;
-            }
-
-            public override void Terminate()
-            {
-                base.Terminate();
                 Terminated = true;
+            }
+
+            public void Dispose()
+            {
+                Disposed = true;
             }
         }
     }

@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             Func<int, IPublishedContent> getParent,
             Func<int, XPathNavigator, IEnumerable<IPublishedContent>> getChildren,
             Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
-            ICacheProvider cacheProvider,
+            IAppCache appCache,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
             bool fromExamine)
@@ -47,12 +47,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _getParent = new Lazy<IPublishedContent>(() => getParent(ParentId));
             _getChildren = new Lazy<IEnumerable<IPublishedContent>>(() => getChildren(Id, nav));
             _getProperty = getProperty;
-            _cacheProvider = cacheProvider;
+            _appCache = appCache;
 
             LoadedFromExamine = fromExamine;
 
             ValidateAndSetProperty(valueDictionary, val => _id = Int32.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
-            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
+            ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key", "__key", "__Key");
             //ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
             ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");
@@ -133,7 +133,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         //private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
         private readonly Lazy<IEnumerable<IPublishedContent>> _getChildren;
         private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IAppCache _appCache;
 
         /// <summary>
         /// Returns 'Media' as the item type
@@ -148,15 +148,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override Guid Key => _key;
 
-        public override int TemplateId => 0;
+        public override int? TemplateId => null;
 
         public override int SortOrder => _sortOrder;
 
         public override string Name => _name;
 
-        public override PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public override PublishedCultureInfo GetCulture(string culture = null) => null;
 
-        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        private static readonly Lazy<Dictionary<string, PublishedCultureInfo>> NoCultures = new Lazy<Dictionary<string, PublishedCultureInfo>>(() => new Dictionary<string, PublishedCultureInfo>());
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => NoCultures.Value;
 
         public override string UrlSegment => _urlName;
 

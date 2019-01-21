@@ -90,7 +90,6 @@ namespace Umbraco.Tests.Misc
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var requestMock = Mock.Get(settings.RequestHandler);
             requestMock.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
-            SettingsForTests.ConfigureSettings(settings);
 
             UriUtility.SetAppDomainAppVirtualPath("/");
 

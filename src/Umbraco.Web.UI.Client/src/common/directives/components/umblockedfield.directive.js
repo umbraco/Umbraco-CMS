@@ -40,6 +40,7 @@ Use this directive to render a value with a lock next to it. When the lock is cl
 @param {boolean=} locked (<code>binding</code>): <Code>true</code> by default. Set to <code>false</code> to unlock the text.
 @param {string=} placeholderText (<code>binding</code>): If ngModel is empty this text will be shown.
 @param {string=} regexValidation (<code>binding</code>): Set a regex expression for validation of the field.
+@param {string} validationPosition (<code>binding</code>): The position of the validation. Set to <code>'left'</code> or <code>'right'</code>.
 @param {string=} serverValidationField (<code>attribute</code>): Set a server validation field.
 **/
 
@@ -70,7 +71,11 @@ Use this directive to render a value with a lock next to it. When the lock is cl
 				// if locked state is not defined as an attr set default state
 				if (scope.placeholderText === undefined || scope.placeholderText === null) {
 					scope.placeholderText = "Enter value...";
-				}
+                }
+
+                if (scope.validationPosition === undefined || scope.validationPosition === null) {
+                    scope.validationPosition = "left";
+                }
 
 			}
 
@@ -93,9 +98,10 @@ Use this directive to render a value with a lock next to it. When the lock is cl
 			templateUrl: 'views/components/umb-locked-field.html',
 			scope: {
 			    ngModel: "=",
-				locked: "=?",
+                locked: "=?",
 				placeholderText: "=?",
-				regexValidation: "=?",
+                regexValidation: "=?",
+                validationPosition: "=?",
 				serverValidationField: "@"
 			},
 			link: link

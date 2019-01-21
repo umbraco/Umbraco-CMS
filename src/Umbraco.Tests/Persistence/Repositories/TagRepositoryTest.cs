@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -946,26 +947,26 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private TagRepository CreateRepository(IScopeProvider provider)
         {
-            return new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
+            return new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
         }
 
         private DocumentRepository CreateContentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
-            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            mediaTypeRepository = new MediaTypeRepository(accessor, DisabledCache, Logger);
-            var repository = new MediaRepository(accessor, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
             return repository;
         }
     }

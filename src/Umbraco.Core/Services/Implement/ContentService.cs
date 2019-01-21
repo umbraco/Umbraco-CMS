@@ -27,13 +27,13 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
 
         public ContentService(IScopeProvider provider, ILogger logger,
-            IEventMessagesFactory eventMessagesFactory, MediaFileSystem mediaFileSystem,
+            IEventMessagesFactory eventMessagesFactory, IMediaFileSystem mediaFileSystem,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
             : base(provider, logger, eventMessagesFactory)
@@ -1552,9 +1552,7 @@ namespace Umbraco.Core.Services.Implement
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args, nameof(Deleted));
 
-                // fixme not going to work, do it differently
-                _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                    (file, e) => Logger.Error<ContentService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
+                // media files deleted by QueuingEventDispatcher
             }
 
             const int pageSize = 500;
@@ -2735,6 +2733,8 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        private static readonly string[] ArrayOfOneNullString = { null };
+
         public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0)
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
@@ -2746,8 +2746,23 @@ namespace Umbraco.Core.Services.Implement
             content.CreatorId = userId;
             content.WriterId = userId;
 
-            foreach (var property in blueprint.Properties)
-                content.SetValue(property.Alias, property.GetValue()); //fixme doesn't take into account variants
+            var now = DateTime.Now;
+            var cultures = blueprint.CultureInfos.Any() ? blueprint.CultureInfos.Select(x=>x.Key) : ArrayOfOneNullString;
+            foreach (var culture in cultures)
+            {
+                foreach (var property in blueprint.Properties)
+                {
+                    content.SetValue(property.Alias, property.GetValue(culture), culture);
+                }
+
+                content.Name = blueprint.Name;
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
+                }
+            }
+
+
 
             return content;
         }

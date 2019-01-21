@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
-using umbraco.cms.businesslogic.packager;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -10,35 +10,30 @@ namespace Umbraco.Web.Install.InstallSteps
         "StarterKitCleanup", 32, "Almost done")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
-        public override InstallSetupResult Execute(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
-            var manifestId = Convert.ToInt32(previousStep.AdditionalData["manifestId"]);
+            var packageId = Convert.ToInt32(previousStep.AdditionalData["packageId"]);
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
 
-            CleanupInstallation(manifestId, packageFile);
+            CleanupInstallation(packageId, packageFile);
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
-        private void CleanupInstallation(int manifestId, string packageFile)
+        private void CleanupInstallation(int packageId, string packageFile)
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new Installer();
-            installer.LoadConfig(packageFile);
-            installer.InstallCleanUp(manifestId, packageFile);
 
-            // library.RefreshContent is obsolete, would need to RefreshAll... snapshot,
-            // but it should be managed automatically by services and caches!
-            //DistributedCache.Instance.RefreshAll...();
+            //fixme: When does the zip file get deleted?
         }
 
         public override bool RequiresExecution(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("manifestId")) == false)
+            if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("packageId")) == false)
             {
                 return false;
             }

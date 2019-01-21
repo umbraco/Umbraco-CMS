@@ -176,7 +176,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                     editorService.close();
 
-                    _.each(model.selectedImages, function (media, i) {
+                    _.each(model.selection, function (media, i) {
                         // if there is no thumbnail, try getting one if the media is not a placeholder item
                         if (!media.thumbnail && media.id && media.metaData) {
                             media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);

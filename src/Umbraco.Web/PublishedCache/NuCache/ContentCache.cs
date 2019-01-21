@@ -21,15 +21,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
-        private readonly ICacheProvider _snapshotCache;
-        private readonly ICacheProvider _elementsCache;
+        private readonly IAppCache _snapshotCache;
+        private readonly IAppCache _elementsCache;
         private readonly DomainHelper _domainHelper;
         private readonly IGlobalSettings _globalSettings;
         private readonly ILocalizationService _localizationService;
 
         #region Constructor
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
+        // fixme ISSUE
+        // after the current snapshot has been resync-ed
+        // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
+        // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
+
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
             : base(previewDefault)
         {
             _snapshot = snapshot;
@@ -254,7 +259,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return GetAtRootNoCache(preview);
 
             // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>)cache.GetCacheItem(
+            return (IEnumerable<IPublishedContent>)cache.Get(
                 CacheKeys.ContentCacheRoots(preview),
                 () => GetAtRootNoCache(preview).ToArray());
         }

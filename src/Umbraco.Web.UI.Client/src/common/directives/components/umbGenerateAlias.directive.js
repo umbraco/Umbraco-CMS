@@ -44,6 +44,7 @@ the directive will use {@link umbraco.directives.directive:umbLockedField umbLoc
 
 @param {string} alias (<code>binding</code>): The model where the alias is bound.
 @param {string} aliasFrom (<code>binding</code>): The model to generate the alias from.
+@param {string} validationPosition (<code>binding</code>): The position of the validation. Set to <code>'left'</code> or <code>'right'</code>.
 @param {boolean=} enableLock (<code>binding</code>): Set to <code>true</code> to add a lock next to the alias from where it can be unlocked and changed.
 **/
 
@@ -57,6 +58,7 @@ angular.module("umbraco.directives")
                 alias: '=',
                 aliasFrom: '=',
                 enableLock: '=?',
+                validationPosition: '=?',
                 serverValidationField: '@'
             },
             link: function (scope, element, attrs, ctrl) {
@@ -86,20 +88,21 @@ angular.module("umbraco.directives")
                 function generateAlias(value) {
 
                   if (generateAliasTimeout) {
-                    $timeout.cancel(generateAliasTimeout);
+                     $timeout.cancel(generateAliasTimeout);
                   }
 
-                  if( value !== undefined && value !== "" && value !== null) {
+                  if (value !== undefined && value !== "" && value !== null) {
 
-                      scope.alias = "";
+                    scope.alias = "";
                     scope.placeholderText = scope.labels.busy;
 
                     generateAliasTimeout = $timeout(function () {
                        updateAlias = true;
                         entityResource.getSafeAlias(value, true).then(function (safeAlias) {
                             if (updateAlias) {
-                              scope.alias = safeAlias.alias;
-                           }
+                                scope.alias = safeAlias.alias;
+                            }
+                            scope.placeholderText = scope.labels.idle;
                       });
                     }, 500);
 
@@ -108,7 +111,6 @@ angular.module("umbraco.directives")
                     scope.alias = "";
                     scope.placeholderText = scope.labels.idle;
                   }
-
                 }
 
                 // if alias gets unlocked - stop watching alias
@@ -119,17 +121,17 @@ angular.module("umbraco.directives")
                 }));
 
                 // validate custom entered alias
-                eventBindings.push(scope.$watch('alias', function(newValue, oldValue){
-
-                  if(scope.alias === "" && bindWatcher === true || scope.alias === null && bindWatcher === true) {
-                    // add watcher
-                    eventBindings.push(scope.$watch('aliasFrom', function(newValue, oldValue) {
-                       if(bindWatcher) {
-                          generateAlias(newValue);
-                       }
-                    }));
-                  }
-
+                eventBindings.push(scope.$watch('alias', function (newValue, oldValue) {
+                    if (scope.alias === "" || scope.alias === null || scope.alias === undefined) {
+                        if (bindWatcher === true) {
+                            // add watcher
+                            eventBindings.push(scope.$watch('aliasFrom', function (newValue, oldValue) {
+                                if (bindWatcher) {
+                                    generateAlias(newValue);
+                                }
+                            }));
+                        }
+                    }
                }));
 
                // clean up

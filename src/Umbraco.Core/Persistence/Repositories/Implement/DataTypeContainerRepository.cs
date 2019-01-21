@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     class DataTypeContainerRepository : EntityContainerRepository, IDataTypeContainerRepository
     {
-        public DataTypeContainerRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public DataTypeContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DataTypeContainer)
         { }
     }

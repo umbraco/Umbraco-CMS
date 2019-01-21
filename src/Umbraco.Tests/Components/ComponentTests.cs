@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Components
 {
@@ -19,309 +18,426 @@ namespace Umbraco.Tests.Components
     public class ComponentTests
     {
         private static readonly List<Type> Composed = new List<Type>();
-        private static readonly List<string> Initialized = new List<string>();
+        private static readonly List<Type> Initialized = new List<Type>();
+        private static readonly List<Type> Terminated = new List<Type>();
 
-        private static IServiceContainer MockContainer(Action<Mock<IServiceContainer>> setup = null)
+        private static IFactory MockFactory(Action<Mock<IFactory>> setup = null)
         {
             // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
-            var testObjects = new TestObjects(null);
+            var mock = new Mock<IFactory>();
+
             var logger = Mock.Of<ILogger>();
-            var s = testObjects.GetDefaultSqlSyntaxProviders(logger);
-            var f = new UmbracoDatabaseFactory(s, logger, new MapperCollection(Enumerable.Empty<BaseMapper>()));
-            var fs = new FileSystems(logger);
+            var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+            var fs = new FileSystems(mock.Object, logger);
             var p = new ScopeProvider(f, fs, logger);
 
-            var mock = new Mock<IServiceContainer>();
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
+
             setup?.Invoke(mock);
             return mock.Object;
+        }
+
+        private static IRegister MockRegister()
+        {
+            return Mock.Of<IRegister>();
+        }
+
+        private static TypeLoader MockTypeLoader()
+        {
+            return new TypeLoader();
+        }
+
+        public static IRuntimeState MockRuntimeState(RuntimeLevel level)
+        {
+            var runtimeState = Mock.Of<IRuntimeState>();
+            Mock.Get(runtimeState).Setup(x => x.Level).Returns(level);
+            return runtimeState;
         }
 
         [Test]
         public void Boot1A()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
+            var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - goes away with RuntimeLevel.Unknown
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Unknown);
-            AssertTypeArray(TypeArray<Component1, Component4, Component2>(), Composed);
+            composers.Compose();
+            AssertTypeArray(TypeArray<Composer1, Composer4, Composer2>(), Composed);
+
+            var factory = MockFactory(m =>
+            {
+                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof(ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                {
+                    if (type == typeof(Composer1)) return new Composer1();
+                    if (type == typeof(Composer5)) return new Composer5();
+                    if (type == typeof(Component5)) return new Component5(new SomeResource());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    throw new NotSupportedException(type.FullName);
+                });
+            });
+
+            var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            builder.RegisterWith(register);
+            var components = builder.CreateCollection(factory);
+
+            Assert.IsEmpty(components);
+            components.Initialize();
+            Assert.IsEmpty(Initialized);
+            components.Terminate();
+            Assert.IsEmpty(Terminated);
         }
 
         [Test]
         public void Boot1B()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - stays with RuntimeLevel.Run
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Run);
-            AssertTypeArray(TypeArray<Component1, Component4, Component2, Component3>(), Composed);
+            components.Compose();
+            AssertTypeArray(TypeArray<Composer1, Composer4, Composer2, Composer3>(), Composed);
         }
 
         [Test]
         public void Boot2()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Composer20, Composer21>();
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 21 is required by 20
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component20, Component21>(), RuntimeLevel.Unknown);
-            AssertTypeArray(TypeArray<Component21, Component20>(), Composed);
+            components.Compose();
+            AssertTypeArray(TypeArray<Composer21, Composer20>(), Composed);
         }
 
         [Test]
         public void Boot3()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Composer22, Composer24, Composer25>();
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // i23 requires 22
             // 24, 25 implement i23
             // 25 required by i23
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component22, Component24, Component25>(), RuntimeLevel.Unknown);
-            AssertTypeArray(TypeArray<Component22, Component25, Component24>(), Composed);
+            components.Compose();
+            AssertTypeArray(TypeArray<Composer22, Composer25, Composer24>(), Composed);
         }
 
         [Test]
         public void BrokenRequire()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
+            var types = TypeArray<Composer1, Composer2, Composer3>();
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             try
             {
                 // 2 is Core and requires 4
                 // 4 is missing
                 // => throw
-                thing.Boot(TypeArray < Component1, Component2, Component3>(), RuntimeLevel.Unknown);
+                components.Compose();
                 Assert.Fail("Expected exception.");
             }
             catch (Exception e)
             {
-                Assert.AreEqual("Broken component dependency: Umbraco.Tests.Components.ComponentTests+Component2 -> Umbraco.Tests.Components.ComponentTests+Component4.", e.Message);
+                Assert.AreEqual("Broken composer dependency: Umbraco.Tests.Components.ComponentTests+Composer2 -> Umbraco.Tests.Components.ComponentTests+Composer4.", e.Message);
             }
         }
 
         [Test]
         public void BrokenRequired()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
+            var types = TypeArray<Composer2, Composer4, Composer13>();
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 13 is required by 1
             // 1 is missing
             // => reorder components accordingly
-            thing.Boot(TypeArray<Component2, Component4, Component13>(), RuntimeLevel.Unknown);
-            AssertTypeArray(TypeArray<Component4, Component2, Component13>(), Composed);
+            components.Compose();
+            AssertTypeArray(TypeArray<Composer4, Composer2, Composer13>(), Composed);
         }
 
         [Test]
         public void Initialize()
         {
-            var container = MockContainer(m =>
+            Composed.Clear();
+            Initialized.Clear();
+            Terminated.Clear();
+
+            var register = MockRegister();
+            var factory = MockFactory(m =>
             {
                 m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                {
+                    if (type == typeof(Composer1)) return new Composer1();
+                    if (type == typeof(Composer5)) return new Composer5();
+                    if (type == typeof(Component5)) return new Component5(new SomeResource());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    throw new NotSupportedException(type.FullName);
+                });
             });
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
-            Composed.Clear();
-            thing.Boot(new[] { typeof(Component1), typeof(Component5) }, RuntimeLevel.Unknown);
-            Assert.AreEqual(2, Composed.Count);
-            Assert.AreEqual(typeof(Component1), Composed[0]);
-            Assert.AreEqual(typeof(Component5), Composed[1]);
-            Assert.AreEqual(1, Initialized.Count);
-            Assert.AreEqual("Umbraco.Tests.Components.ComponentTests+SomeResource", Initialized[0]);
+            var types = new[] { typeof(Composer1), typeof(Composer5) };
+            var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
+
+            Assert.IsEmpty(Composed);
+            composers.Compose();
+            AssertTypeArray(TypeArray<Composer1, Composer5>(), Composed);
+
+            var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            builder.RegisterWith(register);
+            var components = builder.CreateCollection(factory);
+
+            Assert.IsEmpty(Initialized);
+            components.Initialize();
+            AssertTypeArray(TypeArray<Component5>(), Initialized);
+
+            Assert.IsEmpty(Terminated);
+            components.Terminate();
+            AssertTypeArray(TypeArray<Component5>(), Terminated);
         }
 
         [Test]
         public void Requires1()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Composer6), typeof(Composer7), typeof(Composer8) };
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component6), typeof(Component7), typeof(Component8) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(2, Composed.Count);
-            Assert.AreEqual(typeof(Component6), Composed[0]);
-            Assert.AreEqual(typeof(Component8), Composed[1]);
+            Assert.AreEqual(typeof(Composer6), Composed[0]);
+            Assert.AreEqual(typeof(Composer8), Composed[1]);
         }
 
         [Test]
         public void Requires2A()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Composer9), typeof(Composer2), typeof(Composer4) };
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(2, Composed.Count);
-            Assert.AreEqual(typeof(Component4), Composed[0]);
-            Assert.AreEqual(typeof(Component2), Composed[1]);
+            Assert.AreEqual(typeof(Composer4), Composed[0]);
+            Assert.AreEqual(typeof(Composer2), Composed[1]);
             //Assert.AreEqual(typeof(Component9), Composed[2]); -- goes away with RuntimeLevel.Unknown
         }
 
         [Test]
         public void Requires2B()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var factory = MockFactory();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Composer9), typeof(Composer2), typeof(Composer4) };
+            var composers = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Run);
+            composers.Compose();
+            var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+            builder.RegisterWith(register);
+            var components = builder.CreateCollection(factory);
             Assert.AreEqual(3, Composed.Count);
-            Assert.AreEqual(typeof(Component4), Composed[0]);
-            Assert.AreEqual(typeof(Component2), Composed[1]);
-            Assert.AreEqual(typeof(Component9), Composed[2]);
+            Assert.AreEqual(typeof(Composer4), Composed[0]);
+            Assert.AreEqual(typeof(Composer2), Composed[1]);
+            Assert.AreEqual(typeof(Composer9), Composed[2]);
         }
 
         [Test]
         public void WeakDependencies()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Composer10) };
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component10) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(1, Composed.Count);
-            Assert.AreEqual(typeof(Component10), Composed[0]);
+            Assert.AreEqual(typeof(Composer10), Composed[0]);
 
-            thing = new BootLoader(container);
+            types = new[] { typeof(Composer11) };
+            components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component11) }, RuntimeLevel.Unknown));
+            Assert.Throws<Exception>(() => components.Compose());
 
-            thing = new BootLoader(container);
+            types = new[] { typeof(Composer2) };
+            components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component2) }, RuntimeLevel.Unknown));
+            Assert.Throws<Exception>(() => components.Compose());
 
-            thing = new BootLoader(container);
+            types = new[] { typeof(Composer12) };
+            components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component12) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(1, Composed.Count);
-            Assert.AreEqual(typeof(Component12), Composed[0]);
+            Assert.AreEqual(typeof(Composer12), Composed[0]);
         }
 
         [Test]
         public void DisableMissing()
         {
-            var container = MockContainer();
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Composer6), typeof(Composer8) }; // 8 disables 7 which is not in the list
+            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component6), typeof(Component8) }, RuntimeLevel.Unknown); // 8 disables 7 which is not in the list
+            components.Compose();
             Assert.AreEqual(2, Composed.Count);
-            Assert.AreEqual(typeof(Component6), Composed[0]);
-            Assert.AreEqual(typeof(Component8), Composed[1]);
+            Assert.AreEqual(typeof(Composer6), Composed[0]);
+            Assert.AreEqual(typeof(Composer8), Composed[1]);
         }
 
         #region Components
 
-        public class TestComponentBase : UmbracoComponentBase
+        public class TestComposerBase : IComposer
         {
-            public override void Compose(Composition composition)
+            public virtual void Compose(Composition composition)
             {
-                base.Compose(composition);
                 Composed.Add(GetType());
             }
         }
 
-        public class Component1 : TestComponentBase
+        public class Composer1 : TestComposerBase
         { }
 
-        [RequireComponent(typeof(Component4))]
-        public class Component2 : TestComponentBase, IUmbracoCoreComponent
+        [ComposeAfter(typeof(Composer4))]
+        public class Composer2 : TestComposerBase, ICoreComposer
         { }
 
-        public class Component3 : TestComponentBase, IUmbracoUserComponent
+        public class Composer3 : TestComposerBase, IUserComposer
         { }
 
-        public class Component4 : TestComponentBase
+        public class Composer4 : TestComposerBase
         { }
 
-        public class Component5 : TestComponentBase
+        public class Composer5 : TestComposerBase
         {
-            public void Initialize(ISomeResource resource)
+            public override void Compose(Composition composition)
             {
-                Initialized.Add(resource.GetType().FullName);
+                base.Compose(composition);
+                composition.Components().Append<Component5>();
             }
         }
 
-        [DisableComponent]
-        public class Component6 : TestComponentBase
+        public class TestComponentBase : IComponent
+        {
+            public virtual void Initialize()
+            {
+                Initialized.Add(GetType());
+            }
+
+            public virtual void Terminate()
+            {
+                Terminated.Add(GetType());
+            }
+        }
+
+        public class Component5 : TestComponentBase
+        {
+            private readonly ISomeResource _resource;
+
+            public Component5(ISomeResource resource)
+            {
+                _resource = resource;
+            }
+        }
+
+        [Disable]
+        public class Composer6 : TestComposerBase
         { }
 
-        public class Component7 : TestComponentBase
+        public class Composer7 : TestComposerBase
         { }
 
-        [DisableComponent(typeof(Component7))]
-        [EnableComponent(typeof(Component6))]
-        public class Component8 : TestComponentBase
+        [Disable(typeof(Composer7))]
+        [Enable(typeof(Composer6))]
+        public class Composer8 : TestComposerBase
         { }
 
-        public interface ITestComponent : IUmbracoUserComponent
+        public interface ITestComposer : IUserComposer
         { }
 
-        public class Component9 : TestComponentBase, ITestComponent
+        public class Composer9 : TestComposerBase, ITestComposer
         { }
 
-        [RequireComponent(typeof(ITestComponent))]
-        public class Component10 : TestComponentBase
+        [ComposeAfter(typeof(ITestComposer))]
+        public class Composer10 : TestComposerBase
         { }
 
-        [RequireComponent(typeof(ITestComponent), false)]
-        public class Component11 : TestComponentBase
+        [ComposeAfter(typeof(ITestComposer), false)]
+        public class Composer11 : TestComposerBase
         { }
 
-        [RequireComponent(typeof(Component4), true)]
-        public class Component12 : TestComponentBase, IUmbracoCoreComponent
+        [ComposeAfter(typeof(Composer4), true)]
+        public class Composer12 : TestComposerBase, ICoreComposer
         { }
 
-        [RequiredComponent(typeof(Component1))]
-        public class Component13 : TestComponentBase
+        [ComposeBefore(typeof(Composer1))]
+        public class Composer13 : TestComposerBase
         { }
 
         public interface ISomeResource { }
 
         public class SomeResource : ISomeResource { }
 
-        public class Component20 : TestComponentBase
+        public class Composer20 : TestComposerBase
         { }
 
-        [RequiredComponent(typeof(Component20))]
-        public class Component21 : TestComponentBase
+        [ComposeBefore(typeof(Composer20))]
+        public class Composer21 : TestComposerBase
         { }
 
-        public class Component22 : TestComponentBase
+        public class Composer22 : TestComposerBase
         { }
 
-        [RequireComponent(typeof(Component22))]
-        public interface IComponent23 : IUmbracoComponent
+        [ComposeAfter(typeof(Composer22))]
+        public interface IComposer23 : IComposer
         { }
 
-        public class Component24 : TestComponentBase, IComponent23
+        public class Composer24 : TestComposerBase, IComposer23
         { }
 
         // should insert itself between 22 and anything i23
-        [RequiredComponent(typeof(IComponent23))]
+        [ComposeBefore(typeof(IComposer23))]
         //[RequireComponent(typeof(Component22))] - not needed, implement i23
-        public class Component25 : TestComponentBase, IComponent23
+        public class Composer25 : TestComposerBase, IComposer23
         { }
 
         #endregion

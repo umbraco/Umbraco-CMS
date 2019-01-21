@@ -13,7 +13,7 @@ using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services.Implement
 {
-    internal abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
+    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
         where TRepository : IContentTypeRepositoryBase<TItem>
         where TItem : class, IContentTypeComposition
         where TService : class, IContentTypeServiceBase<TItem>

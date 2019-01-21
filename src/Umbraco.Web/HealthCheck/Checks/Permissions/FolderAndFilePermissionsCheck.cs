@@ -65,7 +65,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 { SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
                 { SystemDirectories.Config, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Css, PermissionCheckRequirement.Optional },
-                { SystemDirectories.Masterpages, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Media, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Scripts, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Umbraco, PermissionCheckRequirement.Optional },

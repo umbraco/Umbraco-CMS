@@ -42,6 +42,8 @@ namespace Umbraco.Examine
                 ? ExamineManager.Indexes.Where(x => !x.IndexExists())
                 : ExamineManager.Indexes).ToArray();
 
+            if (indexes.Length == 0) return;
+
             foreach (var index in indexes)
             {
                 index.CreateIndex(); // clear the index

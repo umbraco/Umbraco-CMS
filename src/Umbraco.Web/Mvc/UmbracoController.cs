@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
-using LightInject;
 using Microsoft.Owin;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -29,48 +28,37 @@ namespace Umbraco.Web.Mvc
         // don't need to implement complex constructors + need to refactor them each time we change ours.
         // this means that these properties have a setter.
         // what can go wrong?
+        // fixme clear this comment
 
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        [Inject]
         public virtual IGlobalSettings GlobalSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        [Inject]
         public virtual UmbracoContext UmbracoContext { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database context.
-        /// </summary>
-        [Inject]
-        public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.
         /// </summary>
-        [Inject]
         public ServiceContext Services { get; set; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        [Inject]
-        public CacheHelper ApplicationCache { get; set; }
+        public AppCaches AppCaches { get; set; }
 
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        [Inject]
         public ILogger Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        [Inject]
-        public ProfilingLogger ProfilingLogger { get; set; }
+        public IProfilingLogger ProfilingLogger { get; set; }
 
         protected IOwinContext OwinContext => Request.GetOwinContext();
 
@@ -89,5 +77,27 @@ namespace Umbraco.Web.Mvc
         /// Gets the web security helper.
         /// </summary>
         public virtual WebSecurity Security => UmbracoContext.Security;
+
+        protected UmbracoController()
+            : this(
+                  Current.Factory.GetInstance<IGlobalSettings>(),
+                  Current.Factory.GetInstance<UmbracoContext>(),
+                  Current.Factory.GetInstance<ServiceContext>(),
+                  Current.Factory.GetInstance<AppCaches>(),
+                  Current.Factory.GetInstance<ILogger>(),
+                  Current.Factory.GetInstance<IProfilingLogger>()
+            )
+        {
+        }
+
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+        {
+            GlobalSettings = globalSettings;
+            UmbracoContext = umbracoContext;
+            Services = services;
+            AppCaches = appCaches;
+            Logger = logger;
+            ProfilingLogger = profilingLogger;
+        }
     }
 }

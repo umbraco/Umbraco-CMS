@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -12,22 +11,14 @@ namespace Umbraco.Core.Composing
     /// <typeparam name="TItem">The type of the items.</typeparam>
     public abstract class OrderedCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TBuilder : OrderedCollectionBuilderBase<TBuilder, TCollection, TItem>
-        where TCollection : IBuilderCollection<TItem>
+        where TCollection : class, IBuilderCollection<TItem>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrderedCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
-        /// </summary>
-        /// <param name="container"></param>
-        protected OrderedCollectionBuilderBase(IServiceContainer container)
-            : base (container)
-        { }
-
         protected abstract TBuilder This { get; }
 
         /// <summary>
         /// Clears all types in the collection.
         /// </summary>
-        /// <returns>The buidler.</returns>
+        /// <returns>The builder.</returns>
         public TBuilder Clear()
         {
             Configure(types => types.Clear());
@@ -77,26 +68,6 @@ namespace Umbraco.Core.Composing
             Configure(list =>
             {
                 foreach (var type in types)
-                {
-                    // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
-                    EnsureType(type, "register");
-                    if (list.Contains(type)) list.Remove(type);
-                    list.Add(type);
-                }
-            });
-            return This;
-        }
-
-        /// <summary>
-        ///  Appends types to the collections.
-        /// </summary>
-        /// <param name="types">The types to append.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Append(Func<IServiceFactory, IEnumerable<Type>> types)
-        {
-            Configure(list =>
-            {
-                foreach (var type in types(Container))
                 {
                     // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
                     EnsureType(type, "register");

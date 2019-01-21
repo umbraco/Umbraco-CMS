@@ -10,9 +10,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
@@ -105,7 +106,7 @@ namespace Umbraco.Web
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery => _query ??
-            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache));
+            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache, UmbracoContext.VariationContextAccessor));
 
         /// <summary>
         /// Gets the Umbraco context.
@@ -124,7 +125,7 @@ namespace Umbraco.Web
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
+            ?? (_membershipHelper = Current.Factory.GetInstance<MembershipHelper>());
 
         /// <summary>
         /// Gets the url provider.
@@ -831,7 +832,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Joins any number of int/string/objects into one string and seperates them with the string seperator parameter.
+        /// Joins any number of int/string/objects into one string and separates them with the string separator parameter.
         /// </summary>
         public string Join(string separator, params object[] args)
         {

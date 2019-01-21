@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -104,6 +104,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 ContentKey = redirectUrl.ContentKey,
                 CreateDateUtc = redirectUrl.CreateDateUtc,
                 Url = redirectUrl.Url,
+                Culture = redirectUrl.Culture,
                 UrlHash = redirectUrl.Url.ToSHA1()
             };
         }
@@ -121,6 +122,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 url.ContentId = dto.ContentId;
                 url.ContentKey = dto.ContentKey;
                 url.CreateDateUtc = dto.CreateDateUtc;
+                url.Culture = dto.Culture;
                 url.Url = dto.Url;
                 return url;
             }
@@ -130,10 +132,10 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             }
         }
 
-        public IRedirectUrl Get(string url, Guid contentKey)
+        public IRedirectUrl Get(string url, Guid contentKey, string culture)
         {
             var urlHash = url.ToSHA1();
-            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey);
+            var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey && x.Culture == culture);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }

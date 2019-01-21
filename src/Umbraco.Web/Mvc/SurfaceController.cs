@@ -1,7 +1,11 @@
 ﻿using System;
 using Umbraco.Core;
 using System.Collections.Specialized;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Mvc
 {
@@ -12,6 +16,16 @@ namespace Umbraco.Web.Mvc
     [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
+        // fixme - delete?
+        protected SurfaceController()
+        {
+        }
+
+        protected SurfaceController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger)
+        {
+        }
+
         /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>

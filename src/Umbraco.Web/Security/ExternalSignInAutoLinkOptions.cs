@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.AspNet.Identity.Owin;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
 
@@ -23,7 +25,7 @@ namespace Umbraco.Web.Security
         {
             _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? UmbracoConfig.For.GlobalSettings().DefaultUILanguage;
+            _defaultCulture = defaultCulture ?? Current.Configs.Global().DefaultUILanguage;
         }
 
         private readonly string[] _defaultUserGroups;

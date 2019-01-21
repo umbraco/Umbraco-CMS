@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -60,17 +60,17 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -98,14 +98,14 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).ToSHA1() + "." + ext;
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    Current.FileSystems.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                    Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(staticCache));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -146,11 +146,11 @@ namespace Umbraco.Web.Editors
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (Current.FileSystems.MediaFileSystem.FileExists(filePath))
-                    Current.FileSystems.MediaFileSystem.DeleteFile(filePath);
+                if (Current.MediaFileSystem.FileExists(filePath))
+                    Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache));
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
-            var hideDisabledUsers = UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice;
+            var hideDisabledUsers = Current.Configs.Settings().Security.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -253,7 +253,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail)
+            if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
                 userSave.Username = userSave.Email;
@@ -345,7 +345,7 @@ namespace Umbraco.Web.Editors
             }
 
             IUser user;
-            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail)
+            if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
                 //ensure it's the same
                 userSave.Username = userSave.Email;
@@ -419,7 +419,7 @@ namespace Umbraco.Web.Editors
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
-                    UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail ? "Email" : "Username",
+                    Current.Configs.Settings().Security.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
@@ -539,7 +539,7 @@ namespace Umbraco.Web.Editors
 
             // if the found user has his email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
+            if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
             }
@@ -552,7 +552,7 @@ namespace Umbraco.Web.Editors
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
-                    //need to re-get the user 
+                    //need to re-get the user
                     found = Services.UserService.GetUserById(intId.Result);
                 }
                 else
@@ -712,7 +712,7 @@ namespace Umbraco.Web.Editors
 
             var userName = user.Name;
             Services.UserService.Delete(user, true);
-            
+
             return Request.CreateNotificationSuccessResponse(
                 Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
         }

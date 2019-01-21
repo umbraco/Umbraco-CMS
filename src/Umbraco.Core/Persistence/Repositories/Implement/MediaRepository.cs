@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
-        public MediaRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, ILanguageRepository languageRepository)
+        public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, ILanguageRepository languageRepository)
             : base(scopeAccessor, cache, languageRepository, logger)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
@@ -284,7 +284,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(mediaVersionDto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -341,7 +341,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // replace the property data
             var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == media.VersionId);
             Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -395,7 +395,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly MediaRepository _outerRepo;
 
-            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;

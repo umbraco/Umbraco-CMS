@@ -9,11 +9,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -139,12 +137,10 @@ namespace Umbraco.Web.Trees
 
                 if (menu.Items.Any())
                 {
-                    menu.Items.Last().SeperatorBefore = true;
+                    menu.Items.Last().SeparatorBefore = true;
                 }
 
                 // add default actions for *all* users
-                // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
-                //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
@@ -241,14 +237,16 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
             //fixme - conver this editor to angular
             AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
-
-            menu.Items.Add(new MenuItem("notify", Services.TextService)
+            if (EmailSender.CanSendRequiredEmail)
             {
-                Icon = "megaphone",
-                SeperatorBefore = true,
-                OpensDialog = true
-            });
-
+	            menu.Items.Add(new MenuItem("notify", Services.TextService)
+	            {
+	                Icon = "megaphone",
+	                SeparatorBefore = true,
+	                OpensDialog = true
+	            });
+            }
+			
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;

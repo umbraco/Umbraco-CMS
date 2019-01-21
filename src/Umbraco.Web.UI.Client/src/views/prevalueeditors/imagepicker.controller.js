@@ -7,7 +7,7 @@ function imageFilePickerController($scope) {
             onlyImages: true,
             show: true,
             submit: function (model) {
-                $scope.model.value = model.selectedImages[0].image;
+                $scope.model.value = model.selection[0].image;
                 $scope.mediaPickerOverlay.show = false;
                 $scope.mediaPickerOverlay = null;
             },

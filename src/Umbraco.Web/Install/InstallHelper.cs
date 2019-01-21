@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
-using LightInject;
-using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -15,11 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
@@ -46,31 +39,6 @@ namespace Umbraco.Web.Install
         public InstallationType GetInstallationType()
         {
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
-        }
-
-        internal static void DeleteLegacyInstaller()
-        {
-            if (Directory.Exists(IOHelper.MapPath(SystemDirectories.Install)))
-            {
-                if (Directory.Exists(IOHelper.MapPath("~/app_data/temp/install_backup")))
-                {
-                    //this means the backup already exists with files but there's no files in it, so we'll delete the backup and re-run it
-                    if (Directory.GetFiles(IOHelper.MapPath("~/app_data/temp/install_backup")).Any() == false)
-                    {
-                        Directory.Delete(IOHelper.MapPath("~/app_data/temp/install_backup"), true);
-                        Directory.Move(IOHelper.MapPath(SystemDirectories.Install), IOHelper.MapPath("~/app_data/temp/install_backup"));
-                    }
-                }
-                else
-                {
-                    Directory.Move(IOHelper.MapPath(SystemDirectories.Install), IOHelper.MapPath("~/app_data/temp/install_backup"));
-                }
-            }
-
-            if (Directory.Exists(IOHelper.MapPath("~/Areas/UmbracoInstall")))
-            {
-                Directory.Delete(IOHelper.MapPath("~/Areas/UmbracoInstall"), true);
-            }
         }
 
         internal void InstallStatus(bool isCompleted, string errorMsg)

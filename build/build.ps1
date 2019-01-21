@@ -330,9 +330,6 @@
 
   $ubuild.DefineMethod("PrepareBuild",
   {
-    Write-Host "Clear folders and files"
-    $this.RemoveDirectory("$($this.SolutionRoot)\src\Umbraco.Web.UI.Client\bower_components")
-
     $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
     Write-Host "Create clean web.config"
     $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
@@ -452,7 +449,20 @@
     if ($this.OnError()) { return }
     $this.PrepareAzureGallery()
     if ($this.OnError()) { return }
+    $this.PostPackageHook()
+    if ($this.OnError()) { return }
     Write-Host "Done"
+  })
+
+  $ubuild.DefineMethod("PostPackageHook",
+  {
+    # run hook
+    if ($this.HasMethod("PostPackage"))
+    {
+      Write-Host "Run PostPackage hook"
+      $this.PostPackage();
+      if (-not $?) { throw "Failed to run hook." }
+    }
   })
 
   # ################################################################

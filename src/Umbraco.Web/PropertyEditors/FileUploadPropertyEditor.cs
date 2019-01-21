@@ -15,11 +15,11 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
     public class FileUploadPropertyEditor : DataEditor
     {
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
 
-        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSection)
+        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));

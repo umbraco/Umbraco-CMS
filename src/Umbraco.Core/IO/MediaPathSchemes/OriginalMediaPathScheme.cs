@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO.MediaPathSchemes
@@ -17,18 +18,11 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     public class OriginalMediaPathScheme : IMediaPathScheme
     {
         private readonly object _folderCounterLock = new object();
-        private IFileSystem _filesystem;
         private long _folderCounter;
         private bool _folderCounterInitialized;
 
         /// <inheritdoc />
-        public void Initialize(IFileSystem filesystem)
-        {
-            _filesystem = filesystem;
-        }
-
-        /// <inheritdoc />
-        public string GetFilePath(Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
         {
             string directory;
             if (previous != null)
@@ -37,45 +31,45 @@ namespace Umbraco.Core.IO.MediaPathSchemes
                 // prevpath should be "<int>/<filename>" OR "<int>-<filename>"
                 // and we want to reuse the "<int>" part, so try to find it
 
-                var sep = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories ? "/" : "-";
+                var sep = Current.Configs.Settings().Content.UploadAllowDirectories ? "/" : "-";
                 var pos = previous.IndexOf(sep, StringComparison.Ordinal);
                 var s = pos > 0 ? previous.Substring(0, pos) : null;
 
-                directory = pos > 0 && int.TryParse(s, out _) ? s : GetNextDirectory();
+                directory = pos > 0 && int.TryParse(s, out _) ? s : GetNextDirectory(fileSystem);
             }
             else
             {
-                directory = GetNextDirectory();
+                directory = GetNextDirectory(fileSystem);
             }
 
             if (directory == null)
                 throw new InvalidOperationException("Cannot use a null directory.");
 
-            return UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+            return Current.Configs.Settings().Content.UploadAllowDirectories
                 ? Path.Combine(directory, filename).Replace('\\', '/')
                 : directory + "-" + filename;
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(string filepath)
+        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath)
         {
             return Path.GetDirectoryName(filepath);
         }
 
-        private string GetNextDirectory()
+        private string GetNextDirectory(IFileSystem fileSystem)
         {
-            EnsureFolderCounterIsInitialized();
+            EnsureFolderCounterIsInitialized(fileSystem);
             return Interlocked.Increment(ref _folderCounter).ToString(CultureInfo.InvariantCulture);
         }
 
-        private void EnsureFolderCounterIsInitialized()
+        private void EnsureFolderCounterIsInitialized(IFileSystem fileSystem)
         {
             lock (_folderCounterLock)
             {
                 if (_folderCounterInitialized) return;
 
                 _folderCounter = 1000; // seed
-                var directories = _filesystem.GetDirectories("");
+                var directories = fileSystem.GetDirectories("");
                 foreach (var directory in directories)
                 {
                     if (long.TryParse(directory, out var folderNumber) && folderNumber > _folderCounter)

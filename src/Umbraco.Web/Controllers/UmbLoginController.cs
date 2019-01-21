@@ -2,11 +2,25 @@
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbLoginController : SurfaceController
     {
+        // fixme - delete?
+        public UmbLoginController()
+        {
+        }
+
+        public UmbLoginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger)
+        {
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)

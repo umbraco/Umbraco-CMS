@@ -9,6 +9,7 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Trees;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Manifest
     {
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
-        private readonly IRuntimeCacheProvider _cache;
+        private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
         private readonly ManifestValueValidatorCollection _validators;
 
@@ -29,16 +30,17 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger)
-            : this(cache, validators, "~/App_Plugins", logger)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ILogger logger)
+            : this(appCaches, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, string path, ILogger logger)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
+            _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
             Path = path;
@@ -101,6 +103,7 @@ namespace Umbraco.Core.Manifest
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<ManifestContentAppDefinition>();
             var dashboards = new List<ManifestDashboardDefinition>();
+            var sections = new List<ManifestBackOfficeSection>();
 
             foreach (var manifest in manifests)
             {
@@ -111,6 +114,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
                 if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
+                if (manifest.Sections != null) sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias.ToLowerInvariant()));
             }
 
             return new PackageManifest
@@ -121,7 +125,8 @@ namespace Umbraco.Core.Manifest
                 ParameterEditors = parameterEditors.ToArray(),
                 GridEditors = gridEditors.ToArray(),
                 ContentApps = contentApps.ToArray(),
-                Dashboards = dashboards.ToArray()
+                Dashboards = dashboards.ToArray(),
+                Sections = sections.ToArray()
             };
         }
 

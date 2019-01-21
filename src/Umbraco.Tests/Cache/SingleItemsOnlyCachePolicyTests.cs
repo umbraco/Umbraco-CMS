@@ -28,14 +28,14 @@ namespace Umbraco.Tests.Cache
         public void Get_All_Doesnt_Cache()
         {
             var cached = new List<string>();
-            var cache = new Mock<IRuntimeCacheProvider>();
-            cache.Setup(x => x.InsertCacheItem(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
+            var cache = new Mock<IAppPolicyCache>();
+            cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
                 {
                     cached.Add(cacheKey);
                 });
-            cache.Setup(x => x.GetCacheItemsByKeySearch(It.IsAny<string>())).Returns(new AuditItem[] { });
+            cache.Setup(x => x.SearchByKey(It.IsAny<string>())).Returns(new AuditItem[] { });
 
             var defaultPolicy = new SingleItemsOnlyRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
@@ -52,8 +52,8 @@ namespace Umbraco.Tests.Cache
         public void Caches_Single()
         {
             var isCached = false;
-            var cache = new Mock<IRuntimeCacheProvider>();
-            cache.Setup(x => x.InsertCacheItem(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
+            var cache = new Mock<IAppPolicyCache>();
+            cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
                 It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
                 .Callback(() =>
                 {

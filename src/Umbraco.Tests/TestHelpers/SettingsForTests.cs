@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Configuration;
 using Moq;
 using Umbraco.Core;
@@ -11,22 +10,6 @@ namespace Umbraco.Tests.TestHelpers
 {
     public class SettingsForTests
     {
-        public static void ConfigureSettings(IGlobalSettings settings)
-        {
-            UmbracoConfig.For.SetGlobalConfig(settings);
-        }
-
-        // umbracoSettings
-
-        /// <summary>
-        /// Sets the umbraco settings singleton to the object specified
-        /// </summary>
-        /// <param name="settings"></param>
-        public static void ConfigureSettings(IUmbracoSettingsSection settings)
-        {
-            UmbracoConfig.For.SetUmbracoSettings(settings);
-        }
-
         public static IGlobalSettings GenerateMockGlobalSettings()
         {
             var config = Mock.Of<IGlobalSettings>(
@@ -55,7 +38,6 @@ namespace Umbraco.Tests.TestHelpers
             var content = new Mock<IContentSection>();
             var security = new Mock<ISecuritySection>();
             var requestHandler = new Mock<IRequestHandlerSection>();
-            var templates = new Mock<ITemplatesSection>();
             var logging = new Mock<ILoggingSection>();
             var tasks = new Mock<IScheduledTasksSection>();
             var providers = new Mock<IProvidersSection>();
@@ -64,7 +46,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
-            settings.Setup(x => x.Templates).Returns(templates.Object);
             settings.Setup(x => x.Logging).Returns(logging.Object);
             settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
             settings.Setup(x => x.Providers).Returns(providers.Object);
@@ -78,7 +59,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.RequestHandler.UseDomainPrefixes).Returns(false);
             settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
             settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
-            settings.Setup(x => x.Templates.DefaultRenderingEngine).Returns(RenderingEngine.Mvc);
             settings.Setup(x => x.Providers.DefaultBackOfficeUserProvider).Returns("UsersMembershipProvider");
 
             return settings.Object;
@@ -103,7 +83,7 @@ namespace Umbraco.Tests.TestHelpers
         //    SaveSetting("umbracoConfigurationStatus");
         //}
 
-      
+
 
         // reset & defaults
 
@@ -131,8 +111,6 @@ namespace Umbraco.Tests.TestHelpers
         private static void ResetSettings()
         {
             _defaultGlobalSettings = null;
-            ConfigureSettings(GetDefaultUmbracoSettings());
-            ConfigureSettings(GetDefaultGlobalSettings());
         }
 
         private static IUmbracoSettingsSection _defaultUmbracoSettings;

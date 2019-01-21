@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Web.Hosting;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -15,7 +14,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -26,7 +24,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -43,6 +40,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
         // volatile because we read it with no lock
@@ -79,13 +77,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
+        public PublishedSnapshotService(Options options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
+            IEntityXmlSerializer entitySerializer)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -102,6 +101,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
+
+            // we need an Xml serializer here so that the member cache can support XPath,
+            // for members this is done by navigating the serialized-to-xml member
+            _entitySerializer = entitySerializer;
 
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
@@ -929,7 +932,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Create, Get Published Snapshot
 
         private long _contentGen, _mediaGen, _domainGen;
-        private ICacheProvider _elementsCache;
+        private IAppCache _elementsCache;
 
         public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
@@ -946,18 +949,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // even though the underlying elements may not change (store snapshots)
         public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
-            // note: using ObjectCacheRuntimeCacheProvider for elements and snapshot caches
+            // note: using ObjectCacheAppCache for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
-            // thing - better use a StaticCacheProvider which "just" creates a concurrent
+            // thing - better use a dictionary-based cache which "just" creates a concurrent
             // dictionary
 
-            // for snapshot cache, StaticCacheProvider MAY be OK but it is not thread-safe,
+            // for snapshot cache, DictionaryAppCache MAY be OK but it is not thread-safe,
             // nothing like that...
-            // for elements cache, StaticCacheProvider is a No-No, use something better.
+            // for elements cache, DictionaryAppCache is a No-No, use something better.
+            // ie FastDictionaryAppCache (thread safe and all)
 
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
-            ICacheProvider elementsCache;
+            IAppCache elementsCache;
             lock (_storesLock)
             {
                 var scopeContext = _scopeProvider.Context;
@@ -995,11 +999,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    elementsCache = _elementsCache = new DictionaryCacheProvider();
+                    elementsCache = _elementsCache = new FastDictionaryAppCache();
                 }
             }
 
-            var snapshotCache = new StaticCacheProvider();
+            var snapshotCache = new DictionaryAppCache();
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
@@ -1011,7 +1015,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache

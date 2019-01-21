@@ -13,11 +13,11 @@ namespace Umbraco.Examine
     /// </summary>
     public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder, IPublishedContentValueSetBuilder
     {
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
 
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             IUserService userService,
             bool publishedValuesOnly)
             : base(propertyEditors, publishedValuesOnly)
@@ -42,9 +42,9 @@ namespace Umbraco.Examine
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
                     {"icon", c.ContentType.Icon.Yield()},
-                    {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //Always add invariant published value
+                    {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
-                    {"key", new object[] {c.Key}},
+                    {UmbracoExamineIndex.NodeKeyFieldName, new object[] {c.Key}},
                     {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
                     {"level", new object[] {c.Level}},
                     {"creatorID", new object[] {c.CreatorId}},
@@ -53,20 +53,20 @@ namespace Umbraco.Examine
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
                     {"nodeName", PublishedValuesOnly               //Always add invariant nodeName
                         ? c.PublishName.Yield()
-                        : c.Name.Yield()},            
+                        : c.Name.Yield()},
                     {"urlName", urlValue.Yield()},                  //Always add invariant urlName
                     {"path", c.Path.Yield()},
                     {"nodeType", new object[] {c.ContentType.Id}},
                     {"creatorName", (c.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
-                    {"template", new object[] {c.Template?.Id ?? 0}},
-                    {UmbracoContentIndex.VariesByCultureFieldName, new object[] {0}},
+                    {"templateID", new object[] {c.TemplateId ?? 0}},
+                    {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},
                 };
 
                 if (isVariant)
                 {
-                    values[UmbracoContentIndex.VariesByCultureFieldName] = new object[] { 1 };
+                    values[UmbracoContentIndex.VariesByCultureFieldName] = new object[] { "y" };
 
                     foreach (var culture in c.AvailableCultures)
                     {
@@ -76,7 +76,7 @@ namespace Umbraco.Examine
                         values[$"nodeName_{lowerCulture}"] = PublishedValuesOnly
                             ? c.GetPublishName(culture).Yield()
                             : c.GetCultureName(culture).Yield();
-                        values[$"{UmbracoExamineIndex.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? 1 : 0).Yield<object>();
+                        values[$"{UmbracoExamineIndex.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? "y" : "n").Yield<object>();
                         values[$"updateDate_{lowerCulture}"] = PublishedValuesOnly
                             ? c.GetPublishDate(culture).Yield<object>()
                             : c.GetUpdateDate(culture).Yield<object>();

@@ -14,13 +14,13 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Controllers;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
-using Umbraco.Web.WebServices;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null, true))
+                                controller => controller.GetApplicationTrees(null, null, null))
                         },
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -211,6 +211,10 @@ namespace Umbraco.Web.Editors
                         {
                             "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
                                 controller => controller.Fetch(string.Empty))
+                        },
+                        {
+                            "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
+                                controller => controller.GetCreatedPackages())
                         },
                         {
                             "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
@@ -318,25 +322,25 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
+                            string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
-                        {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
+                        {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
+                        {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                     }
@@ -408,7 +412,7 @@ namespace Umbraco.Web.Editors
                     let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
                     select new Dictionary<string, string>
                 {
-                    {"alias", treeAttr.Alias}, {"packageFolder", pluginAttr.AreaName}
+                    {"alias", treeAttr.TreeAlias}, {"packageFolder", pluginAttr.AreaName}
                 }).ToArray();
 
         }

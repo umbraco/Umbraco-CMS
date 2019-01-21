@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -18,7 +18,14 @@ namespace Umbraco.Web.Mvc
     {
         private PublishedRequest _publishedRequest;
 
+        // fixme - delete?
         public RenderMvcController()
+        {
+            ActionInvoker = new RenderActionInvoker();
+        }
+
+        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
         {
             ActionInvoker = new RenderActionInvoker();
         }

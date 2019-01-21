@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstallLocalController($scope, $route, $location, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService, $q) {
+    function PackagesInstallLocalController($scope, Upload, umbRequestHelper, packageResource, localStorageService, $timeout, $window, localizationService, $q) {
 
         var vm = this;
         vm.state = "upload";
@@ -10,7 +10,7 @@
         vm.installPackage = installPackage;
         vm.installState = {
             status: "",
-            progress:0
+            progress: 0
         };
         vm.installCompleted = false;
         vm.zipFile = {
@@ -27,6 +27,23 @@
             }
         };
 
+        var labels = {};
+        var labelKeys = [
+            "packager_installStateImporting",
+            "packager_installStateInstalling",
+            "packager_installStateRestarting",
+            "packager_installStateComplete",
+            "packager_installStateCompleted"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            labels.installStateImporting = values[0];
+            labels.installStateInstalling = values[1];
+            labels.installStateRestarting = values[2];
+            labels.installStateComplete = values[3];
+            labels.installStateCompleted = values[4];
+        });
+
         function upload(file) {
 
             Upload.upload({
@@ -34,10 +51,10 @@
                 fields: {},
                 file: file
             }).progress(function (evt) {
-                
+
                 // hack: in some browsers the progress event is called after success
                 // this prevents the UI from going back to a uploading state
-                if(vm.zipFile.uploadStatus !== "done" && vm.zipFile.uploadStatus !== "error") {
+                if (vm.zipFile.uploadStatus !== "done" && vm.zipFile.uploadStatus !== "error") {
 
                     // set view state to uploading
                     vm.state = 'uploading';
@@ -110,83 +127,79 @@
         }
 
         function installPackage() {
-            vm.installState.status = localizationService.localize("packager_installStateImporting");
+
+            vm.installState.status = labels.installStateImporting;
             vm.installState.progress = "0";
 
             packageResource
-                .import(vm.localPackage)                
-                .then(function(pack) {
-                        vm.installState.progress = "25";
-                        vm.installState.status = localizationService.localize("packager_installStateInstalling");
-                        return packageResource.installFiles(pack);
-                    },
+                .import(vm.localPackage)
+                .then(function (pack) {
+                    vm.installState.progress = "25";
+                    vm.installState.status = labels.installStateInstalling;
+                    return packageResource.installFiles(pack);
+                },
                     installError)
-                .then(function(pack) {
-                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
-                        vm.installState.progress = "50";
-                        var deferred = $q.defer();
+                .then(function (pack) {
+                    vm.installState.status = labels.installStateRestarting;
+                    vm.installState.progress = "50";
+                    var deferred = $q.defer();
 
-                        //check if the app domain is restarted ever 2 seconds
-                        var count = 0;
-                        function checkRestart() {
-                          $timeout(function () {
+                    //check if the app domain is restarted ever 2 seconds
+                    var count = 0;
+
+                    function checkRestart() {
+                        $timeout(function () {
                             packageResource.checkRestart(pack).then(function (d) {
                                 count++;
                                 //if there is an id it means it's not restarted yet but we'll limit it to only check 10 times
                                 if (d.isRestarting && count < 10) {
-                                  checkRestart();
+                                    checkRestart();
                                 }
                                 else {
-                                  //it's restarted!
-                                  deferred.resolve(d);
+                                    //it's restarted!
+                                    deferred.resolve(d);
                                 }
-                              },
-                              installError);
-                          }, 2000);
-                        }
+                            },
+                                installError);
+                        },
+                            2000);
+                    }
 
-                        checkRestart();
-                        
-                        return deferred.promise;
-                    }, installError)
-                .then(function(pack) {
-                    vm.installState.status = localizationService.localize("packager_installStateRestarting");
-                        vm.installState.progress = "75";
-                        return packageResource.installData(pack);
-                    },
+                    checkRestart();
+
+                    return deferred.promise;
+                },
                     installError)
-                .then(function(pack) {
-                    vm.installState.status = localizationService.localize("packager_installStateComplete");
-                        vm.installState.progress = "100";
-                        return packageResource.cleanUp(pack);
-                    },
+                .then(function (pack) {
+                    vm.installState.status = labels.installStateInstalling;
+                    vm.installState.progress = "75";
+                    return packageResource.installData(pack);
+                },
                     installError)
-                .then(function(result) {
+                .then(function (pack) {
+                    vm.installState.status = labels.installStateComplete;
+                    vm.installState.progress = "100";
+                    return packageResource.cleanUp(pack);
+                },
+                    installError)
+                .then(function (result) {
 
-                        if (result.postInstallationPath) {
-                            //Put the redirect Uri in a cookie so we can use after reloading
-                            localStorageService.set("packageInstallUri", result.postInstallationPath);
-                        }
-                        else {
-                            //set to a constant value so it knows to just go to the installed view
-                            localStorageService.set("packageInstallUri", "installed");
-                        }
+                    //Put the package data in local storage so we can use after reloading
+                    localStorageService.set("packageInstallData", result);
 
-                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
-                        vm.installCompleted = true;
-                        
-                        
+                    vm.installState.status = labels.installStateCompleted;
+                    vm.installCompleted = true;
 
-                    },
-                    installError);
+
+                }, installError);
         }
-        
+
         function installError() {
             //This will return a rejection meaning that the promise change above will stop
             return $q.reject();
         }
 
-        vm.reloadPage = function() {
+        vm.reloadPage = function () {
             //reload on next digest (after cookie)
             $timeout(function () {
                 $window.location.reload(true);

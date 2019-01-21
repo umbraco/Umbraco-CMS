@@ -45,7 +45,6 @@ namespace umbraco
             base.OnPreInit(e);
             using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("PreInit"))
             {
-
                 // handle the infamous umbDebugShowTrace, etc
                 Page.Trace.IsEnabled &= GlobalSettings.DebugMode && string.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]) == false;
 
@@ -63,20 +62,6 @@ namespace umbraco
 
                 //if we are cancelling then return and don't proceed
                 if (args.Cancel) return;
-
-                var template = Current.Services.FileService.GetTemplate(_upage.Template);
-                if (template != null)
-                {
-                    var alias = template.MasterTemplateAlias;
-                    var file = alias.Replace(" ", "") + ".master";
-                    var path = SystemDirectories.Masterpages + "/" + file;
-
-
-                    if (File.Exists(IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path))))
-                        this.MasterPageFile = path;
-                    else
-                        this.MasterPageFile = SystemDirectories.Umbraco + "/masterPages/default.master";
-                }
 
                 // reset the friendly path so it's used by forms, etc.
                 Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
@@ -102,7 +87,6 @@ namespace umbraco
                 // so we just need to ensure that is set
                 var ctx = new ControllerContext(new HttpContextWrapper(Context), new RouteData(), new TempDataController());
                 provider.LoadTempData(ctx);
-
             }
         }
 
@@ -141,7 +125,7 @@ namespace umbraco
                         if (pos > -1)
                         {
                             string htmlBadge =
-                                string.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
+                                string.Format(Current.Configs.Settings().Content.PreviewBadge,
                                               IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                               Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
 

@@ -12,6 +12,8 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class SqlContext : ISqlContext
     {
+        private readonly Lazy<IMapperCollection> _mappers;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlContext"/> class.
         /// </summary>
@@ -20,38 +22,20 @@ namespace Umbraco.Core.Persistence
         /// <param name="databaseType">The database type.</param>
         /// <param name="mappers">The mappers.</param>
         public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
-        {
-            // for tests
-            Mappers = mappers ?? new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>());
-
-            SqlSyntax = sqlSyntax ?? throw new ArgumentNullException(nameof(sqlSyntax));
-            PocoDataFactory = pocoDataFactory ?? throw new ArgumentNullException(nameof(pocoDataFactory));
-            DatabaseType = databaseType ?? throw new ArgumentNullException(nameof(databaseType));
-            Templates = new SqlTemplates(this);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SqlContext"/> class.
-        /// </summary>
-        /// <remarks>Initializes an empty context which must be fully initialized using the
-        /// <see cref="Initialize"/> method; this is done in <see cref="UmbracoDatabaseFactory"/>
-        /// as soon as the factory is fully configured.</remarks>
-        internal SqlContext()
+            : this(sqlSyntax, databaseType, pocoDataFactory, new Lazy<IMapperCollection>(() => mappers ?? new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>())))
         { }
 
         /// <summary>
-        /// Initializes this <see cref="SqlContext"/>.
+        /// Initializes a new instance of the <see cref="SqlContext"/> class.
         /// </summary>
         /// <param name="sqlSyntax">The sql syntax provider.</param>
         /// <param name="pocoDataFactory">The Poco data factory.</param>
         /// <param name="databaseType">The database type.</param>
         /// <param name="mappers">The mappers.</param>
-        /// <remarks>Fully initializes an initially empty context; this is done in <see cref="UmbracoDatabaseFactory"/>
-        /// as soon as the factory is fully configured.</remarks>
-        internal void Initialize(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
+        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, Lazy<IMapperCollection> mappers)
         {
             // for tests
-            Mappers = mappers ?? new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>());
+            _mappers = mappers;
 
             SqlSyntax = sqlSyntax ?? throw new ArgumentNullException(nameof(sqlSyntax));
             PocoDataFactory = pocoDataFactory ?? throw new ArgumentNullException(nameof(pocoDataFactory));
@@ -60,10 +44,10 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <inheritdoc />
-        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+        public ISqlSyntaxProvider SqlSyntax { get; }
 
         /// <inheritdoc />
-        public DatabaseType DatabaseType { get; private set; }
+        public DatabaseType DatabaseType { get; }
 
         /// <inheritdoc />
         public Sql<ISqlContext> Sql() => NPoco.Sql.BuilderFor((ISqlContext) this);
@@ -75,12 +59,12 @@ namespace Umbraco.Core.Persistence
         public IQuery<T> Query<T>() => new Query<T>(this);
 
         /// <inheritdoc />
-        public SqlTemplates Templates { get; private set; }
+        public SqlTemplates Templates { get; }
 
         /// <inheritdoc />
-        public IPocoDataFactory PocoDataFactory { get; private set; }
+        public IPocoDataFactory PocoDataFactory { get; }
 
         /// <inheritdoc />
-        public IMapperCollection Mappers { get; private set; }
+        public IMapperCollection Mappers => _mappers.Value;
     }
 }

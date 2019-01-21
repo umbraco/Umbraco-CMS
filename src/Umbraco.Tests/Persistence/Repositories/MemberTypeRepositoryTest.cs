@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MemberTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new MemberTypeRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
         }
 
         [Test]

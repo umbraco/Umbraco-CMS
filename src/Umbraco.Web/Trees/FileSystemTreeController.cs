@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 
@@ -57,6 +55,10 @@ namespace Umbraco.Web.Trees
             var files = FileSystem.GetFiles(path).Where(x =>
             {
                 var extension = Path.GetExtension(x);
+
+                if (Extensions.Contains("*"))
+                    return true;
+                
                 return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
             });
 

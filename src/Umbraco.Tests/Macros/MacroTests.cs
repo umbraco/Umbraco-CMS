@@ -4,7 +4,9 @@ using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Macros;
@@ -19,14 +21,15 @@ namespace Umbraco.Tests.Macros
         public void Setup()
         {
             //we DO want cache enabled for these tests
-            var cacheHelper = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
+            var cacheHelper = new AppCaches(
+                new ObjectCacheAppCache(),
+                NoAppCache.Instance,
+                new IsolatedCaches(type => new ObjectCacheAppCache()));
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefaultUmbracoSettings());
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
         }
 
         [TestCase("123", "IntProp", typeof(int))]

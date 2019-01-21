@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
         }
 
         [Test]

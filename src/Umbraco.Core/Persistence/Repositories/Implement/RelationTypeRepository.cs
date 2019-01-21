@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class RelationTypeRepository : NPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
-        public RelationTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -19,6 +20,15 @@ namespace Umbraco.Tests.Cache
     [UmbracoTest(WithApplication = true)]
     public class DistributedCacheBinderTests : UmbracoTestBase
     {
+        protected override void Compose(Composition composition)
+        {
+            base.Compose(composition);
+            // refreshers.HandleEvents wants a UmbracoContext
+            // which wants these
+            composition.RegisterUnique(_ => Mock.Of<IPublishedSnapshotService>());
+            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
+        }
+
         [Test]
         public void Can_Find_All_Event_Handlers()
         {
@@ -36,13 +46,6 @@ namespace Umbraco.Tests.Cache
                 //Permission.Updated += PermissionUpdated;
                 //Permission.Deleted += PermissionDeleted;
                 //PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
-
-                new EventDefinition<IApplicationTreeService, EventArgs>(null, serviceContext.ApplicationTreeService, new EventArgs(), "Deleted"),
-                new EventDefinition<IApplicationTreeService, EventArgs>(null, serviceContext.ApplicationTreeService, new EventArgs(), "Updated"),
-                new EventDefinition<IApplicationTreeService, EventArgs>(null, serviceContext.ApplicationTreeService, new EventArgs(), "New"),
-
-                new EventDefinition<ISectionService, EventArgs>(null, serviceContext.SectionService, new EventArgs(), "Deleted"),
-                new EventDefinition<ISectionService, EventArgs>(null, serviceContext.SectionService, new EventArgs(), "New"),
 
                 new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, serviceContext.UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, serviceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),
@@ -137,11 +140,6 @@ namespace Umbraco.Tests.Cache
                 domain.SetData(".appPath", "");
             if (domain.GetData(".appVPath") == null)
                 domain.SetData(".appVPath", "");
-
-            // refreshers.HandleEvents wants a UmbracoContext
-            // which wants these
-            Container.RegisterSingleton(_ => Mock.Of<IPublishedSnapshotService>());
-            Container.RegisterCollectionBuilder<UrlProviderCollectionBuilder>();
 
             // create some event definitions
             var definitions = new IEventDefinition[]

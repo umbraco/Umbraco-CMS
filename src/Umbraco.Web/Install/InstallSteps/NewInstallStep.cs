@@ -4,10 +4,12 @@ using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
@@ -50,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        public override InstallSetupResult Execute(UserModel user)
+        public override Task<InstallSetupResult> ExecuteAsync(UserModel user)
         {
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
@@ -82,7 +84,7 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Username = user.Email.Trim();
 
             _userService.Save(admin);
-            
+
             if (user.SubscribeToNewsLetter)
             {
                 if (_httpClient == null)
@@ -98,7 +100,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 catch { /* fail in silence */ }
             }
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         /// <summary>
@@ -144,7 +146,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
-            _http.ExpireCookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            _http.ExpireCookie(Current.Configs.Settings().Security.AuthCookieName);
 
                 return true;
         }
