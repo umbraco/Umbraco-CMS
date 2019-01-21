@@ -14,7 +14,7 @@ namespace Umbraco.Web.Install
         {
             _installHelper = installHelper;
 
-            // fixme this is ugly but I have a branch where it's nicely refactored - for now we just want to manage ordering
+            // todo this is ugly but I have a branch where it's nicely refactored - for now we just want to manage ordering
             var a = installerSteps.ToArray();
             _orderedInstallerSteps = new InstallSetupStep[]
             {

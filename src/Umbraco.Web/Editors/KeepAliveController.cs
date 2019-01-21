@@ -4,7 +4,7 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
-    // fixme
+    // fixme/task - deal with this
     // this is not authenticated, and therefore public, and therefore reveals we
     // are running Umbraco - but, all requests should come from localhost really,
     // so there should be a way to 404 when the request comes from the outside.

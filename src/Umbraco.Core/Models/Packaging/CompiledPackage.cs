@@ -26,19 +26,19 @@ namespace Umbraco.Core.Models.Packaging
         public string PackageView { get; set; }
         public string IconUrl { get; set; }
 
-        public string Actions { get; set; } //fixme: Should we make this strongly typed to IEnumerable<PackageAction> ?
+        public string Actions { get; set; } //todo: Should we make this strongly typed to IEnumerable<PackageAction> ?
 
         public PreInstallWarnings Warnings { get; set; } = new PreInstallWarnings();
 
         public List<CompiledPackageFile> Files { get; set; } = new List<CompiledPackageFile>();
 
-        public IEnumerable<XElement> Macros { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> Templates { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> Stylesheets { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> DataTypes { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> Languages { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> DictionaryItems { get; set; } //fixme: make strongly typed
-        public IEnumerable<XElement> DocumentTypes { get; set; } //fixme: make strongly typed
+        public IEnumerable<XElement> Macros { get; set; } //todo: make strongly typed
+        public IEnumerable<XElement> Templates { get; set; } //todo: make strongly typed
+        public IEnumerable<XElement> Stylesheets { get; set; } //todo: make strongly typed
+        public IEnumerable<XElement> DataTypes { get; set; } //todo: make strongly typed
+        public IEnumerable<XElement> Languages { get; set; } //todo: make strongly typed
+        public IEnumerable<XElement> DictionaryItems { get; set; } //todo: make strongly typed
+        public IEnumerable<XElement> DocumentTypes { get; set; } //todo: make strongly typed
         public IEnumerable<CompiledPackageDocument> Documents { get; set; }
     }
 }

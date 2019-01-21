@@ -116,7 +116,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Draft = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, publishedSnapshotAccessor, variationContextAccessor).CreateModel();
             Published = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, publishedSnapshotAccessor, variationContextAccessor).CreateModel();
 
-            ChildContentIds = origin.ChildContentIds; // can be the *same* list FIXME oh really?
+            ChildContentIds = origin.ChildContentIds; // can be the *same* list
         }
 
         // everything that is common to both draft and published versions

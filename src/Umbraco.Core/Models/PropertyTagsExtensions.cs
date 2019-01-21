@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     public static class PropertyTagsExtensions
     {
-        // fixme inject?
+        // todo: inject
         private static PropertyEditorCollection PropertyEditors => Current.PropertyEditors;
         private static IDataTypeService DataTypeService => Current.Services.DataTypeService;
 

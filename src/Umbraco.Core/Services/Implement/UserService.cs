@@ -200,7 +200,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException)
                 {
-                    // fixme - refactor users/upgrade
+                    // todo - refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
@@ -705,7 +705,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException)
                 {
-                    // fixme - refactor users/upgrade
+                    // todo - refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!

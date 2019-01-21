@@ -353,7 +353,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<TItem> GetComposedOf(int id)
         {
             // GetAll is cheap, repository has a full dataset cache policy
-            // fixme - still, because it uses the cache, race conditions!
+            // todo - still, because it uses the cache, race conditions!
             var allContentTypes = GetAll(Array.Empty<int>());
             return GetComposedOf(id, allContentTypes);
         }

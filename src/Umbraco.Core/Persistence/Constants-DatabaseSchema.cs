@@ -14,13 +14,13 @@ namespace Umbraco.Core
 
                 public const string Node = /*TableNamePrefix*/ "umbraco" + "Node";
                 public const string NodeData = /*TableNamePrefix*/ "cms" + "ContentNu";
-                public const string NodeXml = /*TableNamePrefix*/ "cms" + "ContentXml";
-                public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // fixme dbfix kill merge with ContentXml
+                public const string NodeXml = /*TableNamePrefix*/ "cms" + "ContentXml"; // todo get rid of these with the xml cache
+                public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // todo get rid of these with the xml cache
 
-                public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType"; // fixme dbfix rename and split uElementType, uDocumentType
+                public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType";
                 public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
-                public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType"; // fixme dbfix must rename corresponding DTO
-                public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType"; // fixme dbfix why can't we just use uNode for this?
+                public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType";
+                public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
                 public const string DataType = TableNamePrefix + "DataType";
                 public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 

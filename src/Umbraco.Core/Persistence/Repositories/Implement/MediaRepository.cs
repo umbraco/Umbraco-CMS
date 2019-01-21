@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<IMedia>(sqlClause, query);
             var sql = translator.Translate();
 
-            sql // fixme why?
+            sql
                 .OrderBy<NodeDto>(x => x.Level)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
@@ -104,7 +104,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                         // ContentRepositoryBase expects a variantName field to order by name
                         // for now, just return the plain invariant node name
-                        // fixme media should support variants !!
                         .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
                     break;
             }
@@ -125,13 +124,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return sql;
         }
 
-        // fixme - kill, eventually
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        // fixme - kill, eventually
         // ah maybe not, that what's used for eg Exists in base repo
         protected override string GetBaseWhereClause()
         {
@@ -228,7 +225,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // fixme - do we really want to keep doing this here?
+            // todo - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
@@ -307,7 +304,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // fixme - do we really want to keep doing this here?
+            // todo - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // if parent has changed, get path, level and sort order
@@ -496,7 +493,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Models.Media) cached; // fixme should we just cache Media not IMedia?
+                        content[i] = (Models.Media) cached;
                         continue;
                     }
                 }

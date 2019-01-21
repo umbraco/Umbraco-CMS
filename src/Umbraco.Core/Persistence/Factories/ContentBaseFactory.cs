@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Published = dto.Published;
                 content.Edited = dto.Edited;
 
-                // fixme - shall we get published infos or not?
+                // todo - shall we get published infos or not?
                 //if (dto.Published)
                 if (publishedVersionDto != null)
                 {
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
 
-                // fixme missing names?
+                // todo missing names?
 
                 content.Path = nodeDto.Path;
                 content.Level = nodeDto.Level;
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
 
-                // fixme missing names?
+                // todo missing names?
 
                 content.Path = nodeDto.Path;
                 content.Level = nodeDto.Level;
@@ -294,7 +294,7 @@ namespace Umbraco.Core.Persistence.Factories
         private static MediaVersionDto BuildMediaVersionDto(IMedia entity, ContentDto contentDto)
         {
             // try to get a path from the string being stored for media
-            // fixme - only considering umbracoFile ?!
+            // todo - only considering umbracoFile
 
             TryMatch(entity.GetValue<string>("umbracoFile"), out var path);
 
@@ -309,11 +309,11 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        // fixme - this should NOT be here?!
+        // todo - this should NOT be here?!
         // more dark magic ;-(
         internal static bool TryMatch(string text, out string path)
         {
-            //fixme: In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
+            // In v8 we should allow exposing this via the property editor in a much nicer way so that the property editor
             // can tell us directly what any URL is for a given property if it contains an asset
 
             path = null;

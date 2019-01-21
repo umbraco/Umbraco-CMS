@@ -183,7 +183,7 @@ namespace Umbraco.Core
             // get a safe & clean filename
             filename = IOHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
-            filename = filename.ToLower(); // fixme - er... why?
+            filename = filename.ToLower();
 
             SetUploadFile(content, propertyTypeAlias, filename, filestream, culture, segment);
         }

@@ -11,15 +11,12 @@ namespace Umbraco.Web.Controllers
 {
     public class UmbLoginController : SurfaceController
     {
-        // fixme - delete?
         public UmbLoginController()
-        {
-        }
+        { }
 
         public UmbLoginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
             : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger)
-        {
-        }
+        { }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

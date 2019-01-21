@@ -82,7 +82,7 @@ namespace Umbraco.Core.Runtime
 
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by either the legacy thing or the db thing in the corresponding
-            // components in the web project - fixme - should obsolete the legacy thing
+            // components in the web project - todo - should obsolete the legacy thing
             composition.RegisterUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),

@@ -215,6 +215,7 @@ namespace Umbraco.Web.Trees
             //assign the route path based on the root node, this means it will route there when the section is navigated to
             //and no dashboards will be available for this section
             sectionRoot.RoutePath = rootNode.Result.RoutePath;
+            sectionRoot.Path = rootNode.Result.Path;
 
             foreach (var d in rootNode.Result.AdditionalData)
             {

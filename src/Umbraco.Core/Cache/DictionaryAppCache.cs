@@ -18,8 +18,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public virtual object Get(string key)
         {
-            // fixme throws if non-existing, shouldn't it return null?
-            return Items[key];
+            return Items.TryGetValue(key, out var value) ? value : null;
         }
 
         /// <inheritdoc />

@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     public class TrueFalseConfiguration
     {
         [ConfigurationField("default", "Default Value", "boolean")]
-        public string Default { get; set; } // fixme - well, true or false?!
+        public string Default { get; set; } // todo - well, true or false?!
 
         [ConfigurationField("labelOn", "Write a label text", "textstring")]
         public string Label { get; set; }

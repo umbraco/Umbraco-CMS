@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IContent"/></returns>
         public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = 0)
         {
-            //fixme - what about culture?
+            // todo - what about culture?
 
             var parent = GetById(parentId);
             return Create(name, parent, contentTypeAlias, userId);
@@ -184,7 +184,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            //fixme - what about culture?
+            // todo - what about culture?
 
             var contentType = GetContentType(contentTypeAlias);
             if (contentType == null)
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            //fixme - what about culture?
+            // todo - what about culture?
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            //fixme - what about culture?
+            // todo - what about culture?
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -282,7 +282,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            //fixme - what about culture?
+            // todo - what about culture?
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -750,8 +750,6 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save, Publish, Unpublish
 
-        // fixme - kill all those raiseEvents
-
         /// <inheritdoc />
         public OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true)
         {
@@ -1018,7 +1016,6 @@ namespace Umbraco.Core.Services.Implement
                         // keep going, though, as we want to save anyways
                     }
 
-                    //fixme - casting
                     // reset published state from temp values (publishing, unpublishing) to original value
                     // (published, unpublished) in order to save the document, unchanged
                     ((Content)content).Published = content.Published;
@@ -1042,7 +1039,6 @@ namespace Umbraco.Core.Services.Implement
                         unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
                     else
                     {
-                        //fixme - casting
                         // reset published state from temp values (publishing, unpublishing) to original value
                         // (published, unpublished) in order to save the document, unchanged
                         ((Content)content).Published = content.Published;
@@ -1414,8 +1410,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                // fixme events?!
-
                 if (!document.HasIdentity)
                     throw new InvalidOperationException("Cannot not branch-publish a new document.");
 
@@ -1624,7 +1618,6 @@ namespace Umbraco.Core.Services.Implement
                 if (deletePriorVersions)
                 {
                     var content = GetVersion(versionId);
-                    // fixme nesting uow?
                     DeleteVersions(id, content.UpdateDate, userId);
                 }
 
@@ -1810,7 +1803,6 @@ namespace Umbraco.Core.Services.Implement
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
         {
-            //fixme no casting
             if (trash.HasValue) ((ContentBase)content).Trashed = trash.Value;
             content.WriterId = userId;
             _documentRepository.Save(content);
@@ -2391,7 +2383,6 @@ namespace Umbraco.Core.Services.Implement
 
             // ensure that the document has published values
             // either because it is 'publishing' or because it already has a published version
-            //fixme - casting
             if (((Content)content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
@@ -2461,7 +2452,6 @@ namespace Umbraco.Core.Services.Implement
             EventMessages evtMsgs)
         {
             // change state to publishing
-            // fixme - casting
             ((Content)content).PublishedState = PublishedState.Publishing;
 
             //if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
@@ -2541,7 +2531,6 @@ namespace Umbraco.Core.Services.Implement
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
             // change state to unpublishing
-            // fixme - casting
             ((Content)content).PublishedState = PublishedState.Unpublishing;
 
             Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);

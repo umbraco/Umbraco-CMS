@@ -14,7 +14,7 @@ namespace Umbraco.Web.HealthCheck
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
         public readonly bool AllChecksSuccessful;
 
-        private ILogger Logger => Current.Logger; // fixme inject
+        private ILogger Logger => Current.Logger; // todo inject
 
         public HealthCheckResults(IEnumerable<HealthCheck> checks)
         {

@@ -267,7 +267,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
             var visited = new HashSet<int>();
 
-            // TODO
+            // todo
             // _localizationService.GetXxx() is expensive, it deep clones objects
             // we want _localizationService.GetReadOnlyXxx() returning IReadOnlyLanguage which cannot be saved back = no need to clone
 

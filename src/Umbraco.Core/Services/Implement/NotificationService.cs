@@ -307,7 +307,7 @@ namespace Umbraco.Core.Services.Implement
                     summary.Append("<table style=\"width: 100 %; \">");
                     foreach (var p in content.Properties)
                     {
-                        //fixme doesn't take into account variants
+                        //todo doesn't take into account variants
 
                         var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
                         var oldText = newText;

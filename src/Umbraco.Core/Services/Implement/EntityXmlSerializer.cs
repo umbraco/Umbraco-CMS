@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         public XElement Serialize(IContent content,
             bool published,
-            bool withDescendants = false) //fixme take care of usage! only used for the packager
+            bool withDescendants = false) //todo take care of usage! only used for the packager
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 

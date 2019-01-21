@@ -27,19 +27,6 @@ namespace Umbraco.Core.Services.Implement
 
         void MemberGroupRepository_SavingMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {
-            // fixme - wtf?
-            // why is the repository triggering these events?
-            // and, the events are *dispatched* by the repository so it makes no sense dispatching them again!
-
-            // v7.6
-            //using (var scope = UowProvider.ScopeProvider.CreateScope())
-            //{
-            //    scope.Complete(); // always
-            //    if (scope.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(e.SavedEntities)))
-            //        e.Cancel = true;
-            //}
-
-            // v8
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(e.SavedEntities), this))
                 e.Cancel = true;
         }

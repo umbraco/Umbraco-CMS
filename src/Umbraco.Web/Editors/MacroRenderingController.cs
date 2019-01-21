@@ -15,6 +15,7 @@ using Umbraco.Web.Macros;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -29,11 +30,14 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class MacroRenderingController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
+        private readonly IMacroService _macroService;
+        private readonly IContentService _contentService;
         private readonly IVariationContextAccessor _variationContextAccessor;
-
-        public MacroRenderingController(IVariationContextAccessor variationContextAccessor)
+        public MacroRenderingController(IVariationContextAccessor variationContextAccessor, IMacroService macroService, IContentService contentService)
         {
             _variationContextAccessor = variationContextAccessor;
+            _macroService = macroService;
+            _contentService = contentService;
         }
 
         /// <summary>
@@ -41,12 +45,12 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// Note that ALL logged in users have access to this method because editors will need to isnert macros into rte (content/media/members) and it's used for
+        /// Note that ALL logged in users have access to this method because editors will need to insert macros into rte (content/media/members) and it's used for
         /// inserting into templates/views/etc... it doesn't expose any sensitive data.
         /// </remarks>
         public IEnumerable<MacroParameter> GetMacroParameters(int macroId)
         {
-            var macro = Services.MacroService.GetById(macroId);
+            var macro = _macroService.GetById(macroId);
             if (macro == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -97,13 +101,13 @@ namespace Umbraco.Web.Editors
         {
             // note - here we should be using the cache, provided that the preview content is in the cache...
 
-            var doc = Services.ContentService.GetById(pageId);
+            var doc = _contentService.GetById(pageId);
             if (doc == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var m = Services.MacroService.GetByAlias(macroAlias);
+            var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             var macro = new MacroModel(m);
@@ -166,7 +170,7 @@ namespace Umbraco.Web.Editors
                 MacroSource = model.VirtualPath.EnsureStartsWith("~")
             };
 
-            Services.MacroService.Save(macro); // may throw
+            _macroService.Save(macro); // may throw
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 

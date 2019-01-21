@@ -13,8 +13,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             Create.Table<ContentVersionCultureVariationDto>().Do();
             Create.Table<DocumentCultureVariationDto>().Do();
-
-            // fixme - data migration?
         }
     }
 }

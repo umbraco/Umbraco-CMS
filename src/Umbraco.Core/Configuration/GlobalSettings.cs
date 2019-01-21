@@ -16,7 +16,8 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Configuration
 {
-    //TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
+    // TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
+    // TODO: need to massively cleanup these configuration classes
 
     /// <summary>
     /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
@@ -54,7 +55,6 @@ namespace Umbraco.Core.Configuration
             ResetInternal();
         }
 
-        //fixme should this go on the interface or some other helper?
         public static bool HasSmtpServerConfigured(string appPath)
         {
             if (HasSmtpServer.HasValue) return HasSmtpServer.Value;
@@ -221,7 +221,6 @@ namespace Umbraco.Core.Configuration
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        //fixme surely thsi doesn't belong here and it's also a web request context thing
         public static bool DebugMode
         {
             get
