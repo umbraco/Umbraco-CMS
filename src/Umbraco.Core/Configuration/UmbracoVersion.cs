@@ -81,7 +81,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    // fixme - this should live in its own independent file! NOT web.config!
+                    // fixme/task - stop having version in web.config appSettings
                     var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
                     return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }

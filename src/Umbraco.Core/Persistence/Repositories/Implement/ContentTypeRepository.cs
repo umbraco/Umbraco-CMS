@@ -79,7 +79,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
             var sql = translator.Translate();
 
-            // fixme - insane! GetBaseQuery does not even return a proper??? oh well...
             var dtos = Database.Fetch<ContentTypeTemplateDto>(sql);
 
             return

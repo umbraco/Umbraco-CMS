@@ -117,7 +117,6 @@ namespace Umbraco.Core.Persistence
         public static IEnumerable<T> ArgIn<T>(string name)
         {
             // don't return an empty enumerable, as it breaks NPoco
-            // fixme - should we cache these arrays?
             return new[] { default (T) };
         }
     }

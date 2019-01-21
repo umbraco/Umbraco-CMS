@@ -496,7 +496,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> On<TLeft, TRight>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin,
             Expression<Func<TLeft, object>> leftField, Expression<Func<TRight, object>> rightField)
         {
-            // fixme - ugly - should define on SqlContext!
+            // todo - ugly - should define on SqlContext!
 
             var xLeft = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(leftField);
             var xRight = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(rightField);

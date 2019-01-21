@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the content types that compose this content type.
         /// </summary>
-        //fixme: we should be storing key references, not the object else we are caching way too much
+        //todo: we should be storing key references, not the object else we are caching way too much
         IEnumerable<IContentTypeComposition> ContentTypeComposition { get; set;  }
 
         /// <summary>

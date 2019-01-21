@@ -5,10 +5,10 @@
     /// </summary>
     public static class CacheKeys
     {
-        public const string ApplicationTreeCacheKey = "ApplicationTreeCache"; // used by ApplicationTreeService
         public const string ApplicationsCacheKey = "ApplicationCache"; // used by SectionService
 
-        public const string TemplateFrontEndCacheKey = "template"; // fixme usage?
+        // TODO this one can probably be removed
+        public const string TemplateFrontEndCacheKey = "template";
 
         public const string MacroContentCacheKey = "macroContent_"; // used in MacroRenderers
     }

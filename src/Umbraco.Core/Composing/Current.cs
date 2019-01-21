@@ -29,7 +29,7 @@ namespace Umbraco.Core.Composing
     {
         private static IFactory _factory;
 
-        // fixme - refactor
+        // TODO: get rid of these oddities
         // we don't want Umbraco tests to die because the container has not been properly initialized,
         // for some too-important things such as IShortStringHelper or loggers, so if it's not
         // registered we setup a default one. We should really refactor our tests so that it does

@@ -34,7 +34,7 @@ namespace Umbraco.Core.Events
 
         private IMediaFileSystem _mediaFileSystem;
 
-        // fixme inject
+        // todo: inject
         private IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
     }
 }

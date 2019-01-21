@@ -317,8 +317,8 @@ namespace Umbraco.Core.Persistence
                         if (dbname == "master" || dbname == "tempdb" || dbname == "model" || dbname == "msdb")
                             continue;
 
-                        // fixme - shall we deal with stale databases?
-                        // fixme - is it always ok to assume file names?
+                        // todo - shall we deal with stale databases?
+                        // todo - is it always ok to assume file names?
                         //var mdf = database.Value;
                         //var ldf = mdf.Replace(".mdf", "_log.ldf");
                         //if (staleOnly && File.Exists(mdf) && File.Exists(ldf))

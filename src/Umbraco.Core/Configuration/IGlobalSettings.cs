@@ -20,17 +20,6 @@ namespace Umbraco.Core.Configuration
         string ReservedPaths { get; }
 
         /// <summary>
-        /// Gets the name of the content XML file.
-        /// </summary>
-        /// <value>The content XML.</value>
-        /// <remarks>
-        /// Defaults to ~/App_Data/umbraco.config
-        /// </remarks>
-        //fixme - remove
-        [Obsolete("This should not be used, need to remove the content xml cache")]
-        string ContentXmlFile { get; }
-
-        /// <summary>
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
         string Path { get; }

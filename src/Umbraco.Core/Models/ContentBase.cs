@@ -128,14 +128,14 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets the enumeration of property groups for the entity.
-        /// fixme is a proxy, kill this
+        /// todo - remove this proxy method
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
 
         /// <summary>
         /// Gets the numeration of property types for the entity.
-        /// fixme is a proxy, kill this
+        /// todo - remove this proxy method
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;

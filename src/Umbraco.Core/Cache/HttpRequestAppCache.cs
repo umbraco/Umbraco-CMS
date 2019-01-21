@@ -31,7 +31,7 @@ namespace Umbraco.Core.Cache
         /// </summary>
         /// <remarks>
         /// <para>Will use HttpContext.Current.</para>
-        /// fixme - should use IHttpContextAccessor
+        /// fixme/task: use IHttpContextAccessor NOT HttpContext.Current
         /// </remarks>
         public HttpRequestAppCache()
         { }

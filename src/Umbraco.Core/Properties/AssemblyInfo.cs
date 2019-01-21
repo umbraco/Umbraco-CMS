@@ -18,8 +18,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 
-[assembly: InternalsVisibleTo("Umbraco.Extensions")] // fixme - what is this?
-
 // Allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

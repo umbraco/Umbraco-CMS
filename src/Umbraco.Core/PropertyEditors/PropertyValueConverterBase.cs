@@ -26,7 +26,6 @@ namespace Umbraco.Core.PropertyEditors
         {
             // the default implementation uses the old magic null & string comparisons,
             // other implementations may be more clever, and/or test the final converted object values
-            // fixme - cannot access the intermediate value here?
             var value = property.GetSourceValue(culture, segment);
             return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
         }

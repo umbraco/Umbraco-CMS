@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        // fixme - but now that we have 1 unique repository?
+        // todo - but now that we have 1 unique repository?
         // this is a *bad* idea because PerformCount captures the current repository and its UOW
         //
         //private static RepositoryCachePolicyOptions _defaultOptions;

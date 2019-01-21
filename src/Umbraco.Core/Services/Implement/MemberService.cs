@@ -391,8 +391,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        // fixme get rid of string filter?
-
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
         {
@@ -1306,7 +1304,7 @@ namespace Umbraco.Core.Services.Implement
                     Id = property.Id,
                     Alias = property.Alias,
                     Name = property.PropertyType.Name,
-                    Value = property.GetValue(), // fixme ignoring variants
+                    Value = property.GetValue(), // todo ignoring variants
                     CreateDate = property.CreateDate,
                     UpdateDate = property.UpdateDate
                 };
@@ -1379,7 +1377,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        // fixme - this should not be here, or???
         public string GetDefaultMemberType()
         {
             return Current.Services.MemberTypeService.GetDefault();
