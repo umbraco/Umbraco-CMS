@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web.Editors
+﻿using Umbraco.Core.Services;
+
+namespace Umbraco.Web.Editors
 {
     using System;
     using System.Collections.Generic;
@@ -28,6 +30,13 @@
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
     public class MacrosController : BackOfficeNotificationsController
     {
+        private readonly IMacroService _macroService;
+
+        public MacrosController(IMacroService macroService)
+        {
+            _macroService = macroService;
+        }
+
         /// <summary>
         /// Creates a new macro
         /// </summary>
@@ -47,7 +56,7 @@
 
             var alias = name.ToSafeAlias();
 
-            if (this.Services.MacroService.GetByAlias(alias) != null)
+            if (_macroService.GetByAlias(alias) != null)
             {
                 return this.ReturnErrorResponse("Macro with this alias already exists");
             }
@@ -62,7 +71,7 @@
                     MacroType = MacroTypes.PartialView
                 };
 
-                this.Services.MacroService.Save(macro, this.Security.CurrentUser.Id);
+                _macroService.Save(macro, this.Security.CurrentUser.Id);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, macro.Id);
             }
@@ -75,7 +84,7 @@
         [HttpGet]
         public HttpResponseMessage GetById(int id)
         {
-            var macro = this.Services.MacroService.GetById(id);
+            var macro = _macroService.GetById(id);
 
             if (macro == null)
             {
@@ -115,6 +124,22 @@
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
 
+
+        [HttpPost]
+        public HttpResponseMessage DeleteById(int id)
+        {
+            var macro = _macroService.GetById(id);
+
+            if (macro == null)
+            {
+                return this.ReturnErrorResponse($"Macro with id {id} does not exist");
+            }
+
+            _macroService.Delete(macro);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         [HttpPost]
         public HttpResponseMessage Save(MacroDisplay macroDisplay)
         {
@@ -123,7 +148,7 @@
                 return this.ReturnErrorResponse($"No macro data found in request");
             }
 
-            var macro = this.Services.MacroService.GetById(int.Parse(macroDisplay.Id.ToString()));
+            var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString()));
 
             if (macro == null)
             {
@@ -132,7 +157,7 @@
 
             if (macroDisplay.Alias != macro.Alias)
             {
-                var macroByAlias = this.Services.MacroService.GetByAlias(macroDisplay.Alias);
+                var macroByAlias = _macroService.GetByAlias(macroDisplay.Alias);
 
                 if (macroByAlias != null)
                 {
@@ -153,7 +178,7 @@
 
             try
             {
-                this.Services.MacroService.Save(macro, this.Security.CurrentUser.Id);
+                _macroService.Save(macro, this.Security.CurrentUser.Id);
 
                 macroDisplay.Notifications.Clear();
 
