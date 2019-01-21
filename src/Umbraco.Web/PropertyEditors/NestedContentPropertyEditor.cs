@@ -42,8 +42,6 @@ namespace Umbraco.Web.PropertyEditors
                 : Current.Services.ContentTypeService.Get(contentTypeAlias);
         }
 
-        //fixme: Need to add a custom IPropertyIndexValueFactory for this editor
-
         #region Pre Value Editor
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();

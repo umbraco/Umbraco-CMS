@@ -425,7 +425,7 @@ namespace Umbraco.Web.Editors
         /// it's resolving which is unecessary and annoying.
         /// </remarks>
         private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes
-            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // fixme inject
+            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // todo inject
 
         /// <summary>
         /// Returns the server variables regarding the application state
@@ -438,7 +438,7 @@ namespace Umbraco.Web.Editors
                 // add versions - see UmbracoVersion for details & differences
 
                 // the complete application version (eg "8.1.2-alpha.25")
-                { "version", _runtimeState.SemanticVersion.ToSemanticString() }, // fixme that's UmbracoVersion.Version!
+                { "version", UmbracoVersion.SemanticVersion.ToSemanticString() },
 
                 // the assembly version (eg "8.0.0")
                 { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }

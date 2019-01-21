@@ -18,7 +18,6 @@ namespace Umbraco.Web.Mvc
     {
         private PublishedRequest _publishedRequest;
 
-        // fixme - delete?
         public RenderMvcController()
         {
             ActionInvoker = new RenderActionInvoker();

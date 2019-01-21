@@ -75,7 +75,7 @@ namespace Umbraco.Web.Cache
 
                 if (assignedDomains.Count > 0)
                 {
-                    //fixme - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
+                    // todo - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
                     // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
                     // DomainCacheRefresher?
 
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Cache
             // content and when the PublishedCachesService is notified of changes it does not see
             // the new content...
 
-            // fixme - what about this?
+            // todo - what about this?
             // should rename it, and then, this is only for Deploy, and then, ???
             //if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
             //  ...
