@@ -399,6 +399,7 @@
     <key alias="insertlink">Insert link</key>
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
+    <key alias="languagedeletewarning">This will delete the language</key>
     <key alias="lastEdited">Last Edited</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internal link:</key>
@@ -423,10 +424,6 @@
     <key alias="siterepublishHelp">The website cache will be refreshed. All published content will be updated, while unpublished content will stay unpublished.</key>
     <key alias="tableColumns">Number of columns</key>
     <key alias="tableRows">Number of rows</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by referring this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
-      choose Id's from the current template's master.]]></key>
     <key alias="thumbnailimageclickfororiginal">Click on the image to see full size</key>
     <key alias="treepicker">Pick item</key>
     <key alias="viewCacheItem">View Cache Item</key>
@@ -609,7 +606,7 @@
     <key alias="hide">Hide</key>
     <key alias="history">History</key>
     <key alias="icon">Icon</key>
-        <key alias="id">Id</key>
+    <key alias="id">Id</key>
     <key alias="import">Import</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -644,7 +641,6 @@
     <key alias="orderBy">Order by</key>
     <key alias="password">Password</key>
     <key alias="path">Path</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">One moment please...</key>
     <key alias="previous">Previous</key>
     <key alias="properties">Properties</key>
@@ -661,7 +657,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
+    <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -1079,6 +1075,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notifications">Notifications</key>
   </area>
   <area alias="packager">
+    <key alias="created">Created</key>
+    <key alias="createPackage">Create package</key>
     <key alias="chooseLocalPackageText"><![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
@@ -1093,8 +1091,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
     <key alias="packageInstall">Install package</key>
-    <key alias="installFinish">Finish</key>
+    <key alias="installed">Installed</key>
     <key alias="installedPackages">Installed packages</key>
+    <key alias="installLocal">Install local</key>
+    <key alias="installFinish">Finish</key>
+    <key alias="noConfigurationView">This package has no configuration view</key>
+    <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
     <key alias="packageSearch">Search for packages</key>
@@ -1117,14 +1119,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as reported by community members. Full compatability cannot be gauranteed for versions reported below 100%</key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Documentation</key>
     <key alias="packageMetaData">Package meta data</key>
     <key alias="packageName">Package name</key>
     <key alias="packageNoItemsHeader">Package doesn't contain any items</key>
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
-    <key alias="packageNoUpgrades">No upgrades available</key>
     <key alias="packageOptions">Package options</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Package repository</key>
@@ -1135,13 +1135,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUninstallText"><![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
       <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,
       so uninstall with caution. If in doubt, contact the package author.]]></key>
-    <key alias="packageUpgradeDownload">Download update from the repository</key>
-    <key alias="packageUpgradeHeader">Upgrade package</key>
-    <key alias="packageUpgradeInstructions">Upgrade instructions</key>
-    <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the Umbraco package repository.</key>
     <key alias="packageVersion">Package version</key>
-    <key alias="packageVersionHistory">Package version history</key>
-    <key alias="viewPackageWebsite">View package website</key>
+    <key alias="packageVersionUpgrade">Upgrading from version</key>
     <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</key>
     <key alias="installStateUninstalling">Uninstalling...</key>
@@ -1250,13 +1245,13 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="sections">
     <key alias="content">Content</key>
-    <key alias="packages">Packages</key>
+    <key alias="forms">Forms</key>
     <key alias="media">Media</key>
     <key alias="member">Members</key>
+    <key alias="packages">Packages</key>
     <key alias="settings">Settings</key>
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
-    <key alias="forms">Forms</key>
   </area>
   <area alias="help">
     <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
@@ -1559,6 +1554,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="variantsHeading">Allow varying by culture</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="elementHeading">Is an Element type</key>
+    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

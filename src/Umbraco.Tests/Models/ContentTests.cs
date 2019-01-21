@@ -232,8 +232,8 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var runtimeCache = new ObjectCacheRuntimeCacheProvider();
-            runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
+            var runtimeCache = new ObjectCacheAppCache();
+            runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();
 
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Models
             {
                 for (int j = 0; j < 1000; j++)
                 {
-                    var clone = runtimeCache.GetCacheItem(content.Id.ToString(CultureInfo.InvariantCulture));
+                    var clone = runtimeCache.Get(content.Id.ToString(CultureInfo.InvariantCulture));
                 }
             }
 

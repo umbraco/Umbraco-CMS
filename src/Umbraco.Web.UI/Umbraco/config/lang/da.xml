@@ -354,6 +354,7 @@
     <key alias="insertlink">Indsæt link</key>
     <key alias="insertMacro">Indsæt makro</key>
     <key alias="inserttable">Indsæt tabel</key>
+    <key alias="languagedeletewarning">Dette vil slette sproget</key>
     <key alias="lastEdited">Sidst redigeret</key>
     <key alias="link">Link</key>
     <key alias="linkinternal">Internt link:</key>
@@ -378,8 +379,6 @@
     <key alias="siterepublishHelp">Websitets cache vil blive genopfrisket. Alt udgivet indhold vil blive opdateret, mens upubliceret indhold vil forblive upubliceret.</key>
     <key alias="tableColumns">Antal kolonner</key>
     <key alias="tableRows">Antal rækker</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Vælg et placeholder id</strong> Ved at sætte et id på en placeholder kan du indskyde indhold fra undertemplates ved at referere til dette ID vha. et <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Vælg et placeholder id</strong> fra listen herunder. Du kan kun vælge id'er fra den nuværende masterskabelon.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klik på billedet for at se den fulde størrelse</key>
     <key alias="treepicker">Vælg</key>
     <key alias="viewCacheItem">Se cache element</key>
@@ -409,6 +408,7 @@
     <key alias="account">konto</key>
     <key alias="selectEditor">Vælg editor</key>
     <key alias="selectSnippet">Vælg snippet</key>
+    <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -577,7 +577,6 @@
     <key alias="orderBy">Sortér efter</key>
     <key alias="password">Kodeord</key>
     <key alias="path">Sti</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">Et øjeblik...</key>
     <key alias="previous">Forrige</key>
     <key alias="properties">Egenskaber</key>
@@ -805,6 +804,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="notifications">Notificeringer</key>
   </area>
   <area alias="packager">
+    <key alias="created">Oprettet</key>
+    <key alias="createPackage">Opret pakke</key>
     <key alias="chooseLocalPackageText">Vælg pakken fra din computer. Umbraco pakker er oftest en ".zip" fil</key>
     <key alias="dropHere">Slip her for at uploade</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
@@ -816,8 +817,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="accept">Jeg accepterer</key>
     <key alias="termsOfUse">betingelser for anvendelse</key>
     <key alias="packageInstall">Installér pakke</key>
-    <key alias="installFinish">Afslut</key>
+    <key alias="installed">Installeret</key>
     <key alias="installedPackages">Installeret pakker</key>
+    <key alias="installLocal">Installér lokal</key>
+    <key alias="installFinish">Afslut</key>
+    <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
+    <key alias="noPackagesCreated">Der er ikke blevet oprettet nogle pakker endnu</key>
     <key alias="noPackages">Du har ingen pakker installeret</key>
     <key alias="noPackagesDescription"><![CDATA[Du har ikke nogen pakker installeret. Du kan enten installere en lokal pakke ved at vælge den fra din computer eller gennemse de tilgængelige pakker ved hjælp af ikonet <strong>'Pakker'</strong> øverst til højre på din skærm]]></key>
     <key alias="packageSearch">Søg efter pakker</key>
@@ -840,13 +845,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageCompatibilityDescription">Denne pakke er kompatibel med de følgende versioner af Umbraco, som rapporteret af community-medlemmer. Fuld kompatibilitet kan ikke garanteres for versioner rapporteret nedenfor 100%</key>
     <key alias="packageExternalSources">Eksterne kilder</key>
     <key alias="packageAuthor">Forfatter</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Pakke meta data</key>
     <key alias="packageName">Pakkenavn</key>
     <key alias="packageNoItemsHeader">Pakken indeholder ingen elementer</key>
     <key alias="packageNoItemsText"><![CDATA[Denne pakkefil indeholder ingen elementer som kan af-installeres.<br/><br/>Du kan roligt fjerne denne fra systemet ved at klikke på "Fjern pakke" nedenfor.]]></key>
-    <key alias="packageNoUpgrades">Ingen opdateringer tilgængelige</key>
     <key alias="packageOptions">Pakkevalg</key>
     <key alias="packageReadme">Pakke læs mig</key>
     <key alias="packageRepository">Pakke opbevaringsbase</key>
@@ -856,13 +859,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageUninstallHeader">Afinstallér pakke</key>
     <key alias="packageUninstallText"><![CDATA[Du kan fjerne markeringen på elementer du ikke ønsker at fjerne, på dette tidspunkt, nedenfor. Når du klikker 'bekræft' vil alle afkrydsede elemenet blive fjernet <br/>
 <span style="color: Red; font-weight: bold;">Bemærk:</span> at dokumenter og medier som afhænger af denne pakke vil muligvis holde op med at virke, så vær forsigtig. Hvis i tvivl, kontakt personen som har udviklet pakken.]]></key>
-    <key alias="packageUpgradeDownload">Download opdatering fra opbevaringsbasen</key>
-    <key alias="packageUpgradeHeader">Opdatér pakke</key>
-    <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
-    <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra Umbracos pakke opbevaringsbase.</key>
     <key alias="packageVersion">Pakke version</key>
-    <key alias="packageVersionHistory">Pakke versionshistorik</key>
-    <key alias="viewPackageWebsite">Se pakkeudviklerens website</key>
     <key alias="packageAlreadyInstalled">Pakke allerede installeret</key>
     <key alias="targetVersionMismatch">Denne pakke kan ikke installeres, den kræver en minimum Umbraco version af</key>
     <key alias="installStateUninstalling">Afinstallerer...</key>
@@ -962,6 +959,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="installer">Umbraco konfigurationsguide</key>
     <key alias="media">Mediearkiv</key>
     <key alias="member">Medlemmer</key>
+    <key alias="packages">Pakker</key>
     <key alias="newsletters">Nyhedsbreve</key>
     <key alias="settings">Indstillinger</key>
     <key alias="statistics">Statistik</key>
@@ -1225,6 +1223,18 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberCanEdit">Medlem kan redigere</key>
     <key alias="showOnMemberProfile">Vis på medlemsprofil</key>
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
+  </area>
+  <area alias="languages">
+      <key alias="addLanguage">Tilføj sprog</key>
+      <key alias="mandatoryLanguage">Påkrævet sprog</key>
+      <key alias="mandatoryLanguageHelp">Egenskaber på dette sprog skal være udfyldt før noden kan blive udgivet.</key>
+      <key alias="defaultLanguage">Standard sprog</key>
+      <key alias="defaultLanguageHelp">Et Umbraco site kan kun have et standard sprog.</key>
+      <key alias="changingDefaultLanguageWarning">Ved at skifte standardsprog kan resultere i standard indhold mangler.</key>
+      <key alias="fallsbackToLabel">Fallsback til</key>
+      <key alias="noFallbackLanguageOption">Ingen fallback sprog</key>
+      <key alias="fallbackLanguageDescription">For at tillade flersproget indhold til at falde tilbage på et andet sprog, hvis det ikke er tilgængelig i det anmodet sprog, vælg det her.</key>
+      <key alias="fallbackLanguage">Fallback sprog</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>

@@ -27,11 +27,11 @@
                         </umb-control-group>
 
                         <umb-control-group label="@stylesheet_styles" description="@stylesheet_stylesHelp">
-                            <textarea ng-model="model.rule.styles" required></textarea>
+                            <textarea class="umb-stylesheet-rule-styles" ng-model="model.rule.styles" required></textarea>
                         </umb-control-group>
 
                         <umb-control-group label="@stylesheet_preview" description="@stylesheet_previewHelp">
-                            <div style="{{model.rule.styles}}">
+                            <div class="umb-stylesheet-rule-preview" style="{{model.rule.styles}}">
                                 a b c d e f g h i j k l m n o p q r s t u v w x t z
                                 <br>
                                 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
@@ -53,6 +53,7 @@
                         type="button"
                         button-style="link"
                         label-key="general_close"
+                        shortcut="esc"
                         action="vm.close()">
                     </umb-button>
                     <umb-button

@@ -21,12 +21,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new MediaTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
+            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
         {
-            return new EntityContainerRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Constants.ObjectTypes.MediaTypeContainer);
+            return new EntityContainerRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Constants.ObjectTypes.MediaTypeContainer);
 
         }
 

@@ -162,7 +162,7 @@ When building a custom infinite editor view you can use the same components as a
 (function () {
     "use strict";
 
-    function editorService(eventsService, keyboardService) {
+    function editorService(eventsService, keyboardService, $timeout) {
 
         let editorsKeyboardShorcuts = [];
         var editors = [];
@@ -245,10 +245,14 @@ When building a custom infinite editor view you can use the same components as a
 
             // emit event to let components know an editor has been removed
             eventsService.emit("appState.editors.close", args);
-
-            // rebind keyboard shortcuts for the new editor in focus
-            rebindKeyboardShortcuts();
             
+            // delay required to map the properties to the correct editor due
+            // to another delay in the closing animation of the editor
+            $timeout(function() {
+                // rebind keyboard shortcuts for the new editor in focus
+                rebindKeyboardShortcuts();
+            }, 0);
+
         }
 
         /**
@@ -748,6 +752,29 @@ When building a custom infinite editor view you can use the same components as a
             open(editor);
         }
 
+         /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a member picker in infinite editing, the submit callback returns an array of selected items
+         * 
+         * @param {Object} editor rendering options
+         * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
+         * @param {Function} editor.close Callback function when the close button is clicked.
+         * 
+         * @returns {Object} editor object
+         */
+        function memberPicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            editor.section = "member";
+            editor.treeAlias = "member";
+            open(editor);
+        }
+
         ///////////////////////
         
         /**
@@ -824,7 +851,8 @@ When building a custom infinite editor view you can use the same components as a
             userPicker: userPicker,
             itemPicker: itemPicker,
             macroPicker: macroPicker,
-            memberGroupPicker: memberGroupPicker
+            memberGroupPicker: memberGroupPicker,
+            memberPicker: memberPicker
         };
 
         return service;

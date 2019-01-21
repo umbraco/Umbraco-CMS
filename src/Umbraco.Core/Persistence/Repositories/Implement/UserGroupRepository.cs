@@ -23,11 +23,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
         private readonly PermissionRepository<IContent> _permissionRepository;
 
-        public UserGroupRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger)
-            : base(scopeAccessor, cacheHelper, logger)
+        public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger)
+            : base(scopeAccessor, appCaches, logger)
         {
-            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, cacheHelper, logger);
-            _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, cacheHelper, logger);
+            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, logger);
+            _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, logger);
         }
 
         public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
@@ -360,7 +360,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly UserGroupRepository _userGroupRepo;
 
-            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _userGroupRepo = userGroupRepo;

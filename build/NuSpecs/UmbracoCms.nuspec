@@ -22,7 +22,7 @@
               not want this to happen as the alpha of the next major is, really, the next major already.
             -->
             <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3, 2.999999)" />
-            <dependency id="Umbraco.ModelsBuilder.Ui" version="[8.0.0-alpha.31]" />
+            <dependency id="Umbraco.ModelsBuilder.Ui" version="[8.0.0-alpha.33]" />
             <dependency id="ImageProcessor.Web" version="[4.9.3.25,4.999999)" />
             <dependency id="ImageProcessor.Web.Config" version="[2.4.1.19,2.999999)" />
             <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[2.0.1,2.999999)" />
@@ -52,10 +52,8 @@
         <!-- config transforms -->
         <!-- beware! config transforms not supported by PackageReference -->
         <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
-        <file src="tools\applications.config.install.xdt" target="Content\config\applications.config.install.xdt" />
         <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
         <file src="tools\Dashboard.config.install.xdt" target="Content\config\Dashboard.config.install.xdt" />
-        <file src="tools\trees.config.install.xdt" target="Content\config\trees.config.install.xdt" />
         <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
         <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" /> <!-- FIXME Content\ !! and then... transform?! -->
 

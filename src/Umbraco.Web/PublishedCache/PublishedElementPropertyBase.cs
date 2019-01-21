@@ -106,7 +106,7 @@ namespace Umbraco.Web.PublishedCache
             }
         }
 
-        private ICacheProvider GetSnapshotCache()
+        private IAppCache GetSnapshotCache()
         {
             // cache within the snapshot cache, unless previewing, then use the snapshot or
             // elements cache (if we don't want to pollute the elements cache with short-lived
@@ -135,12 +135,12 @@ namespace Umbraco.Web.PublishedCache
                 case PropertyCacheLevel.Elements:
                     // cache within the elements  cache, depending...
                     var snapshotCache = GetSnapshotCache();
-                    cacheValues = (CacheValues) snapshotCache?.GetCacheItem(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
+                    cacheValues = (CacheValues) snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 case PropertyCacheLevel.Snapshot:
                     // cache within the snapshot cache
                     var facadeCache = _publishedSnapshotAccessor?.PublishedSnapshot?.SnapshotCache;
-                    cacheValues = (CacheValues) facadeCache?.GetCacheItem(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
+                    cacheValues = (CacheValues) facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 default:
                     throw new InvalidOperationException("Invalid cache level.");

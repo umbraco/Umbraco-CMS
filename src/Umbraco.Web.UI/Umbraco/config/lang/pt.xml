@@ -191,8 +191,6 @@
     <key alias="siterepublishHelp">O cache do website será atualizado. Todo conteúdo publicado será atualizado, enquanto o conteúdo que não foi publicado permanecerá invisível</key>
     <key alias="tableColumns">Número de colunas</key>
     <key alias="tableRows">Número de linhas</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Defina uma id de espaço reservado</strong> definindo uma ID em seu espaço reservado você pode injetar conteúdo dentro deste modelo desde modelos filhos usando esta ID como referência dentro de um elemento <code>&lt;asp:content /&gt;</code>]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Selecione uma id de espaço reservado</strong> da lista abaixo. Você pode escolher somente as IDs em seu modelo mestre atual.]]></key>
     <key alias="thumbnailimageclickfororiginal">Clique para ver a imagem em seu tamanho original</key>
     <key alias="treepicker">Escolha item</key>
     <key alias="viewCacheItem">Ver Item em Cache</key>
@@ -311,7 +309,6 @@
     <key alias="or">ou</key>
     <key alias="password">Senha</key>
     <key alias="path">Caminho</key>
-    <key alias="placeHolderID">ID do Espaço Reservado</key>
     <key alias="pleasewait">Um momento por favor...</key>
     <key alias="previous">Prévio</key>
     <key alias="properties">Propriedades</key>
@@ -522,14 +519,12 @@ Vá até http://%4%/#/content/content/edit/%5% para editar.
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[Selecione o pacote em sua máquina clicando no botão Navegar <br /> e localizando o pacote. Pacotes Umbraco tem extensão ".umb" ou ".zip".]]></key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration">Demonstração</key>
     <key alias="packageDocumentation">Documentação</key>
     <key alias="packageMetaData">Dado meta do pacote</key>
     <key alias="packageName">Nome do pacote</key>
     <key alias="packageNoItemsHeader">Pacote não contém nenhum item</key>
     <key alias="packageNoItemsText"><![CDATA[Este arquivo de pacote não contém nenhum item a ser desinstalado. <br /><br />
 Você pode remover com segurança do seu sistema clicando em "desinstalar pacote" abaixo.]]></key>
-    <key alias="packageNoUpgrades">Nenhuma atualização disponível</key>
     <key alias="packageOptions">Oções do pacote</key>
     <key alias="packageReadme">Leia-me do pacote</key>
     <key alias="packageRepository">Repositório do pacote</key>
@@ -539,12 +534,7 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
     <key alias="packageUninstallHeader">Desinstalar pacote</key>
     <key alias="packageUninstallText"><![CDATA[Você pode de-selecionar itens que não deseja remover neste momento, abaixo. Quando clicar em "confirmar desinstalação" todos os itens selecionados serão removido. <br />
 <span style="color: Red; font-weight: bold;">Aviso:</span> quaisquer documentos, mídia, etc dependentes dos itens que forem removidos vão parar de funcionar e podem levar à instabilidade do sistema. Então desinstale com cuidado. Se tiver dúvidas, contate o autor do pacote]]></key>
-    <key alias="packageUpgradeDownload">Baixar atualização pelo repositório</key>
-    <key alias="packageUpgradeHeader">Atualizar pacote</key>
-    <key alias="packageUpgradeInstructions">Instruções de atualização</key>
-    <key alias="packageUpgradeText">Há uma atualizaçào disponível para este pacote. Você pode baixá-lo diretamente do repositório de pacotes do Umbraco.</key>
     <key alias="packageVersion">Versão do pacote</key>
-    <key alias="viewPackageWebsite">Ver website do pacote</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Colar com formatação completa (Não recomendado)</key>

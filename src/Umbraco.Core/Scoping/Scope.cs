@@ -34,7 +34,7 @@ namespace Umbraco.Core.Scoping
         private bool _disposed;
         private bool? _completed;
 
-        private IsolatedRuntimeCache _isolatedRuntimeCache;
+        private IsolatedCaches _isolatedCaches;
         private IUmbracoDatabase _database;
         private EventMessages _messages;
         private ICompletable _fscope;
@@ -177,14 +177,14 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <inheritdoc />
-        public IsolatedRuntimeCache IsolatedRuntimeCache
+        public IsolatedCaches IsolatedCaches
         {
             get
             {
-                if (ParentScope != null) return ParentScope.IsolatedRuntimeCache;
+                if (ParentScope != null) return ParentScope.IsolatedCaches;
 
-                return _isolatedRuntimeCache ?? (_isolatedRuntimeCache
-                           = new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+                return _isolatedCaches ?? (_isolatedCaches
+                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
             }
         }
 

@@ -52,8 +52,8 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationController"/> class with all its dependencies.
         /// </summary>
-        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         { }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager

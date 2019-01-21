@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class AuditRepository : NPocoRepositoryBase<int, IAuditItem>, IAuditRepository
     {
         public AuditRepository(IScopeAccessor scopeAccessor, ILogger logger)
-            : base(scopeAccessor, CacheHelper.NoCache, logger)
+            : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 
         protected override void PersistNewItem(IAuditItem entity)

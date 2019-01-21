@@ -421,7 +421,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          */
         reBindChangedProperties: function (origContent, savedContent) {
 
-            //TODO: We should probably split out this logic to deal with media/members seperately to content
+            //TODO: We should probably split out this logic to deal with media/members separately to content
 
             //a method to ignore built-in prop changes
             var shouldIgnore = function (propName) {

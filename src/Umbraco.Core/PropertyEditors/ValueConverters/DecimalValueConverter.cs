@@ -18,17 +18,31 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return 0M;
+            if (source == null)
+            {
+                return 0M;
+            }
 
-            // in XML a decimal is a string
+            // is it already a decimal?
+            if(source is decimal)
+            {
+                return source;
+            }
+
+            // is it a double?
+            if(source is double sourceDouble)
+            {
+                return Convert.ToDecimal(sourceDouble);
+            }
+
+            // is it a string?
             if (source is string sourceString)
             {
                 return decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal d) ? d : 0M;
             }
 
-            // in the database an a decimal is an a decimal
-            // default value is zero
-            return source is decimal ? source : 0M;
+            // couldn't convert the source value - default to zero
+            return 0M;
         }
     }
 }

@@ -5,6 +5,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
@@ -161,6 +162,9 @@ namespace Umbraco.Core.Composing
         internal static PackageActionCollection PackageActions
             => Factory.GetInstance<PackageActionCollection>();
 
+        internal static IPackageActionRunner PackageActionRunner
+            => Factory.GetInstance<IPackageActionRunner>();
+
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Factory.GetInstance<PropertyValueConverterCollection>();
 
@@ -176,8 +180,8 @@ namespace Umbraco.Core.Composing
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Factory.GetInstance<ICultureDictionaryFactory>();
 
-        public static CacheHelper ApplicationCache
-            => Factory.GetInstance<CacheHelper>();
+        public static AppCaches AppCaches
+            => Factory.GetInstance<AppCaches>();
 
         public static ServiceContext Services
             => Factory.GetInstance<ServiceContext>();

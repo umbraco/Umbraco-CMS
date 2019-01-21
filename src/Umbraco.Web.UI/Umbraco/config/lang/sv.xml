@@ -249,8 +249,6 @@
     <key alias="siterepublishHelp">Webbplatsens cache kommer att uppdateras. Allt innehåll som är publicerat kommer att uppdateras. Innehåll som inte är publicerat kommer att förbli opublicerat.</key>
     <key alias="tableColumns">Antal kolumner</key>
     <key alias="tableRows">Antal rader</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Ge din platshållare ett id</strong> du kan skjuta in innehåll från underordnade sidmallar i platshållaren genom att ge den ett ID. Du refererar sedan till detta ID med hjälp av en <code>&lt;asp:content /&gt;</code> tagg.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Välj ett platshållar-ID</strong> från listan nedan. Du kan bara välja de ID som finns i denna malls huvudmall.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klicka på förhandsgranskningsbilden för att se bilden i full storlek</key>
     <key alias="treepicker">Välj ett objekt</key>
     <key alias="viewCacheItem">Se cachat objekt</key>
@@ -374,7 +372,6 @@
     <key alias="or">eller</key>
     <key alias="password">Lösenord</key>
     <key alias="path">Sökväg</key>
-    <key alias="placeHolderID">Platshållar-ID</key>
     <key alias="pleasewait">Ett ögonblick...</key>
     <key alias="previous">Föregående</key>
     <key alias="properties">Egenskaper</key>
@@ -544,13 +541,11 @@
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[Välj ett installationspaket, genom att klicka på utforska<br />och leta upp paketet. Umbracos installationspaket har oftast filändelsen ".umb" eller ".zip".]]></key>
     <key alias="packageAuthor">Utvecklare</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Paket metadata</key>
     <key alias="packageName">Paketnamn</key>
     <key alias="packageNoItemsHeader">Paketet innehåller inga poster</key>
     <key alias="packageNoItemsText"><![CDATA[Paketfilen innehåller inga poster som kan avinstalleras.<br/><br/>Det är säkert att ta bort den ur systemet genom att klicka på "avinstallera paket" nedan.]]></key>
-    <key alias="packageNoUpgrades">Inga uppdateringar tillgängliga</key>
     <key alias="packageOptions">Paketalternativ</key>
     <key alias="packageReadme">Paket läsmig</key>
     <key alias="packageRepository">Paketvalv</key>
@@ -559,13 +554,7 @@
     <key alias="packageUninstalledText">Paketet har avinstallerats utan problem</key>
     <key alias="packageUninstallHeader">Avinstallera paket</key>
     <key alias="packageUninstallText"><![CDATA[Nedan kan du avmarkera de poster du inte vill avinstallera just nu. När du klickar på "bekräfta avinstallation" kommer alla markerade poster att avinstalleras.<br/><span style="color: Red; font-weight: bold;">OBS!</span> dokument, media osv som använder de borttagna posterna kommer sluta fungera vilket kan leda till att systemet blir instabilt. Avinstallera därför med försiktighet. Om du är osäker, kontakta personen som skapat paketet.]]></key>
-    <key alias="packageUpgradeDownload">Hämta uppdatering från paketvalvet</key>
-    <key alias="packageUpgradeHeader">Uppdatera paket</key>
-    <key alias="packageUpgradeInstructions">Uppdateringsinstruktioner</key>
-    <key alias="packageUpgradeText">Det finns an uppdaterad version av paketet. Du kan hämta den direkt från Umbracos paketvalv.</key>
     <key alias="packageVersion">Paketversion</key>
-    <key alias="packageVersionHistory">Versionshistorik för paket</key>
-    <key alias="viewPackageWebsite">Besök paketets webbplats</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Klistra in med helt bibehållen formatering (rekommenderas ej)</key>

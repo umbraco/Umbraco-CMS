@@ -9,6 +9,18 @@ namespace Umbraco.Web.Models.Mapping
     {
         public CodeFileMapperProfile()
         {
+            CreateMap<Stylesheet, EntityBasic>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(sheet => sheet.Id))
+                .ForMember(dest => dest.Alias, opt => opt.MapFrom(sheet => sheet.Alias))
+                .ForMember(dest => dest.Key, opt => opt.MapFrom(sheet => sheet.Key))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(sheet => sheet.Name))
+                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.Path, opt => opt.MapFrom(sheet => sheet.Path))
+                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.Udi, opt => opt.Ignore())
+                .ForMember(dest => dest.Icon, opt => opt.Ignore());
+
             CreateMap<IPartialView, CodeFileDisplay>()
                 .ForMember(dest => dest.FileType, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())

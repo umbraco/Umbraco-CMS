@@ -50,11 +50,11 @@ namespace Umbraco.Core.Models
         /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="staticCache"></param>
+        /// <param name="cache"></param>
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        internal static string[] GetUserAvatarUrls(this IUser user, ICacheProvider staticCache)
+        internal static string[] GetUserAvatarUrls(this IUser user, IAppCache cache)
         {
             // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Models
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try gravatar
-                var gravatarAccess = staticCache.GetCacheItem<bool>("UserAvatar" + user.Id, () =>
+                var gravatarAccess = cache.GetCacheItem<bool>("UserAvatar" + user.Id, () =>
                 {
                     // Test if we can reach this URL, will fail when there's network or firewall errors
                     var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);

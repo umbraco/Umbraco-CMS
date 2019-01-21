@@ -36,7 +36,7 @@ namespace Umbraco.Web.PublishedCache
         /// <remarks>
         /// <para>The snapshot-level cache belongs to this snapshot only.</para>
         /// </remarks>
-        ICacheProvider SnapshotCache { get; }
+        IAppCache SnapshotCache { get; }
 
         /// <summary>
         /// Gets the elements-level cache.
@@ -45,7 +45,7 @@ namespace Umbraco.Web.PublishedCache
         /// <para>The elements-level cache is shared by all snapshots relying on the same elements,
         /// ie all snapshots built on top of unchanging content / media / etc.</para>
         /// </remarks>
-        ICacheProvider ElementsCache { get; }
+        IAppCache ElementsCache { get; }
 
         /// <summary>
         /// Forces the preview mode.

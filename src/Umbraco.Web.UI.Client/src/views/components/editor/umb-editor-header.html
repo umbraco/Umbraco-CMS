@@ -23,7 +23,8 @@
             <div id="nameField" style="flex: 1 1 auto;">
                 <div class="umb-editor-header__name-wrapper">
                     <ng-form name="headerNameForm">
-                        <input data-element="editor-name-field"
+                        <input data-element="editor-name-field" 
+                               no-password-manager
                                title="{{key}}"
                                type="text"
                                class="umb-editor-header__name-input"
@@ -45,6 +46,7 @@
                                         alias="$parent.alias"
                                         alias-from="$parent.name"
                                         enable-lock="true"
+                                        validation-position="'right'"
                                         server-validation-field="Alias">
                     </umb-generate-alias>
 
@@ -53,6 +55,7 @@
                 <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
 
                 <input data-element="editor-description"
+                       no-password-manager
                        type="text"
                        class="umb-panel-header-description"
                        localize="placeholder"

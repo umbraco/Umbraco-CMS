@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _logger = logger;
         }
 
-        public override InstallSetupResult Execute(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 DatabaseInstallStep.HandleConnectionStrings(_logger);
             }
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         public override bool RequiresExecution(object model)

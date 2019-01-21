@@ -1,200 +1,119 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using System.Xml.Linq;
+using Semver;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Packaging;
 
 namespace Umbraco.Core.Services
 {
     public interface IPackagingService : IService
     {
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IContent"/>
-        /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="parentId">Optional parent Id for the content being imported</param>
-        /// <param name="userId">Optional Id of the user performing the import</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumrable list of generated content</returns>
-        IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true);
+        #region Package Installation
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// Returns a <see cref="CompiledPackage"/> result from an umbraco package file (zip)
         /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumrable list of generated ContentTypes</returns>
-        IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IContentType"/>
-        /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="importStructure">Boolean indicating whether or not to import the </param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumrable list of generated ContentTypes</returns>
-        IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
-        /// </summary>
-        /// <param name="dictionaryItemElementList">Xml to import</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumerable list of dictionary items</returns>
-        IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, bool raiseEvents = true);
-
-        /// <summary>
-        /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
-        /// </summary>
-        /// <param name="languageElementList">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumerable list of generated languages</returns>
-        IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
-        /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <param name="packageFile"></param>
         /// <returns></returns>
-        IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true);
+        CompiledPackage GetCompiledPackageInfo(FileInfo packageFile);
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="ITemplate"/>
+        /// Installs the package files contained in an umbraco package file (zip)
         /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns>An enumrable list of generated Templates</returns>
-        IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true);
+        /// <param name="packageDefinition"></param>
+        /// <param name="packageFile"></param>
+        /// <param name="userId"></param>
+        IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
 
         /// <summary>
-        /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>
+        /// Installs the data, entities, objects contained in an umbraco package file (zip)
         /// </summary>
-        /// <param name="contentType">ContentType to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ContentType item</returns>
-        XElement Export(IContentType contentType, bool raiseEvents = true);
+        /// <param name="packageDefinition"></param>
+        /// <param name="packageFile"></param>
+        /// <param name="userId"></param>
+        InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
 
         /// <summary>
-        /// Exports an <see cref="IContent"/> item to xml as an <see cref="XElement"/>
+        /// Uninstalls all versions of the package by name
         /// </summary>
-        /// <param name="content">Content to export</param>
-        /// <param name="deep">Optional parameter indicating whether to include descendents</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        XElement Export(IContent content, bool deep = false, bool raiseEvents = true);
+        /// <param name="packageName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        UninstallationSummary UninstallPackage(string packageName, int userId = 0);
+
+        #endregion
+
+        #region Installed Packages
+
+        IEnumerable<PackageDefinition> GetAllInstalledPackages();
 
         /// <summary>
-        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// Returns the <see cref="PackageDefinition"/> for the installation id
         /// </summary>
-        /// <param name="media">Media to export</param>
-        /// <param name="deep">Optional parameter indicating whether to include descendents</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        XElement Export(IMedia media, bool deep = false, bool raiseEvents = true);
+        /// <param name="id"></param>
+        /// <returns></returns>
+        PackageDefinition GetInstalledPackageById(int id);
 
         /// <summary>
-        /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
+        /// Returns all <see cref="PackageDefinition"/> for the package by name
         /// </summary>
-        /// <param name="languages">List of Languages to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Language object</returns>
-        XElement Export(IEnumerable<ILanguage> languages, bool raiseEvents = true);
+        /// <param name="name"></param>
+        /// <returns>
+        /// A list of all package definitions installed for this package (i.e. original install and any upgrades)
+        /// </returns>
+        IEnumerable<PackageDefinition> GetInstalledPackageByName(string name);
 
         /// <summary>
-        /// Exports a single <see cref="ILanguage"/> item to xml as an <see cref="XElement"/>
+        /// Returns a <see cref="PackageInstallType"/> for a given package name and version
         /// </summary>
-        /// <param name="language">Language to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the Language object</returns>
-        XElement Export(ILanguage language, bool raiseEvents = true);
+        /// <param name="packageName"></param>
+        /// <param name="packageVersion"></param>
+        /// <param name="alreadyInstalled">If the package is an upgrade, the original/current PackageDefinition is returned</param>
+        /// <returns></returns>
+        PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled);
+        void DeleteInstalledPackage(int packageId, int userId = 0);
 
         /// <summary>
-        /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
+        /// Persists a package definition to storage
         /// </summary>
-        /// <param name="dictionaryItem">List of dictionary items to export</param>
-        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem objects</returns>
-        XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true, bool raiseEvents = true);
+        /// <returns></returns>
+        bool SaveInstalledPackage(PackageDefinition definition);
+
+        #endregion
+
+        #region Created Packages
+
+        IEnumerable<PackageDefinition> GetAllCreatedPackages();
+        PackageDefinition GetCreatedPackageById(int id);
+        void DeleteCreatedPackage(int id, int userId = 0);
 
         /// <summary>
-        /// Exports a single <see cref="IDictionaryItem"/> item to xml as an <see cref="XElement"/>
+        /// Persists a package definition to storage
         /// </summary>
-        /// <param name="dictionaryItem">Dictionary Item to export</param>
-        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
-        XElement Export(IDictionaryItem dictionaryItem, bool includeChildren, bool raiseEvents = true);
+        /// <returns></returns>
+        bool SaveCreatedPackage(PackageDefinition definition);
 
         /// <summary>
-        /// Exports a list of Data Types
+        /// Creates the package file and returns it's physical path
         /// </summary>
-        /// <param name="dataTypeDefinitions">List of data types to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
-        XElement Export(IEnumerable<IDataType> dataTypeDefinitions, bool raiseEvents = true);
+        /// <param name="definition"></param>
+        string ExportCreatedPackage(PackageDefinition definition);
+
+        #endregion
 
         /// <summary>
-        /// Exports a single Data Type
-        /// </summary>
-        /// <param name="dataType">Data type to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
-        XElement Export(IDataType dataType, bool raiseEvents = true);
-
-        /// <summary>
-        /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="templates">List of Templates to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate objects</returns>
-        XElement Export(IEnumerable<ITemplate> templates, bool raiseEvents = true);
-
-        /// <summary>
-        /// Exports a single <see cref="ITemplate"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="template">Template to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate object</returns>
-        XElement Export(ITemplate template, bool raiseEvents = true);
-
-        /// <summary>
-        /// Exports a list of <see cref="IMacro"/> items to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="macros">Macros to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro objects</returns>
-        XElement Export(IEnumerable<IMacro> macros, bool raiseEvents = true);
-
-        /// <summary>
-        /// Exports a single <see cref="IMacro"/> item to xml as an <see cref="XElement"/>
-        /// </summary>
-        /// <param name="macro">Macro to export</param>
-        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
-        XElement Export(IMacro macro, bool raiseEvents = true);
-
-        /// <summary>
-        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
+        /// This will fetch an Umbraco package file from the package repository and return the file name of the downloaded package
         /// </summary>
         /// <param name="packageId"></param>
         /// <param name="umbracoVersion"></param>
         /// <param name="userId">The current user id performing the operation</param>
-        /// <returns></returns>
-        string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId);
+        /// <returns>
+        /// The file name of the downloaded package which will exist in ~/App_Data/packages
+        /// </returns>
+        Task<FileInfo> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId);
     }
 }

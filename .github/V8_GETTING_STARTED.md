@@ -11,7 +11,7 @@
 
 * Open the `/src/umbraco.sln` Visual Studio solution
 * Start the solution (easiest way is to use `ctrl + F5`)
-* When the solution is first built this may take some time since it will restore all nuget, npm and bower packages, build the .net solution and also build the angular solution
+* When the solution is first built this may take some time since it will restore all nuget and npm packages, build the .net solution and also build the angular solution
 * When the website starts you'll see the Umbraco installer and just follow the prompts
 * You're all set!
 

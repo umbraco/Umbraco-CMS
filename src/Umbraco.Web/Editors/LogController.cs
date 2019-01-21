@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             var mappedItems = items.ToList();
             var userIds = mappedItems.Select(x => x.UserId).ToArray();
             var userAvatars = Services.UserService.GetUsersById(userIds)
-                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(ApplicationCache.RuntimeCache));
+                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(AppCaches.RuntimeCache));
             var userNames = Services.UserService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
             foreach (var item in mappedItems)
             {

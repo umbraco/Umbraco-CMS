@@ -55,12 +55,12 @@
                     <ul class="umb-breadcrumbs">
                         <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
                             <a href ng-click="gotoFolder()" prevent-default>Media</a>
-                            <span class="umb-breadcrumbs__seperator">&#47;</span>
+                            <span class="umb-breadcrumbs__separator">&#47;</span>
                         </li>
     
                         <li ng-repeat="item in path" class="umb-breadcrumbs__ancestor">
                             <a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a>
-                            <span class="umb-breadcrumbs__seperator">&#47;</span>
+                            <span class="umb-breadcrumbs__separator">&#47;</span>
                         </li>
     
                         <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
@@ -171,6 +171,7 @@
             <umb-button
                 action="close()"
                 button-style="link"
+                shortcut="esc"
                 label="Close"
                 type="button">
             </umb-button>

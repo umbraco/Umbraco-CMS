@@ -86,6 +86,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// Property Group
         /// </summary>
-        PropertyGroup
+        PropertyGroup,
+
+        /// <summary>
+        /// Dictionary Item
+        /// </summary>
+        DictionaryItem
     }
 }

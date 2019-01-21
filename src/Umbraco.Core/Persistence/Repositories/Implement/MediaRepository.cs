@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
-        public MediaRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, ILanguageRepository languageRepository)
+        public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, ILanguageRepository languageRepository)
             : base(scopeAccessor, cache, languageRepository, logger)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
@@ -395,7 +395,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly MediaRepository _outerRepo;
 
-            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;

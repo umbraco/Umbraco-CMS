@@ -58,6 +58,11 @@ namespace Umbraco.Core
         RuntimeLevel Level { get; }
 
         /// <summary>
+        /// Gets the reason for the runtime level of execution.
+        /// </summary>
+        RuntimeLevelReason Reason { get; }
+
+        /// <summary>
         /// Gets the current migration state.
         /// </summary>
         string CurrentMigrationState { get; }

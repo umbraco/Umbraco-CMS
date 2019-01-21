@@ -31,16 +31,6 @@ namespace Umbraco.Core.IO
 
         public static char DirSepChar => Path.DirectorySeparatorChar;
 
-        internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
-        {
-            // Unzip
-            var tempDir = unPackDirectory;
-            Directory.CreateDirectory(tempDir);
-            ZipFile.ExtractToDirectory(zipFilePath, unPackDirectory);
-            if (deleteZipFile)
-                File.Delete(zipFilePath);
-        }
-
         //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
@@ -123,11 +113,6 @@ namespace Umbraco.Core.IO
             return MapPath(path, true);
         }
 
-        public static string MapPathIfVirtual(string path)
-        {
-            return path.StartsWith("~/") ? MapPath(path) : path;
-        }
-
         //use a tilde character instead of the complete path
         internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
@@ -154,20 +139,6 @@ namespace Umbraco.Core.IO
         internal static bool VerifyEditPath(string filePath, string validDir)
         {
             return VerifyEditPath(filePath, new[] { validDir });
-        }
-
-        /// <summary>
-        /// Validates that the current filepath matches a directory where the user is allowed to edit a file.
-        /// </summary>
-        /// <param name="filePath">The filepath to validate.</param>
-        /// <param name="validDir">The valid directory.</param>
-        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
-        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
-        internal static bool ValidateEditPath(string filePath, string validDir)
-        {
-            if (VerifyEditPath(filePath, validDir) == false)
-                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-            return true;
         }
 
         /// <summary>
@@ -219,20 +190,6 @@ namespace Umbraco.Core.IO
         {
             var ext = Path.GetExtension(filePath);
             return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
-        }
-
-        /// <summary>
-        /// Validates that the current filepath has one of several authorized extensions.
-        /// </summary>
-        /// <param name="filePath">The filepath to validate.</param>
-        /// <param name="validFileExtensions">The valid extensions.</param>
-        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
-        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
-        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
-        {
-            if (VerifyFileExtension(filePath, validFileExtensions) == false)
-                throw new FileSecurityException(String.Format("The extension for the current file '{0}' is not of an allowed type for this editor. This is typically controlled from either the installed MacroEngines or based on configuration in /config/umbracoSettings.config", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-            return true;
         }
 
         public static bool PathStartsWith(string path, string root, char separator)
@@ -327,17 +284,6 @@ namespace Umbraco.Core.IO
             var absolutePath = MapPath(path);
             if (Directory.Exists(absolutePath) == false)
                 Directory.CreateDirectory(absolutePath);
-        }
-
-        public static void EnsureFileExists(string path, string contents)
-        {
-            var absolutePath = IOHelper.MapPath(path);
-            if (File.Exists(absolutePath)) return;
-
-            using (var writer = File.CreateText(absolutePath))
-            {
-                writer.Write(contents);
-            }
         }
 
         /// <summary>

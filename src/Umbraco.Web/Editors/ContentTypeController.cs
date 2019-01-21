@@ -11,10 +11,18 @@ using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -40,6 +48,22 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
+        private readonly IEntityXmlSerializer _serializer;
+        private readonly PropertyEditorCollection _propertyEditors;
+
+        public ContentTypeController(IEntityXmlSerializer serializer,
+            ICultureDictionaryFactory cultureDictionaryFactory,
+            IGlobalSettings globalSettings,
+            UmbracoContext umbracoContext,
+            ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
+            ServiceContext services, AppCaches appCaches,
+            IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        {
+            _serializer = serializer;
+            _propertyEditors = propertyEditors;
+        }
+
         public int GetCount()
         {
             return Services.ContentTypeService.Count();
@@ -150,8 +174,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var configuration = Current.Services.DataTypeService.GetDataType(id).Configuration;
-            var editor = Current.PropertyEditors[dataTypeDiff.EditorAlias];
+            var configuration = Services.DataTypeService.GetDataType(id).Configuration;
+            var editor = _propertyEditors[dataTypeDiff.EditorAlias];
 
             return new ContentPropertyDisplay()
             {
@@ -444,11 +468,7 @@ namespace Umbraco.Web.Editors
             var contentType = Services.ContentTypeService.Get(id);
             if (contentType == null) throw new NullReferenceException("No content type found with id " + id);
 
-            var serializer = new EntityXmlSerializer();
-            var xml = serializer.Serialize(
-                Services.DataTypeService,
-                Services.ContentTypeService,
-                contentType);
+            var xml = _serializer.Serialize(contentType);
 
             var response = new HttpResponseMessage
             {
@@ -480,14 +500,16 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+            
+            var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors);
 
-            var xd = new XmlDocument();
-            xd.XmlResolver = null;
+            var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
-            var userId = Security.GetUserId();
+            var userId = Security.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
-            Current.Services.PackagingService.ImportContentTypes(element, userId);
+            dataInstaller.ImportDocumentType(element, userId);
 
             // Try to clean up the temporary file.
             try
@@ -496,7 +518,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                Logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -511,7 +533,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -524,26 +546,24 @@ namespace Umbraco.Web.Editors
             }
 
             var model = new ContentTypeImportModel();
+            
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
             if (ext.InvariantEquals("udt"))
             {
-                //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
-                var tempDir = IOHelper.MapPath(SystemDirectories.Data);
+                model.TempFileName = Path.Combine(root, model.TempFileName);
 
-                //ensure it's there
-                Directory.CreateDirectory(tempDir);
-
-                model.TempFileName = "justDelete_" + Guid.NewGuid() + ".udt";
-                var tempFileLocation = Path.Combine(tempDir, model.TempFileName);
-                System.IO.File.Copy(file.LocalFileName, tempFileLocation, true);
+                model.UploadedFiles.Add(new ContentPropertyFile
+                {
+                    TempFilePath = model.TempFileName
+                });
 
                 var xd = new XmlDocument
                 {
                     XmlResolver = null
                 };
-                xd.Load(tempFileLocation);
+                xd.Load(model.TempFileName);
 
                 model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
                 model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
@@ -559,5 +579,7 @@ namespace Umbraco.Web.Editors
             return model;
 
         }
+
+        
     }
 }
