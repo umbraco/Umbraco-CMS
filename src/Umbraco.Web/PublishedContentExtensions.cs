@@ -4,9 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using Examine;
-using Examine.Search;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -15,8 +13,6 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
-
     /// <summary>
     /// Provides extension methods for <c>IPublishedContent</c>.
     /// </summary>
@@ -88,24 +84,21 @@ namespace Umbraco.Web
 
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
-            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates == true)
+            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
                 return content.TemplateId == templateId;
 
-            if (content.TemplateId != templateId && Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates == true)
-            {
-                // fixme - perfs? nothing cached here
-                var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
-                if (publishedContentContentType == null)
-                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
+                return true;
 
-                return publishedContentContentType.IsAllowedTemplate(templateId);
-            }
+            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
+            if (publishedContentContentType == null)
+                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
 
-            return true;
+            return publishedContentContentType.IsAllowedTemplate(templateId);
+
         }
         public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
         {
-            // fixme - perfs? nothing cached here
             var template = Current.Services.FileService.GetTemplate(templateAlias);
             return template != null && content.IsAllowedTemplate(template.Id);
         }
@@ -168,12 +161,7 @@ namespace Umbraco.Web
                 return true;
 
             // else let fallback try to get a value
-            // fixme - really?
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _))
-                return true;
-
-            // else... no
-            return false;
+            return PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _, out _);
         }
 
         /// <summary>
@@ -195,15 +183,12 @@ namespace Umbraco.Web
                 return property.GetValue(culture, segment);
 
             // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
                 return value;
-
-            if (property == null)
-                return null;
 
             // else... if we have a property, at least let the converter return its own
             // vision of 'no value' (could be an empty enumerable)
-            return property.GetValue(culture, segment);
+            return property?.GetValue(culture, segment);
         }
 
         /// <summary>
@@ -226,35 +211,12 @@ namespace Umbraco.Web
                 return property.Value<T>(culture, segment);
 
             // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
                 return value;
 
             // else... if we have a property, at least let the converter return its own
             // vision of 'no value' (could be an empty enumerable) - otherwise, default
             return property == null ? default : property.Value<T>(culture, segment);
-        }
-
-        // fixme - .Value() refactoring - in progress
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", int fallback = 0)
-        {
-            var aliasesA = aliases.Split(',');
-            if (aliasesA.Length == 0)
-                return new HtmlString(string.Empty);
-
-            throw new NotImplementedException("WorkInProgress");
-
-            var property = content.GetProperty(aliasesA[0]);
-
-            //var property = aliases.Split(',')
-            //    .Where(x => string.IsNullOrWhiteSpace(x) == false)
-            //    .Select(x => content.GetProperty(x.Trim(), recurse))
-            //    .FirstOrDefault(x => x != null);
-
-            //if (format == null) format = x => x.ToString();
-
-            //return property != null
-            //    ? new HtmlString(format(property.Value<T>()))
-            //    : new HtmlString(alt);
         }
 
         #endregion
@@ -992,9 +954,8 @@ namespace Umbraco.Web
         /// </remarks>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (content == null) throw new ArgumentNullException(nameof(content)); // fixme wtf is this?
 
-//
             return content.Children.Where(x =>
             {
                 if (!x.ContentType.VariesByCulture()) return true; // invariant = always ok
@@ -1056,10 +1017,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The content type alias.</param>
-        /// <returns>The first child of content, of the given content type.</returns>
-        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null)
+        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null) // fixme oops
         {
             return content.Children(culture,alias).FirstOrDefault();
         }

@@ -45,7 +45,7 @@ namespace Umbraco.Web.Models.PublishedContent
                         value = defaultValue;
                         return true;
                     case Fallback.Language:
-                        if (TryGetValueWithLanguageFallback(property, culture, segment, defaultValue, out value))
+                        if (TryGetValueWithLanguageFallback(property, culture, segment, out value))
                             return true;
                         break;
                     default:
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 }
             }
 
-            value = defaultValue;
+            value = default;
             return false;
         }
 
@@ -72,6 +72,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 value = default;
                 return false;
             }
+
             _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
 
             foreach (var f in fallback)
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Models.PublishedContent
                         value = defaultValue;
                         return true;
                     case Fallback.Language:
-                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out value))
+                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value))
                             return true;
                         break;
                     default:
@@ -92,32 +93,31 @@ namespace Umbraco.Web.Models.PublishedContent
                 }
             }
 
-            value = defaultValue;
+            value = default;
             return false;
         }
 
         /// <inheritdoc />
-        public bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value)
+        public bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value, out IPublishedProperty noValueProperty)
         {
-            // is that ok?
-            return TryGetValue<object>(content, alias, culture, segment, fallback, defaultValue, out value);
+            return TryGetValue<object>(content, alias, culture, segment, fallback, defaultValue, out value, out noValueProperty);
         }
 
         /// <inheritdoc />
-        public virtual bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
+        public virtual bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value, out IPublishedProperty noValueProperty)
         {
+            noValueProperty = default;
+
             var propertyType = content.ContentType.GetPropertyType(alias);
-            if (propertyType == null)
+            if (propertyType != null)
             {
-                value = default;
-                return false;
+                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+                noValueProperty = content.GetProperty(alias);
             }
-            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
 
             // note: we don't support "recurse & language" which would walk up the tree,
             // looking at languages at each level - should someone need it... they'll have
             // to implement it.
-
 
             foreach (var f in fallback)
             {
@@ -129,34 +129,21 @@ namespace Umbraco.Web.Models.PublishedContent
                         value = defaultValue;
                         return true;
                     case Fallback.Language:
-                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out value))
+                        if (propertyType == null)
+                            continue;
+                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value))
                             return true;
                         break;
                     case Fallback.Ancestors:
-                        IPublishedProperty noValueProperty;
-                        if (TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out value,
-                            out noValueProperty))
-                        {
+                        if (TryGetValueWithAncestorsFallback(content, alias, culture, segment, out value, ref noValueProperty))
                             return true;
-                        }
-
-                        // if we found a property, even though with no value, return that property value
-                        // because the converter may want to handle the missing value. ie if defaultValue is default,
-                        // either specified or by default, the converter may want to substitute something else.
-                        if (noValueProperty != null)
-                        {
-                            value = noValueProperty.Value<T>(culture, segment, fallback.Contains(Fallback.DefaultValue) ? Fallback.ToDefaultValue : Fallback.To(), defaultValue: defaultValue);
-                            return true;
-                        }
                         break;
                     default:
                         throw NotSupportedFallbackMethod(f, "content");
                 }
             }
 
-
-
-            value = defaultValue;
+            value = default;
             return false;
         }
 
@@ -166,10 +153,11 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, recursing the tree
-        private bool TryGetValueWithRecursiveFallback<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value, out IPublishedProperty noValueProperty)
+        // because we recurse, content may not even have the a property with the specified alias (but only some ancestor)
+        // in case no value was found, noValueProperty contains the first property that was found (which does not have a value)
+        private bool TryGetValueWithAncestorsFallback<T>(IPublishedContent content, string alias, string culture, string segment, out T value, ref IPublishedProperty noValueProperty)
         {
-            IPublishedProperty property = null; // if we are here, content's property has no value
-            noValueProperty = null;
+            IPublishedProperty property; // if we are here, content's property has no value
             do
             {
                 content = content.Parent;
@@ -184,7 +172,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 }
 
                 property = content?.GetProperty(alias);
-                if (property != null)
+                if (property != null && noValueProperty != null)
                 {
                     noValueProperty = property;
                 }
@@ -198,15 +186,14 @@ namespace Umbraco.Web.Models.PublishedContent
                 return true;
             }
 
-
-            value = defaultValue;
+            value = default;
             return false;
         }
 
         // tries to get a value, falling back onto other languages
-        private bool TryGetValueWithLanguageFallback<T>(IPublishedProperty property, string culture, string segment, T defaultValue, out T value)
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedProperty property, string culture, string segment, out T value)
         {
-            value = defaultValue;
+            value = default;
 
             if (culture.IsNullOrWhiteSpace()) return false;
 
@@ -238,9 +225,9 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, falling back onto other languages
-        private bool TryGetValueWithLanguageFallback<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, out T value)
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedElement content, string alias, string culture, string segment, out T value)
         {
-            value = defaultValue;
+            value = default;
 
             if (culture.IsNullOrWhiteSpace()) return false;
 
@@ -272,15 +259,15 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         // tries to get a value, falling back onto other languages
-        private bool TryGetValueWithLanguageFallback<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value)
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedContent content, string alias, string culture, string segment, out T value)
         {
-            value = defaultValue;
+            value = default;
 
             if (culture.IsNullOrWhiteSpace()) return false;
 
             var visited = new HashSet<int>();
 
-            // fixme
+            // TODO
             // _localizationService.GetXxx() is expensive, it deep clones objects
             // we want _localizationService.GetReadOnlyXxx() returning IReadOnlyLanguage which cannot be saved back = no need to clone
 
