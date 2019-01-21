@@ -932,7 +932,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Create, Get Published Snapshot
 
         private long _contentGen, _mediaGen, _domainGen;
-        private ICacheProvider _elementsCache;
+        private IAppCache _elementsCache;
 
         public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
@@ -949,18 +949,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // even though the underlying elements may not change (store snapshots)
         public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
-            // note: using ObjectCacheRuntimeCacheProvider for elements and snapshot caches
+            // note: using ObjectCacheAppCache for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
-            // thing - better use a StaticCacheProvider which "just" creates a concurrent
+            // thing - better use a dictionary-based cache which "just" creates a concurrent
             // dictionary
 
-            // for snapshot cache, StaticCacheProvider MAY be OK but it is not thread-safe,
+            // for snapshot cache, DictionaryAppCache MAY be OK but it is not thread-safe,
             // nothing like that...
-            // for elements cache, StaticCacheProvider is a No-No, use something better.
+            // for elements cache, DictionaryAppCache is a No-No, use something better.
+            // ie FastDictionaryAppCache (thread safe and all)
 
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
-            ICacheProvider elementsCache;
+            IAppCache elementsCache;
             lock (_storesLock)
             {
                 var scopeContext = _scopeProvider.Context;
@@ -998,11 +999,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    elementsCache = _elementsCache = new DictionaryCacheProvider();
+                    elementsCache = _elementsCache = new FastDictionaryAppCache();
                 }
             }
 
-            var snapshotCache = new StaticCacheProvider();
+            var snapshotCache = new DictionaryAppCache();
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 

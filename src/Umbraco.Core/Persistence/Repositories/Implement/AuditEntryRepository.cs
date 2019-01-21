@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditEntryRepository"/> class.
         /// </summary>
-        public AuditEntryRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public AuditEntryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

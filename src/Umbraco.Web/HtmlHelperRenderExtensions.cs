@@ -105,7 +105,7 @@ namespace Umbraco.Web
                 var contextualKey = contextualKeyBuilder(model, viewData);
                 cacheKey.AppendFormat("c{0}-", contextualKey);
             }
-            return Current.ApplicationCache.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+            return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
         }
 
         public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)

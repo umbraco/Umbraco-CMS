@@ -26,11 +26,6 @@
         IFileSystem ScriptsFileSystem { get; }
 
         /// <summary>
-        /// Gets the masterpages filesystem.
-        /// </summary>
-        IFileSystem MasterPagesFileSystem { get; }
-
-        /// <summary>
         /// Gets the MVC views filesystem.
         /// </summary>
         IFileSystem MvcViewsFileSystem { get; }

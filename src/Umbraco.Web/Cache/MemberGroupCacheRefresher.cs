@@ -8,8 +8,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher>
     {
-        public MemberGroupCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public MemberGroupCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Cache
             // Since we cache by group name, it could be problematic when renaming to
             // previously existing names - see http://issues.umbraco.org/issue/U4-10846.
             // To work around this, just clear all the cache items
-            CacheHelper.IsolatedRuntimeCache.ClearCache<IMemberGroup>();
+            AppCaches.IsolatedCaches.ClearCache<IMemberGroup>();
         }
 
         #endregion

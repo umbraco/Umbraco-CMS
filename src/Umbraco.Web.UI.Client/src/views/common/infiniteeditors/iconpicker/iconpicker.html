@@ -36,7 +36,8 @@
                         use-color-class="true"
                         colors="vm.colors"
                         selected-color="vm.color"
-                        size="s">
+                        size="s"
+                        on-select="vm.selectColor">
                     </umb-color-swatches>
                 </div>
 
@@ -70,6 +71,13 @@
                 label-key="general_close"
                 shortcut="esc"
                 action="vm.close()">
+            </umb-button>
+            <umb-button
+                type="button"
+                button-style="success"
+                label-key="general_submit"
+                state="vm.saveButtonState"
+                action="vm.submit(model)">
             </umb-button>
         </umb-editor-footer-content-right>
     </umb-editor-footer>

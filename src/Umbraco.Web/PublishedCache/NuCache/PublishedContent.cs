@@ -48,7 +48,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cache = GetCurrentSnapshotCache();
             return cache == null
                 ? GetProfileNameByIdNoCache(id)
-                : (string)cache.GetCacheItem(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
+                : (string)cache.Get(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
         }
 
         private static string GetProfileNameByIdNoCache(int id)
@@ -328,7 +328,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     return GetChildren();
 
                 // note: ToArray is important here, we want to cache the result, not the function!
-                return (IEnumerable<IPublishedContent>)cache.GetCacheItem(ChildrenCacheKey, () => GetChildren().ToArray());
+                return (IEnumerable<IPublishedContent>)cache.Get(ChildrenCacheKey, () => GetChildren().ToArray());
             }
         }
 
@@ -383,7 +383,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Caching
 
         // beware what you use that one for - you don't want to cache its result
-        private ICacheProvider GetAppropriateCache()
+        private IAppCache GetAppropriateCache()
         {
             var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
@@ -394,7 +394,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return cache;
         }
 
-        private ICacheProvider GetCurrentSnapshotCache()
+        private IAppCache GetCurrentSnapshotCache()
         {
             var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             return publishedSnapshot?.SnapshotCache;
@@ -436,7 +436,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var cache = GetAppropriateCache();
             if (cache == null) return new PublishedContent(this).CreateModel();
-            return (IPublishedContent)cache.GetCacheItem(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
+            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
         }
 
         // used by Navigable.Source,...

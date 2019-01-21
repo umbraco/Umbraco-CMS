@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly Lazy<PropertyEditorCollection> _editors;
 
         // fixme temp fixing circular dependencies with LAZY but is this the right place?
-        public DataTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;

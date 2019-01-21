@@ -241,9 +241,6 @@
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Config\trees.Release.config">
-      <DependentUpon>trees.config</DependentUpon>
-    </None>
     <None Include="Config\tinyMceConfig.Release.config">
       <DependentUpon>tinyMceConfig.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -301,14 +298,6 @@
     </Content>
     <Content Include="Config\scripting.config" />
     <Content Include="Config\feedProxy.config" />
-    <Content Include="Config\applications.config" />
-    <Content Include="Config\trees.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Config\applications.Release.config">
-      <DependentUpon>applications.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />

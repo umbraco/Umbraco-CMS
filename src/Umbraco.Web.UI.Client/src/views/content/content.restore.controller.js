@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController",
-    function ($scope, relationResource, contentResource, entityResource, navigationService, appState, treeService, userService) {
+    function ($scope, relationResource, contentResource, entityResource, navigationService, appState, treeService, userService, localizationService) {
 
         $scope.source = _.clone($scope.currentNode);
 
@@ -19,6 +19,10 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
         }
         userService.getCurrentUser().then(function (userData) {
             $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
+        });
+        $scope.labels = {};
+        localizationService.localizeMany(["treeHeaders_content"]).then(function (data) {
+            $scope.labels.treeRoot = data[0];
         });
 
         function nodeSelectHandler(args) {
@@ -92,7 +96,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 		    $scope.relation = data[0];
 
 			if ($scope.relation.parentId === -1) {
-				$scope.target = { id: -1, name: "Root" };
+                $scope.target = { id: -1, name: $scope.labels.treeRoot };
 
             } else {
                 $scope.loading = true;

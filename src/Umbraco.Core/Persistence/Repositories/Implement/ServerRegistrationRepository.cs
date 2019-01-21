@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger logger)
-            : base(scopeAccessor, CacheHelper.NoCache, logger)
+            : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy()
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // and this is because the repository is special and should not participate in scopes
             // (cleanup in v8)
             //
-            return new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(GlobalCache.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+            return new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
         public void ClearCache()

@@ -73,8 +73,6 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IMemberTypeService>(container),
                 MockService<IMemberService>(container),
                 MockService<IUserService>(container),
-                MockService<ISectionService>(container),
-                MockService<IApplicationTreeService>(container),
                 MockService<ITagService>(container),
                 MockService<INotificationService>(container),
                 MockService<ILocalizedTextService>(container),
@@ -145,8 +143,7 @@ namespace Umbraco.Tests.TestHelpers
         public IFileSystems GetFileSystemsMock()
         {
             var fileSystems = Mock.Of<IFileSystems>();
-
-            MockFs(fileSystems, x => x.MasterPagesFileSystem);
+            
             MockFs(fileSystems, x => x.MacroPartialsFileSystem);
             MockFs(fileSystems, x => x.MvcViewsFileSystem);
             MockFs(fileSystems, x => x.PartialViewsFileSystem);

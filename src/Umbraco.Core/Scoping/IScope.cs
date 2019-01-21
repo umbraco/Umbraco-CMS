@@ -38,7 +38,7 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Gets the scope isolated cache.
         /// </summary>
-        IsolatedRuntimeCache IsolatedRuntimeCache { get; }
+        IsolatedCaches IsolatedCaches { get; }
 
         /// <summary>
         /// Completes the scope.

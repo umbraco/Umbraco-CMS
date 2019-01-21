@@ -243,8 +243,6 @@
     <key alias="siterepublishHelp">Mezipaměť webu bude obnovena. Všechen publikovaný obsah bude aktualizován, zatímco nepublikovaný obsah zůstane nepublikovaný.</key>
     <key alias="tableColumns">Počet sloupců</key>
     <key alias="tableRows">Počet řádků</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Nastavení ID zástupce</strong> Nastavením ID zástupce můžete do této šablony zavést obsah z podřízených šablon tak, že odkážete na toto ID při použití prvku <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Vyberte id zástupce</strong> ze seznamu níže. Můžete vybírat pouze z ID ze šablony nadřazené tomuto formuláři.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klikněte na obrázek pro zobrazení v plné velikosti</key>
     <key alias="treepicker">Vybrat položku</key>
     <key alias="viewCacheItem">Zobrazit položku mezipaměti</key>
@@ -374,7 +372,6 @@
     <key alias="or">nebo</key>
     <key alias="password">Heslo</key>
     <key alias="path">Cesta</key>
-    <key alias="placeHolderID">ID zástupce</key>
     <key alias="pleasewait">Moment, prosím...</key>
     <key alias="previous">Předchozí</key>
     <key alias="properties">Vlastnosti</key>
@@ -617,14 +614,12 @@
          a výběrem balíčku. Balíčky umbraco mají obvykle přípony ".umb" nebo ".zip".
       ]]></key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration">Ukázka</key>
     <key alias="packageDocumentation">Dokumentace</key>
     <key alias="packageMetaData">Meta data balíčku</key>
     <key alias="packageName">Název balíčku</key>
     <key alias="packageNoItemsHeader">Balíček neobsahuje žádné položky</key>
     <key alias="packageNoItemsText"><![CDATA[Tento balíček neobsahuje žádné položky k odinstalování.<br/><br/>
       Můžete jej ze systému bezpečně odstranit kliknutím na "odebrat balíček" níže.]]></key>
-    <key alias="packageNoUpgrades">Žádné aktualizace nejsou dostupné</key>
     <key alias="packageOptions">Možnosti balíčku</key>
     <key alias="packageReadme">Čti mě balíčku</key>
     <key alias="packageRepository">Úložiště balíčku</key>
@@ -635,12 +630,7 @@
     <key alias="packageUninstallText"><![CDATA[Níže můžete zrušit zaškrtnutí položek, které si nepřejete nyní odebrat. Jakmile kliknete na "potvrdit odinstalování", všechny zaškrtnuté položky budou odebrány.<br />
       <span style="color: Red; font-weight: bold;">Upozornění:</span> všechny dokumenty, media atd. závislé na položkách, které odstraníte, přestanou pracovat a mohou vést k nestabilitě systému,
       takže odinstalovávejte opatrně. Jste-li na pochybách, kontaktujte autora balíčku.]]></key>
-    <key alias="packageUpgradeDownload">Stáhnout aktualizaci z úložiště</key>
-    <key alias="packageUpgradeHeader">Balíček s aktualizací</key>
-    <key alias="packageUpgradeInstructions">Pokyny pro aktualizaci</key>
-    <key alias="packageUpgradeText"> Pro tento balíček je dostupná aktualizace. Můžete si ji stáhnout přímo z úložiště balíčků umbraco.</key>
     <key alias="packageVersion">Verze balíčku</key>
-    <key alias="viewPackageWebsite">Zobrazit web balíčku</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Vložit s úplným formatováním (nedoporučeno)</key>

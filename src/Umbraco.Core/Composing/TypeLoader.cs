@@ -29,7 +29,7 @@ namespace Umbraco.Core.Composing
     {
         private const string CacheKey = "umbraco-types.list";
 
-        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly IAppPolicyCache _runtimeCache;
         private readonly IProfilingLogger _logger;
 
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
+        public TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
             : this(runtimeCache, localTempStorage, logger, true)
         { }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
+        internal TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempStorage = localTempStorage == LocalTempStorage.Unknown ? LocalTempStorage.Default : localTempStorage;
@@ -185,9 +185,7 @@ namespace Umbraco.Core.Composing
                         // the app code folder and everything in it
                         new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath("~/App_Code")), false),
                         // global.asax (the app domain also monitors this, if it changes will do a full restart)
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
-                        // trees.config - use the contents to create the hash since this gets resaved on every app startup!
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
+                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false)
                     }, _logger);
 
                 return _currentAssembliesHash;
@@ -478,7 +476,7 @@ namespace Umbraco.Core.Composing
             var typesHashFilePath = GetTypesHashFilePath();
             DeleteFile(typesHashFilePath, FileDeleteTimeout);
 
-            _runtimeCache.ClearCacheItem(CacheKey);
+            _runtimeCache.Clear(CacheKey);
         }
 
         private Stream GetFileStream(string path, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int timeoutMilliseconds)

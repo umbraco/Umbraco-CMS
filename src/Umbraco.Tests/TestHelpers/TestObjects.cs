@@ -90,7 +90,7 @@ namespace Umbraco.Tests.TestHelpers
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
         public ServiceContext GetServiceContext(
             IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
-            CacheHelper cache,
+            AppCaches cache,
             ILogger logger,
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.TestHelpers
 
                         return new LocalizedTextServiceFileSources(
                             logger,
-                            cache.RuntimeCache,
+                            cache,
                             mainLangFolder,
                             pluginLangFolders.Concat(userLangFolders));
 
@@ -188,9 +188,7 @@ namespace Umbraco.Tests.TestHelpers
                         new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
             });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
-            var treeService = GetLazyService<IApplicationTreeService>(factory, c => new ApplicationTreeService(logger, cache, typeLoader));
-            var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
-            var sectionService = GetLazyService<ISectionService>(factory, c => new SectionService(userService.Value, treeService.Value, scopeProvider, cache));
+            var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));            
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
 
@@ -213,8 +211,6 @@ namespace Umbraco.Tests.TestHelpers
                 serverRegistrationService,
                 entityService,
                 relationService,
-                treeService,
-                sectionService,
                 macroService,
                 memberTypeService,
                 memberGroupService,

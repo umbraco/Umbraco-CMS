@@ -13,8 +13,8 @@ namespace Umbraco.Web.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
-            : base(cacheHelper)
+        public ContentTypeCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
@@ -65,15 +65,15 @@ namespace Umbraco.Web.Cache
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
                 // don't try to be clever - refresh all
-                ContentCacheRefresher.RefreshContentTypes(CacheHelper);
+                ContentCacheRefresher.RefreshContentTypes(AppCaches);
 
             if (payloads.Any(x => x.ItemType == typeof(IMediaType).Name))
                 // don't try to be clever - refresh all
-                MediaCacheRefresher.RefreshMediaTypes(CacheHelper);
+                MediaCacheRefresher.RefreshMediaTypes(AppCaches);
 
             if (payloads.Any(x => x.ItemType == typeof(IMemberType).Name))
                 // don't try to be clever - refresh all
-                MemberCacheRefresher.RefreshMemberTypes(CacheHelper);
+                MemberCacheRefresher.RefreshMemberTypes(AppCaches);
 
             // notify
             _publishedSnapshotService.Notify(payloads);

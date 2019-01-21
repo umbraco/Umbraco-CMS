@@ -44,10 +44,10 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
-        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
+        public PackageInstallController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
 
@@ -369,19 +369,17 @@ namespace Umbraco.Web.Editors
 
             var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
+            zipFile.Delete();
+
+            //bump cdf to be safe
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
-            zipFile.Delete();
-
             var redirectUrl = "";
-            if (packageInfo.Control.IsNullOrWhiteSpace() == false)
+            if (!packageInfo.PackageView.IsNullOrWhiteSpace())
             {
-                //fixme: this needs to be replaced with an angular view the installer.aspx no longer exists.
-                //redirectUrl = string.Format("/developer/framed/{0}",
-                //    Uri.EscapeDataString(
-                //        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
+                redirectUrl = $"/packages/packages/options/{model.Id}";
             }
 
             return new PackageInstallResult

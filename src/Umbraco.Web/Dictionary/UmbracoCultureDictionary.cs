@@ -21,31 +21,29 @@ namespace Umbraco.Web.Dictionary
     public class DefaultCultureDictionary : Core.Dictionary.ICultureDictionary
     {
         private readonly ILocalizationService _localizationService;
-        private readonly ICacheProvider _requestCacheProvider;
+        private readonly IAppCache _requestCache;
         private readonly CultureInfo _specificCulture;
 
         public DefaultCultureDictionary()
-            : this(Current.Services.LocalizationService, Current.ApplicationCache.RequestCache)
-        {
+            : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
+        { }
 
-        }
-
-        public DefaultCultureDictionary(ILocalizationService localizationService, ICacheProvider requestCacheProvider)
+        public DefaultCultureDictionary(ILocalizationService localizationService, IAppCache requestCache)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            _requestCacheProvider = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
+            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
 
         public DefaultCultureDictionary(CultureInfo specificCulture)
-            : this(Current.Services.LocalizationService, Current.ApplicationCache.RequestCache)
+            : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
         {
             _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
         }
 
-        public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, ICacheProvider requestCacheProvider)
+        public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, IAppCache requestCache)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            _requestCacheProvider = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
+            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
             _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
         }
 
@@ -123,7 +121,7 @@ namespace Umbraco.Web.Dictionary
             {
                 //ensure it's stored/retrieved from request cache
                 //NOTE: This is no longer necessary since these are cached at the runtime level, but we can leave it here for now.
-                return _requestCacheProvider.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
+                return _requestCache.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
                     () => _localizationService.GetLanguageByIsoCode(Culture.Name));
             }
         }
