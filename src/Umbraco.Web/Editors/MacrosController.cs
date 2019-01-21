@@ -149,6 +149,7 @@
             macro.UseInEditor = macroDisplay.UseInEditor;
             macro.MacroSource = macroDisplay.View;
             macro.MacroType = MacroTypes.PartialView;
+            macro.Properties.ReplaceAll(macroDisplay.Parameters.Select((x,i) => new MacroProperty(x.Key, x.Label, i, x.Editor)));
 
             try
             {
@@ -218,7 +219,7 @@
         }
 
         /// <summary>
-        /// Finds all the macro partials 
+        /// Finds all the macro partials
         /// </summary>
         /// <returns>
         /// The <see cref="IEnumerable"/>.
