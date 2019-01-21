@@ -7,9 +7,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.LogViewer)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.LogViewer, null, sortOrder: 7)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.LogViewer, null, sortOrder: 9)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
     public class LogViewerTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
