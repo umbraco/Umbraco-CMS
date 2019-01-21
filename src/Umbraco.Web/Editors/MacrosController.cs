@@ -115,6 +115,22 @@
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
 
+
+        [HttpPost]
+        public HttpResponseMessage DeleteById(int id)
+        {
+            var macro = this.Services.MacroService.GetById(id);
+
+            if (macro == null)
+            {
+                return this.ReturnErrorResponse($"Macro with id {id} does not exist");
+            }
+
+            this.Services.MacroService.Delete(macro);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         [HttpPost]
         public HttpResponseMessage Save(MacroDisplay macroDisplay)
         {
