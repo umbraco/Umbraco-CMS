@@ -59,22 +59,18 @@ namespace Umbraco.Web.Editors
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
-            
+
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
-            var indention = Environment.NewLine + "\t\t\t\t\t\t";
+            var indention = Environment.NewLine + "    ";
 
             sb.Append("Model.Root()");
 
-            var timer = new Stopwatch();
-
-            timer.Start();
-
             var currentPage = Umbraco.ContentAtRoot().FirstOrDefault();
-            timer.Stop();
 
             var pointerNode = currentPage;
+
 
             // adjust the "FROM"
             if (model != null && model.Source != null && model.Source.Id > 0)
@@ -83,26 +79,22 @@ namespace Umbraco.Web.Editors
 
                 if (targetNode != null)
                 {
-                    var aliases = this.GetChildContentTypeAliases(targetNode, currentPage).Reverse();
+                    var path = this.GetPathOfContents(targetNode, currentPage).Reverse();
 
-                    foreach (var contentTypeAlias in aliases)
+                    foreach (var content in path)
                     {
-                        timer.Start();
-
-                        pointerNode = pointerNode.FirstChild(x => x.ContentType.Alias == contentTypeAlias);
+                       pointerNode = pointerNode.FirstChild(x => x.Key == content.Key);
 
                         if (pointerNode == null) break;
-
-                        timer.Stop();
-
-                        sb.AppendFormat(".FirstChild(\"{0}\")", contentTypeAlias);
+                        sb.Append(indention);
+                        sb.AppendFormat(".FirstChild(Guid.Parse(\"{0}\"))", content.Key);
                     }
 
                     if (pointerNode == null || pointerNode.Id != model.Source.Id)
                     {
-                        // we did not find the path
+                        // we did not find the path, This will happen if the chosen source is not a descendants
                         sb.Clear();
-                        sb.AppendFormat("Umbraco.Content({0})", model.Source.Id);
+                        sb.AppendFormat("Umbraco.Content(Guid.Parse(\"{0}\"))",targetNode.Key);
                         pointerNode = targetNode;
                     }
                 }
@@ -110,31 +102,21 @@ namespace Umbraco.Web.Editors
 
             // TYPE to return if filtered by type
             IEnumerable<IPublishedContent> contents;
+            sb.Append(indention);
             if (model != null && model.ContentType != null && string.IsNullOrEmpty(model.ContentType.Alias) == false)
             {
-                timer.Start();
 
-                contents = pointerNode.Children.OfTypes(new[] { model.ContentType.Alias });
+                contents = pointerNode.Children(model.ContentType.Alias);
 
-                timer.Stop();
-                // TODO change to .Children({0})
                 sb.AppendFormat(".Children(\"{0}\")", model.ContentType.Alias);
             }
             else
             {
-                timer.Start();
-                contents = pointerNode.Children;
-                timer.Stop();
+                contents = pointerNode.Children();
                 sb.Append(".Children()");
             }
 
-            //setup 2 clauses, 1 for returning, 1 for testing
-            var clause = string.Empty;
-            var tokenizedClause = string.Empty;
-
             // WHERE
-            var token = 0;
-
             if (model != null)
             {
                 model.Filters = model.Filters.Where(x => x.ConstraintValue != null);
@@ -144,56 +126,25 @@ namespace Umbraco.Web.Editors
                     if (string.IsNullOrEmpty(condition.ConstraintValue)) continue;
 
                     //x is passed in as the parameter alias for the linq where statement clause
-                    var operation = condition.BuildCondition("x");
-                    var tokenizedOperation = condition.BuildTokenizedCondition(token);
+                    var operation = condition.BuildCondition("x", contents, Properties);
 
-                    clause = string.IsNullOrEmpty(clause) ? operation : string.Concat(new[] { clause, " && ", operation });
-                    tokenizedClause = string.IsNullOrEmpty(tokenizedClause) ? tokenizedOperation : string.Concat(new[] { tokenizedClause, " && ", tokenizedOperation });
-
-                    token++;
-                }
-
-                if (string.IsNullOrEmpty(clause) == false)
-                {
-                    timer.Start();
-
-                    //trial-run the tokenized clause to time the execution
-                    //for review - this uses a tonized query rather then the normal linq query.
-                    // fixme/task/critical - that cannot work anymore now that we have killed dynamic support
-                    //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
-                    throw new NotImplementedException();
-
-                    contents = contents.Where(x => x.IsVisible());
-
-                    timer.Stop();
-
-                    //the query to output to the editor
-                    sb.Append(indention);
-                    sb.Append(".Where(x => x.IsVisible())");
+                    contents = contents.Where(operation.Compile());
 
                     sb.Append(indention);
-                    sb.AppendFormat(".Where(x => {0})", clause);
+                    sb.AppendFormat(".Where({0})", operation);
                 }
-                else
-                {
-                    timer.Start();
 
-                    contents = contents.Where(x => x.IsVisible());
 
-                    timer.Stop();
+                contents = contents.Where(x => x.IsVisible());
 
-                    sb.Append(indention);
-                    sb.Append(".Where(x => x.IsVisible())");
-                }
+                //the query to output to the editor
+                sb.Append(indention);
+                sb.Append(".Where(x => x.IsVisible())");
+
 
                 if (model.Sort != null && string.IsNullOrEmpty(model.Sort.Property.Alias) == false)
                 {
-                    timer.Start();
-
                     contents = this.SortByDefaultPropertyValue(contents, model.Sort);
-
-                    timer.Stop();
-
                     sb.Append(indention);
 
                     if (model.Sort.Direction == "ascending")
@@ -208,25 +159,28 @@ namespace Umbraco.Web.Editors
 
                 if (model.Take > 0)
                 {
-                    timer.Start();
-
                     contents = contents.Take(model.Take);
-
-                    timer.Stop();
-
                     sb.Append(indention);
                     sb.AppendFormat(".Take({0})", model.Take);
                 }
             }
 
+
+            // Timing should be fairly correct, due to the fact that all the linq statements are yield returned.
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            var results = contents.ToArray();
+            timer.Stop();
+
             queryResult.QueryExpression = sb.ToString();
+            queryResult.ResultCount = results.Count();
             queryResult.ExecutionTime = timer.ElapsedMilliseconds;
-            queryResult.ResultCount = contents.Count();
-            queryResult.SampleResults = contents.Take(20).Select(x => new TemplateQueryResult()
+            queryResult.SampleResults = results.Take(20).Select(x => new TemplateQueryResult()
             {
                 Icon = "icon-file",
                 Name = x.Name
             });
+
 
             return queryResult;
         }
@@ -272,20 +226,20 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<string> GetChildContentTypeAliases(IPublishedContent targetNode, IPublishedContent current)
+        private IEnumerable<IPublishedContent> GetPathOfContents(IPublishedContent targetNode, IPublishedContent current)
         {
-            var aliases = new List<string>();
+            var contents = new List<IPublishedContent>();
 
-            if (targetNode == null || targetNode.Id == current.Id) return aliases;
+            if (targetNode == null || targetNode.Id == current.Id) return contents;
 
             if (targetNode.Id != current.Id)
             {
-                aliases.Add(targetNode.ContentType.Alias);
+                contents.Add(targetNode);
             }
 
-            aliases.AddRange(this.GetChildContentTypeAliases(targetNode.Parent, current));
+            contents.AddRange(this.GetPathOfContents(targetNode.Parent, current));
 
-            return aliases;
+            return contents;
         }
 
         /// <summary>
