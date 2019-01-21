@@ -39,10 +39,7 @@ namespace Umbraco.Web.Trees
                         queryStrings,
                         macro.Name,
                         "icon-settings-alt",
-                        false,
-                        //TODO: Rebuild the macro editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
-                        "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                        Uri.EscapeDataString("/umbraco/developer/macros/editMacro.aspx?macroID=" + macro.Id)));
+                        false));
                 }
             }
 
@@ -56,11 +53,8 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
-                    //Since we haven't implemented anything for macros in angular, this needs to be converted to
-                    //use the legacy format
-                    .ConvertLegacyMenuItem(null, "initmacros", queryStrings.GetValue<string>("application"));
-
+                menu.Items.Add<ActionNew>(Services.TextService);
+                    
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 

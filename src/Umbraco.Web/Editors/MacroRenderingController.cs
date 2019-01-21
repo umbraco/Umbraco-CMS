@@ -27,11 +27,11 @@ namespace Umbraco.Web.Editors
     /// Session, we don't want it to throw null reference exceptions.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    public class MacroController : UmbracoAuthorizedJsonController, IRequiresSessionState
+    public class MacroRenderingController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public MacroController(IVariationContextAccessor variationContextAccessor)
+        public MacroRenderingController(IVariationContextAccessor variationContextAccessor)
         {
             _variationContextAccessor = variationContextAccessor;
         }

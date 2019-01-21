@@ -20,14 +20,14 @@ function macroResource($q, $http, umbRequestHelper) {
          * @param {int} macroId The macro id to get parameters for
          *
          */
-        getMacroParameters: function (macroId) {
+        getMacroParameters: function(macroId) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "macroApiBaseUrl",
-                       "GetMacroParameters",
-                       [{ macroId: macroId }])),
-               'Failed to retrieve macro parameters for macro with id  ' + macroId);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "macroRenderingApiBaseUrl",
+                        "GetMacroParameters",
+                        [{ macroId: macroId }])),
+                'Failed to retrieve macro parameters for macro with id  ' + macroId);
         },
 
         /**
@@ -43,13 +43,14 @@ function macroResource($q, $http, umbRequestHelper) {
          * @param {Array} macroParamDictionary A dictionary of macro parameters
          *
          */
-        getMacroResultAsHtmlForEditor: function (macroAlias, pageId, macroParamDictionary) {
+        getMacroResultAsHtmlForEditor: function(macroAlias, pageId, macroParamDictionary) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
-                        "macroApiBaseUrl",
-                        "GetMacroResultAsHtmlForEditor"), {
+                        "macroRenderingApiBaseUrl",
+                        "GetMacroResultAsHtmlForEditor"),
+                    {
                         macroAlias: macroAlias,
                         pageId: pageId,
                         macroParams: macroParamDictionary
@@ -67,17 +68,55 @@ function macroResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
-                        "macroApiBaseUrl",
-                        "CreatePartialViewMacroWithFile"), {
-                            virtualPath: virtualPath,
-                            filename: filename
-                        }
+                        "macroRenderingApiBaseUrl",
+                        "CreatePartialViewMacroWithFile"),
+                    {
+                        virtualPath: virtualPath,
+                        filename: filename
+                    }
                 ),
                 'Failed to create macro "' + filename + '"'
             );
 
+        },
+
+        createMacro: function(name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "macroApiBaseUrl",
+                        "Create?name=" + name)
+                ),
+                'Failed to create macro "' + name + '"'
+            );
+        },
+
+        getPartialViews: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetPartialViews"),
+                    "Failed to get partial views")
+            );
+        },
+
+        getParameterEditors: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetParameterEditors"),
+                    "Failed to get parameter editors")
+            );
+        },
+
+        getById: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("macroApiBaseUrl", "GetById", { "id": id }), "Failed to get macro")
+            );
+        },
+
+        saveMacro: function(macro) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("macroApiBaseUrl", "Save"), macro)
+            );
         }
-    };
+};
 }
 
 angular.module('umbraco.resources').factory('macroResource', macroResource);

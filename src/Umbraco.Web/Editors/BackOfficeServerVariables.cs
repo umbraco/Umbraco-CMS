@@ -169,8 +169,12 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllowedChildren(0))
                         },
                         {
-                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroController>(
+                            "macroRenderingApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                                 controller => controller.GetMacroParameters(0))
+                        },
+                        {
+                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacrosController>(
+                                controller => controller.Create(null))
                         },
                         {
                             "authenticationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
