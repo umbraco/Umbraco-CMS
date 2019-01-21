@@ -40,7 +40,7 @@
                                autocomplete="off" />
                     </ng-form>
 
-                    <umb-generate-alias data-element="editor-alias"                                        
+                    <umb-generate-alias data-element="editor-alias"
                                         class="umb-panel-header-alias"
                                         ng-if="!hideAlias"
                                         alias="$parent.alias"
@@ -55,7 +55,7 @@
                 <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
 
                 <input data-element="editor-description"
-                       data-lpignore="true"
+                       no-password-manager
                        type="text"
                        class="umb-panel-header-description"
                        localize="placeholder"
