@@ -162,7 +162,7 @@
 							</div>
 						</div>
 
-						<h5>{{model.result.resultCount}} <localize key="template_itemsReturned">items, returned in</localize> N/A ms</h5>
+                        <h5>{{model.result.resultCount}} <localize key="template_itemsReturned">items, returned in</localize> {{model.result.executionTime}} ms</h5>
 
 						<ul class="nav unstyled">
 							<li ng-repeat="item in model.result.sampleResults">
