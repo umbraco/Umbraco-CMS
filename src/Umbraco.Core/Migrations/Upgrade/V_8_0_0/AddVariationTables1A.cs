@@ -40,8 +40,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "languageId");           
 
             Create.Table<DocumentCultureVariationDto>().Do();
-
-            // fixme - data migration?
         }
     }
 }

@@ -16,10 +16,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 
-[assembly: InternalsVisibleTo("Umbraco.VisualStudio")] // fixme - what is this?
-[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")] // fixme - why?
-[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")] // fixme - why?
-
 // Allow this to be mocked in our unit tests
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

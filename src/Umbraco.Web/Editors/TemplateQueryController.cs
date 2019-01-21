@@ -67,7 +67,6 @@ namespace Umbraco.Web.Editors
 
             sb.Append("Model.Root()");
 
-            //fixme: This timer thing is not correct, it's definitely not timing the resulting query, the timer really isn't important and might as well be removed
             var timer = new Stopwatch();
 
             timer.Start();
@@ -160,7 +159,7 @@ namespace Umbraco.Web.Editors
 
                     //trial-run the tokenized clause to time the execution
                     //for review - this uses a tonized query rather then the normal linq query.
-                    // fixme - that cannot work anymore now that we have killed dynamic support
+                    // fixme/task/critical - that cannot work anymore now that we have killed dynamic support
                     //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
                     throw new NotImplementedException();
 

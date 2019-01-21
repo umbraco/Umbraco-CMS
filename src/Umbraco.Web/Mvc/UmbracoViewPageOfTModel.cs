@@ -41,7 +41,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         public AppCaches AppCaches { get; set; }
 
-        // fixme
+        // todo
         // previously, Services and ApplicationCache would derive from UmbracoContext.Application, which
         // was an ApplicationContext - so that everything derived from UmbracoContext.
         // UmbracoContext is fetched from the data tokens, thus allowing the view to be rendered with a

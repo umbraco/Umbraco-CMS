@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Web.Caching;
 
-// fixme should this be/support non-web?
-
 namespace Umbraco.Core.Cache
 {
     /// <summary>

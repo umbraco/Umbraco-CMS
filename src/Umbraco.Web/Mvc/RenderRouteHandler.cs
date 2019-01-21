@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
-        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // fixme inject
+        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // todo inject
 
         #region IRouteHandler Members
 

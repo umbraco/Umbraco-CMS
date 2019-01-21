@@ -109,7 +109,6 @@ namespace Umbraco.Core.Events
             public Type[] SupersedeTypes { get; set; }
         }
 
-        // fixme
         // this is way too convoluted, the superceede attribute is used only on DeleteEventargs to specify
         // that it superceeds save, publish, move and copy - BUT - publish event args is also used for
         // unpublishing and should NOT be superceeded - so really it should not be managed at event args
@@ -305,7 +304,6 @@ namespace Umbraco.Core.Events
             if (superceeding.Length == 0)
                 return false;
 
-            // fixme see notes above
             // delete event args does NOT superceedes 'unpublished' event
             if (argType.IsGenericType && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition.EventName == "Unpublished")
                 return false;
@@ -317,9 +315,9 @@ namespace Umbraco.Core.Events
                 var supercededBy = superceeding.FirstOrDefault(x =>
                     x.Item2.SupersedeTypes.Any(y =>
                         // superceeding a generic type which has the same generic type definition
-                        // fixme no matter the generic type parameters? could be different?
+                        // (but ... no matter the generic type parameters? could be different?)
                         y.IsGenericTypeDefinition && y == argType.GetGenericTypeDefinition()
-                        // or superceeding a non-generic type which is ... fixme how is this ever possible? argType *is* generic?
+                        // or superceeding a non-generic type which is ... (but... how is this ever possible? argType *is* generic?)
                         || y.IsGenericTypeDefinition == false && y == argType));
                 return supercededBy != null;
             }

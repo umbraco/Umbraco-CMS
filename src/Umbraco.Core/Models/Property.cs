@@ -347,7 +347,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         internal bool IsValid(string culture = "*", string segment = "*")
         {
-            //fixme - validating values shouldn't be done here, this calls in to IsValidValue
+            //todo - validating values shouldn't be done here, this calls in to IsValidValue
 
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
@@ -388,7 +388,7 @@ namespace Umbraco.Core.Models
         /// <returns>True is property value is valid, otherwise false</returns>
         private bool IsValidValue(object value)
         {
-            //fixme this shouldn't exist here, the model itself shouldn't be responsible for it's own validation and this requires singleton access
+            //todo - this shouldn't exist here, the model itself shouldn't be responsible for it's own validation and this requires singleton access
             return PropertyType.IsPropertyValueValid(value);
         }
 

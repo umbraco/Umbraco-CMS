@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models
             var propertyEditors = Current.PropertyEditors;
             var dataTypeService = Current.Services.DataTypeService;
 
-            // fixme not dealing with variants
+            // todo not dealing with variants
             // but the entire thing should die anyways
 
             return propertyTypes.Select(x =>

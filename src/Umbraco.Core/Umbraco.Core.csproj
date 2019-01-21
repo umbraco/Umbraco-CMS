@@ -614,7 +614,6 @@
     <Compile Include="Events\RefreshContentEventArgs.cs" />
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
-    <Compile Include="Events\ScopeLifetimeMessagesFactory.cs" />
     <Compile Include="Events\SendEmailEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Events\SupersedeEventAttribute.cs" />
@@ -822,7 +821,6 @@
     <Compile Include="Models\PublishedContent\PublishedDataType.cs" />
     <Compile Include="Models\PublishedContent\PublishedElementModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedElementWrapped.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentEnumerable.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedModelAttribute.cs" />
@@ -1023,7 +1021,6 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Migrations\DataLossException.cs" />
     <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />

@@ -863,8 +863,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        // fixme - need to implement GetAll for backoffice controllers - dynamics?
-
         public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
         {
             return GetResultForAll(type, postFilter, postFilterParams);
@@ -959,7 +957,7 @@ namespace Umbraco.Web.Editors
             // if a post filter is assigned then try to execute it
             if (postFilter.IsNullOrWhiteSpace() == false)
             {
-                // fixme - trouble is, we've killed the dynamic Where thing!
+                // fixme/task/critical - trouble is, we've killed the dynamic Where thing!
                 throw new NotImplementedException("oops");
                 //return postFilterParams == null
                 //               ? entities.AsQueryable().Where(postFilter).ToArray()

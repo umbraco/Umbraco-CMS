@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Abstract Methods
 
-        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount); // fixme obsolete, use QueryType instead everywhere
+        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount); // todo obsolete, use QueryType instead everywhere
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }

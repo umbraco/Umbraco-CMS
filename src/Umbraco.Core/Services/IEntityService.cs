@@ -243,7 +243,7 @@ namespace Umbraco.Core.Services
             IQuery<IUmbracoEntity> filter = null, Ordering ordering = null);
 
         /// <summary>
-        /// Gets descendants of root. fixme: Do we really need this? why not just pass in -1
+        /// Gets descendants of root. todo: Do we really need this? why not just pass in -1
         /// </summary>
         IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter = null, Ordering ordering = null, bool includeTrashed = true);

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        //fixme: This doesn't seem to be used
+        //todo: This doesn't seem to be used
         [IgnoreDataMember]
         internal Action OnAdd;
 
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
         {
             item.IsPublishing = IsPublishing;
 
-            // fixme redo this entirely!!!
+            // todo this is not pretty and should be refactored
             try
             {
                 _addLocker.EnterWriteLock();

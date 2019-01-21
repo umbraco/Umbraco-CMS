@@ -61,7 +61,7 @@ namespace Umbraco.Core.Cache
         /// </summary>
         /// <remarks>
         /// <para>The per-request caches works on top of the current HttpContext items.</para>
-        /// fixme - what about non-web applications?
+        /// <para>Outside a web environment, the behavior of that cache is unspecified.</para>
         /// </remarks>
         public IAppCache RequestCache { get; }
 

@@ -242,7 +242,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves documents.
         /// </summary>
-        // fixme why only 1 result not 1 per content?!
+        // todo why only 1 result not 1 per content?!
         OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>

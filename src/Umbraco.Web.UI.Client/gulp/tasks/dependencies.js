@@ -251,21 +251,24 @@ gulp.task('dependencies', function () {
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
-    stream.add(
-            gulp.src(config.sources.globs.assets)
-				.pipe(imagemin([
-                    imagemin.gifsicle({interlaced: true}),
-                    imagemin.jpegtran({progressive: true}),
-                    imagemin.optipng({optimizationLevel: 5}),
-                    imagemin.svgo({
-                        plugins: [
-                            {removeViewBox: true},
-                            {cleanupIDs: false}
-                        ]
-                    })
-                ]))
-                .pipe(gulp.dest(config.root + config.targets.assets))
-        );
+    
+    var assetsTask = gulp.src(config.sources.globs.assets);
+    if (global.isProd === true) {
+        assetsTask = assetsTask.pipe(imagemin([
+            imagemin.gifsicle({interlaced: true}),
+            imagemin.jpegtran({progressive: true}),
+            imagemin.optipng({optimizationLevel: 5}),
+            imagemin.svgo({
+                plugins: [
+                    {removeViewBox: true},
+                    {cleanupIDs: false}
+                ]
+            })
+        ]));
+    }
+    assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
+    
+    stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less combiler client side

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Migrations.Install
 
         public List<TableDefinition> TableDefinitions { get; }
 
-        // fixme TableDefinitions are those that should be there, IndexDefinitions are those that... are in DB?
+        // todo what are these exactly? TableDefinitions are those that should be there, IndexDefinitions are those that... are in DB?
         internal List<DbIndexDefinition> IndexDefinitions { get; }
 
         public List<string> ValidTables { get; }
