@@ -8,13 +8,13 @@
         <!-- Multiple languages -->
         <div ng-if="vm.languages.length > 0">
 
-            <div style="margin-bottom: 15px;">
+            <div class="mb3">
                 <p><localize key="content_languagesToUnpublish"></localize></p>
             </div>
                 
             <div class="umb-list umb-list--condensed">
         
-                <div class="umb-list-item" ng-repeat="language in vm.languages">
+                <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
                     <ng-form name="unpublishLanguageSelectorForm">
                         <div class="flex">
                             <input id="{{language.culture}}"
@@ -44,4 +44,3 @@
         </div>
         
     </div>
-    

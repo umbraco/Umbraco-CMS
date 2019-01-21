@@ -191,9 +191,6 @@
     <key alias="siterepublishHelp">웹사이트 캐쉬가 재생되었습니다. 모든 발행컨텐츠가 업데이트되었습니다. 그러나 모든 미발행 컨텐츠는 미발행상태로 남아있습니다.</key>
     <key alias="tableColumns">컬럼수</key>
     <key alias="tableRows">줄수</key>
-    <key alias="templateContentAreaHelp"><![CDATA[자식템플릿으로부터 이 템플릿에 컨텐츠를 삽입할 수 있는 Placeholder 아이디를 선택하시거나,
-    <code>&lt;asp:컨텐츠 /&gt;</code> 항목을 사용하는 아이디를 참조하여 <strong>Placeholder 아이디를 설정하세요</strong>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[아래 리스트에서 <strong>Placeholder 아이디를 선택하세요</strong>. 현재 템플릿의 마스터에 아이디들만 선택할 수 있습니다.]]></key>
     <key alias="thumbnailimageclickfororiginal">이미지를 전체크기로 보시려면 클릭하세요.</key>
     <key alias="treepicker">아이템 선택</key>
     <key alias="viewCacheItem">캐쉬 아이템 보기</key>
@@ -314,7 +311,6 @@
     <key alias="or">또는</key>
     <key alias="password">비밀번호</key>
     <key alias="path">경로</key>
-    <key alias="placeHolderID">Placeholder 아이디</key>
     <key alias="pleasewait">잠시만 기다려주세요...</key>
     <key alias="previous">이전</key>
     <key alias="properties">속성</key>
@@ -532,14 +528,12 @@
        Umbraco 패키지는 보통 ".umb" 나 ".zip" 확장자를 가집니다.
     ]]></key>
     <key alias="packageAuthor">저자</key>
-    <key alias="packageDemonstration">데모</key>
     <key alias="packageDocumentation">문서화</key>
     <key alias="packageMetaData">패키지 메타데이터</key>
     <key alias="packageName">패키지 이름</key>
     <key alias="packageNoItemsHeader">패키지가 포함한 아이템이 없습니다.</key>
     <key alias="packageNoItemsText"><![CDATA[이 패키지엔 삭제할 아이템이 포함되어 있지 않습니다.<br/><br/>
     아래 "패키지 삭제"를 클릭하시면 안전하게 시스템에서 삭제하실 수 있습니다.]]></key>
-    <key alias="packageNoUpgrades">업그레이드할 패키지가 없습니다.</key>
     <key alias="packageOptions">패키지 옵션</key>
     <key alias="packageReadme">패키지 정보</key>
     <key alias="packageRepository">패키지 저장소</key>
@@ -550,12 +544,7 @@
     <key alias="packageUninstallText"><![CDATA[삭제하시려는 항목은 선택하지 않을 수 있습니다. "삭제 확인" 버튼을 누를때 체크되어있지 항목은 모두 삭제됩니다.<br />
     <span style="color: Red; font-weight: bold;">알림:</span> 문서, 미디어등 삭제항목에 관련된 모든 항목이 삭제됩니다, 작업을 중단하면 시스템이 불안정적으로 동작할 수 있습니다.
     삭제는 매우 주의를 요하기 때문에 의심스러운항목은 패키지 제작자에게 문의하시기 바랍니다.]]></key>
-    <key alias="packageUpgradeDownload">저장소에서 업데이트 다운로드</key>
-    <key alias="packageUpgradeHeader">업그레이드 패키지</key>
-    <key alias="packageUpgradeInstructions">업그레이드 지시사항</key>
-    <key alias="packageUpgradeText">업그레이드할 패키지가 없습니다. Umbraco패키지 저장소에서 직접다운로드하실 수 있습니다.</key>
     <key alias="packageVersion">패키지 버전</key>
-    <key alias="viewPackageWebsite">패키지 웹사이트 보기</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">포맷을 포함여하 붙여넣기(권장하지 않음)</key>

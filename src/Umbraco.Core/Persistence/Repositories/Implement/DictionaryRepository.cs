@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DictionaryRepository : NPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
-        public DictionaryRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -174,8 +174,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
 
             //Clear the cache entries that exist by uniqueid/item key
-            IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
-            IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)
@@ -186,8 +186,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
 
             //Clear the cache entries that exist by uniqueid/item key
-            IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
-            IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
 
             entity.DeleteDate = DateTime.Now;
         }
@@ -203,8 +203,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
 
                 //Clear the cache entries that exist by uniqueid/item key
-                IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(dto.Key));
-                IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(dto.UniqueId));
+                IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(dto.Key));
+                IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(dto.UniqueId));
             }
         }
 
@@ -224,13 +224,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IDictionaryItem Get(Guid uniqueId)
         {
-            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, GlobalCache, Logger);
+            var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches, Logger);
             return uniqueIdRepo.Get(uniqueId);
         }
 
         public IDictionaryItem Get(string key)
         {
-            var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, GlobalCache, Logger);
+            var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches, Logger);
             return keyRepo.Get(key);
         }
 
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _dictionaryRepository = dictionaryRepository;
@@ -343,7 +343,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DictionaryRepository _dictionaryRepository;
 
-            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _dictionaryRepository = dictionaryRepository;

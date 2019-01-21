@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsentRepository"/> class.
         /// </summary>
-        public ConsentRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public ConsentRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Update(dto);
             entity.ResetDirtyProperties();
 
-            IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IConsent>(entity.Id));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent>(entity.Id));
         }
 
         /// <inheritdoc />

@@ -40,7 +40,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (result.RequiresUpgrade == false)
             {
                 HandleConnectionStrings(_logger);
-                return null;
+                return Task.FromResult<InstallSetupResult>(null);
             }
 
             //upgrade is required so set the flag for the next step

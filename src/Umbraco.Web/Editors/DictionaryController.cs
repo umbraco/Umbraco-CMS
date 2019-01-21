@@ -219,7 +219,7 @@ namespace Umbraco.Web.Editors
         /// <param name="list">
         /// The list.
         /// </param>
-        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, List<DictionaryOverviewDisplay> list)
+        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, ICollection<DictionaryOverviewDisplay> list)
         {
             foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(ItemSort()))
             {
@@ -231,6 +231,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
+        private static Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
     }
 }

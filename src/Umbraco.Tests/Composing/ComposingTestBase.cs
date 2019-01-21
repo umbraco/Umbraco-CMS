@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Composing
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(NullCacheProvider.Instance, LocalTempStorage.Default, ProfilingLogger, detectChanges: false)
+            TypeLoader = new TypeLoader(NoAppCache.Instance, LocalTempStorage.Default, ProfilingLogger, detectChanges: false)
             {
                 AssembliesToScan = AssembliesToScan
             };

@@ -29,10 +29,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberRepository CreateRepository(IScopeProvider provider, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            memberTypeRepository = new MemberTypeRepository(accessor, CacheHelper.Disabled, Logger);
-            memberGroupRepository = new MemberGroupRepository(accessor, CacheHelper.Disabled, Logger);
-            var tagRepo = new TagRepository(accessor, CacheHelper.Disabled, Logger);
-            var repository = new MemberRepository(accessor, CacheHelper.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());
+            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger);
+            memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, Logger);
+            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());
             return repository;
         }
 

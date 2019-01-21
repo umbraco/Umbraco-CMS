@@ -13,16 +13,16 @@ namespace Umbraco.Core.Cache
     internal abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity
     {
-        private readonly IRuntimeCacheProvider _globalCache;
+        private readonly IAppPolicyCache _globalCache;
         private readonly IScopeAccessor _scopeAccessor;
 
-        protected RepositoryCachePolicyBase(IRuntimeCacheProvider globalCache, IScopeAccessor scopeAccessor)
+        protected RepositoryCachePolicyBase(IAppPolicyCache globalCache, IScopeAccessor scopeAccessor)
         {
             _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
             _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
         }
 
-        protected IRuntimeCacheProvider Cache
+        protected IAppPolicyCache Cache
         {
             get
             {
@@ -32,9 +32,9 @@ namespace Umbraco.Core.Cache
                     case RepositoryCacheMode.Default:
                         return _globalCache;
                     case RepositoryCacheMode.Scoped:
-                        return ambientScope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                        return ambientScope.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.None:
-                        return NullCacheProvider.Instance;
+                        return NoAppCache.Instance;
                     default:
                         throw new NotSupportedException($"Repository cache mode {ambientScope.RepositoryCacheMode} is not supported.");
                 }

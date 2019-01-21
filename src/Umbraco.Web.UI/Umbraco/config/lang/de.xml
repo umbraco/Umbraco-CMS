@@ -255,8 +255,6 @@
     <key alias="siterepublishHelp">Der Zwischenspeicher der Website wird aktualisiert und der veröffentlichte Inhalt auf den neuesten Stand gebracht. Unveröffentlichte Inhalte bleiben dabei weiterhin unveröffentlicht.</key>
     <key alias="tableColumns">Anzahl der Spalten</key>
     <key alias="tableRows">Anzahl der Zeilen</key>
-    <key alias="templateContentAreaHelp">&lt;strong&gt;Legen Sie eine Platzhalter-ID fest.&lt;/strong&gt; Anhand der festgelegten Platzhalter-ID können Sie Inhalte von untergeordneten Vorlagen in diese Vorlage integrieren, indem Sie das &lt;code&gt;&amp;lt;asp:content /&amp;gt;&lt;/code&gt;-Element und die zugehörige Platzhalter-ID verwenden.</key>
-    <key alias="templateContentPlaceHolderHelp">&lt;strong&gt;Wählen Sie eine Platzhalter-ID aus.&lt;/strong&gt; Sie können nur unter den Platzhaltern der übergeordneten Vorlage wählen.</key>
     <key alias="thumbnailimageclickfororiginal">Für Originalgröße auf die Abbildung klicken</key>
     <key alias="treepicker">Element auswählen</key>
     <key alias="viewCacheItem">Zwischenspeicher-Element anzeigen</key>
@@ -389,7 +387,6 @@
     <key alias="or">oder</key>
     <key alias="password">Kennwort</key>
     <key alias="path">Pfad</key>
-    <key alias="placeHolderID">Platzhalter-ID</key>
     <key alias="pleasewait">Einen Moment bitte...</key>
     <key alias="previous">Zurück</key>
     <key alias="properties">Eigenschaften</key>
@@ -610,13 +607,11 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   <area alias="packager">
     <key alias="chooseLocalPackageText">Wählen Sie ein Paket auf Ihrem lokalen Computer über "Datei auswählen" aus. &lt;br /&gt;Umbraco-Pakete besitzen üblicherweise die Dateiendungen ".umb" oder ".zip".</key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
     <key alias="packageMetaData">Paket-Meta-Daten</key>
     <key alias="packageName">Name des Pakets</key>
     <key alias="packageNoItemsHeader">Paket enthält keine Elemente</key>
     <key alias="packageNoItemsText">Die Paket-Datei enthält keine Elemente die deinstalliert werden können.&lt;br/&gt;&lt;br/&gt;Sie können das Paket ohne Gefahr deinstallieren indem Sie "Paket deinstallieren" anklicken.</key>
-    <key alias="packageNoUpgrades">Keine Updates für das Paket verfügbar</key>
     <key alias="packageOptions">Paket-Optionen</key>
     <key alias="packageReadme">Informationen zum Paket</key>
     <key alias="packageRepository">Paket-Repository</key>
@@ -625,12 +620,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="packageUninstalledText">Das Paket wurde erfolgreich deinstalliert</key>
     <key alias="packageUninstallHeader">Paket deinstallieren</key>
     <key alias="packageUninstallText">Sie können einzelne Elemente, die Sie nicht deinstallieren möchten, unten abwählen. Wenn Sie "Deinstallation bestätigen" klicken, werden alle markierten Elemente entfernt.&lt;br /&gt;&lt;span style="color: Red; font-weight: bold;"&gt;Achtung:&lt;/span&gt; alle Dokumente, Medien, etc, die von den zu entfernenden Elementen abhängen, werden nicht mehr funktionieren und im Zweifelsfall kann dass gesamte CMS instabil werden. Bitte deinstallieren Sie also mit Vorsicht. Falls Sie unsicher sind, kontaktieren Sie den Autor des Pakets.</key>
-    <key alias="packageUpgradeDownload">Update vom Paket-Repository herunterladen</key>
-    <key alias="packageUpgradeHeader">Paket-Update</key>
-    <key alias="packageUpgradeInstructions">Hinweise für die Durchführung des Updates</key>
-    <key alias="packageUpgradeText"> Es ist ein Update für dieses Paket verfügbar. Sie können es direkt vom Umbraco-Paket-Repository herunterladen.</key>
     <key alias="packageVersion">Version des Pakets</key>
-    <key alias="viewPackageWebsite">Paket-Webseite aufrufen</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Einfügen mit Formatierung (Nicht empfohlen)</key>

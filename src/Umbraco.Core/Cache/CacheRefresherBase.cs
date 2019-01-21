@@ -16,10 +16,10 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheRefresherBase{TInstanceType}"/>.
         /// </summary>
-        /// <param name="cacheHelper">A cache helper.</param>
-        protected CacheRefresherBase(CacheHelper cacheHelper)
+        /// <param name="appCaches">A cache helper.</param>
+        protected CacheRefresherBase(AppCaches appCaches)
         {
-            CacheHelper = cacheHelper;
+            AppCaches = appCaches;
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the cache helper.
         /// </summary>
-        protected CacheHelper CacheHelper { get; }
+        protected AppCaches AppCaches { get; }
 
         /// <summary>
         /// Clears the cache for all repository entities of a specified type.
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Cache
         protected void ClearAllIsolatedCacheByEntityType<TEntity>()
             where TEntity : class, IEntity
         {
-            CacheHelper.IsolatedRuntimeCache.ClearCache<TEntity>();
+            AppCaches.IsolatedCaches.ClearCache<TEntity>();
         }
 
         /// <summary>

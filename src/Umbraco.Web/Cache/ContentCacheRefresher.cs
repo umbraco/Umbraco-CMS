@@ -20,8 +20,8 @@ namespace Umbraco.Web.Cache
         private readonly IdkMap _idkMap;
         private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
-            : base(cacheHelper)
+        public ContentCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
@@ -44,14 +44,14 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(JsonPayload[] payloads)
         {
-            CacheHelper.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
 
             var idsRemoved = new HashSet<int>();
-            var isolatedCache = CacheHelper.IsolatedRuntimeCache.GetOrCreateCache<IContent>();
+            var isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
             foreach (var payload in payloads)
             {
-                isolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
 
                 _idkMap.ClearCache(payload.Id);
 
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Cache
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
                 {
                     var pathid = "," + payload.Id + ",";
-                    isolatedCache.ClearCacheObjectTypes<IContent>((k, v) => v.Path.Contains(pathid));
+                    isolatedCache.ClearOfType<IContent>((k, v) => v.Path.Contains(pathid));
                 }
 
                 //if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
@@ -102,8 +102,8 @@ namespace Umbraco.Web.Cache
             if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
             {
                 // when a public version changes
-                Current.ApplicationCache.ClearPartialViewCache();
-                MacroCacheRefresher.ClearMacroContentCache(CacheHelper); // just the content
+                Current.AppCaches.ClearPartialViewCache();
+                MacroCacheRefresher.ClearMacroContentCache(AppCaches); // just the content
             }
 
             base.Refresh(payloads);
@@ -153,17 +153,17 @@ namespace Umbraco.Web.Cache
 
         #region Indirect
 
-        public static void RefreshContentTypes(CacheHelper cacheHelper)
+        public static void RefreshContentTypes(AppCaches appCaches)
         {
             // we could try to have a mechanism to notify the PublishedCachesService
             // and figure out whether published items were modified or not... keep it
             // simple for now, just clear the whole thing
 
-            cacheHelper.ClearPartialViewCache();
-            MacroCacheRefresher.ClearMacroContentCache(cacheHelper); // just the content
+            appCaches.ClearPartialViewCache();
+            MacroCacheRefresher.ClearMacroContentCache(appCaches); // just the content
 
-            cacheHelper.IsolatedRuntimeCache.ClearCache<PublicAccessEntry>();
-            cacheHelper.IsolatedRuntimeCache.ClearCache<IContent>();
+            appCaches.IsolatedCaches.ClearCache<PublicAccessEntry>();
+            appCaches.IsolatedCaches.ClearCache<IContent>();
         }
 
         #endregion

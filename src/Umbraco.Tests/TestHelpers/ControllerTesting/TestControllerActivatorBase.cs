@@ -60,8 +60,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 memberTypeService: mockedMemberTypeService,
                 dataTypeService: mockedDataTypeService,
                 contentTypeService: mockedContentTypeService,
-                localizedTextService:Mock.Of<ILocalizedTextService>(),
-                sectionService:Mock.Of<ISectionService>());
+                localizedTextService:Mock.Of<ILocalizedTextService>());
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
@@ -151,7 +150,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
-            var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbCtx), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>());
+            var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbCtx), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<AppCaches>(), Mock.Of<ILogger>());
 
             var umbHelper = new UmbracoHelper(umbCtx,
                 Mock.Of<IPublishedContent>(),

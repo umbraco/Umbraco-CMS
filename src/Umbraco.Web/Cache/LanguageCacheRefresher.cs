@@ -10,8 +10,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class LanguageCacheRefresher : CacheRefresherBase<LanguageCacheRefresher>
     {
-        public LanguageCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IDomainService domainService)
-            : base(cacheHelper)
+        public LanguageCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IDomainService domainService)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _domainService = domainService;

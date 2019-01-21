@@ -16,11 +16,16 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Examine;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Search;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -37,6 +42,15 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+        private readonly ITreeService _treeService;
+
+        public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
+            ITreeService treeService)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        {
+            _treeService = treeService;
+        }
+
         /// <summary>
         /// Configures this controller with a custom action selector
         /// </summary>
@@ -129,12 +143,12 @@ namespace Umbraco.Web.Editors
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
-                    var tree = Services.ApplicationTreeService.GetByAlias(searchableTree.Key);
+                    var tree = _treeService.GetByAlias(searchableTree.Key);
                     if (tree == null) continue; //shouldn't occur
 
                     var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
 
-                    result[tree.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
+                    result[Tree.GetRootNodeDisplayName(tree, Services.TextService)] = new TreeSearchResult
                     {
                         Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,
@@ -769,7 +783,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
-                return Mapper.Map<EntityBasic>(found);
+                return Mapper.Map<IEntitySlim, EntityBasic>(found);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -839,8 +853,6 @@ namespace Umbraco.Web.Editors
                     return UmbracoObjectTypes.MediaType;
                 case UmbracoEntityTypes.DocumentType:
                     return UmbracoObjectTypes.DocumentType;
-                case UmbracoEntityTypes.Stylesheet:
-                    return UmbracoObjectTypes.Stylesheet;
                 case UmbracoEntityTypes.Member:
                     return UmbracoObjectTypes.Member;
                 case UmbracoEntityTypes.DataType:
@@ -912,13 +924,31 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.User:
 
-                    long total;
-                    var users = Services.UserService.GetAll(0, int.MaxValue, out total);
+                    var users = Services.UserService.GetAll(0, int.MaxValue, out _);
                     var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
                     return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
 
-                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Stylesheet:
+
+                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                        throw new NotSupportedException("Filtering on stylesheets is not currently supported");
+
+                    return Services.FileService.GetStylesheets().Select(Mapper.Map<EntityBasic>);
+                
                 case UmbracoEntityTypes.Language:
+
+                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                        throw new NotSupportedException("Filtering on languages is not currently supported");
+
+                    return Services.LocalizationService.GetAllLanguages().Select(Mapper.Map<EntityBasic>);
+                case UmbracoEntityTypes.DictionaryItem:
+
+                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                        throw new NotSupportedException("Filtering on languages is not currently supported");
+
+                    return GetAllDictionaryItems();
+
+                case UmbracoEntityTypes.Domain:
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }
@@ -937,5 +967,36 @@ namespace Umbraco.Web.Editors
             }
             return entities;
         }
+
+
+        #region Methods to get all dictionary items
+        private IEnumerable<EntityBasic> GetAllDictionaryItems()
+        {
+            var list = new List<EntityBasic>();
+
+            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems().OrderBy(DictionaryItemSort()))
+            {
+                var item = Mapper.Map<IDictionaryItem, EntityBasic>(dictionaryItem);
+                list.Add(item);
+                GetChildItemsForList(dictionaryItem, list);
+            }
+
+            return list;
+        }
+
+        private static Func<IDictionaryItem, string> DictionaryItemSort() => item => item.ItemKey;
+
+        private void GetChildItemsForList(IDictionaryItem dictionaryItem, ICollection<EntityBasic> list)
+        {
+            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(DictionaryItemSort()))
+            {
+                var item = Mapper.Map<IDictionaryItem, EntityBasic>(childItem);
+                list.Add(item);
+
+                GetChildItemsForList(childItem, list);
+            }
+        } 
+        #endregion
+
     }
 }

@@ -20,18 +20,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
     internal class XmlPublishedContent : PublishedContentBase
     {
-        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, IAppCache appCache, PublishedContentTypeCache contentTypeCache)
         {
             _xmlNode = xmlNode;
             _isPreviewing = isPreviewing;
 
-            _cacheProvider = cacheProvider;
+            _appCache = appCache;
             _contentTypeCache = contentTypeCache;
         }
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
-        private readonly ICacheProvider _cacheProvider; // at snapshot/request level (see PublishedContentCache)
+        private readonly IAppCache _appCache; // at snapshot/request level (see PublishedContentCache)
         private readonly PublishedContentTypeCache _contentTypeCache;
 
 	    private readonly object _initializeLock = new object();
@@ -252,7 +252,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (parent == null) return;
 
             if (parent.Attributes?.GetNamedItem("isDoc") != null)
-                _parent = Get(parent, _isPreviewing, _cacheProvider, _contentTypeCache);
+                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache);
 
             _parentInitialized = true;
         }
@@ -409,7 +409,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var iterator = nav.Select(expr);
 
             _children = iterator.Cast<XPathNavigator>()
-                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _cacheProvider, _contentTypeCache))
+                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache))
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
@@ -421,13 +421,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         /// <param name="node">The Xml node.</param>
         /// <param name="isPreviewing">A value indicating whether we are previewing or not.</param>
-        /// <param name="cacheProvider">A cache provider.</param>
+        /// <param name="appCache">A cache.</param>
         /// <param name="contentTypeCache">A content type cache.</param>
         /// <returns>The IPublishedContent corresponding to the Xml cache node.</returns>
         /// <remarks>Maintains a per-request cache of IPublishedContent items in order to make
         /// sure that we create only one instance of each for the duration of a request. The
         /// returned IPublishedContent is a model, if models are enabled.</remarks>
-        public static IPublishedContent Get(XmlNode node, bool isPreviewing, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache appCache, PublishedContentTypeCache contentTypeCache)
         {
             // only 1 per request
 
@@ -435,12 +435,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) cacheProvider.GetCacheItem(key, () => (new XmlPublishedContent(node, isPreviewing, cacheProvider, contentTypeCache)).CreateModel());
+            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel());
         }
 
         public static void ClearRequest()
         {
-            Current.ApplicationCache.RequestCache.ClearCacheByKeySearch(CacheKeyPrefix);
+            Current.AppCaches.RequestCache.ClearByKey(CacheKeyPrefix);
         }
 
         private const string CacheKeyPrefix = "CONTENTCACHE_XMLPUBLISHEDCONTENT_";

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -40,7 +41,7 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            var apps = _treeAliases.Select(x => Current.Services.ApplicationTreeService
+            var apps = _treeAliases.Select(x => Current.TreeService
                 .GetByAlias(x))
                 .WhereNotNull()
                 .Select(x => x.ApplicationAlias)

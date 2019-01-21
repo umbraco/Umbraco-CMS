@@ -19,7 +19,6 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _partialViewsFileSystem;
         private ShadowWrapper _stylesheetsFileSystem;
         private ShadowWrapper _scriptsFileSystem;
-        private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
 
         // well-known file systems lazy initialization
@@ -103,16 +102,6 @@ namespace Umbraco.Core.IO
         }
 
         /// <inheritdoc />
-        public IFileSystem MasterPagesFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _masterPagesFileSystem;
-            }
-        }
-
-        /// <inheritdoc />
         public IFileSystem MvcViewsFileSystem
         {
             get
@@ -135,14 +124,12 @@ namespace Umbraco.Core.IO
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
             var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", IsScoped);
             _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
-            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", IsScoped);
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
 
             // fixme locking?
@@ -150,7 +137,6 @@ namespace Umbraco.Core.IO
             _shadowWrappers.Add(_partialViewsFileSystem);
             _shadowWrappers.Add(_stylesheetsFileSystem);
             _shadowWrappers.Add(_scriptsFileSystem);
-            _shadowWrappers.Add(_masterPagesFileSystem);
             _shadowWrappers.Add(_mvcViewsFileSystem);
 
             return null;

@@ -125,7 +125,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             CacheValues cacheValues;
             PublishedSnapshot publishedSnapshot;
-            ICacheProvider cache;
+            IAppCache cache;
             switch (cacheLevel)
             {
                 case PropertyCacheLevel.None:
@@ -161,11 +161,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return cacheValues;
         }
 
-        private CacheValues GetCacheValues(ICacheProvider cache)
+        private CacheValues GetCacheValues(IAppCache cache)
         {
             if (cache == null) // no cache, don't cache
                 return new CacheValues();
-            return (CacheValues) cache.GetCacheItem(ValuesCacheKey, () => new CacheValues());
+            return (CacheValues) cache.Get(ValuesCacheKey, () => new CacheValues());
         }
 
         // this is always invoked from within a lock, so does not require its own lock

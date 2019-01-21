@@ -102,7 +102,6 @@ namespace Umbraco.Core.Runtime
 
                 // application caches
                 var appCaches = GetAppCaches();
-                var runtimeCache = appCaches.RuntimeCache;
 
                 // database factory
                 var databaseFactory = GetDatabaseFactory();
@@ -112,7 +111,7 @@ namespace Umbraco.Core.Runtime
 
                 // type loader
                 var localTempStorage = configs.Global().LocalTempStorageLocation;
-                var typeLoader = new TypeLoader(runtimeCache, localTempStorage, ProfilingLogger);
+                var typeLoader = new TypeLoader(appCaches.RuntimeCache, localTempStorage, ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -325,17 +324,16 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the application caches.
         /// </summary>
-        protected virtual CacheHelper GetAppCaches()
+        protected virtual AppCaches GetAppCaches()
         {
             // need the deep clone runtime cache provider to ensure entities are cached properly, ie
             // are cloned in and cloned out - no request-based cache here since no web-based context,
             // is overriden by the web runtime
 
-            return new CacheHelper(
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+            return new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                NoAppCache.Instance,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.

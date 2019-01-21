@@ -9,8 +9,8 @@ namespace Umbraco.Web.Cache
     {
         private readonly IdkMap _idkMap;
 
-        public TemplateCacheRefresher(CacheHelper cacheHelper, IdkMap idkMap)
-            : base(cacheHelper)
+        public TemplateCacheRefresher(AppCaches appCaches, IdkMap idkMap)
+            : base(appCaches)
         {
             _idkMap = idkMap;
         }
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Cache
         private void RemoveFromCache(int id)
         {
             _idkMap.ClearCache(id);
-            CacheHelper.RuntimeCache.ClearCacheItem($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
+            AppCaches.RuntimeCache.Clear($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
 
             //need to clear the runtime cache for templates
             ClearAllIsolatedCacheByEntityType<ITemplate>();

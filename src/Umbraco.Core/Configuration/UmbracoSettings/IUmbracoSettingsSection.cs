@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -12,8 +11,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         ISecuritySection Security { get; }
 
         IRequestHandlerSection RequestHandler { get; }
-
-        ITemplatesSection Templates { get; }
         
         ILoggingSection Logging { get; }
 
@@ -22,6 +19,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IProvidersSection Providers { get; }
 
         IWebRoutingSection WebRouting { get; }
-
     }
 }

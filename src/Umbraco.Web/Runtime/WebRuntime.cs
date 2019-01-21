@@ -59,17 +59,16 @@ namespace Umbraco.Web.Runtime
 
         protected override IProfiler GetProfiler() => _webProfiler;
 
-        protected override CacheHelper GetAppCaches() => new CacheHelper(
+        protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
-                new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
-                new StaticCacheProvider(),
+                new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache)),
                 // we need request based cache when running in web-based context
-                new HttpRequestCacheProvider(),
-                new IsolatedRuntimeCache(type =>
+                new HttpRequestAppCache(),
+                new IsolatedCaches(type =>
                     // we need to have the dep clone runtime cache provider to ensure
                     // all entities are cached properly (cloned in and cloned out)
-                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+                    new DeepCloneAppCache(new ObjectCacheAppCache())));
 
         #endregion
     }
