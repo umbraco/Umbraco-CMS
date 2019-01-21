@@ -515,8 +515,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <EmbeddedResource Include="TreesAndSections\applications.config" />
-    <EmbeddedResource Include="TreesAndSections\trees.config" />
     <None Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
