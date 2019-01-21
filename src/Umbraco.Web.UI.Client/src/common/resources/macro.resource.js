@@ -115,6 +115,12 @@ function macroResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("macroApiBaseUrl", "Save"), macro)
             );
+        },
+
+        deleteById: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("macroApiBaseUrl", "deleteById", { "id": id }))
+            );
         }
 };
 }
