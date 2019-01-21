@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to create a container/folder in 'partialViews', 'partialViewMacros' or 'scripts'
+        /// Used to create a container/folder in 'partialViews', 'partialViewMacros', 'scripts' or 'stylesheets'
         /// </summary>
         /// <param name="type">'partialViews', 'partialViewMacros' or 'scripts'</param>
         /// <param name="parentId">The virtual path of the parent.</param>
@@ -110,6 +110,10 @@ namespace Umbraco.Web.Editors
                 case Core.Constants.Trees.Scripts:
                     virtualPath = NormalizeVirtualPath(name, SystemDirectories.Scripts);
                     Services.FileService.CreateScriptFolder(virtualPath);
+                    break;
+                case Core.Constants.Trees.Stylesheets:
+                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.Css);
+                    Services.FileService.CreateStyleSheetFolder(virtualPath);
                     break;
 
             }
@@ -328,6 +332,11 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                 case Core.Constants.Trees.Stylesheets:
+                    if (IsDirectory(virtualPath, SystemDirectories.Css))
+                    {
+                        Services.FileService.DeleteStyleSheetFolder(virtualPath);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
                     if (Services.FileService.GetStylesheetByName(virtualPath) != null)
                     {
                         Services.FileService.DeleteStylesheet(virtualPath, Security.CurrentUser.Id);

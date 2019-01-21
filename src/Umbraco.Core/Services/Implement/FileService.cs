@@ -140,6 +140,24 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public void CreateStyleSheetFolder(string folderPath)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                ((StylesheetRepository) _stylesheetRepository).AddFolder(folderPath);
+                scope.Complete();
+            }
+        }
+
+        public void DeleteStyleSheetFolder(string folderPath)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                ((StylesheetRepository) _stylesheetRepository).DeleteFolder(folderPath);
+                scope.Complete();
+            }
+        }
+
         public Stream GetStylesheetFileContentStream(string filepath)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
