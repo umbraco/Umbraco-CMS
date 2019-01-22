@@ -79,7 +79,6 @@ namespace Umbraco.Core.Logging.Viewer
                             var reader = new LogEventReader(stream);
                             while (reader.TryRead(out var evt))
                             {
-                                //TODO - convert psuedo code
                                 if (count > skip + take)
                                 {
                                     break;
