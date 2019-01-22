@@ -235,7 +235,6 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionSort>(item, menu, true);
             AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
-            //fixme - conver this editor to angular
             AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
             if (EmailSender.CanSendRequiredEmail)
             {
@@ -308,7 +307,7 @@ namespace Umbraco.Web.Trees
                 entity.Name = "[[" + entity.Id + "]]";
         }
 
-        //fixme: Remove the need for converting to legacy
+        //todo: Remove the need for converting to legacy
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
             where TAction : IAction
         {

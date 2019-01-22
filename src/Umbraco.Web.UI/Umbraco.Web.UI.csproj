@@ -236,6 +236,7 @@
     <Content Include="Config\serilog.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Config\logviewer.searches.config.js" />
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>

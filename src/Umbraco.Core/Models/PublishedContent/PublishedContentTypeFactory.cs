@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
 
             if (!publishedDataTypes.TryGetValue(id, out var dataType))
-                throw new ArgumentException("Not a valid datatype identifier.", nameof(id));
+                throw new ArgumentException($"Could not find a datatype with identifier {id}.", nameof(id));
 
             return dataType;
         }

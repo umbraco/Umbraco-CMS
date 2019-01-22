@@ -273,8 +273,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
-        // fixme
-        // was => _contentData.Published == false;
         /// <inheritdoc />
         public override bool IsDraft(string culture = null)
         {

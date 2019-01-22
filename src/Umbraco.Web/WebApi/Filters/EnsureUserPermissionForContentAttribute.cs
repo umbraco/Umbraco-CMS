@@ -83,13 +83,13 @@ namespace Umbraco.Web.WebApi.Filters
                     }
                     else if (Udi.TryParse(argument, true, out Udi udi))
                     {
-                        //fixme: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                        //todo: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
                         nodeId = Current.Services.EntityService.GetId(udi).Result;
                     }
                     else
                     {
                         Guid.TryParse(argument, out Guid key);
-                        //fixme: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                        //todo: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
                         nodeId = Current.Services.EntityService.GetId(key, UmbracoObjectTypes.Document).Result;
                     }
                 }

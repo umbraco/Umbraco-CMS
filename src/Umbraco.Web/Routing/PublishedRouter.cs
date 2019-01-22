@@ -19,8 +19,7 @@ using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-    // fixme - make this public
-    // fixme - making sense to have an interface?
+    // todo - making sense to have an interface?
     public class PublishedRouter
     {
         private readonly IWebRoutingSection _webRoutingSection;
@@ -53,7 +52,7 @@ namespace Umbraco.Web.Routing
             GetRolesForLogin = s => Roles.Provider.GetRolesForUser(s);
         }
 
-        // fixme
+        // todo
         // in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
         // killing it entirely, if we need cache, just implement it properly !!
         // this is all soooo weird
@@ -381,7 +380,7 @@ namespace Umbraco.Web.Routing
 
             // NOTE: we could start with what's the current default?
 
-            // fixme - bad - we probably should be using the appropriate filesystems!
+            // todo - bad - we probably should be using the appropriate filesystems!
 
             if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
                     alias, new[] { ".cshtml", ".vbhtml" }))

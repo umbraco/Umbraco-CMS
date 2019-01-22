@@ -41,7 +41,7 @@ namespace Umbraco.Web
         /// <param name="replace">A value indicating whether to replace the existing context.</param>
         ///  <returns>The "current" UmbracoContext.</returns>
         ///  <remarks>
-        ///  fixme - this needs to be clarified
+        ///  todo - this needs to be clarified
         ///
         ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
         ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with

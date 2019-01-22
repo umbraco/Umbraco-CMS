@@ -9,7 +9,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Scripts, TreeTitle = "Scripts", IconOpen = "icon-folder", IconClosed = "icon-folder", SortOrder = 10, TreeGroup = Constants.Trees.Groups.Templating)]
     public class ScriptsTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem => Current.FileSystems.ScriptsFileSystem; // fixme inject
+        protected override IFileSystem FileSystem => Current.FileSystems.ScriptsFileSystem; // todo inject
 
         private static readonly string[] ExtensionsStatic = { "js" };
 

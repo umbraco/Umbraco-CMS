@@ -5,7 +5,7 @@ using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.WebApi.Filters
 {
-    //fixme remove this since we don't need it, see notes in EnableOverrideAuthorizationAttribute
+    //todo remove this since we don't need it, see notes in EnableOverrideAuthorizationAttribute
 
     /// <summary>
     /// Abstract auth filter class that can be used to enable overriding class auth filters at the action level

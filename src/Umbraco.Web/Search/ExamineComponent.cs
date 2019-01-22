@@ -154,7 +154,6 @@ namespace Umbraco.Web.Search
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
-                    //new BackgroundTaskRunnerOptions{ LongRunning= true }, //fixme, this flag doesn't have any affect anymore
                     logger);
 
                 _rebuildOnStartupRunner.TryAdd(task);
@@ -214,7 +213,7 @@ namespace Umbraco.Web.Search
                     // just ignore that payload
                     // so what?!
 
-                    //fixme: Rebuild the index at this point?
+                    //todo: Rebuild the index at this point?
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {

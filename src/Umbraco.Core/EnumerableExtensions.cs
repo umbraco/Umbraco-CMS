@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core
 {
@@ -336,6 +337,11 @@ namespace Umbraco.Core
                 for (var value = e.Current; e.MoveNext(); value = e.Current)
                     yield return value;
             }
+        }
+
+        public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Direction sortOrder)
+        {
+            return sortOrder == Direction.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
     }
 }
