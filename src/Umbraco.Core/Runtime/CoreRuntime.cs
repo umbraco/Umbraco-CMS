@@ -328,7 +328,7 @@ namespace Umbraco.Core.Runtime
         {
             // need the deep clone runtime cache provider to ensure entities are cached properly, ie
             // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // is overriden by the web runtime
+            // is overridden by the web runtime
 
             return new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),

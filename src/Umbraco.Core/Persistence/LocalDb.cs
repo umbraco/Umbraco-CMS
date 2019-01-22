@@ -275,7 +275,7 @@ namespace Umbraco.Core.Persistence
             /// <remarks>
             /// The database should not exist in the LocalDb instance.
             /// It will be attached with its name being its MDF filename (full path), uppercased, when
-            /// the first connection is opened, and remain attached until explicitely detached.
+            /// the first connection is opened, and remain attached until explicitly detached.
             /// </remarks>
             public string GetAttachedConnectionString(string databaseName, string filesPath)
             {

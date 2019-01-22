@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
 
         /// <summary>
-        /// Gets explicilty defined permissions for the group for specified entities
+        /// Gets explicitly defined permissions for the group for specified entities
         /// </summary>
         /// <param name="groupIds"></param>
         /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// Gets explicilt and default permissions (if requested) permissions for the group for specified entities
+        /// Gets explicit and default permissions (if requested) permissions for the group for specified entities
         /// </summary>
         /// <param name="groups"></param>
         /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>

@@ -23,7 +23,7 @@ namespace Umbraco.Web._Legacy.PackageActions
         /// <example>
         /// <Action runat="install" alias="publishRootDocument" documentName="News"  />
         /// </example>
-        /// <returns>True if executed succesfully</returns>
+        /// <returns>true if executed successfully</returns>
         public bool Execute(string packageName, XElement xmlData)
         {
 

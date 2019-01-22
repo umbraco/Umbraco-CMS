@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence
                 }
                 else
                 {
-                    //get the SqlDbType from the clr type
+                    //get the SqlDbType from the CLR type
                     sqlDbType = _sqlSyntaxProvider.GetSqlDbType(col.PropertyType);
                 }
 

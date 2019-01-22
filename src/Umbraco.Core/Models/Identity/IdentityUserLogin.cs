@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Entities;
 namespace Umbraco.Core.Models.Identity
 {
     /// <summary>
-    /// Entity type for a user's login (i.e. facebook, google)
+    /// Entity type for a user's login (i.e. Facebook, Google)
     ///
     /// </summary>
     public class IdentityUserLogin : EntityBase, IIdentityUserLogin
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models.Identity
         }
 
         /// <summary>
-        /// The login provider for the login (i.e. facebook, google)
+        /// The login provider for the login (i.e. Facebook, Google)
         ///
         /// </summary>
         public string LoginProvider { get; set; }

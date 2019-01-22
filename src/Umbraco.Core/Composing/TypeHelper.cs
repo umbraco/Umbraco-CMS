@@ -153,7 +153,7 @@ namespace Umbraco.Core.Composing
             {
                 var others = types.Except(new[] {curr});
 
-                //is the curr type a common denominator for all others ?
+                //is the current type a common denominator for all others ?
                 var isBase = others.All(curr.IsAssignableFrom);
 
                 //if this type is the base for all others
