@@ -38,6 +38,12 @@ namespace Umbraco.Web.WebApi.Filters
             _nodeId = nodeId;
         }
 
+        public EnsureUserPermissionForContentAttribute(int nodeId, char permissionToCheck)
+            : this(nodeId)
+        {
+            _permissionToCheck = permissionToCheck;
+        }
+
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
