@@ -118,6 +118,8 @@
     <key alias="listNumeric">Nummerorden</key>
     <key alias="macroInsert">Indsæt makro</key>
     <key alias="pictureInsert">Indsæt billede</key>
+    <key alias="publishAndClose">Udgiv og luk</key>
+    <key alias="publishDescendants">Udgiv med undersider</key>
     <key alias="relations">Redigér relationer</key>
     <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
@@ -125,6 +127,7 @@
     <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
+    <key alias="schedulePublish">Planlæg</key>
     <key alias="showPage">Forhåndsvisning</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
@@ -142,6 +145,7 @@
     <key alias="delete">Brugeren har slettet indholdet</key>
     <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
     <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
+    <key alias="publishvariant">Brugeren har gemt og udgivet indholdet for sprogene: %0% </key>
     <key alias="save">Brugeren har gemt indholdet</key>
     <key alias="move">Brugeren har flyttet indholdet</key>
     <key alias="copy">Brugeren har kopieret indholdet</key>
@@ -224,6 +228,8 @@
     <key alias="published">Udgivet</key>
     <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
+    <key alias="publishDescendantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>%0%</strong> og alle sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
     <key alias="releaseDate">Udgivelsesdato</key>
     <key alias="unpublishDate">Afpubliceringsdato</key>
     <key alias="removeDate">Fjern dato</key>
@@ -251,6 +257,23 @@
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
     <key alias="removeTextBox">Fjern denne tekstboks</key>
     <key alias="contentRoot">Indholdsrod</key>
+    <key alias="includeUnpublished">Medtag udkast: udgiv også ikke-publicerede sider.</key>
+    <key alias="isSensitiveValue">Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du kontakte din web-administrator.</key>
+    <key alias="isSensitiveValue_short">Denne værdi er skjult.</key>
+    <key alias="languagesToPublishForFirstTime">Hvilke sprog vil du gerne udgive? Alle sprog med indhold gemmes!</key>
+    <key alias="languagesToPublish">Hvilke sprog vil du gerne udgive?</key>
+    <key alias="languagesToSave">Hvilke sprog vil du gerne gemme?</key>
+    <key alias="languagesToSaveForFirstTime">Alle sprog med indhold gemmes ved oprettelsen!</key>
+    <key alias="languagesToSendForApproval">Hvilke sprog vil du gerne sende til godkendelse?</key>
+    <key alias="languagesToSchedule">Hvilke sprog vil du gerne planlægge?</key>
+    <key alias="languagesToUnpublish">Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.</key>
+    <key alias="publishedLanguages">Udgivne sprog</key>
+    <key alias="unpublishedLanguages">Ikke-udgivne sprog</key>
+    <key alias="unmodifiedLanguages">Uændrede sprog</key>
+    <key alias="readyToPublish">Klar til at udgive?</key>
+    <key alias="readyToSave">Klar til at gemme?</key>
+    <key alias="sendForApproval">Send til godkendelse</key>
+    <key alias="schedulePublishHelp">Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
@@ -310,6 +333,8 @@
     <key alias="discardChanges">Kassér ændringer</key>
     <key alias="unsavedChanges">Du har ikke-gemte ændringer</key>
     <key alias="unsavedChangesWarning">Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte ændringer</key>
+    <key alias="confirmUnpublish">Afpublicering vil fjerne denne side og alle dets undersider fra websitet.</key>
+    <key alias="doctypeChangeWarning">Du har ikke-gemte ændringer. Hvis du ændrer dokumenttype, kasseres ændringerne.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Færdig</key>
