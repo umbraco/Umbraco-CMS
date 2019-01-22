@@ -5,7 +5,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
-    // fixme should be a ScopeContextualBase
+    // todo should be a ScopeContextualBase
     internal class SafeXmlReaderWriter : IDisposable
     {
         private readonly bool _scoped;

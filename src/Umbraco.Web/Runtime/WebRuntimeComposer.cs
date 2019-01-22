@@ -108,7 +108,7 @@ namespace Umbraco.Web.Runtime
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
 
             composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
-                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
+                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
 
             composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
 

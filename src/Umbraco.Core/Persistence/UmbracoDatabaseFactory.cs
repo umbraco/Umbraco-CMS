@@ -247,8 +247,6 @@ namespace Umbraco.Core.Persistence
         {
             switch (providerName)
             {
-                case Constants.DbProviderNames.MySql:
-                    return new MySqlSyntaxProvider(_logger);
                 case Constants.DbProviderNames.SqlCe:
                     return new SqlCeSyntaxProvider();
                 case Constants.DbProviderNames.SqlServer:

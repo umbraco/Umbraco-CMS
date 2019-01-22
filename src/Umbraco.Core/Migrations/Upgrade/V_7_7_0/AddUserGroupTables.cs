@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.SqlSyntax;
 using ColumnInfo = Umbraco.Core.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
@@ -19,9 +18,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
             //For some of the migration data inserts we require to use a special MSSQL collate expression since
             //some databases may have a custom collation specified and if that is the case, when we compare strings
             //in dynamic SQL it will try to compare strings in different collations and this will yield errors.
-            _collateSyntax = SqlSyntax is MySqlSyntaxProvider || SqlSyntax is SqlCeSyntaxProvider
-                ? string.Empty
-                : "COLLATE DATABASE_DEFAULT";
+            _collateSyntax = "COLLATE DATABASE_DEFAULT";
         }
 
         public override void Migrate()
@@ -340,24 +337,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
 
             if (tables.InvariantContains("umbracoUserType") && tables.InvariantContains("umbracoUser"))
             {
-                if (DatabaseType.IsMySql())
+                //Delete the FK if it exists before dropping the column
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
                 {
-                    //In MySql, this will drop the FK according to it's special naming rules
-                    Delete.ForeignKey().FromTable("umbracoUser").ForeignColumn("userType").ToTable("umbracoUserType").PrimaryColumn("id");
+                    Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser").Do();
                 }
-                else
-                {
-                    //Delete the FK if it exists before dropping the column
-                    if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
-                    {
-                        Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser").Do();
-                    }
 
-                    //This is the super old constraint name of the FK for user type so check this one too
-                    if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_user_userType")))
-                    {
-                        Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser").Do();
-                    }
+                //This is the super old constraint name of the FK for user type so check this one too
+                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_user_userType")))
+                {
+                    Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser").Do();
                 }
 
                 Delete.Column("userType").FromTable("umbracoUser").Do();

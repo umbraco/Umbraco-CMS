@@ -200,12 +200,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return "NVARCHAR";
         }
-
-        public virtual bool? SupportsCaseInsensitiveQueries(IDatabase db)
-        {
-            return true;
-        }
-
+        
         public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             return new List<string>();

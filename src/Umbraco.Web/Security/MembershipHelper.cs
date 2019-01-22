@@ -326,7 +326,7 @@ namespace Umbraco.Web.Security
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Member:
-                    // fixme - need to implement Get(guid)!
+                    // todo - need to implement Get(guid)!
                     var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return GetById(memberAttempt.Result);

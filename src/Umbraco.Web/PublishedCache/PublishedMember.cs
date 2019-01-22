@@ -25,7 +25,6 @@ namespace Umbraco.Web.PublishedCache
             _membershipUser = member;
             _publishedMemberType = publishedMemberType ?? throw new ArgumentNullException(nameof(publishedMemberType));
 
-            // fixme
             // RawValueProperty is used for two things here
             // - for the 'map properties' thing that we should really get rid of
             // - for populating properties that every member should always have, and that we force-create
@@ -48,8 +47,6 @@ namespace Umbraco.Web.PublishedCache
         }
 
         #region Membership provider member properties
-
-        // fixme why this?
 
         public string Email => _membershipUser.Email;
 
