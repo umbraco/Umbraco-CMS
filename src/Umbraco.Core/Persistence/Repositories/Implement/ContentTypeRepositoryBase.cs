@@ -103,7 +103,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-            // fixme v8 are we sorting only for 7.6 relators?
             var sql = translator.Translate()
                 .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
