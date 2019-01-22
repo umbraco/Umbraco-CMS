@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
                         break;
 
                     case UmbracoObjectTypes.MediaType:
-                        source = Services.ContentTypeService.Get(contentTypeId);
+                        source = Services.MediaTypeService.Get(contentTypeId);
                         break;
 
                     case UmbracoObjectTypes.MemberType:
