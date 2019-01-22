@@ -713,9 +713,6 @@ angular.module("umbraco")
                         $scope.model.value.sections.splice(index, 1);
                     }
                 });
-            } else if ($scope.model.config.items.templates && $scope.model.config.items.templates.length === 1) {
-                $scope.addTemplate($scope.model.config.items.templates[0]);
-                clear = false;
             }
 
             if (clear) {
