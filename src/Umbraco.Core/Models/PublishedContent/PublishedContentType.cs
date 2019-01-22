@@ -31,6 +31,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
             _propertyTypes = propertyTypes.ToArray();
 
+            IsElement = contentType.IsElement;
+
             InitializeIndexes();
         }
 
@@ -165,6 +167,11 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             return index >= 0 && index < _propertyTypes.Length ? _propertyTypes[index] : null;
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this content type is for an element.
+        /// </summary>
+        public bool IsElement { get; }
 
         #endregion
     }
