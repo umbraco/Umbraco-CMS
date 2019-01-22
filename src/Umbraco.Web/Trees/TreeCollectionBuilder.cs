@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
 
             var attribute = controllerType.GetCustomAttribute<TreeAttribute>(false);
             if (attribute == null) return; // todo - shouldn't we throw or at least log?
-            var tree = new Tree(attribute.SortOrder, attribute.SectionAlias, attribute.TreeGroup, attribute.TreeAlias, attribute.TreeTitle, controllerType, attribute.IsSingleNodeTree);
+            var tree = new Tree(attribute.SortOrder, attribute.SectionAlias, attribute.TreeGroup, attribute.TreeAlias, attribute.TreeTitle, attribute.TreeUse, controllerType, attribute.IsSingleNodeTree);
             _trees.Add(tree);
         }
 

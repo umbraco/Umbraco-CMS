@@ -69,6 +69,9 @@ namespace Umbraco.Web.Trees
         public abstract string TreeTitle { get; }
 
         /// <inheritdoc />
+        public abstract TreeUse TreeUse { get; }
+
+        /// <inheritdoc />
         public abstract string SectionAlias { get; }
 
         /// <inheritdoc />

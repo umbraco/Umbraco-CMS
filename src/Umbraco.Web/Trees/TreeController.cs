@@ -42,6 +42,9 @@ namespace Umbraco.Web.Trees
         public override string TreeTitle => _treeAttribute.TreeTitle;
 
         /// <inheritdoc />
+        public override TreeUse TreeUse => _treeAttribute.TreeUse;
+
+        /// <inheritdoc />
         public override string SectionAlias => _treeAttribute.SectionAlias;
 
         /// <inheritdoc />

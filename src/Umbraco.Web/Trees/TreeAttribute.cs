@@ -2,6 +2,28 @@
 
 namespace Umbraco.Web.Trees
 {
+    // fixme move
+    [Flags]
+    public enum TreeUse
+    {
+        None = 0,
+        Main = 1,
+        Dialog = 2,
+    }
+
+    public static class TreeUseExtensions
+    {
+        public static bool Has(this TreeUse use, TreeUse uses)
+        {
+            return use == uses;
+        }
+
+        public static bool HasAny(this TreeUse use, TreeUse uses)
+        {
+            return (use & uses) > 0;
+        }
+    }
+
     /// <summary>
     /// Identifies a section tree.
     /// </summary>
@@ -36,6 +58,11 @@ namespace Umbraco.Web.Trees
         /// Gets or sets the group of the tree.
         /// </summary>
         public string TreeGroup { get; set; }
+
+        /// <summary>
+        /// Gets the usage of the tree.
+        /// </summary>
+        public TreeUse TreeUse { get; set; } = TreeUse.Main;
 
         /// <summary>
         /// Gets or sets the tree icon when closed.

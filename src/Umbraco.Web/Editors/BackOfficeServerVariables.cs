@@ -159,7 +159,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null))
+                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
                         },
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(

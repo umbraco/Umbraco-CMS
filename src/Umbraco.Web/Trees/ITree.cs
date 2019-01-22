@@ -31,6 +31,11 @@
         string TreeTitle { get; }
 
         /// <summary>
+        /// Gets the tree use.
+        /// </summary>
+        TreeUse TreeUse { get; }
+
+        /// <summary>
         /// Flag to define if this tree is a single node tree (will never contain child nodes, full screen app)
         /// </summary>
         bool IsSingleNodeTree { get; }

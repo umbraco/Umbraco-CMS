@@ -4,16 +4,17 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
-    [DebuggerDisplay("Tree - {TreeAlias} ({SectionAlias})")]
+    [DebuggerDisplay("Tree - {SectionAlias}/{TreeAlias}")]
     public class Tree : ITree
     {
-        public Tree(int sortOrder, string applicationAlias, string group, string alias, string title, Type treeControllerType, bool isSingleNodeTree)
+        public Tree(int sortOrder, string applicationAlias, string group, string alias, string title, TreeUse use, Type treeControllerType, bool isSingleNodeTree)
         {
             SortOrder = sortOrder;
             SectionAlias = applicationAlias;
             TreeGroup = group;
             TreeAlias = alias;
             TreeTitle = title;
+            TreeUse = use;
             TreeControllerType = treeControllerType;
             IsSingleNodeTree = isSingleNodeTree;
         }
@@ -32,6 +33,9 @@ namespace Umbraco.Web.Trees
 
         /// <inheritdoc />
         public string TreeTitle { get; set; }
+
+        /// <inheritdoc />
+        public TreeUse TreeUse { get; set; }
 
         /// <inheritdoc />
         public bool IsSingleNodeTree { get; }

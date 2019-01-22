@@ -26,16 +26,16 @@ namespace Umbraco.Web.Services
         public Tree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(x => x.TreeAlias == treeAlias);
 
         /// <inheritdoc />
-        public IEnumerable<Tree> GetAll() => _treeCollection;
+        public IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main) => _treeCollection.Where(x => x.TreeUse.HasAny(use));
 
         /// <inheritdoc />
-        public IEnumerable<Tree> GetBySection(string sectionAlias)
-            => _treeCollection.Where(x => x.SectionAlias.InvariantEquals(sectionAlias)).OrderBy(x => x.SortOrder).ToList();
+        public IEnumerable<Tree> GetBySection(string sectionAlias, TreeUse use = TreeUse.Main)
+            => _treeCollection.Where(x => x.SectionAlias.InvariantEquals(sectionAlias) && x.TreeUse.HasAny(use)).OrderBy(x => x.SortOrder).ToList();
 
         /// <inheritdoc />
-        public IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias)
+        public IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias, TreeUse use = TreeUse.Main)
         {
-            return GetBySection(sectionAlias).GroupBy(x => x.TreeGroup).ToDictionary(
+            return GetBySection(sectionAlias, use).GroupBy(x => x.TreeGroup).ToDictionary(
                 x => x.Key ?? "",
                 x => (IEnumerable<Tree>) x.ToArray());
         }

@@ -28,8 +28,6 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
         vm.hideHeader = (typeof $scope.model.hideHeader) === "boolean" ? $scope.model.hideHeader : true;
-        // if you need to load a not initialized tree set this value to false - default is true
-        vm.onlyInitialized = $scope.model.onlyInitialized;
         vm.searchInfo = {
             searchFromId: $scope.model.startNodeId,
             searchFromName: null,

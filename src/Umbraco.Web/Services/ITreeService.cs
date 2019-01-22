@@ -17,16 +17,16 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Gets all trees.
         /// </summary>
-        IEnumerable<Tree> GetAll();
+        IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main);
 
         /// <summary>
         /// Gets all trees for a section.
         /// </summary>
-        IEnumerable<Tree> GetBySection(string sectionAlias);
+        IEnumerable<Tree> GetBySection(string sectionAlias, TreeUse use = TreeUse.Main);
 
         /// <summary>
         /// Gets all trees for a section, grouped.
         /// </summary>
-        IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias);
+        IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias, TreeUse use = TreeUse.Main);
     }
 }

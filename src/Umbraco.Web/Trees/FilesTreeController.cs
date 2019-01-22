@@ -1,9 +1,10 @@
-﻿using Umbraco.Core.IO;
+﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
-    // this is not a section tree - do not mark with [Tree]
+    [Tree(Constants.Applications.Settings, "files", TreeTitle = "Files", IconOpen = "icon-folder", IconClosed = "icon-folder", TreeUse = TreeUse.Dialog)]
     [CoreTree]
     public class FilesTreeController : FileSystemTreeController
     {
