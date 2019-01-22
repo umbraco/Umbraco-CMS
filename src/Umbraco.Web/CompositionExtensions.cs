@@ -9,6 +9,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Tour;
+using Umbraco.Web.Trees;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
@@ -83,6 +84,13 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         public static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
             => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the backoffice sections/applications collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static BackOfficeSectionCollectionBuilder Sections(this Composition composition)
+            => composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>();
 
         #endregion
 
