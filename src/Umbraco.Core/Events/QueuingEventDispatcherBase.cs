@@ -317,7 +317,7 @@ namespace Umbraco.Core.Events
                         // superseding a generic type which has the same generic type definition
                         // (but ... no matter the generic type parameters? could be different?)
                         y.IsGenericTypeDefinition && y == argType.GetGenericTypeDefinition()
-                        // or superceeding a non-generic type which is ... fixme how is this ever possible? argType *is* generic?
+                        // or superceeding a non-generic type which is ... (but... how is this ever possible? argType *is* generic?
                         || y.IsGenericTypeDefinition == false && y == argType));
                 return supercededBy != null;
             }
