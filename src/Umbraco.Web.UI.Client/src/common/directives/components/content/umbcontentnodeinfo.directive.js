@@ -106,6 +106,8 @@
                     }
                 }
 
+                // never show templates for element types (if they happen to have been created in the content tree)
+                scope.disableTemplates = scope.disableTemplates || scope.node.isElement;
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -298,6 +300,12 @@
             }
 
             function updateCurrentUrls() {
+                // never show urls for element types (if they happen to have been created in the content tree)
+                if (scope.node.isElement) {
+                    scope.currentUrls = null;
+                    return;
+                }
+
                 // find the urls for the currently selected language
                 if (scope.node.variants.length > 1) {
                     // nodes with variants
