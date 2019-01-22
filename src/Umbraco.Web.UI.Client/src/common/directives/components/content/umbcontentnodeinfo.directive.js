@@ -62,7 +62,7 @@
 
                         setNodePublishStatus();
 
-                        if (scope.currentUrls.length === 0) {
+                        if (scope.currentUrls && scope.currentUrls.length === 0) {
                             if (scope.node.id > 0) {
                                 //it's created but not published
                                 scope.currentUrls.push({ text: labels.notPublished, isUrl: false });
