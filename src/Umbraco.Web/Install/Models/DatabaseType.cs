@@ -4,7 +4,6 @@
     {
         SqlCe,
         SqlServer,
-        MySql,
         SqlAzure,
         Custom
     }
