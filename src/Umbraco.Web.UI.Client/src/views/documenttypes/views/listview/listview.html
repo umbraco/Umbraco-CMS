@@ -1,4 +1,4 @@
-<umb-box>
+<umb-box ng-hide="model.isElement">
     <umb-box-content>
         <div class="sub-view-columns">
             <div class="sub-view-column-left">
@@ -16,3 +16,8 @@
         </div>
     </umb-box-content>
 </umb-box>
+<umb-empty-state
+    ng-show="model.isElement"
+    position="center">
+    <localize key="contentTypeEditor_elementDoesNotSupport">This is not applicable for an Element type</localize>
+</umb-empty-state>
