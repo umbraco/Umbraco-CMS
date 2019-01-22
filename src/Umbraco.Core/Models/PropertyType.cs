@@ -287,7 +287,7 @@ namespace Umbraco.Core.Models
         /// Converts a value assigned to a property.
         /// </summary>
         /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual common language runtime type
+        /// <para>The input value can be pretty much anything, and is converted to the actual CLR type
         /// expected by the property (eg an integer if the property values are integers).</para>
         /// <para>Throws if the value cannot be converted.</para>
         /// </remarks>

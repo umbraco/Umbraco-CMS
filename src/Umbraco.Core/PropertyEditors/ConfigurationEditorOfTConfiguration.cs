@@ -130,7 +130,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="configuration">The current configuration object.</param>
         public virtual TConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, TConfiguration configuration)
         {
-            // note - editorValue contains a mix of common language runtime types (string, int...) and JToken
+            // note - editorValue contains a mix of CLR types (string, int...) and JToken
             // turning everything back into a JToken... might not be fastest but is simplest
             // for now
 

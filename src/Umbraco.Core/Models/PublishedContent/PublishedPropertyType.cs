@@ -283,11 +283,11 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
-        /// Gets the property model common language runtime type.
+        /// Gets the property model CLR type.
         /// </summary>
         /// <remarks>
-        /// <para>The model common language runtime type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
-        /// <para>For the actual common language runtime type, see <see cref="ClrType"/>.</para>
+        /// <para>The model CLR type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
+        /// <para>For the actual CLR type, see <see cref="ClrType"/>.</para>
         /// </remarks>
         public Type ModelClrType
         {
@@ -299,12 +299,12 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
-        /// Gets the property common language runtime type.
+        /// Gets the property CLR type.
         /// </summary>
         /// <remarks>
-        /// <para>Returns the actual common language runtime type which does not contain <see cref="ModelType"/> types.</para>
+        /// <para>Returns the actual CLR type which does not contain <see cref="ModelType"/> types.</para>
         /// <para>Mapping from <see cref="ModelClrType"/> may throw if some <see cref="ModelType"/> instances
-        /// could not be mapped to actual common language runtime types.</para>
+        /// could not be mapped to actual CLR types.</para>
         /// </remarks>
         public Type ClrType
         {
