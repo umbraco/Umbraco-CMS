@@ -7,7 +7,7 @@ using Serilog.Formatting.Compact.Reader;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class JsonLogViewer : LogViewerSourceBase
+    internal class JsonLogViewer : LogViewerSourceBase
     {
         private readonly string _logsPath;
 

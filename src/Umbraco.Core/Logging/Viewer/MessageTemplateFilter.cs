@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class MessageTemplateFilter : ILogFilter
+    internal class MessageTemplateFilter : ILogFilter
     {
         public readonly Dictionary<string, int> Counts = new Dictionary<string, int>();
 

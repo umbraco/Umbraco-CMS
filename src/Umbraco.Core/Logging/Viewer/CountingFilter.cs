@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class CountingFilter : ILogFilter
+    internal class CountingFilter : ILogFilter
     {
         public CountingFilter()
         {

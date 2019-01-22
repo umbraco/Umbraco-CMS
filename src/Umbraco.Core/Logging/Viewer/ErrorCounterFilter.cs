@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class ErrorCounterFilter : ILogFilter
+    internal class ErrorCounterFilter : ILogFilter
     {
         public int Count { get; private set; }
 

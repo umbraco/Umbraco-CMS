@@ -6,7 +6,7 @@ using Serilog.Filters.Expressions;
 namespace Umbraco.Core.Logging.Viewer
 {
     //Log Expression Filters (pass in filter exp string)
-    public class ExpressionFilter : ILogFilter
+    internal class ExpressionFilter : ILogFilter
     {
         private readonly Func<LogEvent, bool> _filter;
         private const string ExpressionOperators = "()+=*<>%-";
