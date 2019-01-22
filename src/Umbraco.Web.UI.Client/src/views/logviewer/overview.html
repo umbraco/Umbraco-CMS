@@ -28,7 +28,7 @@
                 <div class="umb-package-details__main-content">
                     <!-- Saved Searches -->
                     <umb-box>
-                        <umb-box-header>Saved Searches</umb-box-header>
+                        <umb-box-header title="Saved Searches"></umb-box-header>
                         <umb-box-content>
                             <table>
                                 <tr>
@@ -48,7 +48,7 @@
 
                     <!-- List of top X common log messages -->
                     <umb-box>
-                        <umb-box-header>Common Log Messages</umb-box-header>
+                        <umb-box-header title="Common Log Messages"></umb-box-header>
                         <umb-box-content class="block-form">
                             <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
                             <table class="table table-hover">
@@ -71,7 +71,7 @@
                 <div class="umb-package-details__sidebar">
                     <!-- No of Errors -->
                     <umb-box ng-click="vm.searchLogQuery('Has(@Exception)')" style="cursor:pointer;">
-                        <umb-box-header>Number of Errors</umb-box-header>
+                        <umb-box-header title="Number of Errors"></umb-box-header>
                         <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
                             {{ vm.numberOfErrors }}
                         </umb-box-content>
@@ -79,14 +79,16 @@
 
                     <!-- Chart of diff log types -->
                     <umb-box>
-                        <umb-box-header>Log Types</umb-box-header>
+                        <umb-box-header title="Log Types"></umb-box-header>
                         <umb-box-content class="block-form">
 
                             <canvas chart-doughnut
                                     chart-data="vm.logTypeData"
                                     chart-labels="vm.logTypeLabels"
                                     chart-colors="vm.logTypeColors"
-                                    chart-options="vm.chartOptions"></canvas>
+                                    chart-options="vm.chartOptions">
+                            </canvas>
+
                         </umb-box-content>
                     </umb-box>
                 </div>
