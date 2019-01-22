@@ -118,6 +118,8 @@
     <key alias="listNumeric">Nummerorden</key>
     <key alias="macroInsert">Indsæt makro</key>
     <key alias="pictureInsert">Indsæt billede</key>
+    <key alias="publishAndClose">Udgiv og luk</key>
+    <key alias="publishDescendants">Udgiv med undersider</key>
     <key alias="relations">Redigér relationer</key>
     <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
@@ -125,6 +127,7 @@
     <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
+    <key alias="schedulePublish">Planlæg</key>
     <key alias="showPage">Forhåndsvisning</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
@@ -142,6 +145,7 @@
     <key alias="delete">Brugeren har slettet indholdet</key>
     <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
     <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
+    <key alias="publishvariant">Brugeren har gemt og udgivet indholdet for sprogene: %0% </key>
     <key alias="save">Brugeren har gemt indholdet</key>
     <key alias="move">Brugeren har flyttet indholdet</key>
     <key alias="copy">Brugeren har kopieret indholdet</key>
@@ -310,6 +314,8 @@
     <key alias="discardChanges">Kassér ændringer</key>
     <key alias="unsavedChanges">Du har ikke-gemte ændringer</key>
     <key alias="unsavedChangesWarning">Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte ændringer</key>
+    <key alias="confirmUnpublish">Afpublicering vil fjerne denne side og alle dets undersider fra websitet.</key>
+    <key alias="doctypeChangeWarning">Du har ikke-gemte ændringer. Hvis du ændrer dokumenttype, kasseres ændringerne.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Færdig</key>

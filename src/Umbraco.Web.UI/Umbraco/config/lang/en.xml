@@ -123,6 +123,8 @@
     <key alias="listNumeric">Numeric List</key>
     <key alias="macroInsert">Insert macro</key>
     <key alias="pictureInsert">Insert picture</key>
+    <key alias="publishAndClose">Publish and close</key>
+    <key alias="publishDescendants">Publish with descendants</key>
     <key alias="relations">Edit relations</key>
     <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
@@ -130,6 +132,7 @@
     <key alias="saveAndSchedule">Save and schedule</key>
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="saveListView">Save list view</key>
+    <key alias="schedulePublish">Schedule</key>
     <key alias="showPage">Preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
@@ -325,7 +328,10 @@
     <key alias="discardChanges">Discard changes</key>
     <key alias="unsavedChanges">You have unsaved changes</key>
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="confirmListViewPublish">Publishing will make the selected items visible on the site.</key>
+    <key alias="confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</key>
     <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
+    <key alias="doctypeChangeWarning">You have unsaved changes. Making changes to the Document Type will discard the changes.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
