@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)
         {
-            var cacheHelper = CacheHelper.Disabled;
+            var cacheHelper = AppCaches.Disabled;
             var templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, TestObjects.GetFileSystemsMock());
             var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, templateRepository);
@@ -43,20 +43,20 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
-            var templateRepository = new TemplateRepository(scopeAccessor, CacheHelper.Disabled, Logger, TestObjects.GetFileSystemsMock());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, CacheHelper.Disabled, Logger, templateRepository);
+            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, templateRepository);
             return contentTypeRepository;
         }
 
         private MediaTypeRepository CreateMediaTypeRepository(IScopeAccessor scopeAccessor)
         {
-            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, CacheHelper.Disabled, Logger);
+            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
             return contentTypeRepository;
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor, Guid containerEntityType)
         {
-            return new EntityContainerRepository(scopeAccessor, CacheHelper.Disabled, Logger, containerEntityType);
+            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, containerEntityType);
         }
 
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var templateRepo = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, TestObjects.GetFileSystemsMock());
+                var templateRepo = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
                 var repository = CreateRepository((IScopeAccessor) provider);
                 var templates = new[]
                 {

@@ -10,8 +10,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class LanguageCacheRefresher : CacheRefresherBase<LanguageCacheRefresher>
     {
-        public LanguageCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IDomainService domainService)
-            : base(cacheHelper)
+        public LanguageCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IDomainService domainService)
+            : base(appCaches)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _domainService = domainService;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Cache
 
             if (assignedDomains.Count > 0)
             {
-                //fixme - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
+                // todo - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
                 // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
                 // DomainCacheRefresher?
 

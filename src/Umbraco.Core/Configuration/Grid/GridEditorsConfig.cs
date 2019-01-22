@@ -13,14 +13,14 @@ namespace Umbraco.Core.Configuration.Grid
     internal class GridEditorsConfig : IGridEditorsConfig
     {
         private readonly ILogger _logger;
-        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly AppCaches _appCaches;
         private readonly DirectoryInfo _configFolder;
         private readonly bool _isDebug;
 
-        public GridEditorsConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo configFolder, bool isDebug)
+        public GridEditorsConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, bool isDebug)
         {
             _logger = logger;
-            _runtimeCache = runtimeCache;
+            _appCaches = appCaches;
             _configFolder = configFolder;
             _isDebug = isDebug;
         }
@@ -31,8 +31,8 @@ namespace Umbraco.Core.Configuration.Grid
             {
                 List<GridEditor> GetResult()
                 {
-                    // fixme - should use the common one somehow! + ignoring _appPlugins here!
-                    var parser = new ManifestParser(_runtimeCache, Current.ManifestValidators, _logger);
+                    // TODO should use the common one somehow! + ignoring _appPlugins here!
+                    var parser = new ManifestParser(_appCaches, Current.ManifestValidators, _logger);
 
                     var editors = new List<GridEditor>();
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Configuration.Grid
                 //cache the result if debugging is disabled
                 var result = _isDebug
                     ? GetResult()
-                    : _runtimeCache.GetCacheItem<List<GridEditor>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
+                    : _appCaches.RuntimeCache.GetCacheItem<List<GridEditor>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
 
                 return result;
             }

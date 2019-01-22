@@ -62,7 +62,7 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
             Description = "The bulk actions that are allowed from the list view")]
-        public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // fixme managing defaults?
+        public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // todomanaging defaults?
 
         [ConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
         public string TabName { get; set; }
@@ -76,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
             public string Header { get; set; }
 
             [JsonProperty("isSystem")]
-            public int IsSystem { get; set; } // fixme bool
+            public int IsSystem { get; set; } // todo bool
         }
 
         public class Layout
@@ -91,7 +91,7 @@ namespace Umbraco.Web.PropertyEditors
             public string Icon { get; set; }
 
             [JsonProperty("isSystem")]
-            public int IsSystem { get; set; } // fixme bool
+            public int IsSystem { get; set; } // todo bool
 
             [JsonProperty("selected")]
             public bool Selected { get; set; }

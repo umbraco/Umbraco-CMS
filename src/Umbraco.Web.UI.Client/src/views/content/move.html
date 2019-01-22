@@ -21,7 +21,7 @@
             <p class="abstract" ng-hide="success">
                 <localize key="actions_chooseWhereToMove">Choose where to move</localize>
                 <strong>{{source.name}}</strong>
-                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>                
+                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
             </p>
 
             <div class="umb-loader-wrapper" ng-show="busy">
@@ -31,7 +31,7 @@
             <div ng-hide="success">
 
                 <div ng-hide="miniListView">
-                    <umb-tree-search-box 
+                    <umb-tree-search-box
                         hide-search-callback="hideSearch"
                         search-callback="onSearchResults"
                         search-from-id="{{searchInfo.searchFromId}}"

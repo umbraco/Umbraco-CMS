@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Runtimes
             var logger = new ConsoleLogger();
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            var appCaches = new CacheHelper(); // fixme has HttpRuntime stuff?
+            var appCaches = new AppCaches(); // fixme has HttpRuntime stuff?
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
             var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
             var mainDom = new SimpleMainDom();
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Runtimes
             var logger = new ConsoleLogger();
             var profiler = Mock.Of<IProfiler>();
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            var appCaches = CacheHelper.Disabled;
+            var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
             var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();

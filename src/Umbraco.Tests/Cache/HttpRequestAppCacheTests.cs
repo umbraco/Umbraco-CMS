@@ -5,21 +5,21 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class HttpRequestCacheProviderTests : CacheProviderTests
+    public class HttpRequestAppCacheTests : AppCacheTests
     {
-        private HttpRequestCacheProvider _provider;
+        private HttpRequestAppCache _appCache;
         private FakeHttpContextFactory _ctx;
 
         public override void Setup()
         {
             base.Setup();
             _ctx = new FakeHttpContextFactory("http://localhost/test");
-            _provider = new HttpRequestCacheProvider(_ctx.HttpContext);
+            _appCache = new HttpRequestAppCache(_ctx.HttpContext);
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache AppCache
         {
-            get { return _provider; }
+            get { return _appCache; }
         }
 
         protected override int GetTotalItemCount
@@ -29,24 +29,24 @@ namespace Umbraco.Tests.Cache
     }
 
     [TestFixture]
-    public class StaticCacheProviderTests : CacheProviderTests
+    public class DictionaryAppCacheTests : AppCacheTests
     {
-        private StaticCacheProvider _provider;
+        private DictionaryAppCache _appCache;
 
         public override void Setup()
         {
             base.Setup();
-            _provider = new StaticCacheProvider();
+            _appCache = new DictionaryAppCache();
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache AppCache
         {
-            get { return _provider; }
+            get { return _appCache; }
         }
 
         protected override int GetTotalItemCount
         {
-            get { return _provider.StaticCache.Count; }
+            get { return _appCache.Items.Count; }
         }
     }
 }

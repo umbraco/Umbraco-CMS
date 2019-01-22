@@ -19,7 +19,7 @@
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
                 <p ng-if="!vm.package.packageView">
-                    This package has no configuration view
+                    <localize key="packager_noConfigurationView">This package has no configuration view</localize>
                 </p>
 
                 <div ng-if="vm.package.packageView"

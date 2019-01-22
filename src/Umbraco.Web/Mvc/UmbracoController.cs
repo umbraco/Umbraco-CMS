@@ -22,14 +22,6 @@ namespace Umbraco.Web.Mvc
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
-        // note
-        // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
-        // don't need to implement complex constructors + need to refactor them each time we change ours.
-        // this means that these properties have a setter.
-        // what can go wrong?
-        // fixme clear this comment
-
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
@@ -48,7 +40,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get; set; }
+        public AppCaches AppCaches { get; set; }
 
         /// <summary>
         /// Gets or sets the logger.
@@ -83,19 +75,19 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<IGlobalSettings>(),
                   Current.Factory.GetInstance<UmbracoContext>(),
                   Current.Factory.GetInstance<ServiceContext>(),
-                  Current.Factory.GetInstance<CacheHelper>(),
+                  Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<ILogger>(),
                   Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;
             Services = services;
-            ApplicationCache = applicationCache;
+            AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
         }

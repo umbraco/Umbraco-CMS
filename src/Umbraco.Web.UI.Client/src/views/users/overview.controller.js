@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersOverviewController($scope, $location, $timeout, navigationService, localizationService) {
+    function UsersOverviewController($scope, $location, localizationService) {
 
         var vm = this;
         var usersUri = $location.search().subview;
@@ -24,7 +24,6 @@
             loadNavigation();
 
             setPageName();
-
         }
 
         function loadNavigation() {

@@ -203,7 +203,6 @@ angular.module('umbraco.mocks').
                   "defaultdialogs_siterepublishHelp": "The website cache will be refreshed. All published content will be updated, while unpublished content will stay unpublished.",
                   "defaultdialogs_tableColumns": "Number of columns",
                   "defaultdialogs_tableRows": "Number of rows",
-                  "defaultdialogs_templateContentAreaHelp": "<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.",
                   "defaultdialogs_templateContentPlaceHolderHelp": "<strong>Select a placeholder id</strong> from the list below. You can only      choose Id's from the current template's master.",
                   "defaultdialogs_thumbnailimageclickfororiginal": "Click on the image to see full size",
                   "defaultdialogs_treepicker": "Pick item",

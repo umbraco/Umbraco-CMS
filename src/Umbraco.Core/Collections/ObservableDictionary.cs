@@ -125,6 +125,18 @@ namespace Umbraco.Core.Collections
 
         }
 
+        public void ReplaceAll(IEnumerable<TValue> values)
+        {
+            if (values == null) throw new ArgumentNullException(nameof(values));
+
+            Clear();
+
+            foreach (var value in values)
+            {
+                Add(value);
+            }
+        }
+
         public bool Remove(TKey key)
         {
             if (!Indecies.ContainsKey(key)) return false;

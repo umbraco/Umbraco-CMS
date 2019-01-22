@@ -59,45 +59,10 @@ namespace Umbraco.Core.PropertyEditors
             HideLabel = attribute.HideLabel;
         }
 
-        // fixme kabam!
-        // I don't understand the remarks in the code commented out below
-        // and then,
-        // IPropertyEditor come from a PropertyEditorCollection so they are singletons
-        // IValueEditor is the actual value editor used for editing the value,
-        //  and it has its own configuration, depending on the datatype, so it
-        //  should NOT be a singleton => do NOT cache it in PropertyEditor!
-
         /// <summary>
         /// Gets or sets the value editor configuration.
         /// </summary>
         public virtual object Configuration { get; set; }
-
-        //private PreValueCollection _preVals;
-        //protected PreValueCollection PreValues
-        //{
-        //    get
-        //    {
-        //        if (_preVals == null)
-        //        {
-        //            throw new InvalidOperationException("Pre values cannot be accessed until the Configure method has been called");
-        //        }
-        //        return _preVals;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// This is called to configure the editor for display with it's prevalues, useful when properties need to change dynamically
-        ///// depending on what is in the pre-values.
-        ///// </summary>
-        ///// <param name="preValues"></param>
-        ///// <remarks>
-        ///// This cannot be used to change the value being sent to the editor, ConfigureEditor will be called *after* ConvertDbToEditor, pre-values
-        ///// should not be used to modify values.
-        ///// </remarks>
-        //public virtual void ConfigureForDisplay(PreValueCollection preValues)
-        //{
-        //    _preVals = preValues ?? throw new ArgumentNullException(nameof(preValues));
-        //}
 
         /// <summary>
         /// Gets or sets the editor view.
@@ -225,13 +190,6 @@ namespace Umbraco.Core.PropertyEditors
             return value.TryConvertTo(valueType);
         }
 
-        // fixme - not dealing with variants here!
-        //
-        // editors should declare whether they support variants, and then we should have a common
-        // way of dealing with it, ie of sending and receiving values, etc.
-        // eg
-        // [ { "value": "hello" }, { "lang": "fr-fr", "value": "bonjour" } ]
-
         ///  <summary>
         ///  A method to deserialize the string value that has been saved in the content editor
         ///  to an object to be stored in the database.
@@ -325,7 +283,7 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
-        // fixme - the methods below should be replaced by proper property value convert ToXPath usage!
+        // todo - the methods below should be replaced by proper property value convert ToXPath usage!
 
         /// <summary>
         /// Converts a property to Xml fragments.

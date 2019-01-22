@@ -282,10 +282,6 @@
     <key alias="siterepublishHelp">De cache zal worden vernieuwd. Alle gepubliceerde inhoud zal worden ge-update, terwijl ongepubliceerde inhoud ongepubliceerd zal blijven.</key>
     <key alias="tableColumns">Aantal kolommen</key>
     <key alias="tableRows">Aantal regels</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Plaats een placeholder id</strong> door een ID op uw placeholder te zetten kunt u inhoud plaatsen in deze template vanuit onderliggende templates,
-      door te verwijzen naar deze ID door gebruik te maken van een <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Selecteer een placeholder id</strong> uit onderstaande lijst. U kunt alleen
-      Id's kiezen van de master van de huidige template..]]></key>
     <key alias="thumbnailimageclickfororiginal">Klik op de afbeelding voor volledige grootte</key>
     <key alias="treepicker">Kies een item</key>
     <key alias="viewCacheItem">Toon cache item</key>
@@ -458,7 +454,6 @@
     <key alias="or">of</key>
     <key alias="password">Wachtwoord</key>
     <key alias="path">Pad</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">Een ogenblik geduld aub...</key>
     <key alias="previous">Vorige</key>
     <key alias="properties">Eigenschappen</key>

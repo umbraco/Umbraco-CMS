@@ -139,7 +139,7 @@ namespace Umbraco.Web.Models.Mapping
                     // only when creating a new member and we want to have a generated password pre-filled.
                     Value = new Dictionary<string, object>
                     {
-                        // fixme why ignoreCase, what are we doing here?!
+                        // todo why ignoreCase, what are we doing here?!
                         {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
                         {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },

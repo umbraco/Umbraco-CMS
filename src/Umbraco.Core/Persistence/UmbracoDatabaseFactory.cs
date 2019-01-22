@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.Data.Common;
 using System.Threading;
-using LightInject;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Exceptions;
@@ -23,6 +22,8 @@ namespace Umbraco.Core.Persistence
     /// <para>It wraps an NPoco UmbracoDatabaseFactory which is initializes with a proper IPocoDataFactory to ensure
     /// that NPoco's plumbing is cached appropriately for the whole application.</para>
     /// </remarks>
+    //todo these comments are not true anymore
+    //todo this class needs not be disposable!
     internal class UmbracoDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
     {
         private readonly Lazy<IMapperCollection> _mappers;
@@ -283,7 +284,7 @@ namespace Umbraco.Core.Persistence
             // thread, so we don't really know what we are disposing here...
             // besides, we don't really want to dispose the factory, which is a singleton...
 
-            // fixme - does not make any sense!
+            // todo - the class does not need be disposable
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();
@@ -294,7 +295,7 @@ namespace Umbraco.Core.Persistence
         // this method provides a way to force-reset the variable
         internal void ResetForTests()
         {
-            // fixme - does not make any sense!
+            // todo remove all this eventually
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();

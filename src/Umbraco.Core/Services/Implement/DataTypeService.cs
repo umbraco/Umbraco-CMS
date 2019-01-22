@@ -204,7 +204,7 @@ namespace Umbraco.Core.Services.Implement
                     _dataTypeContainerRepository.Save(container);
                     scope.Complete();
 
-                    // fixme - triggering SavedContainer with a different name?!
+                    // todo - triggering SavedContainer with a different name?!
                     scope.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "RenamedContainer");
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
@@ -318,7 +318,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    scope.Complete(); // fixme what are we doing here exactly?
+                    scope.Complete(); // todo what are we doing here exactly?
                     return OperationResult.Attempt.Fail(ex.Operation, evtMsgs);
                 }
             }
@@ -426,8 +426,8 @@ namespace Umbraco.Core.Services.Implement
 
 
                 // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
-                // fixme - media and members?!
-                // fixme - non-group properties?!
+                // todo - media and members?!
+                // todo - non-group properties?!
                 var query = Query<PropertyType>().Where(x => x.DataTypeId == dataType.Id);
                 var contentTypes = _contentTypeRepository.GetByQuery(query);
                 foreach (var contentType in contentTypes)

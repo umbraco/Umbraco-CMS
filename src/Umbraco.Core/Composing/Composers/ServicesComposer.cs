@@ -111,7 +111,7 @@ namespace Umbraco.Core.Composing.Composers
 
             return new LocalizedTextServiceFileSources(
                 container.GetInstance<ILogger>(),
-                container.GetInstance<CacheHelper>().RuntimeCache,
+                container.GetInstance<AppCaches>(),
                 mainLangFolder,
                 pluginLangFolders.Concat(userLangFolders));
         }

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Composing
     {
         private static IFactory _factory;
 
-        // fixme - refactor
+        // TODO: get rid of these oddities
         // we don't want Umbraco tests to die because the container has not been properly initialized,
         // for some too-important things such as IShortStringHelper or loggers, so if it's not
         // registered we setup a default one. We should really refactor our tests so that it does
@@ -180,8 +180,8 @@ namespace Umbraco.Core.Composing
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Factory.GetInstance<ICultureDictionaryFactory>();
 
-        public static CacheHelper ApplicationCache
-            => Factory.GetInstance<CacheHelper>();
+        public static AppCaches AppCaches
+            => Factory.GetInstance<AppCaches>();
 
         public static ServiceContext Services
             => Factory.GetInstance<ServiceContext>();

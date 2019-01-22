@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models.Identity
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
-            _culture = Current.Configs.Global().DefaultUILanguage; //fixme inject somehow?
+            _culture = Current.Configs.Global().DefaultUILanguage; //todo inject
             _groups = new IReadOnlyUserGroup[0];
             _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += _roles_CollectionChanged;
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models.Identity
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
-            _culture = Current.Configs.Global().DefaultUILanguage; //fixme inject somehow?
+            _culture = Current.Configs.Global().DefaultUILanguage; //todo inject
             _groups = groups.ToArray();
             _roles = new ObservableCollection<IdentityUserRole<string>>(_groups.Select(x => new IdentityUserRole<string>
             {

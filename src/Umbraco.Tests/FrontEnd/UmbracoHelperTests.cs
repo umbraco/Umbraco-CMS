@@ -413,7 +413,7 @@ namespace Umbraco.Tests.FrontEnd
             container
                 .Setup(x => x.GetInstance(typeof(TypeLoader)))
                 .Returns(new TypeLoader(
-                    NullCacheProvider.Instance,
+                    NoAppCache.Instance,
                     LocalTempStorage.Default,
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )

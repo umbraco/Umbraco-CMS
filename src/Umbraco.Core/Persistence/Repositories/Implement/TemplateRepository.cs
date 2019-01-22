@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IFileSystems fileSystems)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
         {
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;

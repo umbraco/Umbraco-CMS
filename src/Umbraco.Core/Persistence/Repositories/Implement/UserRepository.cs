@@ -35,22 +35,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// Constructor
         /// </summary>
         /// <param name="scopeAccessor"></param>
-        /// <param name="cacheHelper"></param>
+        /// <param name="appCaches"></param>
         /// <param name="logger"></param>
         /// <param name="mapperCollection">
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
-            : base(scopeAccessor, cacheHelper, logger)
+        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
+            : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection;
             _globalSettings = globalSettings;
         }
 
         // for tests
-        internal UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
-            : base(scopeAccessor, cacheHelper, logger)
+        internal UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
+            : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection;
             _globalSettings = globalSettings;
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
-                // fixme - this is bad
+                // todo - this is bad
                 // because the membership provider we're trying to get has a dependency on the user service
                 // and we should not depend on services in repositories - need a way better way to do this
 
@@ -238,7 +238,7 @@ ORDER BY colName";
 
         public void ClearLoginSession(Guid sessionId)
         {
-            // fixme why is that one updating and not deleting?
+            // todo why is that one updating and not deleting?
             Database.Execute(Sql()
                 .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
@@ -313,7 +313,7 @@ ORDER BY colName";
             var sql = SqlContext.Sql()
                 .Select<User2UserGroupDto>()
                 .From<User2UserGroupDto>()
-                .WhereIn<User2UserGroupReadOnlyDto>(x => x.UserId, userIds);
+                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
             var users2groups = Database.Fetch<User2UserGroupDto>(sql);
             var groupIds = users2groups.Select(x => x.UserGroupId).ToList();

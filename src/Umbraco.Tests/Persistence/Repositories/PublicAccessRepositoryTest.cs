@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var allEntries = new List<PublicAccessEntry>();
                 for (int i = 0; i < 10; i++)
@@ -272,7 +272,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
 
                 var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -305,11 +305,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, CacheHelper, Logger, TestObjects.GetFileSystemsMock());
-            var tagRepository = new TagRepository(accessor, CacheHelper, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, CacheHelper, Logger);
-            var repository = new DocumentRepository(accessor, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, AppCaches, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
 

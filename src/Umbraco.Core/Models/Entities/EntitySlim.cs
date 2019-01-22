@@ -6,8 +6,6 @@ using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models.Entities
 {
-    // fixme - changing the name of some properties that were in additionalData => must update corresponding javascript?
-
     /// <summary>
     /// Implementation of <see cref="IEntitySlim"/> for internal use.
     /// </summary>

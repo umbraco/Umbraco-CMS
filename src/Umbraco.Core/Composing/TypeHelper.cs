@@ -25,9 +25,6 @@ namespace Umbraco.Core.Composing
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        // fixme wtf is this and do we need it in v8?
         internal static IList CreateGenericEnumerableFromObject(object obj)
         {
             var type = obj.GetType();

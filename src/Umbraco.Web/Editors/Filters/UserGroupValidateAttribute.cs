@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors.Filters
             _userService = userService;
         }
 
-        private IUserService UserService => _userService ?? Current.Services.UserService; // fixme inject
+        private IUserService UserService => _userService ?? Current.Services.UserService; // todo inject
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {

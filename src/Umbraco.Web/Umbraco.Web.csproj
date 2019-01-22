@@ -125,6 +125,7 @@
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
+    <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />
@@ -166,6 +167,8 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
     <Compile Include="Trees\MediaBackOfficeSection.cs" />
     <Compile Include="Trees\MembersBackOfficeSection.cs" />
@@ -364,7 +367,6 @@
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentAppResolver.cs" />
-    <Compile Include="Models\Mapping\ContentItemDisplayNameResolver.cs" />
     <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
@@ -779,7 +781,7 @@
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\LogController.cs" />
-    <Compile Include="Editors\MacroController.cs" />
+    <Compile Include="Editors\MacroRenderingController.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
     <Compile Include="MembershipProviderExtensions.cs" />

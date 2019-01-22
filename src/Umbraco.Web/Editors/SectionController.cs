@@ -26,9 +26,9 @@ namespace Umbraco.Web.Editors
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
 
-        public SectionController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState,
+        public SectionController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
             Dashboards dashboards, ISectionService sectionService, ITreeService treeService)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
             _dashboards = dashboards;
             _sectionService = sectionService;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
             
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data
-            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContext, SqlContext, Services, ApplicationCache, Logger, RuntimeState, _treeService)
+            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContext, SqlContext, Services, AppCaches, Logger, RuntimeState, _treeService)
             {
                 ControllerContext = ControllerContext
             };

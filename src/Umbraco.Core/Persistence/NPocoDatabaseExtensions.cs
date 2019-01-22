@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence
             if (poco == null)
                 throw new ArgumentNullException(nameof(poco));
 
-            // fixme - NPoco has a Save method that works with the primary key
+            // todo - NPoco has a Save method that works with the primary key
             //  in any case, no point trying to update if there's no primary key!
 
             // try to update

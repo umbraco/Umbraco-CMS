@@ -13,14 +13,12 @@ namespace Umbraco.Web.Controllers
 {
     public class UmbRegisterController : SurfaceController
     {
-        // fixme - delete?
         public UmbRegisterController()
-        {
-        }
+        { }
 
-        public UmbRegisterController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger) : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
-        {
-        }
+        public UmbRegisterController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger)
+        { }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

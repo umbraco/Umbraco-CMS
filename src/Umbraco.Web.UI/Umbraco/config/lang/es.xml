@@ -332,8 +332,6 @@
     <key alias="siterepublishHelp">La caché del sitio web será actualizada. Todos los contenidos publicados serán actualizados, mientras el contenido no publicado permanecerá no publicado.</key>
     <key alias="tableColumns">Número de columnas</key>
     <key alias="tableRows">Número de filas</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Coloca un 'placeholder' id</strong> al colocar un ID  en tu 'placeholder' puedes insertar contenido en esta plantilla desde una plantilla hija, referenciando este ID usando un elemento<code>&lt;asp:content /&gt;</code>.]]></key>
-        <key alias="templateContentPlaceHolderHelp">Selecciona una tecla de la lista abajo indicada. Sólo puedes elegir a partir de la ID de la plantilla actual del dominio.</key>
         <key alias="thumbnailimageclickfororiginal">Haz clic sobre la imagen para verla a tamaño completo.</key>
         <key alias="treepicker">Seleccionar elemento</key>
         <key alias="viewCacheItem">Ver elemento en la caché</key>
@@ -545,7 +543,6 @@
     <key alias="orderBy">Ordenar por</key>
     <key alias="password">Contraseña</key>
     <key alias="path">Ruta</key>
-    <key alias="placeHolderID">ID de marcador de posición</key>
     <key alias="pleasewait">Un momento por favor...</key>
     <key alias="previous">Anterior</key>
     <key alias="properties">Propiedades</key>

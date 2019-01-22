@@ -30,7 +30,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IMemberService _memberService;
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
-        private readonly ICacheProvider _requestCache;
+        private readonly IAppCache _requestCache;
         private readonly IGlobalSettings _globalSettings;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly ISiteDomainHelper _siteDomainHelper;
@@ -42,7 +42,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
-            ICacheProvider requestCache,
+            IAppCache requestCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
@@ -63,7 +63,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
-            ICacheProvider requestCache,
+            IAppCache requestCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,

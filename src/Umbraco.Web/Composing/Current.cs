@@ -63,7 +63,7 @@ namespace Umbraco.Web.Composing
 
         #region Temp & Special
 
-        // fixme - have to keep this until tests are refactored
+        // todo - have to keep this until tests are refactored
         // but then, it should all be managed properly in the container
         public static IUmbracoContextAccessor UmbracoContextAccessor
         {
@@ -210,7 +210,7 @@ namespace Umbraco.Web.Composing
 
         public static IProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
 
-        public static CacheHelper ApplicationCache => CoreCurrent.ApplicationCache;
+        public static AppCaches AppCaches => CoreCurrent.AppCaches;
 
         public static ServiceContext Services => CoreCurrent.Services;
 

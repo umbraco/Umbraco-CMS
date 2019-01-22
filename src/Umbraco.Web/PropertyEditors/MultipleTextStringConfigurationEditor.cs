@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         public override MultipleTextStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTextStringConfiguration configuration)
         {
-            // fixme this isn't pretty
+            // todo this isn't pretty
             //the values from the editor will be min/max fieds and we need to format to json in one field
             // is the editor sending strings or ints or?!
             var min = (editorValues.ContainsKey("min") ? editorValues["min"].ToString() : "0").TryConvertTo<int>();

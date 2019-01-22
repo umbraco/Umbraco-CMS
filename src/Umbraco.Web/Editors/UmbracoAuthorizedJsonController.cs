@@ -34,10 +34,10 @@ namespace Umbraco.Web.Editors
         /// <param name="umbracoContext"></param>
         /// <param name="sqlContext"></param>
         /// <param name="services"></param>
-        /// <param name="applicationCache"></param>
+        /// <param name="appCaches"></param>
         /// <param name="logger"></param>
         /// <param name="runtimeState"></param>
-        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
     }

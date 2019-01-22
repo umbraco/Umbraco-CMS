@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-            // fixme v8 are we sorting only for 7.6 relators?
+
             var sql = translator.Translate()
                 .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
@@ -764,7 +764,6 @@ AND umbracoNode.id <> @id",
         {
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
-            // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
                 throw new NotSupportedException("Too many property/content types.");
@@ -903,7 +902,6 @@ AND umbracoNode.id <> @id",
         {
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
-            // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
                 throw new NotSupportedException("Too many property/content types.");

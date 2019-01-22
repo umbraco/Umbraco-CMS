@@ -36,9 +36,9 @@ namespace Umbraco.Tests.PublishedContent
         public void Resync()
         { }
 
-        public ICacheProvider SnapshotCache => null;
+        public IAppCache SnapshotCache => null;
 
-        public ICacheProvider ElementsCache => null;
+        public IAppCache ElementsCache => null;
     }
 
     class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache

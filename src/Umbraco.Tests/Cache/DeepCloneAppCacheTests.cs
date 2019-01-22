@@ -8,15 +8,14 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.Collections;
 
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
-    public class DeepCloneRuntimeCacheProviderTests : RuntimeCacheProviderTests
+    public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     {
-        private DeepCloneRuntimeCacheProvider _provider;
+        private DeepCloneAppCache _provider;
 
         protected override int GetTotalItemCount
         {
@@ -26,15 +25,15 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            _provider = new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache));
+            _provider = new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache));
         }
 
-        internal override ICacheProvider Provider
+        internal override IAppCache AppCache
         {
             get { return _provider; }
         }
 
-        internal override IRuntimeCacheProvider RuntimeProvider
+        internal override IAppPolicyCache AppPolicyCache
         {
             get { return _provider; }
         }
@@ -75,15 +74,15 @@ namespace Umbraco.Tests.Cache
         public void DoesNotCacheExceptions()
         {
             string value;
-            Assert.Throws<Exception>(() => { value = (string)_provider.GetCacheItem("key", () => GetValue(1)); });
-            Assert.Throws<Exception>(() => { value = (string)_provider.GetCacheItem("key", () => GetValue(2)); });
+            Assert.Throws<Exception>(() => { value = (string)_provider.Get("key", () => GetValue(1)); });
+            Assert.Throws<Exception>(() => { value = (string)_provider.Get("key", () => GetValue(2)); });
 
             // does not throw
-            value = (string)_provider.GetCacheItem("key", () => GetValue(3));
+            value = (string)_provider.Get("key", () => GetValue(3));
             Assert.AreEqual("succ3", value);
 
             // cache
-            value = (string)_provider.GetCacheItem("key", () => GetValue(4));
+            value = (string)_provider.Get("key", () => GetValue(4));
             Assert.AreEqual("succ3", value);
         }
 

@@ -96,7 +96,7 @@ namespace Umbraco.Web.Editors
                 var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
                 if (editorField == null) continue;
 
-                // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here) - fixme - editing
+                // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
                 foreach (var validator in editorField.Validators)
                 foreach (var result in validator.Validate(field.Value, null, null))
                     actionContext.ModelState.AddValidationError(result, "Properties", field.Key);

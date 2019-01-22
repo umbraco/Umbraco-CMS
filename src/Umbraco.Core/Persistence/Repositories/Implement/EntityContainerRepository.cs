@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, Guid containerObjectType)
+        public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, Guid containerObjectType)
             : base(scopeAccessor, cache, logger)
         {
             var allowedContainers = new[] { Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer, Constants.ObjectTypes.DataTypeContainer };

@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILanguageRepository languageRepository, ILogger logger)
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILanguageRepository LanguageRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
+        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // todo inject
 
         #region Versions
 
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // deletes a specific version
         public virtual void DeleteVersion(int versionId)
         {
-            // fixme test object node type?
+            // todo test object node type?
 
             // get the version we want to delete
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //  deletes all versions of an entity, older than a date.
         public virtual void DeleteVersions(int nodeId, DateTime versionDate)
         {
-            // fixme test object node type?
+            // todo test object node type?
 
             // get the versions we want to delete, excluding the current one
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersions", tsql =>
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        // FIXME should we do it when un-publishing? or?
+        // todo should we do it when un-publishing? or?
         /// <summary>
         /// Clears tags for an item.
         /// </summary>
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var (dbfield, _) = SqlContext.VisitDto<NodeDto>(x => x.NodeId);
             if (ordering.IsCustomField || !ordering.OrderBy.InvariantEquals("id"))
             {
-                psql.OrderBy(GetAliasedField(dbfield, sql)); // fixme why aliased?
+                psql.OrderBy(GetAliasedField(dbfield, sql));
             }
 
             // create prepared sql
@@ -374,7 +374,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text), sql);
 
                 // "variantName" alias is defined in DocumentRepository.GetBaseQuery
-                // fixme - what if it is NOT a document but a ... media or whatever?
+                // todo - what if it is NOT a document but a ... media or whatever?
                 // previously, we inserted the join+select *here* so we were sure to have it,
                 // but now that's not the case anymore!
                 return "variantName";
@@ -620,7 +620,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region UnitOfWork Events
 
-        //fixme: The reason these events are in the repository is for legacy, the events should exist at the service
+        // todo: The reason these events are in the repository is for legacy, the events should exist at the service
         // level now since we can fire these events within the transaction... so move the events to service level
 
         public class ScopedEntityEventArgs : EventArgs
@@ -735,8 +735,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             /// </summary>
             public T Content { get; set; }
         }
-
-        // fixme copied from 7.6
 
         /// <summary>
         /// For Paging, repositories must support returning different query for the query type specified

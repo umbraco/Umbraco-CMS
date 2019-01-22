@@ -255,8 +255,6 @@
     <key alias="siterepublishHelp">Der Zwischenspeicher der Website wird aktualisiert und der veröffentlichte Inhalt auf den neuesten Stand gebracht. Unveröffentlichte Inhalte bleiben dabei weiterhin unveröffentlicht.</key>
     <key alias="tableColumns">Anzahl der Spalten</key>
     <key alias="tableRows">Anzahl der Zeilen</key>
-    <key alias="templateContentAreaHelp">&lt;strong&gt;Legen Sie eine Platzhalter-ID fest.&lt;/strong&gt; Anhand der festgelegten Platzhalter-ID können Sie Inhalte von untergeordneten Vorlagen in diese Vorlage integrieren, indem Sie das &lt;code&gt;&amp;lt;asp:content /&amp;gt;&lt;/code&gt;-Element und die zugehörige Platzhalter-ID verwenden.</key>
-    <key alias="templateContentPlaceHolderHelp">&lt;strong&gt;Wählen Sie eine Platzhalter-ID aus.&lt;/strong&gt; Sie können nur unter den Platzhaltern der übergeordneten Vorlage wählen.</key>
     <key alias="thumbnailimageclickfororiginal">Für Originalgröße auf die Abbildung klicken</key>
     <key alias="treepicker">Element auswählen</key>
     <key alias="viewCacheItem">Zwischenspeicher-Element anzeigen</key>
@@ -389,7 +387,6 @@
     <key alias="or">oder</key>
     <key alias="password">Kennwort</key>
     <key alias="path">Pfad</key>
-    <key alias="placeHolderID">Platzhalter-ID</key>
     <key alias="pleasewait">Einen Moment bitte...</key>
     <key alias="previous">Zurück</key>
     <key alias="properties">Eigenschaften</key>

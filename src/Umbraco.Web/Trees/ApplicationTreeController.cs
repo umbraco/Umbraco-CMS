@@ -38,9 +38,9 @@ namespace Umbraco.Web.Trees
         private readonly ITreeService _treeService;
 
         public ApplicationTreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
-            ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger,
+            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
             IRuntimeState runtimeState, ITreeService treeService)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
             _treeService = treeService;
         }
@@ -215,6 +215,7 @@ namespace Umbraco.Web.Trees
             //assign the route path based on the root node, this means it will route there when the section is navigated to
             //and no dashboards will be available for this section
             sectionRoot.RoutePath = rootNode.Result.RoutePath;
+            sectionRoot.Path = rootNode.Result.Path;
 
             foreach (var d in rootNode.Result.AdditionalData)
             {

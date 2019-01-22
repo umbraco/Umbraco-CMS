@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// if the property type changes, then a new class needs to be created.</remarks>
     public class PublishedPropertyType
     {
-        //fixme - API design review, should this be an interface?
+        //todo - API design review, should this be an interface?
 
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;
