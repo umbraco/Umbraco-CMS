@@ -1,5 +1,4 @@
-﻿using Serilog.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -9,24 +8,19 @@ namespace Umbraco.Core.Logging.Viewer
     public interface ILogViewer
     {
         /// <summary>
-        /// Get all logs from your chosen datasource back as Serilog LogEvents
+        /// Get all saved searches from your chosen data source
         /// </summary>
-        IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
+        IReadOnlyList<SavedLogSearch> GetSavedSearches();
 
         /// <summary>
-        /// Get all saved searches from your chosen datasource
+        /// Adds a new saved search to chosen data source and returns the updated searches
         /// </summary>
-        IEnumerable<SavedLogSearch> GetSavedSearches();
+        IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query);
 
         /// <summary>
-        /// Adds a new saved search to chosen datasource and returns the updated searches
+        /// Deletes a saved search to chosen data source and returns the remaining searches
         /// </summary>
-        IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query);
-
-        /// <summary>
-        /// Deletes a saved search to chosen datasource and returns the remaining searches
-        /// </summary>
-        IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query);
+        IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query);
 
         /// <summary>
         /// A count of number of errors

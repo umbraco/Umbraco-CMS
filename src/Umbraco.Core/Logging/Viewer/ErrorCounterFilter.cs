@@ -2,14 +2,14 @@
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class ErrorCounterFilter : ILogFilter
+    internal class ErrorCounterFilter : ILogFilter
     {
-        public int count;
+        public int Count { get; private set; }
 
         public bool TakeLogEvent(LogEvent e)
         {
             if (e.Level == LogEventLevel.Fatal || e.Level == LogEventLevel.Error || e.Exception != null)
-                count++;
+                Count++;
 
             //Don't add it to the list
             return false;
