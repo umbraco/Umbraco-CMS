@@ -847,7 +847,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, 'D')]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.ContentService.EmptyRecycleBin();
