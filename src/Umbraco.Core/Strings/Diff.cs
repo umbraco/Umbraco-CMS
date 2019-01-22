@@ -104,7 +104,7 @@ namespace Umbraco.Core.Strings
         /// Find the difference in 2 text documents, comparing by text lines.
         /// The algorithm itself is comparing 2 arrays of numbers so when comparing 2 text documents
         /// each line is converted into a (hash) number. This hash-value is computed by storing all
-        /// text lines into a common hash table so i can find duplicates in there, and generating a
+        /// text lines into a common Hashtable so i can find duplicates in there, and generating a
         /// new number each time a new text line is inserted.
         /// </summary>
         /// <param name="textA">A-version of the text (usually the old one)</param>
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Strings
             // The B-Version of the data (modified data) to be compared.
             var dataB = new DiffData(DiffCodes(textB, h, trimSpace, ignoreSpace, ignoreCase));
 
-            h = null; // free up hash table memory (maybe)
+            h = null; // free up Hashtable memory (maybe)
 
             var max = dataA.Length + dataB.Length + 1;
             // vector for the (0,0) to (x,y) search
@@ -220,7 +220,7 @@ namespace Umbraco.Core.Strings
         /// so further work can work only with simple numbers.
         /// </summary>
         /// <param name="aText">the input text</param>
-        /// <param name="h">This extern initialized hash table is used for storing all ever used text lines.</param>
+        /// <param name="h">This extern initialized Hashtable is used for storing all ever used text lines.</param>
         /// <param name="trimSpace">ignore leading and trailing space characters</param>
         /// <param name="ignoreSpace"></param>
         /// <param name="ignoreCase"></param>
