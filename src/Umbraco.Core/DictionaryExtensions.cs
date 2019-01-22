@@ -10,7 +10,7 @@ using System.Web;
 namespace Umbraco.Core
 {
     ///<summary>
-    /// Extension methods for dictionary & concurrent dictionary
+    /// Extension methods for Dictionary & ConcurrentDictionary
     ///</summary>
     internal static class DictionaryExtensions
     {
