@@ -100,7 +100,7 @@ namespace Umbraco.Core
             public const string AnyString = "any-string"; // that one is for tests
 
             public const string Language = "language";
-            public const string MacroScript = "macro script";
+            public const string MacroScript = "macroscript";
             public const string MediaFile = "media-file";
             public const string TemplateFile = "template-file";
             public const string Script = "script";
