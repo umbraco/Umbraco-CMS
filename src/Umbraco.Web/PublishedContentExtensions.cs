@@ -251,7 +251,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
-            //fixme: pass in the IExamineManager
+            //todo inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -272,7 +272,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
         {
-            //fixme: pass in the IExamineManager
+            //todo inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -954,7 +954,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content)); // fixme wtf is this?
+            if (content == null) throw new ArgumentNullException(nameof(content)); // fixme/task wtf is this?
 
             return content.Children.Where(x =>
             {
@@ -1017,7 +1017,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null) // fixme oops
+        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null) // fixme/task oops
         {
             return content.Children(culture,alias).FirstOrDefault();
         }

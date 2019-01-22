@@ -31,7 +31,7 @@ namespace Umbraco.Web.UI.Controls
             Umbraco = new UmbracoHelper(umbracoContext, services);
             Members = Current.Factory.GetInstance<MembershipHelper>();
 
-            // fixme inject somehow
+            // todo inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;

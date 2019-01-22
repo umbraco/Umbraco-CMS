@@ -12,7 +12,7 @@ namespace Umbraco.Web.PublishedCache
     //
     // at the moment we do NOT support models for sets - that would require
     // an entirely new models factory + not even sure it makes sense at all since
-    // sets are created manually fixme yes it does!
+    // sets are created manually todo yes it does! - what does this all mean?
     //
     internal class PublishedElement : IPublishedElement
     {
