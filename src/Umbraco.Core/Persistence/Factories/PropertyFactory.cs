@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Factories
                             property.Id = propDto.Id;
                             property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
                         }
-                            
+
                     }
 
                     property.ResetDirtyProperties(false);
@@ -116,6 +116,9 @@ namespace Umbraco.Core.Persistence.Factories
 
             var entityVariesByCulture = contentVariation.VariesByCulture();
 
+            // create dtos for each property values, but only for values that do actually exist
+            // ie have a non-null value, everything else is just ignored and won't have a db row
+
             foreach (var property in properties)
             {
                 if (property.PropertyType.IsPublishing)
@@ -135,10 +138,6 @@ namespace Umbraco.Core.Persistence.Factories
                         if (propertyValue.EditedValue != null)
                             propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
 
-                        // deal with missing edit value (fix inconsistencies)
-                        else if (propertyValue.PublishedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property,  languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
-
                         // use explicit equals here, else object comparison fails at comparing eg strings
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
                         edited |= !sameValues;
@@ -150,7 +149,7 @@ namespace Umbraco.Core.Persistence.Factories
                             editedCultures.Add(propertyValue.Culture); // report culture as edited
                         }
 
-                        // flag culture as edited if it contains an edited invariant property 
+                        // flag culture as edited if it contains an edited invariant property
                         if (propertyValue.Culture == null //invariant property
                             && !sameValues // and edited and published are different
                             && entityVariesByCulture) //only when the entity is variant
@@ -160,7 +159,6 @@ namespace Umbraco.Core.Persistence.Factories
 
                             editedCultures.Add(defaultCulture);
                         }
-                        
                     }
                 }
                 else
