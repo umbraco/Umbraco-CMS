@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services.Implement
             //exit if there are no entities
             if (entitiesL.Count == 0) return;
 
-            //put all entity's paths into a list with the same index's
+            //put all entity's paths into a list with the same indices
             var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
