@@ -239,6 +239,8 @@
     <key alias="published">Published</key>
     <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Publication Status</key>
+    <key alias="publishDescendantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> and the same languages of content items underneath and thereby making their content publicly available.]]></key>
     <key alias="releaseDate">Publish at</key>
     <key alias="unpublishDate">Unpublish at</key>
     <key alias="removeDate">Clear Date</key>

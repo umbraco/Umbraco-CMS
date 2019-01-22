@@ -228,6 +228,8 @@
     <key alias="published">Udgivet</key>
     <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
+    <key alias="publishDescendantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>%0%</strong> og alle sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
     <key alias="releaseDate">Udgivelsesdato</key>
     <key alias="unpublishDate">Afpubliceringsdato</key>
     <key alias="removeDate">Fjern dato</key>
