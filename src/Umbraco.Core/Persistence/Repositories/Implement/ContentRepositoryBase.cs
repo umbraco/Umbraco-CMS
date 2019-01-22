@@ -742,6 +742,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="queryType"></param>
         /// <returns></returns>
         protected abstract Sql<ISqlContext> GetBaseQuery(QueryType queryType);
+
         #endregion
 
         #region Utilities
