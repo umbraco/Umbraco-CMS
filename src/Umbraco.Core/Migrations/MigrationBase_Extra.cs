@@ -98,14 +98,12 @@ namespace Umbraco.Core.Migrations
 
         protected bool ColumnExists(string tableName, string columnName)
         {
-            // that's ok even on MySql
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
             return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
         }
 
         protected string ColumnType(string tableName, string columnName)
         {
-            // that's ok even on MySql
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
             var column = columns.FirstOrDefault(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
             return column?.DataType;

@@ -1,18 +1,5 @@
 <div class="umb-editors">
 
-    <!-- FIXME -->
-    <!-- 
-        For some reason I can't get the animation to work when we use the umb-editor directive.
-        The the template isn't rendered quick enough and we can't access the css classes inside the directive
-        I have also tried with the animation service but I can't get the animations to run when the ng-repeat is on the umb-editor directive
-
-        <umb-editor
-            ng-repeat="editor in editors"
-            model="editor">
-        </umb-editor>
-    -->
-
-    <!-- Temp solution -->
     <div class="umb-editor" ng-repeat="model in editors" ng-style="model.style" ng-class="{'umb-editor--small': model.size === 'small', 'umb-editor--animating': model.animating}">
         <div ng-if="!model.view && !model.animating" ng-transclude></div>
         <div ng-if="model.view && !model.animating" ng-include="model.view"></div>

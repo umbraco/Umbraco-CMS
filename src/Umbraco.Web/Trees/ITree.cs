@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Web.Trees
 {
-    //fixme - we don't really use this, it is nice to have the treecontroller, attribute and ApplicationTree streamlined to implement this but it's not used
+    //todo- we don't really use this, it is nice to have the treecontroller, attribute and ApplicationTree streamlined to implement this but it's not used
     //leave as internal for now, maybe we'll use in the future, means we could pass around ITree 
     internal interface ITree
     {

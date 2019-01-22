@@ -325,23 +325,14 @@ namespace Umbraco.Web
 
             var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
 
-            var entityService = Current.Services.EntityService;
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Document:
                     return Content(guidUdi.Guid);
                 case UmbracoObjectTypes.Media:
-                    // fixme - need to implement Media(guid)!
-                    var mediaAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
-                    if (mediaAttempt.Success)
-                        return Media(mediaAttempt.Result);
-                    break;
+                    return Media(guidUdi.Guid);
                 case UmbracoObjectTypes.Member:
-                    // fixme - need to implement Member(guid)!
-                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
-                    if (memberAttempt.Success)
-                        return Member(memberAttempt.Result);
-                    break;
+                    return Member(guidUdi.Guid);
             }
 
             return null;
@@ -650,7 +641,7 @@ namespace Umbraco.Web
             //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
             // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
 
-            var entityService = Current.Services.EntityService; // fixme inject
+            var entityService = Current.Services.EntityService; // todo inject
             var mediaAttempt = entityService.GetId(id, UmbracoObjectTypes.Media);
             return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
         }

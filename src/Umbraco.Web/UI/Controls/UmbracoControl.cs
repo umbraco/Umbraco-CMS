@@ -20,7 +20,7 @@ namespace Umbraco.Web.UI.Controls
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             Umbraco = new UmbracoHelper(umbracoContext, services);
 
-            // fixme inject somehow
+            // todo inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;

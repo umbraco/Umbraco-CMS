@@ -4,11 +4,6 @@ namespace Umbraco.Core.Persistence
 {
     internal static class NPocoDatabaseTypeExtensions
     {
-        public static bool IsMySql(this DatabaseType databaseType)
-        {
-            return databaseType is NPoco.DatabaseTypes.MySqlDatabaseType;
-        }
-
         public static bool IsSqlServer(this DatabaseType databaseType)
         {
             // note that because SqlServerDatabaseType is the base class for

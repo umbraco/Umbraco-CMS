@@ -166,12 +166,6 @@ namespace Umbraco.Core.Migrations.Install
         /// </remarks>
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
-            //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
-            //TODO: At a later point we do other checks for MySql, but ideally it should be necessary to do special checks for different providers.
-            // ALso note that to get the constraints for MySql we have to open a connection which we currently have not.
-            if (SqlSyntax is MySqlSyntaxProvider)
-                return;
-
             //Check constraints in configured database against constraints in schema
             var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
@@ -186,8 +180,8 @@ namespace Umbraco.Core.Migrations.Install
             var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
                 .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
-            //Add valid and invalid foreign key differences to the result object
-            // We'll need to do invariant contains with case insensitivity because foreign key, primary key, and even index naming w/ MySQL is not standardized
+            // Add valid and invalid foreign key differences to the result object
+            // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
             // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
@@ -458,7 +452,6 @@ namespace Umbraco.Core.Migrations.Install
                 _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
             }
 
-            //Turn on identity insert if db provider is not mysql
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} ON "));
 
@@ -467,15 +460,8 @@ namespace Umbraco.Core.Migrations.Install
 
             dataCreation.InitializeBaseData(tableName);
 
-            //Turn off identity insert if db provider is not mysql
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
-
-            //Special case for MySql
-            if (SqlSyntax is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
-            {
-                _database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
-            }
 
             //Loop through index statements and execute sql
             foreach (var sql in indexSql)
@@ -498,7 +484,7 @@ namespace Umbraco.Core.Migrations.Install
             else
             {
                         _logger.Info<Database>("New table {TableName} was created", tableName);
-                
+
             }
         }
 

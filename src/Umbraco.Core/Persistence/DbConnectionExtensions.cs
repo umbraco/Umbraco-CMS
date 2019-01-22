@@ -4,7 +4,6 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
-using MySql.Data.MySqlClient;
 using StackExchange.Profiling.Data;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
@@ -19,12 +18,6 @@ namespace Umbraco.Core.Persistence
             var builder = new DbConnectionStringBuilder { ConnectionString = connectionString };
             var allKeys = builder.Keys.Cast<string>();
 
-            var mySql = new[] { "Server", "Database", "Uid", "Pwd" };
-            if (mySql.All(x => allKeys.InvariantContains(x)))
-            {
-                return Constants.DbProviderNames.MySql;
-            }
-
             if (allKeys.InvariantContains("Data Source")
                 //this dictionary is case insensitive
                 && builder["Data source"].ToString().InvariantContains(".sdf"))
@@ -38,7 +31,6 @@ namespace Umbraco.Core.Persistence
         public static bool IsConnectionAvailable(string connectionString, string providerName)
         {
             if (providerName != Constants.DbProviderNames.SqlCe
-                && providerName != Constants.DbProviderNames.MySql
                 && providerName != Constants.DbProviderNames.SqlServer)
                 throw new NotSupportedException($"Provider \"{providerName}\" is not supported.");
 
@@ -107,11 +99,6 @@ namespace Umbraco.Core.Persistence
                     {
                         var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
                         return $"DataSource: {builder.DataSource}";
-                    }
-                    case MySqlConnection _:
-                    {
-                        var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
-                        return $"Server: {builder.Server}, Database: {builder.Database}";
                     }
                 }
             }

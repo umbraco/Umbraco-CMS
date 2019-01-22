@@ -401,7 +401,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            //fixme: inject
+            //todo: inject
             var actions = Current.Actions.FromEntityPermission(permission)
                 .ToList();
 

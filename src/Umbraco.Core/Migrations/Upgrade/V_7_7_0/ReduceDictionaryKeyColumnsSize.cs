@@ -16,9 +16,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
             var database = Database;
             var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(database);
 
-            var colLen = SqlSyntax is MySqlSyntaxProvider
-                ? database.ExecuteScalar<int?>(string.Format("select max(LENGTH({0})) from cmsDictionary", SqlSyntax.GetQuotedColumnName("key")))
-                : database.ExecuteScalar<int?>(string.Format("select max(datalength({0})) from cmsDictionary", SqlSyntax.GetQuotedColumnName("key")));
+            var colLen = database.ExecuteScalar<int?>(string.Format("select max(datalength({0})) from cmsDictionary", SqlSyntax.GetQuotedColumnName("key")));
 
             if (colLen < 900 == false) return;
 

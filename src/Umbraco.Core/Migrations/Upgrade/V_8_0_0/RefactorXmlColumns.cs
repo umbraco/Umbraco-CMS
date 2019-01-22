@@ -20,35 +20,24 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Alter.Table("cmsPreviewXml").AddColumn("Rv").AsInt64().NotNullable().WithDefaultValue(0).Do();
 
             // remove the any PK_ and the FK_ to cmsContentVersion.VersionId
-            if (DatabaseType.IsMySql())
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            var dups = new List<string>();
+            foreach (var c in constraints.Where(x => x.Item1.InvariantEquals("cmsPreviewXml") && x.Item3.InvariantStartsWith("PK_")))
             {
-                Delete.PrimaryKey("PK_cmsPreviewXml").FromTable("cmsPreviewXml").Do();
-
+                var keyName = c.Item3.ToLowerInvariant();
+                if (dups.Contains(keyName))
+                {
+                    Logger.Warn<RefactorXmlColumns>("Duplicate constraint '{Constraint}'", c.Item3);
+                    continue;
+                }
+                dups.Add(keyName);
+                Delete.PrimaryKey(c.Item3).FromTable(c.Item1).Do();
+            }
+            foreach (var c in constraints.Where(x => x.Item1.InvariantEquals("cmsPreviewXml") && x.Item3.InvariantStartsWith("FK_cmsPreviewXml_cmsContentVersion")))
+            {
                 Delete.ForeignKey().FromTable("cmsPreviewXml").ForeignColumn("VersionId")
                     .ToTable("cmsContentVersion").PrimaryColumn("VersionId")
                     .Do();
-            }
-            else
-            {
-                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
-                var dups = new List<string>();
-                foreach (var c in constraints.Where(x => x.Item1.InvariantEquals("cmsPreviewXml") && x.Item3.InvariantStartsWith("PK_")))
-                {
-                    var keyName = c.Item3.ToLowerInvariant();
-                    if (dups.Contains(keyName))
-                    {
-                        Logger.Warn<RefactorXmlColumns>("Duplicate constraint '{Constraint}'", c.Item3);
-                        continue;
-                    }
-                    dups.Add(keyName);
-                    Delete.PrimaryKey(c.Item3).FromTable(c.Item1).Do();
-                }
-                foreach (var c in constraints.Where(x => x.Item1.InvariantEquals("cmsPreviewXml") && x.Item3.InvariantStartsWith("FK_cmsPreviewXml_cmsContentVersion")))
-                {
-                    Delete.ForeignKey().FromTable("cmsPreviewXml").ForeignColumn("VersionId")
-                        .ToTable("cmsContentVersion").PrimaryColumn("VersionId")
-                        .Do();
-                }
             }
 
             if (ColumnExists("cmsPreviewXml", "Timestamp"))

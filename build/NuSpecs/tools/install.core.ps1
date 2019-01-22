@@ -73,7 +73,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Mvc.FixedDisplayModes.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Mvc.FixedDisplayModes.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\MiniProfiler.dll) { Remove-Item $umbracoBinFolder\MiniProfiler.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\MySql.Data.dll) { Remove-Item $umbracoBinFolder\MySql.Data.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Newtonsoft.Json.dll) { Remove-Item $umbracoBinFolder\Newtonsoft.Json.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Owin.dll) { Remove-Item $umbracoBinFolder\Owin.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Semver.dll) { Remove-Item $umbracoBinFolder\Semver.dll -Force -Confirm:$false }
