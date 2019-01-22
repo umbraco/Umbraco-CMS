@@ -60,7 +60,7 @@ namespace Umbraco.Web.Trees
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //find all tree definitions that have the current application alias
-            var groupedTrees = _treeService.GetGroupedTrees(application);
+            var groupedTrees = _treeService.GetBySectionGrouped(application);
             var allTrees = groupedTrees.Values.SelectMany(x => x).ToList();
 
             if (string.IsNullOrEmpty(tree) == false || allTrees.Count == 1)

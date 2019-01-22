@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -19,7 +18,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     /// <summary>
-    /// A base controller reference for non-attributed trees (un-registered). 
+    /// A base controller reference for non-attributed trees (un-registered).
     /// </summary>
     /// <remarks>
     /// Developers should generally inherit from TreeController.
@@ -28,13 +27,11 @@ namespace Umbraco.Web.Trees
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
         protected TreeControllerBase()
-        {
-        }
+        { }
 
-        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
-        {
-        }
-
+        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        { }
 
         /// <summary>
         /// The method called to render the contents of the tree structure
@@ -63,13 +60,20 @@ namespace Umbraco.Web.Trees
         public abstract string RootNodeDisplayName { get; }
 
         /// <inheritdoc />
+        public abstract string TreeGroup { get; }
+
+        /// <inheritdoc />
         public abstract string TreeAlias { get; }
+
         /// <inheritdoc />
         public abstract string TreeTitle { get; }
+
         /// <inheritdoc />
-        public abstract string ApplicationAlias { get; }
+        public abstract string SectionAlias { get; }
+
         /// <inheritdoc />
         public abstract int SortOrder { get; }
+
         /// <inheritdoc />
         public abstract bool IsSingleNodeTree { get; }
 
@@ -402,5 +406,4 @@ namespace Umbraco.Web.Trees
             handler?.Invoke(instance, e);
         }
     }
-
 }

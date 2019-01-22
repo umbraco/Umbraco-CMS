@@ -6,65 +6,38 @@ using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Services
 {
+    /// <summary>
+    /// Implements <see cref="ITreeService"/>.
+    /// </summary>
     internal class TreeService : ITreeService
     {
         private readonly TreeCollection _treeCollection;
-        private readonly Lazy<IReadOnlyCollection<IGrouping<string, string>>> _groupedTrees;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TreeService"/> class.
+        /// </summary>
+        /// <param name="treeCollection"></param>
         public TreeService(TreeCollection treeCollection)
         {
             _treeCollection = treeCollection;
-            _groupedTrees = new Lazy<IReadOnlyCollection<IGrouping<string, string>>>(InitGroupedTrees);
         }
 
         /// <inheritdoc />
-        public Tree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(t => t.TreeAlias == treeAlias);
+        public Tree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(x => x.TreeAlias == treeAlias);
 
         /// <inheritdoc />
         public IEnumerable<Tree> GetAll() => _treeCollection;
 
         /// <inheritdoc />
-        public IEnumerable<Tree> GetTrees(string sectionAlias)
-            => GetAll().Where(x => x.ApplicationAlias.InvariantEquals(sectionAlias)).OrderBy(x => x.SortOrder).ToList();
+        public IEnumerable<Tree> GetBySection(string sectionAlias)
+            => _treeCollection.Where(x => x.SectionAlias.InvariantEquals(sectionAlias)).OrderBy(x => x.SortOrder).ToList();
 
-        public IDictionary<string, IEnumerable<Tree>> GetGroupedTrees(string sectionAlias)
+        /// <inheritdoc />
+        public IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias)
         {
-            var result = new Dictionary<string, IEnumerable<Tree>>();
-            var foundTrees = GetTrees(sectionAlias).ToList();
-            foreach(var treeGroup in _groupedTrees.Value)
-            {
-                List<Tree> resultGroup = null;
-                foreach(var tree in foundTrees)
-                { 
-                    foreach(var treeAliasInGroup in treeGroup)
-                    {
-                        if (tree.TreeAlias != treeAliasInGroup) continue;
-
-                        if (resultGroup == null) resultGroup = new List<Tree>();
-                        resultGroup.Add(tree);
-                    }  
-                }
-                if (resultGroup != null)
-                    result[treeGroup.Key ?? string.Empty] = resultGroup; //key cannot be null so make empty string
-            }
-            return result;
+            return GetBySection(sectionAlias).GroupBy(x => x.TreeGroup).ToDictionary(
+                x => x.Key ?? "",
+                x => (IEnumerable<Tree>) x.ToArray());
         }
-
-        /// <summary>
-        /// Creates a group of all tree groups and their tree aliases
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Used to initialize the <see cref="_groupedTrees"/> field
-        /// </remarks>
-        private IReadOnlyCollection<IGrouping<string, string>> InitGroupedTrees()
-        {
-            var result = GetAll()
-                .Select(x => (treeAlias: x.TreeAlias, treeGroup: x.TreeControllerType.GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
-                .GroupBy(x => x.treeGroup, x => x.treeAlias)
-                .ToList();
-            return result;
-        }
-
     }
 }

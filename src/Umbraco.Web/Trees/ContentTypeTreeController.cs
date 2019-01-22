@@ -15,9 +15,9 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

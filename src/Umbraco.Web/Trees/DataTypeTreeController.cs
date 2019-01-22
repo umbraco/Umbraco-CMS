@@ -17,9 +17,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, null, sortOrder:3)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, SortOrder = 3, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class DataTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -121,7 +121,7 @@ namespace Umbraco.Web.Trees
                 });
 
                 if (container.HasChildren == false)
-                { 
+                {
                     //can delete data type
                     menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
                 }

@@ -16,9 +16,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:6)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, SortOrder = 6, TreeGroup = Constants.Trees.Groups.Templating)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
+    [CoreTree]
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

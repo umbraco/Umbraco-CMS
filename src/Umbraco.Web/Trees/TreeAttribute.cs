@@ -1,10 +1,9 @@
 ﻿using System;
-using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
     /// <summary>
-    /// Identifies an application tree
+    /// Identifies a section tree.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class TreeAttribute : Attribute, ITree
@@ -12,54 +11,50 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Initializes a new instance of the <see cref="TreeAttribute"/> class.
         /// </summary>
-        /// <param name="appAlias">The app alias.</param>
-        /// <param name="treeAlias"></param>
-        public TreeAttribute(string appAlias,
-            string treeAlias) : this(appAlias, treeAlias, null)
+        public TreeAttribute(string sectionAlias, string treeAlias)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TreeAttribute"/> class.
-        /// </summary>
-        /// <param name="appAlias">The app alias.</param>
-        /// <param name="treeAlias"></param>
-        /// <param name="treeTitle"></param>
-        /// <param name="iconClosed">The icon closed.</param>
-        /// <param name="iconOpen">The icon open.</param>
-        /// <param name="initialize">if set to <c>true</c> [initialize].</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <param name="isSingleNodeTree">Flag to define if this tree is a single node tree (will never contain child nodes, full screen app)</param>
-        public TreeAttribute(string appAlias,
-            string treeAlias,
-            string treeTitle,
-            string iconClosed = "icon-folder",
-            string iconOpen = "icon-folder-open",
-            bool initialize = true,
-            int sortOrder = 0,
-            bool isSingleNodeTree = false)
-        {
-            ApplicationAlias = appAlias;
+            SectionAlias = sectionAlias;
             TreeAlias = treeAlias;
-            TreeTitle = treeTitle;
-            IconClosed = iconClosed;
-            IconOpen = iconOpen;
-            Initialize = initialize;
-            SortOrder = sortOrder;
-            IsSingleNodeTree = isSingleNodeTree;
         }
 
-        public string ApplicationAlias { get; }
-        public string TreeAlias { get; }
-        public string TreeTitle { get; }
-        public string IconClosed { get; }
-        public string IconOpen { get; }
-        public bool Initialize { get; }
-        public int SortOrder { get; }
+        /// <summary>
+        /// Gets the section alias.
+        /// </summary>
+        public string SectionAlias { get; }
 
         /// <summary>
-        /// Flag to define if this tree is a single node tree (will never contain child nodes, full screen app)
+        /// Gets the tree alias.
         /// </summary>
-        public bool IsSingleNodeTree { get; }
+        public string TreeAlias { get; }
+
+        /// <summary>
+        /// Gets or sets the tree title.
+        /// </summary>
+        public string TreeTitle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the group of the tree.
+        /// </summary>
+        public string TreeGroup { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tree icon when closed.
+        /// </summary>
+        public string IconClosed { get; set; } = "icon-folder";
+
+        /// <summary>
+        /// Gets or sets the tree icon when open.
+        /// </summary>
+        public string IconOpen { get; set; } = "icon-folder-open";
+
+        /// <summary>
+        /// Gets or sets the tree sort order.
+        /// </summary>
+        public int SortOrder { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the tree is a single-node tree (no child nodes, full screen app).
+        /// </summary>
+        public bool IsSingleNodeTree { get; set; }
     }
 }

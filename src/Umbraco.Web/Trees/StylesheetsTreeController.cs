@@ -4,8 +4,8 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Trees
 {
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, "Stylesheets", "icon-folder", "icon-folder", sortOrder: 9)]
+    [CoreTree]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, TreeTitle = "Stylesheets", IconOpen = "icon-folder", IconClosed = "icon-folder", SortOrder = 9, TreeGroup = Constants.Trees.Groups.Templating)]
     public class StylesheetsTreeController : FileSystemTreeController
     {
         protected override IFileSystem FileSystem => Current.FileSystems.StylesheetsFileSystem; // fixme inject

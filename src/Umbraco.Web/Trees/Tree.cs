@@ -1,46 +1,44 @@
 ﻿using System;
 using System.Diagnostics;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
-    [DebuggerDisplay("Tree - {TreeAlias} ({ApplicationAlias})")]
+    [DebuggerDisplay("Tree - {TreeAlias} ({SectionAlias})")]
     public class Tree : ITree
     {
-        public Tree(int sortOrder, string applicationAlias, string alias, string title, Type treeControllerType, bool isSingleNodeTree)
+        public Tree(int sortOrder, string applicationAlias, string group, string alias, string title, Type treeControllerType, bool isSingleNodeTree)
         {
             SortOrder = sortOrder;
-            ApplicationAlias = applicationAlias;
+            SectionAlias = applicationAlias;
+            TreeGroup = group;
             TreeAlias = alias;
             TreeTitle = title;
             TreeControllerType = treeControllerType;
             IsSingleNodeTree = isSingleNodeTree;
         }
-        
+
         /// <inheritdoc />
-        /// <summary>
-        /// Gets or sets the sort order.
-        /// </summary>
         public int SortOrder { get; set; }
 
-        /// <summary>
-        /// Gets the application alias.
-        /// </summary>
-        public string ApplicationAlias { get; set; }
+        /// <inheritdoc />
+        public string SectionAlias { get; set; }
+
+        /// <inheritdoc />
+        public string TreeGroup { get; }
 
         /// <inheritdoc />
         public string TreeAlias { get; }
 
         /// <inheritdoc />
-        /// <summary>
-        /// Gets or sets the tree title (fallback if the tree alias isn't localized)
-        /// </summary>
-        /// <value>The title.</value>
         public string TreeTitle { get; set; }
 
+        /// <inheritdoc />
         public bool IsSingleNodeTree { get; }
 
+        /// <summary>
+        /// Gets the tree controller type.
+        /// </summary>
         public Type TreeControllerType { get; }
 
         internal static string GetRootNodeDisplayName(ITree tree, ILocalizedTextService textService)
@@ -64,6 +62,5 @@ namespace Umbraco.Web.Trees
 
             return label;
         }
-
     }
 }
