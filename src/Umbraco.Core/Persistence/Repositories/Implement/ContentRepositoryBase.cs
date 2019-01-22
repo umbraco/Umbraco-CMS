@@ -743,8 +743,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <returns></returns>
         protected abstract Sql<ISqlContext> GetBaseQuery(QueryType queryType);
 
-            // This is used to determien which version is the most recent
-            /// Creates a paged query based on the original query and subtitutes the selectColumns specified
         #endregion
 
         #region Utilities
