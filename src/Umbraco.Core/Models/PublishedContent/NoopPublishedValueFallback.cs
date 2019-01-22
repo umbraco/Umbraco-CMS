@@ -37,16 +37,18 @@
         }
 
         /// <inheritdoc />
-        public bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value)
+        public bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value, out IPublishedProperty noValueProperty)
         {
             value = default;
+            noValueProperty = default;
             return false;
         }
 
         /// <inheritdoc />
-        public bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
+        public bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value, out IPublishedProperty noValueProperty)
         {
             value = default;
+            noValueProperty = default;
             return false;
         }
     }
