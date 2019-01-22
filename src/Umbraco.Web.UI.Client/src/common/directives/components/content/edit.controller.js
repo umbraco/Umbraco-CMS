@@ -151,6 +151,9 @@
          */
         function createButtons(content) {
 
+            // for element items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.isElement ? "primary" : "info";
+
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
             if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo") {

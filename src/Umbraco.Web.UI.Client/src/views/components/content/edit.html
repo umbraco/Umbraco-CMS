@@ -49,7 +49,7 @@
                         ng-if="page.showSaveButton"
                         alias="save"
                         type="button"
-                        button-style="info"
+                        button-style="{{page.saveButtonStyle}}"
                         state="page.saveButtonState"
                         action="save(content)"
                         label-key="buttons_save"
@@ -58,7 +58,7 @@
                     </umb-button>
                     
                     <umb-button-group 
-                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
+                        ng-if="defaultButton && !content.trashed && !content.isElement && !infiniteModel.infiniteMode" 
                         button-style="success"
                         default-button="defaultButton" 
                         sub-buttons="subButtons" 
