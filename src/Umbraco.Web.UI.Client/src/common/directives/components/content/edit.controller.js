@@ -27,6 +27,16 @@
         $scope.app = null;
 
         function init(content) {
+
+            if ($scope.app) {
+                var app = _.find(content.apps, function (app) { return app.alias === $scope.app.alias; });
+                if (app) {
+                    app.active = true;
+                } else {
+                    $scope.app = null;
+                }
+            }
+
             if (!$scope.app) {
                 // set first app to active
                 content.apps[0].active = true;

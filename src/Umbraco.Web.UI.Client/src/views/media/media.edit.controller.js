@@ -95,6 +95,15 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
     function init() {
 
+        if ($scope.app) {
+            var app = _.find($scope.content.apps, function (app) { return app.alias === $scope.app.alias; });
+            if (app) {
+                app.active = true;
+            } else {
+                $scope.app = null;
+            }
+        }
+
         if (!$scope.app) {
             // set first app to active
             $scope.content.apps[0].active = true;
@@ -210,8 +219,8 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
         }
     };
 
-    $scope.appChanged = function (app) {
-        $scope.app = app;
+    $scope.appChanged = function (item) {
+        $scope.app = item;
     }
 
     evts.push(eventsService.on("editors.mediaType.saved", function(name, args) {
