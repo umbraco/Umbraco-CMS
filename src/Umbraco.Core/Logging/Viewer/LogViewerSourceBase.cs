@@ -11,23 +11,27 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public abstract class LogViewerSourceBase : ILogViewer
     {
-        public LogViewerSourceBase(string pathToSearches = "")
+        protected LogViewerSourceBase(string pathToSearches = "")
         {
             if (string.IsNullOrEmpty(pathToSearches))
+                // ReSharper disable once StringLiteralTypo
                 pathToSearches = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
             _searchesConfigPath = pathToSearches;
         }
 
-        private string _searchesConfigPath;
+        private readonly string _searchesConfigPath;
 
         public abstract bool CanHandleLargeLogs { get; }
-        
-        public abstract IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
-        
+
+        /// <summary>
+        /// Get all logs from your chosen data source back as Serilog LogEvents
+        /// </summary>
+        protected abstract IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
+
         public abstract bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
-        public virtual IEnumerable<SavedLogSearch> GetSavedSearches()
+        public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
         {
             //Our default implementation
 
@@ -35,10 +39,10 @@ namespace Umbraco.Core.Logging.Viewer
             EnsureFileExists(_searchesConfigPath, "[]");
 
             var rawJson = System.IO.File.ReadAllText(_searchesConfigPath);
-            return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
+            return JsonConvert.DeserializeObject<SavedLogSearch[]>(rawJson);
         }
 
-        public virtual IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query)
+        public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
         {
             //Get the existing items
             var searches = GetSavedSearches().ToList();
@@ -46,7 +50,7 @@ namespace Umbraco.Core.Logging.Viewer
             //Add the new item to the bottom of the list
             searches.Add(new SavedLogSearch { Name = name, Query = query });
 
-            //Serilaize to JSON string
+            //Serialize to JSON string
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
             //If file does not exist - lets create it with an empty array
@@ -60,7 +64,7 @@ namespace Umbraco.Core.Logging.Viewer
             return searches;
         }
 
-        public virtual IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
         {
             //Get the existing items
             var searches = GetSavedSearches().ToList();
@@ -68,7 +72,7 @@ namespace Umbraco.Core.Logging.Viewer
             //Removes the search
             searches.RemoveAll(s => s.Name.Equals(name) && s.Query.Equals(query));
 
-            //Serilaize to JSON string
+            //Serialize to JSON string
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
             //Write it back down to file
@@ -82,7 +86,7 @@ namespace Umbraco.Core.Logging.Viewer
         {
             var errorCounter = new ErrorCounterFilter();
             GetLogs(startDate, endDate, errorCounter, 0, int.MaxValue);
-            return errorCounter.count;
+            return errorCounter.Count;
         }
 
         public LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate)
@@ -97,7 +101,7 @@ namespace Umbraco.Core.Logging.Viewer
             var messageTemplates = new MessageTemplateFilter();
             GetLogs(startDate, endDate, messageTemplates, 0, int.MaxValue);
 
-            var templates = messageTemplates.counts.
+            var templates = messageTemplates.Counts.
                 Select(x => new LogTemplate { MessageTemplate = x.Key, Count = x.Value })
                 .OrderByDescending(x=> x.Count);
 
@@ -112,20 +116,20 @@ namespace Umbraco.Core.Logging.Viewer
         {
             var expression = new ExpressionFilter(filterExpression);
             var filteredLogs = GetLogs(startDate, endDate, expression, 0, int.MaxValue);
-            
+
             //This is user used the checkbox UI to toggle which log levels they wish to see
             //If an empty array or null - its implied all levels to be viewed
             if (logLevels?.Length > 0)
             {
                 var logsAfterLevelFilters = new List<LogEvent>();
-                bool validLogType = true;
+                var validLogType = true;
                 foreach (var level in logLevels)
                 {
                     //Check if level string is part of the LogEventLevel enum
                     if(Enum.IsDefined(typeof(LogEventLevel), level))
                     {
                         validLogType = true;
-                        logsAfterLevelFilters.AddRange(filteredLogs.Where(x => x.Level.ToString().ToLowerInvariant() == level.ToLowerInvariant()));
+                        logsAfterLevelFilters.AddRange(filteredLogs.Where(x => string.Equals(x.Level.ToString(), level, StringComparison.InvariantCultureIgnoreCase)));
                     }
                     else
                     {
@@ -139,8 +143,7 @@ namespace Umbraco.Core.Logging.Viewer
                 }
             }
 
-            long totalRecords = filteredLogs.Count();
-            long pageIndex = pageNumber - 1;
+            long totalRecords = filteredLogs.Count;
 
             //Order By, Skip, Take & Select
             var logMessages = filteredLogs
@@ -163,7 +166,7 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        private void EnsureFileExists(string path, string contents)
+        private static void EnsureFileExists(string path, string contents)
         {
             var absolutePath = IOHelper.MapPath(path);
             if (System.IO.File.Exists(absolutePath)) return;

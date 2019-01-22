@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public partial class JsonLogViewer : LogViewerSourceBase
+    public class JsonLogViewer : LogViewerSourceBase
     {
-        private string _logsPath;
+        private readonly string _logsPath;
 
-        public JsonLogViewer(string logsPath = "", string searchPath = "") : base(pathToSearches: searchPath)
+        public JsonLogViewer(string logsPath = "", string searchPath = "") : base(searchPath)
         {
             if (string.IsNullOrEmpty(logsPath))
                 logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
@@ -18,15 +19,12 @@ namespace Umbraco.Core.Logging.Viewer
             _logsPath = logsPath;
         }
 
-        const int FileSizeCap = 100;
+        private const int FileSizeCap = 100;
 
-        public override bool CanHandleLargeLogs { get => false; }
+        public override bool CanHandleLargeLogs => false;
 
         public override bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            //Open the JSON log file for the range of dates(and exclude machinename) Could be several for LB
-            var dateRange = endDate - startDate;
-
             //Log Directory
             var logDirectory = _logsPath;
 
@@ -38,32 +36,22 @@ namespace Umbraco.Core.Logging.Viewer
             for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day.ToString("yyyyMMdd")}.json";
+                var filesToFind = $"*{day:yyyyMMdd}.json";
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
-                //Foreach file we find - open it
-                foreach (var filePath in filesForCurrentDay)
-                {
-                    //Get the current filesize in bytes !
-                    var byteFileSize = new FileInfo(filePath).Length;
-
-                    fileSizeCount += byteFileSize;
-                }
+                fileSizeCount += filesForCurrentDay.Sum(x => new FileInfo(x).Length);
             }
 
-            //The GetLogSize call on JsonLogViewer returns the total filesize in bytes
-            //Check if the logsize is not greater than 100Mb (FileSizeCap)
+            //The GetLogSize call on JsonLogViewer returns the total file size in bytes
+            //Check if the log size is not greater than 100Mb (FileSizeCap)
             var logSizeAsMegabytes = fileSizeCount / 1024 / 1024;
             return logSizeAsMegabytes <= FileSizeCap;
         }
 
-        public override IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
+        protected override IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
         {
             var logs = new List<LogEvent>();
-
-            //Open the JSON log file for the range of dates (and exclude machinename) Could be several for LB
-            var dateRange = endDate - startDate;
 
             //Log Directory
             var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
@@ -75,7 +63,7 @@ namespace Umbraco.Core.Logging.Viewer
             for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
-                var filesToFind = $"*{day.ToString("yyyyMMdd")}.json";
+                var filesToFind = $"*{day:yyyyMMdd}.json";
 
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
@@ -89,8 +77,7 @@ namespace Umbraco.Core.Logging.Viewer
                         using (var stream = new StreamReader(fs))
                         {
                             var reader = new LogEventReader(stream);
-                            LogEvent evt;
-                            while (reader.TryRead(out evt))
+                            while (reader.TryRead(out var evt))
                             {
                                 //TODO - convert psuedo code
                                 if (count > skip + take)
@@ -108,7 +95,7 @@ namespace Umbraco.Core.Logging.Viewer
                                 {
                                     logs.Add(evt);
                                 }
-                                    
+
                                 count++;
                             }
                         }
@@ -118,6 +105,6 @@ namespace Umbraco.Core.Logging.Viewer
 
             return logs;
         }
-    
+
     }
 }

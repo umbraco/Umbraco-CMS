@@ -1,4 +1,5 @@
-﻿using Serilog.Events;
+﻿using System;
+using Serilog.Events;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -9,16 +10,13 @@ namespace Umbraco.Core.Logging.Viewer
             Counts = new LogLevelCounts();
         }
 
-        public LogLevelCounts Counts { get; set; }
+        public LogLevelCounts Counts { get; }
 
         public bool TakeLogEvent(LogEvent e)
-        {           
+        {
 
             switch (e.Level)
             {
-                case LogEventLevel.Verbose:
-                    break;
-
                 case LogEventLevel.Debug:
                     Counts.Debug++;
                     break;
@@ -38,10 +36,11 @@ namespace Umbraco.Core.Logging.Viewer
                 case LogEventLevel.Fatal:
                     Counts.Fatal++;
                     break;
-
-                default:
+                case LogEventLevel.Verbose:
                     break;
-            }            
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             //Don't add it to the list
             return false;
