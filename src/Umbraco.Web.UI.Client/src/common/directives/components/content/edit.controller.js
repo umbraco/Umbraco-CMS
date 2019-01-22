@@ -483,7 +483,7 @@
                         view: "views/content/overlays/sendtopublish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabel: "Send for approval",
+                        submitButtonLabelKey: "buttons_saveToPublish",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -539,7 +539,7 @@
                         view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabel: "Publish",
+                        submitButtonLabelKey: "buttons_saveAndPublish",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -600,7 +600,7 @@
                         view: "views/content/overlays/save.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabel: "Save",
+                        submitButtonLabelKey: "buttons_save",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -672,7 +672,7 @@
                     view: "views/content/overlays/schedule.html",
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                    submitButtonLabel: "Schedule",
+                    submitButtonLabelKey: "buttons_schedulePublish",
                     submit: function (model) {
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
