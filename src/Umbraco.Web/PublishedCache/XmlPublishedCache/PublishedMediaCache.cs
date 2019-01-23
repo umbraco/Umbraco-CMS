@@ -41,11 +41,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly IEntityXmlSerializer _entitySerializer;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         // must be specified by the ctor
         private readonly IAppCache _appCache;
 
-        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer)
+        public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService,
+            IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer,
+            IUmbracoContextAccessor umbracoContextAccessor)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
@@ -55,6 +58,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _xmlStore = xmlStore;
             _contentTypeCache = contentTypeCache;
             _entitySerializer = entitySerializer;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         /// <summary>
@@ -666,7 +670,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 _appCache,
                 _contentTypeCache,
                 cacheValues.XPath, // though, outside of tests, that should be null
-                cacheValues.FromExamine
+                cacheValues.FromExamine,
+                _umbracoContextAccessor
             );
             return content.CreateModel();
         }

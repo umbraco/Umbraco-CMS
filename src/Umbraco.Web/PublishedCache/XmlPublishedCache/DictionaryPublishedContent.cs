@@ -38,7 +38,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IAppCache appCache,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
-            bool fromExamine)
+            bool fromExamine,
+            IUmbracoContextAccessor umbracoContextAccessor)
+            :base(umbracoContextAccessor)
         {
             if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
             if (getParent == null) throw new ArgumentNullException(nameof(getParent));

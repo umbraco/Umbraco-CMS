@@ -20,21 +20,29 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
     internal class XmlPublishedContent : PublishedContentBase
     {
-        private XmlPublishedContent(XmlNode xmlNode, bool isPreviewing, IAppCache appCache, PublishedContentTypeCache contentTypeCache)
+        private XmlPublishedContent(
+            XmlNode xmlNode,
+            bool isPreviewing,
+            IAppCache appCache,
+            PublishedContentTypeCache contentTypeCache,
+            IUmbracoContextAccessor umbracoContextAccessor)
+            :base(umbracoContextAccessor)
         {
             _xmlNode = xmlNode;
             _isPreviewing = isPreviewing;
 
             _appCache = appCache;
             _contentTypeCache = contentTypeCache;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
         private readonly IAppCache _appCache; // at snapshot/request level (see PublishedContentCache)
         private readonly PublishedContentTypeCache _contentTypeCache;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-	    private readonly object _initializeLock = new object();
+        private readonly object _initializeLock = new object();
 
         private bool _nodeInitialized;
         private bool _parentInitialized;
@@ -252,7 +260,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (parent == null) return;
 
             if (parent.Attributes?.GetNamedItem("isDoc") != null)
-                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache);
+                _parent = Get(parent, _isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor);
 
             _parentInitialized = true;
         }
@@ -409,7 +417,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var iterator = nav.Select(expr);
 
             _children = iterator.Cast<XPathNavigator>()
-                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache))
+                .Select(n => Get(((IHasXmlNode) n).GetNode(), _isPreviewing, _appCache, _contentTypeCache, _umbracoContextAccessor))
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
@@ -423,11 +431,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="isPreviewing">A value indicating whether we are previewing or not.</param>
         /// <param name="appCache">A cache.</param>
         /// <param name="contentTypeCache">A content type cache.</param>
+        /// <param name="umbracoContextAccessor">A umbraco context accessor</param>
         /// <returns>The IPublishedContent corresponding to the Xml cache node.</returns>
         /// <remarks>Maintains a per-request cache of IPublishedContent items in order to make
         /// sure that we create only one instance of each for the duration of a request. The
         /// returned IPublishedContent is a model, if models are enabled.</remarks>
-        public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache appCache, PublishedContentTypeCache contentTypeCache)
+        public static IPublishedContent Get(XmlNode node, bool isPreviewing, IAppCache appCache,
+            PublishedContentTypeCache contentTypeCache, IUmbracoContextAccessor umbracoContextAccessor)
         {
             // only 1 per request
 
@@ -435,7 +445,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel());
+            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache, umbracoContextAccessor)).CreateModel());
         }
 
         public static void ClearRequest()

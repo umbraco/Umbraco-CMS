@@ -14,6 +14,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class PublishedContent : PublishedContentBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentNode _contentNode;
         // ReSharper disable once InconsistentNaming
         internal readonly ContentData _contentData; // internal for ContentNode cloning
@@ -22,11 +23,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
+        public PublishedContent(
+            ContentNode contentNode,
+            ContentData contentData,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IVariationContextAccessor variationContextAccessor,
+            IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
         {
             _contentNode = contentNode;
             _contentData = contentData;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
             VariationContextAccessor = variationContextAccessor;
 
             _urlSegment = _contentData.Name.ToUrlSegment();
@@ -66,7 +73,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // (see ContentNode.CloneParent)
-        public PublishedContent(ContentNode contentNode, PublishedContent origin)
+        public PublishedContent(
+            ContentNode contentNode,
+            PublishedContent origin,
+            IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
@@ -83,7 +93,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        private PublishedContent(PublishedContent origin)
+        private PublishedContent(
+            PublishedContent origin,
+            IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;
@@ -433,8 +445,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return this;
 
             var cache = GetAppropriateCache();
-            if (cache == null) return new PublishedContent(this).CreateModel();
-            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
+            if (cache == null) return new PublishedContent(this, _umbracoContextAccessor).CreateModel();
+            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this, _umbracoContextAccessor).CreateModel());
         }
 
         // used by Navigable.Source,...
