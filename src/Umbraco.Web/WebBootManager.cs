@@ -131,9 +131,9 @@ namespace Umbraco.Web
             InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();
 
-            // Tell .net 4.5 that we also want to try connecting over TLS 1.2, not just 1.1
-            if (ServicePointManager.SecurityProtocol.HasFlag(SecurityProtocolType.Tls12) == false)
-                ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol | SecurityProtocolType.Tls12;
+            // Tell .NET 4.5 that we also want to try connecting over TLS 1.2, not just TLS 1.1 (but only if specific protocols are defined)
+            if (ServicePointManager.SecurityProtocol != 0)
+                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 
             return this;
         }
