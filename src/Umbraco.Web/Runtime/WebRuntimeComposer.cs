@@ -204,23 +204,9 @@ namespace Umbraco.Web.Runtime
                 .Append<TranslationBackOfficeSection>();
 
 
-            // register core CMS dashboards as types - will be ordered by weight attribute & merged with package.manifest dashboards
-            // TODO WB Maybe use typeloader?!
-
+            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             composition.WithCollectionBuilder<DashboardCollectionBuilder>()
-                .Add(composition.TypeLoader.GetTypes<IDashboardSection>());
-
-                //.Add<ContentDashboard>()
-                //.Add<RedirectUrlDashboard>()
-                //.Add<MediaDashboard>()
-                //.Add<SettingsDashboard>()
-                //.Add<ExamineDashboard>()
-                //.Add<PublishedStatusDashboard>()
-                //.Add<ModelsBuilderDashboard>()
-                //.Add<HealthCheckDashboard>()
-                //.Add<MembersDashboard>()
-                //.Add<FormsDashboard>();
-                
+                .Add(composition.TypeLoader.GetTypes<IDashboardSection>());                
 
             // register back office trees
             foreach (var treeControllerType in umbracoApiControllerTypes
