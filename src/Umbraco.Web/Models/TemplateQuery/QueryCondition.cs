@@ -18,11 +18,10 @@ namespace Umbraco.Web.Models.TemplateQuery
         private static Lazy<MethodInfo> StringContainsMethodInfo =>
             new Lazy<MethodInfo>(() => typeof(string).GetMethod("Contains", new[] {typeof(string)}));
 
-        public static Expression<Func<IPublishedContent, bool>> BuildCondition(this QueryCondition condition,
-            string parameterAlias, IEnumerable<IPublishedContent> contents, IEnumerable<PropertyModel> properties)
+        public static Expression<Func<T, bool>> BuildCondition<T>(this QueryCondition condition, string parameterAlias)
         {
             object constraintValue;
-            switch (condition.Property.Type)
+            switch (condition.Property.Type.ToLowerInvariant())
             {
                 case "string":
                     constraintValue = condition.ConstraintValue;
@@ -30,12 +29,15 @@ namespace Umbraco.Web.Models.TemplateQuery
                 case "datetime":
                     constraintValue = DateTime.Parse(condition.ConstraintValue);
                     break;
+                case "boolean":
+                    constraintValue = Boolean.Parse(condition.ConstraintValue);
+                    break;
                 default:
                     constraintValue = Convert.ChangeType(condition.ConstraintValue, typeof(int));
                     break;
             }
 
-            var parameterExpression = Expression.Parameter(typeof(IPublishedContent), parameterAlias);
+            var parameterExpression = Expression.Parameter(typeof(T), parameterAlias);
             var propertyExpression = Expression.Property(parameterExpression, condition.Property.Alias);
 
             var valueExpression = Expression.Constant(constraintValue);
@@ -73,7 +75,7 @@ namespace Umbraco.Web.Models.TemplateQuery
             }
 
             var predicate =
-                Expression.Lambda<Func<IPublishedContent, bool>>(bodyExpression.Reduce(), parameterExpression);
+                Expression.Lambda<Func<T, bool>>(bodyExpression.Reduce(), parameterExpression);
 
             return predicate;
         }
