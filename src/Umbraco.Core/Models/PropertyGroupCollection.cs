@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        //fixme: this doesn't seem to be used anywhere
+        //todo: this doesn't seem to be used anywhere
         internal Action OnAdd;
 
         internal PropertyGroupCollection()
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Models
             {
                 _addLocker.EnterWriteLock();
 
-                //Note this is done to ensure existig groups can be renamed
+                //Note this is done to ensure existing groups can be renamed
                 if (item.HasIdentity && item.Id > 0)
                 {
                     var exists = Contains(item.Id);

@@ -47,7 +47,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
+        /// Tries to lookup the user's Gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
         /// <param name="user"></param>
         /// <param name="cache"></param>
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Models
             // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
             // and the website will not run.
-            // Also, check if the user has explicitly removed all avatars including a gravatar, this will be possible and the value will be "none"
+            // Also, check if the user has explicitly removed all avatars including a Gravatar, this will be possible and the value will be "none"
             if (user.Avatar == "none" || CryptoConfig.AllowOnlyFipsAlgorithms)
             {
                 return new string[0];
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
                 var gravatarHash = user.Email.ToMd5();
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
-                //try gravatar
+                //try Gravatar
                 var gravatarAccess = cache.GetCacheItem<bool>("UserAvatar" + user.Id, () =>
                 {
                     // Test if we can reach this URL, will fail when there's network or firewall errors

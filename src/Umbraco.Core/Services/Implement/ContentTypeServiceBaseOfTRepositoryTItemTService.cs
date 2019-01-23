@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services.Implement
 
             // note
             // this is meant to run *after* uow.Commit() so must use WasPropertyDirty() everywhere
-            // instead of IsPropertyDirty() since dirty properties have been resetted already
+            // instead of IsPropertyDirty() since dirty properties have been reset already
 
             var changes = new List<ContentTypeChange<TItem>>();
 
@@ -353,7 +353,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<TItem> GetComposedOf(int id)
         {
             // GetAll is cheap, repository has a full dataset cache policy
-            // fixme - still, because it uses the cache, race conditions!
+            // todo - still, because it uses the cache, race conditions!
             var allContentTypes = GetAll(Array.Empty<int>());
             return GetComposedOf(id, allContentTypes);
         }

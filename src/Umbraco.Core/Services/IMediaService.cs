@@ -109,7 +109,7 @@ namespace Umbraco.Core.Services
             IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
-        /// Gets paged documents of a content content
+        /// Gets paged documents of a content
         /// </summary>
         /// <param name="contentTypeId">The page number.</param>
         /// <param name="pageIndex">The page number.</param>
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
-        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        /// <param name="userId">Optional Id of the user issuing the delete operation</param>
         void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0);
         
         /// <summary>

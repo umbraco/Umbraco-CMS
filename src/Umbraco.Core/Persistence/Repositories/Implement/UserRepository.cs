@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
-                // fixme - this is bad
+                // todo - this is bad
                 // because the membership provider we're trying to get has a dependency on the user service
                 // and we should not depend on services in repositories - need a way better way to do this
 
@@ -169,7 +169,7 @@ ORDER BY colName";
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            //TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
             //and also business logic models for these objects but that's just so overkill for what we are doing
             //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
             var now = DateTime.UtcNow;
@@ -238,7 +238,7 @@ ORDER BY colName";
 
         public void ClearLoginSession(Guid sessionId)
         {
-            // fixme why is that one updating and not deleting?
+            // todo why is that one updating and not deleting?
             Database.Execute(Sql()
                 .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
@@ -300,7 +300,7 @@ ORDER BY colName";
         // NPoco cannot fetch 2+ references at a time
         // plus it creates a combinatorial explosion
         // better use extra queries
-        // unfortunately, SqlCe and MySql don't support multiple result sets
+        // unfortunately, SqlCe doesn't support multiple result sets
         private void PerformGetReferencedDtos(List<UserDto> dtos)
         {
             if (dtos.Count == 0) return;
@@ -313,7 +313,7 @@ ORDER BY colName";
             var sql = SqlContext.Sql()
                 .Select<User2UserGroupDto>()
                 .From<User2UserGroupDto>()
-                .WhereIn<User2UserGroupReadOnlyDto>(x => x.UserId, userIds);
+                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
             var users2groups = Database.Fetch<User2UserGroupDto>(sql);
             var groupIds = users2groups.Select(x => x.UserGroupId).ToList();
@@ -690,7 +690,7 @@ ORDER BY colName";
         /// <param name="excludeUserGroups">
         /// A filter to only include users that do not belong to these user groups
         /// </param>
-        /// <param name="userState">Optional parameter to filter by specfied user state</param>
+        /// <param name="userState">Optional parameter to filter by specified user state</param>
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>

@@ -593,7 +593,7 @@ namespace Umbraco.Web.Editors
                 {
                     p.SetValue(valueMapped.GetValue());
 
-                    // fixme - ok, I give up, at that point tags are dead here, until we figure it out
+                    // fixme/task - ok, I give up, at that point tags are dead here, until we figure it out
                     //p.TagChanges.Behavior = valueMapped.TagChanges.Behavior;
                     //p.TagChanges.Enable = valueMapped.TagChanges.Enable;
                     //p.TagChanges.Tags = valueMapped.TagChanges.Tags;

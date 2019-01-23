@@ -11,6 +11,6 @@ namespace Umbraco.Web.WebApi.Filters
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public sealed class EnableOverrideAuthorizationAttribute : Attribute
     {
-        //fixme we should remove this and use the System.Web.Http.OverrideAuthorizationAttribute which uses IOverrideFilter instead
+        //todo we should remove this and use the System.Web.Http.OverrideAuthorizationAttribute which uses IOverrideFilter instead
     }
 }

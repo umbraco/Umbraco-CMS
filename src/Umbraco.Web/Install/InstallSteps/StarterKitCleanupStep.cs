@@ -26,7 +26,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
 
-            //fixme: When does the zip file get deleted?
+            //todo: When does the zip file get deleted?
         }
 
         public override bool RequiresExecution(object model)

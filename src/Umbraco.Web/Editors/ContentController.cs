@@ -94,10 +94,8 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
-            //fixme what about cultures?
-
             var foundContent = Services.ContentService.GetByIds(ids);
-            return foundContent.Select(x => MapToDisplay(x));
+            return foundContent.Select(MapToDisplay);
         }
 
         /// <summary>
@@ -248,7 +246,6 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
-        //fixme what about cultures?
         public ContentItemDisplay GetBlueprintById(int id)
         {
             var foundContent = Services.ContentService.GetBlueprintById(id);
@@ -274,7 +271,7 @@ namespace Umbraco.Web.Editors
             content.AllowedActions = new[] { "A" };
             content.IsBlueprint = true;
 
-            //fixme - exclude the content apps here
+            //todo  - exclude the content apps here
             //var excludeProps = new[] { "_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template" };
             //var propsTab = content.Tabs.Last();
             //propsTab.Properties = propsTab.Properties
@@ -1352,7 +1349,7 @@ namespace Umbraco.Web.Editors
         /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
         /// does not have Delete access to this node.
         /// </remarks>
-        [EnsureUserPermissionForContent("id", 'D')]
+        [EnsureUserPermissionForContent("id", ActionDelete.ActionLetter)]
         [HttpDelete]
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
@@ -1398,7 +1395,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.ContentService.EmptyRecycleBin();
@@ -2021,7 +2018,7 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
-                            "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
+                            "publish/contentPublishedFailedByCulture");
                         break;
                     default:
                         throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");
@@ -2037,7 +2034,7 @@ namespace Umbraco.Web.Editors
         private ContentItemDisplay MapToDisplay(IContent content)
         {
             var display = Mapper.Map<ContentItemDisplay>(content);
-            display.AllowPreview = display.AllowPreview && !content.ContentType.IsElement;
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && !content.ContentType.IsElement;
             return display;
         }
 
@@ -2081,8 +2078,6 @@ namespace Umbraco.Web.Editors
             var rollbackVersions = new List<RollbackVersion>();
             var writerIds = new HashSet<int>();
 
-            //Return a list of all versions of a specific content node
-            // fixme - cap at 50 versions for now?
             var versions = Services.ContentService.GetVersionsSlim(contentId, 0, 50);
 
             //Not all nodes are variants & thus culture can be null

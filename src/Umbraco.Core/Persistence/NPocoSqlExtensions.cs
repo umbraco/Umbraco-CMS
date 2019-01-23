@@ -496,7 +496,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> On<TLeft, TRight>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin,
             Expression<Func<TLeft, object>> leftField, Expression<Func<TRight, object>> rightField)
         {
-            // fixme - ugly - should define on SqlContext!
+            // todo - ugly - should define on SqlContext!
 
             var xLeft = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(leftField);
             var xRight = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(rightField);
@@ -816,7 +816,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto to select.</typeparam>
         /// <param name="sql">The origin Sql.</param>
-        /// <param name="reference">An expression speficying the reference.</param>
+        /// <param name="reference">An expression specifying the reference.</param>
         /// <param name="sqlexpr">An expression to apply to the Sql statement before adding the reference selection.</param>
         /// <returns>The Sql statement.</returns>
         /// <remarks>The <paramref name="sqlexpr"/> expression applies to the Sql statement before the reference selection
@@ -1063,17 +1063,6 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
         {
-            // MySql wants "FOR UPDATE" at the end, and T-Sql wants "WITH (UPDLOCK)" in the FROM statement,
-            // and we want to implement it in the least expensive way, so parsing the entire string here is
-            // a no, so we use reflection to work on the Sql expression before it is built.
-            // TODO propose a clean way to do that type of thing in NPoco
-
-            if (sql.SqlContext.DatabaseType.IsMySql())
-            {
-                sql.Append("FOR UPDATE");
-                return sql;
-            }
-
             // go find the first FROM clause, and append the lock hint
             Sql s = sql;
             var updated = false;

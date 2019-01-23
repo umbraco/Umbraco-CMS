@@ -22,7 +22,7 @@ namespace Umbraco.Core
         /// <param name="memberName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Currenty this will only work for ProperCase and camelCase properties, see the TODO below to enable complete case insensitivity
+        /// Currently this will only work for ProperCase and camelCase properties, see the TODO below to enable complete case insensitivity
         /// </remarks>
         internal static Attempt<object> GetMemberIgnoreCase(this Type type, object target, string memberName)
         {
@@ -410,7 +410,7 @@ namespace Umbraco.Core
         /// <param name="type"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This method is like an 'inbetween' of Type.FullName and Type.AssemblyQualifiedName which returns the type and the assembly separated
+        /// This method is like an 'in between' of Type.FullName and Type.AssemblyQualifiedName which returns the type and the assembly separated
         /// by a comma.
         /// </remarks>
         /// <example>

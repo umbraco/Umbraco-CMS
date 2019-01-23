@@ -11,7 +11,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
@@ -132,7 +131,7 @@ namespace Umbraco.Tests.Published
 
             var contentType1 = factory.CreateContentType(1, "content1", new[] { propertyType1 });
             var contentType2 = factory.CreateContentType(2, "content2", new[] { propertyType2 });
-            var contentTypeN1 = factory.CreateContentType(2, "contentN1", new[] { propertyTypeN1 });
+            var contentTypeN1 = factory.CreateContentType(2, "contentN1", new[] { propertyTypeN1 }, isElement: true);
 
             // mocked content cache returns content types
             contentCache

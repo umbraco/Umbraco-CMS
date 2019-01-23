@@ -72,7 +72,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         bool SupportsClustered();
         bool SupportsIdentityInsert();
-        bool? SupportsCaseInsensitiveQueries(IDatabase db);
 
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }

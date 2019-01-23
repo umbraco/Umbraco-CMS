@@ -3322,7 +3322,7 @@ namespace Umbraco.Core.Strings
 
                     // BEGIN CUSTOM TRANSLITERATION OF CYRILIC CHARS
 
-                    #region Cyrilic chars
+                    #region Cyrillic chars
 
                     // russian uppercase "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
                     // russian lowercase "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я"
@@ -3337,10 +3337,10 @@ namespace Umbraco.Core.Strings
                     // time for a T4 template?
                     // also we should support extensibility so ppl can register more cases in external code
 
-                    // fixme
+                    // todo
                     // transliterates Анастасия as Anastasiya, and not Anastasia
                     // Ольга --> Ol'ga, Татьяна --> Tat'yana -- that's bad (?)
-                    // Note: should ä (german umlaut) become a or ae ?
+                    // Note: should ä (German umlaut) become a or ae ?
 
                     case '\u0410': // А
                         output[opos++] = 'A';

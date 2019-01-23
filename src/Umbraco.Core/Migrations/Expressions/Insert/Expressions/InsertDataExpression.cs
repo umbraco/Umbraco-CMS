@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using System.Linq;
-using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions

@@ -71,7 +71,7 @@ namespace Umbraco.Web.Cache
                     var handler = FindHandler(e);
                     if (handler == null)
                     {
-                        // fixme - should this be fatal (ie, an exception)?
+                        // todo - should this be fatal (ie, an exception)?
                         var name = e.Sender.GetType().Name + "_" + e.EventName;
                         _logger.Warn<DistributedCacheBinder>("Dropping event {EventName} because no corresponding handler was found.", name);
                         continue;

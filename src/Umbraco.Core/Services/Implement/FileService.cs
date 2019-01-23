@@ -331,7 +331,7 @@ namespace Umbraco.Core.Services.Implement
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            //fixme: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
+            //todo: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
             // the event args here. The other option is to create a different event with different event
             // args specifically for this method... which also isn't pretty. So fix this in v8!
             var additionalData = new Dictionary<string, object>
@@ -434,7 +434,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
-        /// <param name="id">The identifer of the template.</param>
+        /// <param name="id">The identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(int id)
         {

@@ -45,8 +45,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (string.IsNullOrEmpty(elementTypeAlias))
                 return null;
 
+            // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
             var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetContentType(elementTypeAlias);
-            if (publishedContentType == null)
+            if (publishedContentType == null || publishedContentType.IsElement == false)
                 return null;
 
             var propertyValues = sourceObject.ToObject<Dictionary<string, object>>();

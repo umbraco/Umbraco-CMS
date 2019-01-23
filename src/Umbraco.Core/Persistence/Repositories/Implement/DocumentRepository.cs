@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void AddGetByQueryOrderBy(Sql<ISqlContext> sql)
         {
-            sql // fixme why - this should be Path
+            sql
                 .OrderBy<NodeDto>(x => x.Level)
                 .OrderBy<NodeDto>(x => x.SortOrder);
         }
@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
                     .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv")
 
-                //fixme - should we be joining this when the query type is not single/many?
+                // todo - should we be joining this when the query type is not single/many?
                 // left join on optional culture variation
                 //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
                 .LeftJoin<ContentVersionCultureVariationDto>(nested =>
@@ -171,13 +171,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return sql;
         }
 
-        // fixme - kill, eventually
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        // fixme - kill, eventually
         // ah maybe not, that what's used for eg Exists in base repo
         protected override string GetBaseWhereClause()
         {
@@ -251,7 +249,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // raise event first else potential FK issues
             OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
-            // fixme - syntax + ...
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
@@ -263,7 +260,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
-            // fixme - stop doing this - sort out IContent vs Content
+            // fixme/task - sort out IContent vs Content
             // however, it's not just so we have access to AddingEntity
             // there are tons of things at the end of the methods, that can only work with a true Content
             // and basically, the repository requires a Content, not an IContent
@@ -280,7 +277,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             SanitizeNames(content, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // fixme - do we really want to keep doing this here?
+            // todo - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
@@ -439,7 +436,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            // fixme - stop doing this - sort out IContent vs Content
             // however, it's not just so we have access to AddingEntity
             // there are tons of things at the end of the methods, that can only work with a true Content
             // and basically, the repository requires a Content, not an IContent
@@ -451,7 +447,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 return; // no change to save, do nothing, don't even update dates
 
             // whatever we do, we must check that we are saving the current version
-            // fixme maybe we can just fetch Current (bool)
             var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == content.VersionId)).FirstOrDefault();
             if (version == null || !version.Current)
                 throw new InvalidOperationException("Cannot save a non-current version.");
@@ -471,7 +466,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             SanitizeNames(content, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // fixme - do we really want to keep doing this here?
+            // todo - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // if parent has changed, get path, level and sort order
@@ -550,7 +545,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
-                        // fixme - change tracking
+                        // todo - change tracking
                         // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
                         // culture has just been edited or not, so we don't update its update date - that date only changes
                         // when the name is set, and it all works because the controller does it - but, if someone uses a
@@ -566,8 +561,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == content.Id);
                 Database.Execute(deleteDocumentVariations);
 
-                // fixme NPoco InsertBulk issue?
-                // we should use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios)
+                // todo NPoco InsertBulk issue?
+                // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
                 // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
                 // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
                 // (same in PersistNewItem above)
@@ -628,7 +623,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // note re. tags: explicitly unpublished entities have cleared tags,
-            // but masked or trashed entities *still* have tags in the db fixme so what?
+            // but masked or trashed entities *still* have tags in the db todo so what?
 
             entity.ResetDirtyProperties();
 
@@ -842,7 +837,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         // reading repository purely for looking up by GUID
-        // fixme - ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        // todo - ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
         private class ContentByGuidReadRepository : NPocoRepositoryBase<Guid, IContent>
         {
             private readonly DocumentRepository _outerRepo;
@@ -1129,7 +1124,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // get properties - indexed by version id
                 var versionId = dto.DocumentVersionDto.Id;
 
-                // fixme - shall we get published properties or not?
+                // todo - shall we get published properties or not?
                 //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
                 var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
 
@@ -1338,7 +1333,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // variant content = update with default culture or anything really
             EnsureInvariantNameExists(content);
 
-            // ensure that that invariant name is unique
+            // ensure that invariant name is unique
             EnsureInvariantNameIsUnique(content);
 
             // and finally,
@@ -1357,7 +1352,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (content.CultureInfos.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
-                // and then, we need to set the invariant name implicitely,
+                // and then, we need to set the invariant name implicitly,
                 // using the default culture if it has a name, otherwise anything we can
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)

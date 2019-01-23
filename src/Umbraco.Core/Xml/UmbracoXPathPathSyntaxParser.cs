@@ -33,7 +33,7 @@ namespace Umbraco.Core.Xml
 
             //TODO: This should probably support some of the old syntax and token replacements, currently
             // it does not, there is a ticket raised here about it: http://issues.umbraco.org/issue/U4-6364
-            // previous tokens were: "$currentPage", "$ancestorOrSelf", "$parentPage" and I beleive they were
+            // previous tokens were: "$currentPage", "$ancestorOrSelf", "$parentPage" and I believe they were
             // allowed 'inline', not just at the beginning... whether or not we want to support that is up
             // for discussion.
 

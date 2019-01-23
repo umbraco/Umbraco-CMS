@@ -3,7 +3,7 @@
     <umb-box>
         <umb-box-content>
 
-            <div class="sub-view-columns">
+            <div class="sub-view-columns" ng-hide="model.isElement">
 
                 <div class="sub-view-column-left">
                     <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
@@ -19,7 +19,7 @@
 
             </div>
 
-            <div class="sub-view-columns">
+            <div class="sub-view-columns" ng-hide="model.isElement">
 
                 <div class="sub-view-column-left">
                     <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>

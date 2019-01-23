@@ -66,11 +66,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var baseQuery = GetBaseQuery(false);
 
-            // fixme why is this different from content/media?!
+            // todo why is this different from content/media?!
             // check if the query is based on properties or not
 
             var wheres = query.GetWhereClauses();
-            //this is a pretty rudimentary check but wil work, we just need to know if this query requires property
+            //this is a pretty rudimentary check but will work, we just need to know if this query requires property
             // level queries
             if (wheres.Any(x => x.Item1.Contains("cmsPropertyType")))
             {
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = SqlContext.Sql();
 
-            switch (queryType) // FIXME pretend we still need these queries for now
+            switch (queryType) // todo pretend we still need these queries for now
             {
                 case QueryType.Count:
                     sql = sql.SelectCount();
@@ -143,18 +143,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return sql;
         }
 
-        // fixme - move that one up to Versionable! or better: kill it!
+        // todo - move that one up to Versionable! or better: kill it!
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        protected override string GetBaseWhereClause() // fixme - can we kill / refactor this?
+        protected override string GetBaseWhereClause() // todo - can we kill / refactor this?
         {
             return "umbracoNode.id = @id";
         }
 
-        // fixme wtf?
+        // todo document/understand that one
         protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData()
         {
             return Sql()
@@ -237,7 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             member.AddingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
-            // fixme - do we really want to keep doing this here?
+            // todo - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
@@ -329,7 +329,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             member.UpdatingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
-            // fixme - do we really want to keep doing this here?
+            // todo - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // if parent has changed, get path, level and sort order
@@ -560,7 +560,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Member) cached; // fixme should we just cache Content not IContent?
+                        content[i] = (Member) cached;
                         continue;
                     }
                 }
@@ -583,7 +583,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // load all properties for all documents from database in 1 query - indexed by version id
             var properties = GetPropertyCollections(temps);
 
-            // assign properites
+            // assign properties
             foreach (var temp in temps)
             {
                 temp.Content.Properties = properties[temp.VersionId];

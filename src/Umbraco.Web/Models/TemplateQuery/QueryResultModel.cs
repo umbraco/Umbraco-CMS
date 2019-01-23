@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.TemplateQuery
         public string QueryExpression { get; set; }
         public IEnumerable<TemplateQueryResult> SampleResults { get; set; }
         public int ResultCount { get; set; }
-        public double ExecutionTime { get; set; }
+        public long ExecutionTime { get; set; }
         public int Take { get; set; }
     }
 }

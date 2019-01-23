@@ -19,13 +19,13 @@
         vm.canCreateTemplate = false;
         vm.updateTemplatePlaceholder = false;
         vm.loadingTemplates = false;
+        vm.isElement = $scope.model.isElement;
 
         vm.createTemplate = createTemplate;
 
         /* ---------- INIT ---------- */
 
         function onInit() {
-
             vm.loadingTemplates = true;
             entityResource.getAll("Template").then(function (templates) {
 
@@ -85,6 +85,15 @@
 
             vm.canCreateTemplate = existingTemplate ? false : true;
         }
+
+        var unbindWatcher = $scope.$watch("model.isElement",
+            function(newValue, oldValue) {
+                vm.isElement = newValue;
+            }
+        );
+        $scope.$on("$destroy", function () {
+            unbindWatcher();
+        });
 
         onInit();
 

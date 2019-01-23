@@ -169,8 +169,12 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllowedChildren(0))
                         },
                         {
-                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroController>(
+                            "macroRenderingApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                                 controller => controller.GetMacroParameters(0))
+                        },
+                        {
+                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacrosController>(
+                                controller => controller.Create(null))
                         },
                         {
                             "authenticationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
@@ -305,8 +309,12 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllLanguages())
                         },
                         {
-                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
                                 controller => controller.GetById(1))
+                        },
+						{
+                            "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
+                                controller => controller.GetNumberOfErrors())
                         }
                     }
                 },
@@ -421,7 +429,7 @@ namespace Umbraco.Web.Editors
         /// it's resolving which is unecessary and annoying.
         /// </remarks>
         private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes
-            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // fixme inject
+            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // todo inject
 
         /// <summary>
         /// Returns the server variables regarding the application state
@@ -434,7 +442,7 @@ namespace Umbraco.Web.Editors
                 // add versions - see UmbracoVersion for details & differences
 
                 // the complete application version (eg "8.1.2-alpha.25")
-                { "version", _runtimeState.SemanticVersion.ToSemanticString() }, // fixme that's UmbracoVersion.Version!
+                { "version", UmbracoVersion.SemanticVersion.ToSemanticString() },
 
                 // the assembly version (eg "8.0.0")
                 { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }

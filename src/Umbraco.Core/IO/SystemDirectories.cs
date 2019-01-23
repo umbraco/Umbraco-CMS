@@ -36,7 +36,6 @@ namespace Umbraco.Core.IO
 
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
-        //fixme: remove this
         [Obsolete("Usercontrols are obsolete and code should be removed")]
         public static string UserControls => "~/usercontrols";
 

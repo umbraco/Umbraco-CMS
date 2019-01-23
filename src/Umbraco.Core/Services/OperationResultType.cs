@@ -5,7 +5,7 @@
     /// </summary>
     public enum OperationResultType : byte
     {
-        // all "ResultType" enums must be byte-based, and declare Failed = 128, and declare
+        // all "ResultType" enum's must be byte-based, and declare Failed = 128, and declare
         // every failure codes as >128 - see OperationResult and OperationResultType for details.
 
         /// <summary>
@@ -38,7 +38,7 @@
         /// <summary>
         /// No operation has been executed because it was not needed (eg deleting an item that doesn't exist).
         /// </summary>
-        NoOperation = Failed | 6, // fixme shouldn't it be a success?
+        NoOperation = Failed | 6, // todo shouldn't it be a success?
 
         //TODO: In the future, we might need to add more operations statuses, potentially like 'FailedByPermissions', etc...
     }

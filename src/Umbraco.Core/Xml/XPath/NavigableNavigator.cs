@@ -2,7 +2,7 @@
 
 // We make sure that diagnostics code will not be compiled nor called into Release configuration.
 // In Debug configuration, diagnostics code can be enabled by defining DEBUGNAVIGATOR below,
-// but by default nothing is writted, unless some lines are un-commented in Debug(...) below.
+// but by default nothing is written, unless some lines are un-commented in Debug(...) below.
 //
 // Beware! Diagnostics are extremely verbose and can overflow logging pretty easily.
 

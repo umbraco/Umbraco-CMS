@@ -357,13 +357,26 @@ namespace Umbraco.Web.Trees
         {
             if (RecycleBinId.ToInvariantString() == id)
             {
-                var menu = new MenuItemCollection();
-                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
+                // get the default assigned permissions for this user
+                var deleteAllowed = false;
+                var deleteAction = Current.Actions.FirstOrDefault(y => y.Letter == ActionDelete.ActionLetter);
+                if (deleteAction != null)
                 {
-                    Icon = "trash",
-                    OpensDialog = true
-                });
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                    var perms = Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService);
+                    deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
+                }
+
+                var menu = new MenuItemCollection();
+                // only add empty recycle bin if the current user is allowed to delete by default 
+                if (deleteAllowed)
+                {
+	                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
+	                {
+	                    Icon = "trash",
+	                    OpensDialog = true
+	                });
+	                menu.Items.Add(new RefreshNode(Services.TextService, true));
+				}
                 return menu;
             }
 
@@ -401,7 +414,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            //fixme: inject
+            //todo: inject
             var actions = Current.Actions.FromEntityPermission(permission)
                 .ToList();
 

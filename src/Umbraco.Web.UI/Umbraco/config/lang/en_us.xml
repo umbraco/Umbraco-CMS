@@ -1081,6 +1081,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
       ]]></key>
+    <key alias="deletewarning">This will delete the package</key>
     <key alias="dropHere">Drop to upload</key>
     <key alias="orClickHereToUpload">or click here to choose package file</key>
     <key alias="uploadPackage">Upload package</key>
@@ -1556,6 +1557,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="allowVaryByCulture">Allow varying by culture</key>
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
+    <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -1680,6 +1682,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Templates</key>
+    <key alias="logViewer">Log Viewer</key>
     <key alias="users">Users</key>
         <key alias="settingsGroup">Settings</key>
         <key alias="templatingGroup">Templating</key>

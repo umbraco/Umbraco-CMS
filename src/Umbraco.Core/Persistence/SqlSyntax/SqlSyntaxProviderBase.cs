@@ -200,12 +200,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return "NVARCHAR";
         }
-
-        public virtual bool? SupportsCaseInsensitiveQueries(IDatabase db)
-        {
-            return true;
-        }
-
+        
         public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             return new List<string>();
@@ -482,7 +477,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var dbTypeDefinition = column.Size != default(int)
                 ? $"{definition}({column.Size})"
                 : definition;
-            //NOTE Percision is left out
+            //NOTE Precision is left out
             return dbTypeDefinition;
         }
 

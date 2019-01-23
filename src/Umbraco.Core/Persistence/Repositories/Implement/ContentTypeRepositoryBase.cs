@@ -103,7 +103,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-            // fixme v8 are we sorting only for 7.6 relators?
             var sql = translator.Translate()
                 .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
@@ -121,7 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
-            //Cannot add a duplicate content type type
+            //Cannot add a duplicate content type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
 WHERE cmsContentType." + SqlSyntax.GetQuotedColumnName("alias") + @"= @alias
@@ -764,7 +763,6 @@ AND umbracoNode.id <> @id",
         {
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
-            // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
                 throw new NotSupportedException("Too many property/content types.");
@@ -903,7 +901,6 @@ AND umbracoNode.id <> @id",
         {
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
-            // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
                 throw new NotSupportedException("Too many property/content types.");
@@ -1320,7 +1317,7 @@ AND umbracoNode.id <> @id",
                 parentMediaTypeIds = new Dictionary<int, List<int>>();
                 var mappedMediaTypes = new List<IMediaType>();
 
-                //loop through each result and fill in our required values, each row will contain different requried data than the rest.
+                //loop through each result and fill in our required values, each row will contain different required data than the rest.
                 // it is much quicker to iterate each result and populate instead of looking up the values over and over in the result like
                 // we used to do.
                 var queue = new Queue<dynamic>(result);
@@ -1727,7 +1724,7 @@ ORDER BY contentTypeId, groupId, id";
         }
 
         /// <summary>
-        /// Gets all entities of the spefified type
+        /// Gets all entities of the specified type
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
@@ -1751,7 +1748,7 @@ ORDER BY contentTypeId, groupId, id";
 
         public string GetUniqueAlias(string alias)
         {
-            // alias is unique accross ALL content types!
+            // alias is unique across ALL content types!
             var aliasColumn = SqlSyntax.GetQuotedColumnName("alias");
             var aliases = Database.Fetch<string>(@"SELECT cmsContentType." + aliasColumn + @" FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id

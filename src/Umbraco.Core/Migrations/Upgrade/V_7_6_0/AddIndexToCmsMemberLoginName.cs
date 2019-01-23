@@ -16,9 +16,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_6_0
             //Now we need to check if we can actually d6 this because we won't be able to if there's data in there that is too long
             //http://issues.umbraco.org/issue/U4-9758
 
-            var colLen = SqlSyntax is MySqlSyntaxProvider
-                ? database.ExecuteScalar<int?>("select max(LENGTH(LoginName)) from cmsMember")
-                : database.ExecuteScalar<int?>("select max(datalength(LoginName)) from cmsMember");
+            var colLen = database.ExecuteScalar<int?>("select max(datalength(LoginName)) from cmsMember");
 
             if (colLen < 900 == false && colLen != null)
             {

@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     //map the view and the config
                     // we need to show the depracated ones for backwards compatibility
-                    var paramEditor = Current.ParameterEditors[property.EditorAlias]; // fixme - include/filter deprecated?!
+                    var paramEditor = Current.ParameterEditors[property.EditorAlias]; // todo - include/filter deprecated?!
                     if (paramEditor == null)
                     {
                         //we'll just map this to a text box

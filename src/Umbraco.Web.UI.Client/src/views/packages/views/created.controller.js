@@ -25,6 +25,8 @@
             event.preventDefault();
 
             const dialog = {
+                view: "views/packages/overlays/delete.html",
+                package: createdPackage,
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
                 submit: function (model) {
                     performDelete(index, createdPackage);
@@ -48,10 +50,14 @@
 
         }
 
-        function performDelete(index, createdPackage) {            
-            packageResource.deleteCreatedPackage(createdPackage.id).then(()=> {
+        function performDelete(index, createdPackage) {        
+            createdPackage.deleteButtonState = "busy";
+
+            packageResource.deleteCreatedPackage(createdPackage.id).then(function () {
                 vm.createdPackages.splice(index, 1);
-            }, angular.noop);
+            }, function (err) {
+                createdPackage.deleteButtonState = "error";
+            });
         }
 
         function goToPackage(createdPackage) {

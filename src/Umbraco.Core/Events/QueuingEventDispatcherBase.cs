@@ -109,10 +109,9 @@ namespace Umbraco.Core.Events
             public Type[] SupersedeTypes { get; set; }
         }
 
-        // fixme
-        // this is way too convoluted, the superceede attribute is used only on DeleteEventargs to specify
-        // that it superceeds save, publish, move and copy - BUT - publish event args is also used for
-        // unpublishing and should NOT be superceeded - so really it should not be managed at event args
+        // this is way too convoluted, the supersede attribute is used only on DeleteEventargs to specify
+        // that it supersedes save, publish, move and copy - BUT - publish event args is also used for
+        // unpublishing and should NOT be superseded - so really it should not be managed at event args
         // level but at event level
         //
         // what we want is:
@@ -137,7 +136,7 @@ namespace Umbraco.Core.Events
             var result = new List<IEventDefinition>();
             var resultArgs = new List<CancellableObjectEventArgs>();
 
-            // eagerly fetch superceeded arg types for each arg type
+            // eagerly fetch superseded arg types for each arg type
             var argTypeSuperceeding = events.Select(x => x.Args.GetType())
                 .Distinct()
                 .ToDictionary(x => x, x => x.GetCustomAttributes<SupersedeEventAttribute>(false).Select(y => y.SupersededEventArgsType).ToArray());
@@ -179,7 +178,7 @@ namespace Umbraco.Core.Events
                             continue;
                         }
 
-                        // look for this entity in superceding event args
+                        // look for this entity in superseding event args
                         // found = must be removed (ie not added), else track
                         if (IsSuperceeded(eventEntity, infos, entities) == false)
                         {
@@ -204,7 +203,7 @@ namespace Umbraco.Core.Events
                             if (eventEntity == null)
                                 continue;
 
-                            // look for this entity in superceding event args
+                            // look for this entity in superseding event args
                             // found = must be removed, else track
                             if (IsSuperceeded(eventEntity, infos, entities))
                                 toRemove.Add(eventEntity);
@@ -212,7 +211,7 @@ namespace Umbraco.Core.Events
                                 entities.Add(Tuple.Create(eventEntity, infos));
                         }
 
-                        // remove superceded entities
+                        // remove superseded entities
                         foreach (var entity in toRemove)
                             eventObjects.Remove(entity);
 
@@ -287,13 +286,13 @@ namespace Umbraco.Core.Events
 
         // determines if a given entity, appearing in a given event definition, should be filtered out,
         // considering the entities that have already been visited - an entity is filtered out if it
-        // appears in another even definition, which superceedes this event definition.
+        // appears in another even definition, which supersedes this event definition.
         private static bool IsSuperceeded(IEntity entity, EventDefinitionInfos infos, List<Tuple<IEntity, EventDefinitionInfos>> entities)
         {
             //var argType = meta.EventArgsType;
             var argType = infos.EventDefinition.Args.GetType();
 
-            // look for other instances of the same entity, coming from an event args that supercedes other event args,
+            // look for other instances of the same entity, coming from an event args that supersedes other event args,
             // ie is marked with the attribute, and is not this event args (cannot supersede itself)
             var superceeding = entities
                 .Where(x => x.Item2.SupersedeTypes.Length > 0 // has the attribute
@@ -305,21 +304,20 @@ namespace Umbraco.Core.Events
             if (superceeding.Length == 0)
                 return false;
 
-            // fixme see notes above
-            // delete event args does NOT superceedes 'unpublished' event
+            // delete event args does NOT supersedes 'unpublished' event
             if (argType.IsGenericType && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition.EventName == "Unpublished")
                 return false;
 
-            // found occurences, need to determine if this event args is superceded
+            // found occurrences, need to determine if this event args is superseded
             if (argType.IsGenericType)
             {
                 // generic, must compare type arguments
                 var supercededBy = superceeding.FirstOrDefault(x =>
                     x.Item2.SupersedeTypes.Any(y =>
-                        // superceeding a generic type which has the same generic type definition
-                        // fixme no matter the generic type parameters? could be different?
+                        // superseding a generic type which has the same generic type definition
+                        // (but ... no matter the generic type parameters? could be different?)
                         y.IsGenericTypeDefinition && y == argType.GetGenericTypeDefinition()
-                        // or superceeding a non-generic type which is ... fixme how is this ever possible? argType *is* generic?
+                        // or superceeding a non-generic type which is ... (but... how is this ever possible? argType *is* generic?
                         || y.IsGenericTypeDefinition == false && y == argType));
                 return supercededBy != null;
             }

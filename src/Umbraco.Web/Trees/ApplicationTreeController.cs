@@ -109,7 +109,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 //Otherwise its a application/section with no trees (aka a full screen app)
-                //For example we do not have a Forms tree definied in C# & can not attribute with [Tree(isSingleNodeTree:true0]
+                //For example we do not have a Forms tree defined in C# & can not attribute with [Tree(isSingleNodeTree:true0]
                 var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
                 var section = Services.TextService.Localize("sections/" + application);
 
@@ -215,6 +215,7 @@ namespace Umbraco.Web.Trees
             //assign the route path based on the root node, this means it will route there when the section is navigated to
             //and no dashboards will be available for this section
             sectionRoot.RoutePath = rootNode.Result.RoutePath;
+            sectionRoot.Path = rootNode.Result.Path;
 
             foreach (var d in rootNode.Result.AdditionalData)
             {

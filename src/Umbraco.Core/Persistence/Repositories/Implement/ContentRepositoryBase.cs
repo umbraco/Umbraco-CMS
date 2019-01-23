@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILanguageRepository LanguageRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
+        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // todo inject
 
         #region Versions
 
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // deletes a specific version
         public virtual void DeleteVersion(int versionId)
         {
-            // fixme test object node type?
+            // todo test object node type?
 
             // get the version we want to delete
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //  deletes all versions of an entity, older than a date.
         public virtual void DeleteVersions(int nodeId, DateTime versionDate)
         {
-            // fixme test object node type?
+            // todo test object node type?
 
             // get the versions we want to delete, excluding the current one
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersions", tsql =>
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        // FIXME should we do it when un-publishing? or?
+        // todo should we do it when un-publishing? or?
         /// <summary>
         /// Clears tags for an item.
         /// </summary>
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var (dbfield, _) = SqlContext.VisitDto<NodeDto>(x => x.NodeId);
             if (ordering.IsCustomField || !ordering.OrderBy.InvariantEquals("id"))
             {
-                psql.OrderBy(GetAliasedField(dbfield, sql)); // fixme why aliased?
+                psql.OrderBy(GetAliasedField(dbfield, sql));
             }
 
             // create prepared sql
@@ -374,7 +374,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text), sql);
 
                 // "variantName" alias is defined in DocumentRepository.GetBaseQuery
-                // fixme - what if it is NOT a document but a ... media or whatever?
+                // todo - what if it is NOT a document but a ... media or whatever?
                 // previously, we inserted the join+select *here* so we were sure to have it,
                 // but now that's not the case anymore!
                 return "variantName";
@@ -515,7 +515,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // now we have
-            // - the definitinos
+            // - the definitions
             // - all property data dtos
             // - tag editors
             // and we need to build the proper property collections
@@ -620,7 +620,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region UnitOfWork Events
 
-        //fixme: The reason these events are in the repository is for legacy, the events should exist at the service
+        // todo: The reason these events are in the repository is for legacy, the events should exist at the service
         // level now since we can fire these events within the transaction... so move the events to service level
 
         public class ScopedEntityEventArgs : EventArgs
@@ -736,215 +736,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public T Content { get; set; }
         }
 
-        // fixme copied from 7.6
-
         /// <summary>
         /// For Paging, repositories must support returning different query for the query type specified
         /// </summary>
         /// <param name="queryType"></param>
         /// <returns></returns>
         protected abstract Sql<ISqlContext> GetBaseQuery(QueryType queryType);
-
-        /*
-        internal class DocumentDefinitionCollection : KeyedCollection<ValueType, DocumentDefinition>
-        {
-            private readonly bool _includeAllVersions;
-
-            /// <summary>
-            /// Constructor specifying if all versions should be allowed, in that case the key for the collection becomes the versionId (GUID)
-            /// </summary>
-            /// <param name="includeAllVersions"></param>
-            public DocumentDefinitionCollection(bool includeAllVersions = false)
-            {
-                _includeAllVersions = includeAllVersions;
-            }
-
-            protected override ValueType GetKeyForItem(DocumentDefinition item)
-            {
-                return _includeAllVersions ? (ValueType)item.Version : item.Id;
-            }
-
-            /// <summary>
-            /// if this key already exists if it does then we need to check
-            /// if the existing item is 'older' than the new item and if that is the case we'll replace the older one
-            /// </summary>
-            /// <param name="item"></param>
-            /// <returns></returns>
-            public bool AddOrUpdate(DocumentDefinition item)
-            {
-                //if we are including all versions then just add, we aren't checking for latest
-                if (_includeAllVersions)
-                {
-                    Add(item);
-                    return true;
-                }
-
-                if (Dictionary == null)
-                {
-                    Add(item);
-                    return true;
-                }
-
-                var key = GetKeyForItem(item);
-                if (TryGetValue(key, out DocumentDefinition found))
-                {
-                    //it already exists and it's older so we need to replace it
-                    if (item.VersionId <= found.VersionId) return false;
-
-                    var currIndex = Items.IndexOf(found);
-                    if (currIndex == -1)
-                        throw new IndexOutOfRangeException("Could not find the item in the list: " + found.Version);
-
-                    //replace the current one with the newer one
-                    SetItem(currIndex, item);
-                    return true;
-                }
-
-                Add(item);
-                return true;
-            }
-
-            public bool TryGetValue(ValueType key, out DocumentDefinition val)
-            {
-                if (Dictionary != null)
-                    return Dictionary.TryGetValue(key, out val);
-
-                val = null;
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Implements a Guid comparer that respect the Sql engine ordering.
-        /// </summary>
-        /// <remarks>
-        /// MySql sorts Guids as strings, but MSSQL sorts guids based on a weird byte sections order
-        /// This comparer compares Guids using the corresponding Sql syntax method, ie the method of the underlying Sql engine.
-        /// see http://stackoverflow.com/questions/7810602/sql-server-guid-sort-algorithm-why
-        /// see https://blogs.msdn.microsoft.com/sqlprogrammability/2006/11/06/how-are-guids-compared-in-sql-server-2005/
-        /// </remarks>
-        private class DocumentDefinitionComparer : IComparer<Guid>
-        {
-            private readonly bool _mySql;
-
-            public DocumentDefinitionComparer(ISqlSyntaxProvider sqlSyntax)
-            {
-                _mySql = sqlSyntax is MySqlSyntaxProvider;
-            }
-
-            public int Compare(Guid x, Guid y)
-            {
-                // MySql sorts Guids as string (ie normal, same as .NET) whereas MSSQL
-                // sorts them on a weird byte sections order
-                return _mySql ? x.CompareTo(y) : new SqlGuid(x).CompareTo(new SqlGuid(y));
-            }
-        }
-
-        internal class DocumentDefinition
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="T:System.Object"/> class.
-            /// </summary>
-            public DocumentDefinition(DocumentDto dto, IContentTypeComposition composition)
-            {
-                DocumentDto = dto;
-                ContentVersionDto = dto.ContentVersionDto;
-                Composition = composition;
-            }
-
-            public DocumentDefinition(ContentVersionDto dto, IContentTypeComposition composition)
-            {
-                ContentVersionDto = dto;
-                Composition = composition;
-            }
-
-            public DocumentDto DocumentDto { get; }
-            public ContentVersionDto ContentVersionDto { get; }
-
-            public int Id => ContentVersionDto.NodeId;
-
-            public Guid Version => DocumentDto?.VersionId ?? ContentVersionDto.VersionId;
-
-            // This is used to determien which version is the most recent
-            public int VersionId => ContentVersionDto.Id;
-
-            public DateTime VersionDate => ContentVersionDto.VersionDate;
-
-            public DateTime CreateDate => ContentVersionDto.ContentDto.NodeDto.CreateDate;
-
-            public IContentTypeComposition Composition { get; set; }
-        }
-
-        // Represents a query that may contain paging information.
-        internal class PagingSqlQuery
-        {
-            // the original query sql
-            public Sql QuerySql { get; }
-
-            public PagingSqlQuery(Sql querySql)
-            {
-                QuerySql = querySql;
-            }
-
-            protected PagingSqlQuery(Sql querySql, int pageSize)
-                : this(querySql)
-            {
-                HasPaging = pageSize > 0;
-            }
-
-            // whether the paging query is actually paging
-            public bool HasPaging { get; }
-
-            // the paging sql
-            public virtual Sql BuildPagedQuery(string columns)
-            {
-                throw new InvalidOperationException("This query has no paging information.");
-            }
-        }
-
-        /// <summary>
-        /// Represents a query that may contain paging information.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        internal class PagingSqlQuery<T> : PagingSqlQuery // fixme what's <T> here?
-        {
-            private readonly Database _db;
-            private readonly long _pageIndex;
-            private readonly int _pageSize;
-
-            // fixme - don't capture a db instance here!
-            // instead, should have an extension method, so one can do
-            // sql = db.BuildPageQuery(pagingQuery, columns)
-            public PagingSqlQuery(Database db, Sql querySql, long pageIndex, int pageSize)
-                : base(querySql, pageSize)
-            {
-                _db = db;
-                _pageIndex = pageIndex;
-                _pageSize = pageSize;
-            }
-
-            /// <summary>
-            /// Creates a paged query based on the original query and subtitutes the selectColumns specified
-            /// </summary>
-            /// <param name="columns"></param>
-            /// <returns></returns>
-            // build a page query
-            public override Sql BuildPagedQuery(string columns)
-            {
-                if (HasPaging == false)
-                    throw new InvalidOperationException("This query has no paging information.");
-
-                // substitutes the original "SELECT ..." with "SELECT {columns}" ie only
-                // select the specified columns - fixme why?
-                var sql = $"SELECT {columns} {QuerySql.SQL.Substring(QuerySql.SQL.IndexOf("FROM", StringComparison.Ordinal))}";
-
-                // and then build the page query
-                var args = QuerySql.Arguments;
-                _db.BuildPageQueries<T>(_pageIndex * _pageSize, _pageSize, sql, ref args, out string unused, out string sqlPage);
-                return new Sql(sqlPage, args);
-            }
-        }
-        */
 
         #endregion
 

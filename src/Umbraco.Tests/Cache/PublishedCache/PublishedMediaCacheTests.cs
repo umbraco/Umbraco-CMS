@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
             var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 
-            DoAssert(doc, 1234, key, templateIdVal: null, 0, "/media/test.jpg", "Image", 23, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
+            DoAssert(doc, 1234, key, null, 0, "/media/test.jpg", "Image", 23, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
             Assert.AreEqual(null, doc.Parent);
         }
 
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>());
             var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
 
-            DoAssert(doc, 2000, key, templateIdVal: null, 2, "image1", "Image", 23, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
+            DoAssert(doc, 2000, key, null, 2, "image1", "Image", 23, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
             Assert.AreEqual(null, doc.Parent);
             Assert.AreEqual(2, doc.Children.Count());
             Assert.AreEqual(2001, doc.Children.ElementAt(0).Id);

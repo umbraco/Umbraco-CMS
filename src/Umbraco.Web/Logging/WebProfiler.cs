@@ -47,7 +47,7 @@ namespace Umbraco.Web.Logging
         {
             // if this is the boot request, or if we should profile this request, stop
             // (the boot request is always profiled, no matter what)
-            var isBootRequest = ((HttpApplication) sender).Context.Items[BootRequestItemKey] != null; // fixme perfs
+            var isBootRequest = ((HttpApplication) sender).Context.Items[BootRequestItemKey] != null;
             if (isBootRequest)
                 _provider.EndBootRequest();
             if (isBootRequest || ShouldProfile(sender))

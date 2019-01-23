@@ -115,8 +115,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 
         protected IEnumerable<IDataEditor> GetMacroParameterEditors()
         {
-            // we need to show the depracated ones for backwards compatibility
-            // FIXME not managing deprecated here?!
             return Current.ParameterEditors;
         }
 

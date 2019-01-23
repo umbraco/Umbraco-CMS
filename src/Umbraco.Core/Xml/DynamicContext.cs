@@ -258,7 +258,7 @@ namespace Umbraco.Core.Xml
                             try
                             {
                                 _value = Convert.ToDouble(value);
-                                // We suceeded, so it's a number.
+                                // We succeeded, so it's a number.
                                 _type = XPathResultType.Number;
                             }
                             catch (FormatException)

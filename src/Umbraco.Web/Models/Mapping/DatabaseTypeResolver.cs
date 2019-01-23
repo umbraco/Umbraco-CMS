@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
             if (!Current.PropertyEditors.TryGet(source.EditorAlias, out var editor))
                 throw new InvalidOperationException($"Could not find property editor \"{source.EditorAlias}\".");
 
-            // fixme - what about source.PropertyEditor? can we get the configuration here? 'cos it may change the storage type?!
+            // todo - what about source.PropertyEditor? can we get the configuration here? 'cos it may change the storage type?!
             var valueType = editor.GetValueEditor().ValueType;
             return ValueTypes.ToStorageType(valueType);
         }

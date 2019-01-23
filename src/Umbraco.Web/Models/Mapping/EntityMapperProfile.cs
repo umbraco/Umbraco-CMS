@@ -204,7 +204,7 @@ namespace Umbraco.Web.Models.Mapping
                 // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
                 if (culture == null)
                     //throw new InvalidOperationException("Missing culture in mapping options.");
-                    // fixme we should throw, but this is used in various places that won't set a culture yet
+                    // todo we should throw, but this is used in various places that won't set a culture yet
                     return source.Name;
 
                 // if we don't have a name for a culture, it means the culture is not available, and

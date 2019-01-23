@@ -285,27 +285,30 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.scaffolds = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
-                // remove all tabs except the specified tab
-                var tabs = scaffold.variants[0].tabs;
-                var tab = _.find(tabs, function (tab) {
-                    return tab.id != 0 && (tab.alias.toLowerCase() == contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias == "");
-                });
-                scaffold.tabs = [];
-                if (tab) {
-                    scaffold.tabs.push(tab);
+                // make sure it's an element type before allowing the user to create new ones
+                if (scaffold.isElement) {
+                    // remove all tabs except the specified tab
+                    var tabs = scaffold.variants[0].tabs;
+                    var tab = _.find(tabs, function (tab) {
+                        return tab.id != 0 && (tab.alias.toLowerCase() == contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias == "");
+                    });
+                    scaffold.tabs = [];
+                    if (tab) {
+                        scaffold.tabs.push(tab);
 
-                    angular.forEach(tab.properties,
-                      function (property) {
-                          if (_.find(notSupported, function (x) { return x === property.editor; })) {
-                              property.notSupported = true;
-                              //TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
-                              property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
-                          }
-                      });
+                        angular.forEach(tab.properties,
+                            function (property) {
+                                if (_.find(notSupported, function (x) { return x === property.editor; })) {
+                                    property.notSupported = true;
+                                    //TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
+                                    property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
+                                }
+                            });
+                    }
+
+                    // Store the scaffold object
+                    $scope.scaffolds.push(scaffold);
                 }
-
-                // Store the scaffold object
-                $scope.scaffolds.push(scaffold);
 
                 scaffoldsLoaded++;
                 initIfAllScaffoldsHaveLoaded();

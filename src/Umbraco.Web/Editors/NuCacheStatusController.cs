@@ -32,7 +32,6 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public string RebuildDbCache()
         {
-            // fixme - should wrap in a service scope once we have them
             var service = PublishedSnapshotService;
             service.RebuildContentDbCache();
             service.RebuildMediaDbCache();
