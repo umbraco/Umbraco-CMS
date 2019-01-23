@@ -293,6 +293,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
         }
 
+        public override bool IsPublished(string culture = null)
+        {
+            if (!ContentType.VariesByCulture())
+            {
+                return _contentData.Published;
+            }
+
+            // handle context culture
+            if (culture == null)
+            {
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+            }
+
+            //If the current culture is not a draft, it must be the published version
+            return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && !cvar.IsDraft;
+        }
+
         #endregion
 
         #region Tree
