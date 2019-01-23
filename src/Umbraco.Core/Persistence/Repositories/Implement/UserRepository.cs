@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
-                // todo - this is bad
+                // TODO: this is bad
                 // because the membership provider we're trying to get has a dependency on the user service
                 // and we should not depend on services in repositories - need a way better way to do this
 
@@ -238,7 +238,7 @@ ORDER BY colName";
 
         public void ClearLoginSession(Guid sessionId)
         {
-            // todo why is that one updating and not deleting?
+            // TODO: why is that one updating and not deleting?
             Database.Execute(Sql()
                 .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
             var val = media.Properties[propertyType];
             if (val == null) return string.Empty;
 
-            //todo would need to be adjusted to variations, when media become variants
+            // TODO: would need to be adjusted to variations, when media become variants
             var jsonString = val.GetValue() as string;
             if (jsonString == null) return string.Empty;
 

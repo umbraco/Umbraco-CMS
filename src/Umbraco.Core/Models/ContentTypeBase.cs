@@ -431,7 +431,7 @@ namespace Umbraco.Core.Models
         /// PropertyTypes that are not part of a PropertyGroup
         /// </summary>
         [IgnoreDataMember]
-        //todo should we mark this as EditorBrowsable hidden since it really isn't ever used?
+        // TODO: should we mark this as EditorBrowsable hidden since it really isn't ever used?
         internal PropertyTypeCollection PropertyTypeCollection => _noGroupPropertyTypes;
 
         /// <summary>

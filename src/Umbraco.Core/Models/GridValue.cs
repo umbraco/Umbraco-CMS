@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         public class GridSection
         {
             [JsonProperty("grid")]
-            public string Grid { get; set; } //todo: what is this?
+            public string Grid { get; set; } // TODO: what is this?
 
             [JsonProperty("rows")]
             public IEnumerable<GridRow> Rows { get; set; }
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models
         public class GridArea
         {
             [JsonProperty("grid")]
-            public string Grid { get; set; } //todo: what is this?
+            public string Grid { get; set; } // TODO: what is this?
 
             [JsonProperty("controls")]
             public IEnumerable<GridControl> Controls { get; set; }
