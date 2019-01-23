@@ -10,6 +10,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
+using Umbraco.Web.Dashboards;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
@@ -91,6 +92,13 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         public static BackOfficeSectionCollectionBuilder Sections(this Composition composition)
             => composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the backoffice dashboards collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static DashboardCollectionBuilder Dashboards(this Composition composition)
+            => composition.WithCollectionBuilder<DashboardCollectionBuilder>();
 
         #endregion
 

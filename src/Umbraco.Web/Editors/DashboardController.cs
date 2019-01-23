@@ -16,6 +16,8 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Dashboards;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -27,7 +29,7 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
-        private readonly Dashboards _dashboards;
+        private readonly IDashboardService _dashboardService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
@@ -38,10 +40,10 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, Dashboards dashboards)
+        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService)
             : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
-            _dashboards = dashboards;
+            _dashboardService = dashboardService;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -79,7 +81,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from '{Url}'", url);
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
@@ -117,7 +119,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from '{Url}'", url);
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
@@ -132,9 +134,9 @@ namespace Umbraco.Web.Editors
 
         [ValidateAngularAntiForgeryToken]
         [OutgoingEditorModelEvent]
-        public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
+        public IEnumerable<Tab<IDashboardSection>> GetDashboard(string section)
         {
-            return _dashboards.GetDashboards(section, Security.CurrentUser);
+            return _dashboardService.GetDashboards(section, Security.CurrentUser);
         }
     }
 }

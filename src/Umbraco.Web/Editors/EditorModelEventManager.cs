@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http.Filters;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.Events;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -14,9 +15,9 @@ namespace Umbraco.Web.Editors
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<MediaItemDisplay>> SendingMediaModel;
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<MemberDisplay>> SendingMemberModel;
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<UserDisplay>> SendingUserModel;
-        public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<DashboardControl>>>> SendingDashboardModel;
+        public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboardSection>>>> SendingDashboardModel;
 
-        private static void OnSendingDashboardModel(HttpActionExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<DashboardControl>>> e)
+        private static void OnSendingDashboardModel(HttpActionExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<IDashboardSection>>> e)
         {
             var handler = SendingDashboardModel;
             handler?.Invoke(sender, e);
@@ -65,8 +66,8 @@ namespace Umbraco.Web.Editors
             if (e.Model is UserDisplay)
                 OnSendingUserModel(sender, new EditorModelEventArgs<UserDisplay>(e));
 
-            if (e.Model is IEnumerable<Tab<DashboardControl>>)
-                OnSendingDashboardModel(sender, new EditorModelEventArgs<IEnumerable<Tab<DashboardControl>>>(e));
+            if (e.Model is IEnumerable<IDashboardSection>)
+                OnSendingDashboardModel(sender, new EditorModelEventArgs<IEnumerable<Tab<IDashboardSection>>>(e));
         }
     }
 }

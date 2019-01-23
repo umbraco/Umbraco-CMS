@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Configuration.Dashboard
+﻿namespace Umbraco.Core.Dashboards
 {
     /// <summary>
     /// Implements <see cref="IAccessRule"/>.

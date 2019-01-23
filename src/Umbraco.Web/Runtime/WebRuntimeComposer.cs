@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
@@ -17,6 +18,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -95,14 +97,13 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
 
+            composition.RegisterUnique<IDashboardService, DashboardService>();
+
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
             // configure the container for web
             composition.ConfigureForWeb();
-
-
-            composition.RegisterUnique<Dashboards>();
-
+            
             composition
                 .ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
@@ -201,6 +202,25 @@ namespace Umbraco.Web.Runtime
                 .Append<UsersBackOfficeSection>()
                 .Append<MembersBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
+
+
+            // register core CMS dashboards as types - will be ordered by weight attribute & merged with package.manifest dashboards
+            // TODO WB Maybe use typeloader?!
+
+            composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+                .Add(composition.TypeLoader.GetTypes<IDashboardSection>());
+
+                //.Add<ContentDashboard>()
+                //.Add<RedirectUrlDashboard>()
+                //.Add<MediaDashboard>()
+                //.Add<SettingsDashboard>()
+                //.Add<ExamineDashboard>()
+                //.Add<PublishedStatusDashboard>()
+                //.Add<ModelsBuilderDashboard>()
+                //.Add<HealthCheckDashboard>()
+                //.Add<MembersDashboard>()
+                //.Add<FormsDashboard>();
+                
 
             // register back office trees
             foreach (var treeControllerType in umbracoApiControllerTypes

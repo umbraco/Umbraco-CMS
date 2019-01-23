@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
-using Umbraco.Core.Configuration.Dashboard;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Manifest
 {
-    public class ManifestDashboardDefinition
+    public class ManifestDashboardDefinition : IDashboardSection
     {
         private string _view;
 
@@ -32,5 +32,6 @@ namespace Umbraco.Core.Manifest
 
         [JsonProperty("access")]
         public IAccessRule[] AccessRules { get; set; } = Array.Empty<IAccessRule>();
+
     }
 }

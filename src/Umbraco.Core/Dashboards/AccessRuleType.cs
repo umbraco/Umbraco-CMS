@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Configuration.Dashboard
+﻿namespace Umbraco.Core.Dashboards
 {
     /// <summary>
     /// Defines dashboard access rules type.
