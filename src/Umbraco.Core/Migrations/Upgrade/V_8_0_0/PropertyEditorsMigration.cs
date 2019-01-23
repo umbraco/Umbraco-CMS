@@ -16,7 +16,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             RenameDataType(Constants.PropertyEditors.Aliases.MediaPicker + "2", Constants.PropertyEditors.Aliases.MediaPicker);
             RenameDataType(Constants.PropertyEditors.Aliases.MemberPicker + "2", Constants.PropertyEditors.Aliases.MemberPicker);
             RenameDataType(Constants.PropertyEditors.Aliases.MultiNodeTreePicker + "2", Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
-            RenameDataType(Constants.PropertyEditors.Aliases.RelatedLinks + "2", Constants.PropertyEditors.Aliases.RelatedLinks);
             RenameDataType("Umbraco.TextboxMultiple", Constants.PropertyEditors.Aliases.TextArea, false);
             RenameDataType("Umbraco.Textbox", Constants.PropertyEditors.Aliases.TextBox, false);
         }
