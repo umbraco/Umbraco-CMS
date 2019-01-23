@@ -302,7 +302,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedMomentLocales())
+                                controller => controller.GetSupportedLocales())
                         },
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
