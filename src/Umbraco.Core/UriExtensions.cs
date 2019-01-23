@@ -66,7 +66,7 @@ namespace Umbraco.Core
             //has an extension, def back office
             if (extension.IsNullOrWhiteSpace() == false) return true;
             //check for special case asp.net calls like:
-            //  /umbraco/webservices/legacyAjaxCalls.asmx/js which will return a null file extension but are still considered extension'd requests
+            //  /umbraco/webservices/legacyAjaxCalls.asmx/js which will return a null file extension but are still considered requests with an extension
             if (urlPath.InvariantContains(".asmx/")
                 || urlPath.InvariantContains(".aspx/")
                 || urlPath.InvariantContains(".ashx/")

@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models
                 }
             }
 
-            // hrm, without knowing what it is, just adding a string here might not be very nice
+            // Without knowing what it is, just adding a string here might not be very nice
             return string.Empty;
         }
 

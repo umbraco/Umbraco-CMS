@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="alias">The original alias.</param>
         /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
-        /// <remarks>Unique accross all content, media and member types.</remarks>
+        /// <remarks>Unique across all content, media and member types.</remarks>
         string GetUniqueAlias(string alias);
 
 

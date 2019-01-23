@@ -11,7 +11,7 @@ namespace Umbraco.Core.Logging
         /// Renders the profiling results.
         /// </summary>
         /// <returns>The profiling results.</returns>
-        /// <remarks>Generally used for Html rendering.</remarks>
+        /// <remarks>Generally used for HTML rendering.</remarks>
         string Render();
 
         /// <summary>

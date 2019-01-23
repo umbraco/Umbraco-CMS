@@ -38,6 +38,7 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.PublishedCache;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
@@ -216,6 +217,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
+            Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
 
             // register back office sections in the order we want them rendered
             Composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>().Append<ContentBackOfficeSection>()

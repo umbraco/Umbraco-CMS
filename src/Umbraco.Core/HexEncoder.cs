@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Provides methods for encoding byte arrays into hexidecimal strings.
+    /// Provides methods for encoding byte arrays into hexadecimal strings.
     /// </summary>
     internal static class HexEncoder
     {
-        // LUT's that provide the hexidecimal representation of each possible byte value.
+        // LUT's that provide the hexadecimal representation of each possible byte value.
         private static readonly char[] HexLutBase = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
         // The base LUT arranged in 16x each item order. 0 * 16, 1 * 16, .... F * 16
@@ -18,7 +18,7 @@ namespace Umbraco.Core
         private static readonly char[] HexLutLo = Enumerable.Range(0, 256).Select(x => HexLutBase[x % 0x10]).ToArray();
 
         /// <summary>
-        /// Converts a <see cref="T:byte[]"/> to a hexidecimal formatted <see cref="string"/> padded to 2 digits.
+        /// Converts a <see cref="T:byte[]"/> to a hexadecimal formatted <see cref="string"/> padded to 2 digits.
         /// </summary>
         /// <param name="bytes">The bytes.</param>
         /// <returns>The <see cref="string"/>.</returns>
@@ -40,7 +40,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Converts a <see cref="T:byte[]"/> to a hexidecimal formatted <see cref="string"/> padded to 2 digits
+        /// Converts a <see cref="T:byte[]"/> to a hexadecimal formatted <see cref="string"/> padded to 2 digits
         /// and split into blocks with the given char separator.
         /// </summary>
         /// <param name="bytes">The bytes.</param>

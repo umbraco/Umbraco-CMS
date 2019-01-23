@@ -182,7 +182,7 @@ namespace Umbraco.Core.Services
             IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
-        /// Gets paged documents of a content content
+        /// Gets paged documents of a content
         /// </summary>
         /// <param name="contentTypeId">The page number.</param>
         /// <param name="pageIndex">The page number.</param>
@@ -303,7 +303,7 @@ namespace Umbraco.Core.Services
         /// Copies a document.
         /// </summary>
         /// <remarks>
-        /// <para>Optionaly recursively copies all children.</para>
+        /// <para>Optionally recursively copies all children.</para>
         /// </remarks>
         IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0);
 

@@ -44,7 +44,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <remarks>
         /// <para>The assembly version is the value of the <see cref="AssemblyVersionAttribute"/>.</para>
-        /// <para>Is is the one that the CLR checks for compatibility. Therefore, it changes only on
+        /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
         public static Version AssemblyVersion {get; }

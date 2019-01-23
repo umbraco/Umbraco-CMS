@@ -179,10 +179,18 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
+    <Compile Include="Models\Link.cs" />
+    <Compile Include="Models\LinkType.cs" />
+    <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultiUrlPickerValueEditor.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
     <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
     <Compile Include="Trees\MediaBackOfficeSection.cs" />
     <Compile Include="Trees\MembersBackOfficeSection.cs" />
@@ -409,10 +417,6 @@
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
     <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
-    <Compile Include="Models\RelatedLink.cs" />
-    <Compile Include="Models\RelatedLinkBase.cs" />
-    <Compile Include="Models\RelatedLinks.cs" />
-    <Compile Include="Models\RelatedLinkType.cs" />
     <Compile Include="Models\SendCodeViewModel.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
     <Compile Include="Models\UserTourStatus.cs" />
@@ -458,9 +462,6 @@
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
-    <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\RelatedLinksConfiguration.cs" />
-    <Compile Include="PropertyEditors\RelatedLinksConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\RichTextConfiguration.cs" />
     <Compile Include="PropertyEditors\SliderConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\TagConfigurationEditor.cs" />
@@ -476,7 +477,6 @@
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksLegacyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
@@ -540,7 +540,6 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
-    <Compile Include="RelatedLinksTypeConverter.cs" />
     <Compile Include="Routing\ContentFinderByUrl.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplate.cs" />
     <Compile Include="Routing\ContentFinderCollection.cs" />
@@ -863,7 +862,6 @@
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfigurationEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />

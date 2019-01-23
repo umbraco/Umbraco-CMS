@@ -7,7 +7,7 @@ namespace Umbraco.Core.Scoping
     /// </summary>
     /// <remarks>A scope context can enlist objects that will be attached to the scope, and available
     /// for the duration of the scope. In addition, it can enlist actions, that will run when the
-    /// scope is exiting, and after the database transaction has been commited.</remarks>
+    /// scope is exiting, and after the database transaction has been committed.</remarks>
     public interface IScopeContext
     {
         /// <summary>

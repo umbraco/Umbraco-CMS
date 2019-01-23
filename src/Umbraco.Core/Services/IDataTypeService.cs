@@ -51,21 +51,21 @@ namespace Umbraco.Core.Services
         /// Saves an <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="userId">Id of the user issuing the save</param>
         void Save(IDataType dataType, int userId = 0);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="userId">Id of the user issuing the save</param>
         void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
+        /// <param name="userId">Id of the user issuing the save</param>
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
         void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents);
 
@@ -77,14 +77,14 @@ namespace Umbraco.Core.Services
         /// all the <see cref="PropertyType"/> data that references this <see cref="IDataType"/>.
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
-        /// <param name="userId">Id of the user issueing the deletion</param>
+        /// <param name="userId">Id of the user issuing the deletion</param>
         void Delete(IDataType dataType, int userId = 0);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its control Id
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
-        /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
+        /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
         Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);

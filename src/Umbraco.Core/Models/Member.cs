@@ -226,7 +226,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the raw password answer value
         /// </summary>
         /// <remarks>
-        /// For security reasons this value should be encrypted, the encryption process is handled by the memberhip provider
+        /// For security reasons this value should be encrypted, the encryption process is handled by the membership provider
         /// Alias: umbracoMemberPasswordRetrievalAnswer
         ///
         /// Part of the standard properties collection.

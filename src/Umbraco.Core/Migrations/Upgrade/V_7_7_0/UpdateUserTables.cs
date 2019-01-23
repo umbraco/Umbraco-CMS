@@ -14,7 +14,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
 
         public override void Migrate()
         {
-            //Don't exeucte if the column is already there
+            //Don't execute if the column is already there
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("createDate")) == false)

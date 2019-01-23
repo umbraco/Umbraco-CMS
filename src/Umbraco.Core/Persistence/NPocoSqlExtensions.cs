@@ -816,7 +816,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto to select.</typeparam>
         /// <param name="sql">The origin Sql.</param>
-        /// <param name="reference">An expression speficying the reference.</param>
+        /// <param name="reference">An expression specifying the reference.</param>
         /// <param name="sqlexpr">An expression to apply to the Sql statement before adding the reference selection.</param>
         /// <returns>The Sql statement.</returns>
         /// <remarks>The <paramref name="sqlexpr"/> expression applies to the Sql statement before the reference selection

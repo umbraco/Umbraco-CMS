@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
         bool AddContentType(IContentTypeComposition contentType);
 
         /// <summary>
-        /// Removes a ContentType with the supplied alias from the the list of composite ContentTypes
+        /// Removes a ContentType with the supplied alias from the list of composite ContentTypes
         /// </summary>
         /// <param name="alias">Alias of a <see cref="IContentType"/></param>
         /// <returns>True if ContentType was removed, otherwise returns False</returns>

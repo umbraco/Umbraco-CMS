@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 var propertyTypes = GetPropertyTypes(dto, memberType, standardPropertyTypes);
 
-                //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
+                //By Convention we add 9 standard PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
                 foreach (var standardPropertyType in standardPropertyTypes)
                 {
                     if (dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;

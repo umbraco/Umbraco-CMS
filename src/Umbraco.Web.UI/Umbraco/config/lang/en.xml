@@ -123,6 +123,8 @@
     <key alias="listNumeric">Numeric List</key>
     <key alias="macroInsert">Insert macro</key>
     <key alias="pictureInsert">Insert picture</key>
+    <key alias="publishAndClose">Publish and close</key>
+    <key alias="publishDescendants">Publish with descendants</key>
     <key alias="relations">Edit relations</key>
     <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
@@ -130,6 +132,7 @@
     <key alias="saveAndSchedule">Save and schedule</key>
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="saveListView">Save list view</key>
+    <key alias="schedulePublish">Schedule</key>
     <key alias="showPage">Preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
@@ -236,6 +239,8 @@
     <key alias="published">Published</key>
     <key alias="publishedPendingChanges">Published (pending changes)</key>
     <key alias="publishStatus">Publication Status</key>
+    <key alias="publishDescendantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> and the same languages of content items underneath and thereby making their content publicly available.]]></key>
     <key alias="releaseDate">Publish at</key>
     <key alias="unpublishDate">Unpublish at</key>
     <key alias="removeDate">Clear Date</key>
@@ -263,8 +268,23 @@
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
+    <key alias="includeUnpublished">Include drafts: also publish unpublished content items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     <key alias="isSensitiveValue_short">This value is hidden.</key>
+    <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
+    <key alias="languagesToPublish">What languages would you like to publish?</key>
+    <key alias="languagesToSave">What languages would you like to save?</key>
+    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
+    <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
+    <key alias="languagesToSchedule">What languages would you like to schedule?</key>
+    <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
+    <key alias="publishedLanguages">Published Languages</key>
+    <key alias="unpublishedLanguages">Unpublished Languages</key>
+    <key alias="unmodifiedLanguages">Unmodified Languages</key>
+    <key alias="readyToPublish">Ready to Publish?</key>
+    <key alias="readyToSave">Ready to Save?</key>
+    <key alias="sendForApproval">Send for approval</key>
+    <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -325,7 +345,10 @@
     <key alias="discardChanges">Discard changes</key>
     <key alias="unsavedChanges">You have unsaved changes</key>
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="confirmListViewPublish">Publishing will make the selected items visible on the site.</key>
+    <key alias="confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</key>
     <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
+    <key alias="doctypeChangeWarning">You have unsaved changes. Making changes to the Document Type will discard the changes.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -1055,6 +1078,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
       ]]></key>
+    <key alias="deletewarning">This will delete the package</key>
     <key alias="dropHere">Drop to upload</key>
     <key alias="orClickHereToUpload">or click here to choose package file</key>
     <key alias="uploadPackage">Upload package</key>

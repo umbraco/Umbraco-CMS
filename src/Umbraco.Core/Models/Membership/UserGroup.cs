@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models.Membership
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        // ReSharper disable once ClassNeverInstantiated.Local // lazy-instanciated in Ps
+        // ReSharper disable once ClassNeverInstantiated.Local // lazy-instantiated in Ps
         private class PropertySelectors
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Name);

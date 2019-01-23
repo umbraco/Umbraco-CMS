@@ -161,7 +161,7 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         /// <param name="result"></param>
         /// <remarks>
-        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK contraints.
+        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK constraints.
         /// Any unique "constraints" in the database are done with unique indexes.
         /// </remarks>
         private void ValidateDbConstraints(DatabaseSchemaResult result)
@@ -399,7 +399,7 @@ namespace Umbraco.Core.Migrations.Install
         /// Creates a new table in the database for the specified <paramref name="modelType"/>.
         /// </summary>
         /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
-        /// <param name="modelType">The the representing the table.</param>
+        /// <param name="modelType">The representing the table.</param>
         /// <param name="dataCreation"></param>
         /// <remarks>
         /// If <paramref name="modelType"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from
