@@ -5,7 +5,7 @@
     /// </summary>
     /// <remarks>
     /// Currently things that need to be assigned to an app in order for user security to work are:
-    /// dialogs, ITasks, editors
+    /// LegacyDialogTask
     /// </remarks>
     public interface IAssignedApp
     {
