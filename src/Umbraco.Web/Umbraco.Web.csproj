@@ -338,7 +338,7 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
-    <Compile Include="HealthCheck\Checks\Security\TlsCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Services\Tls12Check.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
