@@ -1,4 +1,4 @@
-function ColorPickerController($scope) {
+function ColorPickerController($scope, angularHelper) {
 
     //setup the default config
     var config = {
@@ -77,29 +77,7 @@ function ColorPickerController($scope) {
         //now make the editor model the array
         $scope.model.config.items = items;
     }
-
-    $scope.toggleItem = function (color) {
-
-        var currentColor = ($scope.model.value && $scope.model.value.hasOwnProperty("value"))
-            ? $scope.model.value.value
-            : $scope.model.value;
-
-        var newColor;
-        if (currentColor === color.value) {
-            // deselect
-            $scope.model.value = $scope.model.useLabel ? { value: "", label: "" } : "";
-            newColor = "";
-        }
-        else {
-            // select
-            $scope.model.value = $scope.model.useLabel ? { value: color.value, label: color.label } : color.value;
-            newColor = color.value;
-        }
-
-        // this is required to re-validate
-        $scope.propertyForm.modelValue.$setViewValue(newColor);
-    };
-
+    
     // Method required by the valPropertyValidator directive (returns true if the property editor has at least one color selected)
     $scope.validateMandatory = function () {
         var isValid = !$scope.model.validation.mandatory || (
@@ -115,20 +93,35 @@ function ColorPickerController($scope) {
     }
     $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
 
-    // A color is active if it matches the value and label of the model.
-    // If the model doesn't store the label, ignore the label during the comparison.
-    $scope.isActiveColor = function (color) {
-
-        // no value
-        if (!$scope.model.value)
-            return false;
-
+    $scope.onSelect = function (color) {
         // Complex color (value and label)?
-        if (!$scope.model.value.hasOwnProperty("value"))
-            return $scope.model.value === color.value;
+        if (!$scope.model.value.hasOwnProperty("value")) {
+            // did the value change?
+            if ($scope.model.value !== color) {
+                // yes, make sure to set dirty
+                angularHelper.getCurrentForm($scope).$setDirty();
+            }
+            return;
+        }
 
-        return $scope.model.value.value === color.value && $scope.model.value.label === color.label;
-    };
+        // did the value change?
+        if ($scope.model.value.value === color) {
+            // no, skip the rest
+            return;
+        }
+
+        // yes, make sure to set dirty
+        angularHelper.getCurrentForm($scope).$setDirty();
+
+        // update the label according to the new color
+        var selectedItem = _.find($scope.model.config.items, function (item) {
+            return item.value === color;
+        });
+        if (!selectedItem) {
+            return;
+        }
+        $scope.model.value.label = selectedItem.label;
+    }
 
     // Finds the color best matching the model's color,
     // and sets the model color to that one. This is useful when
