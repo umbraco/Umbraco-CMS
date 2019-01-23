@@ -413,7 +413,7 @@ namespace Umbraco.Web.Editors
                 types = Services.ContentTypeService.GetAll(ids).ToList();
             }
 
-            var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
+            var basics = types.Where(type => type.IsElement == false).Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
 
             var localizedTextService = Services.TextService;
             foreach (var basic in basics)
