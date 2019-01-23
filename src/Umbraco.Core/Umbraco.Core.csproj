@@ -331,6 +331,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
+    <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
