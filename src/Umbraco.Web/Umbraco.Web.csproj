@@ -1145,11 +1145,6 @@
     <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
     <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
     <Compile Include="_Legacy\UI\LegacyDialogTask.cs" />
-    <Compile Include="UI\Controls\ProgressBar.cs" />
-    <Compile Include="UI\Controls\UmbracoControl.cs" />
-    <Compile Include="UI\Controls\UmbracoUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="UI\Pages\BasePage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
