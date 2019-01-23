@@ -870,9 +870,6 @@
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Зафиксированы следующие результаты автоматической проверки состояния Umbraco по расписанию, запущенной на %0% в %1%:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Результат проверки состояния Umbraco: %0%</key>
-
-    <key alias="tlsHealthCheckSuccess">Ваш веб-сайт настроен на использование TLS 1.2 или выше для исходящих соединений.</key>
-    <key alias="tlsHealthCheckWarn">Исходящие соединения с вашего сайта обслуживаются по старому протоколу. Вы должны рассмотреть возможность его обновления для использования TLS 1.2 или выше.</key>
   </area>
   <area alias="help">
     <key alias="goTo">перейти к</key>

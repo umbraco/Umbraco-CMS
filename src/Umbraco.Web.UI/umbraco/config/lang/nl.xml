@@ -1624,8 +1624,8 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notificatie email is verzonden naar <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notificatie email staat nog steeds op de default waarde van <strong>%0%</strong>.]]></key>
 
-    <key alias="tlsHealthCheckSuccess">Uw website is ingesteld om TLS 1.2 of hoger te gebruiken voor uitgaande verbindingen.</key>
-    <key alias="tlsHealthCheckWarn">Uitgaande verbindingen van uw website worden via een oud protocol bediend. U zou moeten overwegen om het bij te werken om TLS 1.2 of hoger te gebruiken.</key>
+    <key alias="tls12HealthCheckSuccess">Uw website kan het TLS 1.2 beveiligingsprotocol gebruiken bij het maken van uitgaande verbindingen naar HTTPS-eindpunten.</key>
+    <key alias="tls12HealthCheckWarn">Uw website is niet geconfigureerd om het TLS 1.2 beveiligingsprotocol te kunnen gebruiken bij het maken van uitgaande verbindingen: sommige HTTPS-eindpunten zijn mogelijk niet bereikbaar via een minder veilig protocol.</key>
   </area>
 	<area alias="redirectUrls">
     <key alias="disableUrlTracker">URL tracker uitzetten</key>
