@@ -1194,13 +1194,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
-      <DependentUpon>FeedProxy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
-      <DependentUpon>FeedProxy.aspx</DependentUpon>
-    </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
@@ -1240,7 +1233,6 @@
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />

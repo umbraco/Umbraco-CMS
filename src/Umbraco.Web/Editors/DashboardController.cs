@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from '{Url}'", url);
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from '{Url}'", url);
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
@@ -128,6 +128,75 @@ namespace Umbraco.Web.Editors
             {
                 Content = new StringContent(result, Encoding.UTF8, "text/css")
             };
+        }
+
+        public async Task<HttpResponseMessage> GetRemoteXml(string site, string url)
+        {
+            // This is used in place of the old feedproxy.config
+            // Which was used to grab data from our.umbraco.com, umbraco.com or umbraco.tv
+            // for certain dashboards or the help drawer
+            var urlPrefix = string.Empty;
+            switch (site.ToUpper())
+            {
+                case "TV":
+                    urlPrefix = "https://umbraco.tv/";
+                    break;
+
+                case "OUR":
+                    urlPrefix = "https://our.umbraco.org/";
+                    break;
+
+                case "COM":
+                    urlPrefix = "https://umbraco.com/";
+                    break;
+
+                default:
+                    //Throw error
+                    return new HttpResponseMessage(HttpStatusCode.Unauthorized)
+                    {
+                        Content = new StringContent($"The Site {site} and {url} is not on the whitelist"),
+                    };
+            }
+
+
+            //Make remote call to fetch videos or remote dashboard feed data            
+            var key = $"umbraco-XML-feed-{site}-{url.ToCleanString(Core.Strings.CleanStringType.UrlSegment)}";
+
+            var content = AppCaches.RuntimeCache.GetCacheItem<string>(key);
+            var result = string.Empty;
+
+            if (content != null)
+            {
+                result = content;
+            }
+            else
+            {
+                //content is null, go get it
+                try
+                {
+                    //fetch remote css
+                    content = await HttpClient.GetStringAsync($"{urlPrefix}{url}");
+
+                    //can't use content directly, modified closure problem
+                    result = content;
+
+                    //save server content for 30 mins
+                    AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
+                }
+                catch (HttpRequestException ex)
+                {
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}", urlPrefix, url);
+
+                    //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
+                    AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
+                }
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(result, Encoding.UTF8, "text/xml")
+            };
+
         }
 
         [ValidateAngularAntiForgeryToken]

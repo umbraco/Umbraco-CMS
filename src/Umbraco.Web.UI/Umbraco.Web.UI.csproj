@@ -212,9 +212,6 @@
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
     </None>
-    <None Include="Config\feedProxy.Release.config">
-      <DependentUpon>feedProxy.config</DependentUpon>
-    </None>
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -236,7 +233,6 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
-    <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -255,7 +251,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\scripting.config" />
-    <Content Include="Config\feedProxy.config" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
