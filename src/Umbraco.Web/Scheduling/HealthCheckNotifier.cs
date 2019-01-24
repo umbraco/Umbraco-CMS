@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 using System.Linq;
 using System.Threading;
@@ -56,7 +57,12 @@ namespace Umbraco.Web.Scheduling
                     .Union(healthCheckConfig.DisabledChecks
                         .Select(x => x.Id))
                     .Distinct()
-                    .ToArray();
+                    .ToList();
+
+                //We want to disable the duplicate health checks from Our.Umbraco.HealthChecks
+                //as per this issue https://github.com/umbraco/Umbraco-CMS/issues/4174
+                disabledCheckIds.Add(new Guid("92AE66E1-209D-4F9E-AAF5-19B19D41CF49")); //TlsCheck
+                disabledCheckIds.Add(new Guid("6437384C-D1D3-46DA-9E21-9E0BC1498E1F")); //HstsCheck
 
                 var checks = _healthCheckResolver.HealthChecks
                     .Where(x => disabledCheckIds.Contains(x.Id) == false);
