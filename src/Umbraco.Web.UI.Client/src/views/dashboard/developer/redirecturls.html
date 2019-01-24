@@ -5,9 +5,14 @@
     <umb-editor-sub-header>
 
         <umb-editor-sub-header-content-right>
-
+            <umb-editor-sub-header-section ng-if="vm.dashboard.userIsAdmin === true && vm.dashboard.urlTrackerDisabled === false">
+                <button type="button"
+                        class="umb-era-button umb-button--s -blue"
+                        ng-click="vm.openAddRedirectOverlay()">
+                    <span><localize key="redirectUrls_addRedirect">Add redirect</localize></span>
+                </button>
+            </umb-editor-sub-header-section>
             <umb-editor-sub-header-section ng-if="vm.dashboard.userIsAdmin === true">
-
                 <button ng-if="vm.dashboard.urlTrackerDisabled === false"
                         type="button"
                         class="umb-era-button umb-button--s"
@@ -77,40 +82,6 @@
                 </div>
 
             </div>
-            <div class="umb-table-row -solid">
-                <div class="umb-table-cell not-fixed flx-s1 flx-g1 flx-b4">
-                    <input type="text" class="form-control" ng-model="vm.data.redirectFromUrl" prevent-enter-submit no-dirty-check />
-                </div>
-
-
-
-                <div class="umb-table-cell flx-s1 flx-g1 flx-b6 items-center">
-                    <umb-node-preview ng-repeat="node in vm.data.redirectToSelection"
-                                      icon="node.icon"
-                                      name="node.name"
-                                      published="node.published"
-                                      description="node.url"
-                                      sortable="false"
-                                      allow-remove="true"
-                                      allow-open="false"
-                                      on-remove="vm.removeSelection($index)" >
-                    </umb-node-preview>
-                    <a ng-show="vm.data.redirectToSelection.length === 0"
-                       class="umb-node-preview-add"
-                       href=""
-                       ng-click="vm.openContentPickerOverlay()"
-                       prevent-default>
-                        
-                    </a>
-
-
-
-                </div>
-                <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 60px;">
-                    <button type="button" class="umb-era-button umb-button--s -blue" ng-click="vm.addRedirect()" ng-disabled="!vm.status.readyToAdd">Add</button>
-                </div>
-
-            </div>
         </div>
         
 
@@ -140,9 +111,9 @@
         </umb-pagination>
     </div>
 
-    <umb-overlay ng-if="vm.contentPickerOverlay.show"
-                 model="vm.contentPickerOverlay"
-                 view="vm.contentPickerOverlay.view"
+    <umb-overlay ng-if="vm.addRedirectOverlay.show"
+                 model="vm.addRedirectOverlay"
+                 view="vm.addRedirectOverlay.view"
                  position="right">
     </umb-overlay>
 </div>

@@ -1,0 +1,30 @@
+﻿<div ng-controller="Umbraco.Overlays.RedirectUrlPickerController as vm">
+    <umb-load-indicator ng-hide="vm.loaded"></umb-load-indicator>
+    <div ng-show="vm.loaded">
+        <umb-control-group label="@redirectUrls_originalUrl">
+            <input type="text"
+                   localize="placeholder"
+                   placeholder="@placeholders_enterurl"
+                   class="umb-editor umb-textstring"
+                   ng-model="vm.originalUrl"
+                   required
+                   name="originalUrl"/>
+        </umb-control-group>
+
+        <div class="umb-control-group">
+            <h5>
+                <localize key="redirectUrls_redirectTo">Redirect To</localize>
+            </h5>
+            <umb-node-preview ng-if="vm.contentItem"
+                              icon="vm.contentItem.icon"
+                              name="vm.contentItem.name"
+                              published="vm.contentItem.published"
+                              description="vm.contentItem.url"
+                              sortable="false"
+                              allow-remove="false"
+                              allow-open="false">
+            </umb-node-preview>
+            <div ng-if="!vm.contentItem" ng-include="vm.contentPickerViewPath"></div>
+        </div>
+    </div>
+</div>
