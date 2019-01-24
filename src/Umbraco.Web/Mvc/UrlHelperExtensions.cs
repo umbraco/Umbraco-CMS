@@ -19,6 +19,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="url">The url to validate</param>
         /// <param name="callerUrl">The url of the current local domain (to ensure we can validate if the requested url is local without dependency on the request)</param>
         /// <returns>True if it's an allowed url</returns>
+        [Obsolete("This looks OLD & unused", true)]
         public static bool ValidateProxyUrl(this UrlHelper urlHelper, string url, string callerUrl)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
@@ -59,14 +60,6 @@ namespace Umbraco.Web.Mvc
                 if (requestUri.IsAbsoluteUri == false)
                 {
                     return false;
-                }
-
-                // check for valid proxy urls
-                var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                if (feedProxyXml != null &&
-                    feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null)
-                {
-                    return true;
                 }
             }
             else

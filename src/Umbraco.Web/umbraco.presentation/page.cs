@@ -17,6 +17,7 @@ namespace umbraco
     /// <summary>
     /// Summary description for page.
     /// </summary>
+    [Obsolete("TODO: WB This seems legacy", false)]
     public class page
     {
 

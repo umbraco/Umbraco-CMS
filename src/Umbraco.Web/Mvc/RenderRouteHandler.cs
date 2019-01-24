@@ -347,10 +347,6 @@ namespace Umbraco.Web.Mvc
                 // to Mvc since Mvc can't do much
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
-            // so we have a template, so we should have a rendering engine
-            if (request.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?
-                return GetWebFormsHandler();
-
             if (request.RenderingEngine != RenderingEngine.Mvc) // else ?
                 return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
 
@@ -376,13 +372,6 @@ namespace Umbraco.Web.Mvc
                 return HandlePostedValues(requestContext, postedInfo);
             }
 
-            //Now we can check if we are supposed to render WebForms when the route has not been hijacked
-            if (request.RenderingEngine == RenderingEngine.WebForms
-                && request.HasTemplate
-                && routeDef.HasHijackedRoute == false)
-            {
-                return GetWebFormsHandler();
-            }
 
             //Here we need to check if there is no hijacked route and no template assigned,
             //if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
@@ -434,16 +423,7 @@ namespace Umbraco.Web.Mvc
 
             return new UmbracoMvcHandler(requestContext);
         }
-
-        /// <summary>
-        /// Returns the handler for webforms requests
-        /// </summary>
-        /// <returns></returns>
-        internal static IHttpHandler GetWebFormsHandler()
-        {
-            return (umbraco.UmbracoDefault) BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(umbraco.UmbracoDefault));
-        }
-
+        
         private SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext, string controllerName)
         {
             return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);

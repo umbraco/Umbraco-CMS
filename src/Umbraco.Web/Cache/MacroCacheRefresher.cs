@@ -37,6 +37,7 @@ namespace Umbraco.Web.Cache
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
 
+            //TODO: WB Was I too aggresive with cleanup?
             AppCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
 
             base.RefreshAll();
@@ -112,6 +113,7 @@ namespace Umbraco.Web.Cache
 
         public static void ClearMacroContentCache(AppCaches appCaches)
         {
+            //TODO: WB Was I too aggresive with cleanup?
             appCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
         }
 

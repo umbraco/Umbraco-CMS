@@ -158,12 +158,7 @@ namespace Umbraco.Web.Templates
                     break;
                 case RenderingEngine.WebForms:
                 default:
-                    var webFormshandler = (UmbracoDefault) BuildManager
-                        .CreateInstanceFromVirtualPath("~/default.aspx", typeof(UmbracoDefault));
-                    //the 'true' parameter will ensure that the current query strings are carried through, we don't have
-                    // to build up the url again, it will just work.
-                    _umbracoContext.HttpContext.Server.Execute(webFormshandler, sw, true);
-                    break;
+                    throw new Exception("We no longer support WebForms in Umbraco");
             }
 
         }

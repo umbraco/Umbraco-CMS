@@ -30,15 +30,7 @@ namespace Umbraco.Web.Mvc
 
             var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
 
-            //Special case, if it is webforms but we're posting to an MVC surface controller, then we
-            // need to return the webforms result instead
-            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.WebForms)
-            {
-                EnsureViewContextForWebForms(context);
-                var webFormsHandler = RenderRouteHandler.GetWebFormsHandler();
-                webFormsHandler.ProcessRequest(HttpContext.Current);
-            }
-            else
+            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.Mvc)
             {
                 var factory = ControllerBuilder.Current.GetControllerFactory();
                 context.RouteData.Values["action"] = routeDef.ActionName;

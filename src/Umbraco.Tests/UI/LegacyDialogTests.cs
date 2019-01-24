@@ -23,12 +23,12 @@ namespace Umbraco.Tests.UI
             }
         }
         
-        [TestCase(typeof(macroTasks), Constants.Applications.Settings)]
-        public void Check_Assigned_Apps_For_Tasks(Type taskType, string app)
-        {
-            var task = (LegacyDialogTask)Activator.CreateInstance(taskType);
-            Assert.AreEqual(task.AssignedApp, app);
-        }
+        //[TestCase(typeof(macroTasks), Constants.Applications.Settings)]
+        //public void Check_Assigned_Apps_For_Tasks(Type taskType, string app)
+        //{
+        //    var task = (LegacyDialogTask)Activator.CreateInstance(taskType);
+        //    Assert.AreEqual(task.AssignedApp, app);
+        //}
 
     }
 }
