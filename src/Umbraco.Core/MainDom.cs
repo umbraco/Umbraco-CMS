@@ -165,7 +165,7 @@ namespace Umbraco.Core
                 // which may timeout, and this is accepted - see comments below
 
                 // signal, then wait for the lock, then make sure the event is
-                // resetted (maybe there was noone listening..)
+                // reset (maybe there was noone listening..)
                 _signal.Set();
 
                 // if more than 1 instance reach that point, one will get the lock
@@ -175,7 +175,7 @@ namespace Umbraco.Core
                 _isMainDom = true;
 
                 // we need to reset the event, because otherwise we would end up
-                // signaling ourselves and commiting suicide immediately.
+                // signaling ourselves and committing suicide immediately.
                 // only 1 instance can reach that point, but other instances may
                 // have started and be trying to get the lock - they will timeout,
                 // which is accepted

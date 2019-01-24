@@ -44,7 +44,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <remarks>
         /// <para>The assembly version is the value of the <see cref="AssemblyVersionAttribute"/>.</para>
-        /// <para>Is is the one that the CLR checks for compatibility. Therefore, it changes only on
+        /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
         public static Version AssemblyVersion {get; }
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    // fixme/task - stop having version in web.config appSettings
+                    // TODO - https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
                     var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
                     return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }

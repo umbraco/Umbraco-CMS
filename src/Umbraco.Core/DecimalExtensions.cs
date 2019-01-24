@@ -13,7 +13,7 @@
         /// </summary>
         /// <param name="value">The value to normalize.</param>
         /// <returns>The normalized value.</returns>
-        /// <remarks>Normalizing changes the scaling factor and removes trailing zeroes,
+        /// <remarks>Normalizing changes the scaling factor and removes trailing zeros,
         /// so 1.2500m comes out as 1.25m.</remarks>
         public static decimal Normalize(this decimal value)
         {

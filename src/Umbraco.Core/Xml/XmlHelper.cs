@@ -206,7 +206,7 @@ namespace Umbraco.Core.Xml
         /// <summary>
         /// Opens a file as a XmlDocument.
         /// </summary>
-        /// <param name="filePath">The relative file path. ei. /config/umbraco.config</param>
+        /// <param name="filePath">The relative file path. ie. /config/umbraco.config</param>
         /// <returns>Returns a XmlDocument class</returns>
         public static XmlDocument OpenAsXmlDocument(string filePath)
         {

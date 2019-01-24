@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.PublishedContent
 {
     /// <inheritdoc />
     /// <summary>
-    /// Represents the Clr type of a model.
+    /// Represents the CLR type of a model.
     /// </summary>
     /// <example>
     /// ModelType.For("alias")
@@ -43,11 +43,11 @@ namespace Umbraco.Core.Models.PublishedContent
             => new ModelType(alias);
 
         /// <summary>
-        /// Gets the actual Clr type by replacing model types, if any.
+        /// Gets the actual CLR type by replacing model types, if any.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="modelTypes">The model types map.</param>
-        /// <returns>The actual Clr type.</returns>
+        /// <returns>The actual CLR type.</returns>
         public static Type Map(Type type, Dictionary<string, Type> modelTypes)
             => Map(type, modelTypes, false);
 
@@ -82,11 +82,11 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
-        /// Gets the actual Clr type name by replacing model types, if any.
+        /// Gets the actual CLR type name by replacing model types, if any.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="map">The model types map.</param>
-        /// <returns>The actual Clr type name.</returns>
+        /// <returns>The actual CLR type name.</returns>
         public static string MapToName(Type type, Dictionary<string, string> map)
             => MapToName(type, map, false);
 

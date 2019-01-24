@@ -8,7 +8,7 @@ namespace Umbraco.Core
     public static class Attempt
     {
         // note:
-        // cannot rely on overloads only to differenciate between with/without status
+        // cannot rely on overloads only to differentiate between with/without status
         // in some cases it will always be ambiguous, so be explicit w/ 'WithStatus' methods
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Initializes a new instance of the <see cref="PublishedContentType"/> class with a content type.
         /// </summary>
         public PublishedContentType(IContentTypeComposition contentType, IPublishedContentTypeFactory factory)
-            : this(contentType.Id, contentType.Alias, contentType.GetItemType(), contentType.CompositionAliases(), contentType.Variations)
+            : this(contentType.Id, contentType.Alias, contentType.GetItemType(), contentType.CompositionAliases(), contentType.Variations, contentType.IsElement)
         {
             var propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => factory.CreatePropertyType(this, x))
@@ -30,8 +30,6 @@ namespace Umbraco.Core.Models.PublishedContent
                 EnsureMemberProperties(propertyTypes, factory);
 
             _propertyTypes = propertyTypes.ToArray();
-
-            IsElement = contentType.IsElement;
 
             InitializeIndexes();
         }
@@ -43,8 +41,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>This constructor is for tests and is not intended to be used directly from application code.</para>
         /// <para>Values are assumed to be consisted and are not checked.</para>
         /// </remarks>
-        public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations)
-            : this (id, alias, itemType, compositionAliases, variations)
+        public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
+            : this (id, alias, itemType, compositionAliases, variations, isElement)
         {
             var propertyTypesA = propertyTypes.ToArray();
             foreach (var propertyType in propertyTypesA)
@@ -54,13 +52,14 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
-        private PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, ContentVariation variations)
+        private PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, ContentVariation variations, bool isElement)
         {
             Id = id;
             Alias = alias;
             ItemType = itemType;
             CompositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
             Variations = variations;
+            IsElement = isElement;
         }
 
         private void InitializeIndexes()

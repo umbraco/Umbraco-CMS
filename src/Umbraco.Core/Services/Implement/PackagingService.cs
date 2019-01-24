@@ -69,10 +69,10 @@ namespace Umbraco.Core.Services.Implement
             }
             catch (HttpRequestException ex)
             {
-                throw new ConnectionException("An error occuring downloading the package from " + url, ex);
+                throw new ConnectionException("An error occurring downloading the package from " + url, ex);
             }
 
-            //successfull
+            //successful
             if (bytes.Length > 0)
             {
                 var packagePath = IOHelper.MapPath(SystemDirectories.Packages);

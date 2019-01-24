@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
         /// <param name="user">User to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all user permissions for all nodes that have explicit permissions defined</param>
+        /// <param name="nodeIds">Specifying nothing will return all user permissions for all nodes that have explicit permissions defined</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         /// <remarks>
         /// This will return the default permissions for the user's groups for node ids that don't have explicitly defined permissions
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Services
         /// <param name="fallbackToDefaultPermissions">
         ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
 

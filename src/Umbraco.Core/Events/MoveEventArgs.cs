@@ -14,7 +14,7 @@ namespace Umbraco.Core.Events
         /// <param name="canCancel"></param>
         /// <param name="eventMessages"></param>
         /// <param name="moveInfo">
-        /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
+        /// A collection of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(bool canCancel, EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
             : base(default, canCancel, eventMessages)
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <param name="eventMessages"></param>
         /// <param name="moveInfo">
-        /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
+        /// A collection of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
             : base(default, eventMessages)
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <param name="canCancel"></param>
         /// <param name="moveInfo">
-        /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
+        /// A collection of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(bool canCancel, params MoveEventInfo<TEntity>[] moveInfo)
             : base(default, canCancel)
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Events
         /// Constructor accepting a collection of MoveEventInfo objects
         /// </summary>
         /// <param name="moveInfo">
-        /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
+        /// A collection of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(params MoveEventInfo<TEntity>[] moveInfo)
             : base(default)

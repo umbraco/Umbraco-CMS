@@ -58,7 +58,7 @@ namespace Umbraco.Core
                                 {
                                     var boxedMember = unary.Operand as MemberExpression;
                                     if (boxedMember == null)
-                                        throw new ArgumentException("The type of property could not be infered, try specifying the type parameters explicitly. This can happen if you have tried to access PropertyInfo where the property's return type is a value type, but the expression is trying to convert it to an object");
+                                        throw new ArgumentException("The type of property could not be inferred, try specifying the type parameters explicitly. This can happen if you have tried to access PropertyInfo where the property's return type is a value type, but the expression is trying to convert it to an object");
                                     else member = boxedMember;
                                 }
                             }
@@ -75,7 +75,7 @@ namespace Umbraco.Core
                         if (type != propInfo.ReflectedType &&
                             !type.IsSubclassOf(propInfo.ReflectedType))
                             throw new ArgumentException(string.Format(
-                                "Expresion '{0}' refers to a property that is not from type {1}.",
+                                "Expression '{0}' refers to a property that is not from type {1}.",
                                 propertyLambda,
                                 type));
 

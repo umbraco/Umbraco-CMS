@@ -515,7 +515,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // now we have
-            // - the definitinos
+            // - the definitions
             // - all property data dtos
             // - tag editors
             // and we need to build the proper property collections

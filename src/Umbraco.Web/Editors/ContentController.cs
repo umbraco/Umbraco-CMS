@@ -1349,7 +1349,7 @@ namespace Umbraco.Web.Editors
         /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
         /// does not have Delete access to this node.
         /// </remarks>
-        [EnsureUserPermissionForContent("id", 'D')]
+        [EnsureUserPermissionForContent("id", ActionDelete.ActionLetter)]
         [HttpDelete]
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
@@ -1395,7 +1395,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.ContentService.EmptyRecycleBin();
@@ -2034,6 +2034,7 @@ namespace Umbraco.Web.Editors
         private ContentItemDisplay MapToDisplay(IContent content)
         {
             var display = Mapper.Map<ContentItemDisplay>(content);
+            display.AllowPreview = display.AllowPreview && content.Trashed == false;
             return display;
         }
 

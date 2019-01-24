@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($q, $location, logViewerResource) {
+    function LogViewerOverviewController($q, $location, $timeout, logViewerResource, navigationService) {
 
         var vm = this;
         vm.loading = false;
@@ -102,6 +102,9 @@
                 vm.loading = false;
             });
 
+            $timeout(function () {
+                navigationService.syncTree({ tree: "logViewer", path: "-1" });
+            });
         }
 
         function searchLogQuery(logQuery){

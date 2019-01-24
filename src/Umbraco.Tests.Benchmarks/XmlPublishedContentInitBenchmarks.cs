@@ -94,6 +94,7 @@ namespace Umbraco.Tests.Benchmarks
         Guid key, version;
         string name, urlName, writerName, creatorName, docTypeAlias, path;
         bool isDraft;
+        bool isPublished;
         DateTime createDate, updateDate;
         PublishedContentType publishedContentType;
         Dictionary<string, IPublishedProperty> properties;
@@ -104,7 +105,7 @@ namespace Umbraco.Tests.Benchmarks
             OriginalInitializeNode(_xml10.DocumentElement, false, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out version, out createDate, out updateDate, out level, out isDraft, out isPublished, out publishedContentType,
                 out properties);
         }
 
@@ -114,7 +115,7 @@ namespace Umbraco.Tests.Benchmarks
             OriginalInitializeNode(_xml100.DocumentElement, false, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out version, out createDate, out updateDate, out level, out isDraft, out isPublished, out publishedContentType,
                 out properties);
         }
 
@@ -124,7 +125,7 @@ namespace Umbraco.Tests.Benchmarks
             OriginalInitializeNode(_xml1000.DocumentElement, false, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out version, out createDate, out updateDate, out level, out isDraft, out isPublished, out publishedContentType,
                 out properties);
         }
 
@@ -134,7 +135,7 @@ namespace Umbraco.Tests.Benchmarks
             OriginalInitializeNode(_xml10000.DocumentElement, false, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out version, out createDate, out updateDate, out level, out isDraft, out isPublished, out publishedContentType,
                 out properties);
         }
 
@@ -144,7 +145,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml10.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out isPublished, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -154,7 +155,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml100.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft,  out isPublished,out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml1000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out isPublished,out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -174,7 +175,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml10000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out isPublished,out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -182,7 +183,7 @@ namespace Umbraco.Tests.Benchmarks
         internal static void OriginalInitializeNode(XmlNode xmlNode, bool legacy, bool isPreviewing,
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
-            out Guid version, out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
+            out Guid version, out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft, out bool isPublished,
             out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties)
         {
             //initialize the out params with defaults:
@@ -193,6 +194,7 @@ namespace Umbraco.Tests.Benchmarks
             name = writerName = urlName = creatorName = docTypeAlias = path = null;
             createDate = updateDate = default(DateTime);
             isDraft = false;
+            isPublished = true;
             contentType = null;
             properties = null;
 

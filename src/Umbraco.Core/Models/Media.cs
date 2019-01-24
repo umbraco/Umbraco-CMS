@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
-        /// <param name="name">ame of the Media object</param>
+        /// <param name="name">name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
         /// <param name="contentType">MediaType for the current Media object</param>
         public Media(string name, IMedia parent, IMediaType contentType)
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
-        /// <param name="name">ame of the Media object</param>
+        /// <param name="name">name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
         /// <param name="contentType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
-        /// <param name="name">ame of the Media object</param>
+        /// <param name="name">name of the Media object</param>
         /// <param name="parentId">Id of the Parent IMedia</param>
         /// <param name="contentType">MediaType for the current Media object</param>
         public Media(string name, int parentId, IMediaType contentType)

@@ -9,7 +9,7 @@
 
             <table class="table">
                 <tbody>
-                    <tr ng-repeat="installedPackage in vm.installedPackages">
+                    <tr ng-repeat="installedPackage in vm.installedPackages track by installedPackage.id">
                         <td class="flex items-center">
                             <div class="umb-package-list__item-icon">
                                 <i ng-if="!installedPackage.iconUrl" class="icon-box"></i>

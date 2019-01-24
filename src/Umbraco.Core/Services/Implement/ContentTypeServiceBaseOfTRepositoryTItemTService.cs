@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services.Implement
 
             // note
             // this is meant to run *after* uow.Commit() so must use WasPropertyDirty() everywhere
-            // instead of IsPropertyDirty() since dirty properties have been resetted already
+            // instead of IsPropertyDirty() since dirty properties have been reset already
 
             var changes = new List<ContentTypeChange<TItem>>();
 

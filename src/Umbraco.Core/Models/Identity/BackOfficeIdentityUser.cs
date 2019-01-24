@@ -95,7 +95,7 @@ namespace Umbraco.Core.Models.Identity
         }
 
         /// <summary>
-        /// Returns true if an Id has been set on this object this will be false if the object is new and not peristed to the database
+        /// Returns true if an Id has been set on this object this will be false if the object is new and not persisted to the database
         /// </summary>
         public bool HasIdentity => _hasIdentity;
 

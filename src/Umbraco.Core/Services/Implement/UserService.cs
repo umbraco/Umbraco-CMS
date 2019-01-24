@@ -929,7 +929,7 @@ namespace Umbraco.Core.Services.Implement
         /// Get explicitly assigned permissions for a user and optional node ids
         /// </summary>
         /// <param name="user">User to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
         {
@@ -946,7 +946,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="fallbackToDefaultPermissions">
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
@@ -965,7 +965,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="fallbackToDefaultPermissions">
         ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
@@ -1073,7 +1073,7 @@ namespace Umbraco.Core.Services.Implement
                     {
                         if (entityPermission.IsDefaultPermissions == false)
                         {
-                            //explicit permision found so we'll append it and move on, the collection is a hashset anyways
+                            //explicit permission found so we'll append it and move on, the collection is a hashset anyways
                             //so only supports adding one element per groupid/contentid
                             resultPermissions.Add(entityPermission);
                             added = true;
