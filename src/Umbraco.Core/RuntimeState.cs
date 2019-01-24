@@ -169,7 +169,7 @@ namespace Umbraco.Core
             else if (databaseFactory.Configured == false)
             {
                 // local version *does* match code version, but the database is not configured
-                // install (again? this is a weird situation...)
+                // install - may happen with Deploy/Cloud/etc
                 logger.Debug<RuntimeState>("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
@@ -179,7 +179,7 @@ namespace Umbraco.Core
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
-            var tries = RuntimeStateOptions.InstallMissingDatabase ? 2 : 5;
+            var tries = RuntimeOptions.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = databaseFactory.CanConnect;
@@ -193,7 +193,7 @@ namespace Umbraco.Core
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<RuntimeState>("Could not connect to database.");
 
-                if (RuntimeStateOptions.InstallMissingDatabase)
+                if (RuntimeOptions.InstallMissingDatabase)
                 {
                     // ok to install on a configured but missing database
                     Level = RuntimeLevel.Install;
@@ -222,7 +222,7 @@ namespace Umbraco.Core
                 // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
 
-                if (RuntimeStateOptions.InstallEmptyDatabase)
+                if (RuntimeOptions.InstallEmptyDatabase)
                 {
                     // ok to install on an empty database
                     Level = RuntimeLevel.Install;

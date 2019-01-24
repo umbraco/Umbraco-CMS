@@ -283,48 +283,60 @@ namespace Umbraco.Core.Migrations.Install
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullOrEmptyException(nameof(connectionString));
             if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
 
-            // set the connection string for the new datalayer
-            var connectionStringSettings = new ConnectionStringSettings(Constants.System.UmbracoConnectionName, connectionString, providerName);
+            var fileSource = "web.config";
+            var fileName = IOHelper.MapPath(Path.Combine(SystemDirectories.Root, fileSource));
 
-            var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-            if (xml.Root == null) throw new Exception("Invalid web.config file.");
-            var connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
-            if (connectionStrings == null) throw new Exception("Invalid web.config file.");
+            if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
 
-            // honour configSource, if its set, change the xml file we are saving the configuration
-            // to the one set in the configSource attribute
-            if (connectionStrings.Attribute("configSource") != null)
+            var connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
+            if (connectionStrings == null) throw new Exception($"Invalid {fileSource} file (no connection strings).");
+
+            // handle configSource
+            var configSourceAttribute = connectionStrings.Attribute("configSource");
+            if (configSourceAttribute != null)
             {
-                var source = connectionStrings.Attribute("configSource").Value;
-                var configFile = IOHelper.MapPath($"{SystemDirectories.Root}/{source}");
-                logger.Info<DatabaseBuilder>("Storing ConnectionString in {ConfigFile}", configFile);
-                if (File.Exists(configFile))
-                {
-                    xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-                    fileName = configFile;
-                }
+                fileSource = configSourceAttribute.Value;
+                fileName = IOHelper.MapPath(Path.Combine(SystemDirectories.Root, fileSource));
+
+                if (!File.Exists(fileName))
+                    throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
+
+                xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+                if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
+
                 connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
-                if (connectionStrings == null) throw new Exception("Invalid web.config file.");
+                if (connectionStrings == null) throw new Exception($"Invalid {fileSource} file (no connection strings).");
             }
 
-            // update connectionString if it exists, or else create a new connectionString
-            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == Constants.System.UmbracoConnectionName);
+            // create or update connection string
+            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name")?.Value == Constants.System.UmbracoConnectionName);
             if (setting == null)
             {
                 connectionStrings.Add(new XElement("add",
                     new XAttribute("name", Constants.System.UmbracoConnectionName),
-                    new XAttribute("connectionString", connectionStringSettings),
+                    new XAttribute("connectionString", connectionString),
                     new XAttribute("providerName", providerName)));
             }
             else
             {
-                setting.Attribute("connectionString").Value = connectionString;
-                setting.Attribute("providerName").Value = providerName;
+                AddOrUpdateAttribute(setting, "connectionString", connectionString);
+                AddOrUpdateAttribute(setting, "providerName", providerName);
             }
 
+            // save
+            logger.Info<DatabaseBuilder>("Saving connection string to {ConfigFile}.", fileSource);
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            logger.Info<DatabaseBuilder>("Configured a new ConnectionString using the '{ProviderName}' provider.", providerName);
+            logger.Info<DatabaseBuilder>("Saved connection string to {ConfigFile}.", fileSource);
+        }
+
+        private static void AddOrUpdateAttribute(XElement element, string name, string value)
+        {
+            var attribute = element.Attribute(name);
+            if (attribute == null)
+                element.Add(new XAttribute(name, value));
+            else
+                attribute.Value = value;
         }
 
         internal bool IsConnectionStringConfigured(ConnectionStringSettings databaseSettings)
@@ -422,7 +434,7 @@ namespace Umbraco.Core.Migrations.Install
                 _logger.Info<DatabaseBuilder>("Database configuration status: Started");
 
                 var database = scope.Database;
-                
+
                 var message = string.Empty;
 
                 var schemaResult = ValidateSchema();
@@ -482,7 +494,7 @@ namespace Umbraco.Core.Migrations.Install
                 }
 
                 _logger.Info<DatabaseBuilder>("Database upgrade started");
-                
+
                 // upgrade
                 var upgrader = new UmbracoUpgrader();
                 upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger, _postMigrations);
