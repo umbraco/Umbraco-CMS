@@ -296,7 +296,7 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual void Terminate()
         {
-            _components.Terminate();
+            _components?.Terminate();
         }
 
         /// <summary>
