@@ -480,6 +480,7 @@
         <key alias="anchor">#value or ?key=value</key>
         <key alias="enterAlias">Enter alias...</key>
         <key alias="generatingAlias">Generating alias...</key>
+        <key alias="enterurl">Enter URL...</key>
     </area>
     <area alias="editcontenttype">
         <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -2208,6 +2209,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="enableUrlTracker">Enable URL tracker</key>
         <key alias="originalUrl">Original URL</key>
         <key alias="redirectedTo">Redirected To</key>
+        <key alias="redirectTo">Redirect To</key>
         <key alias="redirectUrlManagement">Redirect Url Management</key>
         <key alias="panelInformation">The following URLs redirect to this content item:</key>
         <key alias="noRedirects">No redirects have been made</key>
@@ -2221,6 +2223,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
         <key alias="enabledConfirm">URL tracker has now been enabled.</key>
         <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
+        <key alias="addRedirect">Add Redirect</key>
     </area>
     <area alias="emptyStates">
         <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>

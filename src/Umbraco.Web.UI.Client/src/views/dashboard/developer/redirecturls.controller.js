@@ -27,8 +27,7 @@
 
         vm.goToPage = goToPage;
         vm.search = search;
-        vm.addRedirect = addRedirect;
-        vm.openContentPickerOverlay = openContentPickerOverlay;
+        vm.openAddRedirectOverlay = openAddRedirectOverlay;
         vm.removeRedirect = removeRedirect;
         vm.disableUrlTracker = disableUrlTracker;
         vm.enableUrlTracker = enableUrlTracker;
@@ -49,50 +48,29 @@
             console.log(vm.data.redirectToSelection);
             vm.data.redirectToSelection = [];
         }
-        function openContentPickerOverlay() {
-            console.log("hi");
-            vm.contentPickerOverlay = {
-                multiPicker: false,
-                view: "contentpicker",
+        function openAddRedirectOverlay() {
+            vm.addRedirectOverlay = {
+                entity: null,
+                entityType: "Document",
+                view: "redirecturlpicker",
                 show: true,
                 submit: function (model) {
                     console.log(model);
-                    angular.forEach(model.selection,
-                        function(entity) {
-                            setEntityUrl(entity);
-                        });
-                    
                     vm.data.redirectToSelection = model.selection;
                     vm.status.readyToAdd = vm.data.redirectFromUrl.length > 0 && vm.data.redirectToSelection.length > 0;
-                    vm.contentPickerOverlay.show = false;
-                    vm.contentPickerOverlay = null;
+                    vm.addRedirectOverlay.show = false;
+                    vm.addRedirectOverlay = null;
 
                 },
                 close: function (oldModel) {
-                    vm.contentPickerOverlay.show = false;
-                    vm.contentPickerOverlay = null;
+                    vm.addRedirectOverlay.show = false;
+                    vm.addRedirectOverlay = null;
                 }
             }
 
         };
 
-        function setEntityUrl(entity) {
-
-            // get url for content and media items
-            if (entityType !== "Member") {
-                entityResource.getUrl(entity.id, entityType).then(function(data) {
-                    // update url  
-                    if (entity.trashed) {
-                        item.url = localizationService.dictionary.general_recycleBin;
-                    } else {
-                        item.url = data;
-                    }
-
-                });
-            }
-        }
-
-        function activate() {            
+        function activate() {
             vm.checkEnabled().then(function() {
                 vm.search();
                 vm.data.redirectFromUrl = "";
@@ -136,34 +114,6 @@
                 vm.dashboard.loading = false;
 
             });
-        }
-
-        function addRedirect() {
-            vm.addRedirectOverlay = {
-                show: true,
-                view: "treepicker",
-                multiPicker: false,
-                entityType: "document",
-                filterCssClass: "not-allowed not-published",
-                startNodeId: null,
-                callback: function (data) {
-                    console.log(data);
-                },
-                treeAlias: "content",
-                section: "content",
-                idType: "udi"
-            
-            };
-            vm.addRedirectOverlay.submit = function(model) {
-
-                console.log('submitted', model);
-                vm.addRedirectOverlay.close();
-            }
-
-            vm.addRedirectOverlay.close = function() {
-                vm.addRedirectOverlay.show = false;
-                vm.addRedirectOverlay = null;
-            }
         }
 
         function removeRedirect(redirectToDelete) {
