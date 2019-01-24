@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -346,6 +347,11 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
+            // translate the content type name if applicable
+            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if(mapped.DocumentType != null)
+                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -545,9 +551,9 @@ namespace Umbraco.Web.Editors
 
             EnsureUniqueName(name, content, "name");
 
-            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
+            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.CurrentUser.Id);
 
-            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
+            Services.ContentService.SaveBlueprint(blueprint, Security.CurrentUser.Id);
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -575,7 +581,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter]
         [ContentPostValidate]
         public ContentItemDisplay PostSaveBlueprint(
-            [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+            [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
@@ -608,6 +614,17 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, Attempt<OperationStatus>> saveMethod)
         {
+            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            //uploaded files to being *only* the actual file name (as it should be).
+            if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
+            {
+                foreach (var file in contentItem.UploadedFiles)
+                {
+                    file.FileName = Path.GetFileName(file.FileName);
+                }
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -684,7 +701,10 @@ namespace Umbraco.Web.Editors
                     {
                         display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                            contentItem.ReleaseDate.HasValue
+                                ? Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText", new [] { contentItem.ReleaseDate.Value.ToLongDateString(), contentItem.ReleaseDate.Value.ToShortTimeString() })
+                                : Services.TextService.Localize("speechBubbles/editContentSavedText")
+                        );
                     }
                     else
                     {
@@ -706,7 +726,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    ShowMessageForPublishStatus(publishStatus.Result, display);
+                    ShowMessageForPublishStatus(publishStatus.Result, display, contentItem.ExpireDate);
                     break;
             }
 
@@ -743,11 +763,11 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.PublishWithStatus(foundContent, Security.GetUserId());
+            var publishResult = Services.ContentService.PublishWithStatus(foundContent, Security.CurrentUser.Id);
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
-                ShowMessageForPublishStatus(publishResult.Result, notificationModel);
+                ShowMessageForPublishStatus(publishResult.Result, notificationModel, foundContent.ExpireDate);
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
@@ -796,7 +816,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.IsInRecycleBin() == false)
             {
-                var moveResult = Services.ContentService.WithResult().MoveToRecycleBin(foundContent, Security.GetUserId());
+                var moveResult = Services.ContentService.WithResult().MoveToRecycleBin(foundContent, Security.CurrentUser.Id);
                 if (moveResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending 
@@ -806,7 +826,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.ContentService.WithResult().Delete(foundContent, Security.GetUserId());
+                var deleteResult = Services.ContentService.WithResult().Delete(foundContent, Security.CurrentUser.Id);
                 if (deleteResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending 
@@ -827,7 +847,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, 'D')]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.ContentService.EmptyRecycleBin();
@@ -859,7 +879,7 @@ namespace Umbraco.Web.Editors
                 var contentService = Services.ContentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sorted.IdSortOrder) == false)
+                if (contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id) == false)
                 {
                     LogHelper.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
@@ -883,7 +903,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            Services.ContentService.Move(toMove, move.ParentId);
+            Services.ContentService.Move(toMove, move.ParentId, Security.CurrentUser.Id);
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
@@ -1028,15 +1048,18 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display)
+        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display, DateTime? expireDate)
         {
             switch (status.StatusType)
             {
                 case PublishStatusType.Success:
-                case PublishStatusType.SuccessAlreadyPublished:
+                case PublishStatusType.SuccessAlreadyPublished:                    
                     display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                            expireDate.HasValue
+                                ? Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText", new [] { expireDate.Value.ToLongDateString(), expireDate.Value.ToShortTimeString() })
+                                : Services.TextService.Localize("speechBubbles/editContentPublishedText")
+                    );
                     break;
                 case PublishStatusType.FailedPathNotPublished:
                     display.AddWarningNotification(

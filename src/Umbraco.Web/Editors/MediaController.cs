@@ -447,12 +447,25 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
+            var destinationParentID = move.ParentId;
+            var sourceParentID = toMove.ParentId;
+            
+            var moveResult = Services.MediaService.WithResult().Move(toMove, move.ParentId);
 
-            Services.MediaService.Move(toMove, move.ParentId);
-
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-            return response;
+            if (sourceParentID == destinationParentID)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),SpeechBubbleIcon.Error)));
+            }
+            if (moveResult == false)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
         }
 
         /// <summary>
@@ -466,6 +479,17 @@ namespace Umbraco.Web.Editors
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
         {
+            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            //uploaded files to being *only* the actual file name (as it should be).
+            if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
+            {
+                foreach (var file in contentItem.UploadedFiles)
+                {
+                    file.FileName = Path.GetFileName(file.FileName);
+                }
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -717,15 +741,7 @@ namespace Umbraco.Web.Editors
                         mediaType = result.FormData["contentTypeAlias"];
                     }
 
-                    //TODO: make the media item name "nice" since file names could be pretty ugly, we have
-                    // string extensions to do much of this but we'll need:
-                    // * Pascalcase the name (use string extensions)
-                    // * strip the file extension
-                    // * underscores to spaces
-                    // * probably remove 'ugly' characters - let's discuss
-                    // All of this logic should exist in a string extensions method and be unit tested
-                    // http://issues.umbraco.org/issue/U4-5572
-                    var mediaItemName = fileName;
+                    var mediaItemName = fileName.ToFriendlyName();
 
                     var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, Security.CurrentUser.Id);
 

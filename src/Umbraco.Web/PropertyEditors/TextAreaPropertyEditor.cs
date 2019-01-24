@@ -19,7 +19,10 @@ namespace Umbraco.Web.PropertyEditors
         internal class TextAreaPreValueEditor : PreValueEditor
         {
             [PreValueField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
-            public bool MaxChars { get; set; }
+            public int MaxChars { get; set; }
+
+            [PreValueField("rows", "Number of rows", "number", Description = "If empty - 10 rows would be set as the default value")]
+            public int Rows { get; set; }
         }
     }
 }

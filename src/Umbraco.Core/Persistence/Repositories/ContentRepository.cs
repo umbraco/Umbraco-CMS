@@ -1220,7 +1220,14 @@ ORDER BY cmsContentVersion.id DESC
                 if (def.DocumentDto.TemplateId.HasValue)
                     templates.TryGetValue(def.DocumentDto.TemplateId.Value, out template); // else null
                 cc.Template = template;
-                cc.Properties = propertyData[cc.Version];
+                if (propertyData.ContainsKey(cc.Version))
+                {
+                    cc.Properties = propertyData[cc.Version];
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No property data found for version: '{cc.Version}'.");
+                }
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946

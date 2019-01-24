@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// A property extension class that allows us to enable tags for any given property
     /// </summary>
-    internal class PropertyTags
+    public class PropertyTags
     {
         public PropertyTags()
         {

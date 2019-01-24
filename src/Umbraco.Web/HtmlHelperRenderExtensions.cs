@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
@@ -289,6 +290,7 @@ namespace Umbraco.Web
 			{
 		        _viewContext = viewContext;
 		        _method = method;
+			    _controllerName = controllerName;
                 _encryptedString = UmbracoHelper.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
 			}
 
@@ -296,12 +298,23 @@ namespace Umbraco.Web
 		    private readonly FormMethod _method;
 			private bool _disposed;
 			private readonly string _encryptedString;
+		    private readonly string _controllerName;
 
-			protected override void Dispose(bool disposing)
+            protected override void Dispose(bool disposing)
 			{
 				if (this._disposed)
 					return;
 				this._disposed = true;
+
+                //Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
+                // We have a controllerName and area so we can match
+                if (_controllerName == "UmbRegister"
+                    || _controllerName == "UmbProfile"
+                    || _controllerName == "UmbLoginStatus"
+                    || _controllerName == "UmbLogin")
+			    {
+			        _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
+			    }
 
                 //write out the hidden surface form routes
                 _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
@@ -813,8 +826,8 @@ namespace Umbraco.Web
 			}
 			htmlHelper.ViewContext.Writer.Write(tagBuilder.ToString(TagRenderMode.StartTag));
 
-			//new UmbracoForm:
-			var theForm = new UmbracoForm(htmlHelper.ViewContext, surfaceController, surfaceAction, area, method, additionalRouteVals);
+            //new UmbracoForm:
+            var theForm = new UmbracoForm(htmlHelper.ViewContext, surfaceController, surfaceAction, area, method, additionalRouteVals);
 
 			if (traditionalJavascriptEnabled)
 			{
@@ -952,5 +965,37 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region RelatedLink
+
+        /// <summary>
+        /// Renders an anchor element for a RelatedLink instance.
+        /// Format: &lt;a href=&quot;relatedLink.Link&quot; target=&quot;_blank/_self&quot;&gt;relatedLink.Caption&lt;/a&gt;
+        /// </summary>
+        /// <param name="htmlHelper">The HTML helper instance that this method extends.</param>
+        /// <param name="relatedLink">The RelatedLink instance</param>
+        /// <returns>An anchor element </returns>
+        public static MvcHtmlString GetRelatedLinkHtml(this HtmlHelper htmlHelper, RelatedLink relatedLink)
+        {
+            return htmlHelper.GetRelatedLinkHtml(relatedLink, null);
+        }
+
+        /// <summary>
+        /// Renders an anchor element for a RelatedLink instance, accepting htmlAttributes.
+        /// Format: &lt;a href=&quot;relatedLink.Link&quot; target=&quot;_blank/_self&quot; htmlAttributes&gt;relatedLink.Caption&lt;/a&gt;
+        /// </summary>
+        /// <param name="htmlHelper">The HTML helper instance that this method extends.</param>
+        /// <param name="relatedLink">The RelatedLink instance</param>
+        /// <param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
+        /// <returns></returns>
+        public static MvcHtmlString GetRelatedLinkHtml(this HtmlHelper htmlHelper, RelatedLink relatedLink, object htmlAttributes)
+        {
+            var tagBuilder = new TagBuilder("a");
+            tagBuilder.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
+            tagBuilder.MergeAttribute("href", relatedLink.Link);
+            tagBuilder.MergeAttribute("target", relatedLink.NewWindow ? "_blank" : "_self");
+            tagBuilder.InnerHtml = HttpUtility.HtmlEncode(relatedLink.Caption);
+            return MvcHtmlString.Create(tagBuilder.ToString(TagRenderMode.Normal));
+        }
+        #endregion
     }
 }

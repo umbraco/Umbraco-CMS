@@ -289,6 +289,29 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Associate_Members_To_Roles_With_Member_Id_Casing()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            // temp make sure they exist
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member1.Id));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member2.Id));
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "mytestrole1" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+
+            Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [Test]
         public void Associate_Members_To_Roles_With_Member_Username()
         {
             ServiceContext.MemberService.AddRole("MyTestRole1");

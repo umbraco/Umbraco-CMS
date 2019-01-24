@@ -1,12 +1,14 @@
 <div class="umb-cropper-gravity">
 	<div class="gravity-container" ng-show="loaded">
-		<div class="viewport">
-			<img ng-src="{{src}}" style="max-width: 100%; max-height: 100%" ng-click="setFocalPoint($event)" draggable="false" />
+	    <div class="viewport">
 
-			<div class="overlay" ng-style="style()">
+	        <img ng-show="isCroppable" ng-src="{{src}}" style="max-width: 100%; max-height: 100%" ng-click="setFocalPoint($event)" draggable="false"/>
+	        <img ng-show="!isCroppable && !hasDimensions" ng-src="{{src}}" width="200" height="200" draggable="false" style="cursor: default;"/>
 
-			</div>
+	        <div ng-show="isCroppable" class="overlay" ng-style="style()">
 
-		</div>
+	        </div>
+
+	    </div>
 	</div>
 </div>

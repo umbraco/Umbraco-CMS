@@ -25,30 +25,31 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 		$scope.showTarget = $scope.model.hideTarget !== true;
 
 		if (dialogOptions.currentTarget) {
-			$scope.model.target = dialogOptions.currentTarget;
+			// clone the current target so we don't accidentally update the caller's model while manipulating $scope.model.target
+			$scope.model.target = angular.copy(dialogOptions.currentTarget);
 			//if we have a node ID, we fetch the current node to build the form data
 			if ($scope.model.target.id || $scope.model.target.udi) {
 
 				//will be either a udi or an int
 				var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
-				if (!$scope.model.target.path) {
+				// is it a content link?
+			    if (!$scope.model.target.isMedia) {
+			        // get the content path
+			        entityResource.getPath(id, "Document").then(function(path) {
+			            //now sync the tree to this path
+			            $scope.dialogTreeEventHandler.syncTree({
+			                path: path,
+			                tree: "content"
+			            });
+			        });
 
-					entityResource.getPath(id, "Document").then(function (path) {
-						$scope.model.target.path = path;
-						//now sync the tree to this path
-						$scope.dialogTreeEventHandler.syncTree({
-							path: $scope.model.target.path,
-							tree: "content"
-						});
-					});
-				}
-
-				// if a link exists, get the properties to build the anchor name list
-				contentResource.getById(id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-					$scope.model.target.url = resp.urls[0];
-				});
+			        // get the content properties to build the anchor name list
+			        contentResource.getById(id).then(function (resp) {
+			            $scope.model.target.url = resp.urls[0];
+			            $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+			        });
+			    }
 			} else if ($scope.model.target.url.length) {
 			    // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
                 // only do the substring if there's a # or a ?
@@ -87,8 +88,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				$scope.model.target.url = "/";
 			} else {
 				contentResource.getById(args.node.id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 					$scope.model.target.url = resp.urls[0];
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 				});
 			}
 
@@ -119,11 +120,15 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 						$scope.model.target.isMedia = true;
 						$scope.model.target.name = media.name;
 						$scope.model.target.url = mediaHelper.resolveFile(media);
-						
-						debugger;
 
 						$scope.mediaPickerOverlay.show = false;
 						$scope.mediaPickerOverlay = null;
+
+						// make sure the content tree has nothing highlighted 
+						$scope.dialogTreeEventHandler.syncTree({
+							path: "-1",
+							tree: "content"
+						});
 					}
 				};
 			});

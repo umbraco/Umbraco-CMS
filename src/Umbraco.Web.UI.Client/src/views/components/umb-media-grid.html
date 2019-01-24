@@ -21,8 +21,10 @@
             <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension != 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
 
             <!-- Icon for files -->
-            <i class="umb-media-grid__item-icon {{item.icon}}" ng-if="!item.thumbnail && item.extension != 'svg'"></i>
-
+            <span class="umb-media-grid__item-file-icon" ng-if="!item.thumbnail && item.extension != 'svg'">
+                <i class="umb-media-grid__item-icon {{item.icon}}"></i>
+                <span ng-if="item.extension">.{{item.extension}}</span>
+            </span>
         </div>
     </div>
 </div>

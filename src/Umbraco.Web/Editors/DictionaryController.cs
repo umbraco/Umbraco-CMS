@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -194,7 +195,7 @@ namespace Umbraco.Web.Editors
 
             const int level = 0;
 
-            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems())
+            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()))
             {
                 var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
                 item.Level = 0;
@@ -220,8 +221,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, List<DictionaryOverviewDisplay> list)
         {
-            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(
-                dictionaryItem.Key))
+            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(ItemSort()))
             {
                 var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(childItem);
                 item.Level = level;
@@ -230,5 +230,7 @@ namespace Umbraco.Web.Editors
                 GetChildItemsForList(childItem, level + 1, list);
             }
         }
+
+        private Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
     }
 }

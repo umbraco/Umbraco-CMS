@@ -999,8 +999,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Reset</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
   </area>
@@ -1600,6 +1598,9 @@
     <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
+
+    <key alias="tlsHealthCheckSuccess">您的网站设置为使用TLS 1.2或更高版本进行传出连接。</key>
+    <key alias="tlsHealthCheckWarn">来自您网站的传出连接通过旧协议提供。您应该考虑将其更新为使用TLS 1.2或更高版本。</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">禁用 url 跟踪程序</key>
