@@ -921,7 +921,6 @@
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
-    <Compile Include="Editors\LegacyController.cs" />
     <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
@@ -1146,10 +1145,6 @@
     <Compile Include="_Legacy\Controls\TabView.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
-    <Compile Include="_Legacy\UI\ITask.cs" />
-    <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
-    <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
-    <Compile Include="_Legacy\UI\LegacyDialogTask.cs" />
     <Compile Include="UI\SpeechBubbleIcon.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />

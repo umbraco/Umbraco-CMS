@@ -7,8 +7,6 @@ namespace Umbraco.Core.IO
 {
     public class SystemFiles
     {
-        public static string CreateUiXml => SystemDirectories.Umbraco + "/config/create/UI.xml";
-
         public static string TinyMceConfig => SystemDirectories.Config + "/tinyMceConfig.config";
         
         public static string GetContentCacheXml(IGlobalSettings globalSettings)
