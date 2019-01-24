@@ -109,8 +109,9 @@
                     if (!vm.hasPristineVariants) {
                         vm.hasPristineVariants = pristineVariantFilter(variant);
                     }
-
+                    
                     if(vm.isNew && hasAnyData(variant)){
+                        variant.publish = true;
                         variant.save = true;
                     }
                 });
