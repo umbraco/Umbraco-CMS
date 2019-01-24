@@ -954,7 +954,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content)); // fixme/task wtf is this?
+            if (content == null) throw new ArgumentNullException(nameof(content));
 
             return content.Children.WhereIsInvariantOrHasCulture(culture);
         }
