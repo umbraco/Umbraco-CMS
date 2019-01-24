@@ -331,6 +331,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
+    <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
@@ -564,7 +565,6 @@
     <Compile Include="Deploy\IImageSourceParser.cs" />
     <Compile Include="Deploy\ILocalLinkParser.cs" />
     <Compile Include="Deploy\IMacroParser.cs" />
-    <Compile Include="Deploy\IPreValueConnector.cs" />
     <Compile Include="Deploy\IServiceConnector.cs" />
     <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
     <Compile Include="Deploy\IValueConnector.cs" />

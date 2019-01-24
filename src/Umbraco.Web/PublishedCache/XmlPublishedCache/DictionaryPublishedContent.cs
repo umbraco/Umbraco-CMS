@@ -179,6 +179,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override bool IsDraft(string culture = null) => false;
 
+        public override bool IsPublished(string culture = null) => true;
+
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
         public override IEnumerable<IPublishedContent> Children => _getChildren.Value;

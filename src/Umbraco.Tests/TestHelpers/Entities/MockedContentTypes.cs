@@ -370,7 +370,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.ContentPicker, ValueStorageType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeId = 1046 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MediaPicker, ValueStorageType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeId = 1048 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MemberPicker, ValueStorageType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeId = 1047 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MultiUrlPicker, ValueStorageType.Nvarchar) { Alias = "multiUrlPicker", Name = "Multi URL Picker", Mandatory = false, SortOrder = 21, DataTypeId = 1050 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.RelatedLinks, ValueStorageType.Ntext) { Alias = "relatedLinks", Name = "Related Links", Mandatory = false, SortOrder = 21, DataTypeId = 1050 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeId = 1041 });
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });

@@ -217,6 +217,7 @@ namespace Umbraco.Tests.PublishedContent
             public Guid Version { get; set; }
             public int Level { get; set; }
             public bool IsDraft(string culture = null) => false;
+            public bool IsPublished(string culture = null) => true;
 
             public IEnumerable<IPublishedProperty> Properties { get; set; }
 
