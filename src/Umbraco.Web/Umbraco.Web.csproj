@@ -172,6 +172,7 @@
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
+    <Compile Include="Mvc\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
