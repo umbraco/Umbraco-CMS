@@ -29,5 +29,30 @@ namespace Umbraco.Tests.Web.Mvc
             var output = _htmlHelper.Wrap("div", "hello world", new {style = "color:red;", onclick = "void();"});
             Assert.AreEqual("<div style=\"color:red;\" onclick=\"void();\">hello world</div>", output.ToHtmlString());
         }
+
+        [Test]
+        public void GetRelatedLinkHtml_Simple()
+        {
+            var relatedLink = new Umbraco.Web.Models.RelatedLink {
+                Caption = "Link Caption",
+                NewWindow = true,
+                Link = "https://www.google.com/"
+            };
+            var output = _htmlHelper.GetRelatedLinkHtml(relatedLink);
+            Assert.AreEqual("<a href=\"https://www.google.com/\" target=\"_blank\">Link Caption</a>", output.ToHtmlString());
+	}
+
+        [Test]
+        public void GetRelatedLinkHtml_HtmlAttributes()
+        {
+            var relatedLink = new Umbraco.Web.Models.RelatedLink
+            {
+                Caption = "Link Caption",
+                NewWindow = true,
+                Link = "https://www.google.com/"
+            };
+            var output = _htmlHelper.GetRelatedLinkHtml(relatedLink, new { @class = "test-class"});
+            Assert.AreEqual("<a class=\"test-class\" href=\"https://www.google.com/\" target=\"_blank\">Link Caption</a>", output.ToHtmlString());
+        }
     }
 }

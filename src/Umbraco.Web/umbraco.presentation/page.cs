@@ -469,6 +469,11 @@ namespace umbraco
                 throw new NotImplementedException();
             }
 
+            public bool IsPublished(string culture = null)
+            {
+                throw new NotImplementedException();
+            }
+
             public IPublishedContent Parent
             {
                 get { return _parent; }
