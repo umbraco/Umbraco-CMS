@@ -55,7 +55,11 @@
         }
 
         function hasAnyData(variant) {
-            var result = variant.isDirty != null || (variant.name != null && variant.name.length > 0);
+            
+            if(variant.name == null || variant.name.length === 0) {
+                return false;
+            }
+            var result = variant.isDirty != null;
 
             if(result) return true;
 
@@ -109,7 +113,7 @@
                     if (!vm.hasPristineVariants) {
                         vm.hasPristineVariants = pristineVariantFilter(variant);
                     }
-                    
+
                     if(hasAnyData(variant)){
                         if(vm.isNew || variant.publishDate == null){
                             variant.publish = true;
