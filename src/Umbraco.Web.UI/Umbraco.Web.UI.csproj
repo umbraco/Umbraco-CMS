@@ -169,9 +169,6 @@
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
-    <None Include="Config\404handlers.Release.config">
-      <DependentUpon>404handlers.config</DependentUpon>
-    </None>
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -308,7 +305,6 @@
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\404handlers.config" />
     <Content Include="Config\Dashboard.config">
       <SubType>Designer</SubType>
     </Content>
