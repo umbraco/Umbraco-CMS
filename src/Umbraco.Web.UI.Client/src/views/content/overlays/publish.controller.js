@@ -110,9 +110,15 @@
                         vm.hasPristineVariants = pristineVariantFilter(variant);
                     }
                     
-                    if(vm.isNew && hasAnyData(variant)){
-                        variant.publish = true;
-                        variant.save = true;
+                    if(hasAnyData(variant)){
+                        if(vm.isNew || variant.publishDate == null){
+                            variant.publish = true;
+                            variant.save = true;
+                        }
+                    }else{
+                        variant.publish = false;
+                        variant.save = false;
+                        variant.canSave = false;
                     }
                 });
 
