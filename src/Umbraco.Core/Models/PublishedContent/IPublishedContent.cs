@@ -156,9 +156,16 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets a value indicating whether the content is published.
         /// </summary>
-        /// <param name="culture"></param>
+        /// <remarks>
+        /// <para>A content is published when it has a published version.</para>
+        /// <para>When retrieving documents from cache in non-preview mode, IsPublished is always
+        /// true, as only published documents are returned. When retrieving in draft mode, IsPublished
+        /// can either be true (document has a published version) or false (document has no
+        /// published version).</para>
+        /// <para>It is therefore possible for both IsDraft and IsPublished to be true at the same
+        /// time, meaning that the content is the draft version, and a published version exists.</para>
+        /// </remarks>
         bool IsPublished(string culture = null);
-
 
         #endregion
 

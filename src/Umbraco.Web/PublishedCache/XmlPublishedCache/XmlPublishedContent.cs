@@ -232,7 +232,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public override bool IsPublished(string culture = null)
         {
             EnsureNodeInitialized();
-            return _isPublished;
+            return _isPublished; // bah
         }
 
         public override IEnumerable<IPublishedProperty> Properties
@@ -309,7 +309,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             name = writerName = urlName = creatorName = docTypeAlias = path = null;
             createDate = updateDate = default(DateTime);
             isDraft = false;
-            isPublished = false;
+            isPublished = false; // fixme not implemented?
             contentType = null;
             properties = null;
 

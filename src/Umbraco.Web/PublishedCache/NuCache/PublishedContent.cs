@@ -293,8 +293,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
         }
 
+        /// <inheritdoc />
         public override bool IsPublished(string culture = null)
         {
+            // fixme I don't understand this - and it does probably not do what's expected
+
             if (!ContentType.VariesByCulture())
             {
                 return _contentData.Published;
@@ -302,9 +305,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // handle context culture
             if (culture == null)
-            {
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-            }
 
             //If the current culture is not a draft, it must be the published version
             return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && !cvar.IsDraft;
