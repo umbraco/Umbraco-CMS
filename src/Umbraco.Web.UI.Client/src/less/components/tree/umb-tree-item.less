@@ -42,13 +42,13 @@
 
 .umb-tree-item.current > .umb-tree-item__inner {
 
-    background: @turquoise-d1; 
+    background: @ui-active; 
     
     // override small icon color. TODO => check usage 
-//    &:before {
-//        color: @turquoise-l2;
-//    }
-
+    &:before {
+        color: @turquoise-l2;
+    }
+    
     .umb-options {
 
         &:hover i {
@@ -57,7 +57,7 @@
 
         i {
             background: @white;
-            border-color: @turquoise-d1;
+            border-color: @ui-active;
             transition: opacity 120ms ease;
         }
     }
@@ -66,7 +66,7 @@
     .umb-tree-icon,
     ins {
         color: @white !important;
-        background-color: @turquoise-d1;
-        border-color: @turquoise-d1;
+        background-color: @ui-active;
+        border-color: @ui-active;
     }
 }
