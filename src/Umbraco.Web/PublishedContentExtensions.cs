@@ -956,13 +956,6 @@ namespace Umbraco.Web
         {
             if (content == null) throw new ArgumentNullException(nameof(content)); // fixme/task wtf is this?
 
-            return content.Children.Where(x =>
-            {
-                if (!x.ContentType.VariesByCulture()) return true; // invariant = always ok
-                return x.HasCulture(culture);
-                return false;
-            });
-
             return content.Children.WhereIsInvariantOrHasCulture(culture);
         }
 
