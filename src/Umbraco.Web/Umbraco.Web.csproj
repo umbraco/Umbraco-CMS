@@ -1138,11 +1138,6 @@
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="_Legacy\Controls\pane.cs" />
-    <Compile Include="_Legacy\Controls\Panel.cs" />
-    <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
-    <Compile Include="_Legacy\Controls\TabPage.cs" />
-    <Compile Include="_Legacy\Controls\TabView.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
     <Compile Include="UI\SpeechBubbleIcon.cs" />
