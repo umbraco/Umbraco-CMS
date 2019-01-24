@@ -58,11 +58,6 @@ namespace Umbraco.Web.HealthCheck
         /// <returns>Returns a collection of anonymous objects representing each group.</returns>
         public object GetAllHealthChecks()
         {
-            //We want to disable the duplicate health checks from Our.Umbraco.HealthChecks
-            //as per this issue https://github.com/umbraco/Umbraco-CMS/issues/4174
-            _disabledCheckIds.Add(new Guid("92AE66E1-209D-4F9E-AAF5-19B19D41CF49")); //TlsCheck
-            _disabledCheckIds.Add(new Guid("6437384C-D1D3-46DA-9E21-9E0BC1498E1F")); //HstsCheck
-
             var groups = _healthCheckResolver.HealthChecks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)
                 .GroupBy(x => x.Group)
@@ -87,7 +82,7 @@ namespace Umbraco.Web.HealthCheck
         public object GetStatus(Guid id)
         {
             var check = GetCheckById(id);
-            
+
             try
             {
                 //Core.Logging.LogHelper.Debug<HealthCheckController>("Running health check: " + check.Name);
