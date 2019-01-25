@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(10)]
     public class FormsDashboard : IDashboardSection
     {
-        public string Name => "Install Umbraco Forms";
-
         public string Alias => "formsInstall";
 
         public string[] Sections => new [] { "forms" };

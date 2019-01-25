@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(10)]
     public class ContentDashboard : IDashboardSection
     {
-        public string Name => "Get Started";
-
         public string Alias => "contentIntro";
 
         public string[] Sections => new [] { "content" };

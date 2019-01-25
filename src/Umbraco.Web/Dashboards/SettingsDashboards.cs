@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(10)]
     public class SettingsDashboard : IDashboardSection
     {
-        public string Name => "Welcome";
-
         public string Alias => "settingsWelcome";
 
         public string[] Sections => new [] { "settings" };

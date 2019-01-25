@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(20)]
     public class RedirectUrlDashboard : IDashboardSection
     {
-        public string Name => "Redirect URL Management";
-
         public string Alias => "contentRedirectManager";
 
         public string[] Sections => new [] { "content" };

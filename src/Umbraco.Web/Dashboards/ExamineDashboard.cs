@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(20)]
     public class ExamineDashboard : IDashboardSection
     {
-        public string Name => "Examine Management";
-
         public string Alias => "settingsExamine";
 
         public string[] Sections => new [] { "settings" };

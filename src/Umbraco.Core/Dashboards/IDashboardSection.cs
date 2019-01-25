@@ -6,12 +6,6 @@ namespace Umbraco.Core.Dashboards
     public interface IDashboardSection
     {
         /// <summary>
-        /// Display name of the dashboard tab
-        /// </summary>
-        [DataMember(Name="name")]
-        string Name { get; }
-
-        /// <summary>
         /// Alias to refer to this dashboard via code
         /// </summary>
         [DataMember(Name = "alias")]

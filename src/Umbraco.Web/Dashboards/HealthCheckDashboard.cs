@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(50)]
     public class HealthCheckDashboard : IDashboardSection
     {
-        public string Name => "Health Check";
-
         public string Alias => "settingsHealthCheck";
 
         public string[] Sections => new [] { "settings" };

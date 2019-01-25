@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(10)]
     public class MediaDashboard : IDashboardSection
     {
-        public string Name => "Content";
-
         public string Alias => "mediaFolderBrowser";
 
         public string[] Sections => new [] { "media" };

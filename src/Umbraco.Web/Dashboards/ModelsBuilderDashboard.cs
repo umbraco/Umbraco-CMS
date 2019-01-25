@@ -7,8 +7,6 @@ namespace Umbraco.Web.Dashboards
     [Weight(40)]
     public class ModelsBuilderDashboard : IDashboardSection
     {
-        public string Name => "Models Builder";
-
         public string Alias => "settingsModelsBuilder";
 
         public string[] Sections => new [] { "settings" };
