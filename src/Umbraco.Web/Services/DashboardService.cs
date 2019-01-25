@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -13,11 +16,13 @@ namespace Umbraco.Web.Services
     {
         private readonly ISectionService _sectionService;
         private readonly DashboardCollection _dashboardCollection;
+        private readonly ILocalizedTextService _localizedText;
 
-        public DashboardService(ISectionService sectionService, DashboardCollection dashboardCollection)
+        public DashboardService(ISectionService sectionService, DashboardCollection dashboardCollection, ILocalizedTextService localizedText)
         {
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _dashboardCollection = dashboardCollection ?? throw new ArgumentNullException(nameof(dashboardCollection));
+            _localizedText = localizedText ?? throw new ArgumentNullException(nameof(localizedText));
         }
 
 
@@ -37,11 +42,10 @@ namespace Umbraco.Web.Services
                     throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
 
                 var dashboards = new List<IDashboardSection> {dashboard};
-
                 tabs.Add(new Tab<IDashboardSection>
                 {
                     Id = tabId++,
-                    Label = dashboard.Name,
+                    Label = _localizedText.Localize("dashboardTabs", dashboard.Alias),
                     Alias = dashboard.Alias,
                     Properties = dashboards
                 });
