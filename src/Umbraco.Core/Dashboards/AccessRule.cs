@@ -3,7 +3,7 @@
     /// <summary>
     /// Implements <see cref="IAccessRule"/>.
     /// </summary>
-    internal class AccessRule : IAccessRule
+    public class AccessRule : IAccessRule
     {
         /// <inheritdoc />
         public AccessRuleType Type { get; set; }
