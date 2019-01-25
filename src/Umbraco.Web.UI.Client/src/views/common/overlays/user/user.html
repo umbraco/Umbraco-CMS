@@ -15,7 +15,7 @@
             type="link"
             href="#/users/users/user/{{user.id}}"
             action="model.close()"
-            button-style="primary"
+            button-style="action"
             label="Edit"
             label-key="general_edit"
             ng-if="canEditProfile">
@@ -25,6 +25,7 @@
             alias="changePassword"
             type="button"
             action="togglePasswordFields()"
+            button-style="action"
             label="Change password"
             label-key="general_changePassword"
             button-style="success">

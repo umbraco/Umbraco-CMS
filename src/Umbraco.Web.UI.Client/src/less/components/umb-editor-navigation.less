@@ -32,8 +32,24 @@
 }
 
 .umb-sub-views-nav-item.is-active {
-  color: @ui-active;
-  border-bottom-color: @ui-active;
+    color: @ui-active;
+    border-bottom-color: @ui-active;
+    
+    //background-color: @ui-active;
+    //color: @ui-active-type;
+    //border-bottom-color: @ui-active-type;
+    /*
+    &::after {
+        content: "";
+        height: 4px;
+        background-color: @ui-active;
+        position: absolute;
+        bottom: -1px;
+        border-radius: 3px 3px 0 0;
+        left: 8px;
+        right: 8px;
+    }
+    */
 }
 
 .show-validation .umb-sub-views-nav-item.-has-error {
@@ -63,7 +79,7 @@
   display: block;
 
   &.-type-alert {
-    background-color: @red-l1;
+    background-color: @red;
   }
   &.-type-warning {
     background-color: @yellow-d2;

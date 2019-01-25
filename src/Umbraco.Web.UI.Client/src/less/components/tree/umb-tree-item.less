@@ -42,7 +42,8 @@
 
 .umb-tree-item.current > .umb-tree-item__inner {
 
-    background: @ui-active; 
+    background: @ui-active;
+    color:@ui-active-type;
     
     // override small icon color. TODO => check usage 
     &:before {
@@ -56,7 +57,7 @@
         }
 
         i {
-            background: @white;
+            background: @ui-active-type;
             border-color: @ui-active;
             transition: opacity 120ms ease;
         }
@@ -65,7 +66,7 @@
     a,
     .umb-tree-icon,
     ins {
-        color: @white !important;
+        color: @ui-active-type !important;
         background-color: @ui-active;
         border-color: @ui-active;
     }

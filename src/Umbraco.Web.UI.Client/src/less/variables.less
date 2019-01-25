@@ -21,42 +21,6 @@
 @white:                 #FFF;
 @grayIcon:              #9E9E9E;
 
-// Accent colors
-// -------------------------
-
-
-
-@blue:                  #2E8AEA;
-@blueDark:              #3544b1;// updated 2019
-@blueExtraDark:         #1b264f;// added 2019
-@blueLight:             #ADD8E6;
-@blueNight:             #162335;// added 2019
-@green:                 #46A546;
-@red:                   #9D261D;
-@yellow:                #fad634;// updated 2019
-@orange:                #f79c37;// updated 2019
-@pink:                  #C3325F;
-@pinkLight:             #f5c1bc;// added 2019
-@brown:                 #9d8057;// added 2019
-
-@u-greyLight:           #f2ebe6;// added 2019
-@u-white:               #f9f7f4;// added 2019
-
-
-// Accent colors
-// -------------------------
-
-@ui-active:             @pinkLight;
-@ui-active-hover:       @pinkLight;
-@ui-selected:           @pinkLight;
-@ui-selected-hover:     @pinkLight;
-
-@ui-action:             @orange;
-@ui-action-hover:       @orange;
-
-@ui-action-disgrete:             @gray-4;
-@ui-action-disgrete-hover:       @orange;
-
 
 // Colors
 // -------------------------
@@ -78,7 +42,7 @@
 
 // UI Colors
 @red-d1:                #F02E28;
-@red:                   #FE3E39;
+@red:                   #D42054;// updated 2019
 @red-l1:			    #FE6561;
 @red-l2:			    #FE8B88;
 @red-l3:			    #FFB2B0;
@@ -86,14 +50,14 @@
 
 @yellow-d2:             #F0AC00;
 @yellow-d1:             #FFC011;
-@yellow:                #FFCE38;
+@yellow:                #fad634;// updated 2019
 @yellow-l1:			    #FFD861;
 @yellow-l2:			    #FFE28A;
 @yellow-l3:			    #FFECB0;
 @yellow-washed:		    #FFFAEB;
 
 @green-d1:              #1FB572;
-@green:                 #35C786;
+@green:                 #36B37E;// updated 2019
 @green-l1:			    #4ECF95;
 @green-l2:			    #79E1B2;
 @green-l3:			    #A6F0CF;
@@ -130,6 +94,67 @@
 @deepPurpleIcon:        #673AB7;
 @indigoIcon:            #3F51B5;
 
+
+// Accent colors
+// -------------------------
+
+//@blueLight:               #4f89de;
+@blue:                  #2E8AEA;
+@blueMid:               #2152A3;// updated 2019
+@blueDark:              #3544b1;// updated 2019
+@blueExtraDark:         #1b264f;// added 2019
+@blueLight:             #ADD8E6;
+@blueNight:             #162335;// added 2019
+@orange:                #f79c37;// updated 2019
+@pink:                  #D93F4C;// #C3325F;// update 2019
+@pinkLight:             #f5c1bc;// added 2019
+@brown:                 #9d8057;// added 2019
+@brownLight:            #e4e0dd;// added 2019
+@claus: #f6efe7;
+@claus2: #f2ebe6;
+@claus3: #535963; //#56777A
+@claus4: #819a9e;
+//@claus5: #2152A3;// blueMid
+@claus6: #02A191;
+//@clausSoftRed: #D93F4C; // todo
+//@clausRed:#D42054;// todo.
+
+@u-greyLight:           #f2ebe6;// added 2019
+@u-white:               #f9f7f4;// added 2019
+
+
+// UI colors
+// -------------------------
+
+//@ui-active:           #346ab3;
+@ui-active:             @blueMid;
+@ui-active-type:        white;
+@ui-active-hover:       @blueMid;
+@ui-selected:           @blueMid;//not used jet.
+@ui-selected-hover:     @blueMid;//not used jet.
+
+@ui-action:             @blueMid;
+@ui-action-hover:       @blueMid;
+
+@ui-action-disgrete:             @gray-4;
+@ui-action-disgrete-hover:       @blueMid;
+
+@type-white:                      @u-white;
+@type-black:                      @blueNight;
+
+@ui-btn:                        @claus4;
+@ui-btn-hover:                  @ui-btn;
+@ui-btn-type:                   @u-white;
+
+@ui-btn-positive:               @green;
+@ui-btn-positive-hover:         @green;
+@ui-btn-positive-type:          @u-white;
+
+@ui-btn-negative:               @red;
+@ui-btn-negative-hover:         @red;
+
+@ui-icon:             @blueNight;
+@ui-icon-hover:       @blueMid;
 
 
 
@@ -278,11 +303,13 @@
 @btnPrimaryBackground:              @green;
 @btnPrimaryBackgroundHighlight:     @green;
 
-@btnInfoBackground:                 @purple-l1;
-@btnInfoBackgroundHighlight:        @purple-l1;
+@btnInfoType:                       @ui-btn-type;// updated 2019
+@btnInfoBackground:                 @ui-btn;// updated 2019
+@btnInfoBackgroundHighlight:        @ui-btn-hover;// updated 2019
 
-@btnSuccessBackground:              @green;
-@btnSuccessBackgroundHighlight:     @green;
+@btnSuccessType:                    @ui-btn-positive-type;// updated 2019
+@btnSuccessBackground:              @ui-btn-positive;// updated 2019
+@btnSuccessBackgroundHighlight:     @ui-btn-positive-hover;// updated 2019
 
 @btnWarningBackground:              @red-l1;
 @btnWarningBackgroundHighlight:     @red-l1;

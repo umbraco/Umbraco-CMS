@@ -189,11 +189,15 @@ input[type="button"] {
 }
 // Success appears as green
 .btn-success {
-  .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+  .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight, @btnSuccessType);
 }
 // Info appears as a neutral blue
 .btn-info {
-  .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight);
+  .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight, @btnInfoType);
+}
+// Made for Umbraco, 2019
+.btn-action {
+  .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight, @btnInfoType);
 }
 // Inverse appears as dark gray
 .btn-inverse {

@@ -16,22 +16,30 @@
 .umb-tab > a {
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    color: @gray-3;
+    color: @ui-action-disgrete;
     padding: 5px 20px 15px 20px;
     transition: color 150ms ease-in-out;
+    &:focus {
+        color: @ui-action-disgrete-hover;
+    }
+    &:hover {
+        color: @ui-action-disgrete-hover;
+        text-decoration: none;
+    }
 }
 
-.umb-tab > a:hover,
-.umb-tab > a:focus {
-    color: @black;
-    text-decoration: none;
-}
 
-.umb-tab--active > a,
-.umb-tab--active > a:hover,
-.umb-tab--active > a:focus {
-  color: @black;
-  border-bottom-color: @turquoise;
+.umb-tab--active > a {
+    color: @ui-active;
+    border-bottom-color: @ui-active;
+    /*
+    &:focus {
+        border-bottom-color: @ui-active;
+    }
+    &:hover {
+        border-bottom-color: @ui-active-hover;
+    }
+    */
 }
 
 .show-validation .umb-tab--error > a,

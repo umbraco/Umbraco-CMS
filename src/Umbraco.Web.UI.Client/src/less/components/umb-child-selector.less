@@ -19,6 +19,13 @@
   cursor: pointer;
   text-align: center;
   justify-content: center;
+  
+  color:@ui-action;
+  &:hover {
+      color:@ui-action-hover;
+      border-color:@ui-action-hover;
+      text-decoration:none;
+  }
 }
 
 .umb-child-selector__children-container {
@@ -44,11 +51,11 @@
 .umb-child-selector__child-name {
   font-size: 14px;
 }
-
+/*
 .umb-child-selector__child-name.-blue {
   color: @turquoise-d1;
 }
-
+*/
 .umb-child-selector__child-actions {
   flex: 0 0 50px;
   text-align: right;

@@ -141,6 +141,7 @@ angular.module("umbraco.directives")
               defined on the tree
             */
             scope.altSelect = function(n, ev) {
+                if(ev.altKey) return false;
                 umbTreeCtrl.emitEvent("treeNodeAltSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
             
