@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Deploy
 {
@@ -17,18 +18,17 @@ namespace Umbraco.Core.Deploy
         IEnumerable<string> PropertyEditorAliases { get; }
 
         /// <summary>
-        /// Gets the environment-agnostic data type configurations corresponding to environment-specific configurations.
+        /// Gets the artifact datatype configuration corresponding to the actual datatype configuration.
         /// </summary>
-        /// <param name="configuration">The environment-specific configuration.</param>
+        /// <param name="dataType">The datatype.</param>
         /// <param name="dependencies">The dependencies.</param>
-        /// <returns></returns>
-        IDictionary<string, string> ConvertToDeploy(IDictionary<string, string> configuration, ICollection<ArtifactDependency> dependencies);
+        IDictionary<string, object> ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
-        /// Gets the environment-specific data type configurations corresponding to environment-agnostic configurations.
+        /// Gets the actual datatype configuration corresponding to the artifact configuration.
         /// </summary>
-        /// <param name="configuration">The environment-agnostic configuration.</param>
-        /// <returns></returns>
-        IDictionary<string, string> ConvertToLocalEnvironment(IDictionary<string, string> configuration);
+        /// <param name="dataType">The datatype.</param>
+        /// <param name="configuration">The artifact configuration.</param>
+        object FromArtifact(IDataType dataType, IDictionary<string, object> configuration);
     }
 }
