@@ -8,8 +8,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Trees;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest

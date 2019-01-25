@@ -6,7 +6,6 @@ using Umbraco.Web.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Web.Http;
 using System;
 using System.Net;
 using System.Text;
@@ -27,6 +26,8 @@ namespace Umbraco.Web.Editors
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
     [WebApi.UmbracoAuthorize]
+    [JsonCamelCaseFormatter]
+
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;

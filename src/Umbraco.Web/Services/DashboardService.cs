@@ -20,7 +20,7 @@ namespace Umbraco.Web.Services
             _dashboardCollection = dashboardCollection ?? throw new ArgumentNullException(nameof(dashboardCollection));
         }
 
-        
+
         /// <inheritdoc />
         public IEnumerable<Tab<IDashboardSection>> GetDashboards(string section, IUser currentUser)
         {
@@ -32,20 +32,19 @@ namespace Umbraco.Web.Services
                 // validate access
                 if (!CheckUserAccessByRules(currentUser, _sectionService, dashboard.AccessRules))
                     continue;
-                
+
                 if (dashboard.View.InvariantEndsWith(".ascx"))
                     throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
 
-                var dashboards = new List<IDashboardSection>();
-                dashboards.Add(dashboard);
+                var dashboards = new List<IDashboardSection> {dashboard};
 
-                tabs.Add(new Tab<IDashboardSection>()
+                tabs.Add(new Tab<IDashboardSection>
                 {
                     Id = tabId++,
                     Label = dashboard.Name,
                     Alias = dashboard.Alias,
                     Properties = dashboards
-                });                
+                });
             }
 
             return tabs;
@@ -56,7 +55,7 @@ namespace Umbraco.Web.Services
         {
             return _sectionService.GetSections().ToDictionary(x => x.Alias, x => GetDashboards(x.Alias, currentUser));
         }
-        
+
         private bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
         {
             if (user.Id == Constants.Security.SuperUserId)
@@ -97,7 +96,7 @@ namespace Umbraco.Web.Services
             }
 
             if (!hasAccess || denyRules.Length == 0)
-                return false;
+                return true;
 
             // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
             // be denied to see it no matter what
@@ -110,7 +109,7 @@ namespace Umbraco.Web.Services
             return hasAccess;
         }
 
-        private (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
+        private static (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
         {
             IAccessRule[] denyRules = null, grantRules = null, grantBySectionRules = null;
 
@@ -130,7 +129,7 @@ namespace Umbraco.Web.Services
                         grantBySectionRules = a;
                         break;
                     default:
-                        throw new Exception("panic");
+                        throw new NotSupportedException($"The '{group.Key.ToString()}'-AccessRuleType is not supported.");
                 }
             }
 
