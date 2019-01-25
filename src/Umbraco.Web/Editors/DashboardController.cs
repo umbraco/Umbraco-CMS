@@ -27,6 +27,8 @@ namespace Umbraco.Web.Editors
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
     [WebApi.UmbracoAuthorize]
+    [JsonCamelCaseFormatter]
+
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;

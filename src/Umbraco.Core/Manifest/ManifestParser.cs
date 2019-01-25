@@ -155,10 +155,16 @@ namespace Umbraco.Core.Manifest
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentNullOrEmptyException(nameof(text));
 
-            var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_logger),
-                new ValueValidatorConverter(_validators),
-                new DashboardAccessRuleConverter());
+            var manifest = JsonConvert.DeserializeObject<PackageManifest>(text, new JsonSerializerSettings()
+            {
+                Converters = new JsonConverter[]
+                {
+                    new DataEditorConverter(_logger),
+                    new ValueValidatorConverter(_validators),
+                    new DashboardAccessRuleConverter()
+                },
+            }
+             );
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)

@@ -8,7 +8,7 @@ namespace Umbraco.Web.Dashboards
 {
     public class DashboardCollectionBuilder : WeightedCollectionBuilderBase<DashboardCollectionBuilder, DashboardCollection, IDashboardSection>
     {
-        protected override DashboardCollectionBuilder This => this;        
+        protected override DashboardCollectionBuilder This => this;
 
         protected override IEnumerable<IDashboardSection> CreateItems(IFactory factory)
         {
@@ -17,8 +17,32 @@ namespace Umbraco.Web.Dashboards
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetInstance<ManifestParser>();
 
-            //TODO WB: We will need to re-sort items from package manifest with the C# Types
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.Dashboards);
+            var dashboardSections = Merge(base.CreateItems(factory).ToArray(), manifestParser.Manifest.Dashboards);
+
+            return dashboardSections;
+        }
+
+        private IEnumerable<IDashboardSection> Merge(IReadOnlyList<IDashboardSection> dashboardsFromCode, IReadOnlyList<ManifestDashboardDefinition> dashboardFromManifest)
+        {
+            var list = dashboardsFromCode.Concat(dashboardFromManifest)
+                .Where(x=>!string.IsNullOrEmpty(x.Alias))
+                .Select(x => (Weight: GetWeight(x), DashboardSection: x))
+                .OrderBy(x=>x.Weight);
+
+            return list.Select(x => x.DashboardSection);
+        }
+
+        private static int GetWeight(IDashboardSection dashboardSection)
+        {
+            switch (dashboardSection)
+            {
+                case ManifestDashboardDefinition danifestDashboardDefinition:
+                    return danifestDashboardDefinition.Weight;
+                default:
+                    var weightAttribute = dashboardSection.GetType().GetCustomAttributes(typeof(WeightAttribute), false)
+                        .Cast<WeightAttribute>().FirstOrDefault();
+                    return weightAttribute.Weight;
+            }
         }
     }
 }

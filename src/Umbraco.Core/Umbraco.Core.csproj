@@ -354,6 +354,7 @@
     <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
+    <Compile Include="Manifest\IgnoreDataMemberWhenSerializingAttribute.cs" />
     <Compile Include="Manifest\ManifestBackOfficeSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
