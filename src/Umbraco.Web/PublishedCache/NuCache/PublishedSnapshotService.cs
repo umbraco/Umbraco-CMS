@@ -1202,16 +1202,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // sanitize - names should be ok but ... never knows
             if (content.GetContentType().VariesByCulture())
             {
-                var infos = content is IContent document
-                    ? (published
-                        ? document.PublishCultureInfos
-                        : document.CultureInfos)
-                    : content.CultureInfos;
+
+                IReadOnlyDictionary<string, ContentCultureInfos> infos =  content.CultureInfos;
+                var publishedCultures = new HashSet<string>();
+
+                if (content is IContent document)
+                {
+                    if (published)
+                    {
+                        infos = document.PublishCultureInfos;
+                    }
+
+                    publishedCultures = new HashSet<string>(document.PublishedCultures);
+                }
+
 
                 foreach (var (culture, info) in infos)
                 {
                     var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(culture);
-                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft, IsPublished = publishedCultures.Contains(culture)};
                 }
             }
 

@@ -16,5 +16,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         [JsonProperty("isDraft")]
         public bool IsDraft { get; set; }
+
+        [JsonProperty("isPublished")]
+        public bool IsPublished { get; set; }
     }
 }
