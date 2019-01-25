@@ -1,144 +1,182 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Web.Http;
-using System;
-using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using Umbraco.Core.Cache;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Core.Dashboards;
-using Umbraco.Web.Services;
+using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Core.Manifest
 {
-    //we need to fire up the controller like this to enable loading of remote css directly from this controller
-    [PluginController("UmbracoApi")]
-    [ValidationFilter]
-    [AngularJsonOnlyConfiguration]
-    [IsBackOffice]
-    [WebApi.UmbracoAuthorize]
-    [JsonCamelCaseFormatter]
-
-    public class DashboardController : UmbracoApiController
+    /// <summary>
+    /// Parses the Main.js file and replaces all tokens accordingly.
+    /// </summary>
+    public class ManifestParser
     {
-        private readonly IDashboardService _dashboardService;
+        private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+
+        private readonly IAppPolicyCache _cache;
+        private readonly ILogger _logger;
+        private readonly ManifestValueValidatorCollection _validators;
+
+        private string _path;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
+        /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public DashboardController()
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ILogger logger)
+            : this(appCaches, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
+        /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, string path, ILogger logger)
         {
-            _dashboardService = dashboardService;
+            if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
+            _cache = appCaches.RuntimeCache;
+            _validators = validators ?? throw new ArgumentNullException(nameof(validators));
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
+            Path = path;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        //we have just one instance of HttpClient shared for the entire application
-        private static readonly HttpClient HttpClient = new HttpClient();
-
-        //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
-        [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public string Path
         {
-            var user = Security.CurrentUser;
-            var allowedSections = string.Join(",", user.AllowedSections);
-            var language = user.Language;
-            var version = UmbracoVersion.SemanticVersion.ToSemanticString();
-
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
-            var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
-
-            var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);
-            var result = new JObject();
-            if (content != null)
-            {
-                result = content;
-            }
-            else
-            {
-                //content is null, go get it
-                try
-                {
-                    //fetch dashboard json and parse to JObject
-                    var json = await HttpClient.GetStringAsync(url);
-                    content = JObject.Parse(json);
-                    result = content;
-
-                    AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
-                }
-                catch (HttpRequestException ex)
-                {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
-
-                    //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
-                    AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
-                }
-            }
-
-            return result;
+            get => _path;
+            set => _path = value.StartsWith("~/") ? IOHelper.MapPath(value) : value;
         }
 
-        public async Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        /// <summary>
+        /// Gets all manifests, merged into a single manifest object.
+        /// </summary>
+        /// <returns></returns>
+        public PackageManifest Manifest
+            => _cache.GetCacheItem<PackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
+            {
+                var manifests = GetManifests();
+                return MergeManifests(manifests);
+            }, new TimeSpan(0, 4, 0));
+
+        /// <summary>
+        /// Gets all manifests.
+        /// </summary>
+        private IEnumerable<PackageManifest> GetManifests()
         {
-            var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
-            var key = "umbraco-dynamic-dashboard-css-" + section;
+            var manifests = new List<PackageManifest>();
 
-            var content = AppCaches.RuntimeCache.GetCacheItem<string>(key);
-            var result = string.Empty;
-
-            if (content != null)
+            foreach (var path in GetManifestFiles())
             {
-                result = content;
-            }
-            else
-            {
-                //content is null, go get it
                 try
                 {
-                    //fetch remote css
-                    content = await HttpClient.GetStringAsync(url);
-
-                    //can't use content directly, modified closure problem
-                    result = content;
-
-                    //save server content for 30 mins
-                    AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
+                    var text = File.ReadAllText(path);
+                    text = TrimPreamble(text);
+                    if (string.IsNullOrWhiteSpace(text))
+                        continue;
+                    var manifest = ParseManifest(text);
+                    manifests.Add(manifest);
                 }
-                catch (HttpRequestException ex)
+                catch (Exception e)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
-
-                    //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
-                    AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
+                    _logger.Error<ManifestParser>(e, "Failed to parse manifest at '{Path}', ignoring.", path);
                 }
             }
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
+            return manifests;
+        }
+
+        /// <summary>
+        /// Merges all manifests into one.
+        /// </summary>
+        private static PackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
+        {
+            var scripts = new HashSet<string>();
+            var stylesheets = new HashSet<string>();
+            var propertyEditors = new List<IDataEditor>();
+            var parameterEditors = new List<IDataEditor>();
+            var gridEditors = new List<GridEditor>();
+            var contentApps = new List<ManifestContentAppDefinition>();
+            var dashboards = new List<ManifestDashboardDefinition>();
+            var sections = new List<ManifestBackOfficeSection>();
+
+            foreach (var manifest in manifests)
             {
-                Content = new StringContent(result, Encoding.UTF8, "text/css")
+                if (manifest.Scripts != null) foreach (var script in manifest.Scripts) scripts.Add(script);
+                if (manifest.Stylesheets != null) foreach (var stylesheet in manifest.Stylesheets) stylesheets.Add(stylesheet);
+                if (manifest.PropertyEditors != null) propertyEditors.AddRange(manifest.PropertyEditors);
+                if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
+                if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
+                if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
+                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
+                if (manifest.Sections != null) sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias.ToLowerInvariant()));
+            }
+
+            return new PackageManifest
+            {
+                Scripts = scripts.ToArray(),
+                Stylesheets = stylesheets.ToArray(),
+                PropertyEditors = propertyEditors.ToArray(),
+                ParameterEditors = parameterEditors.ToArray(),
+                GridEditors = gridEditors.ToArray(),
+                ContentApps = contentApps.ToArray(),
+                Dashboards = dashboards.ToArray(),
+                Sections = sections.ToArray()
             };
         }
 
-        [ValidateAngularAntiForgeryToken]
-        [OutgoingEditorModelEvent]
-        public IEnumerable<Tab<IDashboardSection>> GetDashboard(string section)
+        // gets all manifest files (recursively)
+        private IEnumerable<string> GetManifestFiles()
         {
-            return _dashboardService.GetDashboards(section, Security.CurrentUser);
+            if (Directory.Exists(_path) == false)
+                return new string[0];
+            return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+        }
+
+        private static string TrimPreamble(string text)
+        {
+            // strangely StartsWith(preamble) would always return true
+            if (text.Substring(0, 1) == Utf8Preamble)
+                text = text.Remove(0, Utf8Preamble.Length);
+
+            return text;
+        }
+
+        /// <summary>
+        /// Parses a manifest.
+        /// </summary>
+        internal PackageManifest ParseManifest(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                throw new ArgumentNullOrEmptyException(nameof(text));
+
+            var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
+                new DataEditorConverter(_logger),
+                new ValueValidatorConverter(_validators),
+                new DashboardAccessRuleConverter());
+
+            // scripts and stylesheets are raw string, must process here
+            for (var i = 0; i < manifest.Scripts.Length; i++)
+                manifest.Scripts[i] = IOHelper.ResolveVirtualUrl(manifest.Scripts[i]);
+            for (var i = 0; i < manifest.Stylesheets.Length; i++)
+                manifest.Stylesheets[i] = IOHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+
+            // add property editors that are also parameter editors, to the parameter editors list
+            // (the manifest format is kinda legacy)
+            var ppEditors = manifest.PropertyEditors.Where(x => (x.Type & EditorType.MacroParameter) > 0).ToList();
+            if (ppEditors.Count > 0)
+                manifest.ParameterEditors = manifest.ParameterEditors.Union(ppEditors).ToArray();
+
+            return manifest;
+        }
+
+        // purely for tests
+        internal IEnumerable<GridEditor> ParseGridEditors(string text)
+        {
+            return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(text);
         }
     }
 }
