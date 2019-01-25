@@ -10,9 +10,6 @@ namespace Umbraco.Core.Manifest
     {
         private string _view;
 
-        [JsonProperty("name", Required = Required.Always)]
-        public string Name { get; set; }
-
         [JsonProperty("alias", Required = Required.Always)]
         public string Alias { get; set; }
 

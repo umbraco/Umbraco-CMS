@@ -387,7 +387,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         {
             const string json = @"{'dashboards': [
     {
-        'name': 'First One',
         'alias': 'something',
         'view': '~/App_Plugins/MyPackage/Dashboards/one.html',
         'sections': [ 'content' ],
@@ -395,7 +394,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 
     },
     {
-        'name': 'Second-One',
         'alias': 'something.else',
         'weight': -1,
         'view': '~/App_Plugins/MyPackage/Dashboards/two.html',
@@ -409,7 +407,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[0]);
             var db0 = manifest.Dashboards[0];
             Assert.AreEqual("something", db0.Alias);
-            Assert.AreEqual("First One", db0.Name);
             Assert.AreEqual(100, db0.Weight);
             Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/one.html", db0.View);
             Assert.AreEqual(1, db0.Sections.Length);
@@ -423,7 +420,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[1]);
             var db1 = manifest.Dashboards[1];
             Assert.AreEqual("something.else", db1.Alias);
-            Assert.AreEqual("Second-One", db1.Name);
             Assert.AreEqual(-1, db1.Weight);
             Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/two.html", db1.View);
             Assert.AreEqual(1, db1.Sections.Length);
