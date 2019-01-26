@@ -121,5 +121,22 @@ namespace Umbraco.Web.Editors
 
             return Ok(string.Format("URL tracker is now {0}d", action));
         }
+
+        [HttpPost]
+        public IHttpActionResult AddRedirect(string url, int contentId)
+        {
+            var user = Umbraco.UmbracoContext.Security.CurrentUser;
+            var target = Services.ContentService.GetById(contentId);
+
+            //TODO: Validate user
+            //TODO: Validate url
+
+            //TODO: ensure url does not have a query string
+            //TODO: ensure url does not end in a trailing slash
+            //TODO: ensure url does not point to a file as redirector adds a trailing slash
+
+            Services.RedirectUrlService.Register(url, target.Key);
+            return Ok(string.Format("Url {0} now redirects to {1}", url, target.Name));
+        }
     }
 }
