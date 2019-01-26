@@ -235,7 +235,6 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionSort>(item, menu, true);
             AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
-            //fixme - conver this editor to angular
             AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
             if (EmailSender.CanSendRequiredEmail)
             {
