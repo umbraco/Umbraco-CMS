@@ -3,11 +3,8 @@ using System.Runtime.Serialization;
 using Umbraco.Web.Trees;
 using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
-
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -197,33 +194,6 @@ namespace Umbraco.Web.Models.Trees
             AdditionalData[ActionUrlMethodKey] = method;
         }
 
-        internal void ConvertLegacyMenuItem(IUmbracoEntity item, string nodeType, string currentSection)
-        {
-            // try to get a URL/title from the legacy action,
-            // in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
-            var attempt = LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(Action,
-                item == null ? "-1" : item.Id.ToInvariantString(),
-                nodeType,
-                item == null ? "" : item.Name, currentSection);
-            if (attempt)
-            {
-                var action = attempt.Result;
-                LaunchDialogUrl(action.Url, action.DialogTitle);
-            }
-            else
-            {
-                // if that doesn't work, try to get the legacy confirm view
-                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action);
-                if (attempt2)
-                {
-                    var view = attempt2.Result;
-                    var textService = Current.Services.TextService;
-                    LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?");
-                }
-            }
-        }
-
         #endregion
-
     }
 }
