@@ -128,7 +128,7 @@ namespace umbraco
             this._path = path;
             this._splitpath = path.Split(',');
 
-            // Update the elements hash table
+            // Update the elements hashtable
             _elements.Add("pageID", pageID);
             _elements.Add("parentID", parentId);
             _elements.Add("pageName", pageName);
