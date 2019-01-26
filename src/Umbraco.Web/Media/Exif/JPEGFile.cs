@@ -802,7 +802,7 @@ namespace Umbraco.Web.Media.Exif
 
                 uint fillerbytecount = 0;
 
-                // Try to preserve the creator's note data offset
+                // Try to preserve the makernote data offset
                 if (!makernotewritten &&
                     !makerNoteProcessed &&
                     makerNoteOffset != 0 &&
