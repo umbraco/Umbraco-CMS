@@ -2223,8 +2223,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="enabledConfirm">URL tracker has now been enabled.</key>
         <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
         <key alias="addRedirect">Add Redirect</key>
-        <key alias="redirectAddConfirm"></key>
-        <key alias="redirectAddError"></key>
+        <key alias="redirectAddConfirm">Redirect successfully added</key>
+        <key alias="redirectAddError">Failed to add redirect</key>
     </area>
     <area alias="emptyStates">
         <key alias="emptyDictionaryTree">No Dictionary items to choose from</key>
