@@ -704,7 +704,7 @@ namespace Umbraco.Web.Media.Exif
                 return false;
             }
 
-            // We will need these bit converters to write byte-ordered data
+            // We will need these BitConverters to write byte-ordered data
             BitConverterEx bceExif = new BitConverterEx(BitConverterEx.SystemByteOrder, ByteOrder);
 
             // Create a memory stream to write the APP1 section to
