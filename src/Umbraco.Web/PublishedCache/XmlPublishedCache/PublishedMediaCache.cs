@@ -532,7 +532,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     }
 
                     //if there's no result then return null. Previously we defaulted back to library.GetMedia below
-                    //but this will always get called for when we are getting descendent's since many items won't have
+                    //but this will always get called for when we are getting descendants since many items won't have
                     //children and then we are hitting the database again!
                     //So instead we're going to rely on Examine to have the correct results like it should.
                     return Enumerable.Empty<IPublishedContent>();
