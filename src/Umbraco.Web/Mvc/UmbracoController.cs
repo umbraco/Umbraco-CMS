@@ -22,7 +22,6 @@ namespace Umbraco.Web.Mvc
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
