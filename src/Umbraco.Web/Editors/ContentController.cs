@@ -2018,7 +2018,7 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
-                            "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
+                            "publish/contentPublishedFailedByCulture");
                         break;
                     default:
                         throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");
