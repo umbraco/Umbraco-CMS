@@ -544,6 +544,19 @@ namespace Umbraco.Web
                 () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
             HealthCheckNotificationMethodResolver.Current = new HealthCheckNotificationMethodResolver(LoggerResolver.Current.Logger,
                 () => PluginManager.ResolveTypes<HealthCheck.NotificationMethods.IHealthCheckNotificatationMethod>());
+
+            // Disable duplicate community health checks which appear in Our.Umbraco.HealtchChecks and Umbraco Core.
+            // See this issue to understand why https://github.com/umbraco/Umbraco-CMS/issues/4174
+            var disabledHealthCheckTypes = new[]
+            {
+                "Our.Umbraco.HealthChecks.Checks.Security.HstsCheck",
+                "Our.Umbraco.HealthChecks.Checks.Security.TlsCheck"
+            }.Select(TypeFinder.GetTypeByName).WhereNotNull();
+
+            foreach (var type in disabledHealthCheckTypes)
+            {
+                HealthCheckResolver.Current.RemoveType(type);
+            }
         }
 
         /// <summary>
