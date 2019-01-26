@@ -154,7 +154,7 @@ namespace Umbraco.Web.Models.Trees
         public void LaunchDialogView(string view, string dialogTitle)
         {
             SetDialogTitle(dialogTitle);
-            AdditionalData[ActionViewKey] = view;
+            SetActionView(view);
         }
 
         /// <summary>
@@ -181,6 +181,15 @@ namespace Umbraco.Web.Models.Trees
         private void SetDialogTitle(string dialogTitle)
         {
             AdditionalData[DialogTitleKey] = dialogTitle;
+        }
+
+        /// <summary>
+        /// Configures the menu item to launch a specific view
+        /// </summary>
+        /// <param name="view"></param>
+        private void SetActionView(string view)
+        {
+            AdditionalData[ActionViewKey] = view;
         }
 
         /// <summary>
