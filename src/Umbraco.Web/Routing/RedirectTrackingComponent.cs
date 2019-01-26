@@ -92,7 +92,7 @@ namespace Umbraco.Web.Redirects
             // we cannot rely only on ContentCacheRefresher because when CacheUpdated triggers the old
             // route is gone
             //
-            // this is all verrrry weird but it seems to work
+            // this is all very weird but it seems to work
 
             ContentService.Publishing += ContentService_Publishing;
             ContentService.Published += ContentService_Published;

@@ -59,8 +59,7 @@ namespace Umbraco.Web.Routing
             // there may be spaces as in "/foo/bar,  /foo/nil"
             // these should probably be taken care of earlier on
 
-            // TODO
-            // can we normalize the values so that they contain no whitespaces, and no leading slashes?
+            // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
             // and then the comparisons in IsMatch can be way faster - and allocate way less strings
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;

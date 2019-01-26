@@ -153,7 +153,7 @@ namespace Umbraco.Core.IO
             if (directory == null) throw new InvalidOperationException("Could not get directory.");
             Directory.CreateDirectory(directory); // ensure it exists
 
-            if (stream.CanSeek) // todo - what if we cannot?
+            if (stream.CanSeek) // TODO: what if we cannot?
                 stream.Seek(0, 0);
 
             using (var destination = (Stream) File.Create(fullPath))

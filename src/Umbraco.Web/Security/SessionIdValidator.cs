@@ -19,7 +19,7 @@ namespace Umbraco.Web.Security
     /// </summary>
     /// <remarks>
     /// This uses another cookie to track the last checked time which is done for a few reasons:    
-    /// * We can't use the user's auth ticket to do thsi because we'd be re-issuing the auth ticket all of the time and it would never expire
+    /// * We can't use the user's auth ticket to do this because we'd be re-issuing the auth ticket all of the time and it would never expire
     ///     plus the auth ticket size is much larger than this small value
     /// * This will execute quite often (every minute per user) and in some cases there might be several requests that end up re-issuing the cookie so the cookie value should be small
     /// * We want to avoid the user lookup if it's not required so that will only happen when the time diff is great enough in the cookie

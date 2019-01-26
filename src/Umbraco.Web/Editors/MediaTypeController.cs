@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the avilable compositions for this content type
+        /// Returns the available compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
         /// <param name="filter.contentTypeId"></param>
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a media type container wth a given ID
+        /// Deletes a media type container with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
 
-        // fixme/task - get rid of Lazy injection and fix circular dependencies
+        // TODO - https://github.com/umbraco/Umbraco-CMS/issues/4237 - get rid of Lazy injection and fix circular dependencies
         public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {

@@ -40,9 +40,9 @@ namespace Umbraco.Web.UI.Pages
         public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
 
         /// <summary>
-        /// Gets the Html helper.
+        /// Gets the HTML helper.
         /// </summary>
-        /// <remarks>This html helper is created with an empty context and page so it may not have all of the functionality expected.</remarks>
+        /// <remarks>This HTML helper is created with an empty context and page so it may not have all of the functionality expected.</remarks>
         public HtmlHelper Html => _html ?? (_html = new HtmlHelper(new ViewContext(), new ViewPage()));
 
         /// <summary>

@@ -293,6 +293,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
         }
 
+        public override bool IsPublished(string culture = null)
+        {
+            if (!ContentType.VariesByCulture())
+            {
+                return _contentData.Published;
+            }
+
+            // handle context culture
+            if (culture == null)
+            {
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+            }
+
+            //If the current culture is not a draft, it must be the published version
+            return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && !cvar.IsDraft;
+        }
+
         #endregion
 
         #region Tree
@@ -353,7 +370,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // notes:
             // _contentNode.ChildContentIds is an unordered int[]
-            // need needs to fetch & sort - do it only once, lazyily, though
+            // needs to fetch & sort - do it only once, lazily, though
             // Q: perfs-wise, is it better than having the store managed an ordered list
         }
 

@@ -124,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
         /// <summary>
-        /// Flag to get/set if this was laoded from examine cache
+        /// Flag to get/set if this was loaded from examine cache
         /// </summary>
         internal bool LoadedFromExamine { get; }
 
@@ -178,6 +178,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public override int Level => _level;
 
         public override bool IsDraft(string culture = null) => false;
+
+        public override bool IsPublished(string culture = null) => true;
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 

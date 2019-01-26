@@ -211,9 +211,9 @@ namespace Umbraco.Web.Install
             }
             catch (Exception)
             {
-                //This is not 100% accurate btw because it could turn out that the current user doesn't
-                //have access to read the current permissions but does have write access.
-                //I think this is an edge case however
+                // This is not 100% accurate because it could turn out that the current user doesn't
+                // have access to read the current permissions but does have write access.
+                // I think this is an edge case however
                 return false;
             }
 

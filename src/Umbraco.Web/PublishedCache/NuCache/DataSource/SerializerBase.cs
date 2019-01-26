@@ -60,7 +60,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 case 'D':
                     return PrimitiveSerializer.DateTime.ReadFrom(stream);
                 default:
-                    throw new NotSupportedException($"Cannot deserialize unknow type '{type}'.");
+                    throw new NotSupportedException($"Cannot deserialize unknown type '{type}'.");
             }
         }
 

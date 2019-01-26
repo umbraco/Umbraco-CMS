@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IContent"/></returns>
         public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             var parent = GetById(parentId);
             return Create(name, parent, contentTypeAlias, userId);
@@ -184,7 +184,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             var contentType = GetContentType(contentTypeAlias);
             if (contentType == null)
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -282,7 +282,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 

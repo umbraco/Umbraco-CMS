@@ -307,7 +307,7 @@ namespace Umbraco.Web.Editors
 
             string generatedPassword = null;
             //Depending on the action we need to first do a create or update using the membership provider
-            // this ensures that passwords are formatted correclty and also performs the validation on the provider itself.
+            // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
@@ -360,7 +360,7 @@ namespace Umbraco.Web.Editors
                 Roles.AddUserToRoles(contentItem.PersistedContent.Username, toAdd);
             }
 
-            //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
+            //set the generated password (if there was one) - in order to do this we'll chuck the generated password into the
             // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set
             // the value to be given to the UI. Hooray for AdditionalData :)
             contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
@@ -368,11 +368,11 @@ namespace Umbraco.Web.Editors
             //return the updated model
             var display = Mapper.Map<MemberDisplay>(contentItem.PersistedContent);
 
-            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
             var localizedTextService = Services.TextService;
-            //put the correct msgs in
+            //put the correct messages in
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
@@ -603,7 +603,7 @@ namespace Umbraco.Web.Editors
 
         /// <summary>
         /// Following a refresh of member data called during an update if the membership provider has changed some underlying data,
-        /// we don't want to lose the provided, and potentiallly changed, username
+        /// we don't want to lose the provided, and potentially changed, username
         /// </summary>
         /// <param name="contentItem"></param>
         /// <param name="providedUserName"></param>
@@ -637,7 +637,7 @@ namespace Umbraco.Web.Editors
         ///     we create an empty IMember instance first (of type 'Member'), this gives us a unique ID (GUID)
         ///     that we then use to create the member in the custom membership provider. This acts as the link between Umbraco data and
         ///     the custom membership provider data. This gives us the ability to eventually have custom membership properties but still use
-        ///     a custom memberhip provider. If there is no 'Member' member type, then we will simply just create the membership provider member
+        ///     a custom membership provider. If there is no 'Member' member type, then we will simply just create the membership provider member
         ///     with no link to our data.
         ///
         /// If this is successful, it will go and re-fetch the IMember from the db because it will now have an ID because the Umbraco provider

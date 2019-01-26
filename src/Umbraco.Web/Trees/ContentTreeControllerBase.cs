@@ -429,7 +429,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Determins if the user has access to view the node/document
+        /// Determines if the user has access to view the node/document
         /// </summary>
         /// <param name="doc">The Document to check permissions against</param>
         /// <param name="allowedUserOptions">A list of MenuItems that the user has permissions to execute on the current document</param>

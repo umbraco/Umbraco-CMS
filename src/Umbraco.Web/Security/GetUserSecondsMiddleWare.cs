@@ -123,7 +123,7 @@ namespace Umbraco.Web.Security
                     }
                 }
 
-                //Hack! we need to suppress the stupid forms authentcation module but we can only do that by using non owin stuff
+                //Hack! we need to suppress the stupid forms authentication module but we can only do that by using non owin stuff
                 if (HttpContext.Current != null && HttpContext.Current.Response != null)
                 {
                     HttpContext.Current.Response.SuppressFormsAuthenticationRedirect = true;

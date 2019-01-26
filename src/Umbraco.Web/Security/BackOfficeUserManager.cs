@@ -211,7 +211,7 @@ namespace Umbraco.Web.Security
                 contentSectionConfig.NotificationEmailAddress,
                 new EmailSender());
 
-            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
+            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to support it
 
             //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
             //// You can write your own provider and plug in here.
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         protected virtual IPasswordHasher GetDefaultPasswordHasher(MembershipProviderBase provider)
         {
-            //if the current user membership provider is unkown (this would be rare), then return the default password hasher
+            //if the current user membership provider is unknown (this would be rare), then return the default password hasher
             if (provider.IsUmbracoUsersProvider() == false)
                 return new PasswordHasher();
 
@@ -459,7 +459,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
@@ -471,7 +471,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <returns></returns>
         private IUserSecurityStampStore<BackOfficeIdentityUser, int> GetSecurityStore()
@@ -483,7 +483,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <returns></returns>
         private static string NewSecurityStamp()
@@ -534,14 +534,14 @@ namespace Umbraco.Web.Security
 
 
         /// <summary>
-        /// Overides the microsoft ASP.NET user managment method
+        /// Overrides the Microsoft ASP.NET user management method
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>
         /// returns a Async Task<IdentityResult>
         /// </returns>
         /// <remarks>
-        /// Doesnt set fail attempts back to 0
+        /// Doesn't set fail attempts back to 0
         /// </remarks>
         public override async Task<IdentityResult> AccessFailedAsync(int userId)
         {

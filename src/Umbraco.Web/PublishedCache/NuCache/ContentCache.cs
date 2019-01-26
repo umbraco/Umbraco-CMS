@@ -93,7 +93,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // if in a domain then start with the root node of the domain
                 // and follow the path
                 // note: if domain has a path (eg example.com/en) which is not recommended anymore
-                //  then then /en part of the domain is basically ignored here...
+                //  then /en part of the domain is basically ignored here...
                 content = GetById(preview, startNodeId);
                 content = FollowRoute(content, parts, 0, culture);
             }

@@ -2,7 +2,7 @@
 
     <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
 
-        <div class="umb-pane">
+        <div class="umb-pane" ng-if="!vm.creatingFolder">
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
             <ul class="umb-actions umb-actions-child">
@@ -18,8 +18,34 @@
                         <span class="menu-label"><localize key="create_newRteStyleSheetFile">New richtext style sheet file</localize></span>
                     </a>
                 </li>
+                <li class="umb-action">
+                    <a href="" class="umb-action-link" ng-click="vm.showCreateFolder()">
+                        <i class="large icon icon-folder"></i>
+                        <span class="menu-label"><localize key="general_folder"></localize>...</span>
+                    </a>
+                </li>
             </ul>
 
+        </div>
+
+        <div class="umb-pane" ng-if="vm.creatingFolder">
+            <form novalidate name="createFolderForm"
+                  ng-submit="vm.createFolder(createFolderForm)"
+                  val-form-manager>
+
+                <div ng-show="vm.createFolderError">
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.createFolderError.errorMsg}}</strong></div>
+                        <div>{{vm.createFolderError.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-control-group label="Enter a folder name" hide-label="false">
+                    <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
         </div>
 
     </div>

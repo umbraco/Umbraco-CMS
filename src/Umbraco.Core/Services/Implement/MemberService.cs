@@ -1304,7 +1304,7 @@ namespace Umbraco.Core.Services.Implement
                     Id = property.Id,
                     Alias = property.Alias,
                     Name = property.PropertyType.Name,
-                    Value = property.GetValue(), // todo ignoring variants
+                    Value = property.GetValue(), // TODO: ignoring variants
                     CreateDate = property.CreateDate,
                     UpdateDate = property.UpdateDate
                 };

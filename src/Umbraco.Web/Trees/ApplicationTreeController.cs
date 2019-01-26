@@ -137,7 +137,7 @@ namespace Umbraco.Web.Trees
                 //If treeGroupName == null then its third party
                 if (treeGroupName.IsNullOrWhiteSpace())
                 {
-                    //This is used for the localisation key
+                    //This is used for the localization key
                     //treeHeaders/thirdPartyGroup
                     treeGroupName = "thirdPartyGroup";
                 }

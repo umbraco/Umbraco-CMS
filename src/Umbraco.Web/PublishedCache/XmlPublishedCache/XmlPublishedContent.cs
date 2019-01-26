@@ -63,6 +63,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private int _sortOrder;
         private int _level;
         private bool _isDraft;
+        private bool _isPublished;
 
         public override IEnumerable<IPublishedContent> Children
         {
@@ -228,6 +229,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return _isDraft; // bah
         }
 
+        public override bool IsPublished(string culture = null)
+        {
+            EnsureNodeInitialized();
+            return _isPublished;
+        }
+
         public override IEnumerable<IPublishedProperty> Properties
         {
             get
@@ -280,7 +287,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             InitializeNode(this, _xmlNode, _isPreviewing,
                 out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
                 out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
-                out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
+                out _createDate, out _updateDate, out _level, out _isDraft, out _isPublished, out _contentType, out _properties,
                 _contentTypeCache.Get);
 
             _nodeInitialized = true;
@@ -290,7 +297,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal static void InitializeNode(XmlPublishedContent node, XmlNode xmlNode, bool isPreviewing,
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
-            out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
+            out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,out bool isPublished,
             out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
             Func<PublishedItemType, string, PublishedContentType> getPublishedContentType)
         {
@@ -302,6 +309,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             name = writerName = urlName = creatorName = docTypeAlias = path = null;
             createDate = updateDate = default(DateTime);
             isDraft = false;
+            isPublished = false;
             contentType = null;
             properties = null;
 

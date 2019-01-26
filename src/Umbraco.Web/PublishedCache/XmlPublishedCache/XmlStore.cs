@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// Represents the Xml storage for the Xml published cache.
     /// </summary>
     /// <remarks>
-    /// <para>One instance of <see cref="XmlStore"/> is instanciated by the <see cref="PublishedSnapshotService"/> and
+    /// <para>One instance of <see cref="XmlStore"/> is instantiated by the <see cref="PublishedSnapshotService"/> and
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>
@@ -751,7 +751,7 @@ AND (umbracoNode.id=@id)";
         {
             // using that one method because we want to have proper indent
             // and in addition, writing async is never fully async because
-            // althouth the writer is async, xml.WriteTo() will not async
+            // although the writer is async, xml.WriteTo() will not async
 
             // that one almost works but... "The elements are indented as long as the element
             // does not contain mixed content. Once the WriteString or WriteWhitespace method
@@ -918,7 +918,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         // assumes xml lock
         private void LoadXmlTreeFromDatabaseLocked(SafeXmlReaderWriter safeXml)
         {
-            // initialise the document ready for the composition of content
+            // initialize the document ready for the composition of content
             var xml = new XmlDocument();
             InitializeXml(xml, GetDtd());
 
@@ -973,7 +973,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 var xmlDtos = scope.Database.Query<XmlDto>(ReadMoreCmsContentXmlSql,
                     new { /*@nodeObjectType =*/ nodeObjectType });
 
-                // Initialise the document ready for the final composition of content
+                // Initialize the document ready for the final composition of content
                 InitializeXml(xmlDoc, string.Empty);
 
                 XmlNode parent = null;
@@ -1102,7 +1102,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                                 id = content.Id
                             });
 
-                        // 'using' the enumerator ensures that the enumeration is properly terminated even if abandonned
+                        // 'using' the enumerator ensures that the enumeration is properly terminated even if abandoned
                         // otherwise, it would leak an open reader & an un-released database connection
                         // see PetaPoco.Query<TRet>(Type[] types, Delegate cb, string sql, params object[] args)
                         // and read http://blogs.msdn.com/b/oldnewthing/archive/2008/08/14/8862242.aspx
@@ -1348,7 +1348,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 if (docNode.Name == currentNode.Name)
                 {
                     // name has not changed, safe to just update the current node
-                    // by transfering values eg copying the attributes, and importing the data elements
+                    // by transferring values eg copying the attributes, and importing the data elements
                     TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
 
                     // if moving, move the node to the new parent
@@ -1819,7 +1819,7 @@ WHERE cmsPreviewXml.nodeId IN (
             long total;
             do
             {
-                // .GetPagedResultsByQuery implicitely adds ({Constants.DatabaseSchema.Tables.Document}.newest = 1) which
+                // .GetPagedResultsByQuery implicitly adds ({Constants.DatabaseSchema.Tables.Document}.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 const bool published = true; // previewXml contains edit content!

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         #region Content
 
-        // todo - IPublishedContent properties colliding with models
+        // TODO: IPublishedContent properties colliding with models
         // we need to find a way to remove as much clutter as possible from IPublishedContent,
         // since this is preventing someone from creating a property named 'Path' and have it
         // in a model, for instance. we could move them all under one unique property eg
@@ -153,8 +153,12 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </remarks>
         bool IsDraft(string culture = null);
 
-        // fixme/task - consider having an IsPublished flag too
-        // so that when IsDraft is true, we can check whether there is a published version?
+        /// <summary>
+        /// Gets a value indicating whether the content is published.
+        /// </summary>
+        /// <param name="culture"></param>
+        bool IsPublished(string culture = null);
+
 
         #endregion
 
