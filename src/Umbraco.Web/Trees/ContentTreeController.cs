@@ -214,7 +214,9 @@ namespace Umbraco.Web.Trees
 
             // set names according to variations
             foreach (var entity in result)
+            {
                 EnsureName(entity, cultureVal);
+            }
 
             return result;
         }
@@ -235,7 +237,8 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionSort>(item, menu, true);
             AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
-            AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
+            AddActionNode<ActionProtect>(item, menu, true, opensDialog: true);
+
             if (EmailSender.CanSendRequiredEmail)
             {
 	            menu.Items.Add(new MenuItem("notify", Services.TextService)
@@ -267,7 +270,6 @@ namespace Umbraco.Web.Trees
 
             return menu;
         }
-
         
         /// <summary>
         /// set name according to variations
@@ -279,12 +281,17 @@ namespace Umbraco.Web.Trees
             if (culture == null)
             {
                 if (string.IsNullOrWhiteSpace(entity.Name))
+                {
                     entity.Name = "[[" + entity.Id + "]]";
+                }
+
                 return;
             }
 
             if (!(entity is IDocumentEntitySlim docEntity))
+            {
                 throw new InvalidOperationException($"Cannot render a tree node for a culture when the entity isn't {typeof(IDocumentEntitySlim)}, instead it is {entity.GetType()}");
+            }
 
             // we are getting the tree for a given culture,
             // for those items that DO support cultures, we need to get the proper name, IF it exists
@@ -304,16 +311,15 @@ namespace Umbraco.Web.Trees
             }
 
             if (string.IsNullOrWhiteSpace(entity.Name))
+            {
                 entity.Name = "[[" + entity.Id + "]]";
+            }
         }
 
-        //todo: Remove the need for converting to legacy
-        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
+        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
             where TAction : IAction
         {
-            var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", _actions.GetAction<TAction>().Alias), hasSeparator);
-            if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
-            menuItem.OpensDialog = opensDialog;
+            var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", _actions.GetAction<TAction>().Alias), hasSeparator, opensDialog);
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
