@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     /// <remarks>
     /// DO NOT inherit from UmbracoAuthorizedJsonController since we don't want to use the angularized
-    /// json formatter as it causes prob.
+    /// json formatter as it causes problems.
     /// </remarks>
     [PluginController("UmbracoApi")]
     public class TagsDataController : UmbracoAuthorizedApiController
