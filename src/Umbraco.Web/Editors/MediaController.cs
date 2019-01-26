@@ -457,7 +457,7 @@ namespace Umbraco.Web.Editors
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
         {
-            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
             //uploaded files to being *only* the actual file name (as it should be).
             if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
@@ -500,7 +500,7 @@ namespace Umbraco.Web.Editors
                     && (contentItem.Action == ContentSaveAction.SaveNew))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-                    // add the modelstate to the outgoing object and throw validation response
+                    // add the model state to the outgoing object and throw validation response
                     var forDisplay = Mapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
@@ -513,7 +513,7 @@ namespace Umbraco.Web.Editors
             //return the updated model
             var display = Mapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
 
-            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
             //put the correct msgs in
@@ -928,7 +928,7 @@ namespace Umbraco.Web.Editors
             if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 media = mediaService.GetById(nodeId);
-                //put the content item into storage so it can be retreived
+                //put the content item into storage so it can be retrieved
                 // in the controller (saves a lookup)
                 storage[typeof(IMedia).ToString()] = media;
             }

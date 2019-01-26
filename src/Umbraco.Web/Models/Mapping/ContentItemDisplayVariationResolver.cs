@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 var langs = context.Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages, null, context).ToList();
 
-                //create a variant for each lang, then we'll populate the values
+                //create a variant for each language, then we'll populate the values
                 var variants = langs.Select(x =>
                 {
                     //We need to set the culture in the mapping context since this is needed to ensure that the correct property values
@@ -55,13 +55,13 @@ namespace Umbraco.Web.Models.Mapping
                 //Put the default language first in the list & then sort rest by a-z
                 var defaultLang = variants.SingleOrDefault(x => x.Language.IsDefault);
 
-                //Remove the default lang from the list for now
+                //Remove the default language from the list for now
                 variants.Remove(defaultLang);
 
                 //Sort the remaining languages a-z
                 variants = variants.OrderBy(x => x.Name).ToList();
 
-                //Insert the default lang as the first item
+                //Insert the default language as the first item
                 variants.Insert(0, defaultLang);
 
                 return variants;

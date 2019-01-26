@@ -166,7 +166,7 @@ namespace Umbraco.Web.PropertyEditors
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
 
-            // if we dont have a json structure, we will get it from the property type
+            // if we don't have a json structure, we will get it from the property type
             var val = value.ToString();
             if (val.DetectIsJson())
                 return val;

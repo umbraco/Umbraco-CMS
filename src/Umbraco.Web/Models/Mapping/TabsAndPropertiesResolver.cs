@@ -98,10 +98,10 @@ namespace Umbraco.Web.Models.Mapping
             //re-assign
             genericProps.Properties = contentProps;
 
-            //Show or hide properties tab based on wether it has or not any properties 
+            //Show or hide properties tab based on whether it has or not any properties 
             if (genericProps.Properties.Any() == false)
             {
-                //loop throug the tabs, remove the one with the id of zero and exit the loop
+                //loop through the tabs, remove the one with the id of zero and exit the loop
                 for (var i = 0; i < tabs.Count; i++)
                 {
                     if (tabs[i].Id != 0) continue;

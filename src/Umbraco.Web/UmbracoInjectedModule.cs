@@ -107,7 +107,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Processses the Umbraco Request
+        /// Processes the Umbraco Request
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks>
@@ -150,9 +150,9 @@ namespace Umbraco.Web
 
             // note: requestModule.UmbracoRewrite also did some stripping of &umbPage
             // from the querystring... that was in v3.x to fix some issues with pre-forms
-            // auth. Paul Sterling confirmed in jan. 2013 that we can get rid of it.
+            // auth. Paul Sterling confirmed in Jan. 2013 that we can get rid of it.
 
-            // instanciate, prepare and process the published content request
+            // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
             var request = _publishedRouter.CreateRequest(umbracoContext);
             umbracoContext.PublishedRequest = request;
@@ -347,7 +347,7 @@ namespace Umbraco.Web
             context.RewritePath(rewritePath, "", "", false);
 
             //if it is MVC we need to do something special, we are not using TransferRequest as this will
-            //require us to rewrite the path with query strings and then reparse the query strings, this would
+            //require us to rewrite the path with query strings and then re-parse the query strings, this would
             //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
             //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
             // * Looks up the route based on the new rewritten URL
@@ -380,7 +380,7 @@ namespace Umbraco.Web
             context.RewritePath(rewritePath, "", query, false);
 
             //if it is MVC we need to do something special, we are not using TransferRequest as this will
-            //require us to rewrite the path with query strings and then reparse the query strings, this would
+            //require us to rewrite the path with query strings and then re-parse the query strings, this would
             //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
             //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
             // * Looks up the route based on the new rewritten URL

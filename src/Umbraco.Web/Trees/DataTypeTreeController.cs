@@ -38,8 +38,8 @@ namespace Umbraco.Web.Trees
                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren);
                        node.Path = dt.Path;
                        node.NodeType = "container";
-                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
-                        node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+                       // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
+                       node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                        return node;
                    }));
 

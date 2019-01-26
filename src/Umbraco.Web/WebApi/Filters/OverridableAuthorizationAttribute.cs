@@ -37,7 +37,7 @@ namespace Umbraco.Web.WebApi.Filters
                 return;
             }
 
-            //if the controller is allowing overridable authorization at the action level and there are action level authorization attributes
+            //if the controller is allowing authorization to be overridden at the action level and there are action level authorization attributes
             // then exit and let the action level auth attribute(s) execute.
 
             if (actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<EnableOverrideAuthorizationAttribute>().Any()

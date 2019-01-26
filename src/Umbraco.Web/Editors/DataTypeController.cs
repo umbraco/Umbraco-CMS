@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a data type wth a given ID
+        /// Deletes a data type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -120,7 +120,7 @@ namespace Umbraco.Web.Editors
         {
             var dt = Services.DataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
 
-            //if it doesnt exist yet, we will create it.
+            //if it doesn't exist yet, we will create it.
             if (dt == null)
             {
                 var editor = _propertyEditors[Constants.PropertyEditors.Aliases.ListView];
@@ -172,7 +172,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a data type container wth a given ID
+        /// Deletes a data type container with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

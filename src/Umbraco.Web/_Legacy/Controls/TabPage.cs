@@ -14,7 +14,7 @@ namespace Umbraco.Web._Legacy.Controls
 
     public class TabPage : WebControl
     {
-        // Ensure that a TabPage cannot be instatiated outside
+        // Ensure that a TabPage cannot be instantiated outside
         // this assembly -> New instances of a tabpage can only be retrieved through the tabview
         private bool _hasMenu = true;
         protected LiteralControl ErrorHeaderControl = new LiteralControl();

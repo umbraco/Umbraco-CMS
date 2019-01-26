@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type wth a given ID
+        /// Deletes a document type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the avilable compositions for this content type
+        /// Returns the available compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
         /// <param name="filter"></param>
@@ -187,7 +187,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type container wth a given ID
+        /// Deletes a document type container with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -293,7 +293,7 @@ namespace Umbraco.Web.Editors
                 saveContentType:    type => Services.ContentTypeService.Save(type),
                 beforeCreateNew:    ctSave =>
                 {
-                    //create a default template if it doesnt exist -but only if default template is == to the content type
+                    //create a default template if it doesn't exist -but only if default template is == to the content type
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
                         var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);

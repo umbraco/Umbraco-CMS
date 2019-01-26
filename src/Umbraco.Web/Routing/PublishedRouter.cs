@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
         // todo
         // in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
         // killing it entirely, if we need cache, just implement it properly !!
-        // this is all soooo weird
+        // this is all so weird
         public Func<string, IEnumerable<string>> GetRolesForLogin { get; }
 
         public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
@@ -691,7 +691,7 @@ namespace Umbraco.Web.Routing
             // read the alternate template alias, from querystring, form, cookie or server vars,
             // only if the published content is the initial once, else the alternate template
             // does not apply
-            // + optionnally, apply the alternate template on internal redirects
+            // + optionally, apply the alternate template on internal redirects
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate

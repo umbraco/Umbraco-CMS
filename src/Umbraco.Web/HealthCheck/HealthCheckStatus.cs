@@ -30,7 +30,7 @@ namespace Umbraco.Web.HealthCheck
         public string Description { get; set; }
 
         /// <summary>
-        /// This is optional but would allow a developer to specify a path to an angular html view
+        /// This is optional but would allow a developer to specify a path to an angular HTML view
         /// in order to either show more advanced information and/or to provide input for the admin
         /// to configure how an action is executed
         /// </summary>

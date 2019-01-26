@@ -82,7 +82,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
+        /// Borrowed from Microsoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
+        /// Borrowed from Microsoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
         /// </summary>
         /// <param name="user"></param>
         /// <param name="isPersistent"></param>

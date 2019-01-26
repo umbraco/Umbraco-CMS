@@ -51,7 +51,7 @@ namespace umbraco
         /// <remarks>
         /// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is
         /// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
-        /// with an IPublishedContent item, the template id is asssigned purely based on the default.
+        /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
         internal page(PublishedRequest frequest)
         {

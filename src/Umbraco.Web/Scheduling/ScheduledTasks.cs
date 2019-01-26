@@ -44,7 +44,7 @@ namespace Umbraco.Web.Scheduling
                     ScheduledTaskTimes.Add(t.Alias, DateTime.Now);
                 }
 
-                // Add 1 second to timespan to compensate for differencies in timer
+                // Add 1 second to timespan to compensate for differences in timer
                 else if (
                     new TimeSpan(
                         DateTime.Now.Ticks - ((DateTime)ScheduledTaskTimes[t.Alias]).Ticks).TotalSeconds + 1 >= t.Interval)

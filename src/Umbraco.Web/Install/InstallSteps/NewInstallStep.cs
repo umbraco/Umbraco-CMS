@@ -21,7 +21,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// This is the first UI step for a brand new install
     /// </summary>
     /// <remarks>
-    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an
+    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interrupted because of an
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
     /// display a simple continue installation view.
     /// </remarks>

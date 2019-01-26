@@ -58,7 +58,7 @@ namespace Umbraco.Web.Install.Controllers
 
             var installSteps = _installSteps.GetStepsForCurrentInstallType().ToArray();
 
-            //only get the steps that are targetting the current install type
+            //only get the steps that are targeting the current install type
             steps.AddRange(installSteps);
             setup.Steps = steps;
 

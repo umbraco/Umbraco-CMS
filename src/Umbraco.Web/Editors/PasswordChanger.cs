@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
 
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
             {
-                //if an old password is suplied try to change it
+                //if an old password is supplied try to change it
 
                 try
                 {

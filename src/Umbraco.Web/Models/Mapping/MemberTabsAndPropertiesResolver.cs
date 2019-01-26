@@ -14,7 +14,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
-    /// A custom tab/property resolver for members which will ensure that the built-in membership properties are or arent' displayed
+    /// A custom tab/property resolver for members which will ensure that the built-in membership properties are or aren't displayed
     /// depending on if the member type has these properties
     /// </summary>
     /// <remarks>
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to deal with custom member properties and permissions.</remarks>
+        /// <remarks>Overridden to deal with custom member properties and permissions.</remarks>
         public override IEnumerable<Tab<ContentPropertyDisplay>> Resolve(IMember source, MemberDisplay destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
         {
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (provider.IsUmbracoMembershipProvider() == false)
             {
-                //it's a generic provider so update the locked out property based on our known constant alias
+                // it's a generic provider so update the locked out property based on our known constant alias
                 var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
                 if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                 {
@@ -64,8 +64,8 @@ namespace Umbraco.Web.Models.Mapping
             {
                 var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
-                //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
-                // if we just had all of the membeship provider fields on the member table :(
+                // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
+                // if we just had all of the membership provider fields on the member table :(
                 // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
                 var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
                 if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", source.ContentTypeId);
 
-                //Replace the doctype property
+                // Replace the doctype property
                 var docTypeProperty = resolved.SelectMany(x => x.Properties)
                     .First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                 docTypeProperty.Value = new List<object>
@@ -135,7 +135,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize("password"),
-                    //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
+                    // NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
                     // only when creating a new member and we want to have a generated password pre-filled.
                     Value = new Dictionary<string, object>
                     {
@@ -143,12 +143,12 @@ namespace Umbraco.Web.Models.Mapping
                         {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
                         {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },
-                    //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
+                    // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
-                    //initialize the dictionary with the configuration from the default membership provider
+                    // initialize the dictionary with the configuration from the default membership provider
                     Config = new Dictionary<string, object>(membersProvider.GetConfiguration(_userService))
                     {
-                        //the password change toggle will only be displayed if there is already a password assigned.
+                        // the password change toggle will only be displayed if there is already a password assigned.
                         {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
                     }
                 },
@@ -180,21 +180,21 @@ namespace Umbraco.Web.Models.Mapping
 
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
-            //now update the IsSensitive value
+            // now update the IsSensitive value
             foreach (var prop in result)
             {
-                //check if this property is flagged as sensitive
+                // check if this property is flagged as sensitive
                 var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
-                //check permissions for viewing sensitive data
+                // check permissions for viewing sensitive data
                 if (isSensitiveProperty && (umbracoContext == null || umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false))
                 {
-                    //mark this property as sensitive
+                    // mark this property as sensitive
                     prop.IsSensitive = true;
-                    //mark this property as readonly so that it does not post any data
+                    // mark this property as readonly so that it does not post any data
                     prop.Readonly = true;
-                    //replace this editor with a sensitivevalue
+                    // replace this editor with a sensitive value
                     prop.View = "sensitivevalue";
-                    //clear the value
+                    // clear the value
                     prop.Value = null;
                 }
             }
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         /// <remarks>
         /// If the membership provider installed is the umbraco membership provider, then we will allow changing the username, however if
-        /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively
+        /// the membership provider is a custom one, we cannot allow changing the username because MembershipProvider's do not actually natively
         /// allow that.
         /// </remarks>
         internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, ILocalizedTextService localizedText)
@@ -225,7 +225,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var scenario = memberService.GetMembershipScenario();
 
-            //only allow editing if this is a new member, or if the membership provider is the umbraco one
+            // only allow editing if this is a new member, or if the membership provider is the Umbraco one
             if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
             {
                 prop.View = "textbox";
