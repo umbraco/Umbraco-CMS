@@ -104,7 +104,6 @@ namespace Umbraco.Web.Editors
                 contents = sourceDocument == null
                     ? Enumerable.Empty<IPublishedContent>()
                     : sourceDocument.Children(model.ContentType.Alias);
-                // TODO change to .Children({0})
                 queryExpression.AppendFormat(".Children(\"{0}\")", model.ContentType.Alias);
             }
             else
