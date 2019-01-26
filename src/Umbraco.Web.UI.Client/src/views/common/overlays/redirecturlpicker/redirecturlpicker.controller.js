@@ -1,46 +1,64 @@
 ﻿(function () {
     "use strict";
-    function RedirectUrlPickerController($scope, entityResource) {
-        /*
-         *TODO: Add regex validation on the Original URL
-         *TODO: Add required validation on "entity"
-         * */
-        var $parentModel = $scope.model;     
-        $scope.model = {
-            multipicker: false,
-            show: true,            
-            submit: function (model) {
-                if (model.selection.length > 0) {
-                    $parentModel.entity = model.selection[0].id
-                    $scope.overlayForm.$setValidity('entity', true);
+    function RedirectUrlPickerController($scope, entityResource, editorState) {
+
+        $scope.urlRegex = new RegExp("([\/]{1})[^\/](.*)");
+        $scope.contentItem = null;
+        $scope.loaded = false;
+        $scope.enablePicker = editorState == null || editorState.current == null;
+
+        $scope.removeContentItem = function () {
+            if ($scope.enablePicker) {
+                $scope.contentItem = null;
+            }
+        };
+
+        $scope.openContentPicker = function () {
+            $scope.contentPickerOverlay = {
+                multiPicker: false,
+                view: "contentpicker",
+                show: true,
+                submit: function (model) {
+                    if (angular.isArray(model.selection)) {
+                        _.each(model.selection, function (item, i) {
+                            $scope.contentItem = item;
+                        });
+                    }
+                    else {
+                        $scope.contentItem = model.selection;
+                    }
+
+                    $scope.model.entityId = $scope.contentItem.id;
+                    getContentItemUrl().then(function (url) {
+                        $scope.contentItem.url = url;
+                        $scope.contentPickerOverlay.show = false;
+                        $scope.contentPickerOverlay = null;
+                    });
+                },
+                close: function () {
+                    $scope.contentPickerOverlay.show = false;
+                    $scope.contentPickerOverlay = null;
                 }
             }
         };
-        var vm = this;
-        vm.contentItem = null;
-        vm.loaded = false;
-        vm.contentPickerViewPath = "views/common/overlays/contentpicker/contentpicker.html"
+
+        function getContentItemUrl() {
+            return entityResource.getUrl($scope.contentItem.id, "Document");
+        }
 
         function init() {
-            
-            if ($parentModel.entity) {
-                entityResource.getById($parentModel.entity, $parentModel.entityType).then(function (ent) {
-                    entityResource.getUrl(ent.id, $parentModel.entityType).then(function (data) {
-                        vm.contentItem = ent;
-                        vm.contentItem.url = data;
-                        vm.loaded = true;
+            if ($scope.model.entityId) {
+                entityResource.getById($scope.model.entityId, "Document").then(function (ent) {
+                    $scope.contentItem = ent;
+                    getContentItemUrl().then(function (url) {
+                        $scope.contentItem.url = url;
+                        $scope.loaded = true;
                     });
                 });
             }
             else {
-                vm.loaded = true;
+                $scope.loaded = true;
             }
-
-            $scope.$watch("vm.originalUrl", function (newVal, oldVal) {
-                if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-                    $parentModel.originalUrl = newVal;
-                }
-            });
         }
 
         init();

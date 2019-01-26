@@ -129,12 +129,39 @@
                 'Failed to toggle redirect url tracker');
         }
 
+        /**
+         *  @ngdoc function
+         *   * @name umbraco.resources.redirectUrlResource#addRedirect
+         * @methodOf umbraco.resources.redirectUrlResource
+         * @function
+         *
+         * @description
+         * Called to add a redirect to the redirect url tracker
+         * ##usage
+         * <pre>
+         * redirectUrlsResource.addRedirect("/page", 1106)
+         *    .then(function() {
+         *
+         *    });
+         * </pre>
+         * @param {string} url original url to redirect
+         * @param {int} contentId id of the redirect target
+         */
+        function addRedirect(url, contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                    "AddRedirect", { url: url, contentId: contentId })),
+                'Failed to add redirect');
+        }
+
         var resource = {
             searchRedirectUrls: searchRedirectUrls,
             deleteRedirectUrl: deleteRedirectUrl,
             toggleUrlTracker: toggleUrlTracker,
             getEnableState: getEnableState,
-            getRedirectsForContentItem: getRedirectsForContentItem
+            getRedirectsForContentItem: getRedirectsForContentItem,
+            addRedirect: addRedirect
         };
 
         return resource;

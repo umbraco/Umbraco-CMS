@@ -1,30 +1,42 @@
-﻿<div ng-controller="Umbraco.Overlays.RedirectUrlPickerController as vm">
-    <umb-load-indicator ng-hide="vm.loaded"></umb-load-indicator>
-    <div ng-show="vm.loaded">
-        <umb-control-group label="@redirectUrls_originalUrl">
-            <input type="text"
-                   localize="placeholder"
-                   placeholder="@placeholders_enterurl"
-                   class="umb-editor umb-textstring"
-                   ng-model="vm.originalUrl"
-                   required
-                   name="originalUrl"/>
-        </umb-control-group>
-
-        <div class="umb-control-group">
-            <h5>
-                <localize key="redirectUrls_redirectTo">Redirect To</localize>
-            </h5>
-            <umb-node-preview ng-if="vm.contentItem"
-                              icon="vm.contentItem.icon"
-                              name="vm.contentItem.name"
-                              published="vm.contentItem.published"
-                              description="vm.contentItem.url"
-                              sortable="false"
-                              allow-remove="false"
-                              allow-open="false">
-            </umb-node-preview>
-            <div ng-if="!vm.contentItem" ng-include="vm.contentPickerViewPath"></div>
-        </div>
-    </div>
+﻿<div ng-controller="Umbraco.Overlays.RedirectUrlPickerController">
+    <umb-load-indicator ng-hide="loaded"></umb-load-indicator>
+    
+    <umb-control-group label="@redirectUrls_originalUrl" description="@redirectUrls_originalUrlDescription" required="true">
+        <input type="text"
+               localize="placeholder"
+               placeholder="@placeholders_enterurl"
+               class="umb-editor umb-textstring"
+               ng-model="model.originalUrl"
+               required
+               ng-pattern="urlRegex"
+               name="originalUrl" />
+        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="required"><localize key="general_required"></localize></span>
+        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="pattern"><localize key="redirectUrls_originalUrlPatternValidation"></localize></span>
+    </umb-control-group>
+    <umb-control-group label="@redirectUrls_redirectTo" required="true">
+        <input type="hidden" ng-required="true" ng-model="model.entityId" name="entityId" />
+        <span class="help-inline" val-msg-for="entityId" val-toggle-msg="required"><localize key="general_required"></localize></span>
+        <a ng-show="enablePicker === true && contentItem == null"
+           class="umb-node-preview-add"
+           href=""
+           ng-click="openContentPicker()"
+           prevent-default>
+            <localize key="general_add">Add</localize>
+        </a>
+        <umb-node-preview ng-if="contentItem"
+                          icon="contentItem.icon"
+                          name="contentItem.name"
+                          published="contentItem.published"
+                          description="contentItem.url"
+                          sortable="false"
+                          allow-remove="enablePicker"
+                          on-remove="removeContentItem()">
+        </umb-node-preview>
+    </umb-control-group>
+        <umb-overlay
+        ng-if="contentPickerOverlay.show"
+        model="contentPickerOverlay"
+        position="right"
+        view="contentPickerOverlay.view">
+        </umb-overlay>  
 </div>

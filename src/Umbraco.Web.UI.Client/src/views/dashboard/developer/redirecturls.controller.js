@@ -33,34 +33,23 @@
         vm.enableUrlTracker = enableUrlTracker;
         vm.filter = filter;
         vm.checkEnabled = checkEnabled;
-
-        vm.status = {
-            adding: false,
-            readyToAdd: false
-        };
-        vm.data = {
-            redirectToSelection: [],
-            redirectFromUrl: ""
-        }
-        vm.removeSelection = removeSelection;
-
-        function removeSelection() {
-            console.log(vm.data.redirectToSelection);
-            vm.data.redirectToSelection = [];
-        }
+             
         function openAddRedirectOverlay() {
             vm.addRedirectOverlay = {
-                entity: null,
-                entityType: "Document",
-                view: "redirecturlpicker",
+                view: "redirecturlpicker",                
                 show: true,
                 submit: function (model) {
                     console.log(model);
-                    vm.data.redirectToSelection = model.selection;
-                    vm.status.readyToAdd = vm.data.redirectFromUrl.length > 0 && vm.data.redirectToSelection.length > 0;
-                    vm.addRedirectOverlay.show = false;
-                    vm.addRedirectOverlay = null;
-
+                    redirectUrlsResource.addRedirect(model.originalUrl, model.entityId).then(function () {
+                        vm.search();
+                        vm.addRedirectOverlay.show = false;
+                        vm.addRedirectOverlay = null;
+                        notificationsService.success(localizationService.localize("redirectUrls_redirectAddConfirm"));
+                    }, function (error) {
+                        vm.addRedirectOverlay.show = false;
+                        vm.addRedirectOverlay = null;
+                        notificationsService.error(localizationService.localize("redirectUrls_redirectAddError"));
+                    });
                 },
                 close: function (oldModel) {
                     vm.addRedirectOverlay.show = false;
@@ -73,8 +62,6 @@
         function activate() {
             vm.checkEnabled().then(function() {
                 vm.search();
-                vm.data.redirectFromUrl = "";
-                vm.data.redirectToSelection = [];
             });
         }
 
