@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Membership
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = Current.Configs.Global().DefaultUILanguage; //todo inject
+            _language = Current.Configs.Global().DefaultUILanguage; // TODO: inject
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };

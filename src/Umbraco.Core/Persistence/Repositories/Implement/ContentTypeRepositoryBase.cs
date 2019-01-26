@@ -343,8 +343,7 @@ AND umbracoNode.id <> @id",
             List<int> orphanPropertyTypeIds = null;
             if (entity.IsPropertyDirty("PropertyGroups"))
             {
-                // todo
-                // we used to try to propagate tabs renaming downstream, relying on ParentId, but
+                // TODO: we used to try to propagate tabs renaming downstream, relying on ParentId, but
                 // 1) ParentId makes no sense (if a tab can be inherited from multiple composition
                 //    types) so we would need to figure things out differently, visiting downstream
                 //    content types and looking for tabs with the same name...

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        //todo: this doesn't seem to be used anywhere
+        // TODO: this doesn't seem to be used anywhere
         internal Action OnAdd;
 
         internal PropertyGroupCollection()

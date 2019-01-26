@@ -10,7 +10,7 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    // todo - are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
+    // TODO: are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
     // try to use NPoco's version !
 
     /// <summary>

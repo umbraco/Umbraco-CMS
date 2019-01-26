@@ -882,7 +882,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                // todo - missing 7.6 "ensure valid path" thing here?
+                // TODO: missing 7.6 "ensure valid path" thing here?
                 // but then should be in PerformMoveLocked on every moved item?
 
                 var originalPath = media.Path;
@@ -1031,7 +1031,7 @@ namespace Umbraco.Core.Services.Implement
         {
             var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
-            var evtMsgs = EventMessagesFactory.Get(); // todo - and then?
+            var evtMsgs = EventMessagesFactory.Get(); // TODO: and then?
 
             using (var scope = ScopeProvider.CreateScope())
             {

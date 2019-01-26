@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
         public bool Trashed { get; set; }
 
-        [Column("nodeUser")] // todo: db rename to 'createUserId'
+        [Column("nodeUser")] // TODO: db rename to 'createUserId'
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Text { get; set; }
 
-        [Column("nodeObjectType")] // todo: db rename to 'objectType'
+        [Column("nodeObjectType")] // TODO: db rename to 'objectType'
         [NullSetting(NullSetting = NullSettings.Null)]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType")]
         public Guid? NodeObjectType { get; set; }
