@@ -111,7 +111,7 @@ namespace Umbraco.Web.Editors
         {
             if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            //TODO: Should non-admins be slowed to set granular permissions?
+            // TODO: Should non-admins be allowed to set granular permissions?
 
             var content = Services.ContentService.GetById(saveModel.ContentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
