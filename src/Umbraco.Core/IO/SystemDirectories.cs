@@ -39,9 +39,6 @@ namespace Umbraco.Core.IO
         [Obsolete("Usercontrols are obsolete and code should be removed")]
         public static string UserControls => "~/usercontrols";
 
-        [Obsolete("Only used by legacy load balancing which is obsolete and should be removed")]
-        public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
-
         public static string Packages => Data + "/packages";
 
         public static string Preview => Data + "/preview";

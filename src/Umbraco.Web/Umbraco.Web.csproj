@@ -1135,7 +1135,6 @@
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
     <Compile Include="Routing\UrlProvider.cs" />
-    <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Components\DatabaseServerRegistrarAndMessengerComponent.cs" />
