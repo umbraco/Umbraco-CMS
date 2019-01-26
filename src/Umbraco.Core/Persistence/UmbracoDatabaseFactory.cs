@@ -59,14 +59,18 @@ namespace Umbraco.Core.Persistence
         /// <remarks>Used by the other ctor and in tests.</remarks>
         public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers)
         {
-            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
+            if (string.IsNullOrWhiteSpace(connectionStringName))
+                throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
 
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
             if (settings == null)
+            {
+                logger.Debug<UmbracoDatabaseFactory>("Missing connection string, defer configuration.");
                 return; // not configured
+            }
 
             // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
             // so need to test the values too
@@ -74,7 +78,7 @@ namespace Umbraco.Core.Persistence
             var providerName = settings.ProviderName;
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
-                logger.Debug<UmbracoDatabaseFactory>("Missing connection string or provider name, defer configuration.");
+                logger.Debug<UmbracoDatabaseFactory>("Empty connection string or provider name, defer configuration.");
                 return; // not configured
             }
 

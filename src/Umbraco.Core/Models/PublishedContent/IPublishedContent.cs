@@ -153,8 +153,12 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </remarks>
         bool IsDraft(string culture = null);
 
-        // fixme/task - consider having an IsPublished flag too
-        // so that when IsDraft is true, we can check whether there is a published version?
+        /// <summary>
+        /// Gets a value indicating whether the content is published.
+        /// </summary>
+        /// <param name="culture"></param>
+        bool IsPublished(string culture = null);
+
 
         #endregion
 

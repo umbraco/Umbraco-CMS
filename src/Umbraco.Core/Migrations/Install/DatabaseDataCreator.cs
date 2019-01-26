@@ -135,7 +135,7 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1047, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1047", SortOrder = 2, UniqueId = new Guid("1EA2E01F-EBD8-4CE1-8D71-6B1149E63548"), Text = "Member Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1048, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1048", SortOrder = 2, UniqueId = new Guid("135D60E0-64D9-49ED-AB08-893C9BA44AE5"), Text = "Media Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1049, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1049", SortOrder = 2, UniqueId = new Guid("9DBBCBBB-2327-434A-B355-AF1B84E5010A"), Text = "Multiple Media Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
-            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1050, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1050", SortOrder = 2, UniqueId = new Guid("B4E3535A-1753-47E2-8568-602CF8CFEE6F"), Text = "Multi URL Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1050, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1050", SortOrder = 2, UniqueId = new Guid("B4E3535A-1753-47E2-8568-602CF8CFEE6F"), Text = "Related Links", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
         }
 
         private void CreateLockData()
@@ -301,7 +301,7 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1048, EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker, DbType = "Ntext" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1049, EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker, DbType = "Ntext",
                 Configuration = "{\"multiPicker\":1}" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1050, EditorAlias = Constants.PropertyEditors.Aliases.MultiUrlPicker, DbType = "Ntext" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1050, EditorAlias = Constants.PropertyEditors.Aliases.RelatedLinks, DbType = "Ntext" });
         }
 
         private void CreateRelationTypeData()
