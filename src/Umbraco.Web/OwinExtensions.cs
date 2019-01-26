@@ -44,7 +44,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Nasty little hack to get contextualize from an owin context
+        /// Nasty little hack to get HttpContextBase from an owin context
         /// </summary>
         /// <param name="owinContext"></param>
         /// <returns></returns>
