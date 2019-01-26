@@ -438,7 +438,7 @@ namespace Umbraco.Web.Scheduling
             if (shutdownToken.IsCancellationRequested)
                 return null;
 
-            // if keep alive is false then don't block, exit if there is
+            // if KeepAlive is false then don't block, exit if there is
             // no task in the buffer - yes, there is a race condition, which
             // we'll take care of
             if (_options.KeepAlive == false && _tasks.Count == 0)
