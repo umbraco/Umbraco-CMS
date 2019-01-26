@@ -232,6 +232,10 @@
                     var app = editor.content.apps[i];
                     if (app.alias === "umbContent") {
                         app.active = true;
+                        // tell the world that the app has changed (but do it only once)
+                        if (e === 0) {
+                            selectApp(app);
+                        }
                     }
                     else {
                         app.active = false;
