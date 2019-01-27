@@ -1337,7 +1337,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="partialViews">Partial Views</key>
-    <key alias="partialViewMacros">Partial View Makro Filer</key>
+    <key alias="partialViewMacros">Partial View makrofiler</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
     <key alias="runwayModules">Runway-moduler</key>
