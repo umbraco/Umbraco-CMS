@@ -45,10 +45,26 @@
     <key alias="duplicateDomain">Domain wurde bereits zugewiesen.</key>
     <key alias="language">Sprache</key>
     <key alias="domain">Domain</key>
-    <key alias="domainCreated">Domain '%0%' hinzugefügt</key>
-    <key alias="domainDeleted">Domain '%0%' entfernt</key>
-    <key alias="domainExists">Die Domain '%0%' ist bereits zugeordnet</key>
-    <key alias="domainUpdated">Domain '%0%' aktualisiert</key>
+    <key alias="domainCreated">
+        <![CDATA[
+            Domain '%0%' hinzugefügt
+        ]]>
+    </key>
+    <key alias="domainDeleted">
+        <![CDATA[
+            Domain '%0%' entfernt
+        ]]>
+    </key>
+    <key alias="domainExists">
+        <![CDATA[
+            Die Domain '%0%' ist bereits zugeordnet
+        ]]>
+    </key>
+    <key alias="domainUpdated">
+        <![CDATA[
+            Domain '%0%' aktualisiert
+        ]]>
+    </key>
     <key alias="orEdit">Domains bearbeiten</key>
     <key alias="domainHelp">Beispiel: example.com, www.example.com</key>
     <key alias="inherit">Vererben</key>
@@ -679,16 +695,48 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
-    <key alias="contentPublishedFailedInvalid">%0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.</key>
-    <key alias="contentPublishedFailedByEvent">%0% konnte nicht veröffentlicht werden, da ein Plug-In die Aktion abgebrochen hat.</key>
-    <key alias="contentPublishedFailedByParent">%0% (ID: %1%) kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
+    <key alias="contentPublishedFailedInvalid">
+        <![CDATA[
+            %0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.
+        ]]>
+    </key>
+    <key alias="contentPublishedFailedByEvent">
+        <![CDATA[
+            %0% konnte nicht veröffentlicht werden, da ein Plug-In die Aktion abgebrochen hat.
+        ]]>
+    </key>
+    <key alias="contentPublishedFailedByParent">
+        <![CDATA[
+            %0% (Id: %1%) kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.
+        ]]>
+    </key>
     <key alias="includeUnpublished">Unveröffentlichte Unterelemente einschließen</key>
     <key alias="inProgress">Bitte warten, Veröffentlichung läuft...</key>
-    <key alias="inProgressCounter">%0% Elemente veröffentlicht, %1% Elemente ausstehend ...</key>
-    <key alias="nodePublish">%0% wurde veröffentlicht</key>
-    <key alias="nodePublishAll">%0% und die untergeordneten Elemente wurden veröffentlicht</key>
-    <key alias="publishAll">%0% und alle untergeordneten Elemente veröffentlichen</key>
-    <key alias="publishHelp">Mit &lt;em&gt;Ok&lt;/em&gt; wird &lt;strong&gt;%0%&lt;/strong&gt; veröffentlicht und auf der Website sichtbar.&lt;br/&gt;&lt;br /&gt;Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie &lt;em&gt;Unveröffentlichte Unterelemente einschließen&lt;/em&gt; aktivieren.</key>
+    <key alias="inProgressCounter">
+        <![CDATA[
+            %0% Elemente veröffentlicht, %1% Elemente ausstehend...
+        ]]>
+    </key>
+    <key alias="nodePublish">
+        <![CDATA[
+            %0% wurde veröffentlicht
+        ]]>
+    </key>
+    <key alias="nodePublishAll">
+        <![CDATA[
+            %0% und die untergeordneten Elemente wurden veröffentlicht
+        ]]>
+    </key>
+    <key alias="publishAll">
+        <![CDATA[
+            %0% und alle untergeordneten Elemente veröffentlichen
+        ]]>
+    </key>
+    <key alias="publishHelp">
+        <![CDATA[
+            Mit <em>Ok</em> wird <strong>%0%</strong> veröffentlicht und auf der Website sichtbar.<br/ ><br />Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie <em>Unveröffentlichte Unterelemente einschließen</em> aktivieren.
+        ]]>
+    </key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Sie haben keine freigegeben Farben konfiguriert</key>
@@ -775,12 +823,20 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="contentPublishedFailedByEvent">Das Veröffentlichen wurde von einem individuellen Ereignishandler abgebrochen</key>
     <key alias="contentTypeDublicatePropertyType">Eigenschaft existiert bereits</key>
     <key alias="contentTypePropertyTypeCreated">Eigenschaft erstellt</key>
-    <key alias="contentTypePropertyTypeCreatedText">Name: %0%  Datentyp: %1%</key>
+    <key alias="contentTypePropertyTypeCreatedText">
+        <![CDATA[
+            Name: %0%  Datentyp: %1%
+        ]]>
+    </key>
     <key alias="contentTypePropertyTypeDeleted">Eigenschaft gelöscht</key>
     <key alias="contentTypeSavedHeader">Dokumenttyp gespeichert</key>
     <key alias="contentTypeTabCreated">Registerkarte erstellt</key>
     <key alias="contentTypeTabDeleted">Registerkarte gelöscht</key>
-    <key alias="contentTypeTabDeletedText">Registerkarte %0% gelöscht</key>
+    <key alias="contentTypeTabDeletedText">
+        <![CDATA[
+            Registerkarte %0% gelöscht
+        ]]>
+    </key>
     <key alias="cssErrorHeader">Stylesheet wurde nicht gespeichert</key>
     <key alias="cssSavedHeader">Stylesheet gespeichert</key>
     <key alias="cssSavedText">Stylesheet erfolgreich gespeichert</key>
@@ -922,23 +978,41 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="fields">Felder</key>
     <key alias="includeSubpages">Einschließlich der Unterseiten</key>
     <key alias="mailBody">
-Hallo %0%,
+        <![CDATA[
+            Hallo %0%,
 
-das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
+            das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
 
-Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/translation/details.aspx?id=%4%.
+            Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/translation/details.aspx?id=%4%.
 
-Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/Umbraco.aspx
+            Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/Umbraco.aspx
 
-Einen schönen Tag wünscht
-Ihr freundlicher Umbraco-Robot
+            Einen schönen Tag wünscht
+            Ihr freundlicher Umbraco-Robot
+        ]]>
 	</key>
-    <key alias="mailSubject">[%0%] Aufgabe zur Übersetzung von '%1%'</key>
+    <key alias="mailSubject">
+        <![CDATA[
+            [%0%] Aufgabe zur Übersetzung von '%1%'
+        ]]>
+    </key>
     <key alias="noTranslators">Bitte erstellen Sie zuerst mindestens einen Übersetzer.</key>
     <key alias="ownedTasks">Von Ihnen erstellte Aufgaben</key>
-    <key alias="ownedTasksHelp">Die Liste unten zeigt die von &lt;strong&gt;Ihnen&lt;/strong&gt; erstellten Seiten. Um eine ausführliche Liste mit Kommentaren zu sehen, klicken Sie auf "Details" oder einfach auf den Seitennamen. Sie können die Seite auch direkt als XML herunterladen, indem Sie den Link "XML herunterladen" anklicken. Um eine Übersetzung abzuschließen, gehen Sie bitte auf die Detailansicht und klicken Sie auf "Aufgabe abschließen".</key>
-    <key alias="pageHasBeenSendToTranslation">Die Seite '%0%' wurde zur Übersetzung gesendet</key>
-    <key alias="sendToTranslate">Sendet die Seite '%0%' zur Übersetzung</key>
+    <key alias="ownedTasksHelp">
+        <![CDATA[
+            Die Liste unten zeigt die von <strong>Ihnen</strong> erstellten Seiten. Um eine ausführliche Liste mit Kommentaren zu sehen, klicken Sie auf "Details" oder einfach auf den Seitennamen. Sie können die Seite auch direkt als XML herunterladen, indem Sie den Link "XML herunterladen" anklicken. Um eine Übersetzung abzuschließen, gehen Sie bitte auf die Detailansicht und klicken Sie auf "Aufgabe abschließen".
+        ]]>
+    </key>
+    <key alias="pageHasBeenSendToTranslation">
+        <![CDATA[
+            Die Seite '%0%' wurde zur Übersetzung gesendet
+        ]]>
+    </key>
+    <key alias="sendToTranslate">
+        <![CDATA[
+            Sendet die Seite '%0%' zur Übersetzung
+        ]]>
+    </key>
     <key alias="taskAssignedBy">Zugewiesen von</key>
     <key alias="taskOpened">Aufgabe aktiviert</key>
     <key alias="totalWords">Anzahl der Wörter</key>
@@ -983,7 +1057,11 @@ Ihr freundlicher Umbraco-Robot
   </area>
   <area alias="update">
     <key alias="updateAvailable">Neues Update verfügbar</key>
-    <key alias="updateDownloadText">%0% verfügbar, hier klicken zum Herunterladen</key>
+    <key alias="updateDownloadText">
+        <![CDATA[
+            %0% verfügbar, hier klicken zum Herunterladen
+        ]]>
+    </key>
     <key alias="updateNoServer">Keine Verbindung zum Update-Server</key>
     <key alias="updateNoServerError">Fehler beim Überprüfen der Updates. Weitere Informationen finden Sie im Stacktrace.</key>
   </area>
