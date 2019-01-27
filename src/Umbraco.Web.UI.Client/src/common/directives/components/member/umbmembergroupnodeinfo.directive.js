@@ -7,8 +7,6 @@
 
             var evts = [];
 
-            scope.allowChangeMediaType = false;
-
             function onInit() {
 
                 // make sure dates are formatted to the user's locale
