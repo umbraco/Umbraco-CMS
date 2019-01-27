@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (name.ContainsAny(Path.GetInvalidPathChars())) {
-                return Request.CreateNotificationValidationErrorResponse("The folder name cannot contain illegal characters.");
+                return Request.CreateNotificationValidationErrorResponse(Services.TextService.Localize("codefile/createFolderIllegalChars"));
             }
 
             // if the parentId is root (-1) then we just need an empty string as we are
