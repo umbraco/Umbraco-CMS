@@ -8,7 +8,7 @@
 
         <umb-drawer-content>
 
-            <!-- Tours -->
+        <!-- Tours -->
         <div class="umb-help-section" ng-if="vm.tours" data-element="help-tours">
 
             <h5 class="umb-help-section__title">Tours</h5>
@@ -47,72 +47,71 @@
                     </div>
                 </div>
 
-            </div>
+        </div>
 
-
-            <!-- Show in custom help dashboard -->
+        <!-- Show in custom help dashboard -->
         <div class="umb-help-section" data-element="help-custom-dashboard" ng-if="vm.customDashboard.length > 0">
-                <div ng-repeat="tab in vm.customDashboard">
-                    <div ng-repeat="property in tab.properties">
-                        <div>
-                            <h5 ng-if="property.caption">{{property.caption}}</h5>
-                            <div ng-include="property.path"></div>
-                        </div>
+            <div ng-repeat="tab in vm.customDashboard">
+                <div ng-repeat="property in tab.properties">
+                    <div>
+                        <h5 ng-if="property.caption">{{property.caption}}</h5>
+                        <div ng-include="property.path"></div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!--  Help Content -->
+        <!--  Help Content -->
         <div class="umb-help-section" data-element="help-articles" ng-if="vm.topics.length > 0">
             <h5 class="umb-help-section__title">Articles</h5>
-                <ul class="umb-help-list">
-                    <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
-                    <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-                            <span>
-                                <span class="umb-help-list-item__title">
-                                    <span class="bold">{{topic.name}}</span>
-                                    <span class="umb-help-list-item__open-icon icon-out"></span>
-                                </span>
-                                <span class="umb-help-list-item__description">{{topic.description}}</span>
+            <ul class="umb-help-list">
+                <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
+                <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                        <span>
+                            <span class="umb-help-list-item__title">
+                                <span class="bold">{{topic.name}}</span>
+                                <span class="umb-help-list-item__open-icon icon-out"></span>
                             </span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                            <span class="umb-help-list-item__description">{{topic.description}}</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-            <!--  Umbraco tv content -->
+        <!--  Umbraco tv content -->
         <div class="umb-help-section" data-element="help-videos" ng-if="vm.hasAccessToSettings">
             <h5 class="umb-help-section__title" ng-if="vm.videos.length > 0">Videos</h5>
-                <ul class="umb-help-list">
-                    <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
-                    <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-                            <i class="umb-help-list-item__icon icon-tv-old"></i>
-                            <span class="umb-help-list-item__title">{{video.title}}</span>
-                            <i class="umb-help-list-item__open-icon icon-out"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <ul class="umb-help-list">
+                <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
+                <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                        <i class="umb-help-list-item__icon icon-tv-old"></i>
+                        <span class="umb-help-list-item__title">{{video.title}}</span>
+                        <i class="umb-help-list-item__open-icon icon-out"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-            <!--  Links -->
+        <!--  Links -->
         <div class="umb-help-section" data-element="help-links" ng-if="vm.hasAccessToSettings">
             <a data-element="help-link-umbraco-tv" class="umb-help-badge" target="_blank" href="https://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-                    <i class="umb-help-badge__icon icon-tv-old"></i>
-                    <div class="umb-help-badge__title">Visit umbraco.tv</div>
-                    <small>
-                        <localize key="help_theBestUmbracoVideoTutorials">The best Umbraco video tutorials</localize>
-                    </small>
-                </a>
+                <i class="umb-help-badge__icon icon-tv-old"></i>
+                <div class="umb-help-badge__title">Visit umbraco.tv</div>
+                <small>
+                    <localize key="help_theBestUmbracoVideoTutorials">The best Umbraco video tutorials</localize>
+                </small>
+            </a>
 
             <a data-element="help-link-our-umbraco" class="umb-help-badge" target="_blank" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
-                    <i class="umb-help-badge__icon icon-favorite"></i>
+                <i class="umb-help-badge__icon icon-favorite"></i>
                     
-                    <div class="umb-help-badge__title">Visit our.umbraco.com</div>
-                    <small>
-                        <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
-                    </small>
-                </a>
-            </div>
+                <div class="umb-help-badge__title">Visit our.umbraco.com</div>
+                <small>
+                    <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
+                </small>
+            </a>
+        </div>
 
         </umb-drawer-content>
 
