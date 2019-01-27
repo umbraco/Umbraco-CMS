@@ -42,7 +42,7 @@
                     <umb-button ng-if="model.infiniteMode"
                                 action="close()"
                                 button-style="link"
-                                label="Close"
+                                label-key="general_close"
                                 type="button">
                     </umb-button>
 
@@ -50,14 +50,13 @@
                                 ng-if="page.listViewPath"
                                 type="link"
                                 href="#{{page.listViewPath}}"
-                                label="Return to list"
                                 label-key="buttons_returnToList">
                     </umb-button>
 
                     <!-- label-key="buttons_save" -->
                     <umb-button alias="save"
                                 type="submit"
-                                label="{{page.submitButtonLabel}}"
+                                label-key="{{page.submitButtonLabelKey}}"
                                 button-style="success"
                                 shortcut="ctrl+s"
                                 state="page.saveButtonState">
