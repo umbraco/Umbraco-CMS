@@ -182,6 +182,11 @@
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
     <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
   </area>
+  <area alias="codefile">
+    <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
+    <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
+      <key alias="deleteItemFailed">Sletning af filen/mappen fejlede: %0%</key>
+  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Udgivet</key>
     <key alias="about">Om siden</key>
@@ -282,6 +287,7 @@
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
+    <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
@@ -1158,6 +1164,7 @@ Mange hilsner fra Umbraco robotten
   </area>
 
   <area alias="template">
+    <key alias="deleteByIdFailed">Sletning af skabelonen med ID %0% fejlede</key>
     <key alias="edittemplate">Rediger skabelon</key>
 
     <key alias="insertSections">Sektioner</key>

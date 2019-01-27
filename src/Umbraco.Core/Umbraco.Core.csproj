@@ -572,6 +572,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddInstructionCountColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddCmsMediaTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddUserLoginTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourteenZero\UpdateMemberGroupPickerData.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\RenameTrueFalseField.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\SetDefaultTagsStorageType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoAuditTable.cs" />
