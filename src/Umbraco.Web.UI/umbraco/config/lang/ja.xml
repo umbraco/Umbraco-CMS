@@ -799,7 +799,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     ]]></key>
     <key alias="contentPublishedFailedByParent">
     <![CDATA[
-      親ページが公開されていないので、%0% (ID: %1%) は公開できませんでした。
+      %0% (Id: %1%) 親ページが公開されていないので、%0% (ID: %1%) は公開できませんでした。
     ]]></key>
     <key alias="includeUnpublished">非公開の子ページも含めます</key>
     <key alias="inProgress">公開を進めています - 少々お待ちください...</key>
