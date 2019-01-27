@@ -347,6 +347,11 @@ namespace Umbraco.Web.Editors
 
             var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
+            // translate the content type name if applicable
+            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if(mapped.DocumentType != null)
+                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -696,7 +701,10 @@ namespace Umbraco.Web.Editors
                     {
                         display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                            contentItem.ReleaseDate.HasValue
+                                ? Services.TextService.Localize("speechBubbles/editContentSavedWithReleaseDateText", new [] { contentItem.ReleaseDate.Value.ToLongDateString(), contentItem.ReleaseDate.Value.ToShortTimeString() })
+                                : Services.TextService.Localize("speechBubbles/editContentSavedText")
+                        );
                     }
                     else
                     {
@@ -718,7 +726,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    ShowMessageForPublishStatus(publishStatus.Result, display);
+                    ShowMessageForPublishStatus(publishStatus.Result, display, contentItem.ExpireDate);
                     break;
             }
 
@@ -759,7 +767,7 @@ namespace Umbraco.Web.Editors
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
-                ShowMessageForPublishStatus(publishResult.Result, notificationModel);
+                ShowMessageForPublishStatus(publishResult.Result, notificationModel, foundContent.ExpireDate);
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
@@ -839,7 +847,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, 'D')]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.ContentService.EmptyRecycleBin();
@@ -1040,15 +1048,18 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display)
+        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display, DateTime? expireDate)
         {
             switch (status.StatusType)
             {
                 case PublishStatusType.Success:
-                case PublishStatusType.SuccessAlreadyPublished:
+                case PublishStatusType.SuccessAlreadyPublished:                    
                     display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                            expireDate.HasValue
+                                ? Services.TextService.Localize("speechBubbles/editContentPublishedWithExpireDateText", new [] { expireDate.Value.ToLongDateString(), expireDate.Value.ToShortTimeString() })
+                                : Services.TextService.Localize("speechBubbles/editContentPublishedText")
+                    );
                     break;
                 case PublishStatusType.FailedPathNotPublished:
                     display.AddWarningNotification(

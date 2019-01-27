@@ -7,6 +7,7 @@
                        value="{{item.key}}"
                        ng-model="item.checked"
                        class="umb-checkboxlist__input" />
+                       ng-required="model.validation.mandatory && !model.value.length" />
 
                 <div class="umb-checkboxlist__state">
                     <div class="umb-checkboxlist__check">

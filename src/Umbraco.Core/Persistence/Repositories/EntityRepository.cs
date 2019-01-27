@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -64,7 +64,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
-            var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false)).OrderBy("umbracoNode.id");
+            var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false));
+            pagedSql = (orderDirection == Direction.Descending) ? pagedSql.OrderByDescending("umbracoNode.id") : pagedSql.OrderBy("umbracoNode.id");
 
             IEnumerable<IUmbracoEntity> result;
 
@@ -80,8 +81,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var idGroup in ids)
                 {
                     var propSql = GetPropertySql(Constants.ObjectTypes.Media)
-                        .Where("contentNodeId IN (@ids)", new {ids = idGroup})
-                        .OrderBy("contentNodeId");
+                        .Where("contentNodeId IN (@ids)", new { ids = idGroup });
+                    propSql = (orderDirection == Direction.Descending) ? propSql.OrderByDescending("contentNodeId") : propSql.OrderBy("contentNodeId");
 
                     //This does NOT fetch all data into memory in a list, this will read
                     // over the records as a data reader, this is much better for performance and memory,
@@ -331,14 +332,23 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
+        /// <summary>
+        /// Gets entities by query.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="objectTypeId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Note that this will also fetch all property data for media items, which can cause performance problems
+        /// when used without paging, in sites with large amounts of data in cmsPropertyData.
+        /// </remarks>
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
-
-            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
-            
+
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
 
@@ -364,22 +374,49 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
-                var finalSql = entitySql.Append(GetGroupBy(isContent, false));
-
-                //query = read forward data reader, do not load everything into mem
-                var dtos = _work.Database.Query<dynamic>(finalSql);
-                var collection = new EntityDefinitionCollection();
-                foreach (var dto in dtos)
-                {
-                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
-                }
-                return collection.Select(x => x.BuildFromDynamic()).ToList();
+                return GetByQueryInternal(entitySql, isContent, isMedia);
             }
         }
 
+        /// <summary>
+        /// Gets entities by query without fetching property data.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="objectTypeId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is supposed to be internal and can be used when getting all entities without paging, without causing
+        /// performance issues.
+        /// </remarks>
+        internal IEnumerable<IUmbracoEntity> GetMediaByQueryWithoutPropertyData(IQuery<IUmbracoEntity> query)
+        {
+            var sqlClause = GetBaseWhere(GetBase, false, true, null, UmbracoObjectTypes.Media.GetGuid());
+
+            var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
+            var entitySql = translator.Translate();
+
+            return GetByQueryInternal(entitySql, false, true);
+        }
+
+        internal IEnumerable<IUmbracoEntity> GetByQueryInternal(Sql entitySql, bool isContent, bool isMedia)
+        {
+            var factory = new UmbracoEntityFactory();
+
+            //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
+            var finalSql = entitySql.Append(GetGroupBy(isContent, isMedia));
+
+            //query = read forward data reader, do not load everything into mem
+            var dtos = _work.Database.Query<dynamic>(finalSql);
+            var collection = new EntityDefinitionCollection();
+            foreach (var dto in dtos)
+            {
+                collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, isMedia));
+            }
+            return collection.Select(x => x.BuildFromDynamic()).ToList();
+        }
+
         #endregion
-        
+
 
         #region Sql Statements
 

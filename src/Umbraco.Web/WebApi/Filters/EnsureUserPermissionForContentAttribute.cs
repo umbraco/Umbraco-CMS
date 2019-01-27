@@ -40,6 +40,12 @@ namespace Umbraco.Web.WebApi.Filters
             _nodeId = nodeId;
         }
 
+        public EnsureUserPermissionForContentAttribute(int nodeId, char permissionToCheck)
+            : this(nodeId)
+        {
+            _permissionToCheck = permissionToCheck;
+        }
+
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
             if (string.IsNullOrWhiteSpace(paramName)) throw new ArgumentException("Value cannot be null or whitespace.", "paramName");
