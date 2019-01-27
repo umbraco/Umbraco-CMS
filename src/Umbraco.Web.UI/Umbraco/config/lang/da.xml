@@ -1044,6 +1044,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editMediaSaved">Medie gemt</key>
     <key alias="editMediaSavedText">Medie gemt uden problemer</key>
     <key alias="editMemberSaved">Medlem gemt</key>
+    <key alias="editMemberGroupSaved">Medlemsgruppe gemt</key>
     <key alias="editStylesheetPropertySaved">Stylesheetegenskab gemt</key>
     <key alias="editStylesheetSaved">Stylesheet gemt</key>
     <key alias="editTemplateSaved">Skabelon gemt</key>
