@@ -42,6 +42,7 @@
 
             &:before{
                 opacity: 1;
+                transform: scale(1);
             }
         }
     }
@@ -65,7 +66,6 @@
             background: @green;
             width: 9px;
             height: 9px;
-            transition: .05s ease-out;
             position: absolute;
             left: 0;
             right: 0;
@@ -74,7 +74,8 @@
             margin: auto;
             border-radius: 100%;
             opacity: 0;
-            transition: .05s ease-out;
+            transform: scale(0);
+            transition: .15s ease-out;
         }
     }
 }
