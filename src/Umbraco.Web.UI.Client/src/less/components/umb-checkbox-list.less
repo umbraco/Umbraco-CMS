@@ -1,3 +1,6 @@
+@checkboxWidth: 15px;
+@checkboxHeight: 15px;
+
 .umb-checkbox-list {
   list-style: none;
   margin-left: 0;
@@ -69,10 +72,15 @@
 
 /* Styling for the .umb-checkboxlist class - Styling added 28-10-2018 using BEM syntax */
 .umb-checkboxlist{
+    &__item{
+        line-height: 1;
+        margin: 0 0 5px;
+    }
+
     &__label{
         position: relative;
         padding: 0;
-        margin: 0 0 15px 0;
+        margin: 0;
 
         &-text{
             margin: 0 0 0 10px;
@@ -88,13 +96,13 @@
         opacity: 0;
 
         &:focus ~ .umb-checkboxlist__state .umb-checkboxlist__check{
-            box-shadow: 0 1px 3px fade(@black, 12%), 0 1px 2px fade(@black, 24%);
+            border-color: @gray-5;
         }
 
         &:checked ~ .umb-checkboxlist__state .umb-checkboxlist__check{
             &:before{
-                width: 20px;
-                height: 20px;
+                width: @checkboxWidth;
+                height: @checkboxHeight;
             }
         }
 
@@ -106,23 +114,24 @@
     &__state{
         display: flex;
         flex-wrap: wrap;
-        height: 20px;
+        align-items: center;
+        height: 17px;
         position: relative;
         left: 1px;
     }
 
     &__check{
         position: relative;
-        border: 1px solid @gray-8;
-        width: 20px;
-        height: 20px;
+        border: 1px solid @gray-7;
+        width: @checkboxWidth;
+        height: @checkboxHeight;
 
         &:before{
             content: "";
             background: @green;
             width: 0;
             height: 0;
-            transition: .1s ease-out;
+            transition: .05s ease-out;
             position: absolute;
             left: 0;
             right: 0;
@@ -135,13 +144,13 @@
     &__icon{
         color: @white;
         text-align: center;
-        font-size: 13px;
+        font-size: 10px;
         opacity: 0;
-        transition: .3s ease-out;
+        transition: .2s ease-out;
 
         &:before{
             position: absolute;
-            top: 1px;
+            top: -2px;
             right: 0;
             left: 0;
             bottom: 0;
