@@ -971,10 +971,14 @@ Mange hilsner fra Umbraco robotten
     </key>
     <key alias="contentPublishedFailedInvalid">
       <![CDATA[
-    %0% (ID: %1%) kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
+    %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]>
     </key>
-    <key alias="editContentPublishedFailedByParent">Udgivelsen fejlede fordi en overordnet side ikke er publiceret</key>
+    <key alias="editContentPublishedFailedByParent">
+        <![CDATA[
+            %0% (Id: %1%) blev ikke publiceret fordi en overordnet side ikke er publiceret.
+        ]]>
+    </key>
 
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
