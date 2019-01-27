@@ -103,11 +103,14 @@
         left: 0;
         opacity: 0;
 
+        &:checked:focus ~ .umb-checkboxlist__state .umb-checkboxlist__check,
         &:focus ~ .umb-checkboxlist__state .umb-checkboxlist__check{
             border-color: @gray-5;
         }
 
         &:checked ~ .umb-checkboxlist__state .umb-checkboxlist__check{
+            border-color: @green;
+
             &:before{
                 width: @checkboxWidth;
                 height: @checkboxHeight;
