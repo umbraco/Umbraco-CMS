@@ -1020,6 +1020,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid.]]></key>
   </area>
   <area alias="speechBubbles">
+    <key alias="validationFailedHeader">Validering</key>
+    <key alias="validationFailedMessage">Valideringsfejl skal rettes før elementet kan gemmes</key>
+    <key alias="operationFailedHeader">Fejlet</key>
+    <key alias="operationSavedHeader">Gemt</key>
+    <key alias="invalidUserPermissionsText">Utilstrækkelige brugerrettigheder, kunne ikke fuldføre handlingen</key>
     <key alias="operationCancelledHeader">Annulleret</key>
     <key alias="operationCancelledText">Handlingen blev annulleret af et 3. part tilføjelsesprogram</key>
     <key alias="contentTypeDublicatePropertyType">Property type eksisterer allerede</key>
@@ -1051,6 +1056,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editUserError">Der er opstået en fejl under redigering</key>
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
+    <key alias="editUserGroupSaved">Brugergruppe gemt</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
