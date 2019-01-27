@@ -990,8 +990,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
         <![CDATA[
       %0% (Id: %1%) nie może zostać opublikowany, ponieważ element wygasł.
     ]]></key>
-    <key alias="contentPublishedFailedInvalid"><![CDATA[
-      %0% nie może zostać opublikowany, ponieważ następujące właściwości:  %1%  nie przeszły zasad walidacji.
+    <key alias="contentPublishedFailedInvalid">
+        <![CDATA[
+      %0% (Id: %1%) nie może zostać opublikowany, ponieważ następujące właściwości:  %2%  nie przeszły zasad walidacji.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% nie może zostać opublikowany ze względu na odwołanie akcji przez rozszerzenie firm trzecich

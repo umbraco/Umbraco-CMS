@@ -975,7 +975,7 @@ Mange hilsner fra Umbraco robotten
     </key>
     <key alias="contentPublishedFailedInvalid">
       <![CDATA[
-    %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
+    %0% (Id: %1%) kunne ikke publiceres da følgende egenskaber :  %2%  ikke overholdte valderingsreglerne.
     ]]>
     </key>
     <key alias="editContentPublishedFailedByParent">

@@ -1089,11 +1089,7 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                                    new[]
-                                    {
-                                                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
-                                                                string.Join(",", status.InvalidProperties.Select(x => x.Alias))
-                                    }).Trim());
+                            new[] { status.ContentItem.Name, status.ContentItem.Id.ToString(), string.Join(",", status.InvalidProperties.Select(x => x.Alias) )}));
                     break;
                 default:
                     throw new IndexOutOfRangeException();

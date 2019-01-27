@@ -701,7 +701,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     </key>
     <key alias="contentPublishedFailedInvalid">
         <![CDATA[
-            %0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.
+            %0% (Id: %1%) konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.
         ]]>
     </key>
     <key alias="contentPublishedFailedByEvent">

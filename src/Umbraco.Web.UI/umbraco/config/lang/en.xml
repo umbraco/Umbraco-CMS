@@ -1265,7 +1265,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         </key>
         <key alias="contentPublishedFailedInvalid">
             <![CDATA[
-      %0% could not be published because these properties:  %1%  did not pass validation rules.
+      %0% (Id: %1%) could not be published because these properties:  %2%  did not pass validation rules.
     ]]>
         </key>
         <key alias="contentPublishedFailedByEvent">

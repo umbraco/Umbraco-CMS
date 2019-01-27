@@ -812,7 +812,7 @@
       %0% (Id: %1%) 無法發佈，因為已經過期。
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
-      %0% 無法發佈，因為屬性：%1% 沒有通過驗證規則。
+      %0% 無法發佈，因為屬性：%2% 沒有通過驗證規則。
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% 無法發佈，因為第三方擴充元件取消這項操作。

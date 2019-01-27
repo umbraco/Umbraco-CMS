@@ -960,7 +960,7 @@
     </key>
     <key alias="contentPublishedFailedInvalid">
       <![CDATA[
-       %0%不能发布，因为%1%字段不合验证规则。
+       %0%不能发布，因为%2%字段不合验证规则。
     ]]>
     </key>
     <key alias="contentPublishedFailedByEvent">

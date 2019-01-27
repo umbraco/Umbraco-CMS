@@ -868,8 +868,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
         <![CDATA[
       %0% (Id: %1%) kon niet gepubliceerd worden omdat het item niet meer geldig is.
     ]]></key>
-    <key alias="contentPublishedFailedInvalid"><![CDATA[
-      %0% kan niet worden gepubliceerd, omdat de eigenschappen:%1% de validatieregels niet hebben doorstaan.
+    <key alias="contentPublishedFailedInvalid">
+        <![CDATA[
+      %0% (Id: %1%) kan niet worden gepubliceerd, omdat de eigenschappen:%2% de validatieregels niet hebben doorstaan.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% kon niet worden gepubliceerd doordat een 3rd party extensie het heeft geannuleerd.    

@@ -688,7 +688,7 @@
     ]]>
     </key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
-      %0% nemůže být publikována, protože tyto vlastnosti: %1%  nesplňují validační pravidla.
+      %0% (Id: %1%) nemůže být publikována, protože tyto vlastnosti: %2%  nesplňují validační pravidla.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% nemůže být publikována, protože rozšíření třetí strany akci zrušilo.

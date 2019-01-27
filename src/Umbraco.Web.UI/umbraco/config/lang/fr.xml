@@ -1227,7 +1227,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
       <![CDATA[
-      %0% n'a pas pu être publié car cet élément est programmé pour être publié bientôt.
+      %0% (Id: %1%) n'a pas pu être publié car cet élément est programmé pour être publié bientôt.
     ]]>
     </key>
 	<key alias="contentPublishedFailedExpired">
@@ -1237,7 +1237,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 	</key>
     <key alias="contentPublishedFailedInvalid">
 		<![CDATA[
-      %0% n'a pas pu être publié à cause des propriétés suivantes qui n'ont pas passé les règles de validation :  %1%.
+      %0% (Id: %1%) n'a pas pu être publié à cause des propriétés suivantes qui n'ont pas passé les règles de validation :  %2%.
     ]]>
 	</key>
     <key alias="contentPublishedFailedByEvent">

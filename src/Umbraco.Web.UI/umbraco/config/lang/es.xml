@@ -998,7 +998,7 @@
         </key>
         <key alias="contentPublishedFailedInvalid">
             <![CDATA[
-      %0% no se pudo publicar porque estas propiedades:  %1%  no pasaron las reglas de validación.
+      %0% (Id: %1%) no se pudo publicar porque estas propiedades:  %2%  no pasaron las reglas de validación.
     ]]>
         </key>
         <key alias="contentPublishedFailedByEvent">%0% no se pudo publicar debido a que una extensión de otro proveedor ha cancelado la acción.</key>
