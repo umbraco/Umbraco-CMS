@@ -1349,7 +1349,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="userTypes">Brugertyper</key>
     <key alias="users">Brugere</key>
     <key alias="settingsGroup">Indstillinger</key>
-    <key alias="templatingGroup">Templating</key>
+    <key alias="templatingGroup">Design og layout</key>
     <key alias="thirdPartyGroup">Tredjepart</key>
   </area>
   <area alias="update">
