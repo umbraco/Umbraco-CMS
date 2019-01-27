@@ -864,8 +864,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       %0% kan niet worden gepubliceerd omdat het item is gepland voor release.
     ]]>
     </key>
-	<key alias="contentPublishedFailedExpired"><![CDATA[
-      %0% kon niet gepubliceerd worden omdat het item niet meer geldig is.
+	<key alias="contentPublishedFailedExpired">
+        <![CDATA[
+      %0% (Id: %1%) kon niet gepubliceerd worden omdat het item niet meer geldig is.
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% kan niet worden gepubliceerd, omdat de eigenschappen:%1% de validatieregels niet hebben doorstaan.

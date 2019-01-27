@@ -1373,8 +1373,9 @@
     <key alias="contentPublishedFailedByEvent"><![CDATA[
 		Документ %0% не может быть опубликован. Операцию отменил установленный в системе пакет дополнений.
 		]]></key>
-	<key alias="contentPublishedFailedExpired"><![CDATA[
-      Документ %0% не может быть опубликован, так как текущая информация в нем устарела.
+	<key alias="contentPublishedFailedExpired">
+        <![CDATA[
+      Документ %0% (Id: %1%) не может быть опубликован, так как текущая информация в нем устарела.
     ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
       Документ %0% (Id: %1%) не может быть опубликован, так как не опубликован его родительский документ.

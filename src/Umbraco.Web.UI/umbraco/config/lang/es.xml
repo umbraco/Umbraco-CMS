@@ -993,7 +993,7 @@
         </key>
         <key alias="contentPublishedFailedExpired">
             <![CDATA[
-      %0% no se pudo publicar porque el elemento ha caducado.
+      %0% (Id: %1%) no se pudo publicar porque el elemento ha caducado.
     ]]>
         </key>
         <key alias="contentPublishedFailedInvalid">

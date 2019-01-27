@@ -986,8 +986,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       %0% nie może zostać opublikowany, ponieważ element nie został zaplanowany do wydania.
     ]]>
     </key>
-    <key alias="contentPublishedFailedExpired"><![CDATA[
-      %0% nie może zostać opublikowany, ponieważ element wygasł.
+    <key alias="contentPublishedFailedExpired">
+        <![CDATA[
+      %0% (Id: %1%) nie może zostać opublikowany, ponieważ element wygasł.
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% nie może zostać opublikowany, ponieważ następujące właściwości:  %1%  nie przeszły zasad walidacji.

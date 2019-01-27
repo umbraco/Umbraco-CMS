@@ -966,7 +966,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
     <key alias="contentPublishedFailedExpired">
       <![CDATA[
-      %0% Udgivelsen kunne ikke blive publiceret da publiceringsdatoen er overskredet
+      %0% (Id: %1%) Siden kunne ikke publiceres da publiceringsdatoen er overskredet
      ]]>
     </key>
     <key alias="contentPublishedFailedInvalid">

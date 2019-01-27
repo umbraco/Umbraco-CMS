@@ -807,8 +807,9 @@
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% 無法現在發佈，因為它已經設定發佈時程。
     ]]></key>
-    <key alias="contentPublishedFailedExpired"><![CDATA[
-      %0% 無法發佈，因為已經過期。
+    <key alias="contentPublishedFailedExpired">
+        <![CDATA[
+      %0% (Id: %1%) 無法發佈，因為已經過期。
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% 無法發佈，因為屬性：%1% 沒有通過驗證規則。

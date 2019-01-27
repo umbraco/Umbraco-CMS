@@ -955,7 +955,7 @@
     </key>
     <key alias="contentPublishedFailedExpired">
       <![CDATA[
-      %0% 无法发布, 因为该项已过期。
+      %0% (Id: %1%) 无法发布, 因为该项已过期。
     ]]>
     </key>
     <key alias="contentPublishedFailedInvalid">

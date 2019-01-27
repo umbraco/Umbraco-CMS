@@ -1083,6 +1083,7 @@ namespace Umbraco.Web.Editors
                                     new[]
                                     {
                                                                 string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                                                string.Join(",", status.InvalidProperties.Select(x => x.Alias))
                                     }).Trim());
                     break;
                 case PublishStatusType.FailedIsTrashed:

@@ -787,8 +787,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <![CDATA[
       %0% ページは公開がスケジュールされているため、公開されませんでした。
     ]]></key>
-	<key alias="contentPublishedFailedExpired"><![CDATA[
-      アイテムの有効期限が切れているため %0% を公開できません。
+	<key alias="contentPublishedFailedExpired">
+        <![CDATA[
+      %0% (Id: %1%) アイテムの有効期限が切れているため %0% を公開できません。
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %1% のプロパティがバリデーション定義に違反したため、%0% は公開できませんでした。

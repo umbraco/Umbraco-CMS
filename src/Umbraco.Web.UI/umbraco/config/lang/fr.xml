@@ -1232,7 +1232,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     </key>
 	<key alias="contentPublishedFailedExpired">
 		<![CDATA[
-      %0% n'a pas pu être publié car cet élément a expiré.
+      %0% (Id: %1%) n'a pas pu être publié car cet élément a expiré.
     ]]>
 	</key>
     <key alias="contentPublishedFailedInvalid">
