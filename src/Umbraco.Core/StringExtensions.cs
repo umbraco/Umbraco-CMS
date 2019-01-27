@@ -189,7 +189,6 @@ namespace Umbraco.Core
                 outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
             return new string(outputArray);
         }
-
         private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
         /// <summary>
@@ -542,7 +541,7 @@ namespace Umbraco.Core
         public static string StripHtml(this string text)
         {
             const string pattern = @"<(.|\n)*?>";
-            return Regex.Replace(text, pattern, String.Empty);
+            return Regex.Replace(text, pattern, string.Empty);
         }
 
         /// <summary>

@@ -18,7 +18,7 @@
             />
         </div>
 
-        <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow umb-cropsizes__input-wrap--icon">
+        <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
             <label for="addcropwidth"><localize key="general_width">Width</localize></label>
             <input
                 name="newItem.width"
@@ -26,7 +26,7 @@
                 localize="placeholder"
                 placeholder="@general_width"
                 ng-model="newItem.width"
-                class="umb-cropsizes__input umb-cropsizes__input--narrow"
+                class="umb-cropsizes__input"
                 val-highlight="{{hasError}}"
                 id="addcropwidth"
                 min="0"
@@ -42,7 +42,7 @@
                 localize="placeholder"
                 placeholder="@general_height"
                 ng-model="newItem.height"
-                class="umb-cropsizes__input umb-cropsizes__input--narrow"
+                class="umb-cropsizes__input"
                 val-highlight="{{hasError}}"
                 id="addcropheight"
                 min="0"
@@ -58,7 +58,7 @@
 
     </div>
 
-    <div ui-sortable="sortableOptions" class="umb-cropsizes__sortable">
+    <div ui-sortable="sortableOptions" class="umb-cropsizes__sortable" ng-model="model.value">
         <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="item in model.value">
             <i class="icon icon-navigation handle"></i>
             <div class="umb-prevalues-multivalues__left">

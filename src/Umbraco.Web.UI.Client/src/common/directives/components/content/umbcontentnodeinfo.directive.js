@@ -53,6 +53,9 @@
                 if (scope.documentType !== null) {
                     scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
                 }
+
+                // only allow configuring scheduled publishing if the user has publish ("U") and unpublish ("Z") permissions on this node
+                scope.allowScheduledPublishing = _.contains(scope.node.allowedActions, "U") && _.contains(scope.node.allowedActions, "Z");
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
