@@ -1,13 +1,28 @@
+@checkboxWidth: 15px;
+@checkboxHeight: 15px;
+
 .umb-radiobuttons{
+    ul{
+        float: left;
+    }
+
+    &__item{
+        line-height: 1;
+        margin: 0 0 5px;
+    }
+
     &__label{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
         position: relative;
         padding: 0;
-        margin: 0 0 15px 0;
+        margin: 0;
 
         &-text{
-            margin: 0 0 0 10px;
+            margin: 0 0 0 26px;
             position: relative;
-            top: 3px;
+            top: 2px;
         }
     }
 
@@ -17,46 +32,40 @@
         left: 0;
         opacity: 0;
 
+        &:focus:checked ~ .umb-radiobuttons__state .umb-radiobuttons__check,
         &:focus ~ .umb-radiobuttons__state .umb-radiobuttons__check{
-            box-shadow: 0 1px 3px fade(@black, 12%), 0 1px 2px fade(@black, 24%);
-        }
-
-        &:focus:checked ~ .umb-radiobuttons__state .umb-radiobuttons__check{
-            box-shadow: none;
+            border-color: @gray-5;
         }
 
         &:checked ~ .umb-radiobuttons__state .umb-radiobuttons__check{
-            &:before{
-                width: 22px;
-                height: 22px;
-            }
-        }
+            border-color: @green;
 
-        &:checked ~ .umb-radiobuttons__state .umb-radiobuttons__icon{
-            opacity: 1;
+            &:before{
+                opacity: 1;
+            }
         }
     }
 
     &__state{
-        display: flex;
-        flex-wrap: wrap;
-        height: 22px;
-        position: relative;
+        height: 17px;
+        position: absolute;
+        top: 2px;
+        left: 0;
     }
 
     &__check{
-        border: 1px solid @gray-8;
-        border-radius: 100%;
-        width: 22px;
-        height: 22px;
         position: relative;
+        border: 1px solid @gray-7;
+        width: @checkboxWidth;
+        height: @checkboxHeight;
+        border-radius: 100%;
 
         &:before{
             content: "";
             background: @green;
-            width: 0;
-            height: 0;
-            transition: .1s ease-out;
+            width: 9px;
+            height: 9px;
+            transition: .05s ease-out;
             position: absolute;
             left: 0;
             right: 0;
@@ -64,23 +73,8 @@
             bottom: 0;
             margin: auto;
             border-radius: 100%;
-        }
-    }
-
-    &__icon{
-        color: @white;
-        text-align: center;
-        font-size: 15px;
-        opacity: 0;
-        transition: .3s ease-out;
-
-        &:before{
-            position: absolute;
-            top: 2px;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            margin: auto;
+            opacity: 0;
+            transition: .05s ease-out;
         }
     }
 }

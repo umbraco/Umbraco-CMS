@@ -1,14 +1,19 @@
 ﻿<div class="umb-editor umb-radiobuttons" ng-controller="Umbraco.PropertyEditors.RadioButtonsController">
     <ul class="unstyled">
-        <li ng-repeat="item in model.config.items">
-            <label class="radio">
+
+        <li ng-repeat="item in model.config.items" class="umb-radiobuttons__item">
+            <label class="radio umb-radiobuttons__label">
                 <input type="radio" name="radiobuttons-{{model.alias}}"
-                       value="{{item.id}}"
-                       ng-model="model.value" />
-                {{item.value}}
+                    value="{{item.id}}"
+                    ng-model="model.value"
+                    class="umb-radiobuttons__input" />
+
+                <div class="umb-radiobuttons__state" aria-hidden="true">
                     <div class="umb-radiobuttons__check">
-                        <i class="umb-radiobuttons__icon icon-check" aria-hidden="true"></i>
+                        <!-- <i class="umb-radiobuttons__icon icon-check" aria-hidden="true"></i> -->
                     </div>
+                </div>
+                <span class="umb-radiobuttons__label-text">{{item.value}}</span>
             </label>
         </li>
     </ul>
