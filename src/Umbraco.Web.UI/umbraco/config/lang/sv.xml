@@ -624,7 +624,7 @@
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"> %0% kunde inte publiceras på grund av dess tidsinställda publicering.</key>
     <key alias="contentPublishedFailedByEvent">%0% kunde inte publiceras på grund av att ett tredjepartstillägg avbröt publiceringen.</key>
-    <key alias="contentPublishedFailedByParent">%0% (ID: %1%) kan inte publiceras, på grund av att överordnad nod inte är publicerad.</key>
+    <key alias="contentPublishedFailedByParent">%0% (Id: %1%) kan inte publiceras, på grund av att överordnad nod inte är publicerad.</key>
     <key alias="contentPublishedFailedInvalid">%0% kunde inte publiceras på grund av följande orsaker:  %1%  passerade inte valideringen.</key>
     <key alias="includeUnpublished">Inkludera opublicerade undersidor</key>
     <key alias="inProgress">Publicering pågår - vänligen vänta...</key>

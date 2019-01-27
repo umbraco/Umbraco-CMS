@@ -503,7 +503,7 @@ angular.module('umbraco.mocks').
                   "publicAccess_paSimpleHelp": "If you just want to setup simple protection using a single login and password",
                   "publish_contentPublishedFailedInvalid": "      %0% could not be published because these properties:  %1%  did not pass validation rules.    ",
                   "publish_contentPublishedFailedByEvent": "      %0% could not be published, due to a 3rd party extension cancelling the action.    ",
-                  "publish_contentPublishedFailedByParent": "      %0% (ID: %1%) can not be published, because a parent page is not published.    ",
+                  "publish_contentPublishedFailedByParent": "      %0% (Id: %1%) can not be published, because a parent page is not published.    ",
                   "publish_includeUnpublished": "Include unpublished child pages",
                   "publish_inProgress": "Publishing in progress - please wait...",
                   "publish_inProgressCounter": "%0% out of %1% pages have been published...",

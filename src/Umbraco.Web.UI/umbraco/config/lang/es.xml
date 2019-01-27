@@ -1004,8 +1004,8 @@
         <key alias="contentPublishedFailedByEvent">%0% no se pudo publicar debido a que una extensión de otro proveedor ha cancelado la acción.</key>
         <key alias="contentPublishedFailedByParent">
             <![CDATA[
-      %0% (ID: %1%) no se pudo publicar porque una página padre no está publicada.
-    ]]>
+                %0% (Id: %1%) no se pudo publicar porque una página padre no está publicada.
+            ]]>
         </key>
 
         <key alias="includeUnpublished">Incluir las páginas hija sin publicar</key>

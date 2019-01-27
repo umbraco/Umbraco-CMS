@@ -872,10 +872,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% kon niet worden gepubliceerd doordat een 3rd party extensie het heeft geannuleerd.    
-        ]]></key>
-		<key alias="contentPublishedFailedByParent"><![CDATA[
-      %0% (ID: %1%) kon niet gepubliceerd worden, omdat de parent pagina niet gepubliceerd is.
-    ]]></key>
+        ]]>
+    </key>
+    <key alias="contentPublishedFailedByParent">
+        <![CDATA[
+            %0% (Id: %1%) kon niet gepubliceerd worden, omdat de parent pagina niet gepubliceerd is.
+        ]]>
+    </key>
     <key alias="includeUnpublished">Inclusief ongepubliceerde subitems</key>
     <key alias="inProgress">Publicatie in uitvoering - even geduld...</key>
     <key alias="inProgressCounter">%0% van %1% pagina’s zijn gepubliceerd...</key>

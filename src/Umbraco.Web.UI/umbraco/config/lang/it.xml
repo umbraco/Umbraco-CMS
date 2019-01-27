@@ -589,7 +589,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedByEvent"><![CDATA[%0% non può esser pubblicato a causa di una estensione di terze parti che causa l'annullamento dell'operazione]]></key>
-    <key alias="contentPublishedFailedByParent"><![CDATA[%0% (ID: %1%) non può essere pubblicato perchè una pagina padre non è pubblicata.]]></key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[%0% (Id: %1%) non può essere pubblicato perchè una pagina padre non è pubblicata.]]></key>
     <key alias="includeUnpublished"><![CDATA[Includi tutte le pagine figlio non pubblicate]]></key>
     <key alias="inProgress"><![CDATA[Pubblicazione in corso - attendere...]]></key>
     <key alias="inProgressCounter"><![CDATA[%0% su di %1% pagine sono state pubblicate...]]></key>

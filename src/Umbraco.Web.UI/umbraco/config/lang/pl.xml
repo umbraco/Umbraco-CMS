@@ -996,7 +996,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       %0% nie może zostać opublikowany ze względu na odwołanie akcji przez rozszerzenie firm trzecich
       ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
-      %0% (ID: %1%) nie może zostać opublikowany, ponieważ rodzic nie jest opublikowany.
+      %0% (Id: %1%) nie może zostać opublikowany, ponieważ rodzic nie jest opublikowany.
     ]]></key>
     <key alias="includeUnpublished">Dołącz nieopublikowane węzły pochodne (dzieci)</key>
     <key alias="inProgress">Publikacja w toku - proszę czekać...</key>

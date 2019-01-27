@@ -1247,8 +1247,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 	</key>
     <key alias="contentPublishedFailedByParent">
 		<![CDATA[
-      %0% (ID: %1%) ne peut pas être publié car une page parente n'est pas publiée.
-    ]]>
+            %0% (Id: %1%) ne peut pas être publié car une page parente n'est pas publiée.
+        ]]>
 	</key>
     <key alias="includeUnpublished">Inclure les pages enfant non publiées</key>
     <key alias="inProgress">Publication en cours - veuillez patienter...</key>

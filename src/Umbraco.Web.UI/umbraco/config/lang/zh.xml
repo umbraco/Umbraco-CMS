@@ -970,7 +970,7 @@
     </key>
     <key alias="contentPublishedFailedByParent">
       <![CDATA[
-      %0% (ID: %1%) 不能发布，因为上级页面没有发布。
+      %0% (Id: %1%) 不能发布，因为上级页面没有发布。
     ]]>
     </key>
     <key alias="includeUnpublished">包含未发布的子项</key>

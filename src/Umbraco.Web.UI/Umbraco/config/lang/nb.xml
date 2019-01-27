@@ -661,7 +661,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="contentPublishedFailedAwaitingRelease">%0% kunne ikke publiseres fordi den har planlagt utgivelsesdato.</key>
     <key alias="contentPublishedFailedInvalid">%0% ble ikke publisert. Ett eller flere felter ble ikke godkjent av validering.</key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke publiseres fordi et tredjepartstillegg avbrøt handlingen.</key>
-    <key alias="contentPublishedFailedByParent">%0% (ID: %1%) kan ikke publiseres fordi en overordnet side ikke er publisert.</key>
+    <key alias="contentPublishedFailedByParent">%0% (Id: %1%) kan ikke publiseres fordi en overordnet side ikke er publisert.</key>
     <key alias="includeUnpublished">Inkluder upubliserte undersider</key>
     <key alias="inProgress">Publiserer - vennligst vent...</key>
     <key alias="inProgressCounter">%0% av %1% sider har blitt publisert...</key>

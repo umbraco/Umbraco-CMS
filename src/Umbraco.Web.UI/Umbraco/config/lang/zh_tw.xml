@@ -817,7 +817,7 @@
       %0% 無法發佈，因為第三方擴充元件取消這項操作。
     ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
-      %0% (ID: %1%) 無法發佈，因為父頁面並沒有發佈。
+      %0% (Id: %1%) 無法發佈，因為父頁面並沒有發佈。
     ]]></key>
     <key alias="includeUnpublished">包含未發佈的子項</key>
     <key alias="inProgress">正在發佈，請稍候…</key>

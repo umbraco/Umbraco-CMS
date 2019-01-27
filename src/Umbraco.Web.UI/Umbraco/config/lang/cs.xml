@@ -694,7 +694,7 @@
       %0% nemůže být publikována, protože rozšíření třetí strany akci zrušilo.
     ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
-      %0% (ID: %1%) nemůže být publikována, protože rodičovská stránka není publikována.
+      %0% (Id: %1%) nemůže být publikována, protože rodičovská stránka není publikována.
     ]]></key>
     <key alias="includeUnpublished">Zahrnout nepublikované podřízené stránky</key>
     <key alias="inProgress">Probíhá publikování - počkejte, prosím...</key>
