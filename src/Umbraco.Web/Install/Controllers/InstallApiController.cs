@@ -52,7 +52,7 @@ namespace Umbraco.Web.Install.Controllers
         {
             var setup = new InstallSetup();
 
-            //TODO: Check for user/site token
+            // TODO: Check for user/site token
 
             var steps = new List<InstallSetupStep>();
 

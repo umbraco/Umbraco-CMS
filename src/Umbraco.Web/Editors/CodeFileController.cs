@@ -23,7 +23,7 @@ using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO: Put some exception filters in our webapi to return 404 instead of 500 when we throw ArgumentNullException
+    // TODO: Put some exception filters in our webapi to return 404 instead of 500 when we throw ArgumentNullException
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]

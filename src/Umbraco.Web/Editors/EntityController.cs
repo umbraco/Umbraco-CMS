@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
         {
-            //TODO: Should we restrict search results based on what app the user has access to?
+            // TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
 
             if (string.IsNullOrEmpty(query))
@@ -252,7 +252,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
-            //TODO: Rename this!!! It's misleading, it should be GetByXPath
+            // TODO: Rename this!!! It's misleading, it should be GetByXPath
 
 
             if (type != UmbracoEntityTypes.Document)
@@ -628,7 +628,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support hierarchic here, some might not.
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 return Services.EntityService.GetChildren(id, objectType.Value)
                     .WhereNotNull()
@@ -651,7 +651,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support hierarchic here, some might not.
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
@@ -880,7 +880,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Should we order this by something ?
+                // TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
                 return ExecutePostFilter(entities, postFilter, postFilterParams);
             }
@@ -957,7 +957,7 @@ namespace Umbraco.Web.Editors
             // if a post filter is assigned then try to execute it
             if (postFilter.IsNullOrWhiteSpace() == false)
             {
-                // fixme/task/critical - trouble is, we've killed the dynamic Where thing!
+                // FIXME: task/critical - trouble is, we've killed the dynamic Where thing!
                 throw new NotImplementedException("oops");
                 //return postFilterParams == null
                 //               ? entities.AsQueryable().Where(postFilter).ToArray()

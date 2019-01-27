@@ -1,4 +1,4 @@
-﻿//TODO: This would be nicer as an angular module so it can be injected into stuff... that'd be heaps nicer, but
+﻿// TODO: This would be nicer as an angular module so it can be injected into stuff... that'd be heaps nicer, but
 // how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
 // to force load JS files ?
 

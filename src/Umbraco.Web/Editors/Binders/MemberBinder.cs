@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors.Binders
                         throw new InvalidOperationException("Could not find member with key " + model.Key);
                     }
 
-                    //TODO: Support this scenario!
+                    // TODO: Support this scenario!
                     //if (scenario == MembershipScenario.CustomProviderWithUmbracoLink)
                     //{
                     //    //if there's a 'Member' type then we should be able to just go get it from the db since it was created with a link

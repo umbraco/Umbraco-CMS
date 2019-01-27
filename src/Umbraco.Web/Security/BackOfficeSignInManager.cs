@@ -14,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
 {
-    //TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
+    // TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
     {
         private readonly ILogger _logger;

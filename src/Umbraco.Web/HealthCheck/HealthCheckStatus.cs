@@ -49,6 +49,6 @@ namespace Umbraco.Web.HealthCheck
         [DataMember(Name = "actions")]
         public IEnumerable<HealthCheckAction> Actions { get; set; }
 
-        //TODO: What else?
+        // TODO: What else?
     }
 }

@@ -40,6 +40,6 @@
         /// </summary>
         NoOperation = Failed | 6, // TODO: shouldn't it be a success?
 
-        //TODO: In the future, we might need to add more operations statuses, potentially like 'FailedByPermissions', etc...
+        // TODO: In the future, we might need to add more operations statuses, potentially like 'FailedByPermissions', etc...
     }
 }

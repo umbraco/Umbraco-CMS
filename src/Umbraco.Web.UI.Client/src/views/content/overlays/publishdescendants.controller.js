@@ -69,7 +69,7 @@
                     //and not flagged for saving
                     //then we cannot continue
 
-                    //TODO: Show a message when this occurs
+                    // TODO: Show a message when this occurs
                     return false;
                 }
 

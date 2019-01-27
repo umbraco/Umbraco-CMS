@@ -24,7 +24,7 @@
 angular.module('umbraco.services')
 .factory('localizationService', function ($http, $q, eventsService, $window, $filter, userService) {
 
-    //TODO: This should be injected as server vars
+    // TODO: This should be injected as server vars
     var url = "LocalizedText";
     var resourceFileLoadStatus = "none";
     var resourceLoadingPromise = [];

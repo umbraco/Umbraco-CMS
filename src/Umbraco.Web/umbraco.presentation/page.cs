@@ -324,7 +324,7 @@ namespace umbraco
                 _id = _inner.Id;
                 _key = _inner.Key;
 
-                //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+                // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
                 _creatorName = _inner.GetCreatorProfile().Name;
                 _writerName = _inner.GetWriterProfile().Name;
 

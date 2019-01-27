@@ -460,7 +460,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var subQuery = Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
 
             var sql = GetBaseQuery(false)
-                //TODO: An inner join would be better, though I've read that the query optimizer will always turn a
+                // TODO: An inner join would be better, though I've read that the query optimizer will always turn a
                 // subquery with an IN clause into an inner join anyways.
                 .Append("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)

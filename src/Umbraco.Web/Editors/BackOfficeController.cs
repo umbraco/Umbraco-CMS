@@ -390,7 +390,7 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
-                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
+                // TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
                 // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
                 // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
                 // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure

@@ -370,7 +370,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
                 var sql = scope.SqlContext.Sql()
                     .Select<Thing1Dto>()
-                    .Append(", COUNT(zbThing2Group.groupId) AS groupCount") // fixme
+                    .Append(", COUNT(zbThing2Group.groupId) AS groupCount") // FIXME:
                     .From<Thing1Dto>()
                     .InnerJoin<Thing2GroupDto>().On<Thing1Dto, Thing2GroupDto>((t, t2g) => t.Id == t2g.ThingId)
                     .GroupBy<Thing1Dto>(x => x.Id, x => x.Name);

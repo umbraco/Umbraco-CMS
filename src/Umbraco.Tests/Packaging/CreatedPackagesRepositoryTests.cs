@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Packaging
             def = PackageBuilder.GetById(def.Id);
             Assert.AreEqual("updated", def.Name);
             Assert.AreEqual(2, def.Files.Count);
-            //TODO: There's a whole lot more assertions to be done
+            // TODO: There's a whole lot more assertions to be done
 
         }
 
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Packaging
 
                     Assert.AreEqual("<Actions><Action alias=\"test\" /></Actions>", xml.Element("umbPackage").Element("Actions").ToString(SaveOptions.DisableFormatting));
 
-                    //TODO: There's a whole lot more assertions to be done
+                    // TODO: There's a whole lot more assertions to be done
                 }
             }
         }

@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
             string[] messageParams = null)
         {
             //if there's already a default event message, don't add our default one
-            //todo inject
+            // TODO: inject
             var msgs = Current.EventMessages;
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 

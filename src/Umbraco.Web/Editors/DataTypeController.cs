@@ -204,7 +204,7 @@ namespace Umbraco.Web.Editors
         {
             //If we've made it here, then everything has been wired up and validated by the attribute
 
-            //TODO: Check if the property editor has changed, if it has ensure we don't pass the
+            // TODO: Check if the property editor has changed, if it has ensure we don't pass the
             // existing values to the new property editor!
 
             // get the current configuration,

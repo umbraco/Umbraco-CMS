@@ -95,7 +95,7 @@ namespace Umbraco.Web.Routing
                 return v.InvariantContains(a1) || v.InvariantContains(a2);
             }
 
-            // todo - even with Linq, what happens below has to be horribly slow
+            // TODO: even with Linq, what happens below has to be horribly slow
             // but the only solution is to entirely refactor url providers to stop being dynamic
 
             if (rootNodeId > 0)

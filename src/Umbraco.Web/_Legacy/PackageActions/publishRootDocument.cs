@@ -35,7 +35,7 @@ namespace Umbraco.Web._Legacy.PackageActions
             {
                 if (rootDoc.Name.Trim() == documentName.Trim() && rootDoc.ContentType != null)
                 {
-                    // todo variants?
+                    // TODO: variants?
                     Current.Services.ContentService.SaveAndPublishBranch(rootDoc, true);
                     break;
                 }

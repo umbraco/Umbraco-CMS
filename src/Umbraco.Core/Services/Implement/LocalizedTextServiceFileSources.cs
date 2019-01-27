@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource> _supplementFileSources;
         private readonly DirectoryInfo _fileSourceFolder;
 
-        //TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
+        // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
         private readonly Dictionary<string, CultureInfo> _twoLetterCultureConverter = new Dictionary<string, CultureInfo>();
 
         private readonly Lazy<Dictionary<CultureInfo, Lazy<XDocument>>> _xmlSources;
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Services.Implement
                     var localCopy = fileInfo;
                     var filename = Path.GetFileNameWithoutExtension(localCopy.FullName).Replace("_", "-");
 
-                    //TODO: Fix this nonsense... would have to wait until v8 to store the language files with their correct
+                    // TODO: Fix this nonsense... would have to wait until v8 to store the language files with their correct
                     // names instead of storing them as 2 letters but actually having a 4 letter culture. wtf. So now, we
                     // need to check if the file is 2 letters, then open it to try to find it's 4 letter culture, then use that
                     // if it's successful. We're going to assume (though it seems assuming in the legacy logic is never a great idea)
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Services.Implement
             return _xmlSources.Value;
         }
 
-        //TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
+        // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
         public Attempt<CultureInfo> TryConvert2LetterCultureTo4Letter(string twoLetterCulture)
         {
             if (twoLetterCulture.Length != 2) return Attempt<CultureInfo>.Fail();
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Services.Implement
                 : Attempt<CultureInfo>.Fail();
         }
 
-        //TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
+        // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
         public Attempt<string> TryConvert4LetterCultureTo2Letter(CultureInfo culture)
         {
             if (culture == null) throw new ArgumentNullException("culture");

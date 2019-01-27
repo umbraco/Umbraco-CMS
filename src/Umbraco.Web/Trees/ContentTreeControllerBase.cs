@@ -414,7 +414,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            //todo: inject
+            // TODO: inject
             var actions = Current.Actions.FromEntityPermission(permission)
                 .ToList();
 
@@ -437,7 +437,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, string culture)
         {
-            //TODO: At some stage when we implement permissions on languages we'll need to take care of culture
+            // TODO: At some stage when we implement permissions on languages we'll need to take care of culture
             return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
         }
 

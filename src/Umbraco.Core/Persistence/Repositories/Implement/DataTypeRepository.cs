@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
 
-        // TODO - https://github.com/umbraco/Umbraco-CMS/issues/4237 - get rid of Lazy injection and fix circular dependencies
+        // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4237 - get rid of Lazy injection and fix circular dependencies
         public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //ensure a datatype has a unique name before creating it
             entity.Name = EnsureUniqueNodeName(entity.Name);
 
-            //TODO: should the below be removed?
+            // TODO: should the below be removed?
             //Cannot add a duplicate data type
             var existsSql = Sql()
                 .SelectCount()

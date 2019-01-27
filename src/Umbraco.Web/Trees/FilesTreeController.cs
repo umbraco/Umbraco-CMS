@@ -8,7 +8,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, "files", "Files", "icon-folder", "icon-folder", sortOrder: 13, initialize: false)]
     public class FilesTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem => new PhysicalFileSystem("~/"); // todo inject
+        protected override IFileSystem FileSystem => new PhysicalFileSystem("~/"); // TODO: inject
 
         private static readonly string[] ExtensionsStatic = { "*" };
 

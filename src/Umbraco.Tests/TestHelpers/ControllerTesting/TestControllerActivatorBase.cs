@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
-            // fixme v8?
+            // FIXME: v8?
             ////new app context
             //var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             ////ensure these are set so that the appctx is 'Configured'

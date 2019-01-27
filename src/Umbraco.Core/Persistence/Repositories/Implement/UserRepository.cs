@@ -169,7 +169,7 @@ ORDER BY colName";
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
+            // TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
             //and also business logic models for these objects but that's just so overkill for what we are doing
             //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
             var now = DateTime.UtcNow;
@@ -443,7 +443,7 @@ ORDER BY colName";
             var userDto = UserFactory.BuildDto(entity);
 
             // check if we have a known config, we only want to store config for hashing
-            //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+            // TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
             if (PasswordConfigJson != null)
                 userDto.PasswordConfig = PasswordConfigJson;
 
@@ -538,7 +538,7 @@ ORDER BY colName";
                 }
 
                 // check if we have a known config, we only want to store config for hashing
-                //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+                // TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
                 if (PasswordConfigJson != null)
                 {
                     userDto.PasswordConfig = PasswordConfigJson;
@@ -573,7 +573,7 @@ ORDER BY colName";
                     : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups.Select(x => x.Alias) });
 
                 //first delete all
-                //TODO: We could do this a nicer way instead of "Nuke and Pave"
+                // TODO: We could do this a nicer way instead of "Nuke and Pave"
                 Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
 
                 foreach (var groupDto in assigned)

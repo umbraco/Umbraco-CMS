@@ -37,8 +37,8 @@ namespace Umbraco.Web.Templates
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
         }
 
-        private IFileService FileService => Current.Services.FileService; // todo inject
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>(); // todo inject
+        private IFileService FileService => Current.Services.FileService; // TODO: inject
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>(); // TODO: inject
 
 
         /// <summary>

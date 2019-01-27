@@ -179,7 +179,7 @@ namespace Umbraco.Web.Editors
                     return Mapper.Map<MemberDisplay>(foundMember);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
 
-                //TODO: Support editing custom properties for members with a custom membership provider here.
+                // TODO: Support editing custom properties for members with a custom membership provider here.
 
                 //foundMember = Services.MemberService.GetByKey(key);
                 //if (foundMember == null)
@@ -238,7 +238,7 @@ namespace Umbraco.Web.Editors
                     emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(provider.MinRequiredPasswordLength, provider.MinRequiredNonAlphanumericCharacters);
                     return Mapper.Map<MemberDisplay>(emptyContent);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
-                //TODO: Support editing custom properties for members with a custom membership provider here.
+                // TODO: Support editing custom properties for members with a custom membership provider here.
 
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
@@ -275,7 +275,7 @@ namespace Umbraco.Web.Editors
             {
                 ModelState.Remove("ContentTypeAlias");
 
-                //TODO: We're removing this because we are not displaying it but when we support the CustomProviderWithUmbracoLink scenario
+                // TODO: We're removing this because we are not displaying it but when we support the CustomProviderWithUmbracoLink scenario
                 // we will be able to have a real name associated so do not remove this state once that is implemented!
                 ModelState.Remove("Name");
             }
@@ -291,7 +291,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
-            //TODO: WE need to support this! - requires UI updates, etc...
+            // TODO: WE need to support this! - requires UI updates, etc...
             if (_provider.RequiresQuestionAndAnswer)
             {
                 throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
@@ -334,7 +334,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the IMember -
-            //TODO: When we support the CustomProviderWithUmbracoLink scenario, we'll need to save the custom properties for that here too
+            // TODO: When we support the CustomProviderWithUmbracoLink scenario, we'll need to save the custom properties for that here too
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
                 //save the item
@@ -584,7 +584,7 @@ namespace Umbraco.Web.Editors
 
             UpdateName(contentItem);
 
-            //re-assign the mapped values that are not part of the membership provider properties.
+            // re-assign the mapped values that are not part of the membership provider properties.
             var builtInAliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
             foreach (var p in contentItem.PersistedContent.Properties)
             {
@@ -593,10 +593,10 @@ namespace Umbraco.Web.Editors
                 {
                     p.SetValue(valueMapped.GetValue());
 
-                    // fixme/task - ok, I give up, at that point tags are dead here, until we figure it out
-                    //p.TagChanges.Behavior = valueMapped.TagChanges.Behavior;
-                    //p.TagChanges.Enable = valueMapped.TagChanges.Enable;
-                    //p.TagChanges.Tags = valueMapped.TagChanges.Tags;
+                    // FIXME: /task - ok, I give up, at that point tags are dead here, until we figure it out
+                    // p.TagChanges.Behavior = valueMapped.TagChanges.Behavior;
+                    // p.TagChanges.Enable = valueMapped.TagChanges.Enable;
+                    // p.TagChanges.Tags = valueMapped.TagChanges.Tags;
                 }
             }
         }
@@ -652,7 +652,7 @@ namespace Umbraco.Web.Editors
                 case MembershipScenario.NativeUmbraco:
                     //We are using the umbraco membership provider, create the member using the membership provider first.
                     var umbracoMembershipProvider = (UmbracoMembershipProviderBase)_provider;
-                    //TODO: We are not supporting q/a - passing in empty here
+                    // TODO: We are not supporting q/a - passing in empty here
                     membershipUser = umbracoMembershipProvider.CreateUser(
                         contentItem.ContentTypeAlias, contentItem.Username,
                         contentItem.Password.NewPassword,
@@ -668,7 +668,7 @@ namespace Umbraco.Web.Editors
                     //create it - this persisted item has already been set in the MemberBinder based on the 'Member' member type:
                     Services.MemberService.Save(contentItem.PersistedContent);
 
-                    //TODO: We are not supporting q/a - passing in empty here
+                    // TODO: We are not supporting q/a - passing in empty here
                     membershipUser = _provider.CreateUser(
                         contentItem.Username,
                         contentItem.Password.NewPassword,
@@ -685,7 +685,7 @@ namespace Umbraco.Web.Editors
                     // link back to the umbraco data
 
                     var newKey = Guid.NewGuid();
-                    //TODO: We are not supporting q/a - passing in empty here
+                    // TODO: We are not supporting q/a - passing in empty here
                     membershipUser = _provider.CreateUser(
                         contentItem.Username,
                         contentItem.Password.NewPassword,
@@ -701,7 +701,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException();
             }
 
-            //TODO: Localize these!
+            // TODO: Localize these!
             switch (status)
             {
                 case MembershipCreateStatus.Success:

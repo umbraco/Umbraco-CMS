@@ -284,7 +284,7 @@ namespace Umbraco.Core.IO
             var opath = path;
             path = EnsureDirectorySeparatorChar(path);
 
-            // fixme - this part should go!
+            // FIXME: this part should go!
             // not sure what we are doing here - so if input starts with a (back) slash,
             // we assume it's not a FS relative path and we try to convert it... but it
             // really makes little sense?

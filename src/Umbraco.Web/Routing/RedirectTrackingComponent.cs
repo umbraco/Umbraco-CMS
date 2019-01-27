@@ -182,7 +182,7 @@ namespace Umbraco.Web.Redirects
 
         private static void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> e)
         {
-            //TODO: Use the new e.EventState to track state between Moving/Moved events!
+            // TODO: Use the new e.EventState to track state between Moving/Moved events!
             Moving = true;
         }
 

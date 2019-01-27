@@ -201,7 +201,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void InitializeRepositoryEvents()
         {
-            //todo: The reason these events are in the repository is for legacy, the events should exist at the service
+            // TODO: The reason these events are in the repository is for legacy, the events should exist at the service
             // level now since we can fire these events within the transaction... so move the events to service level
 
             // plug repository event handlers
@@ -584,7 +584,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     continue;
                 }
 
-                // todo- should we do some RV check here? (later)
+                // TODO: should we do some RV check here? (later)
 
                 var capture = payload;
                 using (var scope = _scopeProvider.CreateScope())
@@ -674,7 +674,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     continue;
                 }
 
-                // todo- should we do some RV checks here? (later)
+                // TODO: should we do some RV checks here? (later)
 
                 var capture = payload;
                 using (var scope = _scopeProvider.CreateScope())
@@ -773,7 +773,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (_contentStore.GetWriter(_scopeProvider))
             using (_mediaStore.GetWriter(_scopeProvider))
             {
-                // todo - need to add a datatype lock
+                // TODO: need to add a datatype lock
                 // this is triggering datatypes reload in the factory, and right after we create some
                 // content types by loading them ... there's a race condition here, which would require
                 // some locking on datatypes

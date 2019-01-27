@@ -122,7 +122,7 @@ namespace Umbraco.Web.Search
 
             EnsureUnlocked(_logger, _examineManager);
 
-            //TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
+            // TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
             RebuildIndexes(_indexRebuilder, _logger, true, 5000);
         }
 
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Search
         /// <param name="waitMilliseconds"></param>
         public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
-            //TODO: need a way to disable rebuilding on startup
+            // TODO: need a way to disable rebuilding on startup
 
             lock(RebuildLocker)
             {
@@ -213,7 +213,7 @@ namespace Umbraco.Web.Search
                     // just ignore that payload
                     // so what?!
 
-                    //todo: Rebuild the index at this point?
+                    // TODO: Rebuild the index at this point?
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {

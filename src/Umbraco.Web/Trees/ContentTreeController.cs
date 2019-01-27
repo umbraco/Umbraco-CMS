@@ -307,7 +307,7 @@ namespace Umbraco.Web.Trees
                 entity.Name = "[[" + entity.Id + "]]";
         }
 
-        //todo: Remove the need for converting to legacy
+        // TODO: Remove the need for converting to legacy
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
             where TAction : IAction
         {
