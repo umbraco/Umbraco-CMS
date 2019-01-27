@@ -299,6 +299,7 @@
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
     <key alias="allMembers">Alle medlemmer</key>
+    <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
