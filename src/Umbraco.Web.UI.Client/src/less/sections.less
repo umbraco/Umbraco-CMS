@@ -36,7 +36,7 @@ ul.sections>li>a::after {
 	content: "";
 	height: 4px;
 	width: 100%;
-	background-color: #b3afbd;
+	background-color: @pinkLight;
 	position: absolute;
 	bottom: -4px;
 	border-radius: 3px 3px 0 0;
@@ -45,6 +45,9 @@ ul.sections>li>a::after {
 	transition: all .2s linear;
 }
 
+ul.sections>li.current>a {
+    color:@pinkLight;
+}
 ul.sections>li.current>a::after {
 	opacity: 1;
 	bottom: 0;
