@@ -622,7 +622,7 @@
     <key alias="paSimpleHelp">Välj detta alternativ om du vill skydda sidan med ett enkelt användarnamn och lösenord. Alla loggar då in med samma inloggningsuppgifter.</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"> %0% kunde inte publiceras på grund av dess tidsinställda publicering.</key>
+    <key alias="contentPublishedFailedAwaitingRelease"> %0% (Id: %1%) kunde inte publiceras på grund av dess tidsinställda publicering.</key>
     <key alias="contentPublishedFailedByEvent">%0% kunde inte publiceras på grund av att ett tredjepartstillägg avbröt publiceringen.</key>
     <key alias="contentPublishedFailedByParent">%0% (Id: %1%) kan inte publiceras, på grund av att överordnad nod inte är publicerad.</key>
     <key alias="contentPublishedFailedInvalid">%0% kunde inte publiceras på grund av följande orsaker:  %1%  passerade inte valideringen.</key>

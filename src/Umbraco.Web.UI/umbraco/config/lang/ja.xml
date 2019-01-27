@@ -785,7 +785,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
     <![CDATA[
-      %0% ページは公開がスケジュールされているため、公開されませんでした。
+      %0% (Id: %1%) ページは公開がスケジュールされているため、公開されませんでした。
     ]]></key>
 	<key alias="contentPublishedFailedExpired">
         <![CDATA[

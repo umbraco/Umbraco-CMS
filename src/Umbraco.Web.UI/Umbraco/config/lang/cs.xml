@@ -684,7 +684,7 @@
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
       <![CDATA[
-      %0% nemůže být publikována, protože položka je naplánovaná k uvolnění.
+      %0% (Id: %1%) nemůže být publikována, protože položka je naplánovaná k uvolnění.
     ]]>
     </key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[

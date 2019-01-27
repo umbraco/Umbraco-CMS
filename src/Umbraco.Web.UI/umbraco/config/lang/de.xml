@@ -694,7 +694,11 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="paSimpleHelp">Wenn Sie einen einfachen Zugriffsschutz unter Verwendung eines einzelnen Logins mit Kennwort aktivieren wollen</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
+    <key alias="contentPublishedFailedAwaitingRelease">
+        <![CDATA[
+            %0% (Id: %1%) kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.
+        ]]>
+    </key>
     <key alias="contentPublishedFailedInvalid">
         <![CDATA[
             %0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.

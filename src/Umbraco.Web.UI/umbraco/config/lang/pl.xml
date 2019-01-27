@@ -983,7 +983,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
       <![CDATA[
-      %0% nie może zostać opublikowany, ponieważ element nie został zaplanowany do wydania.
+      %0% (Id: %1%) nie może zostać opublikowany, ponieważ element nie został zaplanowany do wydania.
     ]]>
     </key>
     <key alias="contentPublishedFailedExpired">

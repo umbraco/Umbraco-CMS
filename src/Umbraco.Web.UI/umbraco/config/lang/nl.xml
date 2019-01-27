@@ -861,7 +861,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
       <![CDATA[
-      %0% kan niet worden gepubliceerd omdat het item is gepland voor release.
+      %0% (Id: %1%) kan niet worden gepubliceerd omdat het item is gepland voor release.
     ]]>
     </key>
 	<key alias="contentPublishedFailedExpired">

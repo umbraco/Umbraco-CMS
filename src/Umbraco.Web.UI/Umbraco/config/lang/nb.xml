@@ -658,7 +658,11 @@ Vennlig hilsen Umbraco roboten
     <key alias="paSimpleHelp">Om du ønsker å bruke enkel autentisering via ett enkelt brukernavn og passord</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">%0% kunne ikke publiseres fordi den har planlagt utgivelsesdato.</key>
+    <key alias="contentPublishedFailedAwaitingRelease">
+        <![CDATA[
+            %0% (Id: %1%) kunne ikke publiseres fordi den har planlagt utgivelsesdato.
+        ]]>
+    </key>
     <key alias="contentPublishedFailedInvalid">%0% ble ikke publisert. Ett eller flere felter ble ikke godkjent av validering.</key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke publiseres fordi et tredjepartstillegg avbrøt handlingen.</key>
     <key alias="contentPublishedFailedByParent">%0% (Id: %1%) kan ikke publiseres fordi en overordnet side ikke er publisert.</key>

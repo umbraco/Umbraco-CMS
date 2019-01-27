@@ -988,7 +988,7 @@
         <key alias="contentPublishedFailedAwaitingRelease">
             <![CDATA[
           
-      %0% no se puede publicar porque este elemento está programado para publicarse.
+      %0% (Id: %1%) no se puede publicar porque este elemento está programado para publicarse.
     ]]>
         </key>
         <key alias="contentPublishedFailedExpired">

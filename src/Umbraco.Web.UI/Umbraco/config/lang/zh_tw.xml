@@ -805,7 +805,7 @@
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
-      %0% 無法現在發佈，因為它已經設定發佈時程。
+      %0% (Id: %1%) 無法現在發佈，因為它已經設定發佈時程。
     ]]></key>
     <key alias="contentPublishedFailedExpired">
         <![CDATA[

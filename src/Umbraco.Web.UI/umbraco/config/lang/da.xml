@@ -963,7 +963,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="paSimpleHelp">Hvis du blot ønsker at opsætte simpel beskyttelse ved hjælp af et enkelt login og kodeord</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
+    <key alias="contentPublishedFailedAwaitingRelease">
+        <![CDATA[
+            %0% (Id: %1%) kunne ikke publiceres da publiceringsdato er sat
+        ]]>
+    </key>
     <key alias="contentPublishedFailedExpired">
       <![CDATA[
       %0% (Id: %1%) Siden kunne ikke publiceres da publiceringsdatoen er overskredet

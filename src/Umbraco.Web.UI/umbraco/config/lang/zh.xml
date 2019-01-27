@@ -950,7 +950,7 @@
   <area alias="publish">
     <key alias="contentPublishedFailedAwaitingRelease">
       <![CDATA[
-      %0% 无法发布, 因为该项在计划发布中。
+      %0% (Id: %1%) 无法发布, 因为该项在计划发布中。
     ]]>
     </key>
     <key alias="contentPublishedFailedExpired">
