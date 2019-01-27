@@ -638,10 +638,10 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(Guid id)
         {
-            //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
+            // TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
             // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
 
-            var entityService = Current.Services.EntityService; // todo inject
+            var entityService = Current.Services.EntityService; // TODO: inject
             var mediaAttempt = entityService.GetId(id, UmbracoObjectTypes.Media);
             return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
         }

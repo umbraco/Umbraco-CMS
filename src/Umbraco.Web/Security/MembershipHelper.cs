@@ -216,7 +216,7 @@ namespace Umbraco.Web.Security
                 membershipUser = ((UmbracoMembershipProviderBase)provider).CreateUser(
                     model.MemberTypeAlias,
                     model.Username, model.Password, model.Email,
-                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
                     null, null,
                     true, null, out status);
 
@@ -239,7 +239,7 @@ namespace Umbraco.Web.Security
             else
             {
                 membershipUser = provider.CreateUser(model.Username, model.Password, model.Email,
-                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
                     null, null,
                     true, null, out status);
 
@@ -326,7 +326,7 @@ namespace Umbraco.Web.Security
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Member:
-                    // todo - need to implement Get(guid)!
+                    // TODO: need to implement Get(guid)!
                     var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return GetById(memberAttempt.Result);
@@ -422,7 +422,7 @@ namespace Umbraco.Web.Security
             }
 
             //we can try to look up an associated member by the provider user key
-            //TODO: Support this at some point!
+            // TODO: Support this at some point!
             throw new NotSupportedException("Currently a member profile cannot be edited unless using the built-in Umbraco membership providers");
         }
 
@@ -480,7 +480,7 @@ namespace Umbraco.Web.Security
                     Value = value
                 };
 
-                //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers
+                // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers
                 // can just render their own.
 
                 ////This is a rudimentary check to see what data template we should render

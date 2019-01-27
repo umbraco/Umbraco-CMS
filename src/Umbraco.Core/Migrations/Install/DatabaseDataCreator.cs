@@ -263,7 +263,7 @@ namespace Umbraco.Core.Migrations.Install
             const string listLayout = "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": 1,\"selected\": true}";
             const string layouts = "[" + cardLayout + "," + listLayout + "]";
 
-            //TODO Check which of the DataTypeIds below doesn't exist in umbracoNode, which results in a foreign key constraint errors.
+            // TODO: Check which of the DataTypeIds below doesn't exist in umbracoNode, which results in a foreign key constraint errors.
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -49, EditorAlias = Constants.PropertyEditors.Aliases.Boolean, DbType = "Integer" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -51, EditorAlias = Constants.PropertyEditors.Aliases.Integer, DbType = "Integer" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -87, EditorAlias = Constants.PropertyEditors.Aliases.TinyMce, DbType = "Ntext",

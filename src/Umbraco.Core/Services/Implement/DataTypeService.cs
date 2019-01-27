@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Complete();
 
                     scope.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
-                    //TODO: Audit trail ?
+                    // TODO: Audit trail ?
 
                     return OperationResult.Attempt.Succeed(evtMsgs, container);
                 }
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Complete();
             }
 
-            //TODO: Audit trail ?
+            // TODO: Audit trail ?
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Complete();
             }
 
-            //TODO: Audit trail ?
+            // TODO: Audit trail ?
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 

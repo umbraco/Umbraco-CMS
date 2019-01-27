@@ -11,7 +11,7 @@ namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
-        // TODO: - try lazy property injection?
+        // TODO: try lazy property injection?
         private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Mvc
         ///    //check if context is null, we know it will be null if we are dealing with a request that
         ///    //has an extension and by default no Umb ctx is created for the request
         ///    if (ctx == null) {
-        ///        //TODO: Here you can EnsureContext , please note that the requestContext is passed in
+        ///        // TODO: Here you can EnsureContext , please note that the requestContext is passed in
         ///        //therefore your should refrain from using other singletons like HttpContext.Current since
         ///        //you will already have a reference to it. Also if you need an ApplicationContext you should
         ///        //pass this in via a ctor instead of using the ApplicationContext.Current singleton.

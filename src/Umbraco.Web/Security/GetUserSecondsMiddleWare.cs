@@ -84,7 +84,7 @@ namespace Umbraco.Web.Security
                                 //if it's time to renew, then do it
                                 if (timeRemaining < timeElapsed)
                                 {
-                                    //TODO: This would probably be simpler just to do: context.OwinContext.Authentication.SignIn(context.Properties, identity);
+                                    // TODO: This would probably be simpler just to do: context.OwinContext.Authentication.SignIn(context.Properties, identity);
                                     // this will invoke the default Cookie middleware to basically perform this logic for us.
 
                                     ticket.Properties.IssuedUtc = currentUtc;
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Security
                     }
                 }
 
-                //Hack! we need to suppress the stupid forms authentication module but we can only do that by using non owin stuff
+                // HACK: we need to suppress the stupid forms authentication module but we can only do that by using non owin stuff
                 if (HttpContext.Current != null && HttpContext.Current.Response != null)
                 {
                     HttpContext.Current.Response.SuppressFormsAuthenticationRedirect = true;

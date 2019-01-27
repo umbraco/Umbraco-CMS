@@ -29,7 +29,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         {
             var httpConfig = new HttpConfiguration();
 
-            //TODO: Enable this if you can't see the errors produced
+            // TODO: Enable this if you can't see the errors produced
             //var traceWriter = httpConfig.EnableSystemDiagnosticsTracing();
             //traceWriter.IsVerbose = true;
             //traceWriter.MinimumLevel = TraceLevel.Debug;

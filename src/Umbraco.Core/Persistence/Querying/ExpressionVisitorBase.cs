@@ -269,7 +269,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitNew(NewExpression newExpression)
         {
-            // TODO : check !
+            // TODO: check !
             var member = Expression.Convert(newExpression, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);
             try
@@ -662,7 +662,7 @@ namespace Umbraco.Core.Persistence.Querying
                 // sql 'COALESCE(x,fb) = COALESCE(y,fb)' - of course, fb must be a value outside
                 // of x and y range - and if that is not possible, then a manual comparison need
                 // to be written
-                //TODO support SqlNullableEquals with 0 parameters, using the full syntax below
+                // TODO: support SqlNullableEquals with 0 parameters, using the full syntax below
                 case "SqlNullableEquals":
                     var compareTo = Visit(m.Arguments[1]);
                     var fallback = Visit(m.Arguments[2]);

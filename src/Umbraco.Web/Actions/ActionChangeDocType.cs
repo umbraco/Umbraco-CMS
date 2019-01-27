@@ -5,7 +5,7 @@ using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.Actions
 {
-    //TODO: Add this back in when we support this functionality again
+    // TODO: Add this back in when we support this functionality again
     ///// <summary>
     ///// This action is invoked when the document type of a piece of content is changed
     ///// </summary>

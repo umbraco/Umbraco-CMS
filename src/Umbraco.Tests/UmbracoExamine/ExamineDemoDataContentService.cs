@@ -9,7 +9,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-    //TODO: This is ultra hack and still left over from legacy but still works for testing atm
+    // TODO: This is ultra hack and still left over from legacy but still works for testing atm
     public class ExamineDemoDataContentService
     {
         public const int ProtectedNode = 1142;

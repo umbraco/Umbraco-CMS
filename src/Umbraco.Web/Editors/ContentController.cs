@@ -175,7 +175,7 @@ namespace Umbraco.Web.Editors
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            //TODO: Should non-admins be able to see detailed permissions?
+            // TODO: Should non-admins be able to see detailed permissions?
 
             var allUserGroups = Services.UserService.GetAllUserGroups();
 
@@ -271,7 +271,7 @@ namespace Umbraco.Web.Editors
             content.AllowedActions = new[] { "A" };
             content.IsBlueprint = true;
 
-            //todo  - exclude the content apps here
+            // TODO: exclude the content apps here
             //var excludeProps = new[] { "_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template" };
             //var propsTab = content.Tabs.Last();
             //propsTab.Properties = propsTab.Properties
@@ -433,7 +433,7 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
-                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageNumber = 0,  // TODO: This should be '1' as it's not the index
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
@@ -1091,7 +1091,7 @@ namespace Umbraco.Web.Editors
             {
                 //its invariant, proceed normally
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
-                //TODO: Deal with multiple cancellations
+                // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = Array.Empty<string>();
                 return publishStatus;
@@ -1124,7 +1124,7 @@ namespace Umbraco.Web.Editors
             {
                 //proceed to publish if all validation still succeeds
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, Security.CurrentUser.Id);
-                //TODO: Deal with multiple cancellations
+                // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
                 return publishStatus;
@@ -1431,7 +1431,7 @@ namespace Umbraco.Web.Editors
                 if (!sortResult.Success)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
-                    //TODO: Now you can cancel sorting, does the event messages bubble up automatically?
+                    // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
 
@@ -1907,7 +1907,7 @@ namespace Umbraco.Web.Editors
                 {
                     case PublishResultType.SuccessPublishAlready:
                         {
-                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
                             // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
                             // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
 
@@ -1938,7 +1938,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.SuccessPublish:
                         {
-                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
                             // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
                             // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
 
@@ -2148,7 +2148,7 @@ namespace Umbraco.Web.Editors
                 default:
                     notificationModel.AddErrorNotification(
                                     Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                                    null); //TODO: There is no specific failed to save error message AFAIK
+                                    null); // TODO: There is no specific failed to save error message AFAIK
                     break;
                 case OperationResultType.FailedCancelledByEvent:
                     notificationModel.AddErrorNotification(

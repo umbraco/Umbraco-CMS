@@ -144,7 +144,7 @@ namespace Umbraco.Web.UI.JavaScript
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to //TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
+        ///   Looks up a localized string similar to // TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
         ///// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
         ///// to force load JS files ?
         ///

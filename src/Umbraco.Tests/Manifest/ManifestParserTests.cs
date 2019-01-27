@@ -337,12 +337,12 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(2, config.Count);
             Assert.IsTrue(config.ContainsKey("image"));
             var c = config["image"];
-            Assert.IsInstanceOf<JObject>(c); // fixme - is this what we want?
+            Assert.IsInstanceOf<JObject>(c); // FIXME: is this what we want?
             Assert.IsTrue(config.ContainsKey("link"));
             c = config["link"];
-            Assert.IsInstanceOf<JObject>(c); // fixme - is this what we want?
+            Assert.IsInstanceOf<JObject>(c); // FIXME: is this what we want?
 
-            // fixme - should we resolveUrl in configs?
+            // FIXME: should we resolveUrl in configs?
         }
 
         [Test]

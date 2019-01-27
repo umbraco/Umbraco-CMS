@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
                 _schedule[schedule.Culture] = changes;
             }
 
-            //TODO: Below will throw if there are duplicate dates added, validate/return bool?
+            // TODO: Below will throw if there are duplicate dates added, validate/return bool?
             changes.Add(schedule.Date, schedule);
 
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, schedule));
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Models
 
             if (!releaseDate.HasValue && !expireDate.HasValue) return false;
 
-            //TODO: Do we allow passing in a release or expiry date that is before now?
+            // TODO: Do we allow passing in a release or expiry date that is before now?
 
             if (!_schedule.TryGetValue(culture, out var changes))
             {
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
                 _schedule[culture] = changes;
             }
 
-            //TODO: Below will throw if there are duplicate dates added, should validate/return bool?
+            // TODO: Below will throw if there are duplicate dates added, should validate/return bool?
             // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
 
             if (releaseDate.HasValue)

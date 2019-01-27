@@ -129,7 +129,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (_defaultUmbracoSettings == null)
             {
-                //TODO: Just make this mocks instead of reading from the config
+                // TODO: Just make this mocks instead of reading from the config
 
                 var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
 

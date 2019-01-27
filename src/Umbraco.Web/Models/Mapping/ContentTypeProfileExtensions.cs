@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             where TPropertyTypeBasic : PropertyTypeBasic
         {
             return mapping
-                .ConstructUsing(x => new PropertyGroup(false)) // todo - we have NO idea of isPublishing here = wtf?
+                .ConstructUsing(x => new PropertyGroup(false)) // TODO: we have NO idea of isPublishing here = wtf?
                 .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(src => src.Id > 0))
                 .ForMember(dest => dest.Key, map => map.Ignore())
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Models.Mapping
 
             foreach (var a in add)
             {
-                //TODO: Remove N+1 lookup
+                // TODO: Remove N+1 lookup
                 var addCt = contentTypeService.Get(a);
                 if (addCt != null)
                     dest.AddContentType(addCt);
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Models.Mapping
 
             foreach (var a in add)
             {
-                //TODO: Remove N+1 lookup
+                // TODO: Remove N+1 lookup
                 var addCt = mediaTypeService.Get(a);
                 if (addCt != null)
                     dest.AddContentType(addCt);
@@ -160,7 +160,7 @@ namespace Umbraco.Web.Models.Mapping
             where TDestination : IContentTypeComposition
             where TSourcePropertyType : PropertyTypeBasic
         {
-            // todo not so clean really
+            // TODO: not so clean really
             var isPublishing = typeof(IContentType).IsAssignableFrom(typeof(TDestination));
 
             mapping = mapping

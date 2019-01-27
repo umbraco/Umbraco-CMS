@@ -8,7 +8,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services.Implement
 {
-    //TODO: Convert all of this over to Niels K's localization framework one day
+    // TODO: Convert all of this over to Niels K's localization framework one day
 
     public class LocalizedTextService : ILocalizedTextService
     {
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
 
-            //TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
+            // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);
 
             //This is what the legacy ui service did
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (culture == null) throw new ArgumentNullException("culture");
 
-            //TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
+            // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);
 
             var result = new Dictionary<string, string>();

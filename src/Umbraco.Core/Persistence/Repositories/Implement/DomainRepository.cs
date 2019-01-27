@@ -12,7 +12,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    //TODO: We need to get a readonly ISO code for the domain assigned
+    // TODO: We need to get a readonly ISO code for the domain assigned
 
     internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
     {

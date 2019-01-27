@@ -148,8 +148,8 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
                     'Failed to rebuild index')
                 .then(function() {
 
-                    //rebuilding has started, nothing is returned accept a 200 status code.
-                    //lets poll to see if it is done.
+                    // rebuilding has started, nothing is returned accept a 200 status code.
+                    // lets poll to see if it is done.
                     $timeout(() => { checkProcessing(index, "PostCheckRebuildIndex"), 1000 });
 
                 });
@@ -157,7 +157,7 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
     }
 
     function init() {
-        //go get the data
+        // go get the data
 
         //combine two promises and execute when they are both done
         $q.all([

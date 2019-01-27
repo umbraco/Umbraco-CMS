@@ -227,7 +227,7 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
-            //TODO: Add permissions check!
+            // TODO: Add permissions check!
 
             return Services.MediaService.GetRootMedia()
                            .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>);

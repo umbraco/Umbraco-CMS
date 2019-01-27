@@ -394,7 +394,7 @@ namespace Umbraco.Core.Services.Implement
                 content.Id.ToString(CultureInfo.InvariantCulture),
                 string.Format("{2}://{0}/{1}",
                     string.Concat(siteUri.Authority),
-                    //TODO: RE-enable this so we can have a nice url
+                    // TODO: RE-enable this so we can have a nice url
                     /*umbraco.library.NiceUrl(documentObject.Id))*/
                     string.Concat(content.Id, ".aspx"),
                     protocol),

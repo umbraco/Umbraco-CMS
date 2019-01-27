@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Runtimes
                 return configs;
             }
 
-            // fixme so how the f* should we do it now?
+            // FIXME: so how the f* should we do it now?
             /*
             // pretend we have the proper migration
             // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases

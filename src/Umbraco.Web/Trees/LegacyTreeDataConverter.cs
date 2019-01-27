@@ -12,7 +12,7 @@ namespace Umbraco.Web.Trees
     /// </summary>
     internal class LegacyTreeDataConverter
     {
-        //todo: remove this whole class when everything is angularized
+        // TODO: remove this whole class when everything is angularized
 
         /// <summary>
         /// This will look at the legacy IAction's JsFunctionName and convert it to a confirmation dialog view if possible

@@ -125,13 +125,13 @@ namespace Umbraco.Web.Security
 
         #region What we support do not currently
 
-        //TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
+        // TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
         public override bool SupportsUserClaim
         {
             get { return false; }
         }
 
-        //TODO: Support this
+        // TODO: Support this
         public override bool SupportsQueryableUsers
         {
             get { return false; }
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Security
             get { return false; }
         }
 
-        //TODO: Support this
+        // TODO: Support this
         public override bool SupportsUserPhoneNumber
         {
             get { return false; }
@@ -618,7 +618,7 @@ namespace Umbraco.Web.Security
             OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
+        // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
         internal void RaisePasswordResetEvent(int userId)
         {
             OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), affectedUser: userId));
@@ -702,7 +702,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         protected virtual string GetCurrentRequestIpAddress()
         {
-            //TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
+            // TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
             var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
             return httpContext.GetCurrentRequestIpAddress();
         }

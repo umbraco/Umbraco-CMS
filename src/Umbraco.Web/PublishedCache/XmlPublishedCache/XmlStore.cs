@@ -69,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         // internal for unit tests
         // no file nor db, no config check
-        // todo - er, we DO have a DB?
+        // TODO: er, we DO have a DB?
         internal XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
             bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer)
@@ -602,7 +602,7 @@ AND (umbracoNode.id=@id)";
         // should we have async versions that would do: ?
         // var releaser = await _xmlLock.LockAsync();
         //
-        // todo - not sure about the "resync current published snapshot" thing here, see 7.6...
+        // TODO: not sure about the "resync current published snapshot" thing here, see 7.6...
 
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
@@ -641,7 +641,7 @@ AND (umbracoNode.id=@id)";
 
         public void EnsureFilePermission()
         {
-            // todo - but do we really have a store, initialized, at that point?
+            // TODO: but do we really have a store, initialized, at that point?
             var filename = _xmlFileName + ".temp";
             File.WriteAllText(filename, "TEMP");
             File.Delete(filename);
@@ -1559,8 +1559,8 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // need to update the published xml if we're saving the published version,
             // or having an impact on that version - we update the published xml even when masked
 
-            // todo - in the repo... either its 'unpublished' and 'publishing', or 'published' and 'published', this has changed!
-            // todo - what are we serializing really? which properties?
+            // TODO: in the repo... either its 'unpublished' and 'publishing', or 'published' and 'published', this has changed!
+            // TODO: what are we serializing really? which properties?
 
             // if not publishing, no change to published xml
             if (((Content) entity).PublishedState != PublishedState.Publishing)
@@ -1669,7 +1669,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         // RepositoryCacheMode.Scoped because we do NOT want to use the L2 cache that may be out-of-sync
         // hopefully this does not cause issues and we're not nested in another scope w/different mode
-        // todo - well, guess what?
+        // TODO: well, guess what?
         // original code made sure the repository used no cache
         // now we're using the Scoped scope cache mode
         // and then?
@@ -2027,7 +2027,7 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
             // and that row should have the key="..." attribute
-            // todo - where's the trashed test here?
+            // TODO: where's the trashed test here?
 
             var mediaObjectType = Constants.ObjectTypes.Media;
             var db = scope.Database;

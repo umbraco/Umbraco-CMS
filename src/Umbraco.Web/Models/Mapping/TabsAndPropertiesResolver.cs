@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
         
-        //TODO: This should deserialize to ListViewConfiguration
+        // TODO: This should deserialize to ListViewConfiguration
         private static int GetTabNumberFromConfig(IDictionary<string, object> listViewConfig)
         {
             if (!listViewConfig.TryGetValue("displayAtTabNumber", out var displayTabNum))

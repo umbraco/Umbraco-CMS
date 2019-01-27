@@ -122,7 +122,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
-                        //TODO: Need to fix examine in LB scenarios!
+                        // TODO: Need to fix examine in LB scenarios!
                         Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
@@ -248,7 +248,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                 //See this thread: http://examine.cdodeplex.com/discussions/264341
                 //Catch the exception here for the time being, and just fallback to GetMedia
-                //TODO: Need to fix examine in LB scenarios!
+                // TODO: Need to fix examine in LB scenarios!
             }
             catch (NullReferenceException)
             {
@@ -305,7 +305,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
-                        //TODO: Need to fix examine in LB scenarios!
+                        // TODO: Need to fix examine in LB scenarios!
                         Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)

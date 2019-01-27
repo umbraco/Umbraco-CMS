@@ -42,7 +42,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _globalSettings = globalSettings;
         }
 
-        //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
+        // TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
         private MembershipProvider CurrentProvider
         {
             get

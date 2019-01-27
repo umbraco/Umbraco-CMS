@@ -680,7 +680,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                             //supported keys to move to the next or prev element (13-enter, 27-esc, 38-up, 40-down, 39-right, 37-left)
                             //supported keys to remove the macro (8-backspace, 46-delete)
-                            //TODO: Should we make the enter key insert a line break before or leave it as moving to the next element?
+                            // TODO: Should we make the enter key insert a line break before or leave it as moving to the next element?
                             if ($.inArray(e.keyCode, [13, 40, 39]) !== -1) {
                                 //move to next element
                                 moveSibling(macroElement, true);
@@ -1358,7 +1358,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             self.createAceCodeEditor(args.editor, function () {
 
-                //TODO: CHECK TO SEE WHAT WE NEED TO DO WIT MACROS (See code block?)
+                // TODO: CHECK TO SEE WHAT WE NEED TO DO WIT MACROS (See code block?)
                 /*
                 var html = editor.getContent({source_view: true});
                 html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));

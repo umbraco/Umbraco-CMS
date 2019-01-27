@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Routing
             var cache = umbracoContext.PublishedSnapshot.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
-            // fixme not sure?
+            // FIXME: not sure?
             //PublishedContentCache.UnitTesting = false; // else does not write to routes cache
             //Assert.IsFalse(PublishedContentCache.UnitTesting);
 

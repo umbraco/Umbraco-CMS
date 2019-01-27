@@ -1039,7 +1039,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
         }
 
-        //TODO Method to change name and/or alias of view template
+        // TODO: Method to change name and/or alias of view template
 
         #region Event Handlers
 

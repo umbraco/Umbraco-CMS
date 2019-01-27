@@ -37,7 +37,7 @@ namespace Umbraco.Web.PropertyEditors
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService;
 
-            //todo: inject?
+            // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
         }
 

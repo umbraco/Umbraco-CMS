@@ -92,7 +92,7 @@ namespace Umbraco.Web.Cache
             // content and when the PublishedCachesService is notified of changes it does not see
             // the new content...
 
-            // todo - what about this?
+            // TODO: what about this?
             // should rename it, and then, this is only for Deploy, and then, ???
             //if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
             //  ...

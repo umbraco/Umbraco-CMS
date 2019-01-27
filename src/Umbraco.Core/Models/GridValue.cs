@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Models
 {
-    //TODO: Make a property value converter for this!
+    // TODO: Make a property value converter for this!
 
     /// <summary>
     /// A model representing the value saved for the grid

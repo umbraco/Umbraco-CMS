@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class RichTextConfiguration
     {
-        //todo: Make these strongly typed, for now this works though
+        // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("editor", "Editor", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
         public JObject Editor { get; set; }
 

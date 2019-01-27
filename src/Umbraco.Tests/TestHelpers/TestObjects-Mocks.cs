@@ -55,7 +55,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>A ServiceContext.</returns>
         public ServiceContext GetServiceContextMock(IFactory container = null)
         {
-            // fixme - else some tests break - figure it out
+            // FIXME: else some tests break - figure it out
             container = null;
 
             return ServiceContext.CreatePartial(
@@ -125,8 +125,8 @@ namespace Umbraco.Tests.TestHelpers
 
         public IUmbracoSettingsSection GetUmbracoSettings()
         {
-            //fixme Why not use the SettingsForTest.GenerateMock ... ?
-            //fixme Shouldn't we use the default ones so they are the same instance for each test?
+            // FIXME: Why not use the SettingsForTest.GenerateMock ... ?
+            // FIXME: Shouldn't we use the default ones so they are the same instance for each test?
 
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
             var webRoutingSectionMock = new Mock<IWebRoutingSection>();

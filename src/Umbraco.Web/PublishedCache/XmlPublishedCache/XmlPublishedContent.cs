@@ -377,7 +377,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
             catch (InvalidOperationException e)
             {
-                // todo - enable!
+                // TODO: enable!
                 //content.Instance.RefreshContentFromDatabase();
                 throw new InvalidOperationException($"{e.Message}. This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.");
             }

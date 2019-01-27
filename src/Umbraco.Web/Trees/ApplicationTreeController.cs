@@ -298,7 +298,7 @@ namespace Umbraco.Web.Trees
             if (instance == null)
                 throw new Exception("Failed to create tree " + appTree.TreeControllerType + ".");
 
-            //TODO: Shouldn't we be applying the same proxying logic as above so that filters work? seems like an oversight
+            // TODO: Shouldn't we be applying the same proxying logic as above so that filters work? seems like an oversight
 
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;
