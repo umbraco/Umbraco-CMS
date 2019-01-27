@@ -1064,6 +1064,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="languageSaved">Sprog gemt</key>
     <key alias="mediaTypeSavedHeader">Medietype gemt</key>
     <key alias="memberTypeSavedHeader">Medlemstype gemt</key>
+    <key alias="memberGroupSavedHeader">Medlemsgruppe gemt</key>
     <key alias="templateErrorHeader">Skabelon ikke gemt</key>
     <key alias="templateErrorText">Undgå venligst at du har 2 templates med samme alias</key>
     <key alias="templateSavedHeader">Skabelon gemt</key>

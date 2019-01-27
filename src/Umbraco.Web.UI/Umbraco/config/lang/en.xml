@@ -1218,11 +1218,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="externalLinkPlaceholder">Enter the link</key>
   </area>
   <area alias="imagecropper">
-        <key alias="reset">Reset crop</key>
+    <key alias="reset">Reset crop</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
-        <key alias="updateEditCrop">Done</key>
-        <key alias="undoEditCrop">Undo edits</key>
+    <key alias="updateEditCrop">Done</key>
+    <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Select a version to compare with the current version</key>
@@ -1314,7 +1314,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
     <key alias="editMediaSaved">Media saved</key>
-        <key alias="editMemberGroupSaved">Member group saved</key>
+    <key alias="editMemberGroupSaved">Member group saved</key>
     <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
@@ -1331,6 +1331,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="languageSaved">Language saved</key>
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
+    <key alias="memberGroupSavedHeader">Member Group saved</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
