@@ -29,7 +29,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructor
 
-        // todo - figure this out
+        // TODO: figure this out
         // after the current snapshot has been resync-ed
         // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
@@ -93,7 +93,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // if in a domain then start with the root node of the domain
                 // and follow the path
                 // note: if domain has a path (eg example.com/en) which is not recommended anymore
-                //  then then /en part of the domain is basically ignored here...
+                //  then /en part of the domain is basically ignored here...
                 content = GetById(preview, startNodeId);
                 content = FollowRoute(content, parts, 0, culture);
             }

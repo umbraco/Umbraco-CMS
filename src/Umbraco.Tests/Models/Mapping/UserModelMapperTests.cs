@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Models.Mapping
             var userGroupSave = JsonConvert.DeserializeObject<UserGroupSave>(json.Replace("@@@ID@@@", userGroup.Id.ToString()));
 
             // failed, AutoMapper complained, "Unable to cast object of type 'WhereSelectArrayIterator`2[System.Char,System.String]' to type 'System.Collections.IList'".
-            // fixmed: added ToList() in UserGroupFactory
+            // FIXME: added ToList() in UserGroupFactory
             Mapper.Map(userGroupSave, userGroup);
         }
     }

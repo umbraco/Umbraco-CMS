@@ -35,7 +35,7 @@ namespace Umbraco.Web.UI.JavaScript
         /// <param name="version">The <see cref="SemVersion">version</see> of Umbraco we're upgrading to</param>
         /// <param name="date">A <see cref="DateTime">date</see> value to use in the hash to prevent this method from updating the version on each startup</param>
         /// <param name="dateFormat">Allows the developer to specify the <see cref="string">date precision</see> for the hash (i.e. "yyyyMMdd" would be a precision for the day)</param>
-        /// <returns>Boolean to indicate succesful update of the ClientDependency.config file</returns>
+        /// <returns>Boolean to indicate successful update of the ClientDependency.config file</returns>
         public bool UpdateVersionNumber(SemVersion version, DateTime date, string dateFormat)
         {
             var byteContents = Encoding.Unicode.GetBytes(version + date.ToString(dateFormat));
@@ -56,7 +56,7 @@ namespace Umbraco.Web.UI.JavaScript
                 //CDF requires an INT, and although this isn't fail safe, it will work for our purposes. We are not hashing for crypto purposes
                 //so there could be some collisions with this conversion but it's not a problem for our purposes
                 //It's also important to note that the long.GetHashCode() implementation in .NET is this: return (int) this ^ (int) (this >> 32);
-                //which means that this value will not change per appdomain like some GetHashCode implementations.
+                //which means that this value will not change per AppDomain like some GetHashCode implementations.
                 intHash = longResult.GetHashCode();
             }
 

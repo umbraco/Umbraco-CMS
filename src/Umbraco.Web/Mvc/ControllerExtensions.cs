@@ -165,7 +165,7 @@ namespace Umbraco.Web.Mvc
         /// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
         /// will write to the Response output stream which isn't what we want. Instead, this method will use the same logic inside
         /// of MVC to assign the View object to the result but without executing it.
-        /// This is only relavent for view results of PartialViewResult or ViewResult.
+        /// This is only relevant for view results of PartialViewResult or ViewResult.
         /// </summary>
         /// <param name="result"></param>
         /// <param name="controller"></param>

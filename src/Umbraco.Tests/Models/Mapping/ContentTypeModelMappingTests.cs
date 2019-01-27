@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             base.SetUp();
 
-            // fixme - are we initializing mappers that... have already been?
+            // FIXME: are we initializing mappers that... have already been?
             Mapper.Reset();
             Mapper.Initialize(configuration =>
             {
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.CreateDate, result.CreateDate);
             Assert.AreEqual(display.UpdateDate, result.UpdateDate);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
             for (var i = 0; i < display.Groups.Count(); i++)
             {
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.CreateDate, result.CreateDate);
             Assert.AreEqual(display.UpdateDate, result.UpdateDate);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
             for (var i = 0; i < display.Groups.Count(); i++)
             {
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.CreateDate, result.CreateDate);
             Assert.AreEqual(display.UpdateDate, result.UpdateDate);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
             for (var i = 0; i < display.Groups.Count(); i++)
             {
@@ -276,7 +276,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Assert
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
         }
 
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Assert
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
         }
 
@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(memberType.CreateDate, result.CreateDate);
             Assert.AreEqual(memberType.UpdateDate, result.UpdateDate);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
 
             Assert.AreEqual(memberType.PropertyGroups.Count(), result.Groups.Count());
             for (var i = 0; i < memberType.PropertyGroups.Count(); i++)
@@ -393,7 +393,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(mediaType.CreateDate, result.CreateDate);
             Assert.AreEqual(mediaType.UpdateDate, result.UpdateDate);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
 
             Assert.AreEqual(mediaType.PropertyGroups.Count(), result.Groups.Count());
             for (var i = 0; i < mediaType.PropertyGroups.Count(); i++)
@@ -447,7 +447,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
 
             Assert.AreEqual(contentType.PropertyGroups.Count, result.Groups.Count());
             for (var i = 0; i < contentType.PropertyGroups.Count; i++)
@@ -748,7 +748,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.CreateDate, result.CreateDate);
             Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
 
             Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
             Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
@@ -830,7 +830,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
-            //TODO: Now we need to assert all of the more complicated parts
+            // TODO: Now we need to assert all of the more complicated parts
 
             Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
             Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));

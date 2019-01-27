@@ -13,7 +13,7 @@ namespace Umbraco.Web.Mvc
         {
             base.OnResultExecuting(filterContext);
 
-            // could happens if exception (but afaik this wouldn't happen in MVC)
+            // could happens if exception (but AFAIK this wouldn't happen in MVC)
             if (filterContext.HttpContext == null || filterContext.HttpContext.Response == null ||
                     filterContext.HttpContext.Response.Cache == null)
             {

@@ -20,7 +20,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            // fixme - what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
+            // FIXME: what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
             // can we risk double - registering and then, what happens?
 
             Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()

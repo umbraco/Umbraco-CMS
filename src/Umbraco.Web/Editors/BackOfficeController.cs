@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors
 
             var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
                 //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
-                // in the back office requres the delimiter to be a '_' so we'll just replace it
+                // in the back office requires the delimiter to be a '_' so we'll just replace it
                 .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
 
             return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
@@ -390,7 +390,7 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
-                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
+                // TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
                 // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
                 // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
                 // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
@@ -416,7 +416,7 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
-                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" };
                 }
 
                 //Remove the cookie otherwise this message will keep appearing

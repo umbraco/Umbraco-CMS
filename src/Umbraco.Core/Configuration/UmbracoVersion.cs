@@ -31,7 +31,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        // TODO rename to Version
+        // TODO: rename to Version
         public static Version Current { get; }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    // TODO - https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
+                    // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
                     var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
                     return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }

@@ -120,6 +120,7 @@ namespace Umbraco.Web.Editors
                 //x is passed in as the parameter alias for the linq where statement clause
                 var operation = condition.BuildCondition("x", contents, Properties);
 
+                    //for review - this uses a tonized query rather then the normal linq query.
                 contents = contents.Where(operation.Compile());
                 queryExpression.Append(indent);
                 queryExpression.AppendFormat(".Where({0})", operation);

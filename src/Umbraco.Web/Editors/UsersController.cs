@@ -200,7 +200,7 @@ namespace Umbraco.Web.Editors
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
             {
-                //this user is not an admin so in that case we need to exlude all admin users
+                //this user is not an admin so in that case we need to exclude all admin users
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 

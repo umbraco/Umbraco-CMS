@@ -766,7 +766,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             case "published":
                 return "content_isPublished";
             case "contentTypeAlias":
-                //TODO: Check for members
+                // TODO: Check for members
                 return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
             case "email":
                 return "general_email";

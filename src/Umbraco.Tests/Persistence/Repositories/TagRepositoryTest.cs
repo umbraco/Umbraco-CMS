@@ -454,7 +454,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     contentType.PropertyTypes.First().Id,
                     tags, false);
 
-                //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
+                // TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
                 //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
                 var all = repository.GetMany().ToArray();
 

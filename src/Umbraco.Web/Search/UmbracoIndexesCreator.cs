@@ -14,7 +14,7 @@ namespace Umbraco.Web.Search
     /// </summary>
     public class UmbracoIndexesCreator : LuceneIndexCreator, IUmbracoIndexesCreator
     {
-        //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
+        // TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
         public UmbracoIndexesCreator(IProfilingLogger profilingLogger,
             ILocalizationService languageService,

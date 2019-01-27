@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors.Binders
                         throw new InvalidOperationException("Could not find member with key " + model.Key);
                     }
 
-                    //TODO: Support this scenario!
+                    // TODO: Support this scenario!
                     //if (scenario == MembershipScenario.CustomProviderWithUmbracoLink)
                     //{
                     //    //if there's a 'Member' type then we should be able to just go get it from the db since it was created with a link
@@ -140,7 +140,7 @@ namespace Umbraco.Web.Editors.Binders
                 var contentType = _services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)
                 {
-                    throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
+                    throw new InvalidOperationException("No member type found with alias " + model.ContentTypeAlias);
                 }
 
                 //remove all membership properties, these values are set with the membership provider.
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors.Binders
 
         /// <summary>
         /// This will remove all of the special membership provider properties which were required to display the property editors
-        /// for editing - but the values have been mapped back ot the MemberSave object directly - we don't want to keep these properties
+        /// for editing - but the values have been mapped back to the MemberSave object directly - we don't want to keep these properties
         /// on the IMember because they will attempt to be persisted which we don't want since they might not even exist.
         /// </summary>
         /// <param name="contentType"></param>
