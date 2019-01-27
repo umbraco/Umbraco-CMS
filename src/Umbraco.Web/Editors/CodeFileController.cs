@@ -75,11 +75,14 @@ namespace Umbraco.Web.Editors
         /// <param name="name">The name of the container/folder</param>
         /// <returns></returns>
         [HttpPost]
-        public CodeFileDisplay PostCreateContainer(string type, string parentId, string name)
+        public HttpResponseMessage PostCreateContainer(string type, string parentId, string name)
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
             if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (name.ContainsAny(Path.GetInvalidPathChars())) {
+                return Request.CreateNotificationValidationErrorResponse("The folder name cannot contain illegal characters.");
+            }
 
             // if the parentId is root (-1) then we just need an empty string as we are
             // creating the path below and we don't wan't -1 in the path
@@ -114,11 +117,11 @@ namespace Umbraco.Web.Editors
 
             }
 
-            return new CodeFileDisplay
+            return Request.CreateResponse(HttpStatusCode.OK, new CodeFileDisplay
             {
                 VirtualPath = virtualPath,
                 Path = Url.GetTreePathFromFilePath(virtualPath)
-            };
+            });
         }
 
         /// <summary>
