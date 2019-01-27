@@ -1346,7 +1346,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
     <key alias="userPermissions">Brugertilladelser</key>
-    <key alias="userTypes">Bruger Typer</key>
+    <key alias="userTypes">Brugertyper</key>
     <key alias="users">Brugere</key>
   </area>
   <area alias="update">
