@@ -2038,7 +2038,7 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
-        [EnsureUserPermissionForContent("contentId", 'R')]
+        [EnsureUserPermissionForContent("contentId", ActionBrowse.ActionLetter)]
         public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
         {
             var notifications = new List<NotifySetting>();

@@ -491,17 +491,17 @@ namespace Umbraco.Web.Routing
         // Note: we used to set a default value here but that would then be the default
         // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
         // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-        internal HttpCacheability Cacheability { get; set; }
+        public HttpCacheability Cacheability { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Extensions to append to the Response.Cache object.
         /// </summary>
-        internal List<string> CacheExtensions { get; set; } = new List<string>();
+        public List<string> CacheExtensions { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a dictionary of Headers to append to the Response object.
         /// </summary>
-        internal Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
         #endregion
 

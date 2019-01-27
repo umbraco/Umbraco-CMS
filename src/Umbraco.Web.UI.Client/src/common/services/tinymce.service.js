@@ -1294,7 +1294,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
                 var linkPicker = {
                     currentTarget: currentTarget,
-                    anchors: self.getAnchorNames(JSON.stringify(editorState.current.properties)),
+                    anchors: editorState.current ? self.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
                         editorService.close();
