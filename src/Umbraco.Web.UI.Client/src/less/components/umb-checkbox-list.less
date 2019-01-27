@@ -6,6 +6,12 @@
   margin-left: 0;
 }
 
+.umb-checkboxlist{
+    ul{
+        float: left;
+    }
+}
+
 .umb-checkbox-list__item {
   display: flex;
   align-items: center;
@@ -78,12 +84,15 @@
     }
 
     &__label{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
         position: relative;
         padding: 0;
         margin: 0;
 
         &-text{
-            margin: 0 0 0 10px;
+            margin: 0 0 0 26px;
             position: relative;
             top: 2px;
         }
@@ -112,12 +121,10 @@
     }
 
     &__state{
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
         height: 17px;
-        position: relative;
-        left: 1px;
+        position: absolute;
+        top: 2px;
+        left: 0;
     }
 
     &__check{
