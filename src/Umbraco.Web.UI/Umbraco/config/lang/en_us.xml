@@ -306,11 +306,11 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
-        <key alias="moveFailed">Failed to move media</key>
-        <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
-        <key alias="copyFailed">Failed to copy media</key>
-        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
-        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="moveFailed">Failed to move media</key>
+    <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
+    <key alias="copyFailed">Failed to copy media</key>
+    <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+    <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
