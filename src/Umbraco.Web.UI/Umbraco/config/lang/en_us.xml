@@ -1684,9 +1684,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templates">Templates</key>
     <key alias="logViewer">Log Viewer</key>
     <key alias="users">Users</key>
-        <key alias="settingsGroup">Settings</key>
-        <key alias="templatingGroup">Templating</key>
-        <key alias="thirdPartyGroup">Third Party</key>
+    <key alias="settingsGroup">Settings</key>
+    <key alias="templatingGroup">Templating</key>
+    <key alias="thirdPartyGroup">Third Party</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
