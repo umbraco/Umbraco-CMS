@@ -333,7 +333,7 @@
                     //and it's not publishable or not selected to be published
                     //then we cannot continue
 
-                    //TODO: Show a message when this occurs
+                    // TODO: Show a message when this occurs
                     return false;
                 }
 

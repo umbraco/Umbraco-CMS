@@ -54,7 +54,7 @@ namespace Umbraco.Core.IO
             return Path.GetFileName(fs.GetFullPath(path));
         }
 
-        //TODO: Currently this is the only way to do this
+        // TODO: Currently this is the only way to do this
         internal static void CreateFolder(this IFileSystem fs, string folderPath)
         {
             var path = fs.GetRelativePath(folderPath);

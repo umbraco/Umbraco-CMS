@@ -62,7 +62,7 @@ namespace Umbraco.Web.WebApi
         }
 
         /// <summary>
-        /// Create a 403 (Forbidden) response indicating that hte current user doesn't have access to the resource
+        /// Create a 403 (Forbidden) response indicating that the current user doesn't have access to the resource
         /// requested or the action it needs to take.
         /// </summary>
         /// <param name="request"></param>
@@ -131,7 +131,7 @@ namespace Umbraco.Web.WebApi
         }
 
         /// <summary>
-        /// Creates a succressful response with notifications in the result to be displayed in the UI
+        /// Creates a successful response with notifications in the result to be displayed in the UI
         /// </summary>
         /// <param name="request"></param>
         /// <param name="successMessage"></param>

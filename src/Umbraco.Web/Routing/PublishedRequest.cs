@@ -93,7 +93,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>When the event triggers, no preparation has been done. It is still possible to
         /// modify the request's Uri property, for example to restore its original, public-facing value
-        /// that might have been modified by an in-between equipement such as a load-balancer.</remarks>
+        /// that might have been modified by an in-between equipment such as a load-balancer.</remarks>
         public static event EventHandler<EventArgs> Preparing;
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Routing
                 return true;
             }
 
-            // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
+            // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
             alias = alias.Replace(" ", "");
 
             var model = _publishedRouter.GetTemplate(alias);
@@ -357,7 +357,7 @@ namespace Umbraco.Web.Routing
         }
 
         // note: do we want to have an ordered list of alternate cultures,
-        // to allow for fallbacks when doing dictionnary lookup and such?
+        // to allow for fallbacks when doing dictionary lookup and such?
 
         #endregion
 
@@ -430,7 +430,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Indicates that the content requet should trigger a redirect, with a specified status code.
+        /// Indicates that the content request should trigger a redirect, with a specified status code.
         /// </summary>
         /// <param name="url">The url to redirect to.</param>
         /// <param name="status">The status code (300-308).</param>
@@ -491,23 +491,24 @@ namespace Umbraco.Web.Routing
         // Note: we used to set a default value here but that would then be the default
         // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
         // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-        internal HttpCacheability Cacheability { get; set; }
+        public HttpCacheability Cacheability { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Extensions to append to the Response.Cache object.
         /// </summary>
-        internal List<string> CacheExtensions { get; set; } = new List<string>();
+        public List<string> CacheExtensions { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a dictionary of Headers to append to the Response object.
         /// </summary>
-        internal Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
         #endregion
 
         #region Legacy
 
-        // for legacy/webforms code - todo - get rid of it eventually
+        // for legacy/webforms code -
+        // TODO: get rid of it eventually
         internal page UmbracoPage
         {
             get

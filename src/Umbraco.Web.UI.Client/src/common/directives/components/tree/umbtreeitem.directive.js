@@ -61,7 +61,7 @@ angular.module("umbraco.directives")
                     return '';
                 }
 
-                //TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
+                // TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
 
                 var css = [];                

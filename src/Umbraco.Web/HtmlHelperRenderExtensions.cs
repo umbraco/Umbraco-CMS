@@ -140,7 +140,7 @@ namespace Umbraco.Web
                 return htmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
             }
 
-            //if there's a prefix applied, we need to create a new html helper with a filtered ModelState collection so that it only looks for
+            //if there's a prefix applied, we need to create a new HTML helper with a filtered ModelState collection so that it only looks for
             //specific model state with the prefix.
             var filteredHtmlHelper = new HtmlHelper(htmlHelper.ViewContext, htmlHelper.ViewDataContainer.FilterContainer(prefix));
             return filteredHtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
@@ -736,7 +736,7 @@ namespace Umbraco.Web
                                           object additionalRouteVals = null)
         {
 
-            //ensure that the multipart/form-data is added to the html attributes
+            //ensure that the multipart/form-data is added to the HTML attributes
             if (htmlAttributes.ContainsKey("enctype") == false)
             {
                 htmlAttributes.Add("enctype", "multipart/form-data");

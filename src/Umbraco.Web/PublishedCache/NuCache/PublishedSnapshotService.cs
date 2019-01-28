@@ -58,18 +58,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
         // means faster execution, but uses memory - not sure if we want it
-        // so making it configureable.
+        // so making it configurable.
         public static readonly bool FullCacheWhenPreviewing = true;
 
         // define constant - determines whether to cache the published content
         // objects (in the elements cache, or snapshot cache, depending on preview)
-        // or to refetch them all the time. caching is faster but uses more
+        // or to re-fetch them all the time. caching is faster but uses more
         // memory. not sure what we want.
         public static readonly bool CachePublishedContentChildren = true;
 
         // define constant - determines whether to cache the content cache root
         // objects (in the elements cache, or snapshot cache, depending on preview)
-        // or to refecth them all the time. caching is faster but uses more
+        // or to re-fetch them all the time. caching is faster but uses more
         // memory - not sure what we want.
         public static readonly bool CacheContentCacheRoots = true;
 
@@ -88,7 +88,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
-            //    throw new Exception("Singleton must be instancianted only once!");
+            //    throw new Exception("Singleton must be instantiated only once!");
 
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -140,14 +140,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var localMediaDbPath = IOHelper.MapPath("~/App_Data/NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
 
-                    // if both local dbs exist then GetTree will open them, else new dbs will be created
+                    // if both local databases exist then GetTree will open them, else new databases will be created
                     _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
                     _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
                 }
 
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
-                // figure out whether it can read the dbs or it should populate them from sql
+                // figure out whether it can read the databases or it should populate them from sql
                 _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
                 _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
             }
@@ -194,14 +194,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
                 }
 
-                // finaly, cache is ready!
+                // finally, cache is ready!
                 _isReady = true;
             }
         }
 
         private void InitializeRepositoryEvents()
         {
-            //todo: The reason these events are in the repository is for legacy, the events should exist at the service
+            // TODO: The reason these events are in the repository is for legacy, the events should exist at the service
             // level now since we can fire these events within the transaction... so move the events to service level
 
             // plug repository event handlers
@@ -253,7 +253,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //
             //// indicates that the snapshot cache should reuse the application request cache
             //// otherwise a new cache object would be created for the snapshot specifically,
-            //// which is the default - web boot manager uses this to optimze facades
+            //// which is the default - web boot manager uses this to optimize facades
             //public bool PublishedSnapshotCacheIsApplicationRequestCache;
 
             public bool IgnoreLocalDb;
@@ -584,7 +584,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     continue;
                 }
 
-                // todo- should we do some RV check here? (later)
+                // TODO: should we do some RV check here? (later)
 
                 var capture = payload;
                 using (var scope = _scopeProvider.CreateScope())
@@ -674,7 +674,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     continue;
                 }
 
-                // todo- should we do some RV checks here? (later)
+                // TODO: should we do some RV checks here? (later)
 
                 var capture = payload;
                 using (var scope = _scopeProvider.CreateScope())
@@ -773,7 +773,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (_contentStore.GetWriter(_scopeProvider))
             using (_mediaStore.GetWriter(_scopeProvider))
             {
-                // todo - need to add a datatype lock
+                // TODO: need to add a datatype lock
                 // this is triggering datatypes reload in the factory, and right after we create some
                 // content types by loading them ... there's a race condition here, which would require
                 // some locking on datatypes

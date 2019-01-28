@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public static partial class NPocoDatabaseExtensions
     {
-        // todo: review NPoco native InsertBulk to replace the code below
+        // TODO: review NPoco native InsertBulk to replace the code below
 
         /// <summary>
         /// Bulk-inserts records within a transaction.
@@ -177,8 +177,8 @@ namespace Umbraco.Core.Persistence
             using (var command = database.CreateCommand(database.Connection, CommandType.TableDirect, string.Empty))
             {
                 command.CommandText = pocoData.TableInfo.TableName;
-                command.CommandType = CommandType.TableDirect; // todo - why repeat?
-                // todo - not supporting transactions?
+                command.CommandType = CommandType.TableDirect; // TODO: why repeat?
+                // TODO: not supporting transactions?
                 //cmd.Transaction = GetTypedTransaction<SqlCeTransaction>(db.Connection.);
 
                 var count = 0;

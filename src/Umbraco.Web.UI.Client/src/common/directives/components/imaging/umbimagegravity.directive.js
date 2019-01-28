@@ -131,7 +131,7 @@
         function onDestroy() {
             $(window).off('resize.umbImageGravity');
             if (htmlOverlay) {
-                //TODO: This should be destroyed but this will throw an exception:
+                // TODO: This should be destroyed but this will throw an exception:
                 // "cannot call methods on draggable prior to initialization; attempted to call method 'destroy'"
                 // I've tried lots of things and cannot get this to work, we weren't destroying before so hopefully
                 // there's no mem leaks?

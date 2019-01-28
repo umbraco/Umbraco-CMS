@@ -370,7 +370,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // notes:
             // _contentNode.ChildContentIds is an unordered int[]
-            // need needs to fetch & sort - do it only once, lazyily, though
+            // needs to fetch & sort - do it only once, lazily, though
             // Q: perfs-wise, is it better than having the store managed an ordered list
         }
 

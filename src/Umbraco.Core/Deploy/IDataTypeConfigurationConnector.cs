@@ -5,11 +5,11 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Deploy
 {
     /// <summary>
-    /// Defines methods that can convert a data type configurations to / from an environment-agnostic string.
+    /// Defines methods that can convert data type configuration to / from an environment-agnostic string.
     /// </summary>
-    /// <remarks>Configurations may contain values such as content identifiers, that would be local
+    /// <remarks>Configuration may contain values such as content identifiers, that would be local
     /// to one environment, and need to be converted in order to be deployed.</remarks>
-    [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "This is actual only used by Deploy, but we dont want third parties to have references on deploy, thats why this interface is part of core.")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "This is actual only used by Deploy, but we don't want third parties to have references on deploy, that's why this interface is part of core.")]
     public interface IDataTypeConfigurationConnector
     {
         /// <summary>

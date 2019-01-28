@@ -137,7 +137,7 @@ namespace Umbraco.Web.Trees
                 //If treeGroupName == null then its third party
                 if (treeGroupName.IsNullOrWhiteSpace())
                 {
-                    //This is used for the localisation key
+                    //This is used for the localization key
                     //treeHeaders/thirdPartyGroup
                     treeGroupName = "thirdPartyGroup";
                 }
@@ -298,7 +298,7 @@ namespace Umbraco.Web.Trees
             if (instance == null)
                 throw new Exception("Failed to create tree " + appTree.TreeControllerType + ".");
 
-            //TODO: Shouldn't we be applying the same proxying logic as above so that filters work? seems like an oversight
+            // TODO: Shouldn't we be applying the same proxying logic as above so that filters work? seems like an oversight
 
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;

@@ -8,18 +8,12 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, "files", "Files", "icon-folder", "icon-folder", sortOrder: 13, initialize: false)]
     public class FilesTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem => new PhysicalFileSystem("~/"); // todo inject
+        protected override IFileSystem FileSystem => new PhysicalFileSystem("~/"); // TODO: inject
 
         private static readonly string[] ExtensionsStatic = { "*" };
 
         protected override string[] Extensions => ExtensionsStatic;
 
         protected override string FileIcon => "icon-document";
-
-        protected override void OnRenderFolderNode(ref TreeNode treeNode)
-        {
-            //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
-            treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
-        }
     }
 }

@@ -159,7 +159,7 @@ namespace umbraco.presentation.templateControls
                     if (int.TryParse(Attributes["Cache"], out cacheDuration))
                         tempMacro.CacheDuration = cacheDuration;
                     else
-                        Context.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
+                        Context.Trace.Warn("Template", "Cache attribute is in incorrect format (should be an integer).");
                 }
 
                 var renderer = new MacroRenderer(Current.ProfilingLogger);

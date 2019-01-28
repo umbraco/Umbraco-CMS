@@ -47,7 +47,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         /// <summary>
         /// Gets the HTML.
         /// </summary>
-        /// <returns>The response html</returns>
+        /// <returns>The response HTML</returns>
         public string GetHtml()
         {
             if (Type == "photo")

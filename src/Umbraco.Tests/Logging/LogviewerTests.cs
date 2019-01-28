@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Logging
             Assert.IsNotNull(findItem, "We should have found the saved search, but get no results");
             Assert.AreEqual(1, findItem.Count(), "Our list of searches should only contain one result");
 
-            //TODO: Need someone to help me find out why these don't work
+            // TODO: Need someone to help me find out why these don't work
             //CollectionAssert.Contains(searches, savedSearch, "Can not find the new search that was saved");
             //Assert.That(searches, Contains.Item(savedSearch));
 

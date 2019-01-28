@@ -63,7 +63,7 @@
         }
 
         /// <summary>
-        /// Sets the node style to show that it is is not published
+        /// Sets the node style to show that it is not published
         /// </summary>
         /// <param name="treeNode"></param>
         public static void SetNotPublishedStyle(this TreeNode treeNode)

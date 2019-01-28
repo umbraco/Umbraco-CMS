@@ -124,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
         /// <summary>
-        /// Flag to get/set if this was laoded from examine cache
+        /// Flag to get/set if this was loaded from examine cache
         /// </summary>
         internal bool LoadedFromExamine { get; }
 

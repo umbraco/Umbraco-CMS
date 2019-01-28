@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Gets a value indicating whether a property is an upload field.
         /// </summary>
         /// <param name="property">The property.</param>
-        /// <returns>A value indicating whether a property is an upload field, and (optionaly) has a non-empty value.</returns>
+        /// <returns>A value indicating whether a property is an upload field, and (optionally) has a non-empty value.</returns>
         private static bool IsUploadField(Property property)
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
@@ -61,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <summary>
-        /// Look through all propery values stored against the property and resolve any file paths stored
+        /// Look through all property values stored against the property and resolve any file paths stored
         /// </summary>
         /// <param name="prop"></param>
         /// <returns></returns>

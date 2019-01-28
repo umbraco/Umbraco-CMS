@@ -99,7 +99,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
             }
         });
 
-    //TODO: This doesn't seem necessary?
+    // TODO: This doesn't seem necessary?
     UmbButtonController.$inject = ['$timeout', 'localizationService'];
 
     function UmbButtonController($timeout, localizationService) {

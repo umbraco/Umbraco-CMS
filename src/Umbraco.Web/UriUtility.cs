@@ -223,7 +223,7 @@ namespace Umbraco.Web
         #endregion
 
         /// <summary>
-        /// Returns an faull url with the host, port, etc...
+        /// Returns an full url with the host, port, etc...
         /// </summary>
         /// <param name="absolutePath">An absolute path (i.e. starts with a '/' )</param>
         /// <param name="httpContext"> </param>

@@ -406,7 +406,7 @@ namespace Umbraco.Tests.FrontEnd
 
         private void SetUpDependencyContainer()
         {
-            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
+            // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 

@@ -15,7 +15,7 @@
             return {
                 valStatusChanged: function (args) {
 
-                    //TODO: Verify this is correct, does $scope.model ever exist?
+                    // TODO: Verify this is correct, does $scope.model ever exist?
                     if ($scope.model) {
                         if (!args.form.$valid) {
                             var subViewContent = $element.find(".ng-invalid");

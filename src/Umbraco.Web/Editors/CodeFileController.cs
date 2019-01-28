@@ -23,7 +23,7 @@ using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO: Put some exception filters in our webapi to return 404 instead of 500 when we throw ArgumentNullException
+    // TODO: Put some exception filters in our webapi to return 404 instead of 500 when we throw ArgumentNullException
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to create a container/folder in 'partialViews', 'partialViewMacros' or 'scripts'
+        /// Used to create a container/folder in 'partialViews', 'partialViewMacros', 'scripts' or 'stylesheets'
         /// </summary>
         /// <param name="type">'partialViews', 'partialViewMacros' or 'scripts'</param>
         /// <param name="parentId">The virtual path of the parent.</param>
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
 
             // if the parentId is root (-1) then we just need an empty string as we are
-            // creating the path below and we don't wan't -1 in the path
+            // creating the path below and we don't want -1 in the path
             if (parentId == Core.Constants.System.Root.ToInvariantString())
             {
                 parentId = string.Empty;
@@ -110,6 +110,10 @@ namespace Umbraco.Web.Editors
                 case Core.Constants.Trees.Scripts:
                     virtualPath = NormalizeVirtualPath(name, SystemDirectories.Scripts);
                     Services.FileService.CreateScriptFolder(virtualPath);
+                    break;
+                case Core.Constants.Trees.Stylesheets:
+                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.Css);
+                    Services.FileService.CreateStyleSheetFolder(virtualPath);
                     break;
 
             }
@@ -189,7 +193,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to get a list of available templates/snippets to base a new Partial View og Partial View Macro from
+        /// Used to get a list of available templates/snippets to base a new Partial View or Partial View Macro from
         /// </summary>
         /// <param name="type">This is a string but will be 'partialViews', 'partialViewMacros'</param>
         /// <returns>Returns a list of <see cref="SnippetDisplay"/> if a correct type is sent</returns>
@@ -328,6 +332,11 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                 case Core.Constants.Trees.Stylesheets:
+                    if (IsDirectory(virtualPath, SystemDirectories.Css))
+                    {
+                        Services.FileService.DeleteStyleSheetFolder(virtualPath);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
                     if (Services.FileService.GetStylesheetByName(virtualPath) != null)
                     {
                         Services.FileService.DeleteStylesheet(virtualPath, Security.CurrentUser.Id);

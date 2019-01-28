@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models.Membership
             _isLockedOut = member.IsLockedOut;
             _creationDate = member.CreateDate.ToUniversalTime();
             _lastLoginDate = member.LastLoginDate.ToUniversalTime();
-            //TODO: We currently don't really have any place to store this data!!
+            // TODO: We currently don't really have any place to store this data!!
             _lastActivityDate = member.LastLoginDate.ToUniversalTime();
             _lastPasswordChangedDate = member.LastPasswordChangeDate.ToUniversalTime();
             _lastLockoutDate = member.LastLockoutDate.ToUniversalTime();

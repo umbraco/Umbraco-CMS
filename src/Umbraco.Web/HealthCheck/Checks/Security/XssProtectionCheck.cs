@@ -12,7 +12,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     {
         // The check is mostly based on the instructions in the OWASP CheatSheet
         // (https://www.owasp.org/index.php/HTTP_Strict_Transport_Security_Cheat_Sheet)
-        // and the blogpost of Troy Hunt (https://www.troyhunt.com/understanding-http-strict-transport/)
+        // and the blog post of Troy Hunt (https://www.troyhunt.com/understanding-http-strict-transport/)
         // If you want do to it perfectly, you have to submit it https://hstspreload.appspot.com/,
         // but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
         public XssProtectionCheck(IRuntimeState runtime, ILocalizedTextService textService)

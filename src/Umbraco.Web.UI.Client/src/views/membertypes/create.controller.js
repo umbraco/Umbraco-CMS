@@ -35,7 +35,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
             }, function(err) {
 
-               //TODO: Handle errors
+               // TODO: Handle errors
             });
         };
     }
