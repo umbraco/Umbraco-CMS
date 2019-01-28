@@ -442,7 +442,7 @@
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "content_unpublish",
-                    submitButtonSTYLE: "warning",
+                    submitButtonStyle: "warning",
                     submit: function (model) {
 
                         model.submitButtonState = "busy";
