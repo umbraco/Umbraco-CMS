@@ -10,7 +10,7 @@
   cursor: pointer;
   display: block;
   padding: 4px 10px 0 10px;
-  border-bottom: 2px solid transparent;
+  //border-bottom: 4px solid transparent;
   min-width: 70px;
   border-right: 1px solid @gray-9;
   box-sizing: border-box;
@@ -20,6 +20,23 @@
   justify-content: center;
   height: @editorHeaderHeight;
   position: relative;
+  
+  &:hover {
+      color: @ui-light-active-type-hover !important;
+  }
+  
+  &::after {
+      content: "";
+      height: 0px;
+      left: 8px;
+      right: 8px;
+      background-color: @ui-light-active-border;
+      position: absolute;
+      bottom: 0;
+      border-radius: 3px 3px 0 0;
+      opacity: 0;
+      transition: all .2s linear;
+  }
 }
 
 .umb-sub-views-nav-item:focus {
@@ -36,20 +53,12 @@
     //border-bottom-color: @ui-active;
     
     //background-color: rgba(@ui-active, 0.25);
-    color: @ui-active-type;
-    border-bottom-color: @ui-active;
-    /*
+    color: @ui-light-active-type;
+    //border-bottom-color: @ui-active;
     &::after {
-        content: "";
+        opacity: 1;
         height: 4px;
-        background-color: @ui-active;
-        position: absolute;
-        bottom: -1px;
-        border-radius: 3px 3px 0 0;
-        left: 8px;
-        right: 8px;
     }
-    */
 }
 
 .show-validation .umb-sub-views-nav-item.-has-error {
@@ -69,7 +78,7 @@
   right: 6px;
   min-width: 16px;
   color: @white;
-  background-color: @turquoise-d1;
+  background-color: @ui-active-type;
   border: 2px solid @white;
   border-radius: 50%;
   font-size: 10px;

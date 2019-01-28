@@ -14,24 +14,42 @@
 }
 
 .umb-tab > a {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    color: @ui-action-disgrete;
+    //border-bottom: 4px solid transparent;
+    color: @ui-light-type;
     padding: 5px 20px 15px 20px;
     transition: color 150ms ease-in-out;
     &:focus {
-        color: @ui-action-disgrete-hover;
+        color: @ui-light-type-hover;
     }
     &:hover {
-        color: @ui-action-disgrete-hover;
+        color: @ui-light-type-hover;
         text-decoration: none;
+    }
+    &::after {
+        content: "";
+        height: 0px;
+        left: 14px;
+        right: 14px;
+        background-color: @ui-light-active-border;
+        position: absolute;
+        bottom: 0;
+        border-radius: 3px 3px 0 0;
+        opacity: 0;
+        transition: all .2s linear;
     }
 }
 
 
 .umb-tab--active > a {
-    color: @ui-active;
-    border-bottom-color: @ui-active;
+    color: @ui-light-active-type;
+    //border-bottom-color: @ui-active;
     /*
     &:focus {
         border-bottom-color: @ui-active;
@@ -40,6 +58,10 @@
         border-bottom-color: @ui-active-hover;
     }
     */
+    &::after {
+        opacity: 1;
+        height: 4px;
+    }
 }
 
 .show-validation .umb-tab--error > a,

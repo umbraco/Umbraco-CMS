@@ -515,7 +515,7 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @endColor, @textColor: #fff) {
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: #fff) {
   // gradientBar will set the background to a pleasing blend of these, to support IE<=9
   //.gradientBar(@startColor, @endColor, @textColor);
   
@@ -523,7 +523,7 @@
   border-color: @startColor @startColor darken(@startColor, 15%);
   border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
   
-  background-color: @endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  background-color: @startColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
   .reset-filter();
   
   .caret {
@@ -531,22 +531,23 @@
       border-bottom-color: @textColor;
   }
 
-  // button states
-  &:hover, &:focus, &:active {
-      background-color: darken(@startColor, 2%);
-  }
-
   // in these cases the gradient won't cover the background, so we override
-  &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
+  &:hover, &:focus, &:active, &.active {
     color: @textColor;
-    background-color: darken(@endColor, 5%);
+    background-color: @hoverColor;
   }
-
+  
+  &.disabled, &[disabled] {
+    color: @textColor;
+    background-color: @gray-4;
+  }
+  /*
   // IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
   &:active,
   &.active {
     background-color: darken(@endColor, 10%) e("\9");
   }
+  */
 }
 
 // Navbar vertical align
