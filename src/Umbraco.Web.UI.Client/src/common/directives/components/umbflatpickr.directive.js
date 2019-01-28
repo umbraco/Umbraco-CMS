@@ -92,20 +92,25 @@ Use this directive to render a date time picker
 		}
     };
     
-	function umbFlatpickrCtrl($element, $timeout, $scope, assetsService) {
+	function umbFlatpickrCtrl($element, $timeout, $scope, assetsService, userService) {
         var ctrl = this;
         var loaded = false;
+        var userLocale = null;
 
 		ctrl.$onInit = function() {
 
             // load css file for the date picker
-            assetsService.loadCss('lib/flatpickr/flatpickr.css', $scope);
+            assetsService.loadCss('lib/flatpickr/flatpickr.css', $scope).then(function () {
+                userService.getCurrentUser().then(function (user) {
+                    // init date picker
+                    userLocale = user.locale;
+                    if (userLocale.indexOf('-') > -1) {
+                        userLocale = userLocale.split('-')[0];
+                    }
+                    loaded = true;
+                    grabElementAndRunFlatpickr();
 
-            // load the js file for the date picker
-            assetsService.loadJs('lib/flatpickr/flatpickr.js', $scope).then(function () {
-                // init date picker
-                loaded = true;
-                grabElementAndRunFlatpickr();
+                });
             });
 
 		};
@@ -127,6 +132,10 @@ Use this directive to render a date time picker
 			}
 
 			setUpCallbacks();
+
+            if (!ctrl.options.locale) {
+                ctrl.options.locale = userLocale;
+            }
 
             var fpInstance = new fpLib(element, ctrl.options);
             

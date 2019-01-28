@@ -46,7 +46,7 @@ Use this directive to construct a main content area inside the main editor windo
 
             scope.numberOfOverlays = 0;
 
-            //TODO: this shouldn't be a watch, this should be based on an event handler
+            // TODO: this shouldn't be a watch, this should be based on an event handler
             scope.$watch(function () {
                 return overlayHelper.getNumberOfOverlays();
             }, function (newValue) {

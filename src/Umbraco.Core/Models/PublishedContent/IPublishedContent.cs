@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         #region Content
 
-        // todo - IPublishedContent properties colliding with models
+        // TODO: IPublishedContent properties colliding with models
         // we need to find a way to remove as much clutter as possible from IPublishedContent,
         // since this is preventing someone from creating a property named 'Path' and have it
         // in a model, for instance. we could move them all under one unique property eg

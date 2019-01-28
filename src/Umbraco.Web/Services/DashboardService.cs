@@ -12,8 +12,13 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Services
 {
+	/// <summary>
+    /// A utility class for determine dashboard security
+    /// </summary>
     internal class DashboardService : IDashboardService
     {
+        // TODO: Unit test all this!!! :/
+	
         private readonly ISectionService _sectionService;
         private readonly DashboardCollection _dashboardCollection;
         private readonly ILocalizedTextService _localizedText;

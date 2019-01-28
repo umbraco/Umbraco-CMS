@@ -100,7 +100,7 @@ namespace Umbraco.Core.Packaging
             //Order the DocumentTypes before removing them
             if (contentTypes.Any())
             {
-                //TODO: I don't think this ordering is necessary
+                // TODO: I don't think this ordering is necessary
                 var orderedTypes = (from contentType in contentTypes
                                    orderby contentType.ParentId descending, contentType.Id descending
                                    select contentType).ToList();
@@ -710,7 +710,7 @@ namespace Umbraco.Core.Packaging
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    //TODO: We should expose this to the UI during install!
+                    // TODO: We should expose this to the UI during install!
                     _logger.Warn<PackagingService>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 

@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Services
             };
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
-            //TODO: This is failing the test
+            // TODO: This is failing the test
             ServiceContext.UserService.Save(userGroupA, new[] { user.Id }, false);
 
             var userGroupB = new UserGroup

@@ -124,7 +124,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                   .AfterMap((src, dest) =>
                       {
-                          //TODO: Properly map this (not aftermap)
+                          // TODO: Properly map this (not aftermap)
 
                           //get the icon if there is one
                           dest.Icon = src.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
@@ -204,7 +204,7 @@ namespace Umbraco.Web.Models.Mapping
                 // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
                 if (culture == null)
                     //throw new InvalidOperationException("Missing culture in mapping options.");
-                    // todo we should throw, but this is used in various places that won't set a culture yet
+                    // TODO: we should throw, but this is used in various places that won't set a culture yet
                     return source.Name;
 
                 // if we don't have a name for a culture, it means the culture is not available, and

@@ -14,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security
 {
-    //TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
+    // TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
     {
         private readonly ILogger _logger;
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
+        /// Borrowed from Microsoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
+        /// Borrowed from Microsoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
         /// </summary>
         /// <param name="user"></param>
         /// <param name="isPersistent"></param>

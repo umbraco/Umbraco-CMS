@@ -79,7 +79,7 @@ namespace Umbraco.Web
                 if (_tried == false) return;
                 _tried = false;
 
-                //TODO: when resuming do we always want a full rebuild of all indexes?
+                // TODO: when resuming do we always want a full rebuild of all indexes?
                 ExamineComponent.RebuildIndexes(indexRebuilder, logger, false);
             }
         }

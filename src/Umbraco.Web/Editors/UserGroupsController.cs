@@ -112,7 +112,7 @@ namespace Umbraco.Web.Editors
 
             if (onlyCurrentUserGroups == false)
             {
-                //this user is not an admin so in that case we need to exlude all admin users
+                //this user is not an admin so in that case we need to exclude all admin users
                 allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)));
                 return allGroups;
             }

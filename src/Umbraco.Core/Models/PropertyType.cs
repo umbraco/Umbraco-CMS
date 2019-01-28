@@ -378,14 +378,14 @@ namespace Umbraco.Core.Models
         }
 
 
-        //todo - this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
+        // TODO: this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
         internal bool IsPropertyValueValid(object value)
         {
-            var editor = Current.PropertyEditors[_propertyEditorAlias]; // todo inject
-            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // todo inject
+            var editor = Current.PropertyEditors[_propertyEditorAlias]; // TODO: inject
+            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // TODO: inject
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, Mandatory, ValidationRegExp).Any();
         }

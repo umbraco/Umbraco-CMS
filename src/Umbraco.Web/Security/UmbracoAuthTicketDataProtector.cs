@@ -5,7 +5,7 @@ using Umbraco.Core;
 namespace Umbraco.Web.Security
 {
     /// <summary>
-    /// This is used so that we can retrive the auth ticket protector from an IOwinContext
+    /// This is used so that we can retrieve the auth ticket protector from an IOwinContext
     /// </summary>
     internal class UmbracoAuthTicketDataProtector : DisposableObjectSlim
     {

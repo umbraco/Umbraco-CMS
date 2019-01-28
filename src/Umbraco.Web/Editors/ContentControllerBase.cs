@@ -101,7 +101,7 @@ namespace Umbraco.Web.Editors
 
         protected virtual void HandleInvalidModelState(IErrorModel display)
         {
-            //lastly, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             if (!ModelState.IsValid)
             {
                 display.Errors = ModelState.ToErrorDictionary();
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
         /// <param name="getFromService"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is useful for when filters have alraedy looked up a persisted entity and we don't want to have
+        /// This is useful for when filters have already looked up a persisted entity and we don't want to have
         /// to look it up again.
         /// </remarks>
         protected TPersisted GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
             string[] messageParams = null)
         {
             //if there's already a default event message, don't add our default one
-            //todo inject
+            // TODO: inject
             var msgs = Current.EventMessages;
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 

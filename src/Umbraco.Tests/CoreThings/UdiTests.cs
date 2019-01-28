@@ -22,7 +22,7 @@ namespace Umbraco.Tests.CoreThings
         [SetUp]
         public void SetUp()
         {
-            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
+            // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(

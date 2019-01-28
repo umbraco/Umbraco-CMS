@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Find_All_Event_Handlers()
         {
-            // fixme - cannot work with mocks
+            // FIXME: cannot work with mocks
             // because the events are defined on actual static classes, not on the interfaces, so name matching fails
             // we should really refactor events entirely - in the meantime, let it be an UmbracoTestBase ;(
             //var testObjects = new TestObjects(null);

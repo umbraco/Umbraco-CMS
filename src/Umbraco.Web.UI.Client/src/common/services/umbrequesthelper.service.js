@@ -177,7 +177,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     //show a ysod dialog
                     if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                         const error = { errorMsg: 'An error occured', data: response.data };
-                        //TODO: All YSOD handling should be done with an interceptor
+                        // TODO: All YSOD handling should be done with an interceptor
                         overlayService.ysod(error);
                     }
                     else {
@@ -270,7 +270,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         formHelper.showNotifications(response.data);
                     }
 
-                    //TODO: Do we need to pass the result through umbDataFormatter.formatContentGetData? Right now things work so not sure but we should check
+                    // TODO: Do we need to pass the result through umbDataFormatter.formatContentGetData? Right now things work so not sure but we should check
 
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);
@@ -289,7 +289,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
                             const error = { errorMsg: 'An error occured', data: response.data };
-                            //TODO: All YSOD handling should be done with an interceptor
+                            // TODO: All YSOD handling should be done with an interceptor
                             overlayService.ysod(error);
                         }
                         else {

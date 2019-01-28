@@ -301,7 +301,7 @@
 
                         //based on the selection, we need to filter the available composite types list
                         filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                            //TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                            // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
                         });
                     });
                 }
@@ -311,7 +311,7 @@
 
                     //based on the selection, we need to filter the available composite types list
                     filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                        //TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                        // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
                     });
                 }
 

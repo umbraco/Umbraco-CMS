@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
                 path = parent == null ? "-1" : parent.Path;
             }
 
-            //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
+            // TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
             // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
             // reference exception :(
             return UserService.GetPermissionsForPath(UmbracoContext.Current.Security.CurrentUser, path).GetAllPermissions();

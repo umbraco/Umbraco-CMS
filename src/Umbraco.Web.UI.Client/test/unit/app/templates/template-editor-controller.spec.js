@@ -117,7 +117,7 @@
                 }, 1000);
             });
 
-            ////TODO: THIS FAILED
+            //// TODO: THIS FAILED
             //it("changes layout value when masterpage is selected", function() {
             //    var newTemplate;
             //    ace.clearSelection = nada;

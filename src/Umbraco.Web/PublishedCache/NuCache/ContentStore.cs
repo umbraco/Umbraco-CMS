@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private volatile int _wlocked;
         private List<KeyValuePair<int, ContentNodeKit>> _wchanges;
 
-        // todo - collection trigger (ok for now)
+        // TODO: collection trigger (ok for now)
         // see SnapDictionary notes
         private const long CollectMinGenDelta = 8;
 
@@ -104,7 +104,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // gets a scope contextual representing a locked writer to the dictionary
-        // todo GetScopedWriter? should the dict have a ref onto the scope provider?
+        // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
         public IDisposable GetWriter(IScopeProvider scopeProvider)
         {
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ContentStoreWriter(this, scoped));

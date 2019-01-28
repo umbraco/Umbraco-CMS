@@ -58,7 +58,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //
         // so when getting a read-lock,
         //  either we are write-locked or not, but if not, we won't be write-locked
-        //  otoh the write-lock may be released in the meantime
+        //  on the other hand the write-lock may be released in the meantime
 
         // Lock has a 'forceGen' parameter:
         //  used to start a set of changes that may not commit, to isolate the set from any pending

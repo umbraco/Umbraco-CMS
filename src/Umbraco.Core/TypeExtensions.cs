@@ -55,7 +55,7 @@ namespace Umbraco.Core
                     ? getMember(memberName.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.CamelCase))
                     : getMember(memberName.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.PascalCase));
 
-                //TODO: If this still fails then we should get a list of properties from the object and then compare - doing the above without listing
+                // TODO: If this still fails then we should get a list of properties from the object and then compare - doing the above without listing
                 // all properties will surely be faster than using reflection to get ALL properties first and then query against them.
             }
 

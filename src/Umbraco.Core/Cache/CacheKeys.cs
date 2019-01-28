@@ -7,7 +7,7 @@
     {
         public const string ApplicationsCacheKey = "ApplicationCache"; // used by SectionService
 
-        // TODO this one can probably be removed
+        // TODO: this one can probably be removed
         public const string TemplateFrontEndCacheKey = "template";
 
         public const string MacroContentCacheKey = "macroContent_"; // used in MacroRenderers

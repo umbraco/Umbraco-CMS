@@ -8,7 +8,7 @@
         templateUrl: 'views/components/content/umb-variant-content-editors.html',
         bindings: {
             page: "<",
-            content: "<", //TODO: Not sure if this should be = since we are changing the 'active' property of a variant
+            content: "<", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
             culture: "<",
             onSelectApp: "&?"
         },
@@ -232,6 +232,10 @@
                     var app = editor.content.apps[i];
                     if (app.alias === "umbContent") {
                         app.active = true;
+                        // tell the world that the app has changed (but do it only once)
+                        if (e === 0) {
+                            selectApp(app);
+                        }
                     }
                     else {
                         app.active = false;
@@ -239,7 +243,7 @@
                 }
             }
 
-            //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
+            // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             editor.collapsed = true;
             editor.loading = true;
             $timeout(function () {
@@ -251,7 +255,7 @@
 
         /** Closes the split view */
         function closeSplitView(editorIndex) {
-            //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
+            // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             var editor = vm.editors[editorIndex];
             editor.loading = true;
             editor.collapsed = true;

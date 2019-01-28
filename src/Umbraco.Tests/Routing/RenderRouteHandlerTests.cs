@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Routing
             base.Compose();
 
             // set the default RenderMvcController
-            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
+            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // FIXME: Wrong!
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
             Composition.RegisterUnique(surfaceControllerTypes);
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Routing
 
         //test all template name styles to match the ActionName
 
-        //[TestCase("home-\\234^^*32page")]        //TODO: This fails!
+        //[TestCase("home-\\234^^*32page")]        // TODO: This fails!
         [TestCase("home-page")]
         [TestCase("home-page")]
         [TestCase("home-page")]

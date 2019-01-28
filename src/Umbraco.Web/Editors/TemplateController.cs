@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a template wth a given ID
+        /// Deletes a template with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

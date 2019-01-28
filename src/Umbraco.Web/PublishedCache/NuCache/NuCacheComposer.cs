@@ -19,7 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             composition.SetPublishedSnapshotService<PublishedSnapshotService>();
 
             // add the NuCache health check (hidden from type finder)
-            // todo - no NuCache health check yet
+            // TODO: no NuCache health check yet
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
         }
     }

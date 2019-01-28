@@ -60,7 +60,7 @@ namespace umbraco
                 };
                 FireBeforeRequestInit(args);
 
-                //if we are cancelling then return and don't proceed
+                //if we are canceling then return and don't proceed
                 if (args.Cancel) return;
 
                 // reset the friendly path so it's used by forms, etc.

@@ -251,7 +251,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
-            //todo inject examine manager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -272,7 +272,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
         {
-            //todo inject examine manager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))

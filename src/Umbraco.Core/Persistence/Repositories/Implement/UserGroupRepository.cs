@@ -128,7 +128,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     foreach (var nodeId in nodeIds)
                     {
-                        //TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
+                        // TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
                         // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not
                         // going to be included in the result!
 
@@ -444,7 +444,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             /// <param name="userIds">Ids of users</param>
             private void AddUsersToGroup(int groupId, int[] userIds)
             {
-                //TODO: Check if the user exists?
+                // TODO: Check if the user exists?
                 foreach (var userId in userIds)
                 {
                     var dto = new User2UserGroupDto

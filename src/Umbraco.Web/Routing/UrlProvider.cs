@@ -185,7 +185,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(IPublishedContent content, UrlProviderMode mode, string culture = null, Uri current = null)
         {
-            if (content == null)
+            if (content == null || content.ItemType == PublishedItemType.Element)
                 return "#";
 
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture

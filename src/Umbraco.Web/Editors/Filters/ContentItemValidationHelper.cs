@@ -96,7 +96,7 @@ namespace Umbraco.Web.Editors.Filters
             {
                 if (persistedProperties.Any(property => property.Alias == p.Alias) == false)
                 {
-                    //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
+                    // TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
 
                     var message = $"property with alias: {p.Alias} was not found";
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="modelState"></param>
         /// <returns></returns>
         /// <remarks>
-        /// All property data validation goes into the modelstate with a prefix of "Properties"
+        /// All property data validation goes into the model state with a prefix of "Properties"
         /// </remarks>
         public virtual bool ValidatePropertyData(
             TModelSave model,
