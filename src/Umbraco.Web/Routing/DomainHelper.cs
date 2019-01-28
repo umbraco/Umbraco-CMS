@@ -107,7 +107,7 @@ namespace Umbraco.Web.Routing
         /// <param name="filter">An optional function to filter the list of domains, if more than one applies.</param>
         /// <returns>The domain and its normalized uri, that best matches the specified uri and cultures.</returns>
         /// <remarks>
-        /// todo - must document and explain this all
+        /// TODO: must document and explain this all
         /// <para>If <paramref name="uri"/> is null, pick the first domain that matches <paramref name="culture"/>,
         /// else the first that matches <paramref name="defaultCulture"/>, else the first one (ordered by id), else null.</para>
         /// <para>If <paramref name="uri"/> is not null, look for domains that would be a base uri of the current uri,</para>
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Routing
         /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
         internal static IEnumerable<DomainAndUri> SelectDomains(IEnumerable<Domain> domains, Uri uri)
         {
-            // todo where are we matching ?!!?
+            // TODO: where are we matching ?!!?
             return domains
                 .Where(d => d.IsWildcard == false)
                 .Select(d => new DomainAndUri(d, uri))

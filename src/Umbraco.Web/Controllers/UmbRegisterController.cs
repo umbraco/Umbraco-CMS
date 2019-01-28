@@ -64,7 +64,7 @@ namespace Umbraco.Web.Controllers
                     break;
                 case MembershipCreateStatus.InvalidQuestion:
                 case MembershipCreateStatus.InvalidAnswer:
-                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
                     throw new NotImplementedException(status.ToString());
                 case MembershipCreateStatus.InvalidEmail:
                     ModelState.AddModelError("registerModel.Email", "Email is invalid");

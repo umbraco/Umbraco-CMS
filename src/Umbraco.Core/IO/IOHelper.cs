@@ -155,8 +155,7 @@ namespace Umbraco.Core.IO
             //
             // except that for templates, filePath actually is a virtual path
 
-            //TODO
-            // what's below is dirty, there are too many ways to get the root dir, etc.
+            // TODO: what's below is dirty, there are too many ways to get the root dir, etc.
             // not going to fix everything today
 
             var mappedRoot = MapPath(SystemDirectories.Root);

@@ -63,7 +63,7 @@ namespace Umbraco.Web.Composing
 
         #region Temp & Special
 
-        // todo - have to keep this until tests are refactored
+        // TODO: have to keep this until tests are refactored
         // but then, it should all be managed properly in the container
         public static IUmbracoContextAccessor UmbracoContextAccessor
         {

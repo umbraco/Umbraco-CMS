@@ -120,8 +120,7 @@ namespace Umbraco.Tests.Membership
             Assert.Throws<ProviderException>(() => provider.GetPassword("test", "test"));
         }
 
-        // fixme
-        // in v7 this test relies on ApplicationContext.Current being null, which makes little
+        // FIXME: in v7 this test relies on ApplicationContext.Current being null, which makes little
         // sense, not going to port the weird code in MembershipProviderBase.ResetPassword, so
         // what shall we do?
         [Test]

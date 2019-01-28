@@ -259,7 +259,7 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
-            // execute the externam validators
+            // execute the external validators
             EditorValidator.Validate(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)

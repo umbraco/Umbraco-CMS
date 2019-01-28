@@ -8,7 +8,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, "Stylesheets", "icon-folder", "icon-folder", sortOrder: 9)]
     public class StylesheetsTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem => Current.FileSystems.StylesheetsFileSystem; // todo inject
+        protected override IFileSystem FileSystem => Current.FileSystems.StylesheetsFileSystem; // TODO: inject
 
         private static readonly string[] ExtensionsStatic = { "css" };
 

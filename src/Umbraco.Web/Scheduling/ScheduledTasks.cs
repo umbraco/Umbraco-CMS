@@ -11,7 +11,7 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
-    //TODO: No scheduled task (i.e. URL) would be secured, so if people are actually using these each task
+    // TODO: No scheduled task (i.e. URL) would be secured, so if people are actually using these each task
     // would need to be a publicly available task (URL) which isn't really very good :(
     // We should really be using the AdminTokenAuthorizeAttribute for this stuff
 
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Scheduling
                     ScheduledTaskTimes.Add(t.Alias, DateTime.Now);
                 }
 
-                // Add 1 second to timespan to compensate for differencies in timer
+                // Add 1 second to timespan to compensate for differences in timer
                 else if (
                     new TimeSpan(
                         DateTime.Now.Ticks - ((DateTime)ScheduledTaskTimes[t.Alias]).Ticks).TotalSeconds + 1 >= t.Interval)
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Scheduling
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-            //TODO: pass custom the authorization header, currently these aren't really secured!
+            // TODO: pass custom the authorization header, currently these aren't really secured!
             //request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
 
             try

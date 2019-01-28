@@ -7,6 +7,7 @@
     'lib/underscore/underscore-min.js',
 
     'lib/moment/moment.min.js',
+    'lib/flatpickr/flatpickr.js',
 
     'lib/animejs/anime.min.js',
 

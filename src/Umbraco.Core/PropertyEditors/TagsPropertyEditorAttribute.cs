@@ -43,7 +43,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets or sets a value indicating whether to replace the tags entirely.
         /// </summary>
-        // todo: what's the usage?
+        // TODO: what's the usage?
         public bool ReplaceTags { get; set; }
 
         /// <summary>

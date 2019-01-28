@@ -40,6 +40,13 @@
 
             function setMediaLink(){
                 scope.nodeUrl = scope.node.mediaLink;
+                // grab the file name from the URL and use it as the display name in the file link
+                var match = /.*\/(.*)/.exec(scope.nodeUrl);
+                if (match) {
+                    scope.nodeFileName = match[1];
+                } else {
+                    scope.nodeFileName = scope.nodeUrl;
+                }
             }
 
             scope.openMediaType = function (mediaType) {

@@ -283,7 +283,7 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
-        // todo - the methods below should be replaced by proper property value convert ToXPath usage!
+        // TODO: the methods below should be replaced by proper property value convert ToXPath usage!
 
         /// <summary>
         /// Converts a property to Xml fragments.

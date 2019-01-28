@@ -51,7 +51,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type wth a given ID
+        /// Deletes a document type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the avilable compositions for this content type
+        /// Returns the available compositions for this content type
         /// </summary>
         /// <param name="contentTypeId"></param>
         /// <param name="filterContentTypes">

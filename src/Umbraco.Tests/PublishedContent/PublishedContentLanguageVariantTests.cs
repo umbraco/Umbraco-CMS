@@ -335,7 +335,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
 
-            // hack the value, pretend the converter would return something
+            // HACK: the value, pretend the converter would return something
             var prop = content.GetProperty("welcomeText") as SolidPublishedPropertyWithLanguageVariants;
             Assert.IsNotNull(prop);
             prop.SetValue("nl", "nope"); // HasValue false but getting value returns this

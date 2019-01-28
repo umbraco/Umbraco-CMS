@@ -99,7 +99,7 @@ namespace Umbraco.Web.Media.Exif
         /// Returns an unsigned rational number converted from the first
         /// eight bytes of the given byte array. The first four bytes are
         /// assumed to be the numerator and the next four bytes are the
-        /// denumerator.
+        /// denominator.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>
         public static MathEx.UFraction32 ToURational(byte[] data, ByteOrder frombyteorder)
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Media.Exif
         /// Returns a signed rational number converted from the first
         /// eight bytes of the given byte array. The first four bytes are
         /// assumed to be the numerator and the next four bytes are the
-        /// denumerator.
+        /// denominator.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>
         public static MathEx.Fraction32 ToSRational(byte[] data, ByteOrder frombyteorder)

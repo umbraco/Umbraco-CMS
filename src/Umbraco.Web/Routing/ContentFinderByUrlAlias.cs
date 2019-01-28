@@ -59,8 +59,7 @@ namespace Umbraco.Web.Routing
             // there may be spaces as in "/foo/bar,  /foo/nil"
             // these should probably be taken care of earlier on
 
-            // TODO
-            // can we normalize the values so that they contain no whitespaces, and no leading slashes?
+            // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
             // and then the comparisons in IsMatch can be way faster - and allocate way less strings
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
@@ -96,7 +95,7 @@ namespace Umbraco.Web.Routing
                 return v.InvariantContains(a1) || v.InvariantContains(a2);
             }
 
-            // todo - even with Linq, what happens below has to be horribly slow
+            // TODO: even with Linq, what happens below has to be horribly slow
             // but the only solution is to entirely refactor url providers to stop being dynamic
 
             if (rootNodeId > 0)

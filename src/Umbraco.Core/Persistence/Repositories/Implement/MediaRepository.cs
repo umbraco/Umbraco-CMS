@@ -225,7 +225,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // todo - do we really want to keep doing this here?
+            // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // todo - do we really want to keep doing this here?
+            // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // if parent has changed, get path, level and sort order
