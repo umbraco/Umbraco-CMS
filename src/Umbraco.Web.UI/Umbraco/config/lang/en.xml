@@ -652,7 +652,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
+    <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -1555,6 +1555,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noFallbackLanguageOption">No fall back language</key>
     <key alias="fallbackLanguageDescription">To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.</key>
     <key alias="fallbackLanguage">Fall back language</key>
+  </area>
+  <area alias="macro">
+    <key alias="parameters">Parameters</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
