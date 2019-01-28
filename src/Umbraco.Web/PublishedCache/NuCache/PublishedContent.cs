@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -293,21 +292,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
         }
 
+        /// <inheritdoc />
         public override bool IsPublished(string culture = null)
         {
+            // whether we are the 'draft' or 'published' content, need to determine whether
+            // there is a 'published' version for the specified culture (or at all, for
+            // invariant content items)
+
+            // if there is no 'published' published content, no culture can be published
+            var hasPublished = _contentNode.Published != null;
+            if (!hasPublished)
+                return false;
+
+            // if there is a 'published' published content, and does not vary = published
             if (!ContentType.VariesByCulture())
-            {
-                return _contentData.Published;
-            }
+                return true;
 
             // handle context culture
             if (culture == null)
-            {
                 culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-            }
 
-            //If the current culture is not a draft, it must be the published version
-            return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && !cvar.IsDraft;
+            // there is a 'published' published content, and varies
+            // = depends on the culture
+            return ((PublishedContent) _contentNode.Published)._contentData.CultureInfos.ContainsKey(culture);
         }
 
         #endregion

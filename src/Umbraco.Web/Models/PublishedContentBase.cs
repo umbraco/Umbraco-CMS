@@ -144,6 +144,7 @@ namespace Umbraco.Web.Models
         /// <inheritdoc />
         public abstract bool IsDraft(string culture = null);
 
+        /// <inheritdoc />
         public abstract bool IsPublished(string culture = null);
 
         #endregion
