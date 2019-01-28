@@ -7,7 +7,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.MultiUrlPicker, EditorType.PropertyValue|EditorType.MacroParameter, "Multi Url Picker", "multiurlpicker", ValueType = "JSON", Group = "pickers", Icon = "icon-link")]
+    [DataEditor(Constants.PropertyEditors.Aliases.MultiUrlPicker, EditorType.PropertyValue|EditorType.MacroParameter, "Multi Url Picker", "multiurlpicker", ValueType = ValueTypes.Json, Group = "pickers", Icon = "icon-link")]
     public class MultiUrlPickerPropertyEditor : DataEditor
     {
         private readonly IEntityService _entityService;
