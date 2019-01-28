@@ -652,7 +652,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return true;
             var link = GetParentLink(kit.Node);
             var node = link?.Value;
-            return node?.Published != null;
+            return node?.PublishedModel != null;
         }
 
         private void AddToParentLocked(ContentNode content)

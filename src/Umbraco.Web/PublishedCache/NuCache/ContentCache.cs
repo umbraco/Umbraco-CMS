@@ -243,7 +243,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var n = _snapshot.Get(contentId);
             if (n == null) return false;
 
-            return preview || n.Published != null;
+            return preview || n.PublishedModel != null;
         }
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
@@ -280,8 +280,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // both .Draft and .Published cannot be null at the same time
 
             return preview
-                ? node.Draft ?? GetPublishedContentAsDraft(node.Published)
-                : node.Published;
+                ? node.DraftModel ?? GetPublishedContentAsDraft(node.PublishedModel)
+                : node.PublishedModel;
         }
 
         // gets a published content as a previewing draft, if preview is true
@@ -302,7 +302,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return preview
                 ? _snapshot.IsEmpty == false
-                : _snapshot.GetAtRoot().Any(x => x.Published != null);
+                : _snapshot.GetAtRoot().Any(x => x.PublishedModel != null);
         }
 
         #endregion
