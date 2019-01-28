@@ -53,7 +53,6 @@
         <!-- beware! config transforms not supported by PackageReference -->
         <file src="tools\Web.config.install.xdt" target="Content\Web.config.install.xdt" />
         <file src="tools\ClientDependency.config.install.xdt" target="Content\config\ClientDependency.config.install.xdt" />
-        <file src="tools\Dashboard.config.install.xdt" target="Content\config\Dashboard.config.install.xdt" />
         <file src="tools\umbracoSettings.config.install.xdt" target="Content\config\umbracoSettings.config.install.xdt" />
         <file src="tools\Views.Web.config.install.xdt" target="Views\Web.config.install.xdt" /> <!-- FIXME: Content\ !! and then... transform?! -->
 

@@ -292,7 +292,6 @@
     <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
     <Compile Include="Cache\WebCachingAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
-    <Compile Include="Configurations\DashboardSettings\DashboardSettingsTests.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
@@ -498,14 +497,6 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="Configurations\DashboardSettings\Dashboard.config">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Configurations\DashboardSettings\web.config">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Configurations\UmbracoSettings\umbracoSettings.minimal.config">
       <SubType>Designer</SubType>
