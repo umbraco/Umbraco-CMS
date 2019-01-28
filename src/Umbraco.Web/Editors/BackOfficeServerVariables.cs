@@ -397,6 +397,7 @@ namespace Umbraco.Web.Editors
             return defaultVals;
         }
 
+        [DataContract]
         private class PluginTree
         {
             [DataMember(Name = "alias")]
