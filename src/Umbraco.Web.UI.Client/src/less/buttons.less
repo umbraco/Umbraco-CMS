@@ -193,15 +193,15 @@ input[type="button"] {
 }
 // Info appears as a neutral blue
 .btn-info {
-  .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight, @btnInfoType);
+  .buttonBackground(@sand-5, @blueDark, @blueExtraDark, @u-white);
 }
 // Made for Umbraco, 2019
 .btn-action {
-  .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight, @btnInfoType);
+  .buttonBackground(@blueExtraDark, @blueDark, @pinkLight, @u-white);
 }
 // Made for Umbraco, 2019, used for buttons that has to stand back.
 .btn-transparent {
-  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType);
+  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
 }
 // Inverse appears as dark gray
 .btn-inverse {
@@ -242,9 +242,9 @@ input[type="button"] {
 // outlined
 .btn-outline {
   border: 1px solid;
-  border-color: @gray-8;
+  border-color: @blueExtraDark;
   background: @white;
-  color: @ui-light-type;
+  color: @blueExtraDark;
   padding: 5px 13px;
   transition: all .2s linear;
 }

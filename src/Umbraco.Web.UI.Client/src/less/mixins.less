@@ -515,7 +515,7 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: #fff) {
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: #fff, @textColorHover: @textColor) {
   // gradientBar will set the background to a pleasing blend of these, to support IE<=9
   //.gradientBar(@startColor, @endColor, @textColor);
   
@@ -533,7 +533,7 @@
 
   // in these cases the gradient won't cover the background, so we override
   &:hover, &:focus, &:active, &.active {
-    color: @textColor;
+    color: @textColorHover;
     background-color: @hoverColor;
   }
   
