@@ -2,28 +2,6 @@
 
 namespace Umbraco.Web.Trees
 {
-    // fixme move
-    [Flags]
-    public enum TreeUse
-    {
-        None = 0,
-        Main = 1,
-        Dialog = 2,
-    }
-
-    public static class TreeUseExtensions
-    {
-        public static bool Has(this TreeUse use, TreeUse uses)
-        {
-            return use == uses;
-        }
-
-        public static bool HasAny(this TreeUse use, TreeUse uses)
-        {
-            return (use & uses) > 0;
-        }
-    }
-
     /// <summary>
     /// Identifies a section tree.
     /// </summary>
