@@ -1223,6 +1223,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompositioner</key>
     <key alias="noTabs">Du har ikke tilføjet nogle faner</key>
+    <key alias="addGroup">Tilføj gruppe</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
     <key alias="addProperty">Tilføj egenskab</key>
     <key alias="requiredLabel">Påkrævet label</key>
