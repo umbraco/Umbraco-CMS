@@ -118,12 +118,7 @@ namespace Umbraco.Core
                 /// RadioButton list.
                 /// </summary>
                 public const string RadioButtonList = "Umbraco.RadioButtonList";
-
-                /// <summary>
-                /// Related Links.
-                /// </summary>
-                public const string RelatedLinks = "Umbraco.RelatedLinks";
-
+                
                 /// <summary>
                 /// Slider.
                 /// </summary>
