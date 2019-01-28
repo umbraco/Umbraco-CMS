@@ -7,7 +7,7 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.Misc
 {
-    // fixme - not testing virtual directory!
+    // FIXME: not testing virtual directory!
 
     [TestFixture]
     public class UriUtilityTests

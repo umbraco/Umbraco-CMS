@@ -15,6 +15,6 @@ namespace Umbraco.Web.Scheduling
         void Add(T task);
         bool TryAdd(T task);
 
-        // todo - complete the interface?
+        // TODO: complete the interface?
     }
 }

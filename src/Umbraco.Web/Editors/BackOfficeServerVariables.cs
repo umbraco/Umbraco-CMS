@@ -87,7 +87,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
+            // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
             // so based on compat and how things are currently working we need to replace the serverVarsJs one
             ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
 
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoUrls", new Dictionary<string, object>
                     {
-                        //TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
+                        // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
                         // having each url defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Editors
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
                         {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
-                        //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
+                        // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                         {"serverVarsJs", _urlHelper.Action("Application", "BackOffice")},
                         //API URLs
                         {
@@ -298,7 +298,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedMomentLocales())
+                                controller => controller.GetSupportedLocales())
                         },
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
@@ -366,7 +366,7 @@ namespace Umbraco.Web.Editors
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,
-                                    //TODO: Need to see if this exposes any sensitive data!
+                                    // TODO: Need to see if this exposes any sensitive data!
                                     properties = p.Properties
                                 })
                                 .ToArray()
@@ -422,10 +422,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <remarks>
         /// We are doing this because if we constantly resolve the tree controller types from the PluginManager it will re-scan and also re-log that
-        /// it's resolving which is unecessary and annoying.
+        /// it's resolving which is unnecessary and annoying.
         /// </remarks>
         private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes
-            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // todo inject
+            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // TODO: inject
 
         /// <summary>
         /// Returns the server variables regarding the application state

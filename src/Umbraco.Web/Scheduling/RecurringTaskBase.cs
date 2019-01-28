@@ -9,9 +9,9 @@ namespace Umbraco.Web.Scheduling
     /// </summary>
     /// <remarks>Implement by overriding PerformRun or PerformRunAsync and then IsAsync accordingly,
     /// depending on whether the task is implemented as a sync or async method. Run nor RunAsync are
-    /// sealed here as overriding them would break recurrence. And then optionnally override
+    /// sealed here as overriding them would break recurrence. And then optionally override
     /// RunsOnShutdown, in order to indicate whether the latched task should run immediately on
-    /// shutdown, or just be abandonned (default).</remarks>
+    /// shutdown, or just be abandoned (default).</remarks>
     public abstract class RecurringTaskBase : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<RecurringTaskBase> _runner;

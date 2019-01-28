@@ -302,7 +302,7 @@ namespace Umbraco.Core.Sync
             // (depending on what the cache refreshers are doing). I think it's best we do the one time check, process them and continue, if there are
             // pending requests after being processed, they'll just be processed on the next poll.
             //
-            // todo not true if we're running on a background thread, assuming we can?
+            // TODO: not true if we're running on a background thread, assuming we can?
 
             var sql = Sql().SelectAll()
                 .From<CacheInstructionDto>()

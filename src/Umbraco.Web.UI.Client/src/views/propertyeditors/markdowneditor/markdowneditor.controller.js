@@ -69,7 +69,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
                 }, 200);
             });
 
-            //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
+            // HACK: load the separate css for the editor to avoid it blocking our js loading TEMP HACK
             assetsService.loadCss("lib/markdown/markdown.css", $scope);
         })
 }

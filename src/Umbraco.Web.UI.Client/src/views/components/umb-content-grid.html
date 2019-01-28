@@ -12,7 +12,7 @@
 
         <div class="umb-content-grid__item-name" ng-click="clickItemName(item, $event, $index)" ng-class="{'-light': !item.published && item.updater != null}">
             <i class="umb-content-grid__icon {{ item.icon }}"></i>
-            {{ item.name }}
+            <span>{{ item.name }}</span>
         </div>
 
         <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published && item.updater != null}">

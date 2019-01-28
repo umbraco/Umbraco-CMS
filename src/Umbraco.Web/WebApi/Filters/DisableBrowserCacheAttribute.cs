@@ -21,7 +21,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             //NOTE: Until we upgraded to WebApi 2, this didn't work correctly and we had to revert to using
             // HttpContext.Current responses. I've changed this back to what it should be now since it works
-            // and now with WebApi2, the HttpContext.Current responses dont! Anyways, all good now.
+            // and now with WebApi2, the HttpContext.Current responses don't! Anyways, all good now.
             actionExecutedContext.Response.Headers.CacheControl = new CacheControlHeaderValue()
             {
                 NoCache = true,

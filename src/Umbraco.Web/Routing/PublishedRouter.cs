@@ -19,7 +19,7 @@ using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-    // todo - making sense to have an interface?
+    // TODO: making sense to have an interface?
     public class PublishedRouter
     {
         private readonly IWebRoutingSection _webRoutingSection;
@@ -52,10 +52,9 @@ namespace Umbraco.Web.Routing
             GetRolesForLogin = s => Roles.Provider.GetRolesForUser(s);
         }
 
-        // todo
-        // in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
+        // TODO: in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
         // killing it entirely, if we need cache, just implement it properly !!
-        // this is all soooo weird
+        // this is all so weird
         public Func<string, IEnumerable<string>> GetRolesForLogin { get; }
 
         public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
@@ -380,7 +379,7 @@ namespace Umbraco.Web.Routing
 
             // NOTE: we could start with what's the current default?
 
-            // todo - bad - we probably should be using the appropriate filesystems!
+            // TODO: bad - we probably should be using the appropriate filesystems!
 
             if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
                     alias, new[] { ".cshtml", ".vbhtml" }))
@@ -691,7 +690,7 @@ namespace Umbraco.Web.Routing
             // read the alternate template alias, from querystring, form, cookie or server vars,
             // only if the published content is the initial once, else the alternate template
             // does not apply
-            // + optionnally, apply the alternate template on internal redirects
+            // + optionally, apply the alternate template on internal redirects
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate

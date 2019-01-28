@@ -15,7 +15,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     internal class DashboardSecurity
     {
-        //TODO: Unit test all this!!! :/
+        // TODO: Unit test all this!!! :/
 
         public static bool AuthorizeAccess(ISection dashboardSection, IUser user, ISectionService sectionService)
         {

@@ -773,8 +773,7 @@ namespace Umbraco.Core.Services.Implement
             DoDelete(media);
         }
 
-        //TODO:
-        // both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
+        //TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
         // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
         // if that's not the case, then the file will never be deleted, because when we delete the media,
         // the version referencing the file will not be there anymore. SO, we can leak files.
@@ -882,7 +881,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                // todo - missing 7.6 "ensure valid path" thing here?
+                // TODO: missing 7.6 "ensure valid path" thing here?
                 // but then should be in PerformMoveLocked on every moved item?
 
                 var originalPath = media.Path;
@@ -1031,7 +1030,7 @@ namespace Umbraco.Core.Services.Implement
         {
             var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
-            var evtMsgs = EventMessagesFactory.Get(); // todo - and then?
+            var evtMsgs = EventMessagesFactory.Get(); // TODO: and then?
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1276,7 +1275,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0)
         {
-            //TODO: This currently this is called from the ContentTypeService but that needs to change,
+            // TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
             // This method will recursively go lookup every content item, check if any of it's descendants are
             // of a different type, move them to the recycle bin, then permanently delete the content items.

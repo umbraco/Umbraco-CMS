@@ -271,7 +271,7 @@ AND umbracoNode.id <> @id",
                 compositionBase.RemovedContentTypeKeyTracker != null &&
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
-                //TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
+                // TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
 
                 // find Content based on the current ContentType
                 var sql = Sql()
@@ -291,7 +291,7 @@ AND umbracoNode.id <> @id",
                     // based on the PropertyTypes that belong to the removed ContentType.
                     foreach (var contentDto in contentDtos)
                     {
-                        //TODO: This could be done with bulk SQL statements
+                        // TODO: This could be done with bulk SQL statements
                         foreach (var propertyType in propertyTypes)
                         {
                             var nodeId = contentDto.NodeId;
@@ -343,8 +343,7 @@ AND umbracoNode.id <> @id",
             List<int> orphanPropertyTypeIds = null;
             if (entity.IsPropertyDirty("PropertyGroups"))
             {
-                // todo
-                // we used to try to propagate tabs renaming downstream, relying on ParentId, but
+                // TODO: we used to try to propagate tabs renaming downstream, relying on ParentId, but
                 // 1) ParentId makes no sense (if a tab can be inherited from multiple composition
                 //    types) so we would need to figure things out differently, visiting downstream
                 //    content types and looking for tabs with the same name...
@@ -438,7 +437,7 @@ AND umbracoNode.id <> @id",
                         case ContentVariation.CultureAndSegment:
                         case ContentVariation.Segment:
                         default:
-                            throw new NotSupportedException(); //TODO: Support this
+                            throw new NotSupportedException(); // TODO: Support this
                     }
                 }
 
@@ -628,7 +627,7 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private void ClearScheduledPublishing(IContentTypeComposition contentType)
         {
-            //TODO: Fill this in when scheduled publishing is enabled for variants
+            // TODO: Fill this in when scheduled publishing is enabled for variants
         }
 
         /// <summary>
@@ -671,7 +670,7 @@ AND umbracoNode.id <> @id",
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
                     default:
-                        throw new NotSupportedException(); //TODO: Support this
+                        throw new NotSupportedException(); // TODO: Support this
                 }
             }
         }
@@ -754,7 +753,7 @@ AND umbracoNode.id <> @id",
                 case ContentVariation.CultureAndSegment:
                 case ContentVariation.Segment:
                 default:
-                    throw new NotSupportedException(); //TODO: Support this
+                    throw new NotSupportedException(); // TODO: Support this
             }
         }
 
@@ -1038,7 +1037,7 @@ AND umbracoNode.id <> @id",
 
             var dtos = Database.Fetch<PropertyTypeDto>(sql);
 
-            //TODO Move this to a PropertyTypeFactory
+            // TODO: Move this to a PropertyTypeFactory
             var list = new List<PropertyType>();
             foreach (var dto in dtos.Where(x => x.PropertyTypeGroupId <= 0))
             {
