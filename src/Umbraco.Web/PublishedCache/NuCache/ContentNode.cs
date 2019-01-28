@@ -113,9 +113,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var originDraft = origin.DraftModel == null ? null : PublishedContent.UnwrapIPublishedContent(origin.DraftModel);
             var originPublished = origin.PublishedModel == null ? null : PublishedContent.UnwrapIPublishedContent(origin.PublishedModel);
 
-            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, publishedSnapshotAccessor, variationContextAccessor);
+            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft.ContentData, publishedSnapshotAccessor, variationContextAccessor);
             DraftModel = DraftContent?.CreateModel();
-            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, publishedSnapshotAccessor, variationContextAccessor);
+            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished.ContentData, publishedSnapshotAccessor, variationContextAccessor);
             PublishedModel = PublishedContent?.CreateModel();
 
             ChildContentIds = origin.ChildContentIds; // can be the *same* list
@@ -164,8 +164,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 Node = this,
                 ContentTypeId = ContentType.Id,
 
-                DraftData = draft?._contentData,
-                PublishedData = published?._contentData
+                DraftData = draft?.ContentData,
+                PublishedData = published?.ContentData
             };
         }
     }
