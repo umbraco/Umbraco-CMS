@@ -299,7 +299,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // invariant content items)
 
             // if there is no 'published' published content, no culture can be published
-            var hasPublished = _contentNode.PublishedModel != null;
+            var hasPublished = _contentNode.PublishedContent != null;
             if (!hasPublished)
                 return false;
 
