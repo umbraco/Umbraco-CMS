@@ -10,7 +10,7 @@ using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    //TODO: Make all Http calls async
+    // TODO: Make all Http calls async
 
     public abstract class AbstractOEmbedProvider : IEmbedProvider
     {

@@ -50,7 +50,7 @@ namespace Umbraco.Web.Trees
 
             nodes.AddRange(found.Select(template => CreateTreeNode(
                 template.Id.ToString(CultureInfo.InvariantCulture),
-                //TODO: Fix parent ID stuff for templates
+                // TODO: Fix parent ID stuff for templates
                 "-1",
                 queryStrings,
                 template.Name,
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Trees
                 Key = template.Key,
                 Name = template.Name,
                 NodeObjectType = Constants.ObjectTypes.Template,
-                //TODO: Fix parent/paths on templates
+                // TODO: Fix parent/paths on templates
                 ParentId = -1,
                 Path = template.Path,
                 UpdateDate = template.UpdateDate

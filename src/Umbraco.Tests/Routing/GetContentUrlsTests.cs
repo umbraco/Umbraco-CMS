@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Routing
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             var content = MockedContent.CreateBasicContent(contentType);
-            content.Id = 1046; //fixme: we are using this ID only because it's built into the test XML published cache
+            content.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
             content.Path = "-1,1046";
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Routing
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             var content = MockedContent.CreateBasicContent(contentType);
-            content.Id = 1046; //fixme: we are using this ID only because it's built into the test XML published cache
+            content.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
             content.Path = "-1,1046";
             content.Published = true;
 
@@ -92,13 +92,13 @@ namespace Umbraco.Tests.Routing
         {
             var contentType = MockedContentTypes.CreateBasicContentType();
             var parent = MockedContent.CreateBasicContent(contentType);
-            parent.Id = 1046; //fixme: we are using this ID only because it's built into the test XML published cache
+            parent.Id = 1046; // FIXME: we are using this ID only because it's built into the test XML published cache
             parent.Name = "home";
             parent.Path = "-1,1046";
             parent.Published = true;
             var child = MockedContent.CreateBasicContent(contentType);
             child.Name = "sub1";
-            child.Id = 1173; //fixme: we are using this ID only because it's built into the test XML published cache
+            child.Id = 1173; // FIXME: we are using this ID only because it's built into the test XML published cache
             child.Path = "-1,1046,1173";
             child.Published = true;
 
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Routing
             Assert.IsTrue(urls[0].IsUrl);
         }
 
-        //TODO: We need a lot of tests here, the above was just to get started with being able to unit test this method
+        // TODO: We need a lot of tests here, the above was just to get started with being able to unit test this method
         // * variant URLs without domains assigned, what happens?
         // * variant URLs with domains assigned, but also having more languages installed than there are domains/cultures assigned
         // * variant URLs with an ancestor culture unpublished

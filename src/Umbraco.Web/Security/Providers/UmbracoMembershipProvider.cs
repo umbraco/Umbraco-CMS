@@ -82,7 +82,7 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
-            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and
+            //NOTE: due to backwards compatibility reasons (and UX reasons), this provider doesn't care about the old password and
             // allows simply setting the password manually so we don't really care about the old password.
             // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
@@ -354,7 +354,7 @@ namespace Umbraco.Web.Security.Providers
                 // cause all distributed cache to execute - which will clear out some caches we don't want.
                 // http://issues.umbraco.org/issue/U4-3451
 
-                // when upgrating from 7.2 to 7.3 trying to save will throw
+                // when upgrading from 7.2 to 7.3 trying to save will throw
                 if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
                     MemberService.Save(member, false);
             }
@@ -414,7 +414,7 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>The new password for the specified user.</returns>
         protected override string PerformResetPassword(string username, string answer, string generatedPassword)
         {
-            //TODO: This should be here - but how do we update failure count in this provider??
+            // TODO: This should be here - but how do we update failure count in this provider??
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
             //    UpdateFailureCount(username, "passwordAnswer");
@@ -591,10 +591,10 @@ namespace Umbraco.Web.Security.Providers
             //don't raise events for this! It just sets the member dates, if we do raise events this will
             // cause all distributed cache to execute - which will clear out some caches we don't want.
             // http://issues.umbraco.org/issue/U4-3451
-            //TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
+            // TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
             // for this type of thing (i.e. UpdateLastLogin or similar).
 
-            // when upgrating from 7.2 to 7.3 trying to save will throw
+            // when upgrading from 7.2 to 7.3 trying to save will throw
             if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
                 MemberService.Save(member, false);
 

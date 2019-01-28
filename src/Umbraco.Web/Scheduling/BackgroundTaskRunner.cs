@@ -434,12 +434,12 @@ namespace Umbraco.Web.Scheduling
 
         private async Task<T> GetNextBackgroundTask2(CancellationToken shutdownToken)
         {
-            // exit if cancelling
+            // exit if canceling
             if (shutdownToken.IsCancellationRequested)
                 return null;
 
-            // if keepalive is false then don't block, exit if there is
-            // no task in the buffer - yes, there is a race cond, which
+            // if KeepAlive is false then don't block, exit if there is
+            // no task in the buffer - yes, there is a race condition, which
             // we'll take care of
             if (_options.KeepAlive == false && _tasks.Count == 0)
                 return null;
@@ -482,7 +482,7 @@ namespace Umbraco.Web.Scheduling
             var latched = bgTask as ILatchedBackgroundTask;
             if (latched == null || latched.IsLatched == false) return bgTask;
 
-            // support cancelling awaiting
+            // support canceling awaiting
             // read https://github.com/dotnet/corefx/issues/2704
             // read http://stackoverflow.com/questions/27238232/how-can-i-cancel-task-whenall
             var tokenTaskSource = new TaskCompletionSource<bool>();
@@ -519,7 +519,7 @@ namespace Umbraco.Web.Scheduling
                     try
                     {
                         if (bgTask.IsAsync)
-                            //configure await = false since we don't care about the context, we're on a background thread.
+                            // configure await = false since we don't care about the context, we're on a background thread.
                             await bgTask.RunAsync(token).ConfigureAwait(false);
                         else
                             bgTask.Run();
@@ -706,7 +706,7 @@ namespace Umbraco.Web.Scheduling
                 // immediate parameter is true, the registered object must call the UnregisterObject method before returning;
                 // otherwise, its registration will be removed by the application manager.
 
-                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Cancelling tasks", _logPrefix);
+                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
                 Shutdown(true, true); // cancel all tasks, wait for the current one to end
                 Terminate(true);
             }

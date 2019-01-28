@@ -178,7 +178,7 @@
 
         function loginSubmit(login, password) {
 
-            //TODO: Do validation properly like in the invite password update
+            // TODO: Do validation properly like in the invite password update
 
             //if the login and password are not empty we need to automatically
             // validate them - this is because if there are validation errors on the server
@@ -242,7 +242,7 @@
 
         function requestPasswordResetSubmit(email) {
 
-            //TODO: Do validation properly like in the invite password update
+            // TODO: Do validation properly like in the invite password update
 
             if (email && email.length > 0) {
                 vm.requestPasswordResetForm.email.$setValidity('auth', true);
@@ -286,7 +286,7 @@
                 return;
             }
 
-            //TODO: All of this logic can/should be shared! We should do validation the nice way instead of all of this manual stuff, see: inviteSavePassword
+            // TODO: All of this logic can/should be shared! We should do validation the nice way instead of all of this manual stuff, see: inviteSavePassword
             authResource.performSetPassword(vm.resetPasswordCodeInfo.resetCodeModel.userId, password, confirmPassword, vm.resetPasswordCodeInfo.resetCodeModel.resetCode)
                 .then(function () {
                     vm.showSetPasswordConfirmation = true;

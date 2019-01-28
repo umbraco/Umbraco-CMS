@@ -17,7 +17,7 @@ namespace Umbraco.Core
     /// </summary>
     public class EmailSender : IEmailSender
     {
-        //TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
+        // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
 
         private readonly bool _enableEvents;
 

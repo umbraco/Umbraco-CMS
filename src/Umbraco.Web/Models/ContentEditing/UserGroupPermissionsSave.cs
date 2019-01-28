@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.ContentEditing
             AssignedPermissions = new Dictionary<int, IEnumerable<string>>();
         }
 
-        //TODO: we should have an option to clear the permissions assigned to this node and instead just have them inherit - yes once we actually have inheritance!
+        // TODO: we should have an option to clear the permissions assigned to this node and instead just have them inherit - yes once we actually have inheritance!
 
         [DataMember(Name = "contentId", IsRequired = true)]
         [Required]

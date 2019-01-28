@@ -45,7 +45,7 @@ namespace Umbraco.Web.Trees
         /// All of the query string parameters passed from jsTree
         /// </param>
         /// <remarks>
-        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public ContentTypeBasic Resolve(TSource source, TDestination destination, ContentTypeBasic destMember, ResolutionContext context)
         {
-            //TODO: We can resolve the UmbracoContext from the IValueResolver options!
+            // TODO: We can resolve the UmbracoContext from the IValueResolver options!
             // OMG
             if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                 && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))

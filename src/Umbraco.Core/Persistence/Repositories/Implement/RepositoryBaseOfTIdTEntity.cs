@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        // todo - but now that we have 1 unique repository?
+        // TODO: but now that we have 1 unique repository?
         // this is a *bad* idea because PerformCount captures the current repository and its UOW
         //
         //private static RepositoryCachePolicyOptions _defaultOptions;
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids.Distinct()
                 //don't query by anything that is a default of T (like a zero)
-                //TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
+                // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
                 //.Where(x => Equals(x, default(TId)) == false)
                 .ToArray();
 

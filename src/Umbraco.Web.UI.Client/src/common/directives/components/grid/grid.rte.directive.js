@@ -10,7 +10,7 @@ angular.module("umbraco.directives")
             replace: true,
             link: function (scope, element, attrs) {
 
-                //TODO: A lot of the code below should be shared between the grid rte and the normal rte
+                // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
                 var promises = [];
 
@@ -73,7 +73,7 @@ angular.module("umbraco.directives")
 
                         });
 
-                        //TODO: Perhaps we should pin the toolbar for the rte always, regardless of if it's in the grid or not?
+                        // TODO: Perhaps we should pin the toolbar for the rte always, regardless of if it's in the grid or not?
                         // this would mean moving this code into the tinyMceService.initializeEditor
 
                         //when we leave the editor (maybe)
@@ -116,7 +116,7 @@ angular.module("umbraco.directives")
 
                     loadTinyMce();
 
-                    //TODO: This should probably be in place for all RTE, not just for the grid, which means
+                    // TODO: This should probably be in place for all RTE, not just for the grid, which means
                     // this code can live in tinyMceService.initializeEditor
                     var tabShownListener = eventsService.on("app.tabChange", function (e, args) {
 

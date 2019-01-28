@@ -137,7 +137,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         navigationService.showSearch();
     });
 
-    ////TODO: remove this it's not a thing
+    //// TODO: remove this it's not a thing
     //$scope.selectedId = navigationService.currentId;
 
     var evts = [];
@@ -423,7 +423,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 var path = treeService.getPath(currNode);
                 promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
             }
-            //TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
+            // TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
             //for (var i = 0; i < expandedPaths.length; i++) {
             //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
             //}
@@ -441,16 +441,16 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     };
 
     //this reacts to the options item in the tree
-    //TODO: migrate to nav service
-    //TODO: is this used?
+    // TODO: migrate to nav service
+    // TODO: is this used?
     $scope.searchShowMenu = function (ev, args) {
         //always skip default
         args.skipDefault = true;
         navigationService.showMenu(args);
     };
 
-    //TODO: migrate to nav service
-    //TODO: is this used?
+    // TODO: migrate to nav service
+    // TODO: is this used?
     $scope.searchHide = function () {
         navigationService.hideSearch();
     };

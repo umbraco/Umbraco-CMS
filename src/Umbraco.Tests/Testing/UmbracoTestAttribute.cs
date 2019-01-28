@@ -24,8 +24,9 @@ namespace Umbraco.Tests.Testing
         public bool AutoMapper { get => _autoMapper.ValueOrDefault(WithApplication); set => _autoMapper.Set(value); }
         private readonly Settable<bool> _autoMapper = new Settable<bool>();
 
+        // FIXME: to be completed
         /// <summary>
-        /// Gets or sets a value indicating ... FIXME to be completed
+        /// Gets or sets a value indicating ... 
         /// </summary>
         public bool PublishedRepositoryEvents { get => _publishedRepositoryEvents.ValueOrDefault(false); set => _publishedRepositoryEvents.Set(value); }
         private readonly Settable<bool> _publishedRepositoryEvents = new Settable<bool>();

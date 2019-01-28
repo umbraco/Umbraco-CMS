@@ -2,12 +2,11 @@
     "use strict";
 
     function RedirectUrlsController($scope, redirectUrlsResource, notificationsService, localizationService, $q) {
-        //...todo
-        //search by url or url part
-        //search by domain
-        //display domain in dashboard results?
+        // TODO: search by url or url part
+        // TODO: search by domain
+        // TODO: display domain in dashboard results?
 
-        //used to cancel any request in progress if another one needs to take it's place
+        // used to cancel any request in progress if another one needs to take it's place
         var vm = this;
         var canceler = null;
 

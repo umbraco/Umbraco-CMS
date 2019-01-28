@@ -38,7 +38,7 @@ namespace Umbraco.Web.UI.JavaScript
             var dependencies = assets.Select(x =>
             {
                 // most declarations with be made relative to the /umbraco folder, so things
-                // ike lib/blah/blah.js so we need to turn them into absolutes here
+                // like lib/blah/blah.js so we need to turn them into absolutes here
                 if (x.StartsWith("/") == false && Uri.IsWellFormedUriString(x, UriKind.Relative))
                 {
                     return new BasicFile(assetType) { FilePath = new Uri(requestUrl, x).AbsolutePath };

@@ -66,13 +66,13 @@ namespace Umbraco.Core.Persistence.Dtos
         public bool AllowAtRoot { get; set; }
 
         /* PropertyTypes */
-        //TODO Add PropertyTypeDto (+MemberTypeDto and DataTypeDto as one) ReadOnly list
+        // TODO: Add PropertyTypeDto (+MemberTypeDto and DataTypeDto as one) ReadOnly list
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "ContentTypeId")]
         public List<PropertyTypeReadOnlyDto> PropertyTypes { get; set; }
 
         /* PropertyTypeGroups */
-        //TODO Add PropertyTypeGroupDto ReadOnly list
+        // TODO: Add PropertyTypeGroupDto ReadOnly list
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "ContentTypeNodeId")]
         public List<PropertyTypeGroupReadOnlyDto> PropertyTypeGroups { get; set; }

@@ -44,7 +44,7 @@ namespace Umbraco.Web.WebApi.Filters
                         //cleanup any files associated
                         foreach (var f in contentItem.UploadedFiles)
                         {
-                            //track all temp folders so we can remove old files afterwords
+                            //track all temp folders so we can remove old files afterwards
                             var dir = Path.GetDirectoryName(f.TempFilePath);
                             if (tempFolders.Contains(dir) == false)
                             {
@@ -104,7 +104,7 @@ namespace Umbraco.Web.WebApi.Filters
                             {
                                 if (f.TempFilePath.IsNullOrWhiteSpace() == false)
                                 {
-                                    //track all temp folders so we can remove old files afterwords
+                                    //track all temp folders so we can remove old files afterwards
                                     var dir = Path.GetDirectoryName(f.TempFilePath);
                                     if (tempFolders.Contains(dir) == false)
                                     {

@@ -141,7 +141,8 @@ gulp.task('dependencies', function () {
             "name": "flatpickr",
             "src":  [
                 "./node_modules/flatpickr/dist/flatpickr.js",
-                "./node_modules/flatpickr/dist/flatpickr.css"
+                "./node_modules/flatpickr/dist/flatpickr.css",
+                "./node_modules/flatpickr/dist/l10n/*.js"
             ],
             "base": "./node_modules/flatpickr/dist"
         },

@@ -32,7 +32,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
             }, function(err) {
 
-               //TODO: Handle errors
+               // TODO: Handle errors
             });
         };
     }
