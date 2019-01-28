@@ -14,14 +14,14 @@ namespace Umbraco.Web.Services
         /// <param name="section"></param>
         /// <param name="currentUser"></param>
         /// <returns></returns>
-        IEnumerable<Tab<IDashboardSection>> GetDashboards(string section, IUser currentUser);
+        IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser currentUser);
 
         /// <summary>
         /// Gets all dashboards, organized by section, for a user.
         /// </summary>
         /// <param name="currentUser"></param>
         /// <returns></returns>
-        IDictionary<string, IEnumerable<Tab<IDashboardSection>>> GetDashboards(IUser currentUser);
+        IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser currentUser);
 
     }
 }

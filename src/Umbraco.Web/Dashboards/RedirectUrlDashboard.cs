@@ -5,7 +5,7 @@ using Umbraco.Core.Dashboards;
 namespace Umbraco.Web.Dashboards
 {
     [Weight(20)]
-    public class RedirectUrlDashboard : IDashboardSection
+    public class RedirectUrlDashboard : IDashboard
     {
         public string Alias => "contentRedirectManager";
 

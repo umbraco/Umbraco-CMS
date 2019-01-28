@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Umbraco.Core.Cache;
@@ -26,7 +27,6 @@ namespace Umbraco.Web.Editors
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
     [WebApi.UmbracoAuthorize]
-    [JsonCamelCaseFormatter]
 
     public class DashboardController : UmbracoApiController
     {
@@ -133,11 +133,24 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        // return IDashboardSlim - we don't need sections nor access rules
         [ValidateAngularAntiForgeryToken]
         [OutgoingEditorModelEvent]
-        public IEnumerable<Tab<IDashboardSection>> GetDashboard(string section)
+        public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {
-            return _dashboardService.GetDashboards(section, Security.CurrentUser);
+            return _dashboardService.GetDashboards(section, Security.CurrentUser).Select(x => new Tab<IDashboardSlim>
+            {
+                Id = x.Id,
+                Alias = x.Alias,
+                Label = x.Label,
+                Expanded = x.Expanded,
+                IsActive = x.IsActive,
+                Properties = x.Properties.Select(y => new DashboardSlim
+                {
+                    Alias = y.Alias,
+                    View = y.View
+                })
+            });
         }
     }
 }

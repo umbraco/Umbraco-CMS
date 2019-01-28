@@ -5,7 +5,7 @@ using Umbraco.Core.Dashboards;
 namespace Umbraco.Web.Dashboards
 {
     [Weight(10)]
-    public class ContentDashboard : IDashboardSection
+    public class ContentDashboard : IDashboard
     {
         public string Alias => "contentIntro";
 

@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Controllers;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Umbraco.Core.Manifest;
 
 namespace Umbraco.Web.WebApi
 {
@@ -26,7 +24,7 @@ namespace Umbraco.Web.WebApi
             {
                 SerializerSettings =
                 {
-                    ContractResolver = new CamelCaseAndDataMemberWhenSerializingContractResolver() 
+                    ContractResolver = new CamelCasePropertyNamesContractResolver() 
                 }
             };
             controllerSettings.Formatters.Add(jsonFormatter);

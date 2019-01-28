@@ -103,7 +103,7 @@ namespace Umbraco.Web.Runtime
 
             // configure the container for web
             composition.ConfigureForWeb();
-            
+
             composition
                 .ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
@@ -203,10 +203,9 @@ namespace Umbraco.Web.Runtime
                 .Append<MembersBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
 
-
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
             composition.WithCollectionBuilder<DashboardCollectionBuilder>()
-                .Add(composition.TypeLoader.GetTypes<IDashboardSection>());                
+                .Add(composition.TypeLoader.GetTypes<IDashboard>());
 
             // register back office trees
             foreach (var treeControllerType in umbracoApiControllerTypes

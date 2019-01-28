@@ -32,9 +32,9 @@ namespace Umbraco.Web.Services
 
 
         /// <inheritdoc />
-        public IEnumerable<Tab<IDashboardSection>> GetDashboards(string section, IUser currentUser)
+        public IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser currentUser)
         {
-            var tabs = new List<Tab<IDashboardSection>>();
+            var tabs = new List<Tab<IDashboard>>();
             var tabId = 0;
 
             foreach (var dashboard in _dashboardCollection.Where(x => x.Sections.InvariantContains(section)))
@@ -46,8 +46,8 @@ namespace Umbraco.Web.Services
                 if (dashboard.View.InvariantEndsWith(".ascx"))
                     throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
 
-                var dashboards = new List<IDashboardSection> {dashboard};
-                tabs.Add(new Tab<IDashboardSection>
+                var dashboards = new List<IDashboard> {dashboard};
+                tabs.Add(new Tab<IDashboard>
                 {
                     Id = tabId++,
                     Label = _localizedText.Localize("dashboardTabs", dashboard.Alias),
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <inheritdoc />
-        public IDictionary<string, IEnumerable<Tab<IDashboardSection>>> GetDashboards(IUser currentUser)
+        public IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser currentUser)
         {
             return _sectionService.GetSections().ToDictionary(x => x.Alias, x => GetDashboards(x.Alias, currentUser));
         }

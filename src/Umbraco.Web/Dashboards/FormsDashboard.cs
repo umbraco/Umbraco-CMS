@@ -5,7 +5,7 @@ using Umbraco.Core.Dashboards;
 namespace Umbraco.Web.Dashboards
 {
     [Weight(10)]
-    public class FormsDashboard : IDashboardSection
+    public class FormsDashboard : IDashboard
     {
         public string Alias => "formsInstall";
 

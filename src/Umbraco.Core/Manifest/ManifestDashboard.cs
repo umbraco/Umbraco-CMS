@@ -6,7 +6,7 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Manifest
 {
-    public class ManifestDashboardDefinition : IDashboardSection
+    public class ManifestDashboard : IDashboard
     {
         private string _view;
 
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Manifest
         public string Alias { get; set; }
 
         [JsonProperty("weight", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [DefaultValue(100)]
+        [DefaultValue(100)] // must be equal to DashboardCollectionBuilder.DefaultWeight
         public int Weight { get; set; }
 
         [JsonProperty("view", Required = Required.Always)]
@@ -29,6 +29,5 @@ namespace Umbraco.Core.Manifest
 
         [JsonProperty("access")]
         public IAccessRule[] AccessRules { get; set; } = Array.Empty<IAccessRule>();
-
     }
 }

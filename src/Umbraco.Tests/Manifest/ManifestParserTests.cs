@@ -404,7 +404,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.Dashboards.Length);
 
-            Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[0]);
+            Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[0]);
             var db0 = manifest.Dashboards[0];
             Assert.AreEqual("something", db0.Alias);
             Assert.AreEqual(100, db0.Weight);
@@ -417,7 +417,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(AccessRuleType.Deny, db0.AccessRules[1].Type);
             Assert.AreEqual("foo", db0.AccessRules[1].Value);
 
-            Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[1]);
+            Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[1]);
             var db1 = manifest.Dashboards[1];
             Assert.AreEqual("something.else", db1.Alias);
             Assert.AreEqual(-1, db1.Weight);

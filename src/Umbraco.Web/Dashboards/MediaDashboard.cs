@@ -5,7 +5,7 @@ using Umbraco.Core.Dashboards;
 namespace Umbraco.Web.Dashboards
 {
     [Weight(10)]
-    public class MediaDashboard : IDashboardSection
+    public class MediaDashboard : IDashboard
     {
         public string Alias => "mediaFolderBrowser";
 

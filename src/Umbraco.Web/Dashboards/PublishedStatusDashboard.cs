@@ -5,7 +5,7 @@ using Umbraco.Core.Dashboards;
 namespace Umbraco.Web.Dashboards
 {
     [Weight(30)]
-    public class PublishedStatusDashboard : IDashboardSection
+    public class PublishedStatusDashboard : IDashboard
     {
         public string Alias => "settingsPublishedStatus";
 
