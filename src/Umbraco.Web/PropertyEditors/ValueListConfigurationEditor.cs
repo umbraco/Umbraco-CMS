@@ -68,30 +68,41 @@ namespace Umbraco.Web.PropertyEditors
         {
             var output = new ValueListConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
-                return output; // oops
+            if (editorValues.ContainsKey("items") == false)
+                return output;
+
+            var jsonObject = (JObject) editorValues["items"];
+            if (jsonObject == null)
+                return output;
 
             // auto-assigning our ids, get next id from existing values
             var nextId = 1;
             if (configuration?.Items != null && configuration.Items.Count > 0)
                 nextId = configuration.Items.Max(x => x.Id) + 1;
 
-            // create ValueListItem instances - sortOrder is ignored here
-            foreach (var item in jItems.OfType<JObject>())
+            foreach (var itemValue in jsonObject.Children())
             {
-                var value = item.Property("value")?.Value?.Value<string>();
-                if (string.IsNullOrWhiteSpace(value)) continue;
+                var listItem = itemValue.First;
+                var value = listItem["value"].Value<string>();
+                if(string.IsNullOrEmpty(value))
+                    continue;;
 
-                var id = item.Property("id")?.Value?.Value<int>() ?? 0;
-                if (id >= nextId) nextId = id + 1;
+                int.TryParse(itemValue.Path, out var id);
+                if (id >= nextId)
+                    nextId = id + 1;
 
-                output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
+                output.Items.Add(new ValueListConfiguration.ValueListItem
+                {
+                    Id = id,
+                    Value = value
+                });
             }
 
-            // ensure ids
-            foreach (var item in output.Items)
+            output.Items.ForEach(item =>
+            {
                 if (item.Id == 0)
                     item.Id = nextId++;
+            });
 
             return output;
         }

@@ -123,5 +123,18 @@ namespace Umbraco.Tests.PropertyEditors
             var json = JsonConvert.SerializeObject(result);
             Assert.AreEqual("{\"items\":{\"1\":{\"value\":\"Item 1\",\"sortOrder\":1},\"2\":{\"value\":\"Item 2\",\"sortOrder\":2},\"3\":{\"value\":\"Item 3\",\"sortOrder\":3}}}", json);
         }
+
+        [Test]
+        public void FromConfigurationEditor_WithSerializedConfiguration_DoesReturnCorrectValueListConfiguration()
+        {
+            var serializedJsonInput = "{\"items\":{\"1\":{\"value\":\"Item 1\",\"sortOrder\":1},\"2\":{\"value\":\"Item 2\",\"sortOrder\":2},\"3\":{\"value\":\"Item 3\",\"sortOrder\":3}}}";
+            var inputDictionary = JsonConvert.DeserializeObject(serializedJsonInput, typeof(IDictionary<string, object>));
+            var existingConfiguration = new ValueListConfiguration();
+
+            var sut = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>());
+            var result = sut.FromConfigurationEditor((IDictionary<string, object>)inputDictionary, existingConfiguration);
+
+            Assert.That(result.Items.Count, Is.EqualTo(3));
+        }
     }
 }
