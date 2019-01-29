@@ -134,7 +134,7 @@ namespace umbraco.presentation.templateControls
         }
 
         /// <summary>
-        /// Inits the specified item. To be called from the OnInit method of Item.
+        /// Initializes the specified item. To be called from the OnInit method of Item.
         /// </summary>
         /// <param name="item">The item.</param>
         public virtual void Init(Item item)

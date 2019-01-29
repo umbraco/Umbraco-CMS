@@ -122,6 +122,18 @@
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
+    <Compile Include="Dashboards\ContentDashboard.cs" />
+    <Compile Include="Dashboards\DashboardCollection.cs" />
+    <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
+    <Compile Include="Dashboards\ExamineDashboard.cs" />
+    <Compile Include="Dashboards\FormsDashboard.cs" />
+    <Compile Include="Dashboards\HealthCheckDashboard.cs" />
+    <Compile Include="Dashboards\MediaDashboard.cs" />
+    <Compile Include="Dashboards\MembersDashboard.cs" />
+    <Compile Include="Dashboards\ModelsBuilderDashboard.cs" />
+    <Compile Include="Dashboards\PublishedStatusDashboard.cs" />
+    <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
+    <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
@@ -170,8 +182,11 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Services\DashboardService.cs" />
+    <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
+    <Compile Include="Mvc\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
@@ -252,7 +267,6 @@
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
-    <Compile Include="Editors\Dashboards.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
@@ -704,7 +718,6 @@
     <Compile Include="Editors\Filters\ContentSaveValidationAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
     <Compile Include="Editors\DashboardController.cs" />
-    <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
@@ -825,7 +838,6 @@
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
-    <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />

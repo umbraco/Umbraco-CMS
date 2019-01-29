@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// Provide an abstract base class for <c>IPublishedContent</c> implementations.
     /// </summary>
-    /// <remarks>This base class does which (a) consitently resolves and caches the Url, (b) provides an implementation
+    /// <remarks>This base class does which (a) consistently resolves and caches the Url, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models
         /// The url of documents are computed by the document url providers. The url of medias are, at the moment,
         /// computed here from the 'umbracoFile' property -- but we should move to media url providers at some point.
         /// </remarks>
-        public virtual string GetUrl(string culture = null) // todo - consider .GetCulture("fr-FR").Url
+        public virtual string GetUrl(string culture = null) // TODO: consider .GetCulture("fr-FR").Url
         {
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
                 switch (ItemType)
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Models
 
                         var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
 
-                        // todo - consider implementing media url providers
+                        // TODO: consider implementing media url providers
                         // note: that one does not support variations
                         //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
                         // want to return the normal URL and the cropper stores data as json
@@ -143,6 +143,9 @@ namespace Umbraco.Web.Models
 
         /// <inheritdoc />
         public abstract bool IsDraft(string culture = null);
+
+        /// <inheritdoc />
+        public abstract bool IsPublished(string culture = null);
 
         #endregion
 

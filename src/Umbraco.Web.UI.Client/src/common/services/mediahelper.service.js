@@ -66,7 +66,7 @@ function mediaHelper(umbRequestHelper) {
             });
 
             //for now we'll just return the first image in the collection.
-            //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
+            // TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
             if (mediaVal.length && mediaVal.length > 0) {
                 if (!options.imageOnly || (options.imageOnly === true && mediaVal[0].isImage)) {
                     return mediaVal[0].file;

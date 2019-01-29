@@ -29,7 +29,7 @@ namespace Umbraco.Web.Macros
     {
         private readonly IProfilingLogger _plogger;
 
-        // todo: there are many more things that would need to be injected in here
+        // TODO: there are many more things that would need to be injected in here
 
         public MacroRenderer(IProfilingLogger plogger)
         {
@@ -226,7 +226,7 @@ namespace Umbraco.Web.Macros
 
         // still, this is ugly. The macro should have a Content property
         // referring to IPublishedContent we're rendering the macro against,
-        // this is all soooo convoluted ;-(
+        // this is all so convoluted ;-(
 
         public MacroContent Render(MacroModel macro, Hashtable pageElements, int pageId, Hashtable attributes)
         {
@@ -547,7 +547,7 @@ namespace Umbraco.Web.Macros
 
         private static string EncodeMacroAttribute(string attributeContents)
         {
-            // replace linebreaks
+            // replace line breaks
             attributeContents = attributeContents.Replace("\n", "\\n").Replace("\r", "\\r");
 
             // replace quotes

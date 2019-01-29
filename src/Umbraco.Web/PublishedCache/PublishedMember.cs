@@ -82,6 +82,8 @@ namespace Umbraco.Web.PublishedCache
 
         public override bool IsDraft(string culture = null) => false;
 
+        public override bool IsPublished(string culture = null) => true;
+
         public override IPublishedContent Parent => null;
 
         public override IEnumerable<IPublishedContent> Children => Enumerable.Empty<IPublishedContent>();
@@ -142,10 +144,10 @@ namespace Umbraco.Web.PublishedCache
 
         public override string UrlSegment => throw new NotSupportedException();
 
-        //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string WriterName => _member.GetCreatorProfile().Name;
 
-        //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string CreatorName => _member.GetCreatorProfile().Name;
 
         public override int WriterId => _member.CreatorId;

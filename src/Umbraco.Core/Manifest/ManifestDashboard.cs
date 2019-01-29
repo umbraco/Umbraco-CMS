@@ -1,23 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
-using Umbraco.Core.Configuration.Dashboard;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Manifest
 {
-    public class ManifestDashboardDefinition
+    public class ManifestDashboard : IDashboard
     {
         private string _view;
-
-        [JsonProperty("name", Required = Required.Always)]
-        public string Name { get; set; }
 
         [JsonProperty("alias", Required = Required.Always)]
         public string Alias { get; set; }
 
         [JsonProperty("weight", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [DefaultValue(100)]
+        [DefaultValue(100)] // must be equal to DashboardCollectionBuilder.DefaultWeight
         public int Weight { get; set; }
 
         [JsonProperty("view", Required = Required.Always)]

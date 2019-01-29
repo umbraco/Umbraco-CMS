@@ -123,10 +123,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     if (ex is FileNotFoundException)
                     {
-                        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                        //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
-                        //TODO: Need to fix examine in LB scenarios!
+                        // TODO: Need to fix examine in LB scenarios!
                         Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
@@ -249,10 +249,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
             catch (FileNotFoundException)
             {
-                //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                 //See this thread: http://examine.cdodeplex.com/discussions/264341
                 //Catch the exception here for the time being, and just fallback to GetMedia
-                //TODO: Need to fix examine in LB scenarios!
+                // TODO: Need to fix examine in LB scenarios!
             }
             catch (NullReferenceException)
             {
@@ -306,10 +306,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 {
                     if (ex is FileNotFoundException)
                     {
-                        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                        //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
-                        //TODO: Need to fix examine in LB scenarios!
+                        // TODO: Need to fix examine in LB scenarios!
                         Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
@@ -489,7 +489,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
         /// <summary>
-        /// A Helper methods to return the children for media whther it is based on examine or xml
+        /// A Helper methods to return the children for media whether it is based on examine or xml
         /// </summary>
         /// <param name="parentId"></param>
         /// <param name="xpath"></param>
@@ -536,14 +536,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     }
 
                     //if there's no result then return null. Previously we defaulted back to library.GetMedia below
-                    //but this will always get called for when we are getting descendents since many items won't have
+                    //but this will always get called for when we are getting descendants since many items won't have
                     //children and then we are hitting the database again!
                     //So instead we're going to rely on Examine to have the correct results like it should.
                     return Enumerable.Empty<IPublishedContent>();
                 }
                 catch (FileNotFoundException)
                 {
-                    //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                    //Currently examine is throwing FileNotFound exceptions when we have a load balanced filestore and a node is published in umbraco
                     //See this thread: http://examine.cdodeplex.com/discussions/264341
                     //Catch the exception here for the time being, and just fallback to GetMedia
                 }

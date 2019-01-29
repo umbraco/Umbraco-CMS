@@ -33,10 +33,10 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("name")]
         public string Name { get; set; }
 
-        [Column("date")] // todo: db rename to 'updateDate'
+        [Column("date")] // TODO: db rename to 'updateDate'
         public DateTime UpdateDate { get; set; }
 
-        [Column("availableUserId")] // todo: db rename to 'updateDate'
+        [Column("availableUserId")] // TODO: db rename to 'updateDate'
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? UpdateUserId { get => _updateUserId == 0 ? null : _updateUserId; set => _updateUserId = value; } //return null if zero

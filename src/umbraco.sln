@@ -70,7 +70,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378
 	ProjectSection(SolutionItems) = preProject
 		..\build\NuSpecs\tools\applications.config.install.xdt = ..\build\NuSpecs\tools\applications.config.install.xdt
 		..\build\NuSpecs\tools\ClientDependency.config.install.xdt = ..\build\NuSpecs\tools\ClientDependency.config.install.xdt
-		..\build\NuSpecs\tools\Dashboard.config.install.xdt = ..\build\NuSpecs\tools\Dashboard.config.install.xdt
 		..\build\NuSpecs\tools\install.core.ps1 = ..\build\NuSpecs\tools\install.core.ps1
 		..\build\NuSpecs\tools\install.ps1 = ..\build\NuSpecs\tools\install.ps1
 		..\build\NuSpecs\tools\Readme.txt = ..\build\NuSpecs\tools\Readme.txt

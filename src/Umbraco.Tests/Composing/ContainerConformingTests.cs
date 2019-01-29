@@ -143,12 +143,11 @@ namespace Umbraco.Tests.Composing
         }
 
         [Test]
-        public void SingletonServiceIsUnique() // fixme - but what is LightInject actually doing
+        public void SingletonServiceIsUnique() // FIXME: but what is LightInject actually doing
         {
             var register = GetRegister();
 
-            // fixme
-            // LightInject is 'unique' per serviceType+serviceName
+            // FIXME: LightInject is 'unique' per serviceType+serviceName
             // but that's not how all containers work
             // and we should not rely on it
             // if we need unique, use RegisterUnique

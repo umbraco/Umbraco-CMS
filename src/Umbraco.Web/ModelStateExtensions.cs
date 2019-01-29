@@ -87,7 +87,7 @@ namespace Umbraco.Web
             // if there are assigned member names, we combine the member name with the owner name
             // so that we can try to match it up to a real field. otherwise, we assume that the
             // validation message is for the overall owner.
-            // Owner = the component being validated, like a content property but could be just an html field on another editor
+            // Owner = the component being validated, like a content property but could be just an HTML field on another editor
 
             var withNames = false;
             var delimitedParts = string.Join(".", parts);

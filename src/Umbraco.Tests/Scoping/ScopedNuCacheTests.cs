@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Scoping
 
             // the cache refresher component needs to trigger to refresh caches
             // but then, it requires a lot of plumbing ;(
-            // fixme - and we cannot inject a DistributedCache yet
+            // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Composition.RegisterUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
             Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());

@@ -86,7 +86,7 @@ namespace Umbraco.Web
         // which means that this will be called *many* times for different apps when Umbraco runs
         public override void Init()
         {
-            // note: base.Init() is what initializes all of the httpmodules, ties up a bunch of stuff with IIS, etc...
+            // note: base.Init() is what initializes all of the http modules, ties up a bunch of stuff with IIS, etc...
             // therefore, since OWIN is an HttpModule when running in IIS/ASP.Net the OWIN startup is not executed
             // until this method fires and by that time - Umbraco has booted already
 

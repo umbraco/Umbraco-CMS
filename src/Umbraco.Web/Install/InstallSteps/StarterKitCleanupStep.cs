@@ -26,13 +26,13 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
 
-            //todo: When does the zip file get deleted?
+            // TODO: When does the zip file get deleted?
         }
 
         public override bool RequiresExecution(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the preious one completed - because it has stored some information we need
+            //this step relies on the previous one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("packageId")) == false)
             {
                 return false;

@@ -251,7 +251,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
-            //todo inject examine manager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -272,7 +272,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
         {
-            //todo inject examine manager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -749,9 +749,9 @@ namespace Umbraco.Web
         /// <remarks>
         /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
         /// </remarks>
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
         {
-            return parentNodes.SelectMany(x => x.DescendantsOrSelf(docTypeAlias, culture));
+            return parentNodes.SelectMany(x => x.DescendantsOrSelfOfType(docTypeAlias, culture));
         }
 
         /// <summary>
@@ -799,7 +799,7 @@ namespace Umbraco.Web
             return content.DescendantsOrSelf(false, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias, culture);
         }
@@ -826,7 +826,7 @@ namespace Umbraco.Web
             return content.DescendantsOrSelf(true, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias, culture);
         }
@@ -853,7 +853,7 @@ namespace Umbraco.Web
             return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IPublishedContent DescendantOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
@@ -880,7 +880,7 @@ namespace Umbraco.Web
             return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
@@ -954,14 +954,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content)); // fixme/task wtf is this?
-
-            return content.Children.Where(x =>
-            {
-                if (!x.ContentType.VariesByCulture()) return true; // invariant = always ok
-                return x.HasCulture(culture);
-                return false;
-            });
+            if (content == null) throw new ArgumentNullException(nameof(content));
 
             return content.Children.WhereIsInvariantOrHasCulture(culture);
         }
@@ -1017,7 +1010,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null) // fixme/task oops
+        public static IPublishedContent FirstChildOfType(this IPublishedContent content, string alias, string culture = null)
         {
             return content.Children(culture,alias).FirstOrDefault();
         }

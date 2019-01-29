@@ -234,8 +234,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var updatedItem = repository.Get(user.Id);
 
-                // fixme
-                // this test cannot work, user has 2 sections but the way it's created,
+                // FIXME: this test cannot work, user has 2 sections but the way it's created,
                 // they don't show, so the comparison with updatedItem fails - fix!
 
                 // Assert

@@ -68,9 +68,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 throw new ArgumentException("Both draftData and publishedData cannot be null at the same time.");
 
             if (draftData != null)
-                Draft = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor).CreateModel();
+            {
+                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor);
+                DraftModel = DraftContent.CreateModel();
+            }
+
             if (publishedData != null)
-                Published = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor).CreateModel();
+            {
+                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor);
+                PublishedModel = PublishedContent.CreateModel();
+            }
         }
 
         // clone parent
@@ -89,11 +96,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             CreateDate = origin.CreateDate;
             CreatorId = origin.CreatorId;
 
-            var originDraft = origin.Draft == null ? null : PublishedContent.UnwrapIPublishedContent(origin.Draft);
-            var originPublished = origin.Published == null ? null : PublishedContent.UnwrapIPublishedContent(origin.Published);
+            var originDraft = origin.DraftContent;
+            var originPublished = origin.PublishedContent;
 
-            Draft = originDraft == null ? null : new PublishedContent(this, originDraft, umbracoContextAccessor).CreateModel();
-            Published = originPublished == null ? null : new PublishedContent(this, originPublished, umbracoContextAccessor).CreateModel();
+
+            DraftContent = new PublishedContent(this, originDraft, umbracoContextAccessor);
+            PublishedContent = new PublishedContent(this, originPublished, umbracoContextAccessor);
+            DraftModel = DraftContent?.CreateModel();
+            PublishedModel = PublishedContent?.CreateModel();
 
             ChildContentIds = new List<int>(origin.ChildContentIds); // needs to be *another* list
         }
@@ -111,11 +121,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             CreateDate = origin.CreateDate;
             CreatorId = origin.CreatorId;
 
-            var originDraft = origin.Draft == null ? null : PublishedContent.UnwrapIPublishedContent(origin.Draft);
-            var originPublished = origin.Published == null ? null : PublishedContent.UnwrapIPublishedContent(origin.Published);
+            var originDraft = origin.DraftContent;
+            var originPublished = origin.PublishedContent;
 
-            Draft = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor).CreateModel();
-            Published = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor).CreateModel();
+
+            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            DraftModel = DraftContent?.CreateModel();
+            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            PublishedModel = PublishedContent?.CreateModel();
 
             ChildContentIds = origin.ChildContentIds; // can be the *same* list
         }
@@ -134,9 +147,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public readonly int CreatorId;
 
         // draft and published version (either can be null, but not both)
+        // are the direct PublishedContent instances
+        public PublishedContent DraftContent;
+        public PublishedContent PublishedContent;
+
+        // draft and published version (either can be null, but not both)
         // are models not direct PublishedContent instances
-        public IPublishedContent Draft;
-        public IPublishedContent Published;
+        public IPublishedContent DraftModel;
+        public IPublishedContent PublishedModel;
 
         public ContentNode CloneParent(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
@@ -147,21 +165,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public ContentNodeKit ToKit()
         {
-            var draft = Draft is PublishedContentModel draftModel
-                ? (PublishedContent) draftModel.Unwrap()
-                : (PublishedContent) Draft;
-
-            var published = Published is PublishedContentModel publishedModel
-                ? (PublishedContent) publishedModel.Unwrap()
-                : (PublishedContent) Published;
-
             return new ContentNodeKit
             {
                 Node = this,
                 ContentTypeId = ContentType.Id,
 
-                DraftData = draft?._contentData,
-                PublishedData = published?._contentData
+                DraftData = DraftContent?.ContentData,
+                PublishedData = PublishedContent?.ContentData
             };
         }
     }

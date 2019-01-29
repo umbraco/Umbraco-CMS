@@ -59,7 +59,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
 
             //check if response is ysod
             if (err.status && err.status >= 500) {
-                //TODO: All YSOD handling should be done with an interceptor
+                // TODO: All YSOD handling should be done with an interceptor
                 overlayService.ysod(err);
             }
 

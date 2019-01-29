@@ -14,7 +14,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         XElement Serialize(IContent content,
                 bool published,
-                bool withDescendants = false) //todo take care of usage! only used for the packager
+                bool withDescendants = false) // TODO: take care of usage! only used for the packager
             ;
 
         /// <summary>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -16,9 +15,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentNode _contentNode;
-        // ReSharper disable once InconsistentNaming
-        internal readonly ContentData _contentData; // internal for ContentNode cloning
-
         private readonly string _urlSegment;
 
         #region Constructors
@@ -31,13 +27,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IUmbracoContextAccessor umbracoContextAccessor) :base(umbracoContextAccessor)
         {
             _contentNode = contentNode;
-            _contentData = contentData;
+            ContentData = contentData;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
             VariationContextAccessor = variationContextAccessor;
 
-            _urlSegment = _contentData.Name.ToUrlSegment();
-            IsPreviewing = _contentData.Published == false;
+            _urlSegment = ContentData.Name.ToUrlSegment();
+            IsPreviewing = ContentData.Published == false;
 
             var properties = new List<IPublishedProperty>();
             foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
@@ -81,7 +77,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;
-            _contentData = origin._contentData;
+            ContentData = origin.ContentData;
 
             _urlSegment = origin._urlSegment;
             IsPreviewing = origin.IsPreviewing;
@@ -100,7 +96,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;
             _contentNode = origin._contentNode;
-            _contentData = origin._contentData;
+            ContentData = origin.ContentData;
 
             _urlSegment = origin._urlSegment;
             IsPreviewing = true;
@@ -182,6 +178,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region PublishedContent
 
+        internal ContentData ContentData { get; }
+
         /// <inheritdoc />
         public override int Id => _contentNode.Id;
 
@@ -191,11 +189,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             get
             {
                 if (!ContentType.VariesByCulture())
-                    return _contentData.Name;
+                    return ContentData.Name;
 
                 var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
                 if (culture == "")
-                    return _contentData.Name;
+                    return ContentData.Name;
 
                 return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
             }
@@ -227,7 +225,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override string Path => _contentNode.Path;
 
         /// <inheritdoc />
-        public override int? TemplateId => _contentData.TemplateId;
+        public override int? TemplateId => ContentData.TemplateId;
 
         /// <inheritdoc />
         public override int CreatorId => _contentNode.CreatorId;
@@ -239,13 +237,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override DateTime CreateDate => _contentNode.CreateDate;
 
         /// <inheritdoc />
-        public override int WriterId => _contentData.WriterId;
+        public override int WriterId => ContentData.WriterId;
 
         /// <inheritdoc />
-        public override string WriterName => GetProfileNameById(_contentData.WriterId);
+        public override string WriterName => GetProfileNameById(ContentData.WriterId);
 
         /// <inheritdoc />
-        public override DateTime UpdateDate => _contentData.VersionDate;
+        public override DateTime UpdateDate => ContentData.VersionDate;
 
         private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
 
@@ -275,9 +273,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (_cultureInfos != null) return _cultureInfos;
 
-                if (_contentData.CultureInfos == null)
+                if (ContentData.CultureInfos == null)
                     throw new Exception("oops: _contentDate.CultureInfos is null.");
-                return _cultureInfos = _contentData.CultureInfos
+                return _cultureInfos = ContentData.CultureInfos
                     .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
@@ -289,7 +287,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override bool IsDraft(string culture = null)
         {
             // if this is the 'published' published content, nothing can be draft
-            if (_contentData.Published)
+            if (ContentData.Published)
                 return false;
 
             // not the 'published' published content, and does not vary = must be draft
@@ -302,7 +300,32 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // not the 'published' published content, and varies
             // = depends on the culture
-            return _contentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
+            return ContentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
+        }
+
+        /// <inheritdoc />
+        public override bool IsPublished(string culture = null)
+        {
+            // whether we are the 'draft' or 'published' content, need to determine whether
+            // there is a 'published' version for the specified culture (or at all, for
+            // invariant content items)
+
+            // if there is no 'published' published content, no culture can be published
+            var hasPublished = _contentNode.PublishedContent != null;
+            if (!hasPublished)
+                return false;
+
+            // if there is a 'published' published content, and does not vary = published
+            if (!ContentType.VariesByCulture())
+                return true;
+
+            // handle context culture
+            if (culture == null)
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+
+            // there is a 'published' published content, and varies
+            // = depends on the culture
+            return _contentNode.PublishedContent.ContentData.CultureInfos.ContainsKey(culture);
         }
 
         #endregion
@@ -365,7 +388,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // notes:
             // _contentNode.ChildContentIds is an unordered int[]
-            // need needs to fetch & sort - do it only once, lazyily, though
+            // needs to fetch & sort - do it only once, lazily, though
             // Q: perfs-wise, is it better than having the store managed an ordered list
         }
 

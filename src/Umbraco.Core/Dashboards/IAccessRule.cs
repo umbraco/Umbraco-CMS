@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Core.Configuration.Dashboard
+﻿using Newtonsoft.Json;
+using Umbraco.Core.Manifest;
+
+namespace Umbraco.Core.Dashboards
 {
     /// <summary>
     /// Represents an access rule.

@@ -55,7 +55,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public class PropertyValue
         {
-            //TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
+            // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
             // class to deal with change tracking which variants have changed
 
             private string _culture;
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Models
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            //TODO: This allows us to track changes for an entire Property, but doesn't allow us to track changes at the variant level
+            // TODO: This allows us to track changes for an entire Property, but doesn't allow us to track changes at the variant level
             public readonly PropertyInfo ValuesSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Values);
 
             public readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
@@ -347,7 +347,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         internal bool IsValid(string culture = "*", string segment = "*")
         {
-            //todo - validating values shouldn't be done here, this calls in to IsValidValue
+            // TODO: validating values shouldn't be done here, this calls in to IsValidValue
 
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
@@ -388,7 +388,7 @@ namespace Umbraco.Core.Models
         /// <returns>True is property value is valid, otherwise false</returns>
         private bool IsValidValue(object value)
         {
-            //todo - this shouldn't exist here, the model itself shouldn't be responsible for it's own validation and this requires singleton access
+            // TODO: this shouldn't exist here, the model itself shouldn't be responsible for it's own validation and this requires singleton access
             return PropertyType.IsPropertyValueValid(value);
         }
 

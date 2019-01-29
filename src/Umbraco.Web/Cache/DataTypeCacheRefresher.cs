@@ -56,7 +56,7 @@ namespace Umbraco.Web.Cache
                 _idkMap.ClearCache(payload.Id);
             }
 
-            // todo - not sure I like these?
+            // TODO: not sure I like these?
             TagsValueConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
 

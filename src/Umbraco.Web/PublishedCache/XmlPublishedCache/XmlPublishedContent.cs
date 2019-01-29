@@ -72,6 +72,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private int _level;
         private bool _isDraft;
 
+
         public override IEnumerable<IPublishedContent> Children
         {
             get
@@ -236,6 +237,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return _isDraft; // bah
         }
 
+        public override bool IsPublished(string culture = null)
+        {
+            EnsureNodeInitialized();
+            return true; // Intentionally not implemented, because the XmlPublishedContent should not support this.
+        }
+
         public override IEnumerable<IPublishedProperty> Properties
         {
             get
@@ -377,7 +384,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
             catch (InvalidOperationException e)
             {
-                // todo - enable!
+                // TODO: enable!
                 //content.Instance.RefreshContentFromDatabase();
                 throw new InvalidOperationException($"{e.Message}. This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.");
             }

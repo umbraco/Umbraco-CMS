@@ -159,7 +159,7 @@ namespace Umbraco.Core.Persistence
 
         #region OnSomething
 
-        // todo - has new interceptors to replace OnSomething?
+        // TODO: has new interceptors to replace OnSomething?
 
         protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
@@ -218,7 +218,7 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // todo these escapes should be builtin
+                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
