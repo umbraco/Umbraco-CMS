@@ -2049,4 +2049,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
   </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Getting Started</key>
+    <key alias="contentRedirectManager">Redirect URL Management</key>
+    <key alias="mediaFolderBrowser">Content</key>
+    <key alias="settingsWelcome">Welcome</key>
+    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsModelsBuilder">Models Builder</key>
+    <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="memberIntro">Getting Started</key>
+    <key alias="formsInstall">Install Umbraco Forms</key>
+  </area>
 </language>

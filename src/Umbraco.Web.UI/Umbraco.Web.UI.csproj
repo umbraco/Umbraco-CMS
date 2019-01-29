@@ -105,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.33</Version>
+      <Version>8.0.0-alpha.34</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -212,6 +212,8 @@
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
       <SubType>Designer</SubType>
+    <None Include="Config\feedProxy.Release.config">
+      <DependentUpon>feedProxy.config</DependentUpon>
     </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
@@ -308,6 +310,7 @@
     <Content Include="Config\Dashboard.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Config\404handlers.config" />
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>

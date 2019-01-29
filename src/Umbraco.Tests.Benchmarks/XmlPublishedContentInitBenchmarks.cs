@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml10.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out isPublished, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml100.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft,  out isPublished,out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml1000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out isPublished,out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft,out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Benchmarks
             XmlPublishedContent.InitializeNode(null, _xml10000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out createDate, out updateDate, out level, out isDraft, out isPublished,out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft,out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 

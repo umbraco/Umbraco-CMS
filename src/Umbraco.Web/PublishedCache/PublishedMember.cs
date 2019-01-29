@@ -19,7 +19,11 @@ namespace Umbraco.Web.PublishedCache
         private readonly IPublishedProperty[] _properties;
         private readonly PublishedContentType _publishedMemberType;
 
-        public PublishedMember(IMember member, PublishedContentType publishedMemberType)
+        public PublishedMember(
+            IMember member,
+            PublishedContentType publishedMemberType,
+            IUmbracoContextAccessor umbracoContextAccessor)
+            :base(umbracoContextAccessor)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;
