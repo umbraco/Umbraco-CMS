@@ -9,8 +9,8 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Components
 {

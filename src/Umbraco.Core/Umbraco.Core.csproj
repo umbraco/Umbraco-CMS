@@ -454,6 +454,8 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Trees\IBackOfficeSection.cs" />
+    <Compile Include="PackageActions\AllowDoctype.cs" />
+    <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
@@ -1516,9 +1518,9 @@
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
-    <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollection.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollectionBuilder.cs" />
+    <Compile Include="PackageActions\IPackageAction.cs" />
+    <Compile Include="PackageActions\PackageActionCollection.cs" />
+    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>

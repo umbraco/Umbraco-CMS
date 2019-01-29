@@ -1,8 +1,7 @@
-using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Core._Legacy.PackageActions
+namespace Umbraco.Core.PackageActions
 {
     public interface IPackageAction : IDiscoverable
     {

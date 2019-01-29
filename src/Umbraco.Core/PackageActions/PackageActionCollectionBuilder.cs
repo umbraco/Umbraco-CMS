@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Composing;
 
-namespace Umbraco.Core._Legacy.PackageActions
+namespace Umbraco.Core.PackageActions
 {
     internal class PackageActionCollectionBuilder : LazyCollectionBuilderBase<PackageActionCollectionBuilder, PackageActionCollection, IPackageAction>
     {

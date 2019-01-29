@@ -1135,8 +1135,6 @@
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
-    <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
-    <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
     <Compile Include="Models\ContentEditing\NotificationStyle.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
