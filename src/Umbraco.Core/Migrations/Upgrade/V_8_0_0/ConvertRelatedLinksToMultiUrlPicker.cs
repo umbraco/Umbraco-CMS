@@ -26,12 +26,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var dataTypes = Database.Fetch<DataTypeDto>(sqlDataTypes);
             var dataTypeIds = dataTypes.Select(x => x.NodeId).ToList();
 
+            if (dataTypeIds.Count == 0) return;
+
             var sqlPropertyTpes = Sql()
                 .Select<PropertyTypeDto>()
                 .From<PropertyTypeDto>()
                 .Where<PropertyTypeDto>(x => dataTypeIds.Contains(x.DataTypeId));
 
-            var propertyTypeIds = Database.Fetch<PropertyTypeDto>(sqlPropertyTpes).Select(x => x.Id);
+            var propertyTypeIds = Database.Fetch<PropertyTypeDto>(sqlPropertyTpes).Select(x => x.Id).ToList();
+
+            if (propertyTypeIds.Count == 0) return;
 
             var sqlPropertyData = Sql()
                 .Select<PropertyDataDto>()
@@ -41,7 +45,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
 
             // Create a Multi URL Picker datatype for the converted RelatedLinks data
-            if (properties.Any() == false)
+            if (!properties.Any())
                 return;
 
             foreach (var property in properties)
