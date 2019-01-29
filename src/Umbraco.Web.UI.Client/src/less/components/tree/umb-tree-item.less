@@ -2,7 +2,11 @@
     display: block;
     min-width: 100%;
     width: auto;
-
+    
+    .umb-tree-item__label {
+        user-select: none;
+    }
+    
     &:hover ins {
         visibility: visible;
         cursor: pointer
@@ -14,7 +18,7 @@
     &:hover .umb-tree-item__label {
         overflow: hidden;
         margin-right: 6px;
-    }    
+    }
     
     // Loading Animation
     // ------------------------
@@ -47,7 +51,7 @@
     
     // override small icon color. TODO => check usage 
     &:before {
-        color: @pink;
+        color: @blue;
     }
     
     .umb-options {
