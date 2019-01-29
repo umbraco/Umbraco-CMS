@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -89,7 +88,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         // Should only have a URL if it's an external link otherwise it wil be a UDI 
                         Url = relatedLink.IsInternal == false ? relatedLink.Link : null
                     };
-                    
+
                     links.Add(link);
                 }
 
