@@ -6,7 +6,7 @@
  * @description
  * The controller for editing macros parameters
  */
-function MacrosParametersController($scope, editorService) {
+function MacrosParametersController($scope, editorService, localizationService) {
 
     $scope.sortableOptions = {
         axis: 'y',
@@ -73,6 +73,20 @@ function MacrosParametersController($scope, editorService) {
 
     }
 
+    function setDirty() {
+        $scope.model.setDirty();
+    }
+
+    function init() {
+        localizationService.localizeMany(["macro_addParameter", "macro_editParameter"]).then(function (data) {
+            $scope.labels = {
+                addParameter: data[0],
+                editParameter: data[1]
+            }
+        });
+    }
+
+    init();
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Macros.ParametersController", MacrosParametersController);
