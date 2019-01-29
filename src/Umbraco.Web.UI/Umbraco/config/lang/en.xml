@@ -1545,6 +1545,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
     <key alias="editParameter">Edit parameter</key>
+    <key alias="parameters">Parameters</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>

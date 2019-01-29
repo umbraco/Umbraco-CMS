@@ -1268,6 +1268,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
     <key alias="editParameter">Rediger parameter</key>
+    <key alias="parameters">Parametre</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
