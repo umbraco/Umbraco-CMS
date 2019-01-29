@@ -9,10 +9,10 @@ using Umbraco.Core;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
-using umbraco;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Templates
@@ -184,9 +184,9 @@ namespace Umbraco.Web.Templates
         private void SetNewItemsOnContextObjects(PublishedRequest request)
         {
             // handlers like default.aspx will want it and most macros currently need it
-            request.UmbracoPage = new page(request);
+            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
             //now, set the new ones for this page execution
-            _umbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
+            _umbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
             _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContext.PublishedRequest = request;
         }

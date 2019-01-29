@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Web;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.Routing
 {
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
         private CultureInfo _culture;
         private IPublishedContent _publishedContent;
         private IPublishedContent _initialPublishedContent; // found by finders before 404, redirects, etc
-        private page _umbracoPage; // legacy
+        private PublishedContentHashtableConverter _umbracoPage; // legacy
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
@@ -478,9 +478,9 @@ namespace Umbraco.Web.Routing
 
         #region Legacy
 
-        // for legacy/webforms code -
+        // for legacy/webforms/macro code -
         // TODO: get rid of it eventually
-        internal page UmbracoPage
+        internal PublishedContentHashtableConverter LegacyContentHashTable
         {
             get
             {
@@ -489,7 +489,7 @@ namespace Umbraco.Web.Routing
 
                 return _umbracoPage;
             }
-            set { _umbracoPage = value; }
+            set => _umbracoPage = value;
         }
 
         #endregion

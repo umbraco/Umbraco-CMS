@@ -11,7 +11,6 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using NUnit.Framework;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;

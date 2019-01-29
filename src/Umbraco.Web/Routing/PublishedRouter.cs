@@ -5,7 +5,6 @@ using System.Threading;
 using System.Globalization;
 using System.IO;
 using System.Web.Security;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -14,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Routing
@@ -205,10 +205,10 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the request
             // handlers like default.aspx will want it and most macros currently need it
-            frequest.UmbracoPage = new page(frequest);
+            frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest);
 
             // used by many legacy objects
-            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.UmbracoPage.Elements;
+            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.LegacyContentHashTable.Elements;
 
             return true;
         }
@@ -251,10 +251,10 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
-            request.UmbracoPage = new page(request);
+            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
 
             // this is used by many legacy objects
-            request.UmbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
+            request.UmbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
         }
 
         #endregion

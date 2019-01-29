@@ -1173,7 +1173,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\page.cs">
+    <Compile Include="Macros\PublishedContentHashtableConverter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
