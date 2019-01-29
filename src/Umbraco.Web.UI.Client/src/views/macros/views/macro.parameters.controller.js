@@ -12,7 +12,7 @@ function MacrosParametersController($scope, editorService) {
         axis: 'y',
         containment: 'parent',
         cursor: 'move',
-        items: 'div.umb-stylesheet-rules__listitem',
+        items: 'div.umb-prevalues-multivalues__listitem',
         handle: '.handle',
         tolerance: 'pointer',
         update: function (e, ui) {
