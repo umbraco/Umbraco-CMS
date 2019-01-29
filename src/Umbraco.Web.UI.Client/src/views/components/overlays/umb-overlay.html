@@ -67,7 +67,7 @@
 
                 <umb-button
                     alias="overlaySubmit"
-                    button-style="success"
+                    button-style="{{model.submitButtonStyle || 'success'}}"
                     label-key="{{model.submitButtonLabelKey}}"
                     label="{{model.submitButtonLabel}}"
                     ng-if="model.submit && model.hideSubmitButton !== true"

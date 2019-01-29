@@ -201,7 +201,7 @@ input[type="color"],
   margin-bottom: @baseLineHeight / 2;
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
-  color: @gray-3;
+  color: @gray-2;
   .border-radius(@inputBorderRadius);
   vertical-align: middle;
   box-sizing: border-box;
@@ -243,11 +243,12 @@ input[type="color"],
 .uneditable-input {
   background-color: @inputBackground;
   border: 1px solid @inputBorder;
+  
   .transition(~"border linear .2s, box-shadow linear .2s");
 
   // Focus state
   &:focus {
-    border-color: none;
+    border-color: @inputBorderFocus;
     outline: 0;
     outline: none \9; /* IE6-9 */
   }

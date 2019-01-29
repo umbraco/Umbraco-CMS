@@ -230,21 +230,33 @@
 //
 // Media picker
 // --------------------------------------------------
+
+.umb-mediapicker > div {
+    border: 1px solid @inputBorder;
+}
+.umb-mediapicker-single > div {
+    width:144px;
+}
+.umb-mediapicker-multi > div {
+    width:100%;
+}
+
+
 .umb-mediapicker .add-link {
     display: flex;
     justify-content:center;
     align-items:center;
-    width: 120px;
+    //width: 120px;
     text-align: center;
-    color: @gray-8;
-    border: 2px @gray-8 dashed;
+    color: @gray-9;
+    border: 2px @gray-9 dashed;
     text-decoration: none;
 
     transition: all 150ms ease-in-out;
 
     &:hover {
-        color: @turquoise-d1;
-        border-color: @turquoise;
+        color: @ui-action-disgrete-type-hover;
+        border-color: @ui-action-disgrete-type-hover;
     }
 }
 
@@ -283,7 +295,9 @@
 }
 
 .umb-mediapicker .add-link-square {
-  height: 120px;
+  height: 100px;
+  width: 100px;
+  margin: 10px;
 }
 
 
@@ -330,19 +344,28 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    padding: 2px;
+    padding: 5px;
     margin: 5px;
     background: @white;
-    border: 1px solid @gray-10;
+    //border: 1px solid @gray-10;
     max-width: 100%;
 }
+.umb-mediapicker {
+    
+    .umb-sortable-thumbnails li {
+        border:none;
+    }
+    
+}
+
 
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 0 5px 5px;
-    padding: 5px;
 }
+/*.umb-mediapicker .umb-sortable-thumbnails li.add-wrapper {
+    padding: 0px;
+}*/
 
 .umb-sortable-thumbnails li:hover a {
     display: flex;
@@ -445,6 +468,9 @@
     align-items: center;
     margin-left: 5px;
     text-decoration: none;
+    
+    //border-color: @inputBorder;
+    .box-shadow(0 1px 2px rgba(0,0,0,0.25));
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__action.-red {
@@ -828,7 +854,7 @@
         cursor: default;
         margin: 7px;
         padding: 10px;
-        background: @turquoise;
+        background: @ui-action;
         position: relative;
 
         .icon-trash{

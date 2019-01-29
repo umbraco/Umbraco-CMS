@@ -302,7 +302,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 // TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
-
+                
                 var css = [];
                 if (node.cssClasses) {
                     _.each(node.cssClasses, function (c) {

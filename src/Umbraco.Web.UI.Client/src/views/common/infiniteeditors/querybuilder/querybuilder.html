@@ -26,7 +26,7 @@
 
 									<umb-button
 										type="button"
-										button-style="outline"
+										button-style="action"
 										action="vm.contentTypeSelectOpen = !vm.contentTypeSelectOpen"
 										label="{{vm.query.contentType.name}}"
 										show-caret="true">
@@ -46,7 +46,7 @@
 
 								<umb-button
 									type="button"
-									button-style="outline"
+									button-style="action"
 									action="vm.chooseSource(vm.query)"
 									label="{{vm.query.source.name}}">
 								</umb-button>
@@ -66,7 +66,7 @@
 
 									<umb-button
 										type="button"
-										button-style="outline"
+										button-style="action"
 										action="vm.propertyFilterOpen[$index] = !vm.propertyFilterOpen[$index]"
 										label="{{filter.property.name}}"
 										show-caret="true">
@@ -86,7 +86,7 @@
 
 									<umb-button
 										type="button"
-										button-style="outline"
+										button-style="action"
 										action="vm.termFilterOpen[$index] = !vm.termFilterOpen[$index]"
 										label="{{filter.term.name}}"
 										show-caret="true">
@@ -135,7 +135,7 @@
 
 									<umb-button
 										type="button"
-										button-style="outline"
+										button-style="action"
 										action="vm.sortPropertyOpen = !vm.sortPropertyOpen"
 										label="{{vm.query.sort.property.name}}"
 										show-caret="true">
@@ -154,7 +154,7 @@
 								<umb-button
 									ng-show="vm.query.sort.property.name"
 									type="button"
-									button-style="outline"
+									button-style="action"
 									action="vm.changeSortOrder(vm.query)"
 									label="{{vm.query.sort.translation.currentLabel}}">
 								</umb-button>

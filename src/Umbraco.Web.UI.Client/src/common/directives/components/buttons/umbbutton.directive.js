@@ -14,7 +14,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
         <umb-button
             action="vm.clickButton()"
             type="button"
-            button-style="success"
+            button-style="action"
             state="vm.buttonState"
             shortcut="ctrl+c"
             label="My button"
