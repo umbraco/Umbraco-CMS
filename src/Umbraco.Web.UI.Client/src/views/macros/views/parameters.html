@@ -11,8 +11,7 @@
                         <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="parameter in model.macro.parameters track by $id(parameter)">
                             <i class="icon icon-navigation handle"></i>
                             <div class="umb-prevalues-multivalues__left">
-                                <span>{{parameter.label}}</span> <span>({{parameter.key}})</span><br>
-                                <small>{{parameter.editor}}</small>
+                                <span>{{parameter.label}}</span>&nbsp;<span class="muted">({{parameter.key}})</span>:&nbsp;<small>{{parameter.editor}}</small>
                             </div>
                             <div class="umb-prevalues-multivalues__right">
                                 <a class="umb-node-preview__action" ng-click="edit(parameter, $event)"><localize key="general_edit">Edit</localize></a>
