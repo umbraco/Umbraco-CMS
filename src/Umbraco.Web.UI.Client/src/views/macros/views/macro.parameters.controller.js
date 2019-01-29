@@ -31,7 +31,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
     $scope.add = function (evt) {
         evt.preventDefault();
 
-        openOverlay({}, 'Add parameter', (newParameter) => {
+        openOverlay({}, $scope.labels.addParameter, (newParameter) => {
             if (!$scope.model.macro.parameters) {
                 $scope.model.macro.parameters = [];
             }
@@ -43,7 +43,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
     $scope.edit = function (parameter, evt) {
         evt.preventDefault();
 
-        openOverlay(parameter,'Edit parameter', (newParameter) => {
+        openOverlay(parameter, $scope.labels.editParameter, (newParameter) => {
             parameter.key = newParameter.key;
             parameter.label = newParameter.label;
             parameter.editor = newParameter.editor;
