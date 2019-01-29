@@ -27,6 +27,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (dataTypeIds.Count == 0) return;
 
+            foreach (var dataType in dataTypes)
+            {
+                dataType.EditorAlias = Constants.PropertyEditors.Aliases.MultiUrlPicker;
+                Database.Update(dataType);
+            }
+
             var sqlPropertyTpes = Sql()
                 .Select<PropertyTypeDto>()
                 .From<PropertyTypeDto>()
@@ -44,9 +50,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
 
             // Create a Multi URL Picker datatype for the converted RelatedLinks data
-            if (!properties.Any())
-                return;
-
+            
             foreach (var property in properties)
             {
                 var value = property.Value.ToString();
@@ -99,17 +103,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Database.Update(property);
             }
 
-            foreach (var dataType in dataTypes)
-            {
-                // Change existing datatypes from RelatedLinks to MultiUrlPicker
-                var dataTypeResult = Database.Fetch<DataTypeDto>(Sql()
-                        .Select<DataTypeDto>()
-                        .From<DataTypeDto>()
-                        .Where<DataTypeDto>(x => x.NodeId == dataType.NodeId)).First();
-
-                dataTypeResult.EditorAlias = Constants.PropertyEditors.Aliases.MultiUrlPicker;
-                Database.Update(dataTypeResult);
-            }
+            
         }
     }
 
