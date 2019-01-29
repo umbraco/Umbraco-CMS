@@ -1524,9 +1524,6 @@
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Sync\ServerSyncWebServiceClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
