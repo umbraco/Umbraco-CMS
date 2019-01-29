@@ -16,7 +16,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
         handle: '.handle',
         tolerance: 'pointer',
         update: function (e, ui) {
-            $scope.model.setDirty();
+            setDirty();
         }
     };
 
@@ -25,7 +25,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
         evt.preventDefault();
 
         $scope.model.macro.parameters = _.without($scope.model.macro.parameters, parameter);
-        $scope.model.setDirty();
+        setDirty();
     }
 
     $scope.add = function (evt) {
@@ -36,7 +36,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
                 $scope.model.macro.parameters = [];
             }
             $scope.model.macro.parameters.push(newParameter);
-            $scope.model.setDirty();
+            setDirty();
         });
     }
 
@@ -48,7 +48,7 @@ function MacrosParametersController($scope, editorService, localizationService) 
             parameter.label = newParameter.label;
             parameter.editor = newParameter.editor;
             parameter.editor = newParameter.editor;
-            $scope.model.setDirty();
+            setDirty();
         });
     }
 
