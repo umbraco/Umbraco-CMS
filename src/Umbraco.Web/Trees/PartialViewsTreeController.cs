@@ -10,10 +10,10 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// Tree for displaying partial views in the settings app
     /// </summary>
-    [Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, null, sortOrder: 7)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, SortOrder = 7, TreeGroup = Constants.Trees.Groups.Templating)]
     [UmbracoTreeAuthorize(Constants.Trees.PartialViews)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
+    [CoreTree]
     public class PartialViewsTreeController : FileSystemTreeController
     {
         protected override IFileSystem FileSystem => Current.FileSystems.PartialViewsFileSystem;

@@ -235,7 +235,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     $scope.loading = true;
                     
                     //default args
-                    var args = { section: $scope.section, tree: $scope.treealias, cacheKey: $scope.cachekey, isDialog: $scope.isdialog ? $scope.isdialog : false, onlyinitialized: $scope.onlyInitialized };
+                    var args = { section: $scope.section, tree: $scope.treealias, cacheKey: $scope.cachekey, isDialog: $scope.isdialog ? $scope.isdialog : false };
 
                     //add the extra query string params if specified
                     if ($scope.customtreeparams) {

@@ -8,7 +8,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Packages)]
-    [Tree(Constants.Applications.Packages, Constants.Trees.Packages, null, sortOrder: 0, isSingleNodeTree: true)]
+    [Tree(Constants.Applications.Packages, Constants.Trees.Packages, SortOrder = 0, IsSingleNodeTree = true)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class PackagesTreeController : TreeController

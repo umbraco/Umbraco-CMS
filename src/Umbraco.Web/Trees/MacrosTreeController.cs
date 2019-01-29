@@ -12,9 +12,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Macros, "Macros", sortOrder: 4)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class MacrosTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

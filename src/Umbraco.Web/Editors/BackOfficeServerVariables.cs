@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
@@ -158,7 +159,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null))
+                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
                         },
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -352,7 +353,10 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoPlugins", new Dictionary<string, object>
                     {
-                        {"trees", GetTreePluginsMetaData()}
+                        // for each tree that is [PluginController], get
+                        // alias -> areaName
+                        // so that routing (route.js) can look for views
+                        { "trees", GetPluginTrees().ToArray() }
                     }
                 },
                 {
@@ -393,43 +397,42 @@ namespace Umbraco.Web.Editors
             return defaultVals;
         }
 
-        private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
+        [DataContract]
+        private class PluginTree
         {
-            var treeTypes = TreeControllerTypes.Value;
-            //get all plugin trees with their attributes
-            var treesWithAttributes = treeTypes.Select(x => new
-            {
-                tree = x,
-                attributes =
-                x.GetCustomAttributes(false)
-            }).ToArray();
+            [DataMember(Name = "alias")]
+            public string Alias { get; set; }
 
-            var pluginTreesWithAttributes = treesWithAttributes
-                //don't resolve any tree decorated with CoreTreeAttribute
-                .Where(x => x.attributes.All(a => (a is CoreTreeAttribute) == false))
-                //we only care about trees with the PluginControllerAttribute
-                .Where(x => x.attributes.Any(a => a is PluginControllerAttribute))
-                .ToArray();
-
-            return (from p in pluginTreesWithAttributes
-                    let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
-                    let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
-                    select new Dictionary<string, string>
-                {
-                    {"alias", treeAttr.TreeAlias}, {"packageFolder", pluginAttr.AreaName}
-                }).ToArray();
-
+            [DataMember(Name = "packageFolder")]
+            public string PackageFolder { get; set; }
         }
 
-        /// <summary>
-        /// A lazy reference to all tree controller types
-        /// </summary>
-        /// <remarks>
-        /// We are doing this because if we constantly resolve the tree controller types from the PluginManager it will re-scan and also re-log that
-        /// it's resolving which is unnecessary and annoying.
-        /// </remarks>
-        private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes
-            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // TODO: inject
+        private IEnumerable<PluginTree> GetPluginTrees()
+        {
+            // used to be (cached)
+            //var treeTypes = Current.TypeLoader.GetAttributedTreeControllers();
+            //
+            // ie inheriting from TreeController and marked with TreeAttribute
+            //
+            // do this instead
+            // inheriting from TreeControllerBase and marked with TreeAttribute
+            var trees = Current.Factory.GetInstance<TreeCollection>();
+
+            foreach (var tree in trees)
+            {
+                var treeType = tree.TreeControllerType;
+
+                // exclude anything marked with CoreTreeAttribute
+                var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
+                if (coreTree != null) continue;
+
+                // exclude anything not marked with PluginControllerAttribute
+                var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
+                if (pluginController == null) continue;
+
+                yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
+            }
+        }
 
         /// <summary>
         /// Returns the server variables regarding the application state

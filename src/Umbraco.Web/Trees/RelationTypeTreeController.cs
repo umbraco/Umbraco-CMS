@@ -9,9 +9,9 @@ using Umbraco.Web.Actions;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.RelationTypes, null, sortOrder: 5)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.RelationTypes, SortOrder = 5, TreeGroup = Constants.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class RelationTypeTreeController : TreeController
     {
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
