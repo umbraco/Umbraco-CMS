@@ -37,9 +37,6 @@ namespace Umbraco.Web.Cache
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
 
-            //TODO: WB Was I too aggresive with cleanup?
-            AppCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
-
             base.RefreshAll();
         }
 
@@ -109,12 +106,6 @@ namespace Umbraco.Web.Cache
         internal static string[] GetCacheKeysForAlias(string alias)
         {
             return GetAllMacroCacheKeys().Select(x => x + alias).ToArray();
-        }
-
-        public static void ClearMacroContentCache(AppCaches appCaches)
-        {
-            //TODO: WB Was I too aggresive with cleanup?
-            appCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
         }
 
         #endregion

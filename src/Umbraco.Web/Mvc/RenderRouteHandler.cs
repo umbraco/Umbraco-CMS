@@ -347,9 +347,6 @@ namespace Umbraco.Web.Mvc
                 // to Mvc since Mvc can't do much
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
-            if (request.RenderingEngine != RenderingEngine.Mvc) // else ?
-                return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
-
             return null;
         }
 

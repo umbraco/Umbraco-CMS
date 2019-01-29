@@ -154,11 +154,7 @@ namespace Umbraco.Web.Editors
                     break;
 
                 default:
-                    //Throw error
-                    return new HttpResponseMessage(HttpStatusCode.Unauthorized)
-                    {
-                        Content = new StringContent($"The Site {site} and {url} is not on the whitelist"),
-                    };
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
 
 

@@ -30,24 +30,21 @@ namespace Umbraco.Web.Mvc
 
             var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
 
-            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.Mvc)
+            var factory = ControllerBuilder.Current.GetControllerFactory();
+            context.RouteData.Values["action"] = routeDef.ActionName;
+            ControllerBase controller = null;
+
+            try
             {
-                var factory = ControllerBuilder.Current.GetControllerFactory();
-                context.RouteData.Values["action"] = routeDef.ActionName;
-                ControllerBase controller = null;
+                controller = CreateController(context, factory, routeDef);
 
-                try
-                {
-                    controller = CreateController(context, factory, routeDef);
+                CopyControllerData(context, controller);
 
-                    CopyControllerData(context, controller);
-
-                    ExecuteControllerAction(context, controller);
-                }
-                finally
-                {
-                    CleanupController(controller, factory);
-                }
+                ExecuteControllerAction(context, controller);
+            }
+            finally
+            {
+                CleanupController(controller, factory);
             }
         }
 

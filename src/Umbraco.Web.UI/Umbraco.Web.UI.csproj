@@ -206,15 +206,6 @@
       <DependentUpon>tinyMceConfig.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Config\scripting.Release.config">
-      <DependentUpon>scripting.config</DependentUpon>
-    </None>
-    <None Include="Config\Dashboard.Release.config">
-      <DependentUpon>Dashboard.config</DependentUpon>
-      <SubType>Designer</SubType>
-    <None Include="Config\feedProxy.Release.config">
-      <DependentUpon>feedProxy.config</DependentUpon>
-    </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
     <Content Include="Properties\Settings.settings">
@@ -249,7 +240,6 @@
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\scripting.config" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
@@ -307,10 +297,6 @@
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\Dashboard.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Config\404handlers.config" />
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>

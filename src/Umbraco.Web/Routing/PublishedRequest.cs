@@ -6,10 +6,8 @@ using System.Web;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,7 +22,6 @@ namespace Umbraco.Web.Routing
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
         private Uri _uri; // clean uri, no virtual dir, no trailing slash nor .aspx, nothing
-        private ITemplate _template; // template model if any else null
         private bool _is404;
         private DomainAndUri _domain;
         private CultureInfo _culture;
@@ -43,7 +40,6 @@ namespace Umbraco.Web.Routing
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
-            RenderingEngine = RenderingEngine.Unknown;
         }
 
         /// <summary>
@@ -174,8 +170,7 @@ namespace Umbraco.Web.Routing
             // else
 
             // save
-            var template = _template;
-            var renderingEngine = RenderingEngine;
+            var template = TemplateModel;
 
             // set published content - this resets the template, and sets IsInternalRedirect to false
             PublishedContent = content;
@@ -185,8 +180,7 @@ namespace Umbraco.Web.Routing
             if (isInternalRedirect && Current.Configs.Settings().WebRouting.InternalRedirectPreservesTemplate)
             {
                 // restore
-                _template = template;
-                RenderingEngine = renderingEngine;
+                TemplateModel = template;
             }
         }
 
@@ -234,26 +228,12 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets or sets the template model to use to display the requested content.
         /// </summary>
-        internal ITemplate TemplateModel
-        {
-            get
-            {
-                return _template;
-            }
-
-            set
-            {
-                _template = value;
-                RenderingEngine = RenderingEngine.Unknown; // reset
-                if (_template != null)
-                    RenderingEngine = _publishedRouter.FindTemplateRenderingEngine(_template.Alias);
-            }
-        }
+        internal ITemplate TemplateModel { get; set; }
 
         /// <summary>
         /// Gets the alias of the template to use to display the requested content.
         /// </summary>
-        public string TemplateAlias => _template?.Alias;
+        public string TemplateAlias => TemplateModel?.Alias;
 
         /// <summary>
         /// Tries to set the template to use to display the requested content.
@@ -309,7 +289,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets a value indicating whether the content request has a template.
         /// </summary>
-        public bool HasTemplate => _template != null;
+        public bool HasTemplate => TemplateModel != null;
 
         internal void UpdateOnMissingTemplate()
         {
@@ -358,15 +338,6 @@ namespace Umbraco.Web.Routing
 
         // note: do we want to have an ordered list of alternate cultures,
         // to allow for fallbacks when doing dictionary lookup and such?
-
-        #endregion
-
-        #region Rendering
-
-        /// <summary>
-        /// Gets or sets whether the rendering engine is MVC or WebForms.
-        /// </summary>
-        public RenderingEngine RenderingEngine { get; internal set; }
 
         #endregion
 

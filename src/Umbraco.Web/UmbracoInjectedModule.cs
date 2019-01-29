@@ -270,12 +270,12 @@ namespace Umbraco.Web
                     ReportRuntime(level, "Umbraco is booting.");
 
                     // let requests pile up and wait for 10s then show the splash anyway
-                    if (Current.Configs.Settings().Content.EnableSplashWhileLoading == false
-                        && ((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
+                    //fixme: Do we want this for some insane reason? no other site in history has this
+                    if (((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
 
                     // redirect to booting page
                     httpContext.Response.StatusCode = 503; // temp not available
-                    const string bootUrl = "~/config/splashes/booting.aspx";
+                    const string bootUrl = "~/config/splashes/booting.aspx"; //fixme: remove booting.aspx once the above question is resolved
                     httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
                     httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
                     return false; // cannot serve content

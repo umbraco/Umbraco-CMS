@@ -136,31 +136,22 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            switch (request.RenderingEngine)
+            var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
             {
-                case RenderingEngine.Mvc:
-                    var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
-                    {
-                        Route = RouteTable.Routes["Umbraco_default"]
-                    });
-                    var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
-                    var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
-                    var renderModel = new ContentModel(request.PublishedContent);
-                    //manually add the action/controller, this is required by mvc
-                    requestContext.RouteData.Values.Add("action", routeDef.ActionName);
-                    requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
-                    //add the rest of the required route data
-                    routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
+                Route = RouteTable.Routes["Umbraco_default"]
+            });
+            var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
+            var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
+            var renderModel = new ContentModel(request.PublishedContent);
+            //manually add the action/controller, this is required by mvc
+            requestContext.RouteData.Values.Add("action", routeDef.ActionName);
+            requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
+            //add the rest of the required route data
+            routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
 
-                    var stringOutput = RenderUmbracoRequestToString(requestContext);
+            var stringOutput = RenderUmbracoRequestToString(requestContext);
 
-                    sw.Write(stringOutput);
-                    break;
-                case RenderingEngine.WebForms:
-                default:
-                    throw new Exception("We no longer support WebForms in Umbraco");
-            }
-
+            sw.Write(stringOutput);
         }
 
         /// <summary>

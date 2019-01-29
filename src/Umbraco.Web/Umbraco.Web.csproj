@@ -261,7 +261,6 @@
     <Compile Include="Trees\TreeCollection.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
-    <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
