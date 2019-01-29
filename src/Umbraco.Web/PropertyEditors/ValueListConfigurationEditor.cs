@@ -68,41 +68,69 @@ namespace Umbraco.Web.PropertyEditors
         {
             var output = new ValueListConfiguration();
 
-            if (editorValues.ContainsKey("items") == false)
-                return output;
-
-            var jsonObject = (JObject) editorValues["items"];
-            if (jsonObject == null)
-                return output;
+            // both JObject and JArray are JToken
+            if (!editorValues.TryGetValue("items", out var o) || !(o is JToken jToken))
+                return output; //oops
 
             // auto-assigning our ids, get next id from existing values
             var nextId = 1;
             if (configuration?.Items != null && configuration.Items.Count > 0)
                 nextId = configuration.Items.Max(x => x.Id) + 1;
 
-            foreach (var itemValue in jsonObject.Children())
+            // the configuration editor sends an array back
+            if (jToken is JArray jItemsArray)
             {
-                var listItem = itemValue.First;
-                var value = listItem["value"].Value<string>();
-                if(string.IsNullOrEmpty(value))
-                    continue;;
-
-                int.TryParse(itemValue.Path, out var id);
-                if (id >= nextId)
-                    nextId = id + 1;
-
-                output.Items.Add(new ValueListConfiguration.ValueListItem
+                // create ValueListItem instances - sortOrder is ignored here
+                foreach (var item in jItemsArray.OfType<JObject>())
                 {
-                    Id = id,
-                    Value = value
-                });
+                    var value = item.Property("value")?.Value?.Value<string>();
+                    if (string.IsNullOrWhiteSpace(value)) continue;
+
+                    var id = item.Property("id")?.Value?.Value<int>() ?? 0;
+                    if (id >= nextId) nextId = id + 1;
+
+                    output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
+                }
             }
 
-            output.Items.ForEach(item =>
+            // but we may also want to handle ToConfigurationEditor's output directly
+            // (Deploy uses this)
+            else if (jToken is JObject jItemsObject)
             {
+                foreach (var item in jItemsObject.Children())
+                {
+                    var value = item.First["value"]?.Value<string>();
+                    if (string.IsNullOrWhiteSpace(value)) continue;
+
+                    if (!int.TryParse(item.Path, out var id)) id = 0;
+                    if (id >= nextId) nextId = id + 1;
+
+                    output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
+                }
+            }
+
+            //foreach (var itemValue in jsonObject.Children())
+            //{
+            //    var listItem = itemValue.First;
+            //    var value = listItem["value"].Value<string>();
+            //    if(string.IsNullOrEmpty(value))
+            //        continue;;
+
+            //    int.TryParse(itemValue.Path, out var id);
+            //    if (id >= nextId)
+            //        nextId = id + 1;
+
+            //    output.Items.Add(new ValueListConfiguration.ValueListItem
+            //    {
+            //        Id = id,
+            //        Value = value
+            //    });
+            //}
+
+            // ensure ids
+            foreach (var item in output.Items)
                 if (item.Id == 0)
                     item.Id = nextId++;
-            });
 
             return output;
         }

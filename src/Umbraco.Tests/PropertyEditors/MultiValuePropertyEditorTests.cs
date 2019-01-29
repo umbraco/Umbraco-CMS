@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PropertyEditors;
+using System.Linq;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -26,7 +22,7 @@ namespace Umbraco.Tests.PropertyEditors
     /// to cache. Now we always just deal with strings and we'll keep the tests that show that.
     /// </remarks>
     [TestFixture]
-    public class MultiValuePropertyEditorTests 
+    public class MultiValuePropertyEditorTests
     {
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
@@ -85,25 +81,8 @@ namespace Umbraco.Tests.PropertyEditors
         }
 
         [Test]
-        public void DropDownPreValueEditor_Format_Data_For_Editor()
+        public void ValueListConfiguration_ToConfigurationEditor()
         {
-            // editor wants ApplicationContext.Current.Services.TextService
-            // (that should be fixed with proper injection)
-            var logger = Mock.Of<ILogger>();
-            var textService = new Mock<ILocalizedTextService>();
-            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
-            //var appContext = new ApplicationContext(
-            //    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
-            //    new ServiceContext(
-            //        localizedTextService: textService.Object
-            //    ),
-            //    Mock.Of<CacheHelper>(),
-            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()))
-            //{
-            //    //IsReady = true
-            //};
-            //Current.ApplicationContext = appContext;
-
             var configuration = new ValueListConfiguration
             {
                 Items = new List<ValueListConfiguration.ValueListItem>
@@ -125,16 +104,46 @@ namespace Umbraco.Tests.PropertyEditors
         }
 
         [Test]
-        public void FromConfigurationEditor_WithSerializedConfiguration_DoesReturnCorrectValueListConfiguration()
+        public void ValueListConfiguration_FromConfigurationEditor_JObject()
         {
-            var serializedJsonInput = "{\"items\":{\"1\":{\"value\":\"Item 1\",\"sortOrder\":1},\"2\":{\"value\":\"Item 2\",\"sortOrder\":2},\"3\":{\"value\":\"Item 3\",\"sortOrder\":3}}}";
-            var inputDictionary = JsonConvert.DeserializeObject(serializedJsonInput, typeof(IDictionary<string, object>));
-            var existingConfiguration = new ValueListConfiguration();
+            const string json = "{\"items\":{\"1\":{\"value\":\"Item 1\",\"sortOrder\":1},\"2\":{\"value\":\"Item 2\",\"sortOrder\":2},\"3\":{\"value\":\"Item 3\",\"sortOrder\":3}}}";
 
-            var sut = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>());
-            var result = sut.FromConfigurationEditor((IDictionary<string, object>)inputDictionary, existingConfiguration);
+            var editorValues = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
-            Assert.That(result.Items.Count, Is.EqualTo(3));
+            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>());
+            var currentConfiguration = new ValueListConfiguration();
+            var result = editor.FromConfigurationEditor(editorValues, currentConfiguration);
+
+            Assert.AreEqual(3, result.Items.Count);
+            Assert.AreEqual("Item 1", result.Items[0].Value);
+            Assert.AreEqual(1, result.Items[0].Id);
+            Assert.AreEqual("Item 2", result.Items[1].Value);
+            Assert.AreEqual(2, result.Items[1].Id);
+            Assert.AreEqual("Item 3", result.Items[2].Value);
+            Assert.AreEqual(3, result.Items[2].Id);
+        }
+
+        // [{"key":"multiple","value":false},{"key":"items","value":[{"value":"a","sortOrder":1,"id":"1"},{"value":"b","sortOrder":2,"id":"2"},{"value":"c"}]}]
+
+        [Test]
+        public void ValueListConfiguration_FromConfigurationEditor_JArray()
+        {
+            const string json = "[{\"key\":\"multiple\",\"value\":false},{\"key\":\"items\",\"value\":[{\"value\":\"Item 1\",\"sortOrder\":1,\"id\":\"1\"},{\"value\":\"Item 2\",\"sortOrder\":2,\"id\":\"2\"},{\"value\":\"Item 3\"}]}]";
+
+            // this is what happens in DataTypeController
+            var editorValues = JsonConvert.DeserializeObject<IEnumerable<DataTypeConfigurationFieldSave>>(json).ToDictionary(x => x.Key, x => x.Value);
+
+            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>());
+            var currentConfiguration = new ValueListConfiguration();
+            var result = editor.FromConfigurationEditor(editorValues, currentConfiguration);
+
+            Assert.AreEqual(3, result.Items.Count);
+            Assert.AreEqual("Item 1", result.Items[0].Value);
+            Assert.AreEqual(1, result.Items[0].Id);
+            Assert.AreEqual("Item 2", result.Items[1].Value);
+            Assert.AreEqual(2, result.Items[1].Id);
+            Assert.AreEqual("Item 3", result.Items[2].Value);
+            Assert.AreEqual(3, result.Items[2].Id);
         }
     }
 }
