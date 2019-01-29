@@ -69,13 +69,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (draftData != null)
             {
-                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor);
+                DraftContent = new PublishedContent(this, draftData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
                 DraftModel = DraftContent.CreateModel();
             }
 
             if (publishedData != null)
             {
-                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor);
+                PublishedContent = new PublishedContent(this, publishedData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
                 PublishedModel = PublishedContent.CreateModel();
             }
         }
@@ -124,10 +124,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var originDraft = origin.DraftContent;
             var originPublished = origin.PublishedContent;
 
-
-            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft.ContentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
             DraftModel = DraftContent?.CreateModel();
-            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
+            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished.ContentData, publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor);
             PublishedModel = PublishedContent?.CreateModel();
 
             ChildContentIds = origin.ChildContentIds; // can be the *same* list
