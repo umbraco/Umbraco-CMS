@@ -5,13 +5,6 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Trees
 {
-    // todo
-    // this is a weird collection builder because it actually contains trees, not types
-    // and it does not really rely on DI to instantiate anything - but meh
-    // can we have trees that don't have a controller, or something? looks like, no
-    // and then, we should not register trees here, and only create them when creating
-    // the collection!
-
     /// <summary>
     /// Builds a <see cref="TreeCollection"/>.
     /// </summary>
@@ -32,8 +25,11 @@ namespace Umbraco.Web.Trees
             if (!typeof(TreeControllerBase).IsAssignableFrom(controllerType))
                 throw new ArgumentException($"Type {controllerType} does not inherit from {typeof(TreeControllerBase).FullName}.");
 
+            // no all TreeControllerBase are meant to be used here,
+            // ignore those that don't have the attribute
+
             var attribute = controllerType.GetCustomAttribute<TreeAttribute>(false);
-            if (attribute == null) return; // todo - shouldn't we throw or at least log?
+            if (attribute == null) return;
             var tree = new Tree(attribute.SortOrder, attribute.SectionAlias, attribute.TreeGroup, attribute.TreeAlias, attribute.TreeTitle, attribute.TreeUse, controllerType, attribute.IsSingleNodeTree);
             _trees.Add(tree);
         }
@@ -43,13 +39,5 @@ namespace Umbraco.Web.Trees
             foreach (var controllerType in controllerTypes)
                 AddTreeController(controllerType);
         }
-
-        // todo - do we want to support this?
-        public void AddTree(Tree tree)
-            => _trees.Add(tree);
-
-        // todo - do we want to support this?
-        public void AddTrees(IEnumerable<Tree> tree)
-            => _trees.AddRange(tree);
     }
 }
