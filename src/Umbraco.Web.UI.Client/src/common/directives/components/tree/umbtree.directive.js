@@ -304,16 +304,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
                 
                 var css = [];
-                if (node == $scope.currentNode) {
-                    css.push("current");
-                }
-                if (node.hasChildren) {
-                    css.push("has-children");
-                }
-                if (node.deleteAnimations) {
-                    css.push("umb-tree-item--deleted");
-                }
-                
                 if (node.cssClasses) {
                     _.each(node.cssClasses, function (c) {
                         css.push(c);
