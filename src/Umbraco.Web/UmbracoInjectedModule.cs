@@ -217,18 +217,15 @@ namespace Umbraco.Web
             var lpath = uri.AbsolutePath.ToLowerInvariant();
 
             // handle directory-urls used for asmx
-            // legacy - what's the point really?
-            if (/*maybeDoc &&*/ _globalSettings.UseDirectoryUrls)
+            // TODO: legacy - what's the point really?
+            var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
+            if (asmxPos >= 0)
             {
-                var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
-                if (asmxPos >= 0)
-                {
-                    // use uri.AbsolutePath, not path, 'cos path has been lowercased
-                    httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
-                        uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                        uri.Query.TrimStart('?'));
-                    maybeDoc = false;
-                }
+                // use uri.AbsolutePath, not path, 'cos path has been lowercased
+                httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
+                    uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
+                    uri.Query.TrimStart('?'));
+                maybeDoc = false;
             }
 
             // a document request should be

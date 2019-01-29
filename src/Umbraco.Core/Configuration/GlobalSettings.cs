@@ -31,8 +31,8 @@ namespace Umbraco.Core.Configuration
         private static string _reservedPaths;
         private static string _reservedUrls;
         //ensure the built on (non-changeable) reserved paths are there at all times
-        internal const string StaticReservedPaths = "~/app_plugins/,~/install/,";
-        internal const string StaticReservedUrls = "~/config/splashes/booting.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
+        internal const string StaticReservedPaths = "~/app_plugins/,~/install/";
+        internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known";
         #endregion
 
         /// <summary>
@@ -82,19 +82,18 @@ namespace Umbraco.Core.Configuration
         public string ReservedUrls
         {
             get
-            {                
-                if (_reservedUrls == null)
-                {
-                    var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
-                        ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
-                        : string.Empty;
+            {
+                if (_reservedUrls != null) return _reservedUrls;
 
-                    //ensure the built on (non-changeable) reserved paths are there at all times
-                    _reservedUrls = StaticReservedUrls + urls;
-                }
+                var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
+                    ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                    : string.Empty;
+
+                //ensure the built on (non-changeable) reserved paths are there at all times
+                _reservedUrls = StaticReservedUrls + urls;
                 return _reservedUrls;
             }
-            internal set { _reservedUrls = value; }
+            internal set => _reservedUrls = value;
         }
 
         /// <summary>
@@ -105,22 +104,20 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (_reservedPaths == null)
-                {
-                    var reservedPaths = StaticReservedPaths;
-                    //always add the umbraco path to the list
-                    if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
-                        && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace())
-                    {
-                        reservedPaths += ConfigurationManager.AppSettings["umbracoPath"].EnsureEndsWith(',');
-                    }
+                if (_reservedPaths != null) return _reservedPaths;
 
-                    var allPaths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-                                    ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
-                                    : string.Empty;
+                var reservedPaths = StaticReservedPaths;
+                var umbPath = ConfigurationManager.AppSettings.ContainsKey("umbracoPath") && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace()
+                    ? ConfigurationManager.AppSettings["umbracoPath"]
+                    : "~/umbraco";
+                //always add the umbraco path to the list
+                reservedPaths += umbPath.EnsureEndsWith(',');
 
-                    _reservedPaths = reservedPaths + allPaths;
-                }
+                var allPaths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+                    ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+                    : string.Empty;
+
+                _reservedPaths = reservedPaths + allPaths;
                 return _reservedPaths;
             }
         }
@@ -260,26 +257,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-
-        /// <summary>
-        /// Gets a value indicating whether umbraco uses directory urls.
-        /// </summary>
-        /// <value><c>true</c> if umbraco uses directory urls; otherwise, <c>false</c>.</value>
-        public bool UseDirectoryUrls
-        {
-            get
-            {
-                try
-                {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoUseDirectoryUrls"]);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Returns the number of days that should take place between version checks.
         /// </summary>
