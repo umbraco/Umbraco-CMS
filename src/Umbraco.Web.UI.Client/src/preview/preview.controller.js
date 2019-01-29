@@ -68,16 +68,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             return;
         }
 
-        $scope.pageId = $location.search().id || getParameterByName("id");
-        var culture = $location.search().culture || getParameterByName("culture");
-        
-        if ($scope.pageId) {
-            var query = 'id=' + $scope.pageId;
-            if (culture) {
-                query += "&culture=" + culture;
-            }
-            $scope.pageUrl = "frame?" + query;
-        }
+        setPageUrl();
 
         $scope.isOpen = false;
         $scope.frameLoaded = false;
@@ -93,6 +84,19 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         ];
         $scope.previewDevice = $scope.devices[0];
 
+        
+        function setPageUrl(){
+            $scope.pageId = $location.search().id || getParameterByName("id");
+            var culture = $location.search().culture || getParameterByName("culture");
+
+            if ($scope.pageId) {
+                var query = 'id=' + $scope.pageId;
+                if (culture) {
+                    query += "&culture=" + culture;
+                }
+                $scope.pageUrl = "frame?" + query;
+            }
+        }
         /*****************************************************************************/
         /* Preview devices */
         /*****************************************************************************/
@@ -107,28 +111,39 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         /*****************************************************************************/
 
         $scope.exitPreview = function () {
-            window.top.location.href = "../preview/end?redir=%2f" + $scope.pageId;
+
+            var culture = $location.search().culture || getParameterByName("culture");
+            var relativeUrl = "/" +  $scope.pageId +'?culture='+ culture;
+            window.top.location.href = "../preview/end?redir=" + encodeURIComponent(relativeUrl);
         };
 
         $scope.onFrameLoaded = function (iframe) {
             $scope.frameLoaded = true;
             configureSignalR(iframe);
-        }
+        };
 
         /*****************************************************************************/
-        /* Panel managment */
+        /* Panel management */
         /*****************************************************************************/
 
         $scope.openPreviewDevice = function () {
             $scope.showDevicesPreview = true;
-        }
+        };
+
+        /*****************************************************************************/
+        /* Change culture */
+        /*****************************************************************************/
+        $scope.changeCulture = function (culture) {
+          //  $scope.frameLoaded = false;
+            $location.search("culture", culture);
+            setPageUrl();
+        };
         
     })
 
 
     .component('previewIFrame', {
-
-        template: "<div style='width:100%;height:100%;margin:0 auto;overflow:hidden;'><iframe id='resultFrame' src='about:blank' ng-src=\"{{vm.srcDelayed}}\" frameborder='0'></iframe></div>",
+        template: "<div style='width:100%;height:100%;margin:0 auto;overflow:hidden;'><iframe id='resultFrame' src='about:blank' ng-src=\"{{vm.src}}\" frameborder='0'></iframe></div>",
         controller: function ($element, $scope, angularHelper) {
 
             var vm = this;
@@ -136,22 +151,15 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             vm.$postLink = function () {
                 var resultFrame = $element.find("#resultFrame");
                 resultFrame.on("load", iframeReady);
-                vm.srcDelayed = vm.src;
             };
 
             function iframeReady() {
                 var iframe = $element.find("#resultFrame").get(0);
-                hideUmbracoPreviewBadge(iframe);
                 angularHelper.safeApply($scope, function () {
                     vm.onLoaded({ iframe: iframe });
                 });
             }
 
-            function hideUmbracoPreviewBadge (iframe) {
-                if (iframe && iframe.contentDocument && iframe.contentDocument.getElementById("umbracoPreviewBadge")) {
-                    iframe.contentDocument.getElementById("umbracoPreviewBadge").style.display = "none";
-                }
-            };
 
         },
         controllerAs: "vm",

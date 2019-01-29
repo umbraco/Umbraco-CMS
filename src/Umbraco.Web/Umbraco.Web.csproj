@@ -138,6 +138,7 @@
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
+    <Compile Include="Editors\BackOfficePreviewLinkModel.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
     <Compile Include="Logging\WebProfilerComponent.cs" />

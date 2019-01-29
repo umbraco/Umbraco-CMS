@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.UI.JavaScript;
@@ -21,20 +22,33 @@ namespace Umbraco.Web.Editors
         private readonly IGlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly UmbracoContext _umbracoContext;
+        private readonly ILocalizationService _localizationService;
 
-        public PreviewController(UmbracoFeatures features, IGlobalSettings globalSettings, IPublishedSnapshotService publishedSnapshotService, UmbracoContext umbracoContext)
+        public PreviewController(
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IPublishedSnapshotService publishedSnapshotService,
+            UmbracoContext umbracoContext,
+            ILocalizationService localizationService)
         {
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
             _umbracoContext = umbracoContext;
+            _localizationService = localizationService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
         [DisableBrowserCache]
         public ActionResult Index()
         {
-            var model = new BackOfficePreviewModel(_features, _globalSettings);
+            var availableLanguages = _localizationService.GetAllLanguages();
+            var previewLinks = availableLanguages.Select(x => new BackOfficePreviewLinkModel() {
+                CultureName = x.CultureName,
+                CultureId = x.IsoCode}
+            );
+
+            var model = new BackOfficePreviewModel(_features, _globalSettings, previewLinks);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

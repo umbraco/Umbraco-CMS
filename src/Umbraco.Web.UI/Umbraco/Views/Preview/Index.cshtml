@@ -46,6 +46,17 @@
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }">
                     <a href="" ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
+
+                @if (Model.PreviewLinks != null && Model.PreviewLinks.Count() > 2)
+                {
+                    foreach (var previewLink in Model.PreviewLinks)
+                     {
+                         <li>
+                             <a href="" ng-click="changeCulture('@previewLink.CultureId')" title="Preview in @previewLink.CultureName"><i class="icon icon-globe-europe---africa"></i><span>@previewLink.CultureName</span></a>
+                         </li>
+                     }
+                }
+
                 <li>
                     <a href="" ng-click="exitPreview()" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
                 </li>
