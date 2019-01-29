@@ -88,7 +88,7 @@ namespace umbraco
                 }
                 else
                 {
-                    //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
+                    //get the value the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
                     var elt = elements[_fieldName];
                     if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
                         _fieldContent = elt.ToString().Trim();
@@ -108,7 +108,7 @@ namespace umbraco
                         }
                         else
                         {
-                            //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
+                            //get the value the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
                             var elt = elements[altFieldName];
                             if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
                                 _fieldContent = elt.ToString().Trim();
@@ -135,7 +135,7 @@ namespace umbraco
         /// <returns></returns>
         private string GetRecursiveValueLegacy(IDictionary elements)
         {
-            using (Current.ProfilingLogger.DebugDuration<item>("Checking recusively"))
+            using (Current.ProfilingLogger.DebugDuration<item>("Checking recursively"))
             {
                 var content = "";
 

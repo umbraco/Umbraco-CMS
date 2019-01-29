@@ -3337,8 +3337,7 @@ namespace Umbraco.Core.Strings
                     // time for a T4 template?
                     // also we should support extensibility so ppl can register more cases in external code
 
-                    // todo
-                    // transliterates Анастасия as Anastasiya, and not Anastasia
+                    // TODO: transliterates Анастасия as Anastasiya, and not Anastasia
                     // Ольга --> Ol'ga, Татьяна --> Tat'yana -- that's bad (?)
                     // Note: should ä (German umlaut) become a or ae ?
 

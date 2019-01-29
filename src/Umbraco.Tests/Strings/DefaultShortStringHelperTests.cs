@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Strings
                     BreakTermsOnUpper = true
                 }));
 
-            // fixme - move to a "compose" thing?
+            // FIXME: move to a "compose" thing?
             Composition.RegisterUnique<IShortStringHelper>(f => _helper);
         }
 
@@ -337,8 +337,8 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
-            // FIXME but for a filename we want to keep them!
-            // FIXME and what about a url?
+            // FIXME: but for a filename we want to keep them!
+            // FIXME: and what about a url?
         }
 
         [Test]
@@ -442,8 +442,8 @@ namespace Umbraco.Tests.Strings
             // E is a word (too short to be an acronym)
             // FF is an acronym
 
-            // FIXME "C" can't be an acronym
-            // FIXME "DBXreview" = acronym?!
+            // FIXME: "C" can't be an acronym
+            // FIXME: "DBXreview" = acronym?!
 
             Assert.AreEqual("aaa BBB CCc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias)); // unchanged
             Assert.AreEqual("aaa Bbb Ccc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.CamelCase));

@@ -251,7 +251,7 @@ namespace Umbraco.Web.Media.Exif
             {
                 return new Fraction32(f1.Numerator * f2.Numerator, f1.Denominator * f2.Denominator);
             }
-            // Divison
+            // Division
             public static Fraction32 operator /(Fraction32 f, int n)
             {
                 return new Fraction32(f.Numerator / n, f.Denominator / System.Math.Abs(n));
@@ -893,7 +893,7 @@ namespace Umbraco.Web.Media.Exif
             {
                 return new UFraction32(f1.Numerator * f2.Numerator, f1.Denominator * f2.Denominator);
             }
-            // Divison
+            // Division
             public static UFraction32 operator /(UFraction32 f, uint n)
             {
                 return new UFraction32(f.Numerator / n, f.Denominator / n);

@@ -65,6 +65,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return sourceString;
         }
 
-        //TODO: Now to convert that to XPath!
+        // TODO: Now to convert that to XPath!
     }
 }

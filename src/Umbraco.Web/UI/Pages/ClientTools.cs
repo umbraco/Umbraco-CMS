@@ -126,10 +126,10 @@ namespace Umbraco.Web.UI.Pages
         }
 
         /// <summary>
-        /// A reference to the umbraco UI component "speechbubble". The speechbubble appears in the lower right corner of the screen, notifying users of events
+        /// A reference to the umbraco UI component "speechbubble". The speech bubble appears in the lower right corner of the screen, notifying users of events
         /// </summary>
-        /// <param name="i">The speechbubble icon.</param>
-        /// <param name="header">The speechbubble header.</param>
+        /// <param name="i">The speech bubble icon.</param>
+        /// <param name="header">The speech bubble header.</param>
         /// <param name="body">The body text</param>
         public ClientTools ShowSpeechBubble(SpeechBubbleIcon i, string header, string body)
         {

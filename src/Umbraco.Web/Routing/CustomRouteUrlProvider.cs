@@ -25,7 +25,7 @@ namespace Umbraco.Web.Routing
             //If we get this far, it means it's a custom route with published content assigned, check if the id being requested for is the same id as the assigned published content
             //NOTE: This looks like it might cause an infinite loop because PublishedContentBase.Url calls into UmbracoContext.Current.UrlProvider.GetUrl which calls back into the IUrlProvider pipeline
             // but the specific purpose of this is that a developer is using their own IPublishedContent that returns a specific Url and doesn't go back into the UrlProvider pipeline.
-            //TODO: We could put a try/catch here just in case, else we could do some reflection checking to see if the implementation is PublishedContentBase and the Url property is not overridden.
+            // TODO: We could put a try/catch here just in case, else we could do some reflection checking to see if the implementation is PublishedContentBase and the Url property is not overridden.
             return UrlInfo.Url(
                 content.Id == umbracoContext.PublishedRequest.PublishedContent.Id
                     ? umbracoContext.PublishedRequest.PublishedContent.GetUrl(culture)

@@ -161,7 +161,7 @@ namespace Umbraco.Core.Security
             return (membershipProvider is UmbracoMembershipProviderBase);
         }
 
-        //TODO: Add role provider checks too
+        // TODO: Add role provider checks too
 
         public static UmbracoMembershipProviderBase AsUmbracoMembershipProvider(this MembershipProvider membershipProvider)
         {

@@ -8,17 +8,17 @@
       **/
     function javascriptLibraryResource($q, $http, umbRequestHelper) {
 
-        var existingLocales = [];
+        var existingLocales = null;
 
-        function getSupportedLocalesForMoment() {
+        function getSupportedLocales() {
             var deferred = $q.defer();
 
-            if (existingLocales.length === 0) {
+            if (existingLocales === null) {
                 umbRequestHelper.resourcePromise(
                     $http.get(
                         umbRequestHelper.getApiUrl(
                             "backOfficeAssetsApiBaseUrl",
-                            "GetSupportedMomentLocales")),
+                            "GetSupportedLocales")),
                     "Failed to get cultures").then(function(locales) {
                     existingLocales = locales;
                     deferred.resolve(existingLocales);
@@ -29,9 +29,9 @@
 
             return deferred.promise;
         }
-
+        
         var service = {
-            getSupportedLocalesForMoment: getSupportedLocalesForMoment
+            getSupportedLocales: getSupportedLocales
         };
 
         return service;

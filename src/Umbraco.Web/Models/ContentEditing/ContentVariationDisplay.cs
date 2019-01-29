@@ -72,7 +72,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         /// <remarks>
-        /// The notifications assigned to a variant are currently only used to show custom messagse in the save/publish dialogs.
+        /// The notifications assigned to a variant are currently only used to show custom messages in the save/publish dialogs.
         /// </remarks>
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]

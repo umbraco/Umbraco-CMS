@@ -53,7 +53,7 @@ namespace dashboardUtilities
                 }
                 else
                 {
-                                Current.Logger.Debug<FeedProxy>("Access to unallowed feedproxy attempted: {RequestUrl}", requestUri);
+                                Current.Logger.Debug<FeedProxy>("Access to unallowed feed proxy attempted: {RequestUrl}", requestUri);
                 }
             }
             catch (Exception ex)

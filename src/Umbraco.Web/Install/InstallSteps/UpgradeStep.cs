@@ -20,7 +20,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                // todo- if UmbracoVersion.Local is null?
+                // TODO: if UmbracoVersion.Local is null?
                 // it means that there is a database but the web.config version is cleared
                 // that was a "normal" way to force the upgrader to execute, and we would detect the current
                 // version via the DB like DatabaseSchemaResult.DetermineInstalledVersion - magic, do we really
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
                     return value;
                 }
 
-                var state = Current.RuntimeState; // todo inject
+                var state = Current.RuntimeState; // TODO: inject
                 var currentState = FormatGuidState(state.CurrentMigrationState);
                 var newState = FormatGuidState(state.FinalMigrationState);
 

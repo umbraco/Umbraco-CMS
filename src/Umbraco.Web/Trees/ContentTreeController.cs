@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, culture))
             {
-                //Special check to see if it ia a container, if so then we'll hide children.
+                //Special check to see if it is a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
@@ -307,7 +307,7 @@ namespace Umbraco.Web.Trees
                 entity.Name = "[[" + entity.Id + "]]";
         }
 
-        //todo: Remove the need for converting to legacy
+        // TODO: Remove the need for converting to legacy
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
             where TAction : IAction
         {

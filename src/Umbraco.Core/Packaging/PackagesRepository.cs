@@ -362,7 +362,7 @@ namespace Umbraco.Core.Packaging
                                     new XAttribute("importMode", "root"),
                                     contentXml)));
 
-                        //TODO: I guess tags has been broken for a very long time for packaging, we should get this working again sometime
+                        // TODO: I guess tags has been broken for a very long time for packaging, we should get this working again sometime
                         ////Create the TagProperties node - this is used to store a definition for all
                         //// document properties that are tags, this ensures that we can re-import tags properly
                         //XmlNode tagProps = new XElement("TagProperties");
