@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Umbraco.Web.UI
+﻿namespace Umbraco.Web.Models.ContentEditing
 {
-    public enum SpeechBubbleIcon
+    public enum NotificationStyle
     {
         /// <summary>
         /// Save icon

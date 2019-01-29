@@ -4,7 +4,7 @@ using Umbraco.Web.Composing;
 using ICdfLogger = ClientDependency.Core.Logging.ILogger;
 using ICoreLogger = Umbraco.Core.Logging.ILogger;
 
-namespace Umbraco.Web.UI
+namespace Umbraco.Web
 {
     /// <summary>
     /// A logger for ClientDependency

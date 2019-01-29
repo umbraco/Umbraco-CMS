@@ -12,7 +12,7 @@ using Semver;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Web.UI.JavaScript
+namespace Umbraco.Web.JavaScript
 {
     /// <summary>
     /// A utility class for working with CDF config and cache files - use sparingly!

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using ClientDependency.Core;
@@ -6,10 +8,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
-using System.Linq;
-using System.Text;
 
-namespace Umbraco.Web.UI.JavaScript
+namespace Umbraco.Web.JavaScript
 {
     /// <summary>
     /// Reads from all defined manifests and ensures that any of their initialization is output with the

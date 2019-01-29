@@ -1,12 +1,12 @@
-﻿using System.Web;
-using ClientDependency.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
+using ClientDependency.Core;
 using Umbraco.Core.Manifest;
 
-namespace Umbraco.Web.UI.JavaScript
+namespace Umbraco.Web.JavaScript
 {
     internal class CssInitialization : AssetInitialization
     {

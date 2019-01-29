@@ -8,7 +8,7 @@ using ClientDependency.Core.Config;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 
-namespace Umbraco.Web.UI.JavaScript
+namespace Umbraco.Web.JavaScript
 {
     internal abstract class AssetInitialization
     {

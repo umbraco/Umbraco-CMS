@@ -182,6 +182,11 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Routing\Resources\HtmlPages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HtmlPages.resx</DependentUpon>
+    </Compile>
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
@@ -259,7 +264,7 @@
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="Trees\TreeCollection.cs" />
-    <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
+    <Compile Include="JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
@@ -577,9 +582,6 @@
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
-    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
-    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
@@ -679,7 +681,7 @@
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
-    <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
+    <Compile Include="JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
@@ -691,7 +693,6 @@
     <Compile Include="Scheduling\ThreadingTaskImmutable.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
-    <Compile Include="Mvc\UrlHelperExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
@@ -892,9 +893,9 @@
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="UI\JavaScript\AssetInitialization.cs" />
-    <Compile Include="UI\JavaScript\CssInitialization.cs" />
-    <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
+    <Compile Include="JavaScript\AssetInitialization.cs" />
+    <Compile Include="JavaScript\CssInitialization.cs" />
+    <Compile Include="JavaScript\DependencyPathRenderer.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -1001,7 +1002,7 @@
     <Compile Include="Trees\ContentTreeController.cs" />
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
-    <Compile Include="UI\JavaScript\JsInitialization.cs" />
+    <Compile Include="JavaScript\JsInitialization.cs" />
     <Compile Include="Models\ContentEditing\ContentItemBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyCollectionDto.cs" />
@@ -1035,17 +1036,14 @@
     <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
-    <Compile Include="UI\JavaScript\Resources.Designer.cs">
+    <Compile Include="JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
+    <Compile Include="JavaScript\ServerVariablesParser.cs" />
     <Compile Include="Components\PublicAccessComponent.cs" />
-    <Compile Include="UI\Bundles\JsJQueryCore.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
-    <Compile Include="UI\CdfLogger.cs" />
+    <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
@@ -1139,7 +1137,7 @@
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
     <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
-    <Compile Include="UI\SpeechBubbleIcon.cs" />
+    <Compile Include="Models\ContentEditing\NotificationStyle.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
@@ -1202,7 +1200,7 @@
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\JavaScript\Resources.resx">
+    <EmbeddedResource Include="JavaScript\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
@@ -1211,15 +1209,21 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\JavaScript\Main.js" />
-    <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
-    <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
+    <EmbeddedResource Include="JavaScript\Main.js" />
+    <EmbeddedResource Include="JavaScript\JsInitialize.js" />
+    <EmbeddedResource Include="JavaScript\ServerVariables.js" />
+    <EmbeddedResource Include="Routing\Resources\HtmlPages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>HtmlPages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
+    <EmbeddedResource Include="Routing\Resources\Failed.html" />
+    <EmbeddedResource Include="Routing\Resources\Booting.html" />
+    <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Components;
 
-namespace Umbraco.Web.Redirects
+namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// Implements an Application Event Handler for managing redirect urls tracking.

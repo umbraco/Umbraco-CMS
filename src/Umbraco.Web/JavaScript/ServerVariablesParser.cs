@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Web.UI.JavaScript
+namespace Umbraco.Web.JavaScript
 {
     public sealed class ServerVariablesParser
     {

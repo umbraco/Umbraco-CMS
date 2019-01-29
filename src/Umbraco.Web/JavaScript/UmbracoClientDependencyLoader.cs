@@ -3,7 +3,7 @@ using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core.IO;
 
-namespace Umbraco.Web.UI.JavaScript
+namespace Umbraco.Web.JavaScript
 {
     /// <summary>
     /// Used to load in all client dependencies for Umbraco.

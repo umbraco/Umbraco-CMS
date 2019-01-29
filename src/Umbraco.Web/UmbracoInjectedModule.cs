@@ -275,9 +275,10 @@ namespace Umbraco.Web
 
                     // redirect to booting page
                     httpContext.Response.StatusCode = 503; // temp not available
-                    const string bootUrl = "~/config/splashes/booting.aspx"; //fixme: remove booting.aspx once the above question is resolved
+                    var bootHtml = Routing.Resources.HtmlPages.Booting;
                     httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    httpContext.Response.Write(bootHtml);
+                    httpContext.Response.Flush();
                     return false; // cannot serve content
 
                 case RuntimeLevel.BootFailed:
@@ -285,9 +286,10 @@ namespace Umbraco.Web
                     ReportRuntime(level, "Umbraco has failed.");
 
                     httpContext.Response.StatusCode = 503; // temp not available
-                    const string deathUrl = "~/config/splashes/death.aspx";
+                    var deathHtml = Routing.Resources.HtmlPages.Failed;
                     httpContext.Response.AddHeader("Retry-After", debug ? "1" : "300"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(deathUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    httpContext.Response.Write(deathHtml);
+                    httpContext.Response.Flush();
                     return false; // cannot serve content
 
                 case RuntimeLevel.Run:
