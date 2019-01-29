@@ -33,7 +33,7 @@ namespace Umbraco.Web.UI.Pages
                     .GetByAlias(treeAuth.TreeAlias);
                 if (treeByAlias != null)
                 {
-                    CurrentApp = treeByAlias.ApplicationAlias;
+                    CurrentApp = treeByAlias.SectionAlias;
                 }
             }
         }
