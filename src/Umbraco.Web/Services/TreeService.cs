@@ -26,11 +26,14 @@ namespace Umbraco.Web.Services
         public Tree GetByAlias(string treeAlias) => _treeCollection.FirstOrDefault(x => x.TreeAlias == treeAlias);
 
         /// <inheritdoc />
-        public IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main) => _treeCollection.Where(x => x.TreeUse.HasAny(use));
+        public IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main)
+            // use HasFlagAny: if use is Main|Dialog, we want to return Main *and* Dialog trees
+            => _treeCollection.Where(x => x.TreeUse.HasFlagAny(use));
 
         /// <inheritdoc />
         public IEnumerable<Tree> GetBySection(string sectionAlias, TreeUse use = TreeUse.Main)
-            => _treeCollection.Where(x => x.SectionAlias.InvariantEquals(sectionAlias) && x.TreeUse.HasAny(use)).OrderBy(x => x.SortOrder).ToList();
+            // use HasFlagAny: if use is Main|Dialog, we want to return Main *and* Dialog trees
+            => _treeCollection.Where(x => x.SectionAlias.InvariantEquals(sectionAlias) && x.TreeUse.HasFlagAny(use)).OrderBy(x => x.SortOrder).ToList();
 
         /// <inheritdoc />
         public IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias, TreeUse use = TreeUse.Main)

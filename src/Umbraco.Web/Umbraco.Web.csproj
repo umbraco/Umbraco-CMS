@@ -186,7 +186,6 @@
     <Compile Include="Trees\TranslationBackOfficeSection.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\TreeUse.cs" />
-    <Compile Include="Trees\TreeUseExtensions.cs" />
     <Compile Include="Trees\UsersBackOfficeSection.cs" />
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\ITree.cs" />
