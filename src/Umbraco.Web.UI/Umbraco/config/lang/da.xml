@@ -1086,6 +1086,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
     <key alias="nameHelp">Det navn der vises i teksteditoren</key>
+    <key alias="preview">Forhåndsvisning</key>
+    <key alias="previewHelp">Hvordan teksten vil se ud i teksteditoren.</key>
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">Den CSS der skal anvendes i teksteditoren, f.eks. "color:red;"</key>
     <key alias="tabCode">Kode</key>

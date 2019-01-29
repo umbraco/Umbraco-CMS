@@ -1380,14 +1380,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editstylesheet">Edit stylesheet</key>
     <key alias="editstylesheetproperty">Edit stylesheet property</key>
     <key alias="nameHelp">The name displayed in the editor style selector</key>
+    <key alias="preview">Preview</key>
+    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
     <key alias="selector">Selector</key>
     <key alias="selectorHelp">Uses CSS syntax, e.g. "h1" or ".redHeader"</key>
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
     <key alias="tabCode">Code</key>
-    <key alias="tabRules">Rich Text Editor</key>
-    <key alias="preview">Preview</key>
-    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
+    <key alias="tabRules">Rich Text Editor</key>   
   </area>
   <area alias="template">
     <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
