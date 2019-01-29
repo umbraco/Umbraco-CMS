@@ -21,17 +21,6 @@ namespace Umbraco.Web
     /// </summary>
     public static class UrlHelperExtensions
     {
-        /// <summary>
-        /// Returns the base path (not including the 'action') of the MVC controller "ExamineManagementController"
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static string GetExamineManagementServicePath(this UrlHelper url)
-        {
-            // TODO: Possibly remove this method, I think it's unused...
-            var result = url.GetUmbracoApiService<ExamineManagementController>("GetIndexerDetails");
-            return result.TrimEnd("GetIndexerDetails").EnsureEndsWith('/');
-        }
 
         /// <summary>
         /// Return the Url for a Web Api service
@@ -45,19 +34,6 @@ namespace Umbraco.Web
             where T : UmbracoApiController
         {
             return url.GetUmbracoApiService(actionName, typeof(T), routeVals);
-        }
-
-        /// <summary>
-        /// Return the Base Url (not including the action) for a Web Api service
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url"></param>
-        /// <param name="actionName"></param>
-        /// <returns></returns>
-        public static string GetUmbracoApiServiceBaseUrl<T>(this UrlHelper url, string actionName)
-            where T : UmbracoApiController
-        {
-            return url.GetUmbracoApiService<T>(actionName).TrimEnd(actionName);
         }
 
         public static string GetUmbracoApiServiceBaseUrl<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
@@ -110,19 +86,6 @@ namespace Umbraco.Web
                 area = metaData.AreaName;
             }
             return url.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area, routeVals);
-        }
-
-        /// <summary>
-        /// Return the Url for a Web Api service
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="actionName"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="routeVals"></param>
-        /// <returns></returns>
-        public static string GetUmbracoApiService(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
-        {
-            return url.GetUmbracoApiService(actionName, controllerName, "", routeVals);
         }
 
         /// <summary>
