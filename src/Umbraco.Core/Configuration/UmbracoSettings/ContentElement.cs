@@ -68,8 +68,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
 
-        string IContentSection.PropertyContextHelpOption => PropertyContextHelpOption;
-
         string IContentSection.PreviewBadge => PreviewBadge;
 
         MacroErrorBehaviour IContentSection.MacroErrorBehaviour => MacroErrors;

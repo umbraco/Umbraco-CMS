@@ -16,9 +16,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool ResolveUrlsFromTextString { get; }
 
         IEnumerable<IContentErrorPage> Error404Collection { get; }
-
-        string PropertyContextHelpOption { get; }
-
+        
         string PreviewBadge { get; }
 
         MacroErrorBehaviour MacroErrorBehaviour { get; }
