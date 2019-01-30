@@ -1375,21 +1375,21 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
   </area>
   <area alias="stylesheet">
+    <key alias="addRule">Add style</key>
+    <key alias="editRule">Edit style</key>
     <key alias="editorRules">Rich text editor styles</key>
     <key alias="editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</key>
     <key alias="editstylesheet">Edit stylesheet</key>
     <key alias="editstylesheetproperty">Edit stylesheet property</key>
     <key alias="nameHelp">The name displayed in the editor style selector</key>
-    <key alias="overlayTitleAddRule">Add style</key>
-    <key alias="overlayTitleEditRule">Edit style</key>
+    <key alias="preview">Preview</key>
+    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
     <key alias="selector">Selector</key>
     <key alias="selectorHelp">Uses CSS syntax, e.g. "h1" or ".redHeader"</key>
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
     <key alias="tabCode">Code</key>
-    <key alias="tabRules">Rich Text Editor</key>
-    <key alias="preview">Preview</key>
-    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
+    <key alias="tabRules">Rich Text Editor</key>   
   </area>
   <area alias="template">
     <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
@@ -1574,7 +1574,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fallbackLanguage">Fall back language</key>
   </area>
   <area alias="macro">
+    <key alias="addParameter">Add parameter</key>
+    <key alias="editParameter">Edit parameter</key>
     <key alias="parameters">Parameters</key>
+    <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>

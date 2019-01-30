@@ -31,7 +31,7 @@
     <umb-box-header title="Cache settings"></umb-box-header>
     <umb-box-content>
         <umb-control-group label="Cache period">
-           <input type="number" ng-model="model.macro.cachePeriod"/>
+           <input type="number" min="0" ng-model="model.macro.cachePeriod"/>
         </umb-control-group>
         <umb-control-group label="Cache by page">
             <umb-toggle checked="model.macro.cacheByPage" on-click="model.toggle('cacheByPage')"></umb-toggle>
