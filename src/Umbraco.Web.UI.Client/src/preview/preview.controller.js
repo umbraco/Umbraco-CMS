@@ -134,9 +134,11 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         /* Change culture */
         /*****************************************************************************/
         $scope.changeCulture = function (culture) {
-          //  $scope.frameLoaded = false;
-            $location.search("culture", culture);
-            setPageUrl();
+            if($location.search().culture !== culture){
+                $scope.frameLoaded = false;
+                $location.search("culture", culture);
+                setPageUrl();
+            }
         };
         
     })
@@ -155,10 +157,18 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
             function iframeReady() {
                 var iframe = $element.find("#resultFrame").get(0);
+                hideUmbracoPreviewBadge(iframe);
                 angularHelper.safeApply($scope, function () {
                     vm.onLoaded({ iframe: iframe });
+                    $scope.frameLoaded = true;
                 });
             }
+
+            function hideUmbracoPreviewBadge (iframe) {
+                if (iframe && iframe.contentDocument && iframe.contentDocument.getElementById("umbracoPreviewBadge")) {
+                    iframe.contentDocument.getElementById("umbracoPreviewBadge").style.display = "none";
+                }
+            };
 
 
         },
