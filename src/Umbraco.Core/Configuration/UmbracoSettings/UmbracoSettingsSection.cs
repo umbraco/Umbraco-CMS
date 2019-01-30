@@ -34,12 +34,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (LoggingElement)this["logging"]; }
         }
 
-        [ConfigurationProperty("scheduledTasks")]
-        internal ScheduledTasksElement ScheduledTasks
-        {
-            get { return (ScheduledTasksElement)this["scheduledTasks"]; }
-        }
-
         [ConfigurationProperty("providers")]
         internal ProvidersElement Providers
         {
@@ -77,11 +71,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Logging; }
         }
 
-        IScheduledTasksSection IUmbracoSettingsSection.ScheduledTasks
-        {
-            get { return ScheduledTasks; }
-        }
-        
         IProvidersSection IUmbracoSettingsSection.Providers
         {
             get { return Providers; }

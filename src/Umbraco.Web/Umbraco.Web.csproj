@@ -924,7 +924,6 @@
     <Compile Include="Scheduling\KeepAlive.cs" />
     <Compile Include="Scheduling\LogScrubber.cs" />
     <Compile Include="Scheduling\ScheduledPublishing.cs" />
-    <Compile Include="Scheduling\ScheduledTasks.cs" />
     <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />

@@ -38,7 +38,6 @@ namespace Umbraco.Tests.TestHelpers
             var security = new Mock<ISecuritySection>();
             var requestHandler = new Mock<IRequestHandlerSection>();
             var logging = new Mock<ILoggingSection>();
-            var tasks = new Mock<IScheduledTasksSection>();
             var providers = new Mock<IProvidersSection>();
             var routing = new Mock<IWebRoutingSection>();
 
@@ -46,7 +45,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
             settings.Setup(x => x.Logging).Returns(logging.Object);
-            settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
             settings.Setup(x => x.Providers).Returns(providers.Object);
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
 
@@ -55,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
             settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
             settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
-            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
+            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("Auto");
             settings.Setup(x => x.Providers.DefaultBackOfficeUserProvider).Returns("UsersMembershipProvider");
 
             return settings.Object;
