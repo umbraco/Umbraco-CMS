@@ -251,7 +251,6 @@
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
     <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
