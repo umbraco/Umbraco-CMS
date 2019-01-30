@@ -51,8 +51,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
-            // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = content.ContentType.Alias.ToSafeAlias();
 
             var xml = SerializeContentBase(content, content.GetUrlSegment(_urlSegmentProviders), nodeName, published);
 
@@ -98,8 +97,7 @@ namespace Umbraco.Core.Services.Implement
             if (media == null) throw new ArgumentNullException(nameof(media));
             if (_urlSegmentProviders == null) throw new ArgumentNullException(nameof(_urlSegmentProviders));
 
-            // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = media.ContentType.Alias.ToSafeAlias();
 
             const bool published = false; // always false for media
             var xml = SerializeContentBase(media, media.GetUrlSegment(_urlSegmentProviders), nodeName, published);
@@ -134,8 +132,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         public XElement Serialize(IMember member)
         {
-            // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = member.ContentType.Alias.ToSafeAlias();
 
             const bool published = false; // always false for member
             var xml = SerializeContentBase(member, "", nodeName, published);

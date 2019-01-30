@@ -25,9 +25,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("PropertyContextHelpOption")]
         internal InnerTextConfigurationElement<string> PropertyContextHelpOption => GetOptionalTextElement("PropertyContextHelpOption", "text");
 
-        [ConfigurationProperty("ForceSafeAliases")]
-        internal InnerTextConfigurationElement<bool> ForceSafeAliases => GetOptionalTextElement("ForceSafeAliases", true);
-
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
 
@@ -72,8 +69,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
 
         string IContentSection.PropertyContextHelpOption => PropertyContextHelpOption;
-
-        bool IContentSection.ForceSafeAliases => ForceSafeAliases;
 
         string IContentSection.PreviewBadge => PreviewBadge;
 

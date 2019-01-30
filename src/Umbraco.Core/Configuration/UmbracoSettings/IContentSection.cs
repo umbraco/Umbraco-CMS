@@ -19,8 +19,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         string PropertyContextHelpOption { get; }
 
-        bool ForceSafeAliases { get; }
-
         string PreviewBadge { get; }
 
         MacroErrorBehaviour MacroErrorBehaviour { get; }

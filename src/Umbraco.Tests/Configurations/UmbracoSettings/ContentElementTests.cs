@@ -79,12 +79,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.CloneXmlContent);
         }
-
-        [Test]
-        public void ForceSafeAliases()
-        {
-            Assert.IsTrue(SettingsSection.Content.ForceSafeAliases);
-        }
         
         [Test]
         public void PropertyContextHelpOption()
