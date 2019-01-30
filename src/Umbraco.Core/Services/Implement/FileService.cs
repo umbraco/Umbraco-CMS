@@ -764,6 +764,12 @@ namespace Umbraco.Core.Services.Implement
                     //strip the @inherits if it's there
                     snippetContent = StripPartialViewHeader(snippetContent);
 
+                    //Update Model.Content. to be Model. when used as PartialView
+                    if(partialViewType == PartialViewType.PartialView)
+                    {
+                        snippetContent = snippetContent.Replace("Model.Content.", "Model.");
+                    }
+
                     partialViewContent = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";
                 }
             }
@@ -790,7 +796,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return Attempt<IPartialView>.Succeed(partialView);
-        }
+        }        
 
         public bool DeletePartialView(string path, int userId = 0)
         {
@@ -1026,6 +1032,12 @@ namespace Umbraco.Core.Services.Implement
 
                 //strip the @inherits if it's there
                 snippetContent = StripPartialViewHeader(snippetContent);
+
+                //Update Model.Content. to be Model. when used as PartialView
+                if (partialViewType == PartialViewType.PartialView)
+                {
+                    snippetContent = snippetContent.Replace("Model.Content.", "Model.");
+                }
 
                 var content = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";
                 return content;

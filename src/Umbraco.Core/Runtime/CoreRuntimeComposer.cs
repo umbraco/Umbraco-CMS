@@ -11,6 +11,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
@@ -19,7 +20,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
 namespace Umbraco.Core.Runtime

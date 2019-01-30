@@ -25,7 +25,6 @@ namespace Umbraco.Core
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
-        private RuntimeLevel _level = RuntimeLevel.Unknown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
@@ -87,14 +86,10 @@ namespace Umbraco.Core
         public string FinalMigrationState { get; internal set; }
 
         /// <inheritdoc />
-        public RuntimeLevel Level
-        {
-            get => _level;
-            internal set { _level = value; if (value == RuntimeLevel.Run) _runLevel.Set(); }
-        }
+        public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
 
         /// <inheritdoc />
-        public RuntimeLevelReason Reason { get; internal set; }
+        public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
@@ -115,18 +110,6 @@ namespace Umbraco.Core
 
             if (ApplicationUrl != null && !change) return;
             ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, _globalSettings, _settings, ServerRegistrar, request));
-        }
-
-        private readonly ManualResetEventSlim _runLevel = new ManualResetEventSlim(false);
-
-        /// <summary>
-        /// Waits for the runtime level to become RuntimeLevel.Run.
-        /// </summary>
-        /// <param name="timeout">A timeout.</param>
-        /// <returns>True if the runtime level became RuntimeLevel.Run before the timeout, otherwise false.</returns>
-        internal bool WaitForRunLevel(TimeSpan timeout)
-        {
-            return _runLevel.WaitHandle.WaitOne(timeout);
         }
 
         /// <inheritdoc />

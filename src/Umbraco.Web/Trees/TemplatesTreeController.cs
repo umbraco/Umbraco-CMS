@@ -75,7 +75,7 @@ namespace Umbraco.Web.Trees
 
             //Create the normal create action
             var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-            item.NavigateToRoute($"{queryStrings.GetValue<string>("application")}/templates/edit/{id}?create=true");
+            item.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.Root.ToInvariantString())
             {
