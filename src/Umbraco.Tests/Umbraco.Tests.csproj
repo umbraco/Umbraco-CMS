@@ -493,6 +493,21 @@
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
     <Compile Include="Misc\XmlHelperTests.cs" />
+    <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
+    <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PreviewContent.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedContentCache.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedMediaCache.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedMemberCache.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedSnapshot.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedSnapshotService.cs" />
+    <Compile Include="LegacyXmlPublishedCache\RoutesCache.cs" />
+    <Compile Include="LegacyXmlPublishedCache\SafeXmlReaderWriter.cs" />
+    <Compile Include="LegacyXmlPublishedCache\UmbracoContextCache.cs" />
+    <Compile Include="LegacyXmlPublishedCache\XmlPublishedContent.cs" />
+    <Compile Include="LegacyXmlPublishedCache\XmlPublishedProperty.cs" />
+    <Compile Include="LegacyXmlPublishedCache\XmlStore.cs" />
+    <Compile Include="LegacyXmlPublishedCache\XmlStoreFilePersister.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

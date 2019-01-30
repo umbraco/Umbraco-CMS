@@ -6,21 +6,21 @@ using System.Linq;
 using System.Threading;
 using System.Xml.XPath;
 using Examine;
-using Examine.Providers;
 using Examine.Search;
 using Lucene.Net.Store;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Examine;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Web;
 using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     /// <summary>
     /// An IPublishedMediaStore that first checks for the media in Examine, and then reverts to the database

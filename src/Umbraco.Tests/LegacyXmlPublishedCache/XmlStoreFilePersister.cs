@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Scheduling;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     /// <summary>
     /// This is the background task runner that persists the xml file to the file system

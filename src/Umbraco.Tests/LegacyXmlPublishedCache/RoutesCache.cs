@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     // Note: RoutesCache closely follows the caching strategy dating from v4, which
     // is obviously broken in many ways (eg it's a global cache but relying to some

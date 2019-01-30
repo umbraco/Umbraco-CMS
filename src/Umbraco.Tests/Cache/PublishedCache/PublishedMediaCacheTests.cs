@@ -10,12 +10,12 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Web;
 

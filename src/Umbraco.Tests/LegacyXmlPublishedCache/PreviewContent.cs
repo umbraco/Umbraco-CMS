@@ -7,7 +7,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     class PreviewContent
     {

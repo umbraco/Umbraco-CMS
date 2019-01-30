@@ -266,10 +266,6 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetIndexerDetails())
                         },
                         {
-                            "xmlDataIntegrityBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
-                                controller => controller.CheckContentXmlTable())
-                        },
-                        {
                             "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                 controller => controller.GetAllHealthChecks())
                         },

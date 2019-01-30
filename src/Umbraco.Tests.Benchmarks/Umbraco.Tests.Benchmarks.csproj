@@ -61,7 +61,6 @@
     <Compile Include="StringReplaceManyBenchmarks.cs" />
     <Compile Include="TryConvertToBenchmarks.cs" />
     <Compile Include="XmlBenchmarks.cs" />
-    <Compile Include="XmlPublishedContentInitBenchmarks.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
