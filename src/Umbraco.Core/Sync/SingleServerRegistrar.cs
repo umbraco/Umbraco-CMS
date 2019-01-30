@@ -23,7 +23,7 @@ namespace Umbraco.Core.Sync
 
         public string GetCurrentServerUmbracoApplicationUrl()
         {
-            return _runtime.ApplicationUrl.ToString();
+            return _runtime.ApplicationUrl?.ToString();
         }
 
         private class ServerAddressImpl : IServerAddress
