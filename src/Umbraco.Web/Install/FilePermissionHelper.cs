@@ -11,8 +11,8 @@ namespace Umbraco.Web.Install
     internal class FilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
-        private static readonly string[] PermissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.UserControls, SystemDirectories.Preview };
-        private static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.UserControls, SystemDirectories.Packages };
+        private static readonly string[] PermissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Preview };
+        private static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Packages };
 
         // ensure Umbraco can write to these files (the directories must exist)
         private static readonly string[] PermissionFiles = { };

@@ -40,7 +40,7 @@ function macroService() {
 
         /**
          * @ngdoc function
-         * @name umbraco.services.macroService#generateWebFormsSyntax
+         * @name umbraco.services.macroService#generateMacroSyntax
          * @methodOf umbraco.services.macroService
          * @function    
          *
@@ -79,35 +79,6 @@ function macroService() {
             }
 
             macroString += "/>";
-
-            return macroString;
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.macroService#generateWebFormsSyntax
-         * @methodOf umbraco.services.macroService
-         * @function    
-         *
-         * @description
-         * generates the syntax for inserting a macro into a webforms templates
-         * 
-         * @param {object} args an object containing the macro alias and it's parameter values
-         */
-        generateWebFormsSyntax: function(args) {
-            
-            var macroString = '<umbraco:Macro ';
-
-            if (args.macroParamsDictionary) {
-                
-                _.each(args.macroParamsDictionary, function (val, key) {
-                    var keyVal = key + "=\"" + (val ? val : "") + "\" ";
-                    macroString += keyVal;
-                });
-
-            }
-
-            macroString += "Alias=\"" + args.macroAlias + "\" runat=\"server\"></umbraco:Macro>";
 
             return macroString;
         },
@@ -180,10 +151,7 @@ function macroService() {
             });
 
             //get the syntax based on the rendering engine
-            if (renderingEngine && renderingEngine === "WebForms") {
-                syntax = this.generateWebFormsSyntax({ macroAlias: macroAlias, macroParamsDictionary: paramDictionary });
-            }
-            else if (renderingEngine && renderingEngine === "Mvc") {
+            if (renderingEngine && renderingEngine === "Mvc") {
                 syntax = this.generateMvcSyntax({ macroAlias: macroAlias, macroParamsDictionary: paramDictionary });
             }
             else {
