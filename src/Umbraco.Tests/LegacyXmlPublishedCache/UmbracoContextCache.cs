@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Umbraco.Web;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     static class UmbracoContextCache
     {

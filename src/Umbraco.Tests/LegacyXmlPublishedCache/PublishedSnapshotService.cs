@@ -11,11 +11,12 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     /// <summary>
     /// Implements a published snapshot service.

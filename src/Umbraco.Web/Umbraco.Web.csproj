@@ -536,15 +536,6 @@
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
     <Compile Include="PublishedCache\DefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\DictionaryPublishedContent.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\SafeXmlReaderWriter.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="Routing\ContentFinderByUrl.cs" />
@@ -1023,7 +1014,6 @@
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
@@ -1031,8 +1021,6 @@
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\UmbracoContextCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
@@ -1139,10 +1127,7 @@
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedContentCache.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedContent.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
     <Compile Include="Mvc\MasterControllerFactory.cs" />
@@ -1194,7 +1179,6 @@
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Editors\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

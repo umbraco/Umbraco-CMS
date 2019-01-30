@@ -7,10 +7,12 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
 
     /// <summary>

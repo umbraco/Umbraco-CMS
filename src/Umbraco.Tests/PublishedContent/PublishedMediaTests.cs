@@ -8,7 +8,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using System.Linq;
 using System.Threading;
 using System.Xml;
@@ -23,6 +22,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {

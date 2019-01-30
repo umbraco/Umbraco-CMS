@@ -6,9 +6,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     class PublishedMemberCache : IPublishedMemberCache
     {
