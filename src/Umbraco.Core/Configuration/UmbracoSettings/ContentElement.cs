@@ -39,10 +39,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         
         [ConfigurationProperty("GlobalPreviewStorageEnabled")]
         internal InnerTextConfigurationElement<bool> GlobalPreviewStorageEnabled => GetOptionalTextElement("GlobalPreviewStorageEnabled", false);
-
-        [ConfigurationProperty("defaultDocumentTypeProperty")]
-        internal InnerTextConfigurationElement<string> DefaultDocumentTypeProperty => GetOptionalTextElement("defaultDocumentTypeProperty", "Textstring");
-
+        
         [ConfigurationProperty("showDeprecatedPropertyEditors")]
         internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors => GetOptionalTextElement("showDeprecatedPropertyEditors", false);
 
@@ -74,8 +71,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
 
         bool IContentSection.GlobalPreviewStorageEnabled => GlobalPreviewStorageEnabled;
-
-        string IContentSection.DefaultDocumentTypeProperty => DefaultDocumentTypeProperty;
 
         bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 

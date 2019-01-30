@@ -26,9 +26,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> AllowedUploadFiles { get; }
 
         bool GlobalPreviewStorageEnabled { get; }
-
-        string DefaultDocumentTypeProperty { get; }
-
+        
         /// <summary>
         /// Gets a value indicating whether to show deprecated property editors in
         /// a datatype list of available editors.

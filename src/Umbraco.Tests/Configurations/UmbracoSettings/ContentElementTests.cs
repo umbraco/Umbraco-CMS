@@ -65,11 +65,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
         
         [Test]
-        public void DefaultDocumentTypeProperty()
-        {
-            Assert.AreEqual(SettingsSection.Content.DefaultDocumentTypeProperty, "Textstring");
-        }
-        [Test]
         public void GlobalPreviewStorageEnabled()
         {
             Assert.IsFalse(SettingsSection.Content.GlobalPreviewStorageEnabled);
