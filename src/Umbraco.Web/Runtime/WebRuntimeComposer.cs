@@ -151,7 +151,7 @@ namespace Umbraco.Web.Runtime
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
@@ -208,14 +208,10 @@ namespace Umbraco.Web.Runtime
                 .Add(composition.TypeLoader.GetTypes<IDashboard>());
 
             // register back office trees
-            foreach (var treeControllerType in umbracoApiControllerTypes
-                .Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)))
-            {
-                var attribute = treeControllerType.GetCustomAttribute<TreeAttribute>(false);
-                if (attribute == null) continue;
-                var tree = new Tree(attribute.SortOrder, attribute.ApplicationAlias, attribute.TreeAlias, attribute.TreeTitle, treeControllerType, attribute.IsSingleNodeTree);
-                composition.WithCollectionBuilder<TreeCollectionBuilder>().Trees.Add(tree);
-            }
+            // the collection builder only accepts types inheriting from TreeControllerBase
+            // and will filter out those that are not attributed with TreeAttribute
+            composition.WithCollectionBuilder<TreeCollectionBuilder>()
+                .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
         }
     }
 }

@@ -185,7 +185,7 @@ namespace Umbraco.Core.IO
         /// <param name="filePath">The filepath to validate.</param>
         /// <param name="validFileExtensions">The valid extensions.</param>
         /// <returns>A value indicating whether the filepath is valid.</returns>
-        internal static bool VerifyFileExtension(string filePath, List<string> validFileExtensions)
+        internal static bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
         {
             var ext = Path.GetExtension(filePath);
             return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));

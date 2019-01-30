@@ -8,7 +8,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
-    [Tree(Constants.Applications.Members, Constants.Trees.MemberGroups, null, sortOrder: 1)]
+    [Tree(Constants.Applications.Members, Constants.Trees.MemberGroups, SortOrder = 1)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase

@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -28,7 +27,6 @@ namespace Umbraco.Core
         ///      If any route has an extension in the path like .aspx = back office
         /// 
         ///      These are def back office:
-        ///          /Umbraco/RestServices   = back office
         ///          /Umbraco/BackOffice     = back office
         ///          /Umbraco/Preview        = back office
         ///      If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
@@ -78,7 +76,6 @@ namespace Umbraco.Core
 
             //check for special back office paths
             if (urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/BackOffice/")
-                || urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/RestServices/")
                 || urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/Preview/"))
             {
                 return true;

@@ -14,7 +14,7 @@
     a, a:hover {
         outline: none;
         text-decoration: none;
-
+        
         // TODO: => confirm not in use
 //        &.noSpr {
 //            background-position: 0
@@ -28,10 +28,11 @@
         visibility: hidden;
         text-decoration: none;
         font-size: 12px;
-        transition: opacity 120ms ease;
+        transition: color 120ms;
 
         &:hover {
-            opacity: .7;
+            //opacity: .7;
+            color: @ui-option-type-hover;
         }
     }
 
@@ -86,6 +87,23 @@ body.touch .umb-tree {
     }
 }
 
+// active is equivilant to selected, its the item that is begin affected by the actions performed in the right-click-dialog.
+.umb-tree-item > .umb-tree-item__inner.active {
+    //background: @ui-selected;
+    border-color: @ui-selected-border;
+    color: @ui-selected-type;
+    a {
+        color: @ui-selected-type;
+    }
+    &:hover {
+        //background: @ui-selected-hover;
+        border-color: @ui-selected-border-hover;
+        color: @ui-selected-type-hover;
+        a {
+            color: @ui-selected-type-hover;
+        }
+    }
+}
 .umb-tree-root, .umb-tree-item__inner {
     padding: 0;
     position: relative;
@@ -93,16 +111,28 @@ body.touch .umb-tree {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-
-    &.active {
-        background: @gray-10;
+    
+    border:2px dashed transparent;
+    
+    color: @ui-option-type;
+    a {
+        color: @ui-option-type;
     }
-
+    
     &:hover {
-        background: @gray-10;
-
+        background: @ui-option-hover;
+        
+        color: @ui-option-type-hover;
+        a {
+            color: @ui-option-type-hover;
+        }
+        
         > .umb-options {
             visibility: visible;
+        }
+        
+        .umb-tree-icon {
+            color: @ui-option-type-hover;
         }
     }
 }
@@ -245,7 +275,7 @@ body.touch .umb-tree {
 
 .is-container::before {
     content: "\e04e";
-    color: @turquoise;
+    color: @blue;
     font-size: 8px;
     padding-left: 13px;
     padding-top: 8px;
@@ -273,7 +303,8 @@ body.touch .umb-tree {
 .umb-tree-icon { 
     vertical-align: middle;
     margin: 0 13px 0 0;
-    color: @gray-1;
+    //color: @gray-1;
+    color: @ui-option-type;
     font-size: 20px;   
     
     &.blue {

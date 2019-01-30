@@ -26,18 +26,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
-        public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection, ILanguageRepository languageRepository)
+        public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
             : base(scopeAccessor, cache, languageRepository, logger)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
-            EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
         protected override MediaRepository This => this;
 
-        public bool EnsureUniqueNaming { get; set; }
 
         #region Repository Base
 
@@ -543,10 +541,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             media.ResetDirtyProperties(false);
             return media;
         }
-
-        protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
-        {
-            return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
-        }
+        
     }
 }

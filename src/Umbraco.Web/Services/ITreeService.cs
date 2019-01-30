@@ -1,41 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Web.Models.ContentEditing;
+﻿using System.Collections.Generic;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Services
 {
+    /// <summary>
+    /// Represents a service which manages section trees.
+    /// </summary>
     public interface ITreeService
     {
         /// <summary>
-        /// Gets an ApplicationTree by it's tree alias.
+        /// Gets a tree.
         /// </summary>
         /// <param name="treeAlias">The tree alias.</param>
-        /// <returns>An ApplicationTree instance</returns>
         Tree GetByAlias(string treeAlias);
 
         /// <summary>
-        /// Gets all applicationTrees registered in umbraco from the umbracoAppTree table..
+        /// Gets all trees.
         /// </summary>
-        /// <returns>Returns a ApplicationTree Array</returns>
-        IEnumerable<Tree> GetAll();
-        
+        IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main);
+
         /// <summary>
-        /// Gets the application tree for the applcation with the specified alias
+        /// Gets all trees for a section.
         /// </summary>
-        /// <param name="sectionAlias">The application alias.</param>
-        /// <returns>Returns a ApplicationTree Array</returns>
-        IEnumerable<Tree> GetTrees(string sectionAlias);
-        
+        IEnumerable<Tree> GetBySection(string sectionAlias, TreeUse use = TreeUse.Main);
+
         /// <summary>
-        /// Gets the grouped application trees for the application with the specified alias
+        /// Gets all trees for a section, grouped.
         /// </summary>
-        /// <param name="sectionAlias"></param>
-        /// <returns></returns>
-        IDictionary<string, IEnumerable<Tree>> GetGroupedTrees(string sectionAlias);
+        IDictionary<string, IEnumerable<Tree>> GetBySectionGrouped(string sectionAlias, TreeUse use = TreeUse.Main);
     }
-    
 }

@@ -11,7 +11,6 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using NUnit.Framework;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -367,7 +366,6 @@ namespace Umbraco.Tests.Composing
                     "umbraco.interfaces,",
                     "umbraco.providers,",
                     "Umbraco.Web.UI,",
-                    "umbraco.webservices",
                     "Lucene.",
                     "Examine,",
                     "Examine.",

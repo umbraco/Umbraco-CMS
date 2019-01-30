@@ -21,20 +21,6 @@
 @white:                 #FFF;
 @grayIcon:              #9E9E9E;
 
-// Accent colors
-// -------------------------
-
-
-
-@blue:                  #2E8AEA;
-@blueDark:              #0064CD;
-@blueLight:             #ADD8E6;
-@green:                 #46A546;
-@red:                   #9D261D;
-@yellow:                #FFC40D;
-@orange:                #DF7F48;
-@pink:                  #C3325F;
-
 
 // Colors
 // -------------------------
@@ -56,22 +42,22 @@
 
 // UI Colors
 @red-d1:                #F02E28;
-@red:                   #FE3E39;
-@red-l1:			    #FE6561;
+@red:                   #D42054;// updated 2019
+@red-l1:			    #e22c60;// updated 2019
 @red-l2:			    #FE8B88;
 @red-l3:			    #FFB2B0;
 @red-washed:		    #FFECEB;
 
 @yellow-d2:             #F0AC00;
 @yellow-d1:             #FFC011;
-@yellow:                #FFCE38;
+@yellow:                #fad634;// updated 2019
 @yellow-l1:			    #FFD861;
 @yellow-l2:			    #FFE28A;
 @yellow-l3:			    #FFECB0;
 @yellow-washed:		    #FFFAEB;
 
 @green-d1:              #1FB572;
-@green:                 #35C786;
+@green:                 #2bc37c;// updated 2019
 @green-l1:			    #4ECF95;
 @green-l2:			    #79E1B2;
 @green-l3:			    #A6F0CF;
@@ -88,6 +74,12 @@
 @gray-8:                #D8D7D9;
 @gray-9:                #E9E9EB;
 @gray-10:               #F3F3F5;
+@gray-11:               #F6F6F7;
+
+@sand-1:                hsl(22, 33%, 93%);// added 2019
+@sand-2:                hsl(22, 34%, 88%);// added 2019
+@sand-5:                hsl(22, 31%, 93%);// added 2019
+@sand-7:                hsl(22, 26%, 97%);// added 2019
 
 
 // Additional Icon Colours
@@ -108,6 +100,89 @@
 @deepPurpleIcon:        #673AB7;
 @indigoIcon:            #3F51B5;
 
+
+// Brand colors
+// -------------------------
+
+//@blueLight:               #4f89de;
+@blue:                  #2E8AEA;
+@blueMid:               #2152A3;// updated 2019
+@blueDark:              #3544b1;// updated 2019
+@blueExtraDark:         #1b264f;// added 2019
+@blueLight:             #ADD8E6;
+@blueNight:             #162335;// added 2019
+@orange:                #f79c37;// updated 2019
+@pink:                  #D93F4C;// #C3325F;// update 2019
+@pinkLight:             #f5c1bc;// added 2019
+@pinkRedLight:          #ff8a89;// added 2019
+@brown:                 #9d8057;// added 2019
+@brownLight:            #e4e0dd;// added 2019
+@brownGrayLight:        #f3f2f1;// added 2019
+@orange:                #ff9412;// added 2019
+
+//@u-greyLight:           #f2ebe6;// added 2019
+@u-white:               #f9f7f4;// added 2019
+@u-black:               black;// added 2019
+
+
+// UI colors
+// -------------------------
+
+@ui-option-type:        @blueExtraDark;
+@ui-option-hover:       @sand-7;
+@ui-option-type-hover:  @blueMid;
+
+//@ui-active:           #346ab3;
+@ui-active:             @pinkLight;
+@ui-active-type:        @blueExtraDark;
+@ui-active-type-hover:  @blueMid;
+
+@ui-selected:           @sand-1;
+@ui-selected-hover:     ligthen(@sand-1, 10);
+@ui-selected-type:           @blueExtraDark;
+@ui-selected-type-hover:     @blueMid;
+@ui-selected-border:           @pinkLight;
+@ui-selected-border-hover:     @pinkLight;
+
+@ui-light-border:           @pinkLight;
+@ui-light-type:             @gray-4;
+@ui-light-type-hover:       @blueMid;
+
+@ui-light-active-border:      @pinkLight;
+@ui-light-active-type:        @blueExtraDark;
+@ui-light-active-type-hover:  @blueMid;
+
+
+@ui-action:             white;
+@ui-action-hover:       @sand-7;
+@ui-action-type:             @blueExtraDark;
+@ui-action-type-hover:       @blueMid;
+@ui-action-border:             @blueExtraDark;
+@ui-action-border-hover:       @blueMid;
+
+@ui-action-disgrete:              white;
+@ui-action-disgrete-hover:        @sand-7;
+@ui-action-disgrete-type:         @blueExtraDark;
+@ui-action-disgrete-type-hover:   @blueMid;
+@ui-action-disgrete-border:         @gray-7;
+@ui-action-disgrete-border-hover:   @blueMid;
+
+@type-white:                      @white;
+@type-black:                      @blueNight;
+
+@ui-btn:                        @blueExtraDark;
+@ui-btn-hover:                  @blueMid;
+@ui-btn-type:                   @white;
+
+@ui-btn-positive:               @green;
+@ui-btn-positive-hover:         @green-l1;
+@ui-btn-positive-type:          @white;
+
+@ui-btn-negative:               @red;
+@ui-btn-negative-hover:         @red;
+
+@ui-icon:             @blueNight;
+@ui-icon-hover:       @blueMid;
 
 
 
@@ -130,14 +205,11 @@
 .btn-color-black {background-color: @black;}
 .color-black i { color: @black;}
 
-
 .btn-color-blue-grey {background-color: @blueGrey;}
 .color-blue-grey, .color-blue-grey i { color: @blueGrey !important;}
 
-
 .btn-color-grey{background-color: @grayIcon;}
 .color-grey, .color-grey i { color: @grayIcon !important; }
-
 
 .btn-color-brown{background-color: @brownIcon;}
 .color-brown, .color-brown i { color: @brownIcon !important; }
@@ -193,7 +265,7 @@
 // -------------------------
 @appHeaderHeight:       55px;
 @bodyBackground:        @gray-10;
-@textColor:             @gray-2;
+@textColor:             #000;
 
 @editorHeaderHeight:    70px;
 @editorFooterHeight:    50px;
@@ -253,19 +325,27 @@
 @btnBackgroundHighlight:            @gray-9;
 @btnBorder:                         @gray-9;
 
-@btnPrimaryBackground:              @green;
-@btnPrimaryBackgroundHighlight:     @green;
+@btnPrimaryBackground:              @ui-btn-positive;
+@btnPrimaryBackgroundHighlight:     @ui-btn-positive-hover;
 
-@btnInfoBackground:                 @purple-l1;
-@btnInfoBackgroundHighlight:        @purple-l1;
+@btnInfoType:                       @ui-btn-type;// updated 2019
+@btnInfoTypeHover:                  @ui-btn-type;// updated 2019
+@btnInfoBackground:                 @ui-btn;// updated 2019
+@btnInfoBackgroundHighlight:        @ui-btn-hover;// updated 2019
 
-@btnSuccessBackground:              @green;
-@btnSuccessBackgroundHighlight:     @green;
+@btnWhiteType:                      @blueExtraDark;// updated 2019
+@btnWhiteTypeHover:                 @ui-action-type-hover;// updated 2019
+@btnWhiteBackground:                @white;// updated 2019
+@btnWhiteBackgroundHighlight:       @white;// updated 2019
 
-@btnWarningBackground:              @red-l1;
-@btnWarningBackgroundHighlight:     @red-l1;
+@btnSuccessType:                    @ui-btn-positive-type;// updated 2019
+@btnSuccessBackground:              @ui-btn-positive;// updated 2019
+@btnSuccessBackgroundHighlight:     @ui-btn-positive-hover;// updated 2019
 
-@btnDangerBackground:               @red-l1;
+@btnWarningBackground:              @orange;
+@btnWarningBackgroundHighlight:     lighten(@orange, 10%);
+
+@btnDangerBackground:               @red;
 @btnDangerBackgroundHighlight:      @red-l1;
 
 @btnInverseBackground:              @gray-2;
@@ -278,7 +358,8 @@
 // Forms
 // -------------------------
 @inputBackground:               @white;
-@inputBorder:                   @gray-7;
+@inputBorder:                   @gray-8;
+@inputBorderFocus:              @gray-7;
 @inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;

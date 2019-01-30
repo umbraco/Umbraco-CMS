@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core;
+using Umbraco.Web.JavaScript;
 
 namespace Umbraco.Tests.Web.AngularIntegration
 {

@@ -17,18 +17,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class MemberCache : IPublishedMemberCache, INavigableData
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+
         public readonly IVariationContextAccessor VariationContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IAppCache _snapshotCache;
         private readonly IMemberService _memberService;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly bool _previewDefault;
 
-        public MemberCache(bool previewDefault, IAppCache snapshotCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IEntityXmlSerializer entitySerializer)
+        public MemberCache(bool previewDefault, IAppCache snapshotCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IUmbracoContextAccessor umbracoContextAccessor, IEntityXmlSerializer entitySerializer)
         {
             _snapshotCache = snapshotCache;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             VariationContextAccessor = variationContextAccessor;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _entitySerializer = entitySerializer;
             _memberService = memberService;
             _previewDefault = previewDefault;
@@ -64,14 +68,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     var member = _memberService.GetById(memberId);
                     return member == null
                         ? null
-                        : PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, VariationContextAccessor);
+                        : PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, VariationContextAccessor, _umbracoContextAccessor);
                 });
         }
 
         private IPublishedContent /*IPublishedMember*/ GetById(IMember member, bool previewing)
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ById", _previewDefault, member.Id), () =>
-                PublishedMember.Create(member, GetContentType(member.ContentTypeId), previewing, _publishedSnapshotAccessor, VariationContextAccessor));
+                PublishedMember.Create(member, GetContentType(member.ContentTypeId), previewing, _publishedSnapshotAccessor, VariationContextAccessor, _umbracoContextAccessor));
         }
 
         public IPublishedContent /*IPublishedMember*/ GetByProviderKey(object key)
@@ -106,7 +110,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public IPublishedContent /*IPublishedMember*/ GetByMember(IMember member)
         {
-            return PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, VariationContextAccessor);
+            return PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, VariationContextAccessor, _umbracoContextAccessor);
         }
 
         public IEnumerable<IPublishedContent> GetAtRoot(bool preview)
@@ -114,7 +118,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // because members are flat (not a tree) everything is at root
             // because we're loading everything... let's just not cache?
             var members = _memberService.GetAllMembers();
-            return members.Select(m => PublishedMember.Create(m, GetContentType(m.ContentTypeId), preview, _publishedSnapshotAccessor, VariationContextAccessor));
+            return members.Select(m => PublishedMember.Create(m, GetContentType(m.ContentTypeId), preview, _publishedSnapshotAccessor, VariationContextAccessor, _umbracoContextAccessor));
         }
 
         public XPathNavigator CreateNavigator()

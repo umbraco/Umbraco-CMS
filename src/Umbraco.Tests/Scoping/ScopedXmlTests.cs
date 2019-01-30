@@ -12,11 +12,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -84,10 +84,6 @@ namespace Umbraco.Tests.Scoping
             // sanity checks
             Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
             Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
-
-            // settings
-            var contentMock = Mock.Get(Factory.GetInstance<IUmbracoSettingsSection>().Content);
-            contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
 
             // create document type, document
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
@@ -202,11 +198,6 @@ namespace Umbraco.Tests.Scoping
             // sanity checks
             Assert.AreSame(umbracoContext, Umbraco.Web.Composing.Current.UmbracoContext);
             Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.ContentCache).XmlStore);
-
-            // settings
-            var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var contentMock = Mock.Get(Factory.GetInstance<IUmbracoSettingsSection>().Content);
-            contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
 
             // create document type
             var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
