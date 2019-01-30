@@ -77,7 +77,14 @@ function ColorPickerController($scope, angularHelper) {
     $scope.onSelect = function (color) {
         // did the value change?
         if ($scope.model.value.value === color) {
-            // no, skip the rest
+            // User clicked the currently selected color
+            // to remove the selection, they don't want
+            // to select any color after all.
+            // Unselect the color and mark as dirty
+            $scope.model.activeColor = null;
+            $scope.model.value = null;
+            angularHelper.getCurrentForm($scope).$setDirty();
+
             return;
         }
 
