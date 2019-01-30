@@ -36,10 +36,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("allowedUploadFiles")]
         internal CommaDelimitedConfigurationElement AllowedUploadFiles => GetOptionalDelimitedElement("allowedUploadFiles", new string[0]);
-
-        [ConfigurationProperty("cloneXmlContent")]
-        internal InnerTextConfigurationElement<bool> CloneXmlContent => GetOptionalTextElement("cloneXmlContent", true);
-
+        
         [ConfigurationProperty("GlobalPreviewStorageEnabled")]
         internal InnerTextConfigurationElement<bool> GlobalPreviewStorageEnabled => GetOptionalTextElement("GlobalPreviewStorageEnabled", false);
 
@@ -75,8 +72,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> IContentSection.DisallowedUploadFiles => DisallowedUploadFiles;
 
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
-
-        bool IContentSection.CloneXmlContent => CloneXmlContent;
 
         bool IContentSection.GlobalPreviewStorageEnabled => GlobalPreviewStorageEnabled;
 

@@ -25,8 +25,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> AllowedUploadFiles { get; }
 
-        bool CloneXmlContent { get; }
-
         bool GlobalPreviewStorageEnabled { get; }
 
         string DefaultDocumentTypeProperty { get; }

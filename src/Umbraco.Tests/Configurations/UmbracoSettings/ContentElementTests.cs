@@ -74,11 +74,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsFalse(SettingsSection.Content.GlobalPreviewStorageEnabled);
         }
-        [Test]
-        public void CloneXmlContent()
-        {
-            Assert.IsTrue(SettingsSection.Content.CloneXmlContent);
-        }
         
         [Test]
         public void PreviewBadge()

@@ -263,7 +263,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private bool SyncFromXmlFile => false;
 
         // whether _xml is immutable or not (achieved by cloning before changing anything)
-        private static bool XmlIsImmutable => Current.Configs.Settings().Content.CloneXmlContent;
+        private static bool XmlIsImmutable => true;
 
         // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
         // for audit purposes - false by default, not in umbracoSettings.config
