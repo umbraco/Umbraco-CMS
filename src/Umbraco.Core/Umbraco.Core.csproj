@@ -211,9 +211,6 @@
     <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="Configuration\Configs.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
-    <Compile Include="Configuration\FileSystemProviderElement.cs" />
-    <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
-    <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
@@ -235,8 +232,6 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
-    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
-    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\IGlobalSettings.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\LocalTempStorage.cs" />
