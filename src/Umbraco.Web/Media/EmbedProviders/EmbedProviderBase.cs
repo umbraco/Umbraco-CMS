@@ -1,46 +1,39 @@
-﻿using System;
-using System.Text;
-using System.Xml;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Web;
-using Newtonsoft.Json;
+using System.Xml;
 using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    // TODO: Make all Http calls async
-
-    public abstract class AbstractOEmbedProvider : IEmbedProvider
+    public abstract class EmbedProviderBase : IEmbedProvider
     {
         private static HttpClient _httpClient;
 
-        public virtual bool SupportsDimensions
-        {
-            get { return true; }
-        }
+        public abstract string ApiEndpoint { get; }
 
-        [ProviderSetting]
-        public string APIEndpoint { get; set; }
+        public abstract string[] UrlSchemeRegex { get; }
 
-        [ProviderSetting]
-        public Dictionary<string, string> RequestParams { get; set; }
+        public abstract Dictionary<string, string> RequestParams { get; }
+        
+        public abstract string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
-        public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
-
-        public virtual string BuildFullUrl(string url, int maxWidth, int maxHeight)
+        public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
                 throw new ArgumentException("Not a valid Url");
 
             var fullUrl = new StringBuilder();
 
-            fullUrl.Append(APIEndpoint);
+            fullUrl.Append(ApiEndpoint);
             fullUrl.Append("?url=" + HttpUtility.UrlEncode(url));
 
-            foreach (var p in RequestParams)
-                fullUrl.Append(string.Format("&{0}={1}", p.Key, p.Value));
+            foreach (var param in RequestParams)
+                fullUrl.Append($"&{param.Key}={param.Value}");
 
             if (maxWidth > 0)
                 fullUrl.Append("&maxwidth=" + maxWidth);
@@ -50,7 +43,7 @@ namespace Umbraco.Web.Media.EmbedProviders
 
             return fullUrl.ToString();
         }
-
+        
         public virtual string DownloadResponse(string url)
         {
             if (_httpClient == null)
@@ -83,6 +76,5 @@ namespace Umbraco.Web.Media.EmbedProviders
             var selectSingleNode = doc.SelectSingleNode(property);
             return selectSingleNode != null ? selectSingleNode.InnerText : string.Empty;
         }
-
     }
-}
+};

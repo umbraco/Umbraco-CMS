@@ -23,6 +23,7 @@ using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -212,6 +213,16 @@ namespace Umbraco.Web.Runtime
             // and will filter out those that are not attributed with TreeAttribute
             composition.WithCollectionBuilder<TreeCollectionBuilder>()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
+
+            // register OEmbed providers
+            // no type scanning - all explicit opt-in of adding types
+            composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
+                .Append<Flickr>()
+                .Append<Slideshare>()
+                .Append<Kickstarter>()
+                .Append<GettyImages>()
+                .Append<Instagram>()
+                .Append<Twitter>();
         }
     }
 }
