@@ -11,23 +11,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> ImageFileTypes { get; }
 
-        IEnumerable<string> ImageTagAllowedAttributes { get; }
-
         IEnumerable<IImagingAutoFillUploadField> ImageAutoFillProperties { get; }
         
-        string ScriptFolderPath { get; }
-
-        IEnumerable<string> ScriptFileTypes { get; }
-
-        bool ScriptEditorDisable { get; }
-
         bool ResolveUrlsFromTextString { get; }
 
-        bool UploadAllowDirectories { get; }
-
         IEnumerable<IContentErrorPage> Error404Collection { get; }
-
-        bool EnsureUniqueNaming { get; }
 
         bool XmlCacheEnabled { get; }
 

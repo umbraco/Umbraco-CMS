@@ -11,14 +11,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging => (ContentImagingElement) this["imaging"];
 
-        [ConfigurationProperty("scripteditor")]
-        internal ContentScriptEditorElement ScriptEditor => (ContentScriptEditorElement) this["scripteditor"];
-
         [ConfigurationProperty("ResolveUrlsFromTextString")]
         internal InnerTextConfigurationElement<bool> ResolveUrlsFromTextString => GetOptionalTextElement("ResolveUrlsFromTextString", false);
-
-        [ConfigurationProperty("UploadAllowDirectories")]
-        internal InnerTextConfigurationElement<bool> UploadAllowDirectories => GetOptionalTextElement("UploadAllowDirectories", true);
 
         public IEnumerable<IContentErrorPage> Error404Collection => Errors.Error404Collection;
 
@@ -27,9 +21,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
-
-        [ConfigurationProperty("ensureUniqueNaming")]
-        internal InnerTextConfigurationElement<bool> EnsureUniqueNaming => GetOptionalTextElement("ensureUniqueNaming", true);
 
         [ConfigurationProperty("XmlCacheEnabled")]
         internal InnerTextConfigurationElement<bool> XmlCacheEnabled => GetOptionalTextElement("XmlCacheEnabled", true);
@@ -85,21 +76,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> IContentSection.ImageFileTypes => Imaging.ImageFileTypes;
 
-        IEnumerable<string> IContentSection.ImageTagAllowedAttributes => Imaging.ImageTagAllowedAttributes;
-
         IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties => Imaging.ImageAutoFillProperties;
 
-        bool IContentSection.ScriptEditorDisable => ScriptEditor.ScriptEditorDisable;
-
-        string IContentSection.ScriptFolderPath => ScriptEditor.ScriptFolderPath;
-
-        IEnumerable<string> IContentSection.ScriptFileTypes => ScriptEditor.ScriptFileTypes;
-
         bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
-
-        bool IContentSection.UploadAllowDirectories => UploadAllowDirectories;
-
-        bool IContentSection.EnsureUniqueNaming => EnsureUniqueNaming;
 
         bool IContentSection.XmlCacheEnabled => XmlCacheEnabled;
 

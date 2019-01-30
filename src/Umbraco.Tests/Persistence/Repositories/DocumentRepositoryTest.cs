@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, templateRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
-            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
