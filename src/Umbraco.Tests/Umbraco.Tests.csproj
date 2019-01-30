@@ -298,8 +298,6 @@
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
