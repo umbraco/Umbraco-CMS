@@ -217,18 +217,15 @@ namespace Umbraco.Web
             var lpath = uri.AbsolutePath.ToLowerInvariant();
 
             // handle directory-urls used for asmx
-            // legacy - what's the point really?
-            if (/*maybeDoc &&*/ _globalSettings.UseDirectoryUrls)
+            // TODO: legacy - what's the point really?
+            var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
+            if (asmxPos >= 0)
             {
-                var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
-                if (asmxPos >= 0)
-                {
-                    // use uri.AbsolutePath, not path, 'cos path has been lowercased
-                    httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
-                        uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                        uri.Query.TrimStart('?'));
-                    maybeDoc = false;
-                }
+                // use uri.AbsolutePath, not path, 'cos path has been lowercased
+                httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
+                    uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
+                    uri.Query.TrimStart('?'));
+                maybeDoc = false;
             }
 
             // a document request should be
@@ -260,35 +257,18 @@ namespace Umbraco.Web
 
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
-            var debug = _runtime.Debug;
             var level = _runtime.Level;
             switch (level)
             {
+                // we should never handle Unknown nor Boot: the runtime boots in Application_Start
+                // and as long as it has not booted, no request other than the initial request is
+                // going to be served (see https://stackoverflow.com/a/21402100)
+                // we should never handle BootFailed: if boot failed, the pipeline should not run
+                // at all
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
-                    // not ready yet, but wait
-                    ReportRuntime(level, "Umbraco is booting.");
-
-                    // let requests pile up and wait for 10s then show the splash anyway
-                    if (Current.Configs.Settings().Content.EnableSplashWhileLoading == false
-                        && ((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
-
-                    // redirect to booting page
-                    httpContext.Response.StatusCode = 503; // temp not available
-                    const string bootUrl = "~/config/splashes/booting.aspx";
-                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
-                    return false; // cannot serve content
-
                 case RuntimeLevel.BootFailed:
-                    // redirect to death page
-                    ReportRuntime(level, "Umbraco has failed.");
-
-                    httpContext.Response.StatusCode = 503; // temp not available
-                    const string deathUrl = "~/config/splashes/death.aspx";
-                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "300"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(deathUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
-                    return false; // cannot serve content
+                    throw new Exception($"panic: Unexpected runtime level: {level}.");
 
                 case RuntimeLevel.Run:
                     // ok
@@ -304,7 +284,7 @@ namespace Umbraco.Web
                     return false; // cannot serve content
 
                 default:
-                    throw new NotSupportedException($"Unexpected runtime level: {Current.RuntimeState.Level}.");
+                    throw new NotSupportedException($"Unexpected runtime level: {level}.");
             }
         }
 

@@ -6,10 +6,10 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
+using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.UI.JavaScript;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors

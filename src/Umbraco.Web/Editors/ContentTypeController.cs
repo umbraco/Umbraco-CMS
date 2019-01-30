@@ -22,12 +22,9 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -573,7 +570,7 @@ namespace Umbraco.Web.Editors
                 model.Notifications.Add(new Notification(
                     Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                     Services.TextService.Localize("media/disallowedFileType"),
-                    SpeechBubbleIcon.Warning));
+                    NotificationStyle.Warning));
             }
 
             return model;

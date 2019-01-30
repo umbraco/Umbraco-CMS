@@ -6,6 +6,11 @@
     public enum RuntimeLevelReason
     {
         /// <summary>
+        /// The reason is unknown.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
         /// The code version is lower than the version indicated in web.config, and
         /// downgrading Umbraco is not supported.
         /// </summary>

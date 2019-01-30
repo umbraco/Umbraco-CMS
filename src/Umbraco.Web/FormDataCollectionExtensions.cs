@@ -81,5 +81,24 @@ namespace Umbraco.Web
                 ? converted.Result
                 : default(T);
         }
+
+        /// <summary>
+        /// Returns the object based in the collection based on it's key. This does this with a conversion so if it doesn't convert or the query string is no there an exception is thrown
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static T GetRequiredValue<T>(this FormDataCollection items, string key)
+        {
+            var val = items.Get(key);
+            if (string.IsNullOrEmpty(val))
+                throw new InvalidOperationException($"The required query string parameter {key} is missing");
+
+            var converted = val.TryConvertTo<T>();
+            return converted.Success
+                ? converted.Result
+                : throw new InvalidOperationException($"The required query string parameter {key} cannot be converted to type {typeof(T)}");
+        }
     }
 }

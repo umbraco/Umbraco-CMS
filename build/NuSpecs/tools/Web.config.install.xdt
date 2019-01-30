@@ -2,7 +2,6 @@
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
   <configSections xdt:Transform="InsertIfMissing" />
   <configSections>
-    <section name="FileSystemProviders" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <section name="ExamineLuceneIndexSets" type="Umbraco.Examine.Config.IndexSets, Umbraco.Examine" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="SetAttributes(type,requirePermission)" />
 
     <sectionGroup name="applicationSettings" xdt:Locator="Match(name)">
@@ -11,7 +10,6 @@
     <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing">
       <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
-      <section name="FileSystemProviders" type="Umbraco.Core.Configuration.FileSystemProvidersSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="dashBoard" type="Umbraco.Core.Configuration.Dashboard.DashboardSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </sectionGroup>
@@ -27,12 +25,9 @@
 
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
     <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
-    <FileSystemProviders configSource="config\FileSystemProviders.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <dashBoard configSource="config\Dashboard.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <HealthChecks configSource="config\HealthChecks.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
   </umbracoConfiguration>
-
-  <FileSystemProviders xdt:Transform="Remove" />
 
   <system.data xdt:Transform="InsertIfMissing">
     <DbProviderFactories xdt:Transform="InsertIfMissing">

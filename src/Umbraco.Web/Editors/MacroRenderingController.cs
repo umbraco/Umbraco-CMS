@@ -137,7 +137,7 @@ namespace Umbraco.Web.Editors
                 Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture.Culture);
             }
 
-            var legacyPage = new global::umbraco.page(doc, _variationContextAccessor);
+            var legacyPage = new global::Umbraco.Web.Macros.PublishedContentHashtableConverter(doc, _variationContextAccessor);
 
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;

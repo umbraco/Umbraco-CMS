@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
 using NUnit.Framework;
-using Umbraco.Core.Profiling;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Runtime;
 

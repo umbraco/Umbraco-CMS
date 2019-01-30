@@ -15,7 +15,7 @@
 // sortable-helper
 .umb-grid .ui-sortable-helper {
     position: absolute !important;
-    background-color: @turquoise !important;
+    background-color: @blueMid !important;
     height: 42px !important;
     width: 42px !important;
     overflow: hidden;
@@ -47,7 +47,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    background-color: @turquoise;
+    background-color: @blueMid;
     height: 2px;
     margin-bottom: 20px;
 
@@ -56,7 +56,7 @@
         top: -9px;
         font-family: "icomoon";
         font-size: 18px;
-        color: @turquoise;
+        color: @blueMid;
     }
 
     &:before {
@@ -169,7 +169,7 @@
     transition: border-color 100ms linear;
 
     &:hover {
-        border-color: @turquoise;
+        border-color: @blueMid;
         cursor: pointer;
     }
 }
@@ -202,13 +202,14 @@
     cursor: pointer;
     float: right;
     &:hover {
-        color: @turquoise-d1;
+        color: @ui-action-type-hover;
     }
 }
 
 .umb-grid .cell-tools-add {
-    color: @turquoise-d1;
+    color: @ui-action-type;
     &:focus, &:hover {
+        color: @ui-action-type-hover;
         text-decoration: none;
     }
 }
@@ -218,7 +219,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: @turquoise-d1;
+    color: @ui-action-type;
 }
 
 .umb-grid .cell-tools-add.-bar {
@@ -306,7 +307,7 @@
 }
 
 .umb-control-collapsed:hover {
-    border-color: @turquoise;
+    border-color: @ui-action-border-hover
 }
 
 .umb-grid .umb-control-click-overlay {
@@ -319,7 +320,7 @@
     opacity: 0;
     cursor: pointer;
     &:hover {
-        background-color: @turquoise;
+        background-color: @ui-action-type-hover;
         opacity: 0.1;
         transition: opacity 0.1s;
     }
@@ -411,7 +412,7 @@
 
 // Row states
 .umb-grid .umb-row.-active {
-    background-color: @turquoise-d1;
+    background-color: @ui-action-type;
 
     .umb-row-title-bar {
         cursor: move;
@@ -474,7 +475,7 @@
 
     .umb-cell-content.-has-editors {
         box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
-        border-color: @turquoise;
+        border-color: @ui-action-border;
     }
 }
 
@@ -577,9 +578,9 @@
     margin: 2px;
 
     &:hover, &:hover * {
-        background: @turquoise !important;
+        background: @ui-action-type-hover !important;
         color: @white !important;
-        border-color: @turquoise !important;
+        border-color: @ui-action-type-hover !important;
         text-decoration: none;
     }
 }
@@ -709,7 +710,7 @@
 }
 
 .umb-grid .umb-control.-active {
-    border-color: @turquoise;
+    border-color: @ui-action-border;
 }
 
 .umb-grid .umb-templates-columns {
@@ -722,7 +723,7 @@
 
 .umb-grid .umb-control-bar {
     opacity: 0;
-    background: @turquoise;
+    background: @ui-action-type;
     padding: 2px 5px;
     color: @white;
     font-size: 12px;
@@ -775,7 +776,7 @@
 }
 
 .umb-grid .umb-templates-template a.tb:hover {
-    border: 5px solid @turquoise;
+    border: 5px solid @blueMid;
 }
 
 .umb-grid .umb-templates-template .tb {
@@ -805,7 +806,7 @@
 
 .umb-grid a.umb-templates-column:hover,
 .umb-grid a.umb-templates-column.selected {
-    background-color: @turquoise;
+    background-color: @blueMid;
 }
 
 
@@ -855,7 +856,7 @@
         }
 
         &:hover {
-            border-color: @turquoise;
+            border-color: @blueMid;
             cursor: pointer;
         }
 
@@ -997,7 +998,7 @@
     font-size: 12px;
 
     &:hover, &:hover * {
-        background: @turquoise;
+        background: @blueMid;
         color: @white;
     }
 }

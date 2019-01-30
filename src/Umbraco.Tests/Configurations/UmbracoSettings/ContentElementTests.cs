@@ -130,11 +130,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.XmlContentCheckForDiskChanges);
         }
-        [Test]
-        public void EnableSplashWhileLoading()
-        {
-            Assert.IsFalse(SettingsSection.Content.EnableSplashWhileLoading);
-        }
+        
         [Test]
         public void PropertyContextHelpOption()
         {

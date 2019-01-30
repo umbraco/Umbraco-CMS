@@ -54,18 +54,6 @@ namespace Umbraco.Tests.Routing
             //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
             //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";
 
-            Directory.CreateDirectory(Path.GetDirectoryName(IOHelper.MapPath(SystemFiles.NotFoundhandlersConfig, false)));
-
-            //create the not found handlers config
-            using (var sw = File.CreateText(IOHelper.MapPath(SystemFiles.NotFoundhandlersConfig, false)))
-            {
-                sw.Write(@"<NotFoundHandlers>
-    <notFound assembly='umbraco' type='SearchForAlias' />
-    <notFound assembly='umbraco' type='SearchForTemplate'/>
-    <notFound assembly='umbraco' type='SearchForProfile'/>
-    <notFound assembly='umbraco' type='handle404'/>
-</NotFoundHandlers>");
-            }
         }
 
         public override void TearDown()
