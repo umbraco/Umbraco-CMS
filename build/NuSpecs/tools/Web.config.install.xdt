@@ -2,8 +2,6 @@
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
   <configSections xdt:Transform="InsertIfMissing" />
   <configSections>
-    <section name="ExamineLuceneIndexSets" type="Umbraco.Examine.Config.IndexSets, Umbraco.Examine" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="SetAttributes(type,requirePermission)" />
-
     <sectionGroup name="applicationSettings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing">
@@ -18,7 +16,6 @@
     <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
 	<add key="Umbraco.ModelsBuilder.Enable" value="false" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
 	<add key="Umbraco.ModelsBuilder.ModelsMode" value="Nothing" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
-	<add key="umbracoDefaultUILanguage" value="en-US" xdt:Locator="Match(key)" xdt:Transform="SetAttributes(value)" />
   </appSettings>
 
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
@@ -40,7 +37,7 @@
     <siteMap xdt:Transform="Remove" />
     <httpRuntime xdt:Transform="InsertIfMissing" />
     <httpRuntime maxRequestLength="51200" fcnMode="Single" xdt:Transform="SetAttributes(fcnMode,maxRequestLength)" />
-    <httpRuntime targetFramework="4.5" xdt:Locator="Condition(count(@targetFramework) != 1)" xdt:Transform="SetAttributes(targetFramework)" />
+    <httpRuntime targetFramework="4.7.2" xdt:Locator="Condition(count(@targetFramework) != 1)" xdt:Transform="SetAttributes(targetFramework)" />
 
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
     <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
