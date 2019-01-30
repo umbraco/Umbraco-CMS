@@ -2,7 +2,7 @@ using System;
 
 namespace Umbraco.Web.Models.TemplateQuery
 {
-    public static class OperatorFactory
+    internal static class OperatorFactory
     {
         public static Operator FromString(string stringOperator)
         {
