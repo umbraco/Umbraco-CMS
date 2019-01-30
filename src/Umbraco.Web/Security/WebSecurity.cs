@@ -223,7 +223,7 @@ namespace Umbraco.Web.Security
             // Check for console access
             if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext)))
             {
-                if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
+                if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
             }
             return ValidateRequestAttempt.Success;

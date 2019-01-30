@@ -67,7 +67,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // GetPreValuesCollectionByDataTypeId is cached at repository level;
             // still, the collection is deep-cloned so this is kinda expensive,
             // better to cache here + trigger refresh in DataTypeCacheRefresher
-            // todo: this is cheap now, remove the caching
+            // TODO: this is cheap now, remove the caching
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {

@@ -35,6 +35,11 @@ namespace Umbraco.Web.Models.Mapping
 
         public UrlInfo[] Resolve(IContent source, ContentItemDisplay destination, UrlInfo[] destMember, ResolutionContext context)
         {
+            if (source.ContentType.IsElement)
+            {
+                return new UrlInfo[0];
+            }
+
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             var urls = umbracoContext == null

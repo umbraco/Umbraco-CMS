@@ -28,6 +28,13 @@
   border: 1px dashed @gray-8;
   background: none;
   cursor: pointer;
+  
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+      border-color: @ui-option-type-hover;
+      text-decoration: none;
+  }
 }
 
 .umb-grid-selector__item-content {
@@ -48,7 +55,7 @@
 }
 
 .umb-grid-selector__item-label.-blue {
-  color: @turquoise-d1;
+  color: @ui-option-type;
 }
 
 .umb-grid-selector__item-remove {
@@ -56,6 +63,10 @@
   top: 5px;
   right: 5px;
   cursor: pointer;
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+  }
 }
 
 .umb-grid-selector__item-default-label {
@@ -64,9 +75,15 @@
 }
 
 .umb-grid-selector__item-default-label.-blue {
-  color: @turquoise-d1;
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+  }
 }
 
 .umb-grid-selector__item-add {
-  color: @turquoise-d1;
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+  }
 }

@@ -23,14 +23,28 @@
     position: relative;
     overflow: hidden;
     cursor: pointer;
-
+    
+    border: 2px dashed transparent;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
-
-    transition: box-shadow 100ms;
+    
+    transition: box-shadow 150ms ease-in-out;
 }
 
 .umb-media-grid__item.-file {
     background-color: @white;
+}
+
+.umb-media-grid__item.-selected {
+    box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
+    
+    //background: @ui-selected;
+    color:@ui-selected-type;
+    border-color:@ui-selected-border;
+    
+    &:hover {
+        color:@ui-selected-type-hover;
+        border-color:@ui-selected-border-hover;
+    }
 }
 
 .umb-media-grid__item-file-icon > span {
@@ -43,10 +57,6 @@
     margin-top: -30px;
     margin-left: -10px;
     position: relative;
-}
-
-.umb-media-grid__item.-selected {
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,.35);
 }
 
 .umb-media-grid__item:hover {
@@ -90,12 +100,13 @@
    box-sizing: border-box;
    font-size: 12px;
    overflow: hidden;
-   color: @white;
+   color: @black;
    white-space: nowrap;
-   background: @purple;
+   border-top:1px solid @gray-9;
+   background: @white;
    transition: opacity 150ms;
 }
-
+/*
 .umb-media-grid__item.-file .umb-media-grid__item-overlay {
     opacity: 1;
     color: @gray-4;
@@ -105,9 +116,9 @@
 .umb-media-grid__item.-file:hover .umb-media-grid__item-overlay,
 .umb-media-grid__item.-file.-selected .umb-media-grid__item-overlay {
     color: @white;
-    background: @purple;
+    background: @blueExtraDark;
 }
-
+*/
 .umb-media-grid__info {
     margin-right: 5px;
 }
@@ -134,7 +145,7 @@
    font-size: 40px !important;
    transform: translate(-50%,-50%);
 }
-
+/*
 .umb-media-grid__checkmark {
     position: absolute;
     z-index: 2;
@@ -152,7 +163,7 @@
     color: @white;
     transition: background 100ms;
 }
-
+*/
 .umb-media-grid__edit {
     position: absolute;
     opacity: 0;

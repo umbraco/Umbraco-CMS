@@ -22,15 +22,15 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class SectionController : UmbracoAuthorizedJsonController
     {
-        private readonly Dashboards _dashboards;
+        private readonly IDashboardService _dashboardService;
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
 
         public SectionController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            Dashboards dashboards, ISectionService sectionService, ITreeService treeService)
+            IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService)
             : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
-            _dashboards = dashboards;
+            _dashboardService = dashboardService;
             _sectionService = sectionService;
             _treeService = treeService;
         }
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
                 ControllerContext = ControllerContext
             };
 
-            var dashboards = _dashboards.GetDashboards(Security.CurrentUser);
+            var dashboards = _dashboardService.GetDashboards(Security.CurrentUser);
 
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for
             //a dashboard for a given section, then the UI can deal with it accordingly (i.e. redirect to the first tree)

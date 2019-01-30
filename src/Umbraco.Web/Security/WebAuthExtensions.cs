@@ -23,7 +23,7 @@ namespace Umbraco.Web.Security
         {
             //It is actually not good enough to set this on the current app Context and the thread, it also needs
             // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually
-            // an underlying fault of asp.net not propogating the User correctly.
+            // an underlying fault of asp.net not propagating the User correctly.
             if (HttpContext.Current != null)
             {
                 HttpContext.Current.User = principal;
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Security
         {            
             //It is actually not good enough to set this on the current app Context and the thread, it also needs
             // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually
-            // an underlying fault of asp.net not propogating the User correctly.
+            // an underlying fault of asp.net not propagating the User correctly.
             if (HttpContext.Current != null)
             {
                 HttpContext.Current.User = principal;

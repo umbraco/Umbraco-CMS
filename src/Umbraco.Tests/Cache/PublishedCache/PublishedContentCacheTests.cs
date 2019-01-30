@@ -59,6 +59,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             var umbracoSettings = Factory.GetInstance<IUmbracoSettingsSection>();
             var globalSettings = Factory.GetInstance<IGlobalSettings>();
+            var umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
 
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());
@@ -66,9 +67,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var appCache = new DictionaryAppCache();
             var domainCache = new DomainCache(ServiceContext.DomainService, DefaultCultureAccessor);
             var publishedShapshot = new Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedSnapshot(
-                new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, new SiteDomainHelper(), ContentTypesCache, null, null),
-                new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>()),
-                new PublishedMemberCache(null, appCache, Current.Services.MemberService, ContentTypesCache),
+                new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, new SiteDomainHelper(), umbracoContextAccessor, ContentTypesCache, null, null),
+                new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), umbracoContextAccessor),
+                new PublishedMemberCache(null, appCache, Current.Services.MemberService, ContentTypesCache, umbracoContextAccessor),
                 domainCache);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedShapshot);

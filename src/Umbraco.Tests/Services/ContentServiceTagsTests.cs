@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Services
         {
             base.Compose();
 
-            // fixme - do it differently
+            // FIXME: do it differently
             Composition.Register(factory => factory.GetInstance<ServiceContext>().TextService);
         }
 
@@ -392,11 +392,11 @@ namespace Umbraco.Tests.Services
             propertyType.Variations = ContentVariation.Nothing;
             contentTypeService.Save(contentType);
 
-            //fixme: This throws due to index violations
+            // FIXME: This throws due to index violations
             propertyType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
-            //TODO: Assert results
+            // TODO: Assert results
         }
 
         [Test]
@@ -526,7 +526,7 @@ namespace Umbraco.Tests.Services
             tags = tagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
 
-            // fixme tag & tree issue
+            // FIXME: tag & tree issue
             // when we publish, we 'just' publish the top one and not the ones below = fails
             // what we should do is... NOT clear tags when unpublishing or trashing or...
             // and just update the tag service to NOT return anything related to trashed or
@@ -593,7 +593,7 @@ namespace Umbraco.Tests.Services
             var tags = tagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
 
-            // fixme tag & tree issue
+            // FIXME: tag & tree issue
             // when we (un)publish, we 'just' publish the top one and not the ones below = fails
             // see similar note above
             tags = tagService.GetTagsForEntity(content2.Id);

@@ -133,7 +133,7 @@ namespace Umbraco.Web.Editors
 
             _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
 
-            //remove it in case there's a handler there alraedy
+            //remove it in case there's a handler there already
             index.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
             //now add a single handler

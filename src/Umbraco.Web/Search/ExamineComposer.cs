@@ -45,7 +45,7 @@ namespace Umbraco.Web.Search
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
 
-            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
+            //We want to manage Examine's AppDomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
             //is instantiated, as the value is used during instantiation
             ExamineManager.DisableDefaultHostingEnvironmentRegistration();

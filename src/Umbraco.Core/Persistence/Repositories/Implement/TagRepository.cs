@@ -254,8 +254,7 @@ WHERE r.tagId IS NULL";
 
         #region Queries
 
-        // TODO
-        // consider caching implications
+        // TODO: consider caching implications
         // add lookups for parentId or path (ie get content in tag group, that are descendants of x)
 
         // ReSharper disable once ClassNeverInstantiated.Local

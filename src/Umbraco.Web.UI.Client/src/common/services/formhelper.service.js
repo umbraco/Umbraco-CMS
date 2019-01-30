@@ -121,7 +121,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             }
             else {
 
-                //TODO: All YSOD handling should be done with an interceptor
+                // TODO: All YSOD handling should be done with an interceptor
                 overlayService.ysod(err);
             }
             

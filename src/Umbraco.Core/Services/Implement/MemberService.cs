@@ -449,7 +449,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByUsername(string username)
         {
-            //TODO: Somewhere in here, whether at this level or the repository level, we need to add
+            // TODO: Somewhere in here, whether at this level or the repository level, we need to add
             // a caching mechanism since this method is used by all the membership providers and could be
             // called quite a bit when dealing with members.
 
@@ -770,8 +770,8 @@ namespace Umbraco.Core.Services.Implement
                         throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
                 }
 
-                //TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
-                //TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
+                // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
+                // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
                 return _memberRepository.Get(query);
             }
         }
@@ -1304,7 +1304,7 @@ namespace Umbraco.Core.Services.Implement
                     Id = property.Id,
                     Alias = property.Alias,
                     Name = property.PropertyType.Name,
-                    Value = property.GetValue(), // todo ignoring variants
+                    Value = property.GetValue(), // TODO: ignoring variants
                     CreateDate = property.CreateDate,
                     UpdateDate = property.UpdateDate
                 };
@@ -1330,8 +1330,8 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
 
-                //TODO: What about content that has the contenttype as part of its composition?
-                //TODO: What about content that has the contenttype as part of its composition?
+                // TODO: What about content that has the contenttype as part of its composition?
+                // TODO: What about content that has the contenttype as part of its composition?
                 var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 
                 var members = _memberRepository.Get(query).ToArray();

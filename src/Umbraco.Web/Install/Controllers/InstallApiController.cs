@@ -52,13 +52,13 @@ namespace Umbraco.Web.Install.Controllers
         {
             var setup = new InstallSetup();
 
-            //TODO: Check for user/site token
+            // TODO: Check for user/site token
 
             var steps = new List<InstallSetupStep>();
 
             var installSteps = _installSteps.GetStepsForCurrentInstallType().ToArray();
 
-            //only get the steps that are targetting the current install type
+            //only get the steps that are targeting the current install type
             steps.AddRange(installSteps);
             setup.Steps = steps;
 

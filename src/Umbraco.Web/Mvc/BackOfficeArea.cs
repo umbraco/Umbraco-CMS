@@ -44,14 +44,6 @@ namespace Umbraco.Web.Mvc
                         id = @"[a-zA-Z]*"
                     },
                 new[] {typeof (BackOfficeController).Namespace});
-
-            //Create the REST/web/script service routes
-            context.MapRoute(
-                "Umbraco_web_services",
-                _globalSettings.GetUmbracoMvcArea() + "/RestServices/{controller}/{action}/{id}",
-                new {controller = "SaveFileController", action = "Index", id = UrlParameter.Optional},
-                //look in this namespace for controllers
-                new[] {"Umbraco.Web.WebServices"});
         }
 
         public override string AreaName => _globalSettings.GetUmbracoMvcArea();

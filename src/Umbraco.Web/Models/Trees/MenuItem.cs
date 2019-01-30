@@ -103,7 +103,7 @@ namespace Umbraco.Web.Models.Trees
         /// </summary>
         internal const string ActionUrlKey = "actionUrl";
 
-        //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
+        // TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
         // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog
         // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window,
         // though would be v-easy, just not sure we want to ever support that?

@@ -38,13 +38,12 @@
             });
 
             contentTypeResource.getAll().then(function(contentTypes){
-
-                vm.contentTypes = contentTypes;
+                vm.contentTypes = _.where(contentTypes, {isElement: false});
 
                 // convert legacy icons
                 iconHelper.formatContentTypeIcons(vm.contentTypes);
 
-                vm.selectedChildren = contentTypeHelper.makeObjectArrayFromId($scope.model.allowedContentTypes, vm.contentTypes);
+                vm.selectedChildren = contentTypeHelper.makeObjectArrayFromId($scope.model.allowedContentTypes, contentTypes);
 
                 if($scope.model.id === 0) {
                    contentTypeHelper.insertChildNodePlaceholder(vm.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);

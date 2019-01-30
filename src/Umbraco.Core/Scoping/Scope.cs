@@ -85,7 +85,7 @@ namespace Umbraco.Core.Scoping
                 ParentScope = parent;
 
                 // cannot specify a different mode!
-                // todo - means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
+                // TODO: means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
                 // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
                 if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode > repositoryCacheMode)
                     throw new ArgumentException($"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
@@ -264,7 +264,7 @@ namespace Umbraco.Core.Scoping
                 if (ParentScope != null) return ParentScope.Messages;
                 return _messages ?? (_messages = new EventMessages());
 
-                // todo - event messages?
+                // TODO: event messages?
                 // this may be a problem: the messages collection will be cleared at the end of the scope
                 // how shall we process it in controllers etc? if we don't want the global factory from v7?
                 // it'd need to be captured by the controller
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Scoping
             if (_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
 
-            // todo - safer?
+            // TODO: safer?
             //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
             //    throw new ObjectDisposedException(GetType().FullName);
         }

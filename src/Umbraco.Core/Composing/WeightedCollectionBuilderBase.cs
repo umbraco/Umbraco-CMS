@@ -114,7 +114,7 @@ namespace Umbraco.Core.Composing
             return list;
         }
 
-        protected virtual int DefaultWeight { get; set; } = 10;
+        public virtual int DefaultWeight { get; set; } = 100;
 
         protected virtual int GetWeight(Type type)
         {

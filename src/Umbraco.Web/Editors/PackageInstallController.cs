@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This checks if this package & version is alraedy installed
+        /// This checks if this package & version is already installed
         /// </summary>
         /// <param name="name"></param>
         /// <param name="version"></param>

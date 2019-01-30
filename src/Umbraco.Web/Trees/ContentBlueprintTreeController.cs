@@ -18,9 +18,9 @@ namespace Umbraco.Web.Trees
     /// This authorizes based on access to the content section even though it exists in the settings
     /// </remarks>
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, null, sortOrder: 12)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, SortOrder = 12, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class ContentBlueprintTreeController : TreeController
     {
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Trees
                         var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-item-arrangement", true);
                         treeNode.Path = $"-1,{entity.Id}";
                         treeNode.NodeType = "document-type-blueprints";
-                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                         treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return treeNode;
                     }));

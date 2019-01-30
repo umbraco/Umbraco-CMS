@@ -14,7 +14,7 @@
    padding: 10px 20px;
    box-sizing: border-box;
    flex: 1 1 200px;
-   border: 1px solid transparent;
+   border: 2px dashed transparent;
    transition: border 0.2s;
    position: relative;
    justify-content: space-between;
@@ -22,7 +22,23 @@
    user-select: none;
    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
    border-radius: 3px;
+   
+   transition: box-shadow 150ms ease-in-out;
 }
+
+.umb-folder-grid__folder.-selected {
+    box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
+    
+    //background: @ui-selected;
+    color:@ui-selected-type;
+    border-color:@ui-selected-border;
+    
+    &:hover {
+        color:@ui-selected-type-hover;
+        border-color:@ui-selected-border-hover;
+    }
+}
+
 
 .umb-folder-grid__folder:focus,
 .umb-folder-grid__folder:active {
@@ -31,8 +47,6 @@
 
 .umb-folder-grid__folder:hover {
    text-decoration: none;
-   box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
-   transition: box-shadow 150ms ease-in-out;
 }
 
 .umb-folder-grid__folder-description {
@@ -57,7 +71,7 @@
 .umb-folder-grid__folder-name:hover {
    text-decoration: underline;
 }
-
+/*
 .umb-folder-grid__action {
    opacity: 0;
    border: 2px solid @white;
@@ -78,3 +92,4 @@
    opacity: 1;
    background: @green;
 }
+*/

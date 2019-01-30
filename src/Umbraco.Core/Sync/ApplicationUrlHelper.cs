@@ -26,7 +26,7 @@ namespace Umbraco.Core.Sync
         /// in config files but is determined programmatically.</para>
         /// <para>Must be assigned before resolution is frozen.</para>
         /// </remarks>
-        // todo need another way to do it, eg an interface, injected!
+        // TODO: need another way to do it, eg an interface, injected!
         public static Func<HttpRequestBase, string> ApplicationUrlProvider { get; set; }
 
         internal static string GetApplicationUrl(ILogger logger, IGlobalSettings globalSettings, IUmbracoSettingsSection settings, IServerRegistrar serverRegistrar, HttpRequestBase request = null)

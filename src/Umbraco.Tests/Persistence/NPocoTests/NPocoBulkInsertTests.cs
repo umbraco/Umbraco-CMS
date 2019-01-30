@@ -12,7 +12,7 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.NPocoTests
 {
-    // fixme.npoco - is this still appropriate?
+    // FIXME: npoco - is this still appropriate?
     //
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

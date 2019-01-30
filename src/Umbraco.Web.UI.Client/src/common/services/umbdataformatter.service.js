@@ -66,7 +66,7 @@
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
                     'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'isElement');
 
-                //TODO: Map these
+                // TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
                 saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
                 var realGroups = _.reject(displayModel.groups, function (g) {

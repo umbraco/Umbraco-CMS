@@ -197,7 +197,7 @@ namespace Umbraco.Web._Legacy.UI
             ITaskReturnUrl returnUrlTask = typeInstance as LegacyDialogTask;
             if (returnUrlTask != null)
             {
-                // if castable to LegacyDialogTask: add in additionalValues
+                // if it is possible to cast to LegacyDialogTask: add in additionalValues
                 ((LegacyDialogTask) returnUrlTask).AdditionalValues = additionalValues;
             }
             else

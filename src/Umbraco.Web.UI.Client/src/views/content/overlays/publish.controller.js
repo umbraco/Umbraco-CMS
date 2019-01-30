@@ -27,7 +27,7 @@
                     //and it's not publishable or not selected to be published
                     //then we cannot continue
 
-                    //TODO: Show a message when this occurs
+                    // TODO: Show a message when this occurs
                     return false;
                 }
 
@@ -55,7 +55,11 @@
         }
 
         function hasAnyData(variant) {
-            var result = variant.isDirty != null || (variant.name != null && variant.name.length > 0);
+            
+            if(variant.name == null || variant.name.length === 0) {
+                return false;
+            }
+            var result = variant.isDirty != null;
 
             if(result) return true;
 
@@ -110,8 +114,15 @@
                         vm.hasPristineVariants = pristineVariantFilter(variant);
                     }
 
-                    if(vm.isNew && hasAnyData(variant)){
-                        variant.save = true;
+                    if(hasAnyData(variant)){
+                        if(vm.isNew || variant.publishDate == null){
+                            variant.publish = true;
+                            variant.save = true;
+                        }
+                    }else{
+                        variant.publish = false;
+                        variant.save = false;
+                        variant.canSave = false;
                     }
                 });
 

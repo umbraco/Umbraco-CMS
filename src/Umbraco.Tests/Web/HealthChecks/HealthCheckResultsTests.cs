@@ -84,8 +84,8 @@ namespace Umbraco.Tests.Web.HealthChecks
             Assert.IsTrue(results.AllChecksSuccessful);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed succesfully.") > -1);
-            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' all completed succesfully.") > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully.") > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' all completed successfully.") > -1);
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Web.HealthChecks
             Assert.IsFalse(results.AllChecksSuccessful);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed succesfully.") > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors.") > -1);
         }
 
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Web.HealthChecks
             Assert.IsFalse(results.AllChecksSuccessful);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed succesfully.") > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 1' all completed successfully.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 2' completed with errors.") > -1);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Checks for 'Stub check 3' completed with errors.") > -1);
         }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -15,52 +13,42 @@ namespace Umbraco.Web.WebApi
     internal static class HttpControllerContextExtensions
     {
         /// <summary>
-        /// This method will go an execute the authorization filters for the controller action, if any fail
-        /// it will return their response, otherwise we'll return null.
+        /// Invokes the authorization filters for the controller action.
         /// </summary>
-        /// <param name="controllerContext"></param>
+        /// <returns>The response of the first filter returning a result, if any, otherwise null (authorized).</returns>
         internal static async Task<HttpResponseMessage> InvokeAuthorizationFiltersForRequest(this HttpControllerContext controllerContext)
         {
             var controllerDescriptor = controllerContext.ControllerDescriptor;
             var controllerServices = controllerDescriptor.Configuration.Services;
             var actionDescriptor = controllerServices.GetActionSelector().SelectAction(controllerContext);
-            var actionContext = new HttpActionContext(controllerContext, actionDescriptor);
+
             var filters = actionDescriptor.GetFilterPipeline();
             var filterGrouping = new FilterGrouping(filters);
-            var actionFilters = filterGrouping.ActionFilters;
-            // Because the continuation gets built from the inside out we need to reverse the filter list
-            // so that least specific filters (Global) get run first and the most specific filters (Action) get run last.
-            var authorizationFilters = filterGrouping.AuthorizationFilters.Reverse().ToArray();
 
-            if (authorizationFilters.Any())
-            {
-                var cancelToken = new CancellationToken();
-                var filterResult = await FilterContinuation(actionContext, cancelToken, authorizationFilters, 0);
-                if (filterResult != null)
-                {
-                    //this means that the authorization filter has returned a result - unauthorized so we cannot continue
-                    return filterResult;
-                }
-            }
-            return null;
+            // because the continuation gets built from the inside out we need to reverse the filter list
+            // so that least specific filters (Global) get run first and the most specific filters (Action) get run last.
+            var authorizationFilters = filterGrouping.AuthorizationFilters.Reverse().ToList();
+
+            if (authorizationFilters.Count == 0)
+                return null;
+
+            // if the authorization filter returns a result, it means it failed to authorize
+            var actionContext = new HttpActionContext(controllerContext, actionDescriptor);
+            return await ExecuteAuthorizationFiltersAsync(actionContext, CancellationToken.None, authorizationFilters);
         }
 
         /// <summary>
-        /// This method is how you execute a chain of filters, it needs to recursively call in to itself as the continuation for the next filter in the chain
+        /// Executes a chain of filters.
         /// </summary>
-        /// <param name="actionContext"></param>
-        /// <param name="token"></param>
-        /// <param name="filters"></param>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private static async Task<HttpResponseMessage> FilterContinuation(HttpActionContext actionContext, CancellationToken token, IList<IAuthorizationFilter> filters, int index)
+        /// <remarks>
+        /// Recursively calls in to itself as its continuation for the next filter in the chain.
+        /// </remarks>
+        private static async Task<HttpResponseMessage> ExecuteAuthorizationFiltersAsync(HttpActionContext actionContext, CancellationToken token, IList<IAuthorizationFilter> filters, int index = 0)
         {
             return await filters[index].ExecuteAuthorizationFilterAsync(actionContext, token,
-                () => (index + 1) == filters.Count
+                () => ++index == filters.Count
                     ? Task.FromResult<HttpResponseMessage>(null)
-                    : FilterContinuation(actionContext, token, filters, ++index));
+                    : ExecuteAuthorizationFiltersAsync(actionContext, token, filters, index));
         }
-
-
     }
 }

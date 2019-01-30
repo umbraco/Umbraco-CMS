@@ -228,7 +228,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <remarks>Culture is case-insensitive.</remarks>
         public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.ContainsKey(culture);
+            => content.Cultures.ContainsKey(culture ?? string.Empty);
 
         /// <summary>
         /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
@@ -251,7 +251,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
-            //todo inject examine manager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -272,7 +272,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
         {
-            //todo inject examine manager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))

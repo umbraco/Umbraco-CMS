@@ -95,7 +95,7 @@ namespace Umbraco.Web.Media.Exif
         // Rating
         Rating = IFD.Zeroth + 0x4746,
         RatingPercent = IFD.Zeroth + 0x4749,
-        // Microsoft specifing padding and offset tags
+        // Microsoft specifying padding and offset tags
         ZerothIFDPadding = IFD.Zeroth + 0xea1c,
         // ****************************
         // EXIF Tags
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Media.Exif
         SubjectDistanceRange = IFD.EXIF + 41996,
         ImageUniqueID = IFD.EXIF + 42016,
         InteroperabilityIFDPointer = IFD.EXIF + 40965,
-        // Microsoft specifing padding and offset tags
+        // Microsoft specifying padding and offset tags
         ExifIFDPadding = IFD.EXIF + 0xea1c,
         OffsetSchema = IFD.EXIF + 0xea1d,
         // ****************************
