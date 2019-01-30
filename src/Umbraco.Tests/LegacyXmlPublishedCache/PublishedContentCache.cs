@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using System.Linq;
-using Umbraco.Core.Cache;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
     {

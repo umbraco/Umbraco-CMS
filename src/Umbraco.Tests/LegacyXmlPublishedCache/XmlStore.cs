@@ -12,7 +12,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -20,15 +19,15 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Scheduling;
 using File = System.IO.File;
 using Task = System.Threading.Tasks.Task;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     /// <summary>
     /// Represents the Xml storage for the Xml published cache.

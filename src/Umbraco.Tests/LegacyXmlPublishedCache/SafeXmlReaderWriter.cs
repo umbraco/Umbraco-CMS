@@ -3,7 +3,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Web.PublishedCache.XmlPublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     // TODO: should be a ScopeContextualBase
     internal class SafeXmlReaderWriter : IDisposable
