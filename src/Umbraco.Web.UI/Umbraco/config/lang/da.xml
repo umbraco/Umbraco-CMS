@@ -320,6 +320,7 @@
     <key alias="newPartialViewMacroFromSnippet">Ny partial view makro fra snippet</key>
     <key alias="newPartialViewMacroNoMacro">Ny partial view makro (uden makro)</key>
     <key alias="newStyleSheetFile">Ny stylesheet-fil</key>
+    <key alias="newRteStyleSheetFile">Ny Rich Text Editor stylesheet-fil</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -1088,15 +1089,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
   </area>
   <area alias="stylesheet">
+    <key alias="addRule">Tilføj style</key>
+    <key alias="editRule">Redigér style</key>
     <key alias="editorRules">Teksteditor-styles</key>
     <key alias="editorRulesHelp">Definér de styles, der skal være tilgængelige i teksteditoren for dette stylesheet</key>
     <key alias="selector">Selector</key>
     <key alias="selectorHelp">Bruger CSS-syntaks, f.eks. "h1" eller ".redheader"</key>
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
-    <key alias="overlayTitleAddRule">Tilføj style</key>
-    <key alias="overlayTitleEditRule">Redigér style</key>
     <key alias="nameHelp">Det navn der vises i teksteditoren</key>
+    <key alias="preview">Forhåndsvisning</key>
+    <key alias="previewHelp">Hvordan teksten vil se ud i teksteditoren.</key>
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">Den CSS der skal anvendes i teksteditoren, f.eks. "color:red;"</key>
     <key alias="tabCode">Kode</key>
@@ -1278,7 +1281,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="fallbackLanguage">Fallback sprog</key>
   </area>
   <area alias="macro">
+    <key alias="addParameter">Tilføj parameter</key>
+    <key alias="editParameter">Rediger parameter</key>
     <key alias="parameters">Parametre</key>
+    <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
