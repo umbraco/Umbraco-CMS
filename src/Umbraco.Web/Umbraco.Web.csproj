@@ -257,7 +257,6 @@
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
-    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="Trees\TreeCollection.cs" />
     <Compile Include="JavaScript\ClientDependencyConfiguration.cs" />

@@ -166,6 +166,7 @@
     <Content Include="Umbraco\Config\Lang\cs.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
+    <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
     <None Include="Config\ClientDependency.Release.config">
