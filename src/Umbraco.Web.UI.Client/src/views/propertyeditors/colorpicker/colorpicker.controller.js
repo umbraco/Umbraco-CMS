@@ -12,31 +12,12 @@ function ColorPickerController($scope, angularHelper) {
     //map back to the model
     $scope.model.config = config;
     
-    function convertArrayToDictionaryArray(model) {
-        //now we need to format the items in the dictionary because we always want to have an array
-        var newItems = [];
-        for (var i = 0; i < model.length; i++) {
-            newItems.push({ id: model[i], sortOrder: 0, value: model[i] });
-        }
-
-        return newItems;
-    }
-
-
-    function convertObjectToDictionaryArray(model) {
-        //now we need to format the items in the dictionary because we always want to have an array
-        var newItems = [];
-        var vals = _.values($scope.model.config.items);
-        var keys = _.keys($scope.model.config.items);
-
-        for (var i = 0; i < vals.length; i++) {
-            var label = vals[i].value ? vals[i].value : vals[i];
-            newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: label });
-        }
-
-        return newItems;
-    }
     $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
+
+    $scope.model.activeColor = {
+        value: "",
+        label: ""
+    };
 
     if ($scope.isConfigured) {
 
@@ -94,33 +75,25 @@ function ColorPickerController($scope, angularHelper) {
     $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
 
     $scope.onSelect = function (color) {
-        // Complex color (value and label)?
-        if (!$scope.model.value.hasOwnProperty("value")) {
-            // did the value change?
-            if ($scope.model.value !== color) {
-                // yes, make sure to set dirty
-                angularHelper.getCurrentForm($scope).$setDirty();
-            }
-            return;
-        }
-
         // did the value change?
         if ($scope.model.value.value === color) {
             // no, skip the rest
             return;
         }
 
-        // yes, make sure to set dirty
-        angularHelper.getCurrentForm($scope).$setDirty();
-
-        // update the label according to the new color
+        // yes, update the model (label + value) according to the new color
         var selectedItem = _.find($scope.model.config.items, function (item) {
             return item.value === color;
         });
         if (!selectedItem) {
             return;
         }
-        $scope.model.value.label = selectedItem.label;
+        $scope.model.value = {
+            label: selectedItem.label,
+            value: selectedItem.value
+        };
+        // make sure to set dirty
+        angularHelper.getCurrentForm($scope).$setDirty();
     }
 
     // Finds the color best matching the model's color,
@@ -129,21 +102,13 @@ function ColorPickerController($scope, angularHelper) {
     function initActiveColor() {
 
         // no value - initialize default value
-        if (!$scope.model.value) {
-            $scope.model.value = {
-                value: "",
-                label: ""
-            };
-        }
+        if (!$scope.model.value)
+            return;
 
         // Backwards compatibility, the color used to be stored as a hex value only
         if (typeof $scope.model.value === "string") {
             $scope.model.value = { value: $scope.model.value, label: $scope.model.value };
         }
-
-        // Complex color (value and label)?
-        if (!$scope.model.value.hasOwnProperty("value"))
-            return;
 
         var modelColor = $scope.model.value.value;
         var modelLabel = $scope.model.value.label;
@@ -184,8 +149,8 @@ function ColorPickerController($scope, angularHelper) {
 
         // If a match was found, set it as the active color.
         if (foundItem) {
-            $scope.model.value.value = foundItem.value;
-            $scope.model.value.label = foundItem.label;
+            $scope.model.activeColor.value = foundItem.value;
+            $scope.model.activeColor.label = foundItem.label;
         }
     }
 
