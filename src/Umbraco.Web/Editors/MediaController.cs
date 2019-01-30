@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -18,7 +17,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
@@ -26,9 +24,7 @@ using System.Web.Http.Controllers;
 using Umbraco.Core.Composing;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Web.UI;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -432,7 +428,7 @@ namespace Umbraco.Web.Editors
 
             if (sourceParentID == destinationParentID)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),SpeechBubbleIcon.Error)));
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
@@ -752,7 +748,7 @@ namespace Umbraco.Web.Editors
                     tempFiles.Notifications.Add(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("media/disallowedFileType"),
-                        SpeechBubbleIcon.Warning));
+                        NotificationStyle.Warning));
                 }
             }
 
@@ -844,7 +840,7 @@ namespace Umbraco.Web.Editors
                     new SimpleNotificationModel(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
-                        SpeechBubbleIcon.Warning))));
+                        NotificationStyle.Warning))));
             }
 
             return intParentId;

@@ -217,18 +217,15 @@ namespace Umbraco.Web
             var lpath = uri.AbsolutePath.ToLowerInvariant();
 
             // handle directory-urls used for asmx
-            // legacy - what's the point really?
-            if (/*maybeDoc &&*/ _globalSettings.UseDirectoryUrls)
+            // TODO: legacy - what's the point really?
+            var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
+            if (asmxPos >= 0)
             {
-                var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
-                if (asmxPos >= 0)
-                {
-                    // use uri.AbsolutePath, not path, 'cos path has been lowercased
-                    httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
-                        uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                        uri.Query.TrimStart('?'));
-                    maybeDoc = false;
-                }
+                // use uri.AbsolutePath, not path, 'cos path has been lowercased
+                httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
+                    uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
+                    uri.Query.TrimStart('?'));
+                maybeDoc = false;
             }
 
             // a document request should be
@@ -270,14 +267,15 @@ namespace Umbraco.Web
                     ReportRuntime(level, "Umbraco is booting.");
 
                     // let requests pile up and wait for 10s then show the splash anyway
-                    if (Current.Configs.Settings().Content.EnableSplashWhileLoading == false
-                        && ((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
+                    //fixme: Do we want this for some insane reason? no other site in history has this
+                    if (((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
 
                     // redirect to booting page
                     httpContext.Response.StatusCode = 503; // temp not available
-                    const string bootUrl = "~/config/splashes/booting.aspx";
+                    var bootHtml = Routing.Resources.HtmlPages.Booting;
                     httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    httpContext.Response.Write(bootHtml);
+                    httpContext.Response.Flush();
                     return false; // cannot serve content
 
                 case RuntimeLevel.BootFailed:
@@ -285,9 +283,10 @@ namespace Umbraco.Web
                     ReportRuntime(level, "Umbraco has failed.");
 
                     httpContext.Response.StatusCode = 503; // temp not available
-                    const string deathUrl = "~/config/splashes/death.aspx";
+                    var deathHtml = Routing.Resources.HtmlPages.Failed;
                     httpContext.Response.AddHeader("Retry-After", debug ? "1" : "300"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(deathUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
+                    httpContext.Response.Write(deathHtml);
+                    httpContext.Response.Flush();
                     return false; // cannot serve content
 
                 case RuntimeLevel.Run:

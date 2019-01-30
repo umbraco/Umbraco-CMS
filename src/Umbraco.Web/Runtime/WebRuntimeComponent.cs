@@ -19,16 +19,15 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install;
+using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
-using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 
 using Current = Umbraco.Web.Composing.Current;

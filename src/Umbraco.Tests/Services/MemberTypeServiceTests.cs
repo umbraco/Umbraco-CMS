@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using umbraco.cms.presentation.create.controls;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 

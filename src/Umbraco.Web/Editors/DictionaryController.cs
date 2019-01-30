@@ -8,7 +8,6 @@ using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -172,7 +171,7 @@ namespace Umbraco.Web.Editors
 
                 model.Notifications.Add(new Notification(
                     Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
-                    SpeechBubbleIcon.Success));
+                    NotificationStyle.Success));
 
                 return model;
             }

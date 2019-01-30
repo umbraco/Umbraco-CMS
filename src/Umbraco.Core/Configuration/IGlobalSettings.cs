@@ -35,12 +35,6 @@ namespace Umbraco.Core.Configuration
         int TimeOutInMinutes { get; }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco uses directory urls.
-        /// </summary>
-        /// <value><c>true</c> if umbraco uses directory urls; otherwise, <c>false</c>.</value>
-        bool UseDirectoryUrls { get; }
-
-        /// <summary>
         /// Gets the default UI language.
         /// </summary>
         /// <value>The default UI language.</value>

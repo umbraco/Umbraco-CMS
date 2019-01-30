@@ -64,13 +64,8 @@ namespace Umbraco.Web
         {
             var path = uri.GetSafeAbsolutePath();
 
-            if (path != "/")
-            {
-                if (!globalSettings.UseDirectoryUrls)
-                    path += ".aspx";
-                else if (requestConfig.AddTrailingSlash)
-				    path = path.EnsureEndsWith("/");
-            }
+            if (path != "/" && requestConfig.AddTrailingSlash)
+                path = path.EnsureEndsWith("/");
 
             path = ToAbsolute(path);
 

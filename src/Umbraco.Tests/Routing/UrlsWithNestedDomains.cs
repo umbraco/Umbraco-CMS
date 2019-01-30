@@ -31,7 +31,6 @@ namespace Umbraco.Tests.Routing
         public void DoNotPolluteCache()
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var settings = SettingsForTests.GenerateMockUmbracoSettings();

@@ -471,7 +471,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TestFiles.resx</DependentUpon>
     </Compile>
-    <Compile Include="UI\LegacyDialogTests.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="CoreThings\UriExtensionsTests.cs" />
