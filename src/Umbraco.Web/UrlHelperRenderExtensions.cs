@@ -32,7 +32,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns></returns>
@@ -56,7 +56,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>
@@ -102,7 +102,7 @@ namespace Umbraco.Web
         /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters
         /// </param>
         /// <param name="cacheBuster">
-        /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
+        /// Add a serialized date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
         /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
@@ -120,7 +120,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="urlHelper"></param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>
@@ -183,7 +183,7 @@ namespace Umbraco.Web
         /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters
         /// </param>
         /// <param name="cacheBusterValue">
-        /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
+        /// Add a serialized date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
         /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
@@ -201,7 +201,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="urlHelper"></param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require HTML attributes to be HTML encoded but this can be
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>

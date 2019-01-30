@@ -7,7 +7,7 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
-    //TODO: Add config transform for when config with specified XPath is not found
+    // TODO: Add config transform for when config with specified XPath is not found
 
     public class ConfigurationService
     {

@@ -143,7 +143,7 @@ namespace Umbraco.Core
                         // Special case for empty strings for bools/dates which should return null if an empty string.
                         if (input is string inputString)
                         {
-                            //TODO: Why the check against only bool/date when a string is null/empty? In what scenario can we convert to another type when the string is null or empty other than just being null?
+                            // TODO: Why the check against only bool/date when a string is null/empty? In what scenario can we convert to another type when the string is null or empty other than just being null?
                             if (string.IsNullOrEmpty(inputString) && (underlying == typeof(DateTime) || underlying == typeof(bool)))
                             {
                                 return Attempt<object>.Succeed(null);
@@ -391,7 +391,7 @@ namespace Umbraco.Core
         }
         internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
         {
-            //TODO: Localize this exception
+            // TODO: Localize this exception
             if (isDisposed)
                 throw new ObjectDisposedException(objectname);
         }

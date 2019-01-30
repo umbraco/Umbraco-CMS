@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -19,7 +18,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     /// <summary>
-    /// A base controller reference for non-attributed trees (un-registered). 
+    /// A base controller reference for non-attributed trees (un-registered).
     /// </summary>
     /// <remarks>
     /// Developers should generally inherit from TreeController.
@@ -28,13 +27,11 @@ namespace Umbraco.Web.Trees
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
         protected TreeControllerBase()
-        {
-        }
+        { }
 
-        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
-        {
-        }
-
+        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        { }
 
         /// <summary>
         /// The method called to render the contents of the tree structure
@@ -44,7 +41,7 @@ namespace Umbraco.Web.Trees
         /// All of the query string parameters passed from jsTree
         /// </param>
         /// <remarks>
-        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
         protected abstract TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings);
@@ -63,13 +60,23 @@ namespace Umbraco.Web.Trees
         public abstract string RootNodeDisplayName { get; }
 
         /// <inheritdoc />
+        public abstract string TreeGroup { get; }
+
+        /// <inheritdoc />
         public abstract string TreeAlias { get; }
+
         /// <inheritdoc />
         public abstract string TreeTitle { get; }
+
         /// <inheritdoc />
-        public abstract string ApplicationAlias { get; }
+        public abstract TreeUse TreeUse { get; }
+
+        /// <inheritdoc />
+        public abstract string SectionAlias { get; }
+
         /// <inheritdoc />
         public abstract int SortOrder { get; }
+
         /// <inheritdoc />
         public abstract bool IsSingleNodeTree { get; }
 
@@ -115,7 +122,7 @@ namespace Umbraco.Web.Trees
         /// </param>
         /// <returns>JSON markup for jsTree</returns>
         /// <remarks>
-        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
         [HttpQueryStringFilter("queryStrings")]
@@ -389,7 +396,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// An event that allows developers to modify the meun that is being rendered
+        /// An event that allows developers to modify the menu that is being rendered
         /// </summary>
         /// <remarks>
         /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
@@ -402,5 +409,4 @@ namespace Umbraco.Web.Trees
             handler?.Invoke(instance, e);
         }
     }
-
 }

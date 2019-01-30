@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IContent"/></returns>
         public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             var parent = GetById(parentId);
             return Create(name, parent, contentTypeAlias, userId);
@@ -184,7 +184,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             var contentType = GetContentType(contentTypeAlias);
             if (contentType == null)
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -282,7 +282,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            // todo - what about culture?
+            // TODO: what about culture?
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -778,7 +778,7 @@ namespace Umbraco.Core.Services.Implement
                 var culturesChanging = content.ContentType.VariesByCulture()
                     ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                     : null;
-                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
                 // in this particular case, determining which cultures have changed works with the above with names since it will
                 // have always changed if it's been saved in the back office but that's not really fail safe.
@@ -1562,8 +1562,7 @@ namespace Umbraco.Core.Services.Implement
             DoDelete(content);
         }
 
-        //TODO:
-        // both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
+        //TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
         // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
         // if that's not the case, then the file will never be deleted, because when we delete the content,
         // the version referencing the file will not be there anymore. SO, we can leak files.
@@ -2001,7 +2000,7 @@ namespace Umbraco.Core.Services.Implement
                     ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
 
-                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
                 // in this particular case, determining which cultures have changed works with the above with names since it will
                 // have always changed if it's been saved in the back office but that's not really fail safe.
@@ -2553,7 +2552,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional Id of the user issuing the delete operation</param>
         public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
         {
-            //TODO: This currently this is called from the ContentTypeService but that needs to change,
+            // TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
             // This method will recursively go lookup every content item, check if any of it's descendants are
             // of a different type, move them to the recycle bin, then permanently delete the content items.

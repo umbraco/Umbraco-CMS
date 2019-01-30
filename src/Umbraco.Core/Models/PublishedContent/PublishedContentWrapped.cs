@@ -114,7 +114,6 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <inheritdoc />
         public virtual bool IsPublished(string culture = null) => _content.IsPublished(culture);
 
-
         #endregion
 
         #region Tree

@@ -393,7 +393,7 @@ namespace Umbraco.Core.Services.Implement
                 if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return relation; // todo - returning sth that does not exist here?!
+                    return relation; // TODO: returning sth that does not exist here?!
                 }
 
                 _relationRepository.Save(relation);

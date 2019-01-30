@@ -69,6 +69,7 @@
     <Reference Include="System.Text.Encoding" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -122,6 +123,7 @@
     <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
+    <Compile Include="CoreThings\EnumExtensionsTests.cs" />
     <Compile Include="CoreThings\GuidUtilsTests.cs" />
     <Compile Include="CoreThings\HexEncoderTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
@@ -293,6 +295,7 @@
     <Compile Include="Cache\WebCachingAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
     <Compile Include="Configurations\DashboardSettings\DashboardSettingsTests.cs" />
+    <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
@@ -496,14 +499,6 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="Configurations\DashboardSettings\Dashboard.config">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Configurations\DashboardSettings\web.config">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Configurations\UmbracoSettings\umbracoSettings.minimal.config">
       <SubType>Designer</SubType>

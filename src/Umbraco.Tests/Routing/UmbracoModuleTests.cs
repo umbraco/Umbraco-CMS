@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            // fixme - be able to get the UmbracoModule from the container. any reason settings were from testobjects?
+            // FIXME: be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
             var logger = Mock.Of<ILogger>();
             var globalSettings = TestObjects.GetGlobalSettings();
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Routing
                 new UrlProviderCollection(new IUrlProvider[0]),
                 runtime,
                 logger,
-                null, // fixme - PublishedRouter complexities...
+                null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IVariationContextAccessor>()
             );
 

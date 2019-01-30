@@ -29,7 +29,7 @@ namespace Umbraco.Web.Mvc
             // ControllerBuilder.Current when setting up Mvc and WebApi, it cannot be ctored by
             // the IoC container - and yet we don't want that ctor to resolve the factories
             // as that happen before everything is configured - so, passing a factories
-            // accessor func.
+            // accessor function.
 
             _factoriesAccessor = factoriesAccessor;
         }

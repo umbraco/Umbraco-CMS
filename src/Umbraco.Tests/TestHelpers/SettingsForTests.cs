@@ -18,7 +18,6 @@ namespace Umbraco.Tests.TestHelpers
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
                     settings.Path == IOHelper.ResolveUrl("~/umbraco") &&
-                    settings.UseDirectoryUrls == true &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.LocalTempStorageLocation == LocalTempStorage.Default &&
@@ -129,7 +128,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (_defaultUmbracoSettings == null)
             {
-                //TODO: Just make this mocks instead of reading from the config
+                // TODO: Just make this mocks instead of reading from the config
 
                 var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
 

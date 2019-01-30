@@ -105,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.33</Version>
+      <Version>8.0.0-alpha.34</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -162,7 +162,6 @@
     <Content Include="Config\Lang\ru-RU.user.xml" />
     <Content Include="Config\Lang\sv-SE.user.xml" />
     <Content Include="Config\Lang\zh-CN.user.xml" />
-    <Content Include="Config\splashes\booting.aspx" />
     <Content Include="Config\splashes\noNodes.aspx" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
@@ -203,13 +202,6 @@
       <DependentUpon>tinyMceConfig.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Config\scripting.Release.config">
-      <DependentUpon>scripting.config</DependentUpon>
-    </None>
-    <None Include="Config\Dashboard.Release.config">
-      <DependentUpon>Dashboard.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
     <Content Include="Properties\Settings.settings">
@@ -244,7 +236,6 @@
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\scripting.config" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
@@ -302,9 +293,6 @@
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\Dashboard.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>

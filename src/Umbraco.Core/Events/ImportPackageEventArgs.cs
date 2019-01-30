@@ -27,7 +27,7 @@ namespace Umbraco.Core.Events
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            //TODO: MetaData for package metadata has no equality operators :/
+            // TODO: MetaData for package metadata has no equality operators :/
             return base.Equals(other) && PackageMetaData.Equals(other.PackageMetaData);
         }
 

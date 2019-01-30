@@ -16,9 +16,9 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:1)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, SortOrder = 1, TreeGroup = Constants.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class MediaTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -36,12 +36,12 @@ namespace Umbraco.Web.Trees
                         var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
-                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                         node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
 
-            //if the request is for folders only then just return
+            // if the request is for folders only then just return
             if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
             nodes.AddRange(
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Trees
                     .Select(dt =>
                     {
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
-                        // need this check to keep supporting sites where childs have already been created.
+                        // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
                         var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, "icon-thumbnails", hasChildren);
 
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //set the default to create
+                // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Trees
             var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
             if (container != null)
             {
-                //set the default to create
+                // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Trees
 
                 if (container.HasChildren == false)
                 {
-                    //can delete doc type
+                    // can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
                 }
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Trees
                 {
                     menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                    //no move action if this is a child doc type
+                    // no move action if this is a child doc type
                     if (parent == null)
                     {
                         menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Trees
                 else
                 {
                     menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
-                    //no move action if this is a child doc type
+                    // no move action if this is a child doc type
                     if (parent == null)
                     {
                         menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);

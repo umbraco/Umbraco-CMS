@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -279,7 +278,7 @@ AnotherContentFinder
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
-            Assert.AreEqual(40, types.Count());
+            Assert.AreEqual(39, types.Count());
         }
 
         /// <summary>

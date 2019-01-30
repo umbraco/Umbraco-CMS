@@ -50,7 +50,7 @@ namespace Umbraco.Web.Editors.Binders
                     }
                 }
 
-                //TODO: anything after 3 parts we can put in metadata
+                // TODO: anything after 3 parts we can put in metadata
 
                 var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
 

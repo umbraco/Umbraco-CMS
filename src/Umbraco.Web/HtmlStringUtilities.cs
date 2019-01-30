@@ -11,15 +11,15 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Provides utility methods for UmbracoHelper for working with strings and html in views.
+    /// Provides utility methods for UmbracoHelper for working with strings and HTML in views.
     /// </summary>
     public sealed class HtmlStringUtilities
     {
         /// <summary>
-        /// Replaces text line breaks with html line breaks
+        /// Replaces text line breaks with HTML line breaks
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
+        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
         public HtmlString ReplaceLineBreaksForHtml(string text)
         {
             return new HtmlString(text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />"));
@@ -257,8 +257,8 @@ namespace Umbraco.Web
 
                         string firstTrim = outputtr.ReadToEnd().Replace("  ", " ").Trim();
 
-                        //Check to see if there is an empty char between the hellip and the output string
-                        //if there is, remove it
+                        // Check to see if there is an empty char between the hellip and the output string
+                        // if there is, remove it
                         if (addElipsis && lengthReached && string.IsNullOrWhiteSpace(firstTrim) == false)
                         {
                             result = firstTrim[firstTrim.Length - hellip.Length - 1] == ' ' ? firstTrim.Remove(firstTrim.Length - hellip.Length - 1, 1) : firstTrim;
@@ -275,9 +275,9 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Returns the length of the words from a html block
+        /// Returns the length of the words from a HTML block
         /// </summary>
-        /// <param name="html">Html text</param>
+        /// <param name="html">HTML text</param>
         /// <param name="words">Amount of words you would like to measure</param>
         /// <param name="tagsAsContent"></param>
         /// <returns></returns>

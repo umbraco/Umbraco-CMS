@@ -69,6 +69,6 @@ namespace Umbraco.Tests.Security
             Assert.IsTrue(result);
         }
 
-        //TODO : Write remaining tests for `ShouldAuthenticateRequest`
+        // TODO: Write remaining tests for `ShouldAuthenticateRequest`
     }
 }

@@ -5,7 +5,7 @@ using Umbraco.Core.Security;
 namespace Umbraco.Web.Security
 {
     /// <summary>
-    /// This class is used by events raised from hthe BackofficeUserManager
+    /// This class is used by events raised from the BackofficeUserManager
     /// </summary>
     public class IdentityAuditEventArgs : EventArgs
     {
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Security
         public int AffectedUser { get; private set; }
 
         /// <summary>
-        /// If a user is perfoming an action on a different user, then this will be set. Otherwise it will be -1
+        /// If a user is performing an action on a different user, then this will be set. Otherwise it will be -1
         /// </summary>
         public int PerformingUser { get; private set; }
 

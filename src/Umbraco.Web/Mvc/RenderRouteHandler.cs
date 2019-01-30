@@ -44,12 +44,12 @@ namespace Umbraco.Web.Mvc
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
-        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // todo inject
+        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // TODO: inject
 
         #region IRouteHandler Members
 
         /// <summary>
-        /// Assigns the correct controller based on the Umbraco request and returns a standard MvcHandler to prcess the response,
+        /// Assigns the correct controller based on the Umbraco request and returns a standard MvcHandler to process the response,
         /// this also stores the render model into the data tokens for the current RouteData.
         /// </summary>
         /// <param name="requestContext"></param>
@@ -347,9 +347,6 @@ namespace Umbraco.Web.Mvc
                 // to Mvc since Mvc can't do much
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
-            if (request.RenderingEngine != RenderingEngine.Mvc) // else ?
-                return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
-
             return null;
         }
 
@@ -417,7 +414,7 @@ namespace Umbraco.Web.Mvc
             // Set the session state requirements
             requestContext.HttpContext.SetSessionStateBehavior(GetSessionStateBehavior(requestContext, routeDef.ControllerName));
 
-            // reset the friendly path so in the controllers and anything occuring after this point in time,
+            // reset the friendly path so in the controllers and anything occurring after this point in time,
             //the URL is reset back to the original request.
             requestContext.HttpContext.RewritePath(UmbracoContext.OriginalRequestUrl.PathAndQuery);
 

@@ -30,7 +30,7 @@ namespace Umbraco.Web
                     {"requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer},
                     {"allowManuallyChangingPassword", baseProvider != null && baseProvider.AllowManuallyChangingPassword},
                     {"minNonAlphaNumericChars", membershipProvider.MinRequiredNonAlphanumericCharacters}
-                    //TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
+                    // TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
                 };
         }
 

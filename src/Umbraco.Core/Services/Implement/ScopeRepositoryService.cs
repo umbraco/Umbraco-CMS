@@ -4,7 +4,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {
-    // todo that one does not add anything = kill
+    // TODO: that one does not add anything = kill
     public abstract class ScopeRepositoryService : RepositoryService
     {
         protected ScopeRepositoryService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)

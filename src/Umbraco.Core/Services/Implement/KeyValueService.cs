@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services.Implement
             // if already running 8, either following an upgrade or an install,
             // then everything should be ok (the table should exist, etc)
 
-            if (UmbracoVersion.LocalVersion.Major >= 8)
+            if (UmbracoVersion.LocalVersion != null && UmbracoVersion.LocalVersion.Major >= 8)
                 return;
 
             // else we are upgrading from 7, we can assume that the locks table

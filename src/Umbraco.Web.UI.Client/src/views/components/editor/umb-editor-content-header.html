@@ -13,7 +13,7 @@
             <div id="nameField" style="flex: 1 1 auto;">
                 <div class="umb-editor-header__name-wrapper">
                     <ng-form name="headerNameForm">
-                        <input 
+                        <input
                             data-element="editor-name-field"
                             type="text"
                             class="umb-editor-header__name-input"
@@ -54,22 +54,22 @@
 
         </div>
 
-        <div ng-if="splitViewOpen" style="margin-left: 20px;">
+        <div ng-if="splitViewOpen">
             <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
                 <i class="icon-delete"></i>
             </a>
         </div>
 
         <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
-            <umb-editor-navigation 
+            <umb-editor-navigation
                 data-element="editor-sub-views"
                 navigation="navigation"
                 on-select="selectNavigationItem(item)">
             </umb-editor-navigation>
         </div>
 
-        <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true" style="margin-left: 20px;">
-            <umb-editor-menu 
+        <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true">
+            <umb-editor-menu
                 data-element="editor-actions"
                 current-node="menu.currentNode"
                 current-section="{{menu.currentSection}}">

@@ -115,7 +115,7 @@
         /// <summary>
         /// The document could not be published because it has no publishing flags or values.
         /// </summary>
-        FailedPublishNothingToPublish = FailedPublish | 9, // in ContentService.StrategyCanPublish - todo weird
+        FailedPublishNothingToPublish = FailedPublish | 9, // TODO: in ContentService.StrategyCanPublish - weird
 
         /// <summary>
         /// The document could not be published because some mandatory cultures are missing.

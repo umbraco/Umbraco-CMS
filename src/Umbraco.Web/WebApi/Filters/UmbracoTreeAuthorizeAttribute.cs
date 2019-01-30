@@ -44,7 +44,7 @@ namespace Umbraco.Web.WebApi.Filters
             var apps = _treeAliases.Select(x => Current.TreeService
                 .GetByAlias(x))
                 .WhereNotNull()
-                .Select(x => x.ApplicationAlias)
+                .Select(x => x.SectionAlias)
                 .Distinct()
                 .ToArray();
 

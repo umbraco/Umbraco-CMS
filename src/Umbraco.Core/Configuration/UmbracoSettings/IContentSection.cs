@@ -35,8 +35,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool XmlContentCheckForDiskChanges { get; }
 
-        bool EnableSplashWhileLoading { get; }
-
         string PropertyContextHelpOption { get; }
 
         bool ForceSafeAliases { get; }

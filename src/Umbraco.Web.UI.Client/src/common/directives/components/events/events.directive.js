@@ -188,7 +188,7 @@ angular.module('umbraco.directives')
             e.stopPropagation();
             var fn = $parse(attrs.onRightClick);
             scope.$apply(function () {
-                fn(scope, { $event: event });
+                fn(scope, { $event: e });
             });
             return false;
         });

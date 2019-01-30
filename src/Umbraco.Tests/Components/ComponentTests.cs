@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Components
 
         private static IFactory MockFactory(Action<Mock<IFactory>> setup = null)
         {
-            // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
+            // FIXME: use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
             var mock = new Mock<IFactory>();
 
@@ -444,7 +444,7 @@ namespace Umbraco.Tests.Components
 
         #region TypeArray
 
-        // fixme - move to Testing
+        // FIXME: move to Testing
 
         private static Type[] TypeArray<T1>()
         {
