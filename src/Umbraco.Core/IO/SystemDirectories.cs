@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web;
+﻿using System.Web;
 
 namespace Umbraco.Core.IO
 {
@@ -35,9 +34,6 @@ namespace Umbraco.Core.IO
         public static string Css => IOHelper.ReturnPath("umbracoCssPath", "~/css");
 
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
-
-        [Obsolete("Usercontrols are obsolete and code should be removed")]
-        public static string UserControls => "~/usercontrols";
 
         public static string Packages => Data + "/packages";
 
