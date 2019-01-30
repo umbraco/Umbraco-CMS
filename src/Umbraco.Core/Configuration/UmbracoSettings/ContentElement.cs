@@ -22,9 +22,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
-        [ConfigurationProperty("PropertyContextHelpOption")]
-        internal InnerTextConfigurationElement<string> PropertyContextHelpOption => GetOptionalTextElement("PropertyContextHelpOption", "text");
-
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
 
@@ -37,17 +34,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("allowedUploadFiles")]
         internal CommaDelimitedConfigurationElement AllowedUploadFiles => GetOptionalDelimitedElement("allowedUploadFiles", new string[0]);
         
-        [ConfigurationProperty("GlobalPreviewStorageEnabled")]
-        internal InnerTextConfigurationElement<bool> GlobalPreviewStorageEnabled => GetOptionalTextElement("GlobalPreviewStorageEnabled", false);
-        
         [ConfigurationProperty("showDeprecatedPropertyEditors")]
         internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors => GetOptionalTextElement("showDeprecatedPropertyEditors", false);
-
-        [ConfigurationProperty("EnableInheritedDocumentTypes")]
-        internal InnerTextConfigurationElement<bool> EnableInheritedDocumentTypes => GetOptionalTextElement("EnableInheritedDocumentTypes", true);
-
-        [ConfigurationProperty("EnableInheritedMediaTypes")]
-        internal InnerTextConfigurationElement<bool> EnableInheritedMediaTypes => GetOptionalTextElement("EnableInheritedMediaTypes", true);
 
         [ConfigurationProperty("loginBackgroundImage")]
         internal InnerTextConfigurationElement<string> LoginBackgroundImage => GetOptionalTextElement("loginBackgroundImage", string.Empty);
@@ -70,15 +58,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
 
-        bool IContentSection.GlobalPreviewStorageEnabled => GlobalPreviewStorageEnabled;
-
         bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 
-        bool IContentSection.EnableInheritedDocumentTypes => EnableInheritedDocumentTypes;
-
-        bool IContentSection.EnableInheritedMediaTypes => EnableInheritedMediaTypes;
-
-        
         string IContentSection.LoginBackgroundImage => LoginBackgroundImage;
     }
 }

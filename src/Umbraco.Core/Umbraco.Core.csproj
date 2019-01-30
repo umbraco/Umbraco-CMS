@@ -239,8 +239,6 @@
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\BackOfficeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
@@ -250,7 +248,6 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
