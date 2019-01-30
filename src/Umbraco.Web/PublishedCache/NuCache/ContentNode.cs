@@ -100,8 +100,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var originPublished = origin.PublishedContent;
 
 
-            DraftContent = new PublishedContent(this, originDraft, umbracoContextAccessor);
-            PublishedContent = new PublishedContent(this, originPublished, umbracoContextAccessor);
+            DraftContent = originDraft == null ? null : new PublishedContent(this, originDraft, umbracoContextAccessor);
+            PublishedContent = originPublished == null ? null : new PublishedContent(this, originPublished, umbracoContextAccessor);
             DraftModel = DraftContent?.CreateModel();
             PublishedModel = PublishedContent?.CreateModel();
 
