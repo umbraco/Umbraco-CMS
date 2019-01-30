@@ -879,9 +879,6 @@
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="UI\JavaScript\AssetInitialization.cs" />
-    <Compile Include="UI\JavaScript\CssInitialization.cs" />
-    <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
     <Compile Include="JavaScript\AssetInitialization.cs" />
     <Compile Include="JavaScript\CssInitialization.cs" />
     <Compile Include="JavaScript\DependencyPathRenderer.cs" />

@@ -140,32 +140,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.cs">
-      <DependentUpon>editMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.designer.cs">
-      <DependentUpon>editMacro.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\Default.Master.cs">
-      <DependentUpon>default.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\Default.Master.designer.cs">
-      <DependentUpon>default.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.designer.cs">
-      <DependentUpon>umbracoDialog.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoPage.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
-      <DependentUpon>umbracoPage.Master</DependentUpon>
-    </Compile>
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
@@ -192,7 +166,6 @@
     <Content Include="Umbraco\Config\Lang\cs.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
-    <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
@@ -314,9 +287,6 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
-    <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
-    <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
