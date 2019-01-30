@@ -15,9 +15,9 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Trees
                         var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
-                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                         node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Trees
                     .Select(dt =>
                     {
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
-                        // need this check to keep supporting sites where childs have already been created.
+                        // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
                         var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, "icon-item-arrangement", hasChildren);
 

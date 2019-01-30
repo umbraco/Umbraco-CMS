@@ -2,7 +2,11 @@
     display: block;
     min-width: 100%;
     width: auto;
-
+    
+    .umb-tree-item__label {
+        user-select: none;
+    }
+    
     &:hover ins {
         visibility: visible;
         cursor: pointer
@@ -14,17 +18,17 @@
     &:hover .umb-tree-item__label {
         overflow: hidden;
         margin-right: 6px;
-    }    
+    }
     
     // Loading Animation
     // ------------------------
     .l {
         width: 100%;
-        height: 1px;
+        height: 2px;
         overflow: hidden;
         position: absolute;
         left: 0;
-        bottom: 0;
+        bottom: -1px;
 
         div { 
             .umb-loader;
@@ -42,13 +46,14 @@
 
 .umb-tree-item.current > .umb-tree-item__inner {
 
-    background: @turquoise-d1; 
+    background: @ui-active;
+    color:@ui-active-type;
     
     // override small icon color. TODO => check usage 
-//    &:before {
-//        color: @turquoise-l2;
-//    }
-
+    &:before {
+        color: @blue;
+    }
+    
     .umb-options {
 
         &:hover i {
@@ -56,8 +61,8 @@
         }
 
         i {
-            background: @white;
-            border-color: @turquoise-d1;
+            background: @ui-active-type;
+            //border-color: @ui-active;
             transition: opacity 120ms ease;
         }
     }
@@ -65,8 +70,8 @@
     a,
     .umb-tree-icon,
     ins {
-        color: @white !important;
-        background-color: @turquoise-d1;
-        border-color: @turquoise-d1;
+        color: @ui-active-type !important;
+        //background-color: @ui-active;
+        //border-color: @ui-active;
     }
 }

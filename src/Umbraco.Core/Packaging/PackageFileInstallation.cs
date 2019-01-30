@@ -65,7 +65,7 @@ namespace Umbraco.Core.Packaging
                 var file = IOHelper.FindFile(item);
                 if (file != null)
                 {
-                    //TODO: Surely this should be ~/ ?
+                    // TODO: Surely this should be ~/ ?
                     file = file.EnsureStartsWith("/");
                     var filePath = IOHelper.MapPath(file);
 

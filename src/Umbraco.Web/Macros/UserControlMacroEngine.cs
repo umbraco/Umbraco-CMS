@@ -2,7 +2,6 @@
 using System.IO;
 using System.Web;
 using System.Web.UI;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;

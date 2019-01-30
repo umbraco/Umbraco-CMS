@@ -49,7 +49,7 @@ namespace Umbraco.Core.Manifest
         /// Gets or sets the dashboards listed in the manifest.
         /// </summary>
         [JsonProperty("dashboards")]
-        public ManifestDashboardDefinition[] Dashboards { get; set; } = Array.Empty<ManifestDashboardDefinition>();
+        public ManifestDashboard[] Dashboards { get; set; } = Array.Empty<ManifestDashboard>();
 
         /// <summary>
         /// Gets or sets the sections listed in the manifest.

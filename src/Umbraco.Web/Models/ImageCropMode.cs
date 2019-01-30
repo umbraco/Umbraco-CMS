@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models
         Crop,
 
         /// <summary>
-        /// Resizes the image to the given dimensions. If the set dimensions do not match the aspect ratio of the original image then the output is resized to the maximum possible value in each direction while aintaining the original aspect ratio.
+        /// Resizes the image to the given dimensions. If the set dimensions do not match the aspect ratio of the original image then the output is resized to the maximum possible value in each direction while maintaining the original aspect ratio.
         /// </summary>
         Max,
 

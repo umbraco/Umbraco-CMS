@@ -100,6 +100,9 @@ namespace Umbraco.Core.Runtime
                 // throws if not full-trust
                 new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
 
+                // run handlers
+                RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
+
                 // application caches
                 var appCaches = GetAppCaches();
 
@@ -131,12 +134,17 @@ namespace Umbraco.Core.Runtime
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
 
+                // run handlers
+                RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
+
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
                 Compose(composition);
 
-                // acquire the main domain, determine our runtime level
+                // acquire the main domain
                 AcquireMainDom(mainDom);
+
+                // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
                 // get composers, and compose
@@ -288,7 +296,7 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual void Terminate()
         {
-            _components.Terminate();
+            _components?.Terminate();
         }
 
         /// <summary>

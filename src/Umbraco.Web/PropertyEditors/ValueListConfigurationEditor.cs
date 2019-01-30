@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Services;
@@ -13,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <remarks>
     /// This pre-value editor is shared with editors like drop down, checkbox list, etc....
     /// </remarks>
-    internal class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
+    public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
     {
         public ValueListConfigurationEditor(ILocalizedTextService textService)
         {

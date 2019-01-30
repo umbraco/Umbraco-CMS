@@ -211,29 +211,6 @@
     <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="Configuration\Configs.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
-    <Compile Include="Configuration\Dashboard\AccessElement.cs" />
-    <Compile Include="Configuration\Dashboard\AccessRule.cs" />
-    <Compile Include="Configuration\Dashboard\AccessRuleType.cs" />
-    <Compile Include="Configuration\Dashboard\AreaCollection.cs" />
-    <Compile Include="Configuration\Dashboard\AreaElement.cs" />
-    <Compile Include="Configuration\Dashboard\AreasElement.cs" />
-    <Compile Include="Configuration\Dashboard\ControlCollection.cs" />
-    <Compile Include="Configuration\Dashboard\ControlElement.cs" />
-    <Compile Include="Configuration\Dashboard\DashboardSection.cs" />
-    <Compile Include="Configuration\Dashboard\IAccess.cs" />
-    <Compile Include="Configuration\Dashboard\IAccessRule.cs" />
-    <Compile Include="Configuration\Dashboard\IArea.cs" />
-    <Compile Include="Configuration\Dashboard\IDashboardControl.cs" />
-    <Compile Include="Configuration\Dashboard\IDashboardSection.cs" />
-    <Compile Include="Configuration\Dashboard\IDashboardTab.cs" />
-    <Compile Include="Configuration\Dashboard\ISection.cs" />
-    <Compile Include="Configuration\Dashboard\SectionCollection.cs" />
-    <Compile Include="Configuration\Dashboard\SectionElement.cs" />
-    <Compile Include="Configuration\Dashboard\TabCollection.cs" />
-    <Compile Include="Configuration\Dashboard\TabElement.cs" />
-    <Compile Include="Configuration\FileSystemProviderElement.cs" />
-    <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
-    <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
@@ -255,8 +232,6 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
-    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
-    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\IGlobalSettings.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\LocalTempStorage.cs" />
@@ -331,7 +306,15 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
+    <Compile Include="Dashboards\AccessRule.cs" />
+    <Compile Include="Dashboards\AccessRuleType.cs" />
+    <Compile Include="Dashboards\DashboardSlim.cs" />
+    <Compile Include="Dashboards\IAccessRule.cs" />
+    <Compile Include="Dashboards\IDashboard.cs" />
+    <Compile Include="Dashboards\IDashboardSlim.cs" />
+    <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
+    <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
@@ -372,7 +355,7 @@
     <Compile Include="Manifest\ManifestBackOfficeSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
-    <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
+    <Compile Include="Manifest\ManifestDashboard.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
@@ -392,6 +375,7 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\ConvertRelatedLinksToMultiUrlPicker.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentTypeIsElementColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLogTableColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddTypedLabels.cs" />
@@ -415,6 +399,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigrationFix.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
@@ -465,6 +450,8 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Trees\IBackOfficeSection.cs" />
+    <Compile Include="PackageActions\AllowDoctype.cs" />
+    <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
@@ -529,7 +516,7 @@
     <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeLevelReason.cs" />
-    <Compile Include="RuntimeStateOptions.cs" />
+    <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
@@ -564,7 +551,6 @@
     <Compile Include="Deploy\IImageSourceParser.cs" />
     <Compile Include="Deploy\ILocalLinkParser.cs" />
     <Compile Include="Deploy\IMacroParser.cs" />
-    <Compile Include="Deploy\IPreValueConnector.cs" />
     <Compile Include="Deploy\IServiceConnector.cs" />
     <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
     <Compile Include="Deploy\IValueConnector.cs" />
@@ -1320,7 +1306,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreRuntimeComposer.cs" />
@@ -1529,13 +1514,10 @@
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
-    <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollection.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollectionBuilder.cs" />
+    <Compile Include="PackageActions\IPackageAction.cs" />
+    <Compile Include="PackageActions\PackageActionCollection.cs" />
+    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Sync\ServerSyncWebServiceClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\SolutionInfo.cs">

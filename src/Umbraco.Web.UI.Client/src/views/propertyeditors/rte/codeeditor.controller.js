@@ -32,7 +32,7 @@
 
             // set default title
             if(!$scope.model.title) {
-                // TODO localize
+                // TODO: localize
                 $scope.model.title = "Edit source code";
             }
         }

@@ -281,7 +281,7 @@ namespace Umbraco.Web.Trees
                         Services.TextService.Localize("general/recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
-                        queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
+                        queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
 
                 }
 
@@ -414,7 +414,7 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            //todo: inject
+            // TODO: inject
             var actions = Current.Actions.FromEntityPermission(permission)
                 .ToList();
 
@@ -429,7 +429,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Determins if the user has access to view the node/document
+        /// Determines if the user has access to view the node/document
         /// </summary>
         /// <param name="doc">The Document to check permissions against</param>
         /// <param name="allowedUserOptions">A list of MenuItems that the user has permissions to execute on the current document</param>
@@ -437,7 +437,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, string culture)
         {
-            //TODO: At some stage when we implement permissions on languages we'll need to take care of culture
+            // TODO: At some stage when we implement permissions on languages we'll need to take care of culture
             return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
         }
 

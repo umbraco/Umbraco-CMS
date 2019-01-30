@@ -4,23 +4,24 @@
 }
 
 .umb-insert-code-box {
-    border: 2px solid @gray-10;
+    border: 1px solid @gray-10;
     padding: 15px 20px;
     margin-bottom: 10px;
     border-radius: 3px;
+    cursor: pointer;
 }
 
-.umb-insert-code-box:hover,
+.umb-insert-code-box:hover, 
 .umb-insert-code-box.-selected {
-    border-color: @turquoise;
-    cursor: pointer;
+    background-color: @ui-option-hover;
+    color: @ui-action-type-hover;
+    //border-color: @ui-action-border-hover;
 }
 
 .umb-insert-code-box__title {
     font-size: 15px;
     margin-bottom: 5px;
     font-weight: bold;
-    color: @black;
 }
 
 .umb-insert-code-box__description {
@@ -31,7 +32,7 @@
 .umb-insert-code-box__check {
     width: 18px;
     height: 18px;
-    background: @gray-10;
+    background: @gray-10;x
     border-radius: 50%;
     display: flex;
     align-items: center;

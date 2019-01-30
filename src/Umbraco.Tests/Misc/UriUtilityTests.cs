@@ -7,7 +7,7 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.Misc
 {
-    // fixme - not testing virtual directory!
+    // FIXME: not testing virtual directory!
 
     [TestFixture]
     public class UriUtilityTests
@@ -60,32 +60,20 @@ namespace Umbraco.Tests.Misc
             Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
         }
 
-        // test directoryUrl false, trailingSlash false
-        [TestCase("/", "/", false, false)]
-        [TestCase("/home", "/home.aspx", false, false)]
-        [TestCase("/home/sub1", "/home/sub1.aspx", false, false)]
-
-        // test directoryUrl false, trailingSlash true
-        [TestCase("/", "/", false, true)]
-        [TestCase("/home", "/home.aspx", false, true)]
-        [TestCase("/home/sub1", "/home/sub1.aspx", false, true)]
 
         // test directoryUrl true, trailingSlash false
-        [TestCase("/", "/", true, false)]
-        [TestCase("/home", "/home", true, false)]
-        [TestCase("/home/sub1", "/home/sub1", true, false)]
+        [TestCase("/", "/", false)]
+        [TestCase("/home", "/home", false)]
+        [TestCase("/home/sub1", "/home/sub1", false)]
 
         // test directoryUrl true, trailingSlash true
-        [TestCase("/", "/", true, true)]
-        [TestCase("/home", "/home/", true, true)]
-        [TestCase("/home/sub1", "/home/sub1/", true, true)]
+        [TestCase("/", "/", true)]
+        [TestCase("/home", "/home/", true)]
+        [TestCase("/home/sub1", "/home/sub1/", true)]
 
-        public void Uri_From_Umbraco(string sourceUrl, string expectedUrl, bool directoryUrls, bool trailingSlash)
+        public void Uri_From_Umbraco(string sourceUrl, string expectedUrl, bool trailingSlash)
         {
-            ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
-
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
-            globalConfig.Setup(x => x.UseDirectoryUrls).Returns(directoryUrls);
 
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var requestMock = Mock.Get(settings.RequestHandler);

@@ -21,6 +21,6 @@ namespace Umbraco.Web.HealthCheck
 
         public Guid Id { get; private set; }
 
-        //TODO: Do we need more metadata?
+        // TODO: Do we need more metadata?
     }
 }

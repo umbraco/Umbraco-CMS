@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Scoping
     [NUnit.Framework.Ignore("Cannot dispatch events on NoScope!")]
     public class PassThroughEventDispatcherTests
     {
-        // fixme so... should we remove, or enable, these tests?
+        // FIXME: so... should we remove, or enable, these tests?
 
     //    [Test]
     //    public void TriggersCancelableEvents()

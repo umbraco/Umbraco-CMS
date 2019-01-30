@@ -634,7 +634,7 @@
                     templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
                 } else {
                     // Declaration doesn't exist, so prepend to start of doc
-                    //TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
+                    // TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
                     templateCode = "@{\n\tLayout = \"" + newValue + "\";\n}\n" + templateCode;
                 }
             } else {

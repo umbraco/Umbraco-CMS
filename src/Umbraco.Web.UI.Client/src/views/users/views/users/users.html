@@ -11,7 +11,7 @@
             <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
                 <umb-button-group
                     ng-if="vm.defaultButton"
-                    button-style="success"
+                    button-style="action"
                     default-button="vm.defaultButton"
                     sub-buttons="vm.subButtons">
                 </umb-button-group>
@@ -392,7 +392,7 @@
 
                         <umb-button
                             ng-if="vm.usersViewState === 'inviteUser'"
-                            button-style="success"
+                            button-style="action"
                             state="vm.page.createButtonState"
                             type="button"
                             action="vm.inviteUser(addUserForm)"
@@ -402,7 +402,7 @@
 
                         <umb-button
                             ng-if="vm.usersViewState === 'createUser'"
-                            button-style="success"
+                            button-style="action"
                             state="vm.page.createButtonState"
                             type="button"
                             action="vm.createUser(addUserForm)"
@@ -486,7 +486,7 @@
                         </umb-button>
                         <umb-button
                             type="button"
-                            button-style="success"
+                            button-style="action"
                             label-key="user_goToProfile"
                             action="vm.goToUser(vm.newUser.id);"
                             size="m">
@@ -536,7 +536,7 @@
                     </umb-button>
                     <umb-button
                         type="button"
-                        button-style="success"
+                        button-style="action"
                         label-key="user_goToProfile"
                         action="vm.goToUser(vm.newUser.id);"
                         size="m">

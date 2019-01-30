@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Querying
                 return string.Empty;
             }
 
-            //TODO: When m.Expression.NodeType == ExpressionType.Constant and it's an expression like: content => aliases.Contains(content.ContentType.Alias);
+            // TODO: When m.Expression.NodeType == ExpressionType.Constant and it's an expression like: content => aliases.Contains(content.ContentType.Alias);
             // then an SQL parameter will be added for aliases as an array, however in SqlIn on the subclass it will manually add these SqlParameters anyways,
             // however the query will still execute because the SQL that is written will only contain the correct indexes of SQL parameters, this would be ignored,
             // I'm just unsure right now due to time constraints how to make it correct. It won't matter right now and has been working already with this bug but I've

@@ -11,13 +11,13 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Composing
 
         #region Temp & Special
 
-        // todo - have to keep this until tests are refactored
+        // TODO: have to keep this until tests are refactored
         // but then, it should all be managed properly in the container
         public static IUmbracoContextAccessor UmbracoContextAccessor
         {

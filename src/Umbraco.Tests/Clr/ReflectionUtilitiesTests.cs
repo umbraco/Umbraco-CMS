@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Clr
             setterInt4(object4, 42);
             Assert.AreEqual(42, object4.IntValue);
 
-            // fixme the code below runs fine with ReSharper test running within VisualStudio
+            // FIXME: the code below runs fine with ReSharper test running within VisualStudio
             // but it crashes when running via vstest.console.exe - unless some settings are required?
 
             // converting works
@@ -552,7 +552,7 @@ namespace Umbraco.Tests.Clr
             Assert.AreEqual(44, getter3(c));
         }
 
-        // fixme - missing tests specifying 'returned' on method, property
+        // FIXME: missing tests specifying 'returned' on method, property
 
         [Test]
         public void DeconstructAnonymousType()

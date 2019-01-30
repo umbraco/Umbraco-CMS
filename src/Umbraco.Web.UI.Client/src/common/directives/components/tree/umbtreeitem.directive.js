@@ -61,7 +61,7 @@ angular.module("umbraco.directives")
                     return '';
                 }
 
-                //TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
+                // TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
 
                 var css = [];                
@@ -141,6 +141,7 @@ angular.module("umbraco.directives")
               defined on the tree
             */
             scope.altSelect = function(n, ev) {
+                if(ev.altKey) return false;
                 umbTreeCtrl.emitEvent("treeNodeAltSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
             

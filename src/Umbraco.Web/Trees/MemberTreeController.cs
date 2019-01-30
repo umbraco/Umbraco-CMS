@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Content,
         Constants.Applications.Media,
         Constants.Applications.Members)]
-    [Tree(Constants.Applications.Members, Constants.Trees.Members, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Members, Constants.Trees.Members, SortOrder = 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
@@ -125,14 +125,14 @@ namespace Umbraco.Web.Trees
             {
                 nodes.Add(
                         CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", true,
-                            queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
+                            queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
                 {
                     nodes.AddRange(Services.MemberTypeService.GetAll()
                         .Select(memberType =>
                             CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, "icon-users", true,
-                                queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
+                                queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
 

@@ -14,7 +14,7 @@ namespace Umbraco.Web.Install
         {
             _installHelper = installHelper;
 
-            // todo this is ugly but I have a branch where it's nicely refactored - for now we just want to manage ordering
+            // TODO: this is ugly but I have a branch where it's nicely refactored - for now we just want to manage ordering
             var a = installerSteps.ToArray();
             _orderedInstallerSteps = new InstallSetupStep[]
             {
@@ -26,7 +26,7 @@ namespace Umbraco.Web.Install
                 a.OfType<DatabaseInstallStep>().First(),
                 a.OfType<DatabaseUpgradeStep>().First(),
 
-                //TODO: Add these back once we have a compatible starter kit
+                // TODO: Add these back once we have a compatible starter kit
                 //orderedInstallerSteps.OfType<StarterKitDownloadStep>().First(),
                 //orderedInstallerSteps.OfType<StarterKitInstallStep>().First(),
                 //orderedInstallerSteps.OfType<StarterKitCleanupStep>().First(),

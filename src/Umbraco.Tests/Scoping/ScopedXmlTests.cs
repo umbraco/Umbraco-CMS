@@ -12,11 +12,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Scoping
 
             // the cache refresher component needs to trigger to refresh caches
             // but then, it requires a lot of plumbing ;(
-            // fixme - and we cannot inject a DistributedCache yet
+            // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
             Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());

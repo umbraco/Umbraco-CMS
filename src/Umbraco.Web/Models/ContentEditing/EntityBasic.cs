@@ -54,7 +54,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This will only be populated for some entities like macros
         /// </summary>
         /// <remarks>
-        /// This is overrideable to specify different validation attributes if required
+        /// It is possible to override this to specify different validation attributes if required
         /// </remarks>
         [DataMember(Name = "alias")]
         public virtual string Alias { get; set; }

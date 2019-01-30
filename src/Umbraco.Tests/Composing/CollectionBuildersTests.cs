@@ -453,7 +453,7 @@ namespace Umbraco.Tests.Composing
         public class Resolved1 : Resolved
         { }
 
-        [Weight(5)] // default is 10
+        [Weight(50)] // default is 100
         public class Resolved2 : Resolved
         { }
 

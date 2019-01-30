@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
         {
-            //TODO: Should we restrict search results based on what app the user has access to?
+            // TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
 
             if (string.IsNullOrEmpty(query))
@@ -207,7 +207,7 @@ namespace Umbraco.Web.Editors
         /// Gets the url of an entity
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
-        /// <param name="type">The tpye of entity such as Document, Media, Member</param>
+        /// <param name="type">The type of entity such as Document, Media, Member</param>
         /// <returns>The URL or path to the item</returns>
         public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
         {
@@ -252,11 +252,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
-            //TODO: Rename this!!! It's misleading, it should be GetByXPath
+            // TODO: Rename this!!! It's misleading, it should be GetByXPath
 
 
             if (type != UmbracoEntityTypes.Document)
-                throw new ArgumentException("Get by query is only compatible with enitities of type Document");
+                throw new ArgumentException("Get by query is only compatible with entities of type Document");
 
 
             var q = ParseXPathQuery(query, nodeContextId);
@@ -268,7 +268,7 @@ namespace Umbraco.Web.Editors
             return GetById(node.Id, type);
         }
 
-        //PP: wip in progress on the query parser
+        // PP: Work in progress on the query parser
         private string ParseXPathQuery(string query, int id)
         {
             return UmbracoXPathPathSyntaxParser.ParseXPathQuery(
@@ -628,7 +628,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support hierarchic here, some might not.
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 return Services.EntityService.GetChildren(id, objectType.Value)
                     .WhereNotNull()
@@ -651,7 +651,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support hierarchic here, some might not.
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
@@ -885,7 +885,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Should we order this by something ?
+                // TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
                 return ExecutePostFilter(entities, postFilter);
             }

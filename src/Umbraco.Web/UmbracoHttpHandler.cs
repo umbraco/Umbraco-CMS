@@ -23,7 +23,7 @@ namespace Umbraco.Web
             UmbracoContext = umbracoContext;
             Umbraco = new UmbracoHelper(umbracoContext, services);
 
-            // todo inject somehow
+            // TODO: inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;
