@@ -40,7 +40,7 @@ function macroService() {
 
         /**
          * @ngdoc function
-         * @name umbraco.services.macroService#generateWebFormsSyntax
+         * @name umbraco.services.macroService#generateMacroSyntax
          * @methodOf umbraco.services.macroService
          * @function    
          *
