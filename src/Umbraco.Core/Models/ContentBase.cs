@@ -380,9 +380,22 @@ namespace Umbraco.Core.Models
         {
             var alsoInvariant = culture != null && culture != "*";
 
-            return Properties.Where(x => // select properties...
-                    x.PropertyType.SupportsVariation(culture, "*", true) && // that support the variation
-                    (!x.IsValid(culture) || (alsoInvariant && !x.IsValid(null)))) // and are not valid
+            return Properties.Where(x =>
+                {
+                    var supportVariation = x.PropertyType.SupportsVariation(culture, "*", true);
+
+                    if (supportVariation)
+                    {
+                        // If the property support variation then we report an error
+                        // when property is invalid for current culture OR property is invalid for invariant
+                        return !x.IsValid(culture) || (alsoInvariant && !x.IsValid(null));
+                    }
+
+                    // Else we report error if the property is invalid for the default language
+                    return !x.IsValid();
+
+
+                })
                 .ToArray();
         }
 
