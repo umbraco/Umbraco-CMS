@@ -97,7 +97,6 @@ namespace Umbraco.Tests.Routing
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
             frequest.TemplateModel = template;
-            frequest.RenderingEngine = RenderingEngine.Mvc;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 

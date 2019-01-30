@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;

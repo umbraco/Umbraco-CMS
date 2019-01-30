@@ -8,7 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Core.PackageActions;
 using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Composing

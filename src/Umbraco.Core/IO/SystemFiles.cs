@@ -7,14 +7,8 @@ namespace Umbraco.Core.IO
 {
     public class SystemFiles
     {
-        public static string CreateUiXml => SystemDirectories.Umbraco + "/config/create/UI.xml";
-
         public static string TinyMceConfig => SystemDirectories.Config + "/tinyMceConfig.config";
-
-        public static string NotFoundhandlersConfig => SystemDirectories.Config + "/404handlers.config";
-
-        public static string FeedProxyConfig => string.Concat(SystemDirectories.Config, "/feedProxy.config");
-
+        
         public static string GetContentCacheXml(IGlobalSettings globalSettings)
         {
             switch (globalSettings.LocalTempStorageLocation)

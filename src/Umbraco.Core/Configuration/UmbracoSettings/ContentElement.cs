@@ -40,9 +40,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("XmlContentCheckForDiskChanges")]
         internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges => GetOptionalTextElement("XmlContentCheckForDiskChanges", false);
 
-        [ConfigurationProperty("EnableSplashWhileLoading")]
-        internal InnerTextConfigurationElement<bool> EnableSplashWhileLoading => GetOptionalTextElement("EnableSplashWhileLoading", false);
-
         [ConfigurationProperty("PropertyContextHelpOption")]
         internal InnerTextConfigurationElement<string> PropertyContextHelpOption => GetOptionalTextElement("PropertyContextHelpOption", "text");
 
@@ -109,8 +106,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.ContinouslyUpdateXmlDiskCache => ContinouslyUpdateXmlDiskCache;
 
         bool IContentSection.XmlContentCheckForDiskChanges => XmlContentCheckForDiskChanges;
-
-        bool IContentSection.EnableSplashWhileLoading => EnableSplashWhileLoading;
 
         string IContentSection.PropertyContextHelpOption => PropertyContextHelpOption;
 

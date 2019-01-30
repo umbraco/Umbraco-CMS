@@ -2,7 +2,6 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using umbraco;
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using Newtonsoft.Json;
@@ -36,8 +35,6 @@ namespace Umbraco.Web.Cache
                 AppCaches.RuntimeCache.ClearByKey(prefix);
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
-
-            AppCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
 
             base.RefreshAll();
         }
@@ -108,11 +105,6 @@ namespace Umbraco.Web.Cache
         internal static string[] GetCacheKeysForAlias(string alias)
         {
             return GetAllMacroCacheKeys().Select(x => x + alias).ToArray();
-        }
-
-        public static void ClearMacroContentCache(AppCaches appCaches)
-        {
-            appCaches.RuntimeCache.ClearOfType<MacroCacheContent>();
         }
 
         #endregion

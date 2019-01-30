@@ -1,10 +1,9 @@
-﻿using Umbraco.Web.UI;
-
+﻿
 namespace Umbraco.Web.Models.ContentEditing
 {
     public static class MessagesExtensions
     {
-        public static void AddNotification(this INotificationModel model, string header, string msg, SpeechBubbleIcon type)
+        public static void AddNotification(this INotificationModel model, string header, string msg, NotificationStyle type)
         {
             model.Notifications.Add(new Notification()
                 {
@@ -20,7 +19,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 {
                     Header = header,
                     Message = msg,
-                    NotificationType = SpeechBubbleIcon.Success
+                    NotificationType = NotificationStyle.Success
                 });
         }
 
@@ -30,7 +29,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 {
                     Header = header,
                     Message = msg,
-                    NotificationType = SpeechBubbleIcon.Error
+                    NotificationType = NotificationStyle.Error
                 });
         }
 
@@ -40,7 +39,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 {
                     Header = header,
                     Message = msg,
-                    NotificationType = SpeechBubbleIcon.Warning
+                    NotificationType = NotificationStyle.Warning
                 });
         }
 
@@ -50,7 +49,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 {
                     Header = header,
                     Message = msg,
-                    NotificationType = SpeechBubbleIcon.Info
+                    NotificationType = NotificationStyle.Info
                 });
         }
     }

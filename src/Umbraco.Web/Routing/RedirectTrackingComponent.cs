@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -13,7 +12,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.Redirects
+namespace Umbraco.Web.Routing
 {
     /// Implements an Application Event Handler for managing redirect urls tracking.
     /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old url</para>
