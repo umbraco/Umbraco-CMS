@@ -390,16 +390,17 @@ namespace Umbraco.Core.Services.Implement
         /// Create a new template, setting the content if a view exists in the filesystem
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="alias"></param>
         /// <param name="content"></param>
         /// <param name="masterTemplate"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
+        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = 0)
         {
             // file might already be on disk, if so grab the content to avoid overwriting
-            var template = new Template(name, name)
+            var template = new Template(name, alias)
             {
-                Content = GetViewContent(name) ?? content
+                Content = GetViewContent(alias) ?? content
             };
             
             if (masterTemplate != null)

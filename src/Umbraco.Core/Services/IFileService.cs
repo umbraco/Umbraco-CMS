@@ -200,7 +200,7 @@ namespace Umbraco.Core.Services
         /// </returns>
         Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
 
-        ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
+        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = 0);
 
         /// <summary>
         /// Deletes a template by its alias
