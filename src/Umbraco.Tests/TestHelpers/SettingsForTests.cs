@@ -54,7 +54,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
             settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
             settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
-            settings.Setup(x => x.RequestHandler.UseDomainPrefixes).Returns(false);
             settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
             settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
             settings.Setup(x => x.Providers.DefaultBackOfficeUserProvider).Returns("UsersMembershipProvider");

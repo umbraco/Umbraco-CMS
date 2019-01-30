@@ -127,13 +127,6 @@ namespace Umbraco.Web.Routing
 
             // ignore vdir at that point, UriFromUmbraco will do it
 
-            if (mode == UrlProviderMode.AutoLegacy)
-            {
-                mode = _requestSettings.UseDomainPrefixes
-                    ? UrlProviderMode.Absolute
-                    : UrlProviderMode.Auto;
-            }
-
             if (domainUri == null) // no domain was found
             {
                 if (current == null)

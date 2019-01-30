@@ -12,11 +12,6 @@
     /// </remarks>
     public enum UrlProviderMode
     {
-        /// <summary>
-        /// Indicates that the url provider should determine automatically whether to return relative or absolute urls,
-        /// and also respect the legacy <c>useDomainPrefixes</c> setting.
-        /// </summary>
-        AutoLegacy,
 
         /// <summary>
         /// Indicates that the url provider should produce relative urls exclusively.

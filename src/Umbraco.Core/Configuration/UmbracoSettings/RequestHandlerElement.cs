@@ -7,12 +7,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
     {
-        [ConfigurationProperty("useDomainPrefixes")]
-        public InnerTextConfigurationElement<bool> UseDomainPrefixes
-        {
-            get { return GetOptionalTextElement("useDomainPrefixes", false); }
-        }
-
         [ConfigurationProperty("addTrailingSlash")]
         public InnerTextConfigurationElement<bool> AddTrailingSlash
         {
@@ -92,11 +86,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
 
             return collection;
-        }
-
-        bool IRequestHandlerSection.UseDomainPrefixes
-        {
-            get { return UseDomainPrefixes; }
         }
 
         bool IRequestHandlerSection.AddTrailingSlash
