@@ -77,10 +77,6 @@ if ($project) {
 		$splashesDestination = Join-Path $projectPath "Config\splashes\"
 		New-Item $splashesDestination -Type directory
 		Copy-Item $splashesSource $splashesDestination -Force
-        
-		$umbracoUIXMLSource = Join-Path $installPath "UmbracoFiles\Umbraco\Config\Create\UI.xml"
-		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
-		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
 	} else {
 		# This part only runs for upgrades
 	
@@ -102,31 +98,6 @@ if ($project) {
 		{
 			# Not a big problem if this fails, let it go
 		}
-		
-		Try 
-		{
-			$uiXmlConfigPath = Join-Path $umbracoFolder -ChildPath "Config" | Join-Path -ChildPath "create" | Join-Path -ChildPath "UI.xml"
-			$uiXmlFile = Join-Path $umbracoFolder -ChildPath "Config" | Join-Path -ChildPath "create" | Join-Path -ChildPath "UI.xml"
-
-			$uiXml = New-Object System.Xml.XmlDocument
-			$uiXml.PreserveWhitespace = $true
-
-			$uiXml.Load($uiXmlFile)
-			$createExists = $uiXml.SelectNodes("//nodeType[@alias='macros']/tasks/create")
-
-			if($createExists.Count -eq 0) 
-			{    
-				$macrosTasksNode = $uiXml.SelectNodes("//nodeType[@alias='macros']/tasks")
-
-				#Creating: <create assembly="umbraco" type="macroTasks" />
-				$createNode = $uiXml.CreateElement("create")
-				$createNode.SetAttribute("assembly", "umbraco")
-				$createNode.SetAttribute("type", "macroTasks")
-				$macrosTasksNode.AppendChild($createNode)
-				$uiXml.Save($uiXmlFile)
-			}
-		} 
-		Catch { }
 	}
 	
 	$installFolder = Join-Path $projectPath "Install"
