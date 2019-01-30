@@ -1,9 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.CodeAnnotations;
-using Umbraco.Web.UI.Pages;
-
-
-namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Web.Actions
 {
     // TODO: Add this back in when we support this functionality again
     ///// <summary>

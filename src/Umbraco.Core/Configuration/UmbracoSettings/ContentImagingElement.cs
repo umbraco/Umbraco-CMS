@@ -22,18 +22,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return new[] {"jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif"};
         }
 
-        [ConfigurationProperty("allowedAttributes")]
-        internal CommaDelimitedConfigurationElement ImageTagAllowedAttributes
-        {
-            get
-            {
-                return new OptionalCommaDelimitedConfigurationElement(
-                       (CommaDelimitedConfigurationElement)this["allowedAttributes"],
-                        //set the default
-                       new[] { "src", "alt", "border", "class", "style", "align", "id", "name", "onclick", "usemap" });
-            }
-        }
-
         private ImagingAutoFillPropertiesCollection _defaultImageAutoFill;
 
         [ConfigurationCollection(typeof(ImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]

@@ -9,11 +9,11 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -42,7 +42,6 @@ namespace Umbraco.Tests.Routing
         public void Ensure_Cache_Is_Correct()
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -106,7 +105,6 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -137,7 +135,6 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -160,7 +157,6 @@ namespace Umbraco.Tests.Routing
             const string currentUri = "http://example.us/test";
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -209,7 +205,6 @@ namespace Umbraco.Tests.Routing
             const string currentUri = "http://example.fr/test";
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -267,7 +262,6 @@ namespace Umbraco.Tests.Routing
             const string currentUri = "http://example.us/test";
 
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -321,7 +315,6 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_Relative_Or_Absolute()
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();
@@ -348,7 +341,6 @@ namespace Umbraco.Tests.Routing
         public void Get_Url_Unpublished()
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var umbracoSettings = Current.Configs.Settings();

@@ -51,7 +51,7 @@ namespace Umbraco.Tests.PublishedContent
             request.PublishedContent = content.Object;
             publishedRouter.ConfigureRequest(request);
 
-            Assert.IsNotNull(request.UmbracoPage);
+            Assert.IsNotNull(request.LegacyContentHashTable);
         }
 
         private Mock<IPublishedContent> GetPublishedContentMock()

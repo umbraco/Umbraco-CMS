@@ -195,6 +195,7 @@
   <area alias="codefile">
     <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
     <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+    <key alias="createFolderIllegalChars">The folder name cannot contain illegal characters.</key>
     <key alias="deleteItemFailed">Failed to delete item: %0%</key>
   </area>
   <area alias="content">
@@ -302,10 +303,10 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
-        <key alias="moveFailed">Failed to move media</key>
-        <key alias="copyFailed">Failed to copy media</key>
-        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
-        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="moveFailed">Failed to move media</key>
+    <key alias="copyFailed">Failed to copy media</key>
+    <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+    <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -653,7 +654,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
+    <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -1219,11 +1220,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="externalLinkPlaceholder">Enter the link</key>
   </area>
   <area alias="imagecropper">
-        <key alias="reset">Reset crop</key>
+    <key alias="reset">Reset crop</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
-        <key alias="updateEditCrop">Done</key>
-        <key alias="undoEditCrop">Undo edits</key>
+    <key alias="updateEditCrop">Done</key>
+    <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Select a version to compare with the current version</key>
@@ -1315,7 +1316,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
     <key alias="editMediaSaved">Media saved</key>
-        <key alias="editMemberGroupSaved">Member group saved</key>
+    <key alias="editMemberGroupSaved">Member group saved</key>
     <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
@@ -1332,6 +1333,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="languageSaved">Language saved</key>
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
+    <key alias="memberGroupSavedHeader">Member Group saved</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
@@ -1495,6 +1497,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
     <key alias="noTabs">You have not added any tabs</key>
+    <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
     <key alias="addProperty">Add property</key>
     <key alias="requiredLabel">Required label</key>
@@ -1545,6 +1548,19 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
   </area>
+  <area alias="languages">
+    <key alias="addLanguage">Add language</key>
+    <key alias="mandatoryLanguage">Mandatory language</key>
+    <key alias="mandatoryLanguageHelp">Properties on this language have to be filled out before the node can be published.</key>
+    <key alias="defaultLanguage">Default language</key>
+    <key alias="defaultLanguageHelp">An Umbraco site can only have one default language set.</key>
+    <key alias="changingDefaultLanguageWarning">Switching default language may result in default content missing.</key>
+    <key alias="fallsbackToLabel">Falls back to</key>
+    <key alias="noFallbackLanguageOption">No fall back language</key>
+    <key alias="fallbackLanguageDescription">To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.</key>
+    <key alias="fallbackLanguage">Fall back language</key>
+  </area>
+
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
     <key alias="editParameter">Edit parameter</key>
@@ -1662,6 +1678,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Templates</key>
+    <key alias="logViewer">Log Viewer</key>
     <key alias="users">Users</key>
     <key alias="settingsGroup">Settings</key>
     <key alias="templatingGroup">Templating</key>

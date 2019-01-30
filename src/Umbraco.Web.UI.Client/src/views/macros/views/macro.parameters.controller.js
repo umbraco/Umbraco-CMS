@@ -47,7 +47,6 @@ function MacrosParametersController($scope, editorService, localizationService) 
             parameter.key = newParameter.key;
             parameter.label = newParameter.label;
             parameter.editor = newParameter.editor;
-            parameter.editor = newParameter.editor;
             setDirty();
         });
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Packaging
 {

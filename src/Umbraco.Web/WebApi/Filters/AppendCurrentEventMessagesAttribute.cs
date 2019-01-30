@@ -4,7 +4,6 @@ using System.Web.Http.Filters;
 using Umbraco.Core.Events;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.UI;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -32,23 +31,23 @@ namespace Umbraco.Web.WebApi.Filters
 
             foreach (var eventMessage in msgs.GetAll())
             {
-                SpeechBubbleIcon msgType;
+                NotificationStyle msgType;
                 switch (eventMessage.MessageType)
                 {
                     case EventMessageType.Default:
-                        msgType = SpeechBubbleIcon.Save;
+                        msgType = NotificationStyle.Save;
                         break;
                     case EventMessageType.Info:
-                        msgType = SpeechBubbleIcon.Info;
+                        msgType = NotificationStyle.Info;
                         break;
                     case EventMessageType.Error:
-                        msgType = SpeechBubbleIcon.Error;
+                        msgType = NotificationStyle.Error;
                         break;
                     case EventMessageType.Success:
-                        msgType = SpeechBubbleIcon.Success;
+                        msgType = NotificationStyle.Success;
                         break;
                     case EventMessageType.Warning:
-                        msgType = SpeechBubbleIcon.Warning;
+                        msgType = NotificationStyle.Warning;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

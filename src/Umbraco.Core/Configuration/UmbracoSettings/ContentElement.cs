@@ -11,14 +11,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging => (ContentImagingElement) this["imaging"];
 
-        [ConfigurationProperty("scripteditor")]
-        internal ContentScriptEditorElement ScriptEditor => (ContentScriptEditorElement) this["scripteditor"];
-
         [ConfigurationProperty("ResolveUrlsFromTextString")]
         internal InnerTextConfigurationElement<bool> ResolveUrlsFromTextString => GetOptionalTextElement("ResolveUrlsFromTextString", false);
-
-        [ConfigurationProperty("UploadAllowDirectories")]
-        internal InnerTextConfigurationElement<bool> UploadAllowDirectories => GetOptionalTextElement("UploadAllowDirectories", true);
 
         public IEnumerable<IContentErrorPage> Error404Collection => Errors.Error404Collection;
 
@@ -28,26 +22,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
-        [ConfigurationProperty("ensureUniqueNaming")]
-        internal InnerTextConfigurationElement<bool> EnsureUniqueNaming => GetOptionalTextElement("ensureUniqueNaming", true);
-
-        [ConfigurationProperty("XmlCacheEnabled")]
-        internal InnerTextConfigurationElement<bool> XmlCacheEnabled => GetOptionalTextElement("XmlCacheEnabled", true);
-
-        [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
-        internal InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache => GetOptionalTextElement("ContinouslyUpdateXmlDiskCache", true);
-
-        [ConfigurationProperty("XmlContentCheckForDiskChanges")]
-        internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges => GetOptionalTextElement("XmlContentCheckForDiskChanges", false);
-
-        [ConfigurationProperty("EnableSplashWhileLoading")]
-        internal InnerTextConfigurationElement<bool> EnableSplashWhileLoading => GetOptionalTextElement("EnableSplashWhileLoading", false);
-
         [ConfigurationProperty("PropertyContextHelpOption")]
         internal InnerTextConfigurationElement<string> PropertyContextHelpOption => GetOptionalTextElement("PropertyContextHelpOption", "text");
-
-        [ConfigurationProperty("ForceSafeAliases")]
-        internal InnerTextConfigurationElement<bool> ForceSafeAliases => GetOptionalTextElement("ForceSafeAliases", true);
 
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
@@ -60,10 +36,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("allowedUploadFiles")]
         internal CommaDelimitedConfigurationElement AllowedUploadFiles => GetOptionalDelimitedElement("allowedUploadFiles", new string[0]);
-
-        [ConfigurationProperty("cloneXmlContent")]
-        internal InnerTextConfigurationElement<bool> CloneXmlContent => GetOptionalTextElement("cloneXmlContent", true);
-
+        
         [ConfigurationProperty("GlobalPreviewStorageEnabled")]
         internal InnerTextConfigurationElement<bool> GlobalPreviewStorageEnabled => GetOptionalTextElement("GlobalPreviewStorageEnabled", false);
 
@@ -88,33 +61,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> IContentSection.ImageFileTypes => Imaging.ImageFileTypes;
 
-        IEnumerable<string> IContentSection.ImageTagAllowedAttributes => Imaging.ImageTagAllowedAttributes;
-
         IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties => Imaging.ImageAutoFillProperties;
 
-        bool IContentSection.ScriptEditorDisable => ScriptEditor.ScriptEditorDisable;
-
-        string IContentSection.ScriptFolderPath => ScriptEditor.ScriptFolderPath;
-
-        IEnumerable<string> IContentSection.ScriptFileTypes => ScriptEditor.ScriptFileTypes;
-
         bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
-
-        bool IContentSection.UploadAllowDirectories => UploadAllowDirectories;
-
-        bool IContentSection.EnsureUniqueNaming => EnsureUniqueNaming;
-
-        bool IContentSection.XmlCacheEnabled => XmlCacheEnabled;
-
-        bool IContentSection.ContinouslyUpdateXmlDiskCache => ContinouslyUpdateXmlDiskCache;
-
-        bool IContentSection.XmlContentCheckForDiskChanges => XmlContentCheckForDiskChanges;
-
-        bool IContentSection.EnableSplashWhileLoading => EnableSplashWhileLoading;
-
-        string IContentSection.PropertyContextHelpOption => PropertyContextHelpOption;
-
-        bool IContentSection.ForceSafeAliases => ForceSafeAliases;
 
         string IContentSection.PreviewBadge => PreviewBadge;
 
@@ -123,8 +72,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> IContentSection.DisallowedUploadFiles => DisallowedUploadFiles;
 
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
-
-        bool IContentSection.CloneXmlContent => CloneXmlContent;
 
         bool IContentSection.GlobalPreviewStorageEnabled => GlobalPreviewStorageEnabled;
 

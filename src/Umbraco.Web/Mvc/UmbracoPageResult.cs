@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
@@ -30,32 +29,21 @@ namespace Umbraco.Web.Mvc
 
             var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
 
-            //Special case, if it is webforms but we're posting to an MVC surface controller, then we
-            // need to return the webforms result instead
-            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.WebForms)
+            var factory = ControllerBuilder.Current.GetControllerFactory();
+            context.RouteData.Values["action"] = routeDef.ActionName;
+            ControllerBase controller = null;
+
+            try
             {
-                EnsureViewContextForWebForms(context);
-                var webFormsHandler = RenderRouteHandler.GetWebFormsHandler();
-                webFormsHandler.ProcessRequest(HttpContext.Current);
+                controller = CreateController(context, factory, routeDef);
+
+                CopyControllerData(context, controller);
+
+                ExecuteControllerAction(context, controller);
             }
-            else
+            finally
             {
-                var factory = ControllerBuilder.Current.GetControllerFactory();
-                context.RouteData.Values["action"] = routeDef.ActionName;
-                ControllerBase controller = null;
-
-                try
-                {
-                    controller = CreateController(context, factory, routeDef);
-
-                    CopyControllerData(context, controller);
-
-                    ExecuteControllerAction(context, controller);
-                }
-                finally
-                {
-                    CleanupController(controller, factory);
-                }
+                CleanupController(controller, factory);
             }
         }
 

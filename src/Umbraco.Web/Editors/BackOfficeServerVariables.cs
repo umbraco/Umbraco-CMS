@@ -184,11 +184,7 @@ namespace Umbraco.Web.Editors
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
-                        },
-                        {
-                            "legacyApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LegacyController>(
-                                controller => controller.DeleteLegacyItem(null, null, null))
-                        },
+                        },                        
                         {
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
@@ -268,10 +264,6 @@ namespace Umbraco.Web.Editors
                         {
                             "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                                 controller => controller.GetIndexerDetails())
-                        },
-                        {
-                            "xmlDataIntegrityBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
-                                controller => controller.CheckContentXmlTable())
                         },
                         {
                             "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
