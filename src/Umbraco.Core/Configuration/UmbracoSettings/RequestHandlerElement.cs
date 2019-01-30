@@ -8,10 +8,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
     {
         [ConfigurationProperty("addTrailingSlash")]
-        public InnerTextConfigurationElement<bool> AddTrailingSlash
-        {
-            get { return GetOptionalTextElement("addTrailingSlash", true); }
-        }
+        public InnerTextConfigurationElement<bool> AddTrailingSlash => GetOptionalTextElement("addTrailingSlash", true);
 
         private UrlReplacingElement _defaultUrlReplacing;
         [ConfigurationProperty("urlReplacing")]
@@ -88,29 +85,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return collection;
         }
 
-        bool IRequestHandlerSection.AddTrailingSlash
-        {
-            get { return AddTrailingSlash; }
-        }
+        bool IRequestHandlerSection.AddTrailingSlash => AddTrailingSlash;
 
-        bool IRequestHandlerSection.RemoveDoubleDashes
-        {
-            get { return UrlReplacing.RemoveDoubleDashes; }
-        }
+        bool IRequestHandlerSection.ConvertUrlsToAscii => UrlReplacing.ConvertUrlsToAscii.InvariantEquals("true");
 
-        bool IRequestHandlerSection.ConvertUrlsToAscii
-        {
-            get { return UrlReplacing.ConvertUrlsToAscii.InvariantEquals("true"); }
-        }
+        bool IRequestHandlerSection.TryConvertUrlsToAscii => UrlReplacing.ConvertUrlsToAscii.InvariantEquals("try");
 
-        bool IRequestHandlerSection.TryConvertUrlsToAscii
-        {
-            get { return UrlReplacing.ConvertUrlsToAscii.InvariantEquals("try"); }
-        }
-
-        IEnumerable<IChar> IRequestHandlerSection.CharCollection
-        {
-            get { return UrlReplacing.CharCollection; }
-        }
+        IEnumerable<IChar> IRequestHandlerSection.CharCollection => UrlReplacing.CharCollection;
     }
 }

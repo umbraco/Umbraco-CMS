@@ -248,15 +248,12 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
@@ -265,7 +262,6 @@
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\LogTypeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />

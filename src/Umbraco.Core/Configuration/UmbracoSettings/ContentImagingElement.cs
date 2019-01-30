@@ -6,16 +6,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
 
         [ConfigurationProperty("imageFileTypes")]
-        internal CommaDelimitedConfigurationElement ImageFileTypes
-        {
-            get
-            {
-                return new OptionalCommaDelimitedConfigurationElement(
-                       (CommaDelimitedConfigurationElement)this["imageFileTypes"],
-                        //set the default
-                       GetDefaultImageFileTypes());
-            }
-        }
+        internal CommaDelimitedConfigurationElement ImageFileTypes =>
+            new OptionalCommaDelimitedConfigurationElement(
+                (CommaDelimitedConfigurationElement)this["imageFileTypes"],
+                //set the default
+                GetDefaultImageFileTypes());
 
         internal static string[] GetDefaultImageFileTypes()
         {

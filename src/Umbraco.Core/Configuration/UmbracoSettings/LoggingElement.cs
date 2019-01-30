@@ -7,15 +7,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
 
         [ConfigurationProperty("maxLogAge")]
-        internal InnerTextConfigurationElement<int> MaxLogAge
-        {
-            get { return GetOptionalTextElement("maxLogAge", -1); }
-        }
-        
-        int ILoggingSection.MaxLogAge
-        {
-            get { return MaxLogAge; }
-        }
+        internal InnerTextConfigurationElement<int> MaxLogAge => GetOptionalTextElement("maxLogAge", -1);
 
+        int ILoggingSection.MaxLogAge => MaxLogAge;
     }
 }

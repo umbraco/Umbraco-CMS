@@ -6,8 +6,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
         bool AddTrailingSlash { get; }
 
-        bool RemoveDoubleDashes { get; }
-
         bool ConvertUrlsToAscii { get; }
 
         bool TryConvertUrlsToAscii { get; }

@@ -12,12 +12,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.RequestHandler.AddTrailingSlash == true);
         }
-        [Test]
-        public void RemoveDoubleDashes()
-        {
-            Assert.IsTrue(SettingsSection.RequestHandler.RemoveDoubleDashes == true);
 
-        }
         [Test]
         public void CharCollection()
         {
