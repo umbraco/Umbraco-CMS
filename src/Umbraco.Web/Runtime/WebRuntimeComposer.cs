@@ -222,7 +222,11 @@ namespace Umbraco.Web.Runtime
                 .Append<Kickstarter>()
                 .Append<GettyImages>()
                 .Append<Instagram>()
-                .Append<Twitter>();
+                .Append<Twitter>()
+                .Append<Vimeo>()
+                .Append<Ted>()
+                .Append<Soundcloud>();
         }
     }
 }
+

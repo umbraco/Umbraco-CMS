@@ -148,6 +148,9 @@
     <Compile Include="Media\EmbedProviders\EmbedProvidersCollectionBuilder.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Media\EmbedProviders\GettyImages.cs" />
+    <Compile Include="Media\EmbedProviders\SoundCloud.cs" />
+    <Compile Include="Media\EmbedProviders\Ted.cs" />
+    <Compile Include="Media\EmbedProviders\Vimeo.cs" />
     <Compile Include="Media\EmbedProviders\Twitter.cs" />
     <Compile Include="Media\EmbedProviders\Kickstarter.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
