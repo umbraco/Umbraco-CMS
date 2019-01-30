@@ -47,7 +47,6 @@ function MacrosParametersController($scope, editorService) {
             parameter.key = newParameter.key;
             parameter.label = newParameter.label;
             parameter.editor = newParameter.editor;
-            parameter.editor = newParameter.editor;
             $scope.model.setDirty();
         });
     }
