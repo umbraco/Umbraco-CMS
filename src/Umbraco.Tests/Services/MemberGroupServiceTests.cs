@@ -1,39 +1,24 @@
 ﻿using System;
-using System.Linq;
+using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
-    public class MemberGroupServiceTests : BaseServiceTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
+    public class MemberGroupServiceTests : TestWithSomeContentBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-        
-        [Test]
-        [ExpectedException("System.InvalidOperationException")]
-        public void New_MemberGroup_Is_Not_Allowed_With_Empty_Name()
+        /// <summary>
+        /// Used to list out all ambiguous events that will require dispatching with a name
+        /// </summary>
+        [Test, Explicit]
+        public void List_Ambiguous_Events()
         {
             var service = ServiceContext.MemberGroupService;
-            
-            service.Save(new MemberGroup {Name = ""});
-
-            Assert.Fail("An exception should have been thrown");
+            Assert.Throws<InvalidOperationException>(() => service.Save(new MemberGroup { Name = "" }));
         }
     }
 }
