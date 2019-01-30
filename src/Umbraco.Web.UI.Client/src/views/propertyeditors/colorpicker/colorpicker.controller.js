@@ -128,9 +128,13 @@ function ColorPickerController($scope, angularHelper) {
     // either the value or label was changed on the data type.
     function initActiveColor() {
 
-        // no value
-        if (!$scope.model.value)
-            return;
+        // no value - initialize default value
+        if (!$scope.model.value) {
+            $scope.model.value = {
+                value: "",
+                label: ""
+            };
+        }
 
         // Backwards compatibility, the color used to be stored as a hex value only
         if (typeof $scope.model.value === "string") {
