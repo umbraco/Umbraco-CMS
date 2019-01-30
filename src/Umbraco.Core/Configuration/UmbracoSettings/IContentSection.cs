@@ -17,12 +17,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<IContentErrorPage> Error404Collection { get; }
 
-        bool XmlCacheEnabled { get; }
-
-        bool ContinouslyUpdateXmlDiskCache { get; }
-
-        bool XmlContentCheckForDiskChanges { get; }
-
         string PropertyContextHelpOption { get; }
 
         bool ForceSafeAliases { get; }

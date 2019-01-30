@@ -85,21 +85,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.ForceSafeAliases);
         }
-        [Test]
-        public void XmlCacheEnabled()
-        {
-            Assert.IsTrue(SettingsSection.Content.XmlCacheEnabled);
-        }
-        [Test]
-        public void ContinouslyUpdateXmlDiskCache()
-        {
-            Assert.IsTrue(SettingsSection.Content.ContinouslyUpdateXmlDiskCache);
-        }
-        [Test]
-        public virtual void XmlContentCheckForDiskChanges()
-        {
-            Assert.IsTrue(SettingsSection.Content.XmlContentCheckForDiskChanges);
-        }
         
         [Test]
         public void PropertyContextHelpOption()

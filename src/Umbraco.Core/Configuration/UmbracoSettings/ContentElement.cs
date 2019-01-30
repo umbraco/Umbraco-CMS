@@ -22,15 +22,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
-        [ConfigurationProperty("XmlCacheEnabled")]
-        internal InnerTextConfigurationElement<bool> XmlCacheEnabled => GetOptionalTextElement("XmlCacheEnabled", true);
-
-        [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
-        internal InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache => GetOptionalTextElement("ContinouslyUpdateXmlDiskCache", true);
-
-        [ConfigurationProperty("XmlContentCheckForDiskChanges")]
-        internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges => GetOptionalTextElement("XmlContentCheckForDiskChanges", false);
-
         [ConfigurationProperty("PropertyContextHelpOption")]
         internal InnerTextConfigurationElement<string> PropertyContextHelpOption => GetOptionalTextElement("PropertyContextHelpOption", "text");
 
@@ -79,12 +70,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties => Imaging.ImageAutoFillProperties;
 
         bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
-
-        bool IContentSection.XmlCacheEnabled => XmlCacheEnabled;
-
-        bool IContentSection.ContinouslyUpdateXmlDiskCache => ContinouslyUpdateXmlDiskCache;
-
-        bool IContentSection.XmlContentCheckForDiskChanges => XmlContentCheckForDiskChanges;
 
         string IContentSection.PropertyContextHelpOption => PropertyContextHelpOption;
 
