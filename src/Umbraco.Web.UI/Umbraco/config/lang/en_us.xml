@@ -307,11 +307,11 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
-        <key alias="moveFailed">Failed to move media</key>
-        <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
-        <key alias="copyFailed">Failed to copy media</key>
-        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
-        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
+    <key alias="moveFailed">Failed to move media</key>
+    <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
+    <key alias="copyFailed">Failed to copy media</key>
+    <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+    <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -1337,6 +1337,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="languageSaved">Language saved</key>
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
+    <key alias="memberGroupSavedHeader">Member Group saved</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
@@ -1572,6 +1573,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fallbackLanguageDescription">To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.</key>
     <key alias="fallbackLanguage">Fall back language</key>
   </area>
+  <area alias="macro">
+    <key alias="parameters">Parameters</key>
+  </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
     <key alias="waitingMessage">this can take a bit of time, don't worry</key>
@@ -1685,9 +1689,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templates">Templates</key>
     <key alias="logViewer">Log Viewer</key>
     <key alias="users">Users</key>
-        <key alias="settingsGroup">Settings</key>
-        <key alias="templatingGroup">Templating</key>
-        <key alias="thirdPartyGroup">Third Party</key>
+    <key alias="settingsGroup">Settings</key>
+    <key alias="templatingGroup">Templating</key>
+    <key alias="thirdPartyGroup">Third Party</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
@@ -1774,7 +1778,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
     <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
-        <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
+    <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize you. Click the circle above to upload your photo.</key>
     <key alias="writer">Writer</key>
     <key alias="change">Change</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
