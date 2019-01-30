@@ -177,9 +177,6 @@
     <Content Include="Config\imageprocessor\cache.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Config\FileSystemProviders.Release.config">
-      <DependentUpon>FileSystemProviders.config</DependentUpon>
-    </None>
     <None Include="Config\EmbeddedMedia.Release.config">
       <DependentUpon>EmbeddedMedia.config</DependentUpon>
     </None>
@@ -302,7 +299,6 @@
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
     <Content Include="Config\BackOfficeTours\getting-started.json" />
   </ItemGroup>

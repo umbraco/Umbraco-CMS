@@ -7,6 +7,10 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// A registrar that stores registered server nodes in the database.
     /// </summary>
+    /// <remarks>
+    /// This is the default registrar which determines a server's role by using a master election process.
+    /// The master election process doesn't occur until just after startup so this election process doesn't really affect the primary startup phase.
+    /// </remarks>
     public sealed class DatabaseServerRegistrar : IServerRegistrar
     {
         private readonly Lazy<IServerRegistrationService> _registrationService;
