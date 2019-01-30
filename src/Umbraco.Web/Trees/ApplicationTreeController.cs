@@ -47,11 +47,11 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="application">The application to load tree for</param>
         /// <param name="tree">An optional single tree alias, if specified will only load the single tree for the request app</param>
-        /// <param name="querystring"></param>
+        /// <param name="queryStrings"></param>
         /// <param name="use">Tree use.</param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection querystring, TreeUse use = TreeUse.Main)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Trees
                 if (t == null)
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                var treeRootNode = await GetTreeRootNode(t, Constants.System.Root, querystring);
+                var treeRootNode = await GetTreeRootNode(t, Constants.System.Root, queryStrings);
                 if (treeRootNode != null)
                     return treeRootNode;
 
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Trees
                 var nodes = new TreeNodeCollection();
                 foreach (var t in allTrees)
                 {
-                    var node = await TryGetRootNode(t, querystring);
+                    var node = await TryGetRootNode(t, queryStrings);
                     if (node != null)
                         nodes.Add(node);
                 }
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Trees
                 var nodes = new TreeNodeCollection();
                 foreach (var t in trees)
                 {
-                    var node = await TryGetRootNode(t, querystring);
+                    var node = await TryGetRootNode(t, queryStrings);
                     if (node != null)
                         nodes.Add(node);
                 }
