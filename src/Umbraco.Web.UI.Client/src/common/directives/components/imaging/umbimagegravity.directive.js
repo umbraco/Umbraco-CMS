@@ -28,7 +28,7 @@
         /** Sets the css style for the Dot */
         function style() {
 
-            if (vm.dimensions.width <= 0) {
+            if (vm.dimensions.width <= 0 || vm.dimensions.height <= 0) {
                 //this initializes the dimensions since when the image element first loads
                 //there will be zero dimensions
                 setDimensions();
