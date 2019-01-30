@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Content,
         Constants.Applications.Media,
         Constants.Applications.Members)]
-    [Tree(Constants.Applications.Members, Constants.Trees.Members, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Members, Constants.Trees.Members, SortOrder = 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMemberResult")]

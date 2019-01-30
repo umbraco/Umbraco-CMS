@@ -7,9 +7,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Languages)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, null, sortOrder: 11)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, SortOrder = 11, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class LanguageTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

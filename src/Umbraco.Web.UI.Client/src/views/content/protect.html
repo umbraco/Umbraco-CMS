@@ -127,7 +127,7 @@
                 <div class="alert alert-success" ng-bind-html="vm.success.message"></div>
                 <umb-button type="button"
                             action="vm.close()"
-                            button-style="success"
+                            button-style="action"
                             label-key="general_ok">
                 </umb-button>
             </umb-pane>
@@ -144,7 +144,7 @@
             <umb-button ng-hide="vm.step  || vm.removing"
                         type="button"
                         action="vm.next()"
-                        button-style="success"
+                        button-style="action"
                         label-key="general_next"
                         disabled="vm.loading || !vm.type">
             </umb-button>

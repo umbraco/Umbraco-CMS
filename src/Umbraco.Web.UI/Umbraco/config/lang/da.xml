@@ -187,7 +187,8 @@
   <area alias="codefile">
     <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
     <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
-      <key alias="deleteItemFailed">Sletning af filen/mappen fejlede: %0%</key>
+    <key alias="createFolderIllegalChars">Mappens navn må ikke indeholde ugyldige tegn.</key>
+    <key alias="deleteItemFailed">Sletning af filen/mappen fejlede: %0%</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Udgivet</key>

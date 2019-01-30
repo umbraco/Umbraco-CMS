@@ -199,6 +199,7 @@
   <area alias="codefile">
     <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
     <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+    <key alias="createFolderIllegalChars">The folder name cannot contain illegal characters.</key>
     <key alias="deleteItemFailed">Failed to delete item: %0%</key>
   </area>
   <area alias="content">

@@ -204,6 +204,7 @@
     <Compile Include="Trees\SettingsBackOfficeSection.cs" />
     <Compile Include="Trees\TranslationBackOfficeSection.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
+    <Compile Include="Trees\TreeUse.cs" />
     <Compile Include="Trees\UsersBackOfficeSection.cs" />
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\ITree.cs" />
@@ -1127,7 +1128,6 @@
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
     <Compile Include="Routing\UrlProvider.cs" />
-    <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Components\DatabaseServerRegistrarAndMessengerComponent.cs" />
