@@ -225,7 +225,14 @@ namespace Umbraco.Web.Runtime
                 .Append<Twitter>()
                 .Append<Vimeo>()
                 .Append<Ted>()
-                .Append<Soundcloud>();
+                .Append<Soundcloud>()
+                .Append<Issuu>()
+                .Append<Hulu>();
+
+
+                //Giphy
+                //Meetup
+                //Spotify
         }
     }
 }
