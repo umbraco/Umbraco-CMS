@@ -26,7 +26,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 //populate the new macroSource column with legacy data
                 Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroXSLT, macroType = {(int)MacroTypes.Unknown} WHERE macroXSLT IS NOT NULL").Do();
                 Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptAssembly, macroType = {(int)MacroTypes.Unknown} WHERE macroScriptAssembly IS NOT NULL").Do();
-                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptType, macroType = {(int)MacroTypes.UserControl} WHERE macroScriptType IS NOT NULL").Do();
+                Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroScriptType, macroType = {(int)MacroTypes.Unknown} WHERE macroScriptType IS NOT NULL").Do();
                 Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.Macro} SET macroSource = macroPython, macroType = {(int)MacroTypes.PartialView} WHERE macroPython IS NOT NULL").Do();
 
                 //now apply constraints (NOT NULL) to new table
