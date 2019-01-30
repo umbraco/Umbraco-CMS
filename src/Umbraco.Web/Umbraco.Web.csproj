@@ -182,11 +182,6 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
-    <Compile Include="Routing\Resources\HtmlPages.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>HtmlPages.resx</DependentUpon>
-    </Compile>
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
@@ -1210,17 +1205,11 @@
     <EmbeddedResource Include="JavaScript\Main.js" />
     <EmbeddedResource Include="JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="JavaScript\ServerVariables.js" />
-    <EmbeddedResource Include="Routing\Resources\HtmlPages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>HtmlPages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Routing\Resources\Failed.html" />
-    <EmbeddedResource Include="Routing\Resources\Booting.html" />
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />

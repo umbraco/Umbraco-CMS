@@ -257,37 +257,18 @@ namespace Umbraco.Web
 
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
-            var debug = _runtime.Debug;
             var level = _runtime.Level;
             switch (level)
             {
+                // we should never handle Unknown nor Boot: the runtime boots in Application_Start
+                // and as long as it has not booted, no request other than the initial request is
+                // going to be served (see https://stackoverflow.com/a/21402100)
+                // we should never handle BootFailed: if boot failed, the pipeline should not run
+                // at all
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
-                    // not ready yet, but wait
-                    ReportRuntime(level, "Umbraco is booting.");
-
-                    // let requests pile up and wait for 10s then show the splash anyway
-                    //fixme: Do we want this for some insane reason? no other site in history has this
-                    if (((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
-
-                    // redirect to booting page
-                    httpContext.Response.StatusCode = 503; // temp not available
-                    var bootHtml = Routing.Resources.HtmlPages.Booting;
-                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
-                    httpContext.Response.Write(bootHtml);
-                    httpContext.Response.Flush();
-                    return false; // cannot serve content
-
                 case RuntimeLevel.BootFailed:
-                    // redirect to death page
-                    ReportRuntime(level, "Umbraco has failed.");
-
-                    httpContext.Response.StatusCode = 503; // temp not available
-                    var deathHtml = Routing.Resources.HtmlPages.Failed;
-                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "300"); // seconds
-                    httpContext.Response.Write(deathHtml);
-                    httpContext.Response.Flush();
-                    return false; // cannot serve content
+                    throw new Exception($"panic: Unexpected runtime level: {level}.");
 
                 case RuntimeLevel.Run:
                     // ok
@@ -303,7 +284,7 @@ namespace Umbraco.Web
                     return false; // cannot serve content
 
                 default:
-                    throw new NotSupportedException($"Unexpected runtime level: {Current.RuntimeState.Level}.");
+                    throw new NotSupportedException($"Unexpected runtime level: {level}.");
             }
         }
 
