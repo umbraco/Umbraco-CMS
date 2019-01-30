@@ -152,7 +152,7 @@ namespace Umbraco.Web.Runtime
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,

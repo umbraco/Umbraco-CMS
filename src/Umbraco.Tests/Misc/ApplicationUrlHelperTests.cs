@@ -37,8 +37,7 @@ namespace Umbraco.Tests.Misc
             // no applicable settings, but a provider
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string)null)
-                && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>());
+                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string)null));
 
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(true);
@@ -59,8 +58,7 @@ namespace Umbraco.Tests.Misc
             // no applicable settings, but a provider
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
-                && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>());
+                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null));
 
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(true);
@@ -82,8 +80,7 @@ namespace Umbraco.Tests.Misc
             // no applicable settings, cannot set url
 
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
-                && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>());
+                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null));
 
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(true);
@@ -93,47 +90,12 @@ namespace Umbraco.Tests.Misc
             // still NOT set
             Assert.IsNull(url);
         }
-
-        [Test]
-        public void SetApplicationUrlFromStSettingsNoSsl()
-        {
-            var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
-                && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/umbraco"));
-
-            var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
-            globalConfig.Setup(x => x.UseHttps).Returns(false);
-
-
-
-            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>(), globalConfig.Object, Mock.Of<IServerRegistrar>());
-
-            Assert.AreEqual("http://mycoolhost.com/umbraco", url);
-        }
-
-        [Test]
-        public void SetApplicationUrlFromStSettingsSsl()
-        {
-            var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
-                && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/umbraco/"));
-
-            var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
-            globalConfig.Setup(x => x.UseHttps).Returns(true);
-
-
-
-            var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>(), globalConfig.Object, Mock.Of<IServerRegistrar>());
-
-            Assert.AreEqual("https://mycoolhost.com/umbraco", url);
-        }
-
+        
         [Test]
         public void SetApplicationUrlFromWrSettingsSsl()
         {
             var settings = Mock.Of<IUmbracoSettingsSection>(section =>
-                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == "httpx://whatever.com/umbraco/")
-                && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/umbraco"));
+                section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == "httpx://whatever.com/umbraco/"));
 
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(true);

@@ -1,9 +1,9 @@
-function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
+function startUpVideosDashboardController($scope, dashboardResource) {
     $scope.videos = [];
     $scope.init = function(url){
-        var proxyUrl = "dashboard/feedproxy.aspx?url=" + url;
-        $http.get(proxyUrl).then(function(data){
-              var feed = $(data.data);
+
+        dashboardResource.getRemoteXmlData('COM', url).then(function (data) {
+            var feed = $(data.data);
               $('item', feed).each(function (i, item) {
                   var video = {};
                   video.thumbnail = $(item).find('thumbnail').attr('url');
@@ -11,6 +11,10 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
                   video.link = $("guid", item).text();
                   $scope.videos.push(video);
               });
+
+        },
+        function (exception) {
+            console.error('ex from remote data', exception);
         });
     };
 }
@@ -24,7 +28,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 
     vm.loading = true;
     vm.showDefault = false;
-    
+
     vm.startTour = startTour;
 
     function onInit() {
@@ -93,7 +97,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             });
         });
     }));
-    
+
     //proxy remote css through the local server
     assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
     dashboardResource.getRemoteDashboardContent("content").then(
@@ -117,7 +121,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             vm.showDefault = true;
         });
 
-    
+
     onInit();
 
 }

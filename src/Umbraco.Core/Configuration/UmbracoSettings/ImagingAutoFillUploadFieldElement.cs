@@ -10,58 +10,30 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("alias", IsKey = true, IsRequired = true)]
         public string Alias
         {
-            get { return (string)this["alias"]; }
-            set { this["alias"] = value; }
+            get => (string)this["alias"];
+            set => this["alias"] = value;
         }
 
         [ConfigurationProperty("widthFieldAlias")]
-        internal InnerTextConfigurationElement<string> WidthFieldAlias
-        {
-            get { return GetOptionalTextElement("widthFieldAlias", "umbracoWidth"); }
-        }
+        internal InnerTextConfigurationElement<string> WidthFieldAlias => GetOptionalTextElement("widthFieldAlias", "umbracoWidth");
 
         [ConfigurationProperty("heightFieldAlias")]
-        internal InnerTextConfigurationElement<string> HeightFieldAlias
-        {
-            get { return GetOptionalTextElement("heightFieldAlias", "umbracoHeight"); }
-        }
+        internal InnerTextConfigurationElement<string> HeightFieldAlias => GetOptionalTextElement("heightFieldAlias", "umbracoHeight");
 
         [ConfigurationProperty("lengthFieldAlias")]
-        internal InnerTextConfigurationElement<string> LengthFieldAlias
-        {
-            get { return GetOptionalTextElement("lengthFieldAlias", "umbracoBytes"); }
-        }
+        internal InnerTextConfigurationElement<string> LengthFieldAlias => GetOptionalTextElement("lengthFieldAlias", "umbracoBytes");
 
         [ConfigurationProperty("extensionFieldAlias")]
-        internal InnerTextConfigurationElement<string> ExtensionFieldAlias
-        {
-            get { return GetOptionalTextElement("extensionFieldAlias", "umbracoExtension"); }
-        }
+        internal InnerTextConfigurationElement<string> ExtensionFieldAlias => GetOptionalTextElement("extensionFieldAlias", "umbracoExtension");
 
-        string IImagingAutoFillUploadField.Alias
-        {
-            get { return Alias; }
+        string IImagingAutoFillUploadField.Alias => Alias;
 
-        }
+        string IImagingAutoFillUploadField.WidthFieldAlias => WidthFieldAlias;
 
-        string IImagingAutoFillUploadField.WidthFieldAlias
-        {
-            get { return WidthFieldAlias; }
-        }
+        string IImagingAutoFillUploadField.HeightFieldAlias => HeightFieldAlias;
 
-        string IImagingAutoFillUploadField.HeightFieldAlias
-        {
-            get { return HeightFieldAlias; }
-        }
+        string IImagingAutoFillUploadField.LengthFieldAlias => LengthFieldAlias;
 
-        string IImagingAutoFillUploadField.LengthFieldAlias
-        {
-            get { return LengthFieldAlias; }
-        }
-
-        string IImagingAutoFillUploadField.ExtensionFieldAlias
-        {
-            get { return ExtensionFieldAlias; }
-        }
+        string IImagingAutoFillUploadField.ExtensionFieldAlias => ExtensionFieldAlias;
     }
 }

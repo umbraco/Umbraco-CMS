@@ -211,9 +211,6 @@
     <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="Configuration\Configs.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
-    <Compile Include="Configuration\FileSystemProviderElement.cs" />
-    <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
-    <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
@@ -235,8 +232,6 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
-    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
-    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\IGlobalSettings.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\LocalTempStorage.cs" />
@@ -244,8 +239,6 @@
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\BackOfficeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
@@ -254,43 +247,28 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentScriptEditorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\LogTypeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ProvidersElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ScheduledTasksElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Constants-Applications.cs" />
@@ -455,6 +433,8 @@
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Trees\IBackOfficeSection.cs" />
+    <Compile Include="PackageActions\AllowDoctype.cs" />
+    <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
@@ -1308,7 +1288,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreRuntimeComposer.cs" />
@@ -1517,13 +1496,10 @@
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
-    <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollection.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollectionBuilder.cs" />
+    <Compile Include="PackageActions\IPackageAction.cs" />
+    <Compile Include="PackageActions\PackageActionCollection.cs" />
+    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Sync\ServerSyncWebServiceClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\SolutionInfo.cs">

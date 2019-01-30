@@ -14,10 +14,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         
         ILoggingSection Logging { get; }
 
-        IScheduledTasksSection ScheduledTasks { get; }
-
-        IProvidersSection Providers { get; }
-
         IWebRoutingSection WebRouting { get; }
     }
 }

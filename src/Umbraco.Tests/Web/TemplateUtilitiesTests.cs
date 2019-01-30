@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Web
                 snapshotService,
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
                 //setup a quick mock of the WebRouting section
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 //pass in the custom url provider
                 new[]{ testUrlProvider.Object },
                 globalSettings,

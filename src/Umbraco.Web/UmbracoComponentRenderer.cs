@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web.Templates;
-using umbraco;
 using System.Collections.Generic;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
@@ -86,7 +85,7 @@ namespace Umbraco.Web
                 throw new InvalidOperationException("Cannot render a macro when there is no current PublishedContentRequest.");
             }
 
-            return RenderMacro(alias, parameters, _umbracoContext.PublishedRequest.UmbracoPage);
+            return RenderMacro(alias, parameters, _umbracoContext.PublishedRequest.LegacyContentHashTable);
         }
 
         /// <summary>
@@ -96,7 +95,7 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="umbracoPage">The legacy umbraco page object that is required for some macros</param>
         /// <returns></returns>
-        internal IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters, page umbracoPage)
+        internal IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters, PublishedContentHashtableConverter umbracoPage)
         {
             if (alias == null) throw new ArgumentNullException("alias");
             if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
@@ -115,7 +114,7 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="umbracoPage">The legacy umbraco page object that is required for some macros</param>
         /// <returns></returns>
-        internal IHtmlString RenderMacro(MacroModel m, IDictionary<string, object> parameters, page umbracoPage)
+        internal IHtmlString RenderMacro(MacroModel m, IDictionary<string, object> parameters, PublishedContentHashtableConverter umbracoPage)
         {
             if (umbracoPage == null) throw new ArgumentNullException(nameof(umbracoPage));
             if (m == null) throw new ArgumentNullException(nameof(m));
