@@ -44,12 +44,8 @@ namespace Umbraco.Web.Editors
         public ActionResult Index()
         {
             var availableLanguages = _localizationService.GetAllLanguages();
-            var previewLinks = availableLanguages.Select(x => new BackOfficePreviewLinkModel() {
-                CultureName = x.CultureName,
-                CultureId = x.IsoCode}
-            );
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, previewLinks);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

@@ -47,12 +47,12 @@
                     <a href="" ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
 
-                @if (Model.PreviewLinks != null && Model.PreviewLinks.Count() > 2)
+                @if (Model.Languages != null && Model.Languages.Count() > 2)
                 {
-                    foreach (var previewLink in Model.PreviewLinks)
+                    foreach (var previewLink in Model.Languages)
                      {
                          <li>
-                             <a href="" ng-click="changeCulture('@previewLink.CultureId')" title="Preview in @previewLink.CultureName"><i class="icon icon-globe-europe---africa"></i><span>@previewLink.CultureName</span></a>
+                             <a href="" ng-click="changeCulture('@previewLink.IsoCode')" title="Preview in @previewLink.CultureName"><i class="icon icon-globe-europe---africa"></i><span>@previewLink.CultureName</span></a>
                          </li>
                      }
                 }
