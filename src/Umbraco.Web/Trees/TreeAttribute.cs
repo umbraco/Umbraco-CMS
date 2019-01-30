@@ -40,7 +40,7 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Gets the usage of the tree.
         /// </summary>
-        public TreeUse TreeUse { get; set; } = TreeUse.Main;
+        public TreeUse TreeUse { get; set; } = TreeUse.Main | TreeUse.Dialog;
 
         /// <summary>
         /// Gets or sets the tree icon when closed.
