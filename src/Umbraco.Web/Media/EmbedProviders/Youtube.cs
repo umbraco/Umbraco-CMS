@@ -9,7 +9,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         public override string[] UrlSchemeRegex => new string[]
         {
             @"youtu.be/.*",
-            @"youtu.be/.*"
+            @"youtube.com/watch.*"
         };
         
         public override Dictionary<string, string> RequestParams => new Dictionary<string, string>()
