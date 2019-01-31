@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -640,7 +640,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
         {
-            content.SetTags(TagCacheStorageType.Csv, propertyTypeAlias, tags, replaceTags, tagGroup);
+            content.SetTags(TagCacheStorageType.Json, propertyTypeAlias, tags, replaceTags, tagGroup);
         }
 
         /// <summary>
