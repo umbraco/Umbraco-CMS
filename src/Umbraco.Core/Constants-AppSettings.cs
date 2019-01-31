@@ -1,12 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Umbraco.Core
 {
     public static partial class Constants
     {
         /// <summary>
-        /// Defines the identifiers for Umbraco system nodes.
+        /// Specific web.config AppSetting keys for Umbraco.Core application
         /// </summary>
         public static class AppSettings
         {
@@ -14,43 +13,111 @@ namespace Umbraco.Core
             [Obsolete("We need to kill this appsetting as we do not use XML content cache umbraco.config anymore due to NuCache")]
             public const string ContentXML = "Umbraco.Core.ContentXML"; //umbracoContentXML
 
-
+            /// <summary>
+            /// TODO: FILL ME IN
+            /// </summary>
             public const string RegisterType = "Umbraco.Core.RegisterType";
+
+            /// <summary>
+            /// This is used for a unit test in PublishedMediaCache
+            /// </summary>
+            public const string PublishedMediaCacheSeconds = "Umbraco.Core.PublishedMediaCacheSeconds";
+
+            /// <summary>
+            /// TODO: FILL ME IN
+            /// </summary>
+            public const string AssembliesAcceptingLoadExceptions = "Umbraco.Core.AssembliesAcceptingLoadExceptions";
+
+            /// <summary>
+            /// This will return the version number of the currently installed umbraco instance
+            /// </summary>
+            /// <remarks>
+            /// Umbraco will automatically set & modify this value when installing & upgrading
+            /// </remarks>
+            public const string ConfigurationStatus = "Umbraco.Core.ConfigurationStatus";
+
+            /// <summary>
+            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// </summary>
+            public const string Path = "Umbraco.Core.Path";
+
+            /// <summary>
+            /// The reserved urls from web.config.
+            /// </summary>
+            public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
+
+            /// <summary>
+            /// The reserved paths from web.config
+            /// </summary>
+            public const string ReservedPaths = "Umbraco.Core.ReservedPaths";
+
+            /// <summary>
+            /// Set the timeout for the Umbraco backoffice in minutes
+            /// </summary>
+            public const string TimeOutInMinutes = "Umbraco.Core.TimeOutInMinutes";
+
+            /// <summary>
+            /// The number of days to check for a new version of Umbraco
+            /// </summary>
+            /// <remarks>
+            /// Default is set to 7. Setting this to 0 will never check
+            /// This is used to help track statistics
+            /// </remarks>
+            public const string VersionCheckPeriod = "Umbraco.Core.VersionCheckPeriod";
+
+            /// <summary>
+            /// This is the location type to store temporary files such as cache files or other localized files for a given machine
+            /// </summary>
+            /// <remarks>
+            /// Currently used for the xml cache file and the plugin cache files
+            /// </remarks>
+            public const string LocalTempStorage = "Umbraco.Core.LocalTempStorage";
+
+            /// <summary>
+            /// The default UI language of the backoffice such as 'en-US'
+            /// </summary>
+            public const string DefaultUILanguage = "Umbraco.Core.DefaultUILanguage";
+
+            /// <summary>
+            /// A true/false value indicating whether umbraco should hide top level nodes from generated urls.
+            /// </summary>
+            public const string HideTopLevelNodeFromPath = "Umbraco.Core.HideTopLevelNodeFromPath";
+
+            /// <summary>
+            /// A true or false indicating whether umbraco should force a secure (https) connection to the backoffice.
+            /// </summary>
+            public const string UseHttps = "Umbraco.Core.UseHttps";
+
+            /// <summary>
+            /// TODO: FILL ME IN
+            /// </summary>
+            public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";
+
             
-            public const string PublishedMediaCacheSeconds = "Umbraco.Core.PublishedMediaCacheSeconds"; //"Umbraco.PublishedMediaCache.Seconds"
-
-            public const string AssembliesAcceptingLoadExceptions = "Umbraco.Core.AssembliesAcceptingLoadExceptions"; //Umbraco.AssembliesAcceptingLoadExceptions
-
-            public const string ConfigurationStatus = "Umbraco.Core.ConfigurationStatus"; //umbracoConfigurationStatus
-
-            public const string Path = "Umbraco.Core.Path"; //umbracoPath
-
-            public const string ReservedUrls = "Umbraco.Core.ReservedUrls"; //umbracoReservedUrls
-
-            public const string ReservedPaths = "Umbraco.Core.ReservedPaths"; //umbracoReservedPaths
-            
-            public const string TimeOutInMinutes = "Umbraco.Core.TimeOutInMinutes"; //umbracoTimeOutInMinutes
-
-            public const string VersionCheckPeriod = "Umbraco.Core.VersionCheckPeriod"; //umbracoVersionCheckPeriod
-
-            public const string LocalTempStorage = "Umbraco.Core.LocalTempStorage"; //umbracoLocalTempStorage
-
-            public const string DefaultUILanguage = "Umbraco.Core.DefaultUILanguage"; //umbracoDefaultUILanguage
-
-            public const string HideTopLevelNodeFromPath = "Umbraco.Core.HideTopLevelNodeFromPath"; //umbracoHideTopLevelNodeFromPath
-
-            public const string UseHttps = "Umbraco.Core.UseHttps"; //umbracoUseHttps
-
-            public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer"; //umbracoDisableElectionForSingleServer
-
-            public const string DatabaseFactoryServerVersion = "Umbraco.Core.DatabaseFactoryServerVersion"; //Umbraco.DatabaseFactory.ServerVersion
-            
-
+            /// <summary>
+            /// Debug specific web.config AppSetting keys for Umbraco
+            /// </summary>
+            /// <remarks>
+            /// Do not use these keys in a production environment
+            /// </remarks>
             public static class Debug
             {
-                public const string LogUncompletedScopes = "Umbraco.Core.LogUncompletedScopes"; //"Umbraco.CoreDebug.LogUncompletedScopes"
+                /// <summary>
+                /// When set to true, Scope logs the stack trace for any scope that gets disposed without being completed.
+                /// this helps troubleshooting rogue scopes that we forget to complete
+                /// </summary>
+                public const string LogUncompletedScopes = "Umbraco.Core.Debug.LogUncompletedScopes";
 
-                public const string DumpOnTimeoutThreadAbort = "Umbraco.Core.DumpOnTimeoutThreadAbort"; //Umbraco.CoreDebug.DumpOnTimeoutThreadAbort
+                /// <summary>
+                /// When set to true, the Logger creates a mini dump of w3wp in ~/App_Data/MiniDump whenever it logs
+                /// an error due to a ThreadAbortException that is due to a timeout.
+                /// </summary>
+                public const string DumpOnTimeoutThreadAbort = "Umbraco.Core.Debug.DumpOnTimeoutThreadAbort";
+
+                /// <summary>
+                /// TODO: FILL ME IN
+                /// </summary>
+                public const string DatabaseFactoryServerVersion = "Umbraco.Core.Debug.DatabaseFactoryServerVersion";
             }
         }
     }

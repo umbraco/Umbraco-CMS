@@ -18,7 +18,7 @@ namespace Umbraco.Core.Composing
         /// Creates a new instance of the configured container.
         /// </summary>
         /// <remarks>
-        /// To override the default LightInjectContainer, add an appSetting named umbracoRegisterType with
+        /// To override the default LightInjectContainer, add an appSetting named 'Umbraco.Core.RegisterType' with
         /// a fully qualified type name to a class with a static method "Create" returning an IRegister.
         /// </remarks>
         public static IRegister Create()
