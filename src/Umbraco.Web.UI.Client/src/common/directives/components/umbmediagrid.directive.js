@@ -157,7 +157,8 @@ Use this directive to generate a thumbnail grid of media items.
                     item.isFolder = !mediaHelper.hasFilePropertyType(item);
                 }
 
-                if (!item.isFolder) {
+                // if it's not a folder, get the thumbnail, extension etc. if we haven't already
+                if (!item.isFolder && !item.thumbnail) {
 
                     // handle entity
                     if(item.image) {
