@@ -502,95 +502,21 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 onPostRender: function () {
 
                     var ctrl = this;
-                    var isOnMacroElement = false;
 
 					/**
-					 if the selection comes from a different element that is not the macro's
-					 we need to check if the selection includes part of the macro, if so we'll force the selection
-					 to clear to the next element since if people can select part of the macro markup they can then modify it.
-					*/
-                    function handleSelectionChange() {
-
-                        if (!editor.selection.isCollapsed()) {
-                            var endSelection = tinymce.activeEditor.selection.getEnd();
-                            var startSelection = tinymce.activeEditor.selection.getStart();
-                            //don't proceed if it's an entire element selected
-                            if (endSelection !== startSelection) {
-
-                                //if the end selection is a macro then move the cursor
-                                //NOTE: we don't have to handle when the selection comes from a previous parent because
-                                // that is automatically taken care of with the normal onNodeChanged logic since the
-                                // evt.element will be the macro once it becomes part of the selection.
-                                var $testForMacro = $(endSelection).closest(".umb-macro-holder");
-                                if ($testForMacro.length > 0) {
-
-                                    //it came from before so move after, if there is no after then select ourselves
-                                    var next = $testForMacro.next();
-                                    if (next.length > 0) {
-                                        editor.selection.setCursorLocation($testForMacro.next().get(0));
-                                    } else {
-                                        selectMacroElement($testForMacro.get(0));
-                                    }
-
-                                }
-                            }
-                        }
-                    }
-
-                    /** helper method to select the macro element */
-                    function selectMacroElement(macroElement) {
-
-                        // move selection to top element to ensure we can't edit this
-                        editor.selection.select(macroElement);
-
-                        // check if the current selection *is* the element (ie bug)
-                        var currentSelection = editor.selection.getStart();
-                        if (tinymce.isIE) {
-                            if (!editor.dom.hasClass(currentSelection, 'umb-macro-holder')) {
-                                while (!editor.dom.hasClass(currentSelection, 'umb-macro-holder') && currentSelection.parentNode) {
-                                    currentSelection = currentSelection.parentNode;
-                                }
-                                editor.selection.select(currentSelection);
-                            }
-                        }
-                    }
-
-					/**
-					 * Add a node change handler, test if we're editing a macro and select the whole thing, then set our isOnMacroElement flag.
-					 * If we change the selection inside this method, then we end up in an infinite loop, so we have to remove ourselves
-					 * from the event listener before changing selection, however, it seems that putting a break point in this method
-					 * will always cause an 'infinite' loop as the caret keeps changing.
-					 *
-					 * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
+					 * Check if the macro is currently selected and toggle the menu button
 					 */
                     function onNodeChanged(evt) {
 
                         //set our macro button active when on a node of class umb-macro-holder
                         var $macroElement = $(evt.element).closest(".umb-macro-holder");
 
-                        handleSelectionChange();
-
-                        //set the button active
+                        //set the button active/inactive
                         ctrl.active($macroElement.length !== 0);
-
-                        if ($macroElement.length > 0) {
-                            var macroElement = $macroElement.get(0);
-
-                            //remove the event listener before re-selecting
-                            editor.off('NodeChange', onNodeChanged);
-
-                            selectMacroElement(macroElement);
-
-                            //set the flag
-                            isOnMacroElement = true;
-
-                            //re-add the event listener
-                            editor.on('NodeChange', onNodeChanged);
-                        } else {
-                            isOnMacroElement = false;
-                        }
-
                     }
+
+                    //NOTE: This could be another way to deal with the active/inactive state
+                    //editor.on('ObjectSelected', function (e) {});
 
                     /** when the contents load we need to find any macros declared and load in their content */
                     editor.on("LoadContent", function (o) {
@@ -602,101 +528,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     });
 
-                    /**
-                     * This prevents any other commands from executing when the current element is the macro so the content cannot be edited
-                     *
-                     * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
-                     */
-                    editor.on('BeforeExecCommand', function (o) {
-                        if (isOnMacroElement) {
-                            if (o.preventDefault) {
-                                o.preventDefault();
-                            }
-                            if (o.stopImmediatePropagation) {
-                                o.stopImmediatePropagation();
-                            }
-                            return;
-                        }
-                    });
-
-                    /**
-                     * This double checks and ensures you can't paste content into the rendered macro
-                     *
-                     * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
-                     */
-                    editor.on("Paste", function (o) {
-                        if (isOnMacroElement) {
-                            if (o.preventDefault) {
-                                o.preventDefault();
-                            }
-                            if (o.stopImmediatePropagation) {
-                                o.stopImmediatePropagation();
-                            }
-                            return;
-                        }
-                    });
-
                     //set onNodeChanged event listener
                     editor.on('NodeChange', onNodeChanged);
-
-					/**
-					 * Listen for the keydown in the editor, we'll check if we are currently on a macro element, if so
-					 * we'll check if the key down is a supported key which requires an action, otherwise we ignore the request
-					 * so the macro cannot be edited.
-					 *
-					 * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
-					 */
-                    editor.on('KeyDown', function (e) {
-                        if (isOnMacroElement) {
-                            var macroElement = editor.selection.getNode();
-
-                            //get the 'real' element (either p or the real one)
-                            macroElement = getRealMacroElem(macroElement);
-
-                            //prevent editing
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            var moveSibling = function (element, isNext) {
-                                var $e = $(element);
-                                var $sibling = isNext ? $e.next() : $e.prev();
-                                if ($sibling.length > 0) {
-                                    editor.selection.select($sibling.get(0));
-                                    editor.selection.collapse(true);
-                                } else {
-                                    //if we're moving previous and there is no sibling, then lets recurse and just select the next one
-                                    if (!isNext) {
-                                        moveSibling(element, true);
-                                        return;
-                                    }
-
-                                    //if there is no sibling we'll generate a new p at the end and select it
-                                    editor.setContent(editor.getContent() + "<p>&nbsp;</p>");
-                                    editor.selection.select($(editor.dom.getRoot()).children().last().get(0));
-                                    editor.selection.collapse(true);
-
-                                }
-                            };
-
-                            //supported keys to move to the next or prev element (13-enter, 27-esc, 38-up, 40-down, 39-right, 37-left)
-                            //supported keys to remove the macro (8-backspace, 46-delete)
-                            // TODO: Should we make the enter key insert a line break before or leave it as moving to the next element?
-                            if ($.inArray(e.keyCode, [13, 40, 39]) !== -1) {
-                                //move to next element
-                                moveSibling(macroElement, true);
-                            } else if ($.inArray(e.keyCode, [27, 38, 37]) !== -1) {
-                                //move to prev element
-                                moveSibling(macroElement, false);
-                            } else if ($.inArray(e.keyCode, [8, 46]) !== -1) {
-                                //delete macro element
-
-                                //move first, then delete
-                                moveSibling(macroElement, false);
-                                editor.dom.remove(macroElement);
-                            }
-                            return;
-                        }
-                    });
 
                 },
 
@@ -739,6 +572,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         insertMacroInEditor: function (editor, macroObject) {
 
+            //Important note: the TinyMce plugin "noneditable" is used here so that the macro cannot be edited,
+            // for this to work the mceNonEditable class needs to come last and we also need to use the attribute contenteditable = false
+            // (even though all the docs and examples say that is not necessary)
+
             //put the macro syntax in comments, we will parse this out on the server side to be used
             //for persisting.
             var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
@@ -746,7 +583,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             var uniqueId = "umb-macro-" + editor.dom.uniqueId();
             var macroDiv = editor.dom.create('div',
                 {
-                    'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+                    'class': 'umb-macro-holder ' + macroObject.macroAlias + " " + uniqueId + ' mceNonEditable',
+                    'contenteditable': 'false'
                 },
                 macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
