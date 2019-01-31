@@ -60,8 +60,8 @@ angular.module("umbraco")
             start: function (e, ui) {
 
                 // Fade out row when sorting
-                ui.item.context.style.display = "block";
-                ui.item.context.style.opacity = "0.5";
+                ui.item[0].style.display = "block";
+                ui.item[0].style.opacity = "0.5";
 
                 draggedRteSettings = {};
                 ui.item.find(".mceNoEditor").each(function () {
@@ -75,7 +75,7 @@ angular.module("umbraco")
             stop: function (e, ui) {
 
                 // Fade in row when sorting stops
-                ui.item.context.style.opacity = "1";
+                ui.item[0].style.opacity = "1";
 
                 // reset all RTEs affected by the dragging
                 ui.item.parents(".umb-column").find(".mceNoEditor").each(function () {
@@ -185,12 +185,12 @@ angular.module("umbraco")
                 startingArea = area;
 
                 // fade out control when sorting
-                ui.item.context.style.display = "block";
-                ui.item.context.style.opacity = "0.5";
+                ui.item[0].style.display = "block";
+                ui.item[0].style.opacity = "0.5";
 
                 // reset dragged RTE settings in case a RTE isn't dragged
                 draggedRteSettings = undefined;
-                ui.item.context.style.display = "block";
+                ui.item[0].style.display = "block";
                 ui.item.find(".mceNoEditor").each(function () {
                     notIncludedRte = [];
                     var editors = _.findWhere(tinyMCE.editors, { id: $(this).attr("id") });
@@ -210,7 +210,7 @@ angular.module("umbraco")
             stop: function (e, ui) {
 
                 // Fade in control when sorting stops
-                ui.item.context.style.opacity = "1";
+                ui.item[0].style.opacity = "1";
 
                 ui.item.offsetParent().find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
@@ -400,7 +400,7 @@ angular.module("umbraco")
         }
 
         $scope.editGridItemSettings = function (gridItem, itemType) {
-
+            
             placeHolder = "{0}";
 
             var styles, config;
@@ -658,7 +658,7 @@ angular.module("umbraco")
         // *********************************************
         $scope.initContent = function () {
             var clear = true;
-
+            
             //settings indicator shortcut
             if (($scope.model.config.items.config && $scope.model.config.items.config.length > 0) || ($scope.model.config.items.styles && $scope.model.config.items.styles.length > 0)) {
                 $scope.hasSettings = true;
@@ -755,7 +755,7 @@ angular.module("umbraco")
         // Init layout / row
         // *********************************************
         $scope.initRow = function (row) {
-
+            
             //merge the layout data with the original config data
             //if there are no config info on this, splice it out
             var original = _.find($scope.model.config.items.layouts, function (o) { return o.name === row.name; });
