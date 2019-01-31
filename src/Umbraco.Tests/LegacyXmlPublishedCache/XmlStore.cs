@@ -254,16 +254,16 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly bool _xmlFileEnabled = true;
 
         // whether the disk cache is enabled
-        private bool XmlFileEnabled => _xmlFileEnabled && Current.Configs.Settings().Content.XmlCacheEnabled;
+        private bool XmlFileEnabled => true;
 
         // whether the disk cache is enabled and to update the disk cache when xml changes
-        private bool SyncToXmlFile => XmlFileEnabled && Current.Configs.Settings().Content.ContinouslyUpdateXmlDiskCache;
+        private bool SyncToXmlFile => true;
 
         // whether the disk cache is enabled and to reload from disk cache if it changes
-        private bool SyncFromXmlFile => XmlFileEnabled && Current.Configs.Settings().Content.XmlContentCheckForDiskChanges;
+        private bool SyncFromXmlFile => false;
 
         // whether _xml is immutable or not (achieved by cloning before changing anything)
-        private static bool XmlIsImmutable => Current.Configs.Settings().Content.CloneXmlContent;
+        private static bool XmlIsImmutable => true;
 
         // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
         // for audit purposes - false by default, not in umbracoSettings.config

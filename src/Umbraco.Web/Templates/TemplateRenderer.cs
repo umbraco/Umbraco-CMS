@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
@@ -10,7 +9,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 using Umbraco.Web.Macros;
 using Current = Umbraco.Web.Composing.Current;
@@ -21,7 +19,7 @@ namespace Umbraco.Web.Templates
     /// This is used purely for the RenderTemplate functionality in Umbraco
     /// </summary>
     /// <remarks>
-    /// This allows you to render either an MVC or Webforms template based purely off of a node id and an optional alttemplate id as string output.
+    /// This allows you to render an MVC template based purely off of a node id and an optional alttemplate id as string output.
     /// </remarks>
     internal class TemplateRenderer
     {

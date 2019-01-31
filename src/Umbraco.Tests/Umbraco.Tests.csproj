@@ -146,6 +146,7 @@
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
     <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
+    <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -298,12 +299,8 @@
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />

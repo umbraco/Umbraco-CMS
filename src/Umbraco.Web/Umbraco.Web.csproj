@@ -182,10 +182,12 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
     <Compile Include="Mvc\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
@@ -257,7 +259,6 @@
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
-    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="Trees\TreeCollection.cs" />
     <Compile Include="JavaScript\ClientDependencyConfiguration.cs" />
@@ -342,7 +343,6 @@
     <Compile Include="HealthCheck\HealthCheckController.cs" />
     <Compile Include="Macros\MacroPropertyModel.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
-    <Compile Include="Macros\UserControlMacroEngine.cs" />
     <Compile Include="HealthCheck\HealthCheckGroup.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
@@ -925,7 +925,6 @@
     <Compile Include="Scheduling\KeepAlive.cs" />
     <Compile Include="Scheduling\LogScrubber.cs" />
     <Compile Include="Scheduling\ScheduledPublishing.cs" />
-    <Compile Include="Scheduling\ScheduledTasks.cs" />
     <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
@@ -1100,7 +1099,7 @@
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
-    <Compile Include="Routing\ContentFinderByLegacy404.cs" />
+    <Compile Include="Routing\ContentFinderByConfigured404.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />

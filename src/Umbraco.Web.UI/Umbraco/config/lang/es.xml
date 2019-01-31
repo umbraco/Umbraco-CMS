@@ -451,7 +451,6 @@
         <key alias="contentTypeAliasAndNameNotNull">Debes rellenar el alias y el nombre en el tipo de propiedad</key>
     <key alias="filePermissionsError">Hay un problema de lectura y escritura al acceder a un archivo o carpeta</key>
     <key alias="macroErrorLoadingPartialView">Error cargando Vista Parcial (archivo: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Error cargando userControl '%0%'</key>
     <key alias="missingTitle"><![CDATA[Por favor, introduzca un título
 ]]></key>
         <key alias="missingType">Por favor, elige un tipo </key>

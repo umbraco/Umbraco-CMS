@@ -216,7 +216,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Emitted when a language is created or an existing one saved/edited
     evts.push(eventsService.on("editors.languages.languageSaved", function (e, args) {
-        console.log('lang event listen args', args);
         if(args.isNew){
             //A new language has been created - reload languages for tree
             loadLanguages().then(function (languages) {

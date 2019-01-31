@@ -357,7 +357,6 @@
     <key alias="contentTypeAliasAndNameNotNull">請為新的屬性類型填寫名稱和別名！</key>
     <key alias="filePermissionsError">許可權有問題，訪問指定文檔或資料夾失敗！</key>
     <key alias="macroErrorLoadingPartialView">讀取片段視圖腳本錯誤（檔案：%0%）</key>
-    <key alias="macroErrorLoadingUsercontrol">讀取使用者控制項 %0% 錯誤</key>
     <key alias="missingTitle">請輸入標題</key>
     <key alias="missingType">請選擇類型</key>
     <key alias="pictureResizeBiggerThanOrg">圖片尺寸大於原始尺寸不會提高圖片品質，您確定要把圖片尺寸變大嗎?</key>

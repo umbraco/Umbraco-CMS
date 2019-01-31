@@ -286,7 +286,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Yeni özellik tipine takma adını ve hem de doldurunuz!</key>
     <key alias="filePermissionsError">Belirli bir dosya veya klasör için okuma / yazma erişimi olan bir sorun var</key>
     <key alias="macroErrorLoadingPartialView">Error loading Partial View script (Dosya: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Error loading userControl '%0%'</key>
     <key alias="missingTitle">Lütfen bir başlık girin</key>
     <key alias="missingType">Lütfen bir tür seçin</key>
     <key alias="pictureResizeBiggerThanOrg">Orijinal boyutundan daha resmi büyütmek üzereyiz. Devam etmek istediğinizden emin misiniz?</key>
