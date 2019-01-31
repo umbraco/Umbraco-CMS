@@ -143,6 +143,7 @@
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
+    <Compile Include="Macros\IMacroRenderer.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
     <Compile Include="Media\Exif\ExifEnums.cs" />
@@ -194,6 +195,7 @@
     <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
+    <Compile Include="Templates\ITemplateRenderer.cs" />
     <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
     <Compile Include="Trees\MediaBackOfficeSection.cs" />
     <Compile Include="Trees\MembersBackOfficeSection.cs" />

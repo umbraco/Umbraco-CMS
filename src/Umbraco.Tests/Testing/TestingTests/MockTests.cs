@@ -61,12 +61,11 @@ namespace Umbraco.Tests.Testing.TestingTests
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,
-                Mock.Of<IPublishedContent>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionary>(),
+                Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<AppCaches>(), Mock.Of<ILogger>()),
-                ServiceContext.CreatePartial());
+                Mock.Of<IPublishedContentQuery>(),
+                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<AppCaches>(), Mock.Of<ILogger>()));
             Assert.Pass();
         }
 

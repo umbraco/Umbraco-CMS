@@ -94,6 +94,9 @@ namespace Umbraco.Web.Composing
         public static UmbracoContext UmbracoContext
             => UmbracoContextAccessor.UmbracoContext;
 
+        public static UmbracoHelper UmbracoHelper
+            => Factory.GetInstance<UmbracoHelper>();
+
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
 

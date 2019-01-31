@@ -23,8 +23,8 @@ namespace Umbraco.Web.Mvc
             ActionInvoker = new RenderActionInvoker();
         }
 
-        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
-            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
+        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger, umbracoHelper)
         {
             ActionInvoker = new RenderActionInvoker();
         }
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public override UmbracoContext UmbracoContext => PublishedRequest.UmbracoContext;
+        public override UmbracoContext UmbracoContext => PublishedRequest.UmbracoContext; //TODO: Why?
 
         /// <summary>
         /// Gets the current content item.

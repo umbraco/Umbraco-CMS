@@ -32,9 +32,12 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMacroService _macroService;
         private readonly IContentService _contentService;
+        private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        public MacroRenderingController(IVariationContextAccessor variationContextAccessor, IMacroService macroService, IContentService contentService)
+
+        public MacroRenderingController(IUmbracoComponentRenderer componentRenderer, IVariationContextAccessor variationContextAccessor, IMacroService macroService, IContentService contentService)
         {
+            _componentRenderer = componentRenderer;
             _variationContextAccessor = variationContextAccessor;
             _macroService = macroService;
             _contentService = contentService;
@@ -103,17 +106,14 @@ namespace Umbraco.Web.Editors
 
             var doc = _contentService.GetById(pageId);
             if (doc == null)
-            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
 
             var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            var macro = new MacroModel(m);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
-            if (macro.RenderInEditor == false)
+            if (!m.UseInEditor)
             {
                 var response = Request.CreateResponse();
                 //need to create a specific content result formatted as HTML since this controller has been configured
@@ -132,23 +132,24 @@ namespace Umbraco.Web.Editors
             // to set the current culture to the culture related to the content item. This is hacky but it works.
             var publishedContent = UmbracoContext.ContentCache.GetById(doc.Id);
             var culture = publishedContent?.GetCulture();
+            _variationContextAccessor.VariationContext = new VariationContext(); //must have an active variation context!
             if (culture != null)
             {
                 Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture.Culture);
+                _variationContextAccessor.VariationContext = new VariationContext(Thread.CurrentThread.CurrentCulture.Name);
             }
 
-            var legacyPage = new global::Umbraco.Web.Macros.PublishedContentHashtableConverter(doc, _variationContextAccessor);
 
+            //fixme: don't think we need this anymore
+            var legacyPage = new PublishedContentHashtableConverter(doc, _variationContextAccessor);
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
-
-            var renderer = new UmbracoComponentRenderer(UmbracoContext);
 
             var result = Request.CreateResponse();
             //need to create a specific content result formatted as HTML since this controller has been configured
             //with only json formatters.
             result.Content = new StringContent(
-                renderer.RenderMacro(macro, macroParams, legacyPage).ToString(),
+                _componentRenderer.RenderMacro(doc.Id, m.Alias, macroParams).ToString(),
                 Encoding.UTF8,
                 "text/html");
             return result;

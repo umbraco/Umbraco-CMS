@@ -128,12 +128,11 @@ namespace Umbraco.Tests.Web.Mvc
 
             var helper = new UmbracoHelper(
                 umbracoContext,
-                Mock.Of<IPublishedContent>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionary>(),
+                Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<AppCaches>(), Mock.Of<ILogger>()),
-                ServiceContext.CreatePartial());
+                Mock.Of<IPublishedContentQuery>(),
+                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<AppCaches>(), Mock.Of<ILogger>()));
 
             var ctrl = new TestSurfaceController(umbracoContext, helper);
             var result = ctrl.GetContent(2) as PublishedContentResult;
@@ -185,12 +184,8 @@ namespace Umbraco.Tests.Web.Mvc
         public class TestSurfaceController : SurfaceController
         {
             public TestSurfaceController(UmbracoContext ctx, UmbracoHelper helper = null)
-                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null)
+                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null, helper)
             {
-                if (helper != null)
-                {
-                   Umbraco = helper;
-                }
             }
 
             public ActionResult Index()

@@ -79,8 +79,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Exposes an UmbracoHelper
         /// </summary>
-        protected UmbracoHelper Umbraco => _helper
-            ?? (_helper = new UmbracoHelper(Current.UmbracoContext, Current.Services));
+        protected UmbracoHelper Umbraco => _helper ?? (_helper = Current.Factory.GetInstance<UmbracoHelper>());
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
