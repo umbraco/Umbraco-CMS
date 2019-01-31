@@ -246,8 +246,6 @@
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
                     
-                    console.log(item.logType);
-                    
                     switch (item.logType) {
                         case "Save":
                             item.logTypeColor = "primary";
