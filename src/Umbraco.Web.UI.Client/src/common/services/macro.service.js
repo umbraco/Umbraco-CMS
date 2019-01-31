@@ -130,6 +130,10 @@ function macroService() {
 
             var paramDictionary = {};
             var macroAlias = macro.alias;
+            if (!macroAlias) {
+                throw "The macro object does not contain an alias";
+            }
+
             var syntax;
 
             _.each(macroParams, function (item) {
