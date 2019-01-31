@@ -161,13 +161,13 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoConfigurationStatus")
-                    ? ConfigurationManager.AppSettings["umbracoConfigurationStatus"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ConfigurationStatus)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus]
                     : string.Empty;
             }
             set
             {
-                SaveSetting("umbracoConfigurationStatus", value);
+                SaveSetting(Constants.AppSettings.ConfigurationStatus, value);
             }
         }
         

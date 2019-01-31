@@ -35,8 +35,8 @@ namespace Umbraco.Core.Migrations.Upgrade
         public override void AfterMigrations(IScope scope, ILogger logger)
         {
             // assume we have something in web.config that makes some sense = the origin version
-            if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var originVersion))
-                throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
+            if (!SemVersion.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus], out var originVersion))
+                throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
             // target version is the code version
             var targetVersion = UmbracoVersion.SemanticVersion;

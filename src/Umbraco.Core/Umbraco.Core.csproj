@@ -285,6 +285,7 @@
     <Compile Include="Constants-Security.cs" />
     <Compile Include="Constants-System.cs" />
     <Compile Include="Constants-Indexes.cs" />
+    <Compile Include="Constants-AppSettings.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
