@@ -458,7 +458,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 		 */
         createInsertMacro: function (editor, callback) {
 
-            var createInsertMacroScope = this;
+            let self = this;
+            let activeMacroElement = null; //track an active macro element
 
             /** Adds custom rules for the macro plugin and custom serialization */
             editor.on('preInit', function (args) {
@@ -481,7 +482,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //get all macro divs and load their content
                 $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                    createInsertMacroScope.loadMacroContent($(this), null);
+                    self.loadMacroContent($(this), null);
                 });
 
             });
@@ -511,18 +512,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 tooltip: 'Insert macro',
                 onPostRender: function () {
 
-                    var ctrl = this;
-
+                    let ctrl = this;
+                    
 					/**
 					 * Check if the macro is currently selected and toggle the menu button
 					 */
                     function onNodeChanged(evt) {
 
                         //set our macro button active when on a node of class umb-macro-holder
-                        var $macroElement = $(evt.element).closest(".umb-macro-holder");
+                        activeMacroElement = getRealMacroElem(evt.element);
 
                         //set the button active/inactive
-                        ctrl.active($macroElement.length !== 0);
+                        ctrl.active(activeMacroElement !== null);
                     }
 
                     //NOTE: This could be another way to deal with the active/inactive state
@@ -543,11 +544,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
                     //so we'll need to extract them and submit them to the dialog.
-                    var macroElement = editor.selection.getNode();
-                    macroElement = getRealMacroElem(macroElement);
-                    if (macroElement) {
+                    if (activeMacroElement) {
                         //we have a macro selected so we'll need to parse it's alias and parameters
-                        var contents = $(macroElement).contents();
+                        var contents = $(activeMacroElement).contents();
                         var comment = _.find(contents, function (item) {
                             return item.nodeType === 8;
                         });
@@ -557,7 +556,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         var syntax = comment.textContent.trim();
                         var parsed = macroService.parseMacroSyntax(syntax);
                         dialogData = {
-                            macroData: parsed
+                            macroData: parsed,
+                            activeMacroElement: activeMacroElement //pass the active element along so we can retrieve it later
                         };
                     }
 
@@ -570,7 +570,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
         },
 
-        insertMacroInEditor: function (editor, macroObject) {
+        insertMacroInEditor: function (editor, macroObject, activeMacroElement) {
 
             //Important note: the TinyMce plugin "noneditable" is used here so that the macro cannot be edited,
             // for this to work the mceNonEditable class needs to come last and we also need to use the attribute contenteditable = false
@@ -588,7 +588,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 },
                 macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
-            editor.selection.setNode(macroDiv);
+            //if there's an activeMacroElement then replace it, otherwise set the contents of the selected node
+            if (activeMacroElement) {
+                activeMacroElement.replaceWith(macroDiv); //directly replaces the html node
+            }
+            else {
+                editor.selection.setNode(macroDiv);
+            }
 
             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
 
@@ -1126,7 +1132,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
             });
 
-            var self = this;
+            let self = this;
 
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
@@ -1184,7 +1190,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     dialogData: dialogData,
                     submit: function (model) {
                         var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
-                        self.insertMacroInEditor(args.editor, macroObject);
+                        self.insertMacroInEditor(args.editor, macroObject, dialogData.activeMacroElement);
                         editorService.close();
                     },
                     close: function () {
