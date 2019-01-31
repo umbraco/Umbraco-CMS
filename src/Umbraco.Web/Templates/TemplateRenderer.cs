@@ -97,7 +97,7 @@ namespace Umbraco.Web.Templates
 
             //First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
             //after this page has rendered.
-            SaveExistingItems(out var oldPageElements, out var oldPublishedRequest, out var oldAltTemplate);
+            SaveExistingItems(out var oldPublishedRequest, out var oldAltTemplate);
 
             try
             {
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Templates
             finally
             {
                 //restore items on context objects to continuing rendering the parent template
-                RestoreItems(oldPageElements, oldPublishedRequest, oldAltTemplate);
+                RestoreItems(oldPublishedRequest, oldAltTemplate);
             }
 
         }
@@ -172,10 +172,7 @@ namespace Umbraco.Web.Templates
 
         private void SetNewItemsOnContextObjects(PublishedRequest request)
         {
-            // handlers like default.aspx will want it and most macros currently need it
-            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
             //now, set the new ones for this page execution
-            _umbracoContextAccessor.UmbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
             _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
         }
@@ -183,11 +180,10 @@ namespace Umbraco.Web.Templates
         /// <summary>
         /// Save all items that we know are used for rendering execution to variables so we can restore after rendering
         /// </summary>
-        private void SaveExistingItems(out object oldPageElements, out PublishedRequest oldPublishedRequest, out object oldAltTemplate)
+        private void SaveExistingItems(out PublishedRequest oldPublishedRequest, out object oldAltTemplate)
         {
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
-            oldPageElements = _umbracoContextAccessor.UmbracoContext.HttpContext.Items["pageElements"];
             oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
             oldAltTemplate = _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
         }
@@ -195,10 +191,9 @@ namespace Umbraco.Web.Templates
         /// <summary>
         /// Restores all items back to their context's to continue normal page rendering execution
         /// </summary>
-        private void RestoreItems(object oldPageElements, PublishedRequest oldPublishedRequest, object oldAltTemplate)
+        private void RestoreItems(PublishedRequest oldPublishedRequest, object oldAltTemplate)
         {
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
-            _umbracoContextAccessor.UmbracoContext.HttpContext.Items["pageElements"] = oldPageElements;
             _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
         }
     }

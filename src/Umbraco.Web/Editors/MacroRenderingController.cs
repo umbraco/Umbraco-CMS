@@ -139,12 +139,6 @@ namespace Umbraco.Web.Editors
                 _variationContextAccessor.VariationContext = new VariationContext(Thread.CurrentThread.CurrentCulture.Name);
             }
 
-
-            //fixme: don't think we need this anymore
-            var legacyPage = new PublishedContentHashtableConverter(doc, _variationContextAccessor);
-            UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
-            UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
-
             var result = Request.CreateResponse();
             //need to create a specific content result formatted as HTML since this controller has been configured
             //with only json formatters.

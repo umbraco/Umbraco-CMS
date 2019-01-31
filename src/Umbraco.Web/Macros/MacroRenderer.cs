@@ -195,10 +195,6 @@ namespace Umbraco.Web.Macros
 
         #region Render/Execute
 
-        // still, this is ugly. The macro should have a Content property
-        // referring to IPublishedContent we're rendering the macro against,
-        // this is all so convoluted ;-(
-
         public MacroContent Render(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
         {
             var m = _macroService.GetByAlias(macroAlias);
