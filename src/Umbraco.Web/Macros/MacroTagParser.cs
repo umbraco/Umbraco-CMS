@@ -162,8 +162,6 @@ namespace Umbraco.Web.Macros
             while (!stop)
             {
                 var tagIndex = fieldResult.ToString().ToLower().IndexOf("<?umbraco");
-                if (tagIndex < 0)
-                    tagIndex = fieldResult.ToString().ToLower().IndexOf("<umbraco:macro");
                 if (tagIndex > -1)
                 {
                     var tempElementContent = "";

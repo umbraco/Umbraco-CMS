@@ -66,22 +66,6 @@ namespace Umbraco.Core.Sync
                 return umbracoApplicationUrl;
             }
 
-            // try umbracoSettings:settings/scheduledTasks/@baseUrl
-            // which is assumed to:
-            // - end with SystemDirectories.Umbraco
-            // - NOT contain any scheme (because, legacy)
-            // - end or not with a slash, it will be taken care of
-            // eg "mysite.com/umbraco"
-            url = settings.ScheduledTasks.BaseUrl;
-            if (url.IsNullOrWhiteSpace() == false)
-            {
-                var ssl = globalSettings.UseHttps ? "s" : "";
-                url = "http" + ssl + "://" + url;
-                var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using scheduledTasks/@baseUrl)", umbracoApplicationUrl);
-                return umbracoApplicationUrl;
-            }
-
             // try the server registrar
             // which is assumed to return a url that:
             // - end with SystemDirectories.Umbraco

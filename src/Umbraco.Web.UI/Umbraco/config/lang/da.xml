@@ -300,6 +300,7 @@
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
     <key alias="allMembers">Alle medlemmer</key>
+    <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
@@ -319,6 +320,7 @@
     <key alias="newPartialViewMacroFromSnippet">Ny partial view makro fra snippet</key>
     <key alias="newPartialViewMacroNoMacro">Ny partial view makro (uden makro)</key>
     <key alias="newStyleSheetFile">Ny stylesheet-fil</key>
+    <key alias="newRteStyleSheetFile">Ny Rich Text Editor stylesheet-fil</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -622,6 +624,7 @@
     <key alias="searchNoResult">Beklager, vi kan ikke finde det, du leder efter.</key>
     <key alias="noItemsInList">Ingen elementer er blevet tilføjet</key>
     <key alias="server">Server</key>
+    <key alias="settings">Indstillinger</key>
     <key alias="show">Vis</key>
     <key alias="showPageOnSend">Hvilken side skal vises efter at formularen er sendt</key>
     <key alias="size">Størrelse</key>
@@ -1020,6 +1023,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid.]]></key>
   </area>
   <area alias="speechBubbles">
+    <key alias="validationFailedHeader">Validering</key>
+    <key alias="validationFailedMessage">Valideringsfejl skal rettes før elementet kan gemmes</key>
+    <key alias="operationFailedHeader">Fejlet</key>
+    <key alias="operationSavedHeader">Gemt</key>
+    <key alias="invalidUserPermissionsText">Utilstrækkelige brugerrettigheder, kunne ikke fuldføre handlingen</key>
     <key alias="operationCancelledHeader">Annulleret</key>
     <key alias="operationCancelledText">Handlingen blev annulleret af et 3. part tilføjelsesprogram</key>
     <key alias="contentTypeDublicatePropertyType">Property type eksisterer allerede</key>
@@ -1044,12 +1052,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="editMediaSaved">Medie gemt</key>
     <key alias="editMediaSavedText">Medie gemt uden problemer</key>
     <key alias="editMemberSaved">Medlem gemt</key>
+    <key alias="editMemberGroupSaved">Medlemsgruppe gemt</key>
     <key alias="editStylesheetPropertySaved">Stylesheetegenskab gemt</key>
     <key alias="editStylesheetSaved">Stylesheet gemt</key>
     <key alias="editTemplateSaved">Skabelon gemt</key>
     <key alias="editUserError">Der er opstået en fejl under redigering</key>
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
+    <key alias="editUserGroupSaved">Brugergruppe gemt</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
@@ -1057,6 +1067,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="languageSaved">Sprog gemt</key>
     <key alias="mediaTypeSavedHeader">Medietype gemt</key>
     <key alias="memberTypeSavedHeader">Medlemstype gemt</key>
+    <key alias="memberGroupSavedHeader">Medlemsgruppe gemt</key>
     <key alias="templateErrorHeader">Skabelon ikke gemt</key>
     <key alias="templateErrorText">Undgå venligst at du har 2 templates med samme alias</key>
     <key alias="templateSavedHeader">Skabelon gemt</key>
@@ -1078,15 +1089,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
   </area>
   <area alias="stylesheet">
+    <key alias="addRule">Tilføj style</key>
+    <key alias="editRule">Redigér style</key>
     <key alias="editorRules">Teksteditor-styles</key>
     <key alias="editorRulesHelp">Definér de styles, der skal være tilgængelige i teksteditoren for dette stylesheet</key>
     <key alias="selector">Selector</key>
     <key alias="selectorHelp">Bruger CSS-syntaks, f.eks. "h1" eller ".redheader"</key>
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
-    <key alias="overlayTitleAddRule">Tilføj style</key>
-    <key alias="overlayTitleEditRule">Redigér style</key>
     <key alias="nameHelp">Det navn der vises i teksteditoren</key>
+    <key alias="preview">Forhåndsvisning</key>
+    <key alias="previewHelp">Hvordan teksten vil se ud i teksteditoren.</key>
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">Den CSS der skal anvendes i teksteditoren, f.eks. "color:red;"</key>
     <key alias="tabCode">Kode</key>
@@ -1215,6 +1228,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompositioner</key>
     <key alias="noTabs">Du har ikke tilføjet nogle faner</key>
+    <key alias="addGroup">Tilføj gruppe</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
     <key alias="addProperty">Tilføj egenskab</key>
     <key alias="requiredLabel">Påkrævet label</key>
@@ -1255,16 +1269,22 @@ Mange hilsner fra Umbraco robotten
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
   </area>
   <area alias="languages">
-      <key alias="addLanguage">Tilføj sprog</key>
-      <key alias="mandatoryLanguage">Påkrævet sprog</key>
-      <key alias="mandatoryLanguageHelp">Egenskaber på dette sprog skal være udfyldt før noden kan blive udgivet.</key>
-      <key alias="defaultLanguage">Standard sprog</key>
-      <key alias="defaultLanguageHelp">Et Umbraco site kan kun have et standard sprog.</key>
-      <key alias="changingDefaultLanguageWarning">Ved at skifte standardsprog kan resultere i standard indhold mangler.</key>
-      <key alias="fallsbackToLabel">Fallsback til</key>
-      <key alias="noFallbackLanguageOption">Ingen fallback sprog</key>
-      <key alias="fallbackLanguageDescription">For at tillade flersproget indhold til at falde tilbage på et andet sprog, hvis det ikke er tilgængelig i det anmodet sprog, vælg det her.</key>
-      <key alias="fallbackLanguage">Fallback sprog</key>
+    <key alias="addLanguage">Tilføj sprog</key>
+    <key alias="mandatoryLanguage">Påkrævet sprog</key>
+    <key alias="mandatoryLanguageHelp">Egenskaber på dette sprog skal være udfyldt før noden kan blive udgivet.</key>
+    <key alias="defaultLanguage">Standard sprog</key>
+    <key alias="defaultLanguageHelp">Et Umbraco site kan kun have et standard sprog.</key>
+    <key alias="changingDefaultLanguageWarning">Ved at skifte standardsprog kan resultere i standard indhold mangler.</key>
+    <key alias="fallsbackToLabel">Fallsback til</key>
+    <key alias="noFallbackLanguageOption">Ingen fallback sprog</key>
+    <key alias="fallbackLanguageDescription">For at tillade flersproget indhold til at falde tilbage på et andet sprog, hvis det ikke er tilgængelig i det anmodet sprog, vælg det her.</key>
+    <key alias="fallbackLanguage">Fallback sprog</key>
+  </area>
+  <area alias="macro">
+    <key alias="addParameter">Tilføj parameter</key>
+    <key alias="editParameter">Rediger parameter</key>
+    <key alias="parameters">Parametre</key>
+    <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt felt</key>
@@ -1337,7 +1357,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="partialViews">Partial Views</key>
-    <key alias="partialViewMacros">Partial View Makro Filer</key>
+    <key alias="partialViewMacros">Partial View makrofiler</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
     <key alias="runwayModules">Runway-moduler</key>
@@ -1346,8 +1366,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
     <key alias="userPermissions">Brugertilladelser</key>
-    <key alias="userTypes">Bruger Typer</key>
+    <key alias="userTypes">Brugertyper</key>
     <key alias="users">Brugere</key>
+    <key alias="settingsGroup">Indstillinger</key>
+    <key alias="templatingGroup">Design og layout</key>
+    <key alias="thirdPartyGroup">Tredjepart</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>

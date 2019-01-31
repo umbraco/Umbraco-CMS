@@ -11,14 +11,14 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides an implementation of <see cref="IContentFinder"/> that runs the legacy 404 logic.
     /// </summary>
-    public class ContentFinderByLegacy404 : IContentLastChanceFinder
+    public class ContentFinderByConfigured404 : IContentLastChanceFinder
     {
 
         private readonly ILogger _logger;
         private readonly IEntityService _entityService;
         private readonly IContentSection _contentConfigSection;
 
-        public ContentFinderByLegacy404(ILogger logger, IEntityService entityService, IContentSection contentConfigSection)
+        public ContentFinderByConfigured404(ILogger logger, IEntityService entityService, IContentSection contentConfigSection)
         {
             _logger = logger;
             _entityService = entityService;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(PublishedRequest frequest)
         {
-            _logger.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
+            _logger.Debug<ContentFinderByConfigured404>("Looking for a page to handle 404.");
 
             // try to find a culture as best as we can
             var errorCulture = CultureInfo.CurrentUICulture;
@@ -70,17 +70,17 @@ namespace Umbraco.Web.Routing
 
             if (error404.HasValue)
             {
-                _logger.Debug<ContentFinderByLegacy404>("Got id={ErrorNodeId}.", error404.Value);
+                _logger.Debug<ContentFinderByConfigured404>("Got id={ErrorNodeId}.", error404.Value);
 
                 content = frequest.UmbracoContext.ContentCache.GetById(error404.Value);
 
-                _logger.Debug<ContentFinderByLegacy404>(content == null
+                _logger.Debug<ContentFinderByConfigured404>(content == null
                     ? "Could not find content with that id."
                     : "Found corresponding content.");
             }
             else
             {
-                _logger.Debug<ContentFinderByLegacy404>("Got nothing.");
+                _logger.Debug<ContentFinderByConfigured404>("Got nothing.");
             }
 
             frequest.PublishedContent = content;

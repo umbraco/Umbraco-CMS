@@ -15,15 +15,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         }
 
-        public bool HasContentId
-        {
-            get { return ContentId != int.MinValue; }
-        }
+        public bool HasContentId => ContentId != int.MinValue;
 
-        public bool HasContentKey
-        {
-            get { return ContentKey != Guid.Empty; }
-        }
+        public bool HasContentKey => ContentKey != Guid.Empty;
 
         public int ContentId
         {
@@ -51,15 +45,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        public string ContentXPath
-        {
-            get { return Value; }
-        }
+        public string ContentXPath => Value;
 
         public string Culture
         {
-            get { return (string) RawXml.Attribute("culture"); }
-            set { RawXml.Attribute("culture").Value = value; }
+            get => (string) RawXml.Attribute("culture");
+            set => RawXml.Attribute("culture").Value = value;
         }
     }
 }

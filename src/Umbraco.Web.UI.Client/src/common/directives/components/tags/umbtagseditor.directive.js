@@ -116,7 +116,7 @@
                             });
 
                         }).bind("typeahead:opened", function (obj) {
-                            console.log("opened ");
+
                         });
                 });
 

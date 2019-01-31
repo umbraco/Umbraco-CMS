@@ -43,31 +43,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void ScriptFolderPath()
-        {
-            Assert.AreEqual(SettingsSection.Content.ScriptFolderPath, "/scripts");
-        }
-        [Test]
-        public void ScriptFileTypes()
-        {
-            Assert.IsTrue(SettingsSection.Content.ScriptFileTypes.All(x => "js,xml".Split(',').Contains(x)));
-        }
-        [Test]
-        public void DisableScriptEditor()
-        {
-            Assert.AreEqual(SettingsSection.Content.ScriptEditorDisable, false);
-        }
-
-        [Test]
         public void ImageFileTypes()
         {
             Assert.IsTrue(SettingsSection.Content.ImageFileTypes.All(x => "jpeg,jpg,gif,bmp,png,tiff,tif".Split(',').Contains(x)));
         }
-        [Test]
-        public void AllowedAttributes()
-        {
-            Assert.IsTrue(SettingsSection.Content.ImageTagAllowedAttributes.All(x => "src,alt,border,class,style,align,id,name,onclick,usemap".Split(',').Contains(x)));
-        }
+        
         [Test]
         public virtual void ImageAutoFillProperties()
         {
@@ -83,59 +63,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).LengthFieldAlias, "umbracoBytes2");
             Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).ExtensionFieldAlias, "umbracoExtension2");
         }
-
-        [Test]
-        public void UploadAllowDirectories()
-        {
-            Assert.IsTrue(SettingsSection.Content.UploadAllowDirectories);
-        }
-        [Test]
-        public void DefaultDocumentTypeProperty()
-        {
-            Assert.AreEqual(SettingsSection.Content.DefaultDocumentTypeProperty, "Textstring");
-        }
-        [Test]
-        public void GlobalPreviewStorageEnabled()
-        {
-            Assert.IsFalse(SettingsSection.Content.GlobalPreviewStorageEnabled);
-        }
-        [Test]
-        public void CloneXmlContent()
-        {
-            Assert.IsTrue(SettingsSection.Content.CloneXmlContent);
-        }
-        [Test]
-        public void EnsureUniqueNaming()
-        {
-            Assert.IsTrue(SettingsSection.Content.EnsureUniqueNaming);
-        }
-
-        [Test]
-        public void ForceSafeAliases()
-        {
-            Assert.IsTrue(SettingsSection.Content.ForceSafeAliases);
-        }
-        [Test]
-        public void XmlCacheEnabled()
-        {
-            Assert.IsTrue(SettingsSection.Content.XmlCacheEnabled);
-        }
-        [Test]
-        public void ContinouslyUpdateXmlDiskCache()
-        {
-            Assert.IsTrue(SettingsSection.Content.ContinouslyUpdateXmlDiskCache);
-        }
-        [Test]
-        public virtual void XmlContentCheckForDiskChanges()
-        {
-            Assert.IsTrue(SettingsSection.Content.XmlContentCheckForDiskChanges);
-        }
         
-        [Test]
-        public void PropertyContextHelpOption()
-        {
-            Assert.AreEqual(SettingsSection.Content.PropertyContextHelpOption, "text");
-        }
         [Test]
         public void PreviewBadge()
         {

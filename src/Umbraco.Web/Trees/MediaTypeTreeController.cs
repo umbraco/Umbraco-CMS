@@ -65,8 +65,6 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedMediaTypes = Current.Configs.Settings().Content.EnableInheritedMediaTypes;
-
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // set the default to create
@@ -103,30 +101,18 @@ namespace Umbraco.Web.Trees
                 var ct = Services.MediaTypeService.Get(int.Parse(id));
                 var parent = ct == null ? null : Services.MediaTypeService.Get(ct.ParentId);
 
-                if (enableInheritedMediaTypes)
-                {
-                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                    // no move action if this is a child doc type
-                    if (parent == null)
-                    {
-                        menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
-                    }
-                }
-                else
+                // no move action if this is a child doc type
+                if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
-                    // no move action if this is a child doc type
-                    if (parent == null)
-                    {
-                        menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
-                    }
+                    menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
                 }
 
                 menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
                 menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
-                if (enableInheritedMediaTypes)
-                    menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
             }
 
             return menu;

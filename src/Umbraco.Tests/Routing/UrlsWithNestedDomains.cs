@@ -34,8 +34,6 @@ namespace Umbraco.Tests.Routing
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var request = Mock.Get(settings.RequestHandler);
-            request.Setup(x => x.UseDomainPrefixes).Returns(true);
 
             SetDomains1();
 

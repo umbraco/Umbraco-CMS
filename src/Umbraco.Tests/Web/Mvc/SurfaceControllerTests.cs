@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<HttpContextBase>().Object,
                 publishedSnapshotService.Object,
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Mock_Current_Page()
         {
-            var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "AutoLegacy");
+            var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "Auto");
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var umbracoContext = UmbracoContext.EnsureContext(

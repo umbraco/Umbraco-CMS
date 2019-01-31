@@ -8,22 +8,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class RequestHandlerElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void UseDomainPrefixes()
-        {
-            Assert.IsTrue(SettingsSection.RequestHandler.UseDomainPrefixes == false);
-
-        }
-        [Test]
         public void AddTrailingSlash()
         {
             Assert.IsTrue(SettingsSection.RequestHandler.AddTrailingSlash == true);
         }
-        [Test]
-        public void RemoveDoubleDashes()
-        {
-            Assert.IsTrue(SettingsSection.RequestHandler.RemoveDoubleDashes == true);
 
-        }
         [Test]
         public void CharCollection()
         {
