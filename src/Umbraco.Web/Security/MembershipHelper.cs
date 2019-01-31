@@ -31,7 +31,6 @@ namespace Umbraco.Web.Security
         private readonly IMemberTypeService _memberTypeService;
         private readonly IUserService _userService;
         private readonly IPublicAccessService _publicAccessService;
-        private readonly PublishedRouter _publishedRouter;
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
 
@@ -46,7 +45,6 @@ namespace Umbraco.Web.Security
             IMemberTypeService memberTypeService,
             IUserService userService,
             IPublicAccessService publicAccessService,
-            PublishedRouter publishedRouter,
             AppCaches appCaches,
             ILogger logger
         )
@@ -57,7 +55,6 @@ namespace Umbraco.Web.Security
             _memberTypeService = memberTypeService;
             _userService = userService;
             _publicAccessService = publicAccessService;
-            _publishedRouter = publishedRouter;
             _appCaches = appCaches;
             _logger = logger;
 
@@ -116,7 +113,7 @@ namespace Umbraco.Web.Security
         {
             return UmbracoContext.PublishedRequest == null
                 ? _publicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser)
-                : _publicAccessService.HasAccess(path, CurrentUserName, _publishedRouter.GetRolesForLogin);
+                : _publicAccessService.HasAccess(path, CurrentUserName, GetUserRoles);
         }
 
         /// <summary>
@@ -515,6 +512,24 @@ namespace Umbraco.Web.Security
         #endregion
 
         /// <summary>
+        /// Gets the current user's roles.
+        /// </summary>
+        /// <remarks>Roles are cached per user name, at request level.</remarks>
+        public IEnumerable<string> GetCurrentUserRoles()
+            => GetUserRoles(CurrentUserName);
+
+        /// <summary>
+        /// Gets a user's roles.
+        /// </summary>
+        /// <remarks>Roles are cached per user name, at request level.</remarks>
+        public IEnumerable<string> GetUserRoles(string userName)
+        {
+            // optimize by caching per-request (v7 cached per PublishedRequest, in PublishedRouter)
+            var key = "Umbraco.Web.Security.MembershipHelper__Roles__" + userName;
+            return _appCaches.RequestCache.GetCacheItem(key, () => Roles.Provider.GetRolesForUser(userName));
+        }
+
+        /// <summary>
         /// Returns the login status model of the currently logged in member, if no member is logged in it returns null;
         /// </summary>
         /// <returns></returns>
@@ -618,7 +633,7 @@ namespace Umbraco.Web.Security
                 var provider = _membershipProvider;
 
                 string username;
-                
+
                 if (provider.IsUmbracoMembershipProvider())
                 {
                     var member = GetCurrentPersistedMember();
@@ -626,7 +641,7 @@ namespace Umbraco.Web.Security
                     if (member == null)
                         return false;
                     username = member.Username;
-                    
+
                     // If types defined, check member is of one of those types
                     var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
                     if (allowTypesList.Any(allowType => allowType != string.Empty))

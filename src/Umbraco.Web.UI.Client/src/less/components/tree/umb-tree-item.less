@@ -2,6 +2,7 @@
     display: block;
     min-width: 100%;
     width: auto;
+    margin-top:1px;
     
     .umb-tree-item__label {
         user-select: none;
@@ -44,6 +45,38 @@
     }
 }
 
+// active is equivilant to selected, its the item that is begin affected by the actions performed in the right-click-dialog.
+.umb-tree-item.active {
+    
+}
+.umb-tree-item.active > .umb-tree-item__inner {
+    //background: @ui-selected;
+    color: @ui-selected-type;
+    a {
+        color: @ui-selected-type;
+    }
+    
+    border-color: @ui-selected-border;
+    box-shadow: 0 0 2px 0 fade(@ui-selected-border, 80%);
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid fade(white, 80%);
+    }
+    &:hover {
+        //background: @ui-selected-hover;
+        //border-color: @ui-selected-border-hover;// dont hover border, cause its cant be deselected in current code.
+        color: @ui-selected-type-hover;
+        a {
+            color: @ui-selected-type-hover;
+        }
+    }
+}
+
 .umb-tree-item.current > .umb-tree-item__inner {
 
     background: @ui-active;
@@ -74,4 +107,11 @@
         //background-color: @ui-active;
         //border-color: @ui-active;
     }
+}
+
+.umb-tree-item.current-not-active > .umb-tree-item__inner {
+    
+    background: @ui-active-blur;
+    color:@ui-active-type;
+    
 }

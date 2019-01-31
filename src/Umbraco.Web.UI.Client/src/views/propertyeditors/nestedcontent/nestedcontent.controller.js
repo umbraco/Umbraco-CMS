@@ -71,7 +71,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         //$scope.model.config.contentTypes;
         //$scope.model.config.minItems;
         //$scope.model.config.maxItems;
-        //console.log($scope);
 
         var inited = false;
 
