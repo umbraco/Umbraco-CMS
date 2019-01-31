@@ -139,7 +139,7 @@ namespace Umbraco.Core.Persistence
         {
             // replace NPoco database type by a more efficient one
 
-            var setting = ConfigurationManager.AppSettings["Umbraco.DatabaseFactory.ServerVersion"];
+            var setting = ConfigurationManager.AppSettings[Constants.AppSettings.DatabaseFactoryServerVersion];
             var fromSettings = false;
 
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
