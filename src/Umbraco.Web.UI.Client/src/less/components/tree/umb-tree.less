@@ -87,23 +87,6 @@ body.touch .umb-tree {
     }
 }
 
-// active is equivilant to selected, its the item that is begin affected by the actions performed in the right-click-dialog.
-.umb-tree-item > .umb-tree-item__inner.active {
-    //background: @ui-selected;
-    border-color: @ui-selected-border;
-    color: @ui-selected-type;
-    a {
-        color: @ui-selected-type;
-    }
-    &:hover {
-        //background: @ui-selected-hover;
-        border-color: @ui-selected-border-hover;
-        color: @ui-selected-type-hover;
-        a {
-            color: @ui-selected-type-hover;
-        }
-    }
-}
 .umb-tree-root, .umb-tree-item__inner {
     padding: 0;
     position: relative;
@@ -112,7 +95,7 @@ body.touch .umb-tree {
     flex-wrap: nowrap;
     align-items: center;
     
-    border:2px dashed transparent;
+    border:2px solid transparent;
     
     color: @ui-option-type;
     a {

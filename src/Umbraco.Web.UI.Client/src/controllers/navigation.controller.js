@@ -34,7 +34,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 appState.setTreeState("selectedNode", args.node);
                 //when a node is activated, this is the same as clicking it and we need to set the
                 //current menu item to be this node as well.
-                appState.setMenuState("currentNode", args.node);
+                //appState.setMenuState("currentNode", args.node);// Niels: No, we are setting it from the dialog.
             }
         });
 
@@ -44,7 +44,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             args.event.preventDefault();
 
             //Set the current action node (this is not the same as the current selected node!)
-            appState.setMenuState("currentNode", args.node);
+            //appState.setMenuState("currentNode", args.node);// Niels: No, we are setting it from the dialog.
 
             if (args.event && args.event.altKey) {
                 args.skipDefault = true;
@@ -96,7 +96,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 //put this node into the tree state
                 appState.setTreeState("selectedNode", args.node);
                 //when a node is clicked we also need to set the active menu node to this node
-                appState.setMenuState("currentNode", args.node);
+                //appState.setMenuState("currentNode", args.node);
 
                 //not legacy, lets just set the route value and clear the query string if there is one.
                 $location.path(n.routePath);
@@ -216,7 +216,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Emitted when a language is created or an existing one saved/edited
     evts.push(eventsService.on("editors.languages.languageSaved", function (e, args) {
-        console.log('lang event listen args', args);
         if(args.isNew){
             //A new language has been created - reload languages for tree
             loadLanguages().then(function (languages) {

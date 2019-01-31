@@ -548,7 +548,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new property type!</key>
     <key alias="filePermissionsError">There is a problem with read/write access to a specific file or folder</key>
     <key alias="macroErrorLoadingPartialView">Error loading Partial View script (file: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Error loading userControl '%0%'</key>
     <key alias="missingTitle">Please enter a title</key>
     <key alias="missingType">Please choose a type</key>
     <key alias="pictureResizeBiggerThanOrg">You're about to make the picture larger than the original size. Are you sure that you want to proceed?</key>

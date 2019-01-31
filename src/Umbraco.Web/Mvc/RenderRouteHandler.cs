@@ -386,11 +386,8 @@ namespace Umbraco.Web.Mvc
 
                 var handler = GetHandlerOnMissingTemplate(request);
 
-                // if it's not null it can be either the PublishedContentNotFoundHandler (no document was
-                // found to handle 404, or document with no template was found) or the WebForms handler
-                // (a document was found and its template is WebForms)
-
-                // if it's null it means that a document was found and its template is Mvc
+                // if it's not null it's the PublishedContentNotFoundHandler (no document was found to handle 404, or document with no template was found)
+                // if it's null it means that a document was found
 
                 // if we have a handler, return now
                 if (handler != null)

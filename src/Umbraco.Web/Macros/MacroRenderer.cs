@@ -11,7 +11,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Caching;
-using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -171,8 +170,7 @@ namespace Umbraco.Web.Macros
             switch (model.MacroType)
             {
                 case MacroTypes.PartialView:
-                case MacroTypes.UserControl:
-                    filename = model.MacroSource; //user controls & partial views are saved with their full virtual path
+                    filename = model.MacroSource; // partial views are saved with their full virtual path
                     break;
                 default:
                     // not file-based, or not supported
@@ -363,14 +361,6 @@ namespace Umbraco.Web.Macros
                         () => ExecutePartialView(model),
                         () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
 
-                case MacroTypes.UserControl:
-                    return ExecuteMacroWithErrorWrapper(model,
-                        $"Loading UserControl: MacroSource=\"{model.MacroSource}\".",
-                        "Loaded UserControl.",
-                        () => ExecuteUserControl(model),
-                        () => textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { model.MacroSource }));
-
-                //case MacroTypes.Script:
                 default:
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Execute macro with unsupported type \"{model.MacroType}\".",
@@ -409,17 +399,6 @@ namespace Umbraco.Web.Macros
             var engine = new PartialViewMacroEngine();
             var content = UmbracoContext.Current.PublishedRequest.PublishedContent;
             return engine.Execute(macro, content);
-        }
-
-        public static MacroContent ExecuteUserControl(MacroModel macro)
-        {
-            // add tilde for v4 defined macros
-            if (string.IsNullOrEmpty(macro.MacroSource) == false
-                && macro.MacroSource.StartsWith("~") == false)
-                macro.MacroSource = "~/" + macro.MacroSource;
-
-            var engine = new UserControlMacroEngine();
-            return engine.Execute(macro);
         }
 
         #endregion

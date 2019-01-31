@@ -100,7 +100,7 @@
         }
 
         function goToPage(ancestor) {
-            $location.path(ancestor.path).search("subview", ancestor.subView);
+            $location.path(ancestor.path);
         }
 
         function openSectionPicker() {
@@ -292,8 +292,7 @@
             vm.breadcrumbs = [
                 {
                     "name": vm.labels.groups,
-                    "path": "/users/users/overview",
-                    "subView": "groups"
+                    "path": "/users/users/groups"
                 },
                 {
                     "name": vm.userGroup.name

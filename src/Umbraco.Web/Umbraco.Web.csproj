@@ -197,10 +197,12 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
     <Compile Include="Mvc\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
@@ -356,7 +358,6 @@
     <Compile Include="HealthCheck\HealthCheckController.cs" />
     <Compile Include="Macros\MacroPropertyModel.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
-    <Compile Include="Macros\UserControlMacroEngine.cs" />
     <Compile Include="HealthCheck\HealthCheckGroup.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />

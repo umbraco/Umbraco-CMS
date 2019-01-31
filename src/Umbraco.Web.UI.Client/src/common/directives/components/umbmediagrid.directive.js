@@ -140,11 +140,11 @@ Use this directive to generate a thumbnail grid of media items.
                     }
 
                 }
-
+                
                 if (scope.items.length > 0) {
                     setFlexValues(scope.items);
                 }
-
+                
             }
 
             function setItemData(item) {
@@ -235,7 +235,7 @@ Use this directive to generate a thumbnail grid of media items.
                 }
 
             }
-
+            
             function setFlexValues(mediaItems) {
 
                 var flexSortArray = mediaItems;
@@ -269,12 +269,12 @@ Use this directive to generate a thumbnail grid of media items.
                         "min-height": itemMinHeight + "px"
                     };
 
-                    mediaItem.flexStyle = flexStyle;
+                        mediaItem.flexStyle = flexStyle;
 
                 }
 
             }
-
+            
             scope.clickItem = function(item, $event, $index) {
                 if (scope.onClick) {
                     scope.onClick(item, $event, $index);

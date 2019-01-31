@@ -13,8 +13,6 @@
 
             function addEditor(editor) {
                 
-                console.log("add:", editor)
-                
                 editor.animating = true;
 
                 showOverlayOnPrevEditor();
@@ -90,8 +88,6 @@
             }
 
             function removeEditor(editor) {
-                
-                console.log("remove: ", editor)
                 
                 editor.animating = true;
 
