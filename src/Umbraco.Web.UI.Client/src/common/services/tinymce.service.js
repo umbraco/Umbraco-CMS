@@ -476,6 +476,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             });
 
+            /** when the contents load we need to find any macros declared and load in their content */
+            editor.on("SetContent", function (o) {
+
+                //get all macro divs and load their content
+                $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
+                    createInsertMacroScope.loadMacroContent($(this), null);
+                });
+
+            });
+
 			/**
 			 * Because the macro gets wrapped in a P tag because of the way 'enter' works, this
 			 * method will return the macro element if not wrapped in a p, or the p if the macro
@@ -517,16 +527,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //NOTE: This could be another way to deal with the active/inactive state
                     //editor.on('ObjectSelected', function (e) {});
-
-                    /** when the contents load we need to find any macros declared and load in their content */
-                    editor.on("LoadContent", function (o) {
-
-                        //get all macro divs and load their content
-                        $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                            createInsertMacroScope.loadMacroContent($(this), null);
-                        });
-
-                    });
 
                     //set onNodeChanged event listener
                     editor.on('NodeChange', onNodeChanged);
