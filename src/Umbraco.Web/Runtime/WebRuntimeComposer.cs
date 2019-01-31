@@ -217,22 +217,19 @@ namespace Umbraco.Web.Runtime
             // register OEmbed providers
             // no type scanning - all explicit opt-in of adding types
             composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
+                .Append<YouTube>()
+                .Append<Instagram>()
+                .Append<Twitter>()
+                .Append<Vimeo>()
+                .Append<DailyMotion>()
                 .Append<Flickr>()
                 .Append<Slideshare>()
                 .Append<Kickstarter>()
                 .Append<GettyImages>()
-                .Append<Instagram>()
-                .Append<Twitter>()
-                .Append<Vimeo>()
                 .Append<Ted>()
                 .Append<Soundcloud>()
                 .Append<Issuu>()
                 .Append<Hulu>();
-
-
-                //Giphy
-                //Meetup
-                //Spotify
         }
     }
 }

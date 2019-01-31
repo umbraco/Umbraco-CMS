@@ -143,11 +143,13 @@
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
+    <Compile Include="Media\EmbedProviders\YouTube.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProviderBase.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProvidersCollection.cs" />
     <Compile Include="Media\EmbedProviders\EmbedProvidersCollectionBuilder.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Media\EmbedProviders\GettyImages.cs" />
+    <Compile Include="Media\EmbedProviders\DailyMotion.cs" />
     <Compile Include="Media\EmbedProviders\SoundCloud.cs" />
     <Compile Include="Media\EmbedProviders\Hulu.cs" />
     <Compile Include="Media\EmbedProviders\Ted.cs" />
