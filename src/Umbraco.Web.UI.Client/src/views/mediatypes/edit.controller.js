@@ -9,7 +9,10 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
+    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, 
+        dataTypeResource, editorState, contentEditingHelper, formHelper, 
+        navigationService, iconHelper, contentTypeHelper, notificationsService, 
+        $filter, $q, localizationService, overlayHelper, eventsService) {
 
         var vm = this;
         var evts = [];
