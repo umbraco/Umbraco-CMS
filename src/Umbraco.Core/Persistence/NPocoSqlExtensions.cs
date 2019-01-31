@@ -496,7 +496,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> On<TLeft, TRight>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin,
             Expression<Func<TLeft, object>> leftField, Expression<Func<TRight, object>> rightField)
         {
-            // todo - ugly - should define on SqlContext!
+            // TODO: ugly - should define on SqlContext!
 
             var xLeft = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(leftField);
             var xRight = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(rightField);
@@ -816,7 +816,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto to select.</typeparam>
         /// <param name="sql">The origin Sql.</param>
-        /// <param name="reference">An expression speficying the reference.</param>
+        /// <param name="reference">An expression specifying the reference.</param>
         /// <param name="sqlexpr">An expression to apply to the Sql statement before adding the reference selection.</param>
         /// <returns>The Sql statement.</returns>
         /// <remarks>The <paramref name="sqlexpr"/> expression applies to the Sql statement before the reference selection
@@ -1180,7 +1180,7 @@ namespace Umbraco.Core.Persistence
 
         private static string GetTableName(this Type type)
         {
-            // todo: returning string.Empty for now
+            // TODO: returning string.Empty for now
             // BUT the code bits that calls this method cannot deal with string.Empty so we
             // should either throw, or fix these code bits...
             var attr = type.FirstAttribute<TableNameAttribute>();

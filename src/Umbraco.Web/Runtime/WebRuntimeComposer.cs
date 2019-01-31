@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
@@ -17,6 +18,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -80,7 +82,7 @@ namespace Umbraco.Web.Runtime
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
             // a way to inject the UmbracoContext - and register it per-request to be more efficient
-            //TODO: stop doing this
+            // TODO: stop doing this
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
             // register the umbraco helper
@@ -95,13 +97,12 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
 
+            composition.RegisterUnique<IDashboardService, DashboardService>();
+
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
             // configure the container for web
             composition.ConfigureForWeb();
-
-
-            composition.RegisterUnique<Dashboards>();
 
             composition
                 .ComposeUmbracoControllers(GetType().Assembly)
@@ -150,7 +151,7 @@ namespace Umbraco.Web.Runtime
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
@@ -202,15 +203,15 @@ namespace Umbraco.Web.Runtime
                 .Append<MembersBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
 
+            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
+            composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+                .Add(composition.TypeLoader.GetTypes<IDashboard>());
+
             // register back office trees
-            foreach (var treeControllerType in umbracoApiControllerTypes
-                .Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)))
-            {
-                var attribute = treeControllerType.GetCustomAttribute<TreeAttribute>(false);
-                if (attribute == null) continue;
-                var tree = new Tree(attribute.SortOrder, attribute.ApplicationAlias, attribute.TreeAlias, attribute.TreeTitle, treeControllerType, attribute.IsSingleNodeTree);
-                composition.WithCollectionBuilder<TreeCollectionBuilder>().Trees.Add(tree);
-            }
+            // the collection builder only accepts types inheriting from TreeControllerBase
+            // and will filter out those that are not attributed with TreeAttribute
+            composition.WithCollectionBuilder<TreeCollectionBuilder>()
+                .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
         }
     }
 }

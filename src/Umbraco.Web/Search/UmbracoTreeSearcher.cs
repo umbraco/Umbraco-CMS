@@ -64,7 +64,7 @@ namespace Umbraco.Web.Search
 
             var umbracoContext = _umbracoHelper.UmbracoContext;
 
-            //TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
+            // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc... 
             //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
             //{

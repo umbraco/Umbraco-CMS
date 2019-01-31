@@ -522,7 +522,7 @@ namespace Umbraco.Core.Security
         protected abstract MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status);
 
         /// <summary>
-        /// Gets the members password if password retreival is enabled
+        /// Gets the members password if password retrieval is enabled
         /// </summary>
         /// <param name="username"></param>
         /// <param name="answer"></param>
@@ -539,7 +539,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Gets the members password if password retreival is enabled
+        /// Gets the members password if password retrieval is enabled
         /// </summary>
         /// <param name="username"></param>
         /// <param name="answer"></param>

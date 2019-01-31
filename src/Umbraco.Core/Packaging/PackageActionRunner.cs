@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Packaging
 {
     /// <summary>
-    /// Package actions are executed on packge install / uninstall.
+    /// Package actions are executed on package install / uninstall.
     /// </summary>
     internal class PackageActionRunner : IPackageActionRunner
     {

@@ -98,7 +98,7 @@ namespace Umbraco.Tests.TestHelpers
                 File.Delete(umbracoSettingsFile);
         }
 
-        // fixme obsolete the dateTimeFormat thing and replace with dateDelta
+        // FIXME: obsolete the dateTimeFormat thing and replace with dateDelta
         public static void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
         {
             const int dateDeltaMilliseconds = 500; // .5s

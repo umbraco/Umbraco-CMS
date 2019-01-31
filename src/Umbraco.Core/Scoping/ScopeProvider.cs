@@ -425,7 +425,7 @@ namespace Umbraco.Core.Scoping
         //        LogHelper.Debug<ScopeProvider>("CallContext: " + Environment.StackTrace);
         //}
 
-        // all scope instances that are currently beeing tracked
+        // all scope instances that are currently being tracked
         private static readonly object StaticScopeInfosLock = new object();
         private static readonly Dictionary<IScope, ScopeInfo> StaticScopeInfos = new Dictionary<IScope, ScopeInfo>();
 

@@ -100,7 +100,7 @@ namespace Umbraco.Core.Packaging
             //Order the DocumentTypes before removing them
             if (contentTypes.Any())
             {
-                //TODO: I don't think this ordering is necessary
+                // TODO: I don't think this ordering is necessary
                 var orderedTypes = (from contentType in contentTypes
                                    orderby contentType.ParentId descending, contentType.Id descending
                                    select contentType).ToList();
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="parentId">Optional parent Id for the content being imported</param>
         /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
         /// <param name="userId">Optional Id of the user performing the import</param>
-        /// <returns>An enumrable list of generated content</returns>
+        /// <returns>An enumerable list of generated content</returns>
         public IEnumerable<IContent> ImportContent(CompiledPackageDocument packageDocument, int parentId, IDictionary<string, IContentType> importedDocumentTypes, int userId)
         {
             var element = packageDocument.XmlData;
@@ -343,7 +343,7 @@ namespace Umbraco.Core.Packaging
         /// </summary>
         /// <param name="docTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <returns>An enumrable list of generated ContentTypes</returns>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
         public IEnumerable<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
         {
             return ImportDocumentTypes(docTypeElements.ToList(), true, userId);
@@ -355,12 +355,12 @@ namespace Umbraco.Core.Packaging
         /// <param name="unsortedDocumentTypes">Xml to import</param>
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <returns>An enumrable list of generated ContentTypes</returns>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
         public IEnumerable<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
         {
             var importedContentTypes = new Dictionary<string, IContentType>();
             
-            //When you are importing a single doc type we have to assume that the depedencies are already there.
+            //When you are importing a single doc type we have to assume that the dependencies are already there.
             //Otherwise something like uSync won't work.
             var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
             var isSingleDocTypeImport = unsortedDocumentTypes.Count == 1;
@@ -437,7 +437,7 @@ namespace Umbraco.Core.Packaging
             if (importStructure)
             {
                 var updatedContentTypes = new List<IContentType>();
-                //Update the structure here - we can't do it untill all DocTypes have been created
+                //Update the structure here - we can't do it until all DocTypes have been created
                 foreach (var documentType in documentTypes)
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
@@ -710,7 +710,7 @@ namespace Umbraco.Core.Packaging
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    //TODO: We should expose this to the UI during install!
+                    // TODO: We should expose this to the UI during install!
                     _logger.Warn<PackagingService>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
@@ -796,7 +796,7 @@ namespace Umbraco.Core.Packaging
         /// </summary>
         /// <param name="dataTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the user</param>
-        /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
+        /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
         public IEnumerable<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
         {
             var dataTypes = new List<IDataType>();
@@ -815,7 +815,7 @@ namespace Umbraco.Core.Packaging
                     parentId = importedFolders[dataTypeDefinitionName];
 
                 var definition = _dataTypeService.GetDataType(dataTypeDefinitionId);
-                //If the datatypedefinition doesn't already exist we create a new new according to the one in the package xml
+                //If the datatype definition doesn't already exist we create a new according to the one in the package xml
                 if (definition == null)
                 {
                     var databaseType = databaseTypeAttribute?.Value.EnumParse<ValueStorageType>(true) ?? ValueStorageType.Ntext;
@@ -1195,7 +1195,7 @@ namespace Umbraco.Core.Packaging
         /// </summary>
         /// <param name="templateElements">Xml to import</param>
         /// <param name="userId">Optional user id</param>
-        /// <returns>An enumrable list of generated Templates</returns>
+        /// <returns>An enumerable list of generated Templates</returns>
         public IEnumerable<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
         {
             var templates = new List<ITemplate>();

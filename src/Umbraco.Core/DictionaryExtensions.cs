@@ -10,7 +10,7 @@ using System.Web;
 namespace Umbraco.Core
 {
     ///<summary>
-    /// Extension methods for dictionary & concurrentdictionary
+    /// Extension methods for Dictionary & ConcurrentDictionary
     ///</summary>
     internal static class DictionaryExtensions
     {
@@ -72,7 +72,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// Taken from: http://stackoverflow.com/questions/12240219/is-there-a-way-to-use-concurrentdictionary-tryupdate-with-a-lambda-expression
         ///
-        /// WARNING: If the value changes after we've retreived it, then the item will not be updated
+        /// WARNING: If the value changes after we've retrieved it, then the item will not be updated
         /// </remarks>
         public static bool TryUpdateOptimisitic<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
         {

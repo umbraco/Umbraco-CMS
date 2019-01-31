@@ -43,7 +43,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
-    $scope.page.submitButtonLabel = "Save";
+    $scope.page.submitButtonLabelKey = "buttons_save";
     $scope.app = null;
 
     if (create) {
@@ -127,6 +127,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
             }
         }));
     }
+    $scope.page.submitButtonLabelKey = "buttons_save";
     
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
@@ -262,7 +263,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
         
         // setup infinite mode
         if(infiniteMode) {
-            $scope.page.submitButtonLabel = "Save and Close";
+            $scope.page.submitButtonLabelKey = "buttons_saveAndClose";
         }
     }
 

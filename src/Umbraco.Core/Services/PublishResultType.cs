@@ -5,7 +5,7 @@
     /// </summary>
     public enum PublishResultType : byte
     {
-        // all "ResultType" enums must be byte-based, and declare Failed = 128, and declare
+        // all "ResultType" enum's must be byte-based, and declare Failed = 128, and declare
         // every failure codes as >128 - see OperationResult and OperationResultType for details.
 
         #region Success - Publish
@@ -115,7 +115,7 @@
         /// <summary>
         /// The document could not be published because it has no publishing flags or values.
         /// </summary>
-        FailedPublishNothingToPublish = FailedPublish | 9, // in ContentService.StrategyCanPublish - todo weird
+        FailedPublishNothingToPublish = FailedPublish | 9, // TODO: in ContentService.StrategyCanPublish - weird
 
         /// <summary>
         /// The document could not be published because some mandatory cultures are missing.

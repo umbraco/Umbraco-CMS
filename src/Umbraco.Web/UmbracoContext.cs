@@ -41,7 +41,7 @@ namespace Umbraco.Web
         /// <param name="replace">A value indicating whether to replace the existing context.</param>
         ///  <returns>The "current" UmbracoContext.</returns>
         ///  <remarks>
-        ///  todo - this needs to be clarified
+        ///  TODO: this needs to be clarified
         ///
         ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
         ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
@@ -260,7 +260,7 @@ namespace Umbraco.Web
         /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
         /// since the UmbracoContext itself doesn't use this.
         ///
-        /// TODO The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
+        /// TODO: The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
         /// </remarks>
         internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
             => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));

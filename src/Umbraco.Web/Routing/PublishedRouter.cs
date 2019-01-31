@@ -5,7 +5,6 @@ using System.Threading;
 using System.Globalization;
 using System.IO;
 using System.Web.Security;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -14,12 +13,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
-using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-    // todo - making sense to have an interface?
+    // TODO: making sense to have an interface?
     public class PublishedRouter
     {
         private readonly IWebRoutingSection _webRoutingSection;
@@ -52,10 +51,9 @@ namespace Umbraco.Web.Routing
             GetRolesForLogin = s => Roles.Provider.GetRolesForUser(s);
         }
 
-        // todo
-        // in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
+        // TODO: in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
         // killing it entirely, if we need cache, just implement it properly !!
-        // this is all soooo weird
+        // this is all so weird
         public Func<string, IEnumerable<string>> GetRolesForLogin { get; }
 
         public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
@@ -207,10 +205,10 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the request
             // handlers like default.aspx will want it and most macros currently need it
-            frequest.UmbracoPage = new page(frequest);
+            frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest);
 
             // used by many legacy objects
-            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.UmbracoPage.Elements;
+            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.LegacyContentHashTable.Elements;
 
             return true;
         }
@@ -253,10 +251,10 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
-            request.UmbracoPage = new page(request);
+            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
 
             // this is used by many legacy objects
-            request.UmbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
+            request.UmbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
         }
 
         #endregion
@@ -365,29 +363,6 @@ namespace Umbraco.Web.Routing
         #endregion
 
         #region Rendering engine
-
-        /// <summary>
-        /// Finds the rendering engine to use to render a template specified by its alias.
-        /// </summary>
-        /// <param name="alias">The alias of the template.</param>
-        /// <returns>The rendering engine, or Unknown if the template was not found.</returns>
-        internal RenderingEngine FindTemplateRenderingEngine(string alias)
-        {
-            if (string.IsNullOrWhiteSpace(alias))
-                return RenderingEngine.Unknown;
-
-            alias = alias.Replace('\\', '/'); // forward slashes only
-
-            // NOTE: we could start with what's the current default?
-
-            // todo - bad - we probably should be using the appropriate filesystems!
-
-            if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
-                    alias, new[] { ".cshtml", ".vbhtml" }))
-                return RenderingEngine.Mvc;
-
-            return RenderingEngine.Unknown;
-        }
 
         internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
         {
@@ -691,7 +666,7 @@ namespace Umbraco.Web.Routing
             // read the alternate template alias, from querystring, form, cookie or server vars,
             // only if the published content is the initial once, else the alternate template
             // does not apply
-            // + optionnally, apply the alternate template on internal redirects
+            // + optionally, apply the alternate template on internal redirects
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate

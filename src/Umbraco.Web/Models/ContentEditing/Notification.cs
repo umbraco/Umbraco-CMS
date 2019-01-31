@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Web.UI;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -11,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         }
 
-        public Notification(string header, string message, SpeechBubbleIcon notificationType)
+        public Notification(string header, string message, NotificationStyle notificationType)
         {
             Header = header;
             Message = message;
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Message { get; set; }
 
         [DataMember(Name = "type")]
-        public SpeechBubbleIcon NotificationType { get; set; }
+        public NotificationStyle NotificationType { get; set; }
         
     }
 }

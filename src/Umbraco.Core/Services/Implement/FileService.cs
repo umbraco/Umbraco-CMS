@@ -140,6 +140,24 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public void CreateStyleSheetFolder(string folderPath)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                ((StylesheetRepository) _stylesheetRepository).AddFolder(folderPath);
+                scope.Complete();
+            }
+        }
+
+        public void DeleteStyleSheetFolder(string folderPath)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                ((StylesheetRepository) _stylesheetRepository).DeleteFolder(folderPath);
+                scope.Complete();
+            }
+        }
+
         public Stream GetStylesheetFileContentStream(string filepath)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -331,7 +349,7 @@ namespace Umbraco.Core.Services.Implement
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            //todo: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
+            // TODO: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
             // the event args here. The other option is to create a different event with different event
             // args specifically for this method... which also isn't pretty. So fix this in v8!
             var additionalData = new Dictionary<string, object>
@@ -372,16 +390,17 @@ namespace Umbraco.Core.Services.Implement
         /// Create a new template, setting the content if a view exists in the filesystem
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="alias"></param>
         /// <param name="content"></param>
         /// <param name="masterTemplate"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
+        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = 0)
         {
             // file might already be on disk, if so grab the content to avoid overwriting
-            var template = new Template(name, name)
+            var template = new Template(name, alias)
             {
-                Content = GetViewContent(name) ?? content
+                Content = GetViewContent(alias) ?? content
             };
             
             if (masterTemplate != null)
@@ -434,7 +453,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
-        /// <param name="id">The identifer of the template.</param>
+        /// <param name="id">The identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(int id)
         {
@@ -746,6 +765,12 @@ namespace Umbraco.Core.Services.Implement
                     //strip the @inherits if it's there
                     snippetContent = StripPartialViewHeader(snippetContent);
 
+                    //Update Model.Content. to be Model. when used as PartialView
+                    if(partialViewType == PartialViewType.PartialView)
+                    {
+                        snippetContent = snippetContent.Replace("Model.Content.", "Model.");
+                    }
+
                     partialViewContent = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";
                 }
             }
@@ -772,7 +797,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return Attempt<IPartialView>.Succeed(partialView);
-        }
+        }        
 
         public bool DeletePartialView(string path, int userId = 0)
         {
@@ -1009,6 +1034,12 @@ namespace Umbraco.Core.Services.Implement
                 //strip the @inherits if it's there
                 snippetContent = StripPartialViewHeader(snippetContent);
 
+                //Update Model.Content. to be Model. when used as PartialView
+                if (partialViewType == PartialViewType.PartialView)
+                {
+                    snippetContent = snippetContent.Replace("Model.Content.", "Model.");
+                }
+
                 var content = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";
                 return content;
             }
@@ -1021,7 +1052,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
         }
 
-        //TODO Method to change name and/or alias of view template
+        // TODO: Method to change name and/or alias of view template
 
         #region Event Handlers
 

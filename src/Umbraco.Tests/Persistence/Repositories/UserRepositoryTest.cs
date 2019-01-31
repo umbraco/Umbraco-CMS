@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger>());
             var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger>());
-            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
             return repository;
         }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(accessor, AppCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, templateRepository);
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
@@ -234,8 +234,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var updatedItem = repository.Get(user.Id);
 
-                // fixme
-                // this test cannot work, user has 2 sections but the way it's created,
+                // FIXME: this test cannot work, user has 2 sections but the way it's created,
                 // they don't show, so the comparison with updatedItem fails - fix!
 
                 // Assert

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;

@@ -298,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public int MemberGroupId { get; set; }
         }
 
-        // todo - understand why we need these two repository-level events, move them back to service
+        // TODO: understand why we need these two repository-level events, move them back to service
 
         /// <summary>
         /// Occurs before Save

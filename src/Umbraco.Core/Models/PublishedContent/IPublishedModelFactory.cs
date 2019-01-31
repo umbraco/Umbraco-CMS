@@ -24,10 +24,10 @@ namespace Umbraco.Core.Models.PublishedContent
         IList CreateModelList(string alias);
 
         /// <summary>
-        /// Maps a Clr type that may contain model types, to an actual Clr type.
+        /// Maps a CLR type that may contain model types, to an actual CLR type.
         /// </summary>
-        /// <param name="type">The Clr type.</param>
-        /// <returns>The actual Clr type.</returns>
+        /// <param name="type">The CLR type.</param>
+        /// <returns>The actual CLR type.</returns>
         /// <remarks>See <seealso cref="ModelType"/> for more details.</remarks>
         Type MapModelType(Type type);
     }

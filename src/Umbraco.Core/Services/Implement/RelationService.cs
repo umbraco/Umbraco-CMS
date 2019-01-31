@@ -381,7 +381,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The created <see cref="Relation"/></returns>
         public IRelation Relate(int parentId, int childId, IRelationType relationType)
         {
-            // Ensure that the RelationType has an indentity before using it to relate two entities
+            // Ensure that the RelationType has an identity before using it to relate two entities
             if (relationType.HasIdentity == false)
                 Save(relationType);
 
@@ -393,7 +393,7 @@ namespace Umbraco.Core.Services.Implement
                 if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return relation; // todo - returning sth that does not exist here?!
+                    return relation; // TODO: returning sth that does not exist here?!
                 }
 
                 _relationRepository.Save(relation);

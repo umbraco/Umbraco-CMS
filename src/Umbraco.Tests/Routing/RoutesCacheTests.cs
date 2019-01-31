@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Routing
 {
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Routing
             var cache = umbracoContext.PublishedSnapshot.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
-            // fixme not sure?
+            // FIXME: not sure?
             //PublishedContentCache.UnitTesting = false; // else does not write to routes cache
             //Assert.IsFalse(PublishedContentCache.UnitTesting);
 

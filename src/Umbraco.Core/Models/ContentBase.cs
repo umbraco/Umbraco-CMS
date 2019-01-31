@@ -128,14 +128,14 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets the enumeration of property groups for the entity.
-        /// todo - remove this proxy method
+        /// TODO: remove this proxy method
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
 
         /// <summary>
         /// Gets the numeration of property types for the entity.
-        /// todo - remove this proxy method
+        /// TODO: remove this proxy method
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
@@ -391,7 +391,7 @@ namespace Umbraco.Core.Models
         #region Dirty
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
@@ -408,14 +408,14 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override bool IsDirty()
         {
             return IsEntityDirty() || this.IsAnyUserPropertyDirty();
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override bool WasDirty()
         {
             return WasEntityDirty() || this.WasAnyUserPropertyDirty();
@@ -438,7 +438,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override bool IsPropertyDirty(string propertyName)
         {
             if (base.IsPropertyDirty(propertyName))
@@ -448,7 +448,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override bool WasPropertyDirty(string propertyName)
         {
             if (base.WasPropertyDirty(propertyName))
@@ -458,7 +458,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override IEnumerable<string> GetDirtyProperties()
         {
             var instanceProperties = base.GetDirtyProperties();
@@ -467,7 +467,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        /// <remarks>Overriden to include user properties.</remarks>
+        /// <remarks>Overridden to include user properties.</remarks>
         public override IEnumerable<string> GetWereDirtyProperties()
         {
             var instanceProperties = base.GetWereDirtyProperties();
@@ -479,7 +479,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         /// <remarks>
-        /// Overriden to deal with specific object instances
+        /// Overridden to deal with specific object instances
         /// </remarks>
         protected override void PerformDeepClone(object clone)
         {

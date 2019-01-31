@@ -17,8 +17,8 @@ namespace Umbraco.Web.Trees
         // dictionary items in templates, even when we dont have authorization to manage the dictionary items
         )]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
-    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null)]
+    [CoreTree]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Trees
         /// All of the query string parameters passed from jsTree
         /// </param>
         /// <remarks>
-        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

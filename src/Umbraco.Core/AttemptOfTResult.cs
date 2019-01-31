@@ -121,7 +121,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Implicity operator to check if the attempt was successful without having to access the 'success' property
+        /// Implicitly operator to check if the attempt was successful without having to access the 'success' property
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>

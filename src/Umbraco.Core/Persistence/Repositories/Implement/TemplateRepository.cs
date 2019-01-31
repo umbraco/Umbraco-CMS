@@ -407,13 +407,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
             }
 
-            // TODO
-            //  see if this could enable us to update UpdateDate without messing with change tracking
-            //  and then we'd want to do it for scripts, stylesheets and partial views too (ie files)
-            //var xtemplate = template as Template;
-            //xtemplate.DisableChangeTracking();
-            //template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
-            //xtemplate.EnableChangeTracking();
+            // TODO: see if this could enable us to update UpdateDate without messing with change tracking
+            // and then we'd want to do it for scripts, stylesheets and partial views too (ie files)
+            // var xtemplate = template as Template;
+            // xtemplate.DisableChangeTracking();
+            // template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
+            // xtemplate.EnableChangeTracking();
 
             template.VirtualPath = fs.GetUrl(filename);
 
@@ -480,7 +479,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<ITemplate> GetAll(params string[] aliases)
         {
             //We must call the base (normal) GetAll method
-            // which is cached. This is a specialized method and unfortunatley with the params[] it
+            // which is cached. This is a specialized method and unfortunately with the params[] it
             // overlaps with the normal GetAll method.
             if (aliases.Any() == false) return base.GetMany();
 
@@ -580,9 +579,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public bool ValidateTemplate(ITemplate template)
         {
             // get path
-            // TODO
-            //  templates should have a real Path somehow - but anyways
-            //  are we using Path for something else?!
+            // TODO: templates should have a real Path somehow - but anyways
+            // are we using Path for something else?!
             var path = template.VirtualPath;
 
             // get valid paths
@@ -652,7 +650,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private string EnsureUniqueAlias(ITemplate template, int attempts)
         {
-            //TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
+            // TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
             if (AliasAlreadExists(template))
                 return template.Alias + attempts;
             attempts++;

@@ -17,16 +17,15 @@
             <div class="umb-dashboard__content">
 
                 <umb-tab-content ng-repeat="tab in dashboard.tabs" ng-if="tab.active" tab="tab" class="row-fluid">
-    
+
                     <div ng-repeat="property in tab.properties">
-    
+
                         <div class="clearfix">
-                            <h3 ng-show="property.caption">{{property.caption}}</h3>
-                            <div ng-include="property.path"></div>
+                            <div ng-include="property.view"></div>
                         </div>
-    
+
                     </div>
-                    
+
                 </umb-tab-content>
 
             </div>
@@ -34,5 +33,5 @@
         </div>
 
     </form>
-    
+
 </div>

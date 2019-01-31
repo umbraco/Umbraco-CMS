@@ -132,7 +132,7 @@ namespace Umbraco.Core.IO
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
 
-            // todo - do we need a lock here?
+            // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
             _shadowWrappers.Add(_partialViewsFileSystem);
             _shadowWrappers.Add(_stylesheetsFileSystem);

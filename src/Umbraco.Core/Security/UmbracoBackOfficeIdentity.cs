@@ -113,7 +113,7 @@ namespace Umbraco.Core.Security
         /// Returns the required claim types for a back office identity
         /// </summary>
         /// <remarks>
-        /// This does not incude the role claim type or allowed apps type since that is a collection and in theory could be empty
+        /// This does not include the role claim type or allowed apps type since that is a collection and in theory could be empty
         /// </remarks>
         public static IEnumerable<string> RequiredBackOfficeIdentityClaimTypes => new[]
         {

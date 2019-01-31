@@ -83,7 +83,7 @@ namespace Umbraco.Core.Cache
             }
             return entries
                 .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
-                .Where(x => x != null); // backward compat, don't store null values in the cache
+                .Where(x => x != null); // backward compatible, don't store null values in the cache
         }
 
         /// <inheritdoc />

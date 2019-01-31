@@ -19,10 +19,11 @@
 
             <umb-editor-container class="form-horizontal">
 
-                <p><localize key="member_memberGroupNoProperties">Member groups have no additional properties for editing.</localize></p>
+                <umb-membergroup-node-info ng-if="content"
+                                           node="content">
+                </umb-membergroup-node-info>
 
             </umb-editor-container>
-            
 
             <umb-editor-footer>
 

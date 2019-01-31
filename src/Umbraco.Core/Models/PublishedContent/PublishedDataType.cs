@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public int Id { get; }
 
         /// <summary>
-        /// Gets the dat type editor alias.
+        /// Gets the data type editor alias.
         /// </summary>
         public string EditorAlias { get; }
 

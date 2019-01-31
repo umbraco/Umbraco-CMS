@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, templateRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, cacheHelper, Logger);
-            var repository = new DocumentRepository(scopeAccessor, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(scopeAccessor, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, containerEntityType);
         }
 
-        //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
+        // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
         
         [Test]
         public void Maps_Templates_Correctly()

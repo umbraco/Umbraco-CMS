@@ -287,7 +287,7 @@ namespace Umbraco.Core.Models
         /// Converts a value assigned to a property.
         /// </summary>
         /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual Clr type
+        /// <para>The input value can be pretty much anything, and is converted to the actual CLR type
         /// expected by the property (eg an integer if the property values are integers).</para>
         /// <para>Throws if the value cannot be converted.</para>
         /// </remarks>
@@ -345,7 +345,7 @@ namespace Umbraco.Core.Models
                     var convDecimal = value.TryConvertTo<decimal>();
                     if (convDecimal)
                     {
-                        // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                        // need to normalize the value (change the scaling factor and remove trailing zeros)
                         // because the underlying database is going to mess with the scaling factor anyways.
                         converted = convDecimal.Result.Normalize();
                         return true;
@@ -378,14 +378,14 @@ namespace Umbraco.Core.Models
         }
 
 
-        //todo - this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
+        // TODO: this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
         internal bool IsPropertyValueValid(object value)
         {
-            var editor = Current.PropertyEditors[_propertyEditorAlias]; // todo inject
-            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // todo inject
+            var editor = Current.PropertyEditors[_propertyEditorAlias]; // TODO: inject
+            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // TODO: inject
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, Mandatory, ValidationRegExp).Any();
         }

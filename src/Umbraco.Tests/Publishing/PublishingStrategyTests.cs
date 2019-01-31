@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Publishing
         [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {
-            //TODO Create new test
+            // TODO: Create new test
         }
 
         public IEnumerable<IContent> CreateTestData()

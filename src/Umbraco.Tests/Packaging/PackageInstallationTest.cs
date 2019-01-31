@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Packaging
             Assert.AreEqual(1, preInstallWarnings.FilesReplaced.Count());
             Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", preInstallWarnings.FilesReplaced.First());
 
-            //TODO: More Asserts
+            // TODO: More Asserts
         }
 
         [Test]

@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Overlays.YsodController", function ($scope, legacyResource, treeService, navigationService, localizationService) {
+    .controller("Umbraco.Overlays.YsodController", function ($scope, localizationService) {
 
         function onInit() {
 

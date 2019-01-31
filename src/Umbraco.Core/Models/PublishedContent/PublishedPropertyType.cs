@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// if the property type changes, then a new class needs to be created.</remarks>
     public class PublishedPropertyType
     {
-        //todo - API design review, should this be an interface?
+        // TODO: API design review, should this be an interface?
 
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;
@@ -283,11 +283,11 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
-        /// Gets the property model Clr type.
+        /// Gets the property model CLR type.
         /// </summary>
         /// <remarks>
-        /// <para>The model Clr type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
-        /// <para>For the actual Clr type, see <see cref="ClrType"/>.</para>
+        /// <para>The model CLR type may be a <see cref="ModelType"/> type, or may contain <see cref="ModelType"/> types.</para>
+        /// <para>For the actual CLR type, see <see cref="ClrType"/>.</para>
         /// </remarks>
         public Type ModelClrType
         {
@@ -299,12 +299,12 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
-        /// Gets the property Clr type.
+        /// Gets the property CLR type.
         /// </summary>
         /// <remarks>
-        /// <para>Returns the actual Clr type which does not contain <see cref="ModelType"/> types.</para>
+        /// <para>Returns the actual CLR type which does not contain <see cref="ModelType"/> types.</para>
         /// <para>Mapping from <see cref="ModelClrType"/> may throw if some <see cref="ModelType"/> instances
-        /// could not be mapped to actual Clr types.</para>
+        /// could not be mapped to actual CLR types.</para>
         /// </remarks>
         public Type ClrType
         {

@@ -2,17 +2,15 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
-using umbraco;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Templates
@@ -21,7 +19,7 @@ namespace Umbraco.Web.Templates
     /// This is used purely for the RenderTemplate functionality in Umbraco
     /// </summary>
     /// <remarks>
-    /// This allows you to render either an MVC or Webforms template based purely off of a node id and an optional alttemplate id as string output.
+    /// This allows you to render an MVC template based purely off of a node id and an optional alttemplate id as string output.
     /// </remarks>
     internal class TemplateRenderer
     {
@@ -37,8 +35,8 @@ namespace Umbraco.Web.Templates
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
         }
 
-        private IFileService FileService => Current.Services.FileService; // todo inject
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>(); // todo inject
+        private IFileService FileService => Current.Services.FileService; // TODO: inject
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>(); // TODO: inject
 
 
         /// <summary>
@@ -136,36 +134,22 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            switch (request.RenderingEngine)
+            var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
             {
-                case RenderingEngine.Mvc:
-                    var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
-                    {
-                        Route = RouteTable.Routes["Umbraco_default"]
-                    });
-                    var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
-                    var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
-                    var renderModel = new ContentModel(request.PublishedContent);
-                    //manually add the action/controller, this is required by mvc
-                    requestContext.RouteData.Values.Add("action", routeDef.ActionName);
-                    requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
-                    //add the rest of the required route data
-                    routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
+                Route = RouteTable.Routes["Umbraco_default"]
+            });
+            var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
+            var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
+            var renderModel = new ContentModel(request.PublishedContent);
+            //manually add the action/controller, this is required by mvc
+            requestContext.RouteData.Values.Add("action", routeDef.ActionName);
+            requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
+            //add the rest of the required route data
+            routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
 
-                    var stringOutput = RenderUmbracoRequestToString(requestContext);
+            var stringOutput = RenderUmbracoRequestToString(requestContext);
 
-                    sw.Write(stringOutput);
-                    break;
-                case RenderingEngine.WebForms:
-                default:
-                    var webFormshandler = (UmbracoDefault) BuildManager
-                        .CreateInstanceFromVirtualPath("~/default.aspx", typeof(UmbracoDefault));
-                    //the 'true' parameter will ensure that the current query strings are carried through, we don't have
-                    // to build up the url again, it will just work.
-                    _umbracoContext.HttpContext.Server.Execute(webFormshandler, sw, true);
-                    break;
-            }
-
+            sw.Write(stringOutput);
         }
 
         /// <summary>
@@ -177,7 +161,7 @@ namespace Umbraco.Web.Templates
         /// <returns></returns>
         /// <remarks>
         /// To achieve this we temporarily change the output text writer of the current HttpResponse, then
-        ///   execute the controller via the handler which innevitably writes the result to the text writer
+        ///   execute the controller via the handler which inevitably writes the result to the text writer
         ///   that has been assigned to the response. Then we change the response textwriter back to the original
         ///   before continuing .
         /// </remarks>
@@ -198,9 +182,9 @@ namespace Umbraco.Web.Templates
         private void SetNewItemsOnContextObjects(PublishedRequest request)
         {
             // handlers like default.aspx will want it and most macros currently need it
-            request.UmbracoPage = new page(request);
+            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
             //now, set the new ones for this page execution
-            _umbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
+            _umbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
             _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContext.PublishedRequest = request;
         }

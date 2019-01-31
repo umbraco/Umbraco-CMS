@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
-                // todo - this is bad
+                // TODO: this is bad
                 // because the membership provider we're trying to get has a dependency on the user service
                 // and we should not depend on services in repositories - need a way better way to do this
 
@@ -169,7 +169,7 @@ ORDER BY colName";
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            // TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
             //and also business logic models for these objects but that's just so overkill for what we are doing
             //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
             var now = DateTime.UtcNow;
@@ -238,7 +238,7 @@ ORDER BY colName";
 
         public void ClearLoginSession(Guid sessionId)
         {
-            // todo why is that one updating and not deleting?
+            // TODO: why is that one updating and not deleting?
             Database.Execute(Sql()
                 .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
@@ -443,7 +443,7 @@ ORDER BY colName";
             var userDto = UserFactory.BuildDto(entity);
 
             // check if we have a known config, we only want to store config for hashing
-            //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+            // TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
             if (PasswordConfigJson != null)
                 userDto.PasswordConfig = PasswordConfigJson;
 
@@ -538,7 +538,7 @@ ORDER BY colName";
                 }
 
                 // check if we have a known config, we only want to store config for hashing
-                //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
+                // TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
                 if (PasswordConfigJson != null)
                 {
                     userDto.PasswordConfig = PasswordConfigJson;
@@ -573,7 +573,7 @@ ORDER BY colName";
                     : Database.Fetch<UserGroupDto>("SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)", new { aliases = entity.Groups.Select(x => x.Alias) });
 
                 //first delete all
-                //TODO: We could do this a nicer way instead of "Nuke and Pave"
+                // TODO: We could do this a nicer way instead of "Nuke and Pave"
                 Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
 
                 foreach (var groupDto in assigned)
@@ -690,7 +690,7 @@ ORDER BY colName";
         /// <param name="excludeUserGroups">
         /// A filter to only include users that do not belong to these user groups
         /// </param>
-        /// <param name="userState">Optional parameter to filter by specfied user state</param>
+        /// <param name="userState">Optional parameter to filter by specified user state</param>
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <remarks>

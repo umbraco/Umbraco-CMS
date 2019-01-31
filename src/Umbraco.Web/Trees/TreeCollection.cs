@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Trees
 {
+    /// <summary>
+    /// Represents the collection of section trees.
+    /// </summary>
     public class TreeCollection : BuilderCollectionBase<Tree>
     {
         public TreeCollection(IEnumerable<Tree> items)

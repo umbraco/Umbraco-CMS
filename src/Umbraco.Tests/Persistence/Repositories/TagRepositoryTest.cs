@@ -454,7 +454,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     contentType.PropertyTypes.First().Id,
                     tags, false);
 
-                //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
+                // TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
                 //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
                 var all = repository.GetMany().ToArray();
 
@@ -957,7 +957,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, templateRepository);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
@@ -966,7 +966,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger);
-            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
             return repository;
         }
     }

@@ -216,7 +216,7 @@ namespace Umbraco.Web.Security
                 membershipUser = ((UmbracoMembershipProviderBase)provider).CreateUser(
                     model.MemberTypeAlias,
                     model.Username, model.Password, model.Email,
-                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
                     null, null,
                     true, null, out status);
 
@@ -239,7 +239,7 @@ namespace Umbraco.Web.Security
             else
             {
                 membershipUser = provider.CreateUser(model.Username, model.Password, model.Email,
-                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
                     null, null,
                     true, null, out status);
 
@@ -326,7 +326,7 @@ namespace Umbraco.Web.Security
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Member:
-                    // todo - need to implement Get(guid)!
+                    // TODO: need to implement Get(guid)!
                     var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return GetById(memberAttempt.Result);
@@ -422,7 +422,7 @@ namespace Umbraco.Web.Security
             }
 
             //we can try to look up an associated member by the provider user key
-            //TODO: Support this at some point!
+            // TODO: Support this at some point!
             throw new NotSupportedException("Currently a member profile cannot be edited unless using the built-in Umbraco membership providers");
         }
 
@@ -480,13 +480,13 @@ namespace Umbraco.Web.Security
                     Value = value
                 };
 
-                //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers
+                // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers
                 // can just render their own.
 
                 ////This is a rudimentary check to see what data template we should render
                 //// if developers want to change the template they can do so dynamically in their views or controllers
                 //// for a given property.
-                ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “Html”, “Object”, “String”, “Text”, and “Url”
+                ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “HTML”, “Object”, “String”, “Text”, and “Url”
                 //// by default we'll render a text box since we've defined that metadata on the UmbracoProperty.Value property directly.
                 //if (prop.DataTypeId == new Guid(Constants.PropertyEditors.TrueFalse))
                 //{
@@ -706,7 +706,7 @@ namespace Umbraco.Web.Security
         /// <param name="lastActivityDate"></param>
         /// <param name="comment"></param>
         /// <returns>
-        /// Returns successful if the membershipuser required updating, otherwise returns failed if it didn't require updating.
+        /// Returns successful if the membership user required updating, otherwise returns failed if it didn't require updating.
         /// </returns>
         internal Attempt<MembershipUser> UpdateMember(MembershipUser member, MembershipProvider provider,
             string email = null,
@@ -763,7 +763,7 @@ namespace Umbraco.Web.Security
 
                     if (provider.IsUmbracoMembershipProvider() == false)
                     {
-                        throw new NotSupportedException("An IMember model can only be retreived when using the built-in Umbraco membership providers");
+                        throw new NotSupportedException("An IMember model can only be retrieved when using the built-in Umbraco membership providers");
                     }
                     var username = provider.GetCurrentUserName();
                     var member = _memberService.GetByUsername(username);

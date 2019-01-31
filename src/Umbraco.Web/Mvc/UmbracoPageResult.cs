@@ -1,12 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -30,32 +27,21 @@ namespace Umbraco.Web.Mvc
 
             var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
 
-            //Special case, if it is webforms but we're posting to an MVC surface controller, then we
-            // need to return the webforms result instead
-            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.WebForms)
+            var factory = ControllerBuilder.Current.GetControllerFactory();
+            context.RouteData.Values["action"] = routeDef.ActionName;
+            ControllerBase controller = null;
+
+            try
             {
-                EnsureViewContextForWebForms(context);
-                var webFormsHandler = RenderRouteHandler.GetWebFormsHandler();
-                webFormsHandler.ProcessRequest(HttpContext.Current);
+                controller = CreateController(context, factory, routeDef);
+
+                CopyControllerData(context, controller);
+
+                ExecuteControllerAction(context, controller);
             }
-            else
+            finally
             {
-                var factory = ControllerBuilder.Current.GetControllerFactory();
-                context.RouteData.Values["action"] = routeDef.ActionName;
-                ControllerBase controller = null;
-
-                try
-                {
-                    controller = CreateController(context, factory, routeDef);
-
-                    CopyControllerData(context, controller);
-
-                    ExecuteControllerAction(context, controller);
-                }
-                finally
-                {
-                    CleanupController(controller, factory);
-                }
+                CleanupController(controller, factory);
             }
         }
 
@@ -90,27 +76,6 @@ namespace Umbraco.Web.Mvc
                 throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
                                                     " in the context of an Http POST when using a SurfaceController form");
             }
-        }
-
-        /// <summary>
-        /// When POSTing to MVC but rendering in WebForms we need to do some trickery, we'll create a dummy viewcontext with all of the
-        /// current modelstate, tempdata, viewdata so that if we're rendering partial view macros within the webforms view, they will
-        /// get all of this merged into them.
-        /// </summary>
-        /// <param name="context"></param>
-        private static void EnsureViewContextForWebForms(ControllerContext context)
-        {
-            var tempDataDictionary = new TempDataDictionary();
-            tempDataDictionary.Save(context, new SessionStateTempDataProvider());
-            var viewCtx = new ViewContext(context, new DummyView(), new ViewDataDictionary(), tempDataDictionary, new StringWriter());
-
-            viewCtx.ViewData.ModelState.Merge(new ModelStateDictionary(context.Controller.ViewData.ModelState));
-
-            foreach (var d in context.Controller.ViewData)
-                viewCtx.ViewData[d.Key] = d.Value;
-
-            //now we need to add it to the special route tokens so it's picked up later
-            context.HttpContext.Request.RequestContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext] = viewCtx;
         }
 
         /// <summary>

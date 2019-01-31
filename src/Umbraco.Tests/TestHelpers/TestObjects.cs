@@ -236,9 +236,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (databaseFactory == null)
             {
-                //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
-                //mappersBuilder.AddCore();
-                //var mappers = mappersBuilder.CreateCollection();
+                // var mappersBuilder = new MapperCollectionBuilder(Current.Container); // FIXME:
+                // mappersBuilder.AddCore();
+                // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
@@ -87,7 +88,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
+            // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
             // so based on compat and how things are currently working we need to replace the serverVarsJs one
             ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
 
@@ -105,7 +106,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoUrls", new Dictionary<string, object>
                     {
-                        //TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
+                        // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
                         // having each url defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
@@ -114,7 +115,7 @@ namespace Umbraco.Web.Editors
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
                         {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
-                        //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
+                        // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                         {"serverVarsJs", _urlHelper.Action("Application", "BackOffice")},
                         //API URLs
                         {
@@ -158,7 +159,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null))
+                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
                         },
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -183,11 +184,7 @@ namespace Umbraco.Web.Editors
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
-                        },
-                        {
-                            "legacyApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LegacyController>(
-                                controller => controller.DeleteLegacyItem(null, null, null))
-                        },
+                        },                        
                         {
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
@@ -269,10 +266,6 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetIndexerDetails())
                         },
                         {
-                            "xmlDataIntegrityBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
-                                controller => controller.CheckContentXmlTable())
-                        },
-                        {
                             "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
                                 controller => controller.GetAllHealthChecks())
                         },
@@ -302,7 +295,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedMomentLocales())
+                                controller => controller.GetSupportedLocales())
                         },
                         {
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
@@ -352,7 +345,10 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoPlugins", new Dictionary<string, object>
                     {
-                        {"trees", GetTreePluginsMetaData()}
+                        // for each tree that is [PluginController], get
+                        // alias -> areaName
+                        // so that routing (route.js) can look for views
+                        { "trees", GetPluginTrees().ToArray() }
                     }
                 },
                 {
@@ -370,7 +366,7 @@ namespace Umbraco.Web.Editors
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,
-                                    //TODO: Need to see if this exposes any sensitive data!
+                                    // TODO: Need to see if this exposes any sensitive data!
                                     properties = p.Properties
                                 })
                                 .ToArray()
@@ -393,43 +389,42 @@ namespace Umbraco.Web.Editors
             return defaultVals;
         }
 
-        private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
+        [DataContract]
+        private class PluginTree
         {
-            var treeTypes = TreeControllerTypes.Value;
-            //get all plugin trees with their attributes
-            var treesWithAttributes = treeTypes.Select(x => new
-            {
-                tree = x,
-                attributes =
-                x.GetCustomAttributes(false)
-            }).ToArray();
+            [DataMember(Name = "alias")]
+            public string Alias { get; set; }
 
-            var pluginTreesWithAttributes = treesWithAttributes
-                //don't resolve any tree decorated with CoreTreeAttribute
-                .Where(x => x.attributes.All(a => (a is CoreTreeAttribute) == false))
-                //we only care about trees with the PluginControllerAttribute
-                .Where(x => x.attributes.Any(a => a is PluginControllerAttribute))
-                .ToArray();
-
-            return (from p in pluginTreesWithAttributes
-                    let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
-                    let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
-                    select new Dictionary<string, string>
-                {
-                    {"alias", treeAttr.TreeAlias}, {"packageFolder", pluginAttr.AreaName}
-                }).ToArray();
-
+            [DataMember(Name = "packageFolder")]
+            public string PackageFolder { get; set; }
         }
 
-        /// <summary>
-        /// A lazy reference to all tree controller types
-        /// </summary>
-        /// <remarks>
-        /// We are doing this because if we constantly resolve the tree controller types from the PluginManager it will re-scan and also re-log that
-        /// it's resolving which is unecessary and annoying.
-        /// </remarks>
-        private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes
-            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // todo inject
+        private IEnumerable<PluginTree> GetPluginTrees()
+        {
+            // used to be (cached)
+            //var treeTypes = Current.TypeLoader.GetAttributedTreeControllers();
+            //
+            // ie inheriting from TreeController and marked with TreeAttribute
+            //
+            // do this instead
+            // inheriting from TreeControllerBase and marked with TreeAttribute
+            var trees = Current.Factory.GetInstance<TreeCollection>();
+
+            foreach (var tree in trees)
+            {
+                var treeType = tree.TreeControllerType;
+
+                // exclude anything marked with CoreTreeAttribute
+                var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
+                if (coreTree != null) continue;
+
+                // exclude anything not marked with PluginControllerAttribute
+                var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
+                if (pluginController == null) continue;
+
+                yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
+            }
+        }
 
         /// <summary>
         /// Returns the server variables regarding the application state

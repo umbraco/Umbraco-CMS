@@ -12,7 +12,7 @@ function treeResource($q, $http, umbRequestHelper) {
         }
         return node.childNodesUrl;
     }
-        
+
     /** internal method to get the tree menu url */
     function getTreeMenuUrl(node) {
         if (!node.menuUrl) {
@@ -23,7 +23,7 @@ function treeResource($q, $http, umbRequestHelper) {
 
     //the factory object returned
     return {
-        
+
         /** Loads in the data to display the nodes menu */
         loadMenu: function (node) {
             var treeMenuUrl = getTreeMenuUrl(node);
@@ -53,12 +53,9 @@ function treeResource($q, $http, umbRequestHelper) {
             }
 
             //create the query string for the tree request, these are the mandatory options:
-            var query = "application=" + options.section + "&tree=" + options.tree + "&isDialog=" + options.isDialog;
-
-            //if you need to load a not initialized tree set this value to false - default is true
-            if (options.onlyinitialized) {
-                query += "&onlyInitialized=" + options.onlyinitialized;
-            }
+            var query = "application=" + options.section
+                        + "&tree=" + options.tree
+                        + "&use=" + (options.isDialog ? "dialog" : "main");
 
             //the options can contain extra query string parameters
             if (options.queryString) {
@@ -73,7 +70,7 @@ function treeResource($q, $http, umbRequestHelper) {
                             query)),
                 'Failed to retrieve data for application tree ' + options.section);
         },
-        
+
         /** Loads in the data to display the child nodes for a given node */
         loadNodes: function (options) {
 

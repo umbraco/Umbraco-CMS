@@ -140,7 +140,7 @@ namespace Umbraco.Web
                 return htmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
             }
 
-            //if there's a prefix applied, we need to create a new html helper with a filtered ModelState collection so that it only looks for
+            //if there's a prefix applied, we need to create a new HTML helper with a filtered ModelState collection so that it only looks for
             //specific model state with the prefix.
             var filteredHtmlHelper = new HtmlHelper(htmlHelper.ViewContext, htmlHelper.ViewDataContainer.FilterContainer(prefix));
             return filteredHtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
@@ -736,7 +736,7 @@ namespace Umbraco.Web
                                           object additionalRouteVals = null)
         {
 
-            //ensure that the multipart/form-data is added to the html attributes
+            //ensure that the multipart/form-data is added to the HTML attributes
             if (htmlAttributes.ContainsKey("enctype") == false)
             {
                 htmlAttributes.Add("enctype", "multipart/form-data");
@@ -829,40 +829,6 @@ namespace Umbraco.Web
             return item;
         }
 
-        #endregion
-
-
-        #region RelatedLink
-
-        /// <summary>
-        /// Renders an anchor element for a RelatedLink instance.
-        /// Format: &lt;a href=&quot;relatedLink.Link&quot; target=&quot;_blank/_self&quot;&gt;relatedLink.Caption&lt;/a&gt;
-        /// </summary>
-        /// <param name="htmlHelper">The HTML helper instance that this method extends.</param>
-        /// <param name="relatedLink">The RelatedLink instance</param>
-        /// <returns>An anchor element </returns>
-        public static MvcHtmlString GetRelatedLinkHtml(this HtmlHelper htmlHelper, RelatedLink relatedLink)
-        {
-            return htmlHelper.GetRelatedLinkHtml(relatedLink, null);
-        }
-
-        /// <summary>
-        /// Renders an anchor element for a RelatedLink instance, accepting htmlAttributes.
-        /// Format: &lt;a href=&quot;relatedLink.Link&quot; target=&quot;_blank/_self&quot; htmlAttributes&gt;relatedLink.Caption&lt;/a&gt;
-        /// </summary>
-        /// <param name="htmlHelper">The HTML helper instance that this method extends.</param>
-        /// <param name="relatedLink">The RelatedLink instance</param>
-        /// <param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
-        /// <returns></returns>
-        public static MvcHtmlString GetRelatedLinkHtml(this HtmlHelper htmlHelper, RelatedLink relatedLink, object htmlAttributes)
-        {
-            var tagBuilder = new TagBuilder("a");
-            tagBuilder.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
-            tagBuilder.MergeAttribute("href", relatedLink.Link);
-            tagBuilder.MergeAttribute("target", relatedLink.NewWindow ? "_blank" : "_self");
-            tagBuilder.InnerHtml = HttpUtility.HtmlEncode(relatedLink.Caption);
-            return MvcHtmlString.Create(tagBuilder.ToString(TagRenderMode.Normal));
-        }
         #endregion
     }
 }

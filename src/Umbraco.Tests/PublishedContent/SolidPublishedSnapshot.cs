@@ -192,6 +192,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft(string culture = null) => false;
+        public bool IsPublished(string culture = null) => true;
 
         #endregion
 

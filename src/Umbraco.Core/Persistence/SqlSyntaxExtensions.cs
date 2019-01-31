@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence
     {
         private static string GetTableName(this Type type)
         {
-            // todo: returning string.Empty for now
+            // TODO: returning string.Empty for now
             // BUT the code bits that calls this method cannot deal with string.Empty so we
             // should either throw, or fix these code bits...
             var attr = type.FirstAttribute<TableNameAttribute>();

@@ -29,7 +29,7 @@
         /// Gets the source value of the property.
         /// </summary>
         /// <remarks>
-        /// <para>The source value is whatever was passed to the property when it was instanciated, and it is
+        /// <para>The source value is whatever was passed to the property when it was instantiated, and it is
         /// somewhat implementation-dependent -- depending on how the IPublishedCache is implemented.</para>
         /// <para>The XmlPublishedCache source values are strings exclusively since they come from the Xml cache.</para>
         /// <para>For other caches that get their source value from the database, it would be either a string,

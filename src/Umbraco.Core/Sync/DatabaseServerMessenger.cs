@@ -153,7 +153,7 @@ namespace Umbraco.Core.Sync
             ReadLastSynced(); // get _lastId
             using (var scope = ScopeProvider.CreateScope())
             {
-                EnsureInstructions(scope.Database); // reset _lastId if instrs are missing
+                EnsureInstructions(scope.Database); // reset _lastId if instructions are missing
                 Initialize(scope.Database); // boot
 
                 scope.Complete();
@@ -302,7 +302,7 @@ namespace Umbraco.Core.Sync
             // (depending on what the cache refreshers are doing). I think it's best we do the one time check, process them and continue, if there are
             // pending requests after being processed, they'll just be processed on the next poll.
             //
-            // todo not true if we're running on a background thread, assuming we can?
+            // TODO: not true if we're running on a background thread, assuming we can?
 
             var sql = Sql().SelectAll()
                 .From<CacheInstructionDto>()
@@ -326,7 +326,7 @@ namespace Umbraco.Core.Sync
             var processed = new HashSet<RefreshInstruction>();
 
             //It would have been nice to do this in a Query instead of Fetch using a data reader to save
-            // some memory however we cannot do thta because inside of this loop the cache refreshers are also
+            // some memory however we cannot do that because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open
             foreach (var dto in database.Fetch<CacheInstructionDto>(topSql))
             {
@@ -405,7 +405,7 @@ namespace Umbraco.Core.Sync
             }
             //catch (ThreadAbortException ex)
             //{
-            //    //This will occur if the instructions processing is taking too long since this is occuring on a request thread.
+            //    //This will occur if the instructions processing is taking too long since this is occurring on a request thread.
             //    // Or possibly if IIS terminates the appdomain. In any case, we should deal with this differently perhaps...
             //}
             catch (Exception ex)
@@ -624,7 +624,7 @@ namespace Umbraco.Core.Sync
         /// <param name="instructions"></param>
         /// <param name="processed"></param>
         /// <returns>
-        /// Returns true if all instructions were processed, otherwise false if the processing was interupted (i.e. app shutdown)
+        /// Returns true if all instructions were processed, otherwise false if the processing was interrupted (i.e. app shutdown)
         /// </returns>
         private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions, HashSet<RefreshInstruction> processed)
         {

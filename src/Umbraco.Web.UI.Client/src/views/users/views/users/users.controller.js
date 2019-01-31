@@ -558,7 +558,7 @@
         }
 
         function goToUser(userId) {
-            $location.path('users/users/user/' + userId);
+            $location.path('users/users/user/' + userId).search("create", null).search("invite", null);
         }
 
         // helpers

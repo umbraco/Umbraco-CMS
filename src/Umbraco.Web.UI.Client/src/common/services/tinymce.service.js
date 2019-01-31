@@ -680,7 +680,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                             //supported keys to move to the next or prev element (13-enter, 27-esc, 38-up, 40-down, 39-right, 37-left)
                             //supported keys to remove the macro (8-backspace, 46-delete)
-                            //TODO: Should we make the enter key insert a line break before or leave it as moving to the next element?
+                            // TODO: Should we make the enter key insert a line break before or leave it as moving to the next element?
                             if ($.inArray(e.keyCode, [13, 40, 39]) !== -1) {
                                 //move to next element
                                 moveSibling(macroElement, true);
@@ -1294,7 +1294,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
                 var linkPicker = {
                     currentTarget: currentTarget,
-                    anchors: self.getAnchorNames(JSON.stringify(editorState.current.properties)),
+                    anchors: editorState.current ? self.getAnchorNames(JSON.stringify(editorState.current.properties)) : [],
                     submit: function (model) {
                         self.insertLinkInEditor(args.editor, model.target, anchorElement);
                         editorService.close();
@@ -1346,7 +1346,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     dialogData: dialogData,
                     submit: function (model) {
                         var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
-                        self.insertMacroInEditor(args.editor, macroObject, $scope);
+                        self.insertMacroInEditor(args.editor, macroObject);
                         editorService.close();
                     },
                     close: function () {
@@ -1358,7 +1358,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             self.createAceCodeEditor(args.editor, function () {
 
-                //TODO: CHECK TO SEE WHAT WE NEED TO DO WIT MACROS (See code block?)
+                // TODO: CHECK TO SEE WHAT WE NEED TO DO WIT MACROS (See code block?)
                 /*
                 var html = editor.getContent({source_view: true});
                 html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));

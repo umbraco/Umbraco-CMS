@@ -35,11 +35,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).LengthFieldAlias == "umbracoBytes");
             Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias == "umbracoExtension");
         }
-
-        [Test]
-        public override void XmlContentCheckForDiskChanges()
-        {
-            Assert.IsTrue(SettingsSection.Content.XmlContentCheckForDiskChanges == false);
-        }
+        
     }
 }
