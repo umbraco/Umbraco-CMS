@@ -388,6 +388,7 @@
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
+    <Compile Include="Models\ContentCultureInfosCollectionExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentSchedule.cs" />

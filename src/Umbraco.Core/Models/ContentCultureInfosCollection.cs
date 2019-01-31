@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
             foreach (var item in items)
                 Add(new ContentCultureInfos(item));
         }
-        
+
         /// <summary>
         /// Adds or updates a <see cref="ContentCultureInfos"/> instance.
         /// </summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
                     Name = name,
                     Date = date
                 });
-            }    
+            }
         }
 
         /// <inheritdoc />

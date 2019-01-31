@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -27,18 +26,16 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
-        private readonly IMediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
 
         public ContentService(IScopeProvider provider, ILogger logger,
-            IEventMessagesFactory eventMessagesFactory, IMediaFileSystem mediaFileSystem,
+            IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
             : base(provider, logger, eventMessagesFactory)
         {
-            _mediaFileSystem = mediaFileSystem;
             _documentRepository = documentRepository;
             _entityRepository = entityRepository;
             _auditRepository = auditRepository;

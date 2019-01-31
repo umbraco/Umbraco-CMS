@@ -15,14 +15,12 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Content : ContentBase, IContent
     {
-        private IContentType _contentType;
         private int? _templateId;
         private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
-        private ContentCultureInfosCollection _publishInfos;
-        private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
+        private ContentCultureInfosCollection _publishInfos, _publishInfos1, _publishInfos2;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -48,7 +46,7 @@ namespace Umbraco.Core.Models
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parent, contentType, properties, culture)
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -75,7 +73,7 @@ namespace Umbraco.Core.Models
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -137,7 +135,6 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _templateId, Ps.Value.TemplateSelector);
         }
 
-
         /// <summary>
         /// Gets or sets a value indicating whether this content item is published or not.
         /// </summary>
@@ -181,7 +178,7 @@ namespace Umbraco.Core.Models
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IContentType ContentType => _contentType;
+        public IContentType ContentType { get; private set; }
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -217,7 +214,7 @@ namespace Umbraco.Core.Models
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
+            => _publishInfos1 != null && _publishInfos1.ContainsKey(culture);
 
         // adjust dates to sync between version, cultures etc
         // used by the repo when persisting
@@ -228,7 +225,7 @@ namespace Umbraco.Core.Models
                 if (_publishInfos == null || !_publishInfos.TryGetValue(culture, out var publishInfos))
                     continue;
 
-                if (_publishInfosOrig != null && _publishInfosOrig.TryGetValue(culture, out var publishInfosOrig)
+                if (_publishInfos1 != null && _publishInfos1.TryGetValue(culture, out var publishInfosOrig)
                     && publishInfosOrig.Date == publishInfos.Date)
                     continue;
 
@@ -285,6 +282,24 @@ namespace Umbraco.Core.Models
             _publishInfos.AddOrUpdate(culture, name, date);
         }
 
+        // internal for repository
+        internal void AknPublishInfo()
+        {
+            _publishInfos1 = _publishInfos2 = new ContentCultureInfosCollection(_publishInfos);
+        }
+
+        /// <inheritdoc />
+        public bool IsPublishingCulture(string culture) => _publishInfos.IsCultureUpdated(_publishInfos1, culture);
+
+        /// <inheritdoc />
+        public bool IsUnpublishingCulture(string culture) => _publishInfos.IsCultureRemoved(_publishInfos1, culture);
+
+        /// <inheritdoc />
+        public bool HasPublishedCulture(string culture) => _publishInfos1.IsCultureUpdated(_publishInfos2, culture);
+
+        /// <inheritdoc />
+        public bool HasUnpublishedCulture(string culture) => _publishInfos1.IsCultureRemoved(_publishInfos2, culture);
+
         private void ClearPublishInfos()
         {
             _publishInfos = null;
@@ -300,7 +315,7 @@ namespace Umbraco.Core.Models
             if (_publishInfos.Count == 0) _publishInfos = null;
 
             // set the culture to be dirty - it's been modified
-            TouchCultureInfo(culture);
+            TouchCulture(culture);
         }
 
         // sets a publish edited
@@ -423,7 +438,7 @@ namespace Umbraco.Core.Models
         public void ChangeContentType(IContentType contentType)
         {
             ContentTypeId = contentType.Id;
-            _contentType = contentType;
+            ContentType = contentType;
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
 
@@ -442,7 +457,7 @@ namespace Umbraco.Core.Models
             if(clearProperties)
             {
                 ContentTypeId = contentType.Id;
-                _contentType = contentType;
+                ContentType = contentType;
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
 
@@ -457,16 +472,18 @@ namespace Umbraco.Core.Models
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
-            
+
             if (ContentType != null)
                 ContentType.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
 
+            _publishInfos2 = _publishInfos1;
+
             // Make a copy of the _publishInfos, this is purely so that we can detect
             // if this entity's previous culture publish state (regardless of the rememberDirty flag)
-            _publishInfosOrig = _publishInfos == null
+            _publishInfos1 = _publishInfos == null
                 ? null
                 : new ContentCultureInfosCollection(_publishInfos);
 
@@ -500,7 +517,7 @@ namespace Umbraco.Core.Models
             var clonedContent = (Content)clone;
 
             //need to manually clone this since it's not settable
-            clonedContent._contentType = (IContentType) ContentType.DeepClone();
+            clonedContent.ContentType = (IContentType) ContentType.DeepClone();
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._publishInfos != null)

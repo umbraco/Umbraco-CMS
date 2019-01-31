@@ -177,5 +177,29 @@ namespace Umbraco.Core.Models
         /// <para>Unpublishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
         void UnpublishCulture(string culture = "*");
+
+        /// <summary>
+        /// Determines whether a culture is being published, during a Publishing event.
+        /// </summary>
+        /// <remarks>Outside of a Publishing event handler, the returned value is unspecified.</remarks>
+        bool IsPublishingCulture(string culture);
+
+        /// <summary>
+        /// Determines whether a culture is being unpublished, during a Publishing event.
+        /// </summary>
+        /// <remarks>Outside of a Publishing event handler, the returned value is unspecified.</remarks>
+        bool IsUnpublishingCulture(string culture);
+
+        /// <summary>
+        /// Determines whether a culture has been published, during a Published event.
+        /// </summary>
+        /// <remarks>Outside of a Published event handler, the returned value is unspecified.</remarks>
+        bool HasPublishedCulture(string culture);
+
+        /// <summary>
+        /// Determines whether a culture has been unpublished, during a Published event.
+        /// </summary>
+        /// <remarks>Outside of a Published event handler, the returned value is unspecified.</remarks>
+        bool HasUnpublishedCulture(string culture);
     }
 }

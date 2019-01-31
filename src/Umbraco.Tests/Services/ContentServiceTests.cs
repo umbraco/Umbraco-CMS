@@ -6,7 +6,6 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -14,14 +13,11 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
-using System.Reflection;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Services
 {
@@ -58,32 +54,6 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             Composition.RegisterUnique(factory => Mock.Of<ILocalizedTextService>());
-        }
-
-        /// <summary>
-        /// Used to list out all ambiguous events that will require dispatching with a name
-        /// </summary>
-        [Test, Explicit]
-        public void List_Ambiguous_Events()
-        {
-            var events = ServiceContext.ContentService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
-            var typedEventHandler = typeof(TypedEventHandler<,>);
-            foreach(var e in events)
-            {
-                //only continue if this is a TypedEventHandler
-                if (!e.EventHandlerType.IsGenericType) continue;
-                var typeDef = e.EventHandlerType.GetGenericTypeDefinition();
-                if (typedEventHandler != typeDef) continue;
-
-                //get the event arg type
-                var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
-
-                var found = EventNameExtractor.FindEvent(typeof(ContentService), eventArgType, EventNameExtractor.MatchIngNames);
-                if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
-                {
-                    Console.WriteLine($"Ambiguous event, source: {typeof(ContentService)}, args: {eventArgType}");
-                }
-            }
         }
 
         [Test]
@@ -818,7 +788,7 @@ namespace Umbraco.Tests.Services
             content.PublishCulture(langGB.IsoCode);
             content.PublishCulture(langFr.IsoCode);
             Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content).Success);
-           
+
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.AreEqual(PublishedState.Published, content.PublishedState);

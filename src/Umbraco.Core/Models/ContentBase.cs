@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
-        private ContentCultureInfosCollection _cultureInfos;
+        private ContentCultureInfosCollection _cultureInfos, _cultureInfos1, _cultureInfos2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -222,7 +222,8 @@ namespace Umbraco.Core.Models
                 _cultureInfos = null;
         }
 
-        protected void TouchCultureInfo(string culture)
+        /// <inheritdoc />
+        public void TouchCulture(string culture)
         {
             if (_cultureInfos == null || !_cultureInfos.TryGetValue(culture, out var infos)) return;
             _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
@@ -400,6 +401,9 @@ namespace Umbraco.Core.Models
             foreach (var prop in Properties)
                 prop.ResetDirtyProperties(rememberDirty);
 
+            _cultureInfos2 = _cultureInfos1;
+            _cultureInfos1 = _cultureInfos == null ? null : new ContentCultureInfosCollection(_cultureInfos);
+
             // take care of culture infos
             if (_cultureInfos == null) return;
 
@@ -474,6 +478,12 @@ namespace Umbraco.Core.Models
             var propertyTypes = Properties.Where(x => x.WasDirty()).Select(x => x.Alias);
             return instanceProperties.Concat(propertyTypes);
         }
+
+        /// <inheritdoc />
+        public bool IsSavingCulture(string culture) => _cultureInfos.IsCultureUpdated(_cultureInfos1, culture);
+
+        /// <inheritdoc />
+        public bool HasSavedCulture(string culture) => _cultureInfos1.IsCultureUpdated(_cultureInfos2, culture);
 
         #endregion
 

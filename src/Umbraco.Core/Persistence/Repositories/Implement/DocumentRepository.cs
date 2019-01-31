@@ -1188,8 +1188,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var v in contentVariation)
                     content.SetCultureInfo(v.Culture, v.Name, v.Date);
             if (content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
+            {
                 foreach (var v in contentVariation)
                     content.SetPublishInfo(v.Culture, v.Name, v.Date);
+                content.AknPublishInfo();
+            }
             if (documentVariations.TryGetValue(content.Id, out var documentVariation))
                 foreach (var v in documentVariation.Where(x => x.Edited))
                     content.SetCultureEdited(v.Culture);
