@@ -55,6 +55,7 @@
         border: 2px solid @ui-selected-border;
         border-radius: 5px;
         box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
     }
     
     .umb-media-grid__item-overlay {
@@ -128,6 +129,10 @@
    border-top:1px solid fade(black, 4%);
    background: fade(@white, 92%);
    transition: opacity 150ms;
+   
+   &:hover {
+       text-decoration: underline;
+   }
 }
 
 /*
