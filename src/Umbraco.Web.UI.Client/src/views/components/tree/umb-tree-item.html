@@ -1,21 +1,19 @@
-<li class="umb-tree-item" data-element="tree-item-{{::node.dataElement}}" ng-class="{'current': (node == currentNode), 'has-children': node.hasChildren, 'umb-tree-item--deleted': node.deleteAnimations}" on-right-click="altSelect(node, $event)">
-    <div class="umb-tree-item__inner" ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
-        <ins data-element="tree-item-expand" 
-            ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}" 
+<li class="umb-tree-item" data-element="tree-item-{{::node.dataElement}}" ng-class="getNodeCssClass(node)" on-right-click="altSelect(node, $event)">
+    <div class="umb-tree-item__inner" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
+        <ins data-element="tree-item-expand"
+            ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}"
             ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
             ng-click="load(node)">&nbsp;</ins>
 
         <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.routePath}}" ng-click="select(node, $event)" ng-style="::node.style"></i>
         <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)">{{node.name}}</a>
-    
+
         <!-- NOTE: These are the 'option' elipses -->
         <a data-element="tree-item-options" class="umb-options" ng-click="options(node, $event)" ng-if="::node.menuUrl"><i></i><i></i><i></i></a>
         <div ng-show="node.loading" class="l"><div></div></div>
     </div>
-    
+
     <ul ng-class="{collapsed: !node.expanded}">
         <umb-tree-item class="umb-animated" ng-repeat="child in node.children track by child.id" enablelistviewexpand="{{enablelistviewexpand}}" tree="tree" current-node="currentNode" node="child" is-dialog="isDialog" section="{{section}}"></umb-tree-item>
     </ul>
 </li>
-
-
