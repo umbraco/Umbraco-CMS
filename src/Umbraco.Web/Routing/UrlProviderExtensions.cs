@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
         /// <para>Contains all the Urls that we can figure out (based upon domains, etc).</para>
         /// </remarks>
         public static IEnumerable<UrlInfo> GetContentUrls(this IContent content,
-            PublishedRouter publishedRouter,
+            IPublishedRouter publishedRouter,
             UmbracoContext umbracoContext,
             ILocalizationService localizationService,
             ILocalizedTextService textService,
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Routing
         /// <returns></returns>
         private static IEnumerable<UrlInfo> GetContentUrlsByCulture(IContent content,
             IEnumerable<string> cultures,
-            PublishedRouter publishedRouter,
+            IPublishedRouter publishedRouter,
             UmbracoContext umbracoContext,
             IContentService contentService,
             ILocalizedTextService textService,
@@ -161,7 +161,7 @@ namespace Umbraco.Web.Routing
                 return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
         }
 
-        private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, PublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
+        private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
         {
             // test for collisions on the 'main' url
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
