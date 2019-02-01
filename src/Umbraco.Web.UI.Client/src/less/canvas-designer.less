@@ -275,7 +275,7 @@ a, a:hover{
     font-family: "Lato", Helvetica, Arial, sans-serif;
     font-size: 13px;
     line-height: 16px;
-    background: #413659;
+    background: #1b264f;
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
@@ -306,7 +306,7 @@ a, a:hover{
 
 ul.sections {
     display: block;
-    background: #413659;
+    background: #1b264f;
     height: 100%;
     position:absolute;
     top: 90px;
@@ -322,7 +322,7 @@ ul.sections {
 
 ul.sections li {
     display: block;
-    border-left: 4px #413659 solid;
+    border-left: 4px #1b264f solid;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
     transition: all .3s linear;
@@ -330,7 +330,8 @@ ul.sections li {
 
 .fix-left-menu ul.sections li a span,
 .fix-left-menu ul.sections li a i {
-    color: #8d869b;
+    color: #fff;
+    opacity: .7;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
     transition: all .3s linear;
@@ -345,6 +346,11 @@ ul.sections li a {
     text-align: center;
     text-decoration: none;
     border-bottom: 1px solid #2E2246;
+    &:hover {
+        span, i {
+            opacity: 1;
+        }
+    }
 }
 
 ul.sections li a i {
@@ -367,7 +373,7 @@ ul.sections li.current a i {
 }
 
 ul.sections li.current, ul.sections li:hover {
-    border-left: 4px #00AEA2 solid;
+    border-left: 4px #f5c1bc solid;
 }
 
 .fix-left-menu:hover ul.sections li a span,
