@@ -808,7 +808,7 @@
                 // Build the correct path so both /#/ and #/ work.
                 var query = 'id=' + content.id;
                 if ($scope.culture) {
-                    query += "&culture=" + $scope.culture;
+                    query += "#?culture=" + $scope.culture;
                 }
                 var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
