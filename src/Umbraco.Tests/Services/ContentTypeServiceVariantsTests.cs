@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Services
             var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-            var contentTypeService = Current.Services.ContentTypeService;
+            var contentTypeServiceBaseFactory = Current.Services.ContentTypeServiceBaseFactory;
 
             return new PublishedSnapshotService(
                 options,
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeService,
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeServiceBaseFactory,
                 Factory.GetInstance<IEntityXmlSerializer>());
         }
 

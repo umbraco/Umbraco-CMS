@@ -211,6 +211,11 @@ namespace Umbraco.Core.Services.Implement
 
         #region Get, Has, Is, Count
 
+        IContentTypeComposition IContentTypeServiceBase.Get(int id)
+        {
+            return Get(id);
+        }
+
         public TItem Get(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -951,5 +956,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
     }
 }

@@ -176,7 +176,7 @@ namespace Umbraco.Tests.TestHelpers
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value));
                 return new PackagingService(
-                    auditService.Value, 
+                    auditService.Value,
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
@@ -188,9 +188,10 @@ namespace Umbraco.Tests.TestHelpers
                         new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
             });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
-            var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));            
+            var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
+            var contentTypeServiceBaseFactory = GetLazyService<IContentTypeServiceBaseFactory>(factory, c => new ContentTypeServiceBaseFactory(factory.GetInstance<IContentTypeService>(),factory.GetInstance<IMediaTypeService>(),factory.GetInstance<IMemberTypeService>()));
 
             return new ServiceContext(
                 publicAccessService,
@@ -217,7 +218,8 @@ namespace Umbraco.Tests.TestHelpers
                 notificationService,
                 externalLoginService,
                 redirectUrlService,
-                consentService);
+                consentService,
+                contentTypeServiceBaseFactory);
         }
 
         private Lazy<T> GetLazyService<T>(IFactory container, Func<IFactory, T> ctor)

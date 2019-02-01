@@ -403,7 +403,8 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var contentType = Services.ContentTypeService.Get(contentItem.ContentTypeId);
+                var contentTypeService = Services.ContentTypeServiceBaseFactory.Create(contentItem);
+                var contentType = contentTypeService.Get(contentItem.ContentTypeId);
                 var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
@@ -498,7 +499,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
-            
+
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
                 Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors);
 
@@ -544,7 +545,7 @@ namespace Umbraco.Web.Editors
             }
 
             var model = new ContentTypeImportModel();
-            
+
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
@@ -578,6 +579,6 @@ namespace Umbraco.Web.Editors
 
         }
 
-        
+
     }
 }

@@ -47,10 +47,10 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        public MediaController(PropertyEditorCollection propertyEditors, IContentTypeService contentTypeService)
+        public MediaController(PropertyEditorCollection propertyEditors, IContentTypeServiceBaseFactory contentTypeServiceBaseFactory)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
-            _contentTypeService = contentTypeService;
+            _contentTypeServiceBaseFactory = contentTypeServiceBaseFactory;
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace Umbraco.Web.Editors
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IContentTypeService _contentTypeService;
+        private readonly IContentTypeServiceBaseFactory _contentTypeServiceBaseFactory;
 
         protected int[] UserStartNodes
         {
@@ -726,7 +726,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(_contentTypeService, Constants.Conventions.Media.File,fileName, fs);
+                        f.SetValue(_contentTypeServiceBaseFactory, Constants.Conventions.Media.File,fileName, fs);
                     }
 
                     var saveResult = mediaService.Save(f, Security.CurrentUser.Id);

@@ -23,6 +23,7 @@ namespace Umbraco.Web.Models.Mapping
             IUserService userService,
             IContentService contentService,
             IContentTypeService contentTypeService,
+            IContentTypeServiceBaseFactory contentTypeServiceBaseFactory,
             ILocalizationService localizationService)
         {
             // create, capture, cache
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
             var creatorResolver = new CreatorResolver(userService);
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
-            var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>(contentTypeService);
+            var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>(contentTypeServiceBaseFactory);
             var allowedTemplatesResolver = new AllowedTemplatesResolver(contentTypeService);
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);

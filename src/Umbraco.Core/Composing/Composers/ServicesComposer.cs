@@ -37,6 +37,7 @@ namespace Umbraco.Core.Composing.Composers
             composition.RegisterUnique<IMemberService, MemberService>();
             composition.RegisterUnique<IMediaService, MediaService>();
             composition.RegisterUnique<IContentTypeService, ContentTypeService>();
+            composition.RegisterUnique<IContentTypeServiceBaseFactory, ContentTypeServiceBaseFactory>();
             composition.RegisterUnique<IMediaTypeService, MediaTypeService>();
             composition.RegisterUnique<IDataTypeService, DataTypeService>();
             composition.RegisterUnique<IFileService, FileService>();

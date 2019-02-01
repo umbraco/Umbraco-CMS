@@ -166,7 +166,7 @@ namespace Umbraco.Core
         /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
         /// you need to store the file by yourself using Store and then figure out
         /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
-        public static void SetValue(this IContentBase content, IContentTypeService contentTypeService, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        public static void SetValue(this IContentBase content, IContentTypeServiceBaseFactory contentTypeServiceBaseFactory, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             if (filename == null || filestream == null) return;
 
@@ -175,12 +175,12 @@ namespace Umbraco.Core
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower();
 
-            SetUploadFile(content,contentTypeService, propertyTypeAlias, filename, filestream, culture, segment);
+            SetUploadFile(content,contentTypeServiceBaseFactory, propertyTypeAlias, filename, filestream, culture, segment);
         }
 
-        private static void SetUploadFile(this IContentBase content, IContentTypeService contentTypeService, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        private static void SetUploadFile(this IContentBase content, IContentTypeServiceBaseFactory contentTypeServiceBaseFactory, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
-            var property = GetProperty(content, contentTypeService, propertyTypeAlias);
+            var property = GetProperty(content, contentTypeServiceBaseFactory, propertyTypeAlias);
 
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
@@ -201,11 +201,12 @@ namespace Umbraco.Core
         }
 
         // gets or creates a property for a content item.
-        private static Property GetProperty(IContentBase content, IContentTypeService contentTypeService, string propertyTypeAlias)
+        private static Property GetProperty(IContentBase content, IContentTypeServiceBaseFactory contentTypeServiceBaseFactory, string propertyTypeAlias)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (property != null) return property;
 
+            var contentTypeService = contentTypeServiceBaseFactory.Create(content);
             var contentType = contentTypeService.Get(content.ContentTypeId);
             var propertyType = contentType.CompositionPropertyTypes
                 .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
@@ -233,8 +234,9 @@ namespace Umbraco.Core
         /// the "folder number" that was assigned to the previous file referenced by the property,
         /// if any.</para>
         /// </remarks>
-        public static string StoreFile(this IContentBase content, IContentTypeService contentTypeService, string propertyTypeAlias, string filename, Stream filestream, string filepath)
+        public static string StoreFile(this IContentBase content, IContentTypeServiceBaseFactory contentTypeServiceBaseFactory, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
+            var contentTypeService = contentTypeServiceBaseFactory.Create(content);
             var contentType = contentTypeService.Get(content.ContentTypeId);
             var propertyType = contentType
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
@@ -317,7 +319,7 @@ namespace Umbraco.Core
         {
             return serializer.Serialize(content, false, false);
         }
-        
+
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IMedia"/> object

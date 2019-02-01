@@ -16,11 +16,11 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentTypeBasicResolver<TSource, TDestination> : IValueResolver<TSource, TDestination, ContentTypeBasic>
         where TSource : IContentBase
     {
-        private readonly IContentTypeService _contentTypeService;
+        private readonly IContentTypeServiceBaseFactory _contentTypeServiceBaseFactory;
 
-        public ContentTypeBasicResolver(IContentTypeService contentTypeService)
+        public ContentTypeBasicResolver(IContentTypeServiceBaseFactory contentTypeServiceBaseFactory)
         {
-            _contentTypeService = contentTypeService;
+            _contentTypeServiceBaseFactory = contentTypeServiceBaseFactory;
         }
 
         public ContentTypeBasic Resolve(TSource source, TDestination destination, ContentTypeBasic destMember, ResolutionContext context)
@@ -30,8 +30,9 @@ namespace Umbraco.Web.Models.Mapping
             if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                 && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
-                var contentType = _contentTypeService.Get(source.ContentTypeId);
-                var contentTypeBasic =  Mapper.Map<IContentType, ContentTypeBasic>(contentType);
+                var contentTypeService = _contentTypeServiceBaseFactory.Create(source);
+                var contentType = contentTypeService.Get(source.ContentTypeId);
+                var contentTypeBasic =  Mapper.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
 
                 return contentTypeBasic;
             }

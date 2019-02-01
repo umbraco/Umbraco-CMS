@@ -102,7 +102,7 @@ namespace Umbraco.Web.Macros
             Elements.Add("path", path);
             Elements.Add("splitpath", path.Split(','));
         }
-        
+
         /// <summary>
         /// Puts the properties of the node into the elements table
         /// </summary>
@@ -202,7 +202,8 @@ namespace Umbraco.Web.Macros
                 CreatorName = _inner.GetCreatorProfile().Name;
                 WriterName = _inner.GetWriterProfile().Name;
 
-                ContentType = Current.PublishedContentTypeFactory.CreateContentType(_inner.ContentType);
+                var contentTypeService = Current.Services.ContentTypeServiceBaseFactory.Create(_inner);
+                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentTypeService.Get(_inner.ContentTypeId));
 
                 _properties = ContentType.PropertyTypes
                     .Select(x =>

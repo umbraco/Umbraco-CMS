@@ -41,7 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly IContentTypeService _contentTypeService;
+        private readonly IContentTypeServiceBaseFactory _contentTypeServiceBaseFactory;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
@@ -85,7 +85,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeService contentTypeService,
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeServiceBaseFactory contentTypeServiceBaseFactory,
             IEntityXmlSerializer entitySerializer)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -104,7 +104,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
-            _contentTypeService = contentTypeService;
+            _contentTypeServiceBaseFactory = contentTypeServiceBaseFactory;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -1204,7 +1204,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            var contentTypeService = _contentTypeServiceBaseFactory.Create(content);
+            var contentType = contentTypeService.Get(content.ContentTypeId);
             if (contentType.VariesByCulture())
             {
                 var infos = content is IContent document

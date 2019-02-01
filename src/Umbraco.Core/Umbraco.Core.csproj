@@ -1346,6 +1346,7 @@
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="Services\IConsentService.cs" />
+    <Compile Include="Services\IContentTypeServiceBaseFactory.cs" />
     <Compile Include="Services\IEntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
@@ -1363,6 +1364,7 @@
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTItemTService.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTRepositoryTItemTService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
+    <Compile Include="Services\Implement\ContentTypeServiceBaseFactory.cs" />
     <Compile Include="Services\Implement\DataTypeService.cs" />
     <Compile Include="Services\Implement\DomainService.cs" />
     <Compile Include="Services\Implement\EntityService.cs" />

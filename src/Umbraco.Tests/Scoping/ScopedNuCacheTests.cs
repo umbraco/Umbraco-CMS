@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-            var contentTypeService = Current.Services.ContentTypeService;
+            var contentTypeServiceBaseFactory = Current.Services.ContentTypeServiceBaseFactory;
 
             return new PublishedSnapshotService(
                 options,
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Scoping
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeService,
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeServiceBaseFactory,
                 Factory.GetInstance<IEntityXmlSerializer>());
         }
 
