@@ -22,6 +22,7 @@
 
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;
+        vm.getItemUrl = getItemUrl;
         vm.selectAll = selectAll;
         vm.isSelectedAll = isSelectedAll;
         vm.isSortDirection = isSortDirection;
@@ -51,10 +52,35 @@
         function selectItem(selectedItem, $index, $event) {
             listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
         }
-
-        function clickItem(item) {
+        
+        function getItemUrl(item) {
             // if item.id is 2147483647 (int.MaxValue) use item.key
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
+            return $scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id);
+        }
+        
+        function clickItem(item) {
+            
+            var contentEditor = {
+                id: node.id,
+                submit: function (model) {
+                    // update the node
+                    node.name = model.contentNode.name;
+                    // TODO: node.description = model.contentNode.description;
+                    node.published = model.contentNode.hasPublishedVersion;
+                    if (entityType !== "Member") {
+                        entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
+                            node.url = data;
+                        });
+                    }
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.contentEditor(contentEditor);
+            
+            
         }
 
         function isSortDirection(col, direction) {

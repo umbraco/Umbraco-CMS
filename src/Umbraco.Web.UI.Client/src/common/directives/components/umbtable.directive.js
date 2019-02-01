@@ -123,6 +123,12 @@
             }
         };
 
+        vm.getItemUrl = function (item) {
+            if (vm.getItemUrl) {
+                vm.getItemUrl({ item: item});
+            }
+        };
+
         vm.selectItem = function (item, $index, $event) {
             if (vm.onSelect) {
                 vm.onSelect({ item: item, $index: $index, $event: $event });
@@ -171,6 +177,7 @@
                 allowSelectAll: '<',
                 onSelect: '&',
                 onClick: '&',
+                getItemUrl: '&',
                 onSelectAll: '&',
                 onSelectedAll: '&',
                 onSortingDirection: '&',

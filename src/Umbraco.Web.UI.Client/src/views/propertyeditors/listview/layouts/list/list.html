@@ -44,6 +44,7 @@
             item-properties="options.includeProperties"
             on-select="vm.selectItem(item, $index, $event)"
             on-click="vm.clickItem(item)"
+            get-item-url="vm.getItemUrl(item)"
             on-select-all="vm.selectAll($event)"
             on-selected-all="vm.isSelectedAll()"
             on-sorting-direction="vm.isSortDirection(col, direction)"

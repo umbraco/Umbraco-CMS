@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
+    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper, editorService) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -115,9 +115,38 @@
         function selectFolder(folder, $event, $index) {
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
-
-        function goToItem(item, $event, $index) {
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+        
+        function getItemUrl(item) {
+            // if item.id is 2147483647 (int.MaxValue) use item.key
+            
+            console.log("request URL for", item)
+            console.log($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id))
+            
+            return $scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id);
+        }
+        
+        function goToItem(node, $event, $index) {
+            
+            var contentEditor = {
+                id: node.id,
+                submit: function (model) {
+                    // update the node
+                    node.name = model.contentNode.name;
+                    // TODO: node.description = model.contentNode.description;
+                    node.published = model.contentNode.hasPublishedVersion;
+                    if (entityType !== "Member") {
+                        entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
+                            node.url = data;
+                        });
+                    }
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
+                }
+            };
+            editorService.contentEditor(contentEditor);
+            
         }
 
         activate();

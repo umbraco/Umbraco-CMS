@@ -40,7 +40,8 @@
                     <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <a title="{{ item.name }}" class="umb-table-body__link" href=""
+                    <a title="{{ item.name }}" class="umb-table-body__link"
+                       ng-href="vm.getItemUrl(item)"
                        ng-click="vm.clickItem(item, $event)"
                        ng-bind="item.name">
                     </a>
