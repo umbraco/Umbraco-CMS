@@ -38,9 +38,11 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Macros;
 using Umbraco.Web.PublishedCache;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Testing
@@ -228,6 +230,21 @@ namespace Umbraco.Tests.Testing
                 .Append<MembersBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
+
+            //TODO: A lot of this is just copied from the WebRuntimeComposer, maybe we should just compose it all?
+            Composition.Register<IPublishedContentQuery>(factory =>
+            {
+                var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
+                return new PublishedContentQuery(umbCtx.UmbracoContext.ContentCache, umbCtx.UmbracoContext.MediaCache, factory.GetInstance<IVariationContextAccessor>());
+            }, Lifetime.Request);
+            Composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
+
+            Composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
+            Composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            Composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+
+            // register the umbraco helper - this is Transient! very important!
+            Composition.Register<UmbracoHelper>();
         }
 
         protected virtual void ComposeWtf()

@@ -159,9 +159,9 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IPublishedContentQuery>(),
                 membershipHelper);
 
-            return CreateController(controllerType, request, umbHelper);
+            return CreateController(controllerType, request, umbCtx, umbHelper);
         }
 
-        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoHelper helper);
+        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoContext umbracoContext, UmbracoHelper helper);
     }
 }

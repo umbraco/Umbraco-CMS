@@ -78,20 +78,7 @@ namespace Umbraco.Web
         /// Gets the query context.
         /// </summary>
         public IPublishedContentQuery ContentQuery { get; }
-
-        /// <summary>
-        /// Gets the Umbraco context.
-        /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get
-            {
-                if (_umbracoContext == null)
-                    throw new NullReferenceException("UmbracoContext has not been set.");
-                return _umbracoContext;
-            }
-        }
-
+        
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
@@ -100,7 +87,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the url provider.
         /// </summary>
-        public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
+        public UrlProvider UrlProvider => _umbracoContext.UrlProvider;
 
         /// <summary>
         /// Gets (or sets) the current <see cref="IPublishedContent"/> item assigned to the UmbracoHelper.
