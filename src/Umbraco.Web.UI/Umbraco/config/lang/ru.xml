@@ -483,7 +483,6 @@
     <key alias="dissallowedMediaType">Использование данного типа файлов на сайте запрещено администратором</key>
     <key alias="filePermissionsError">Ошибка доступа к указанному файлу или папке</key>
     <key alias="macroErrorLoadingPartialView">Ошибка загрузки кода в частичном представлении (файл: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Ошибка загрузки пользовательского элемента управления '%0%'</key>
     <key alias="missingTitle">Укажите заголовок</key>
     <key alias="missingType">Выберите тип</key>
     <key alias="pictureResizeBiggerThanOrg">Вы пытаетесь увеличить изображение по сравнению с его исходным размером. Уверены, что хотите сделать это?</key>

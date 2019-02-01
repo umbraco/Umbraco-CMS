@@ -84,7 +84,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Extension method to manually regsiter an area
+        /// Extension method to manually register an area
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="routes"></param>
@@ -103,7 +103,7 @@ namespace Umbraco.Web
         }
 
         ///// <summary>
-        ///// Extension method to manually regsiter an area from the container
+        ///// Extension method to manually register an area from the container
         ///// </summary>
         ///// <typeparam name="T"></typeparam>
         ///// <param name="routes"></param>

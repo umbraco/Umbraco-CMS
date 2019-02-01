@@ -109,6 +109,19 @@ namespace Umbraco.Core.Services
         void DeleteScriptFolder(string folderPath);
 
         /// <summary>
+        /// Creates a folder for style sheets
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        void CreateStyleSheetFolder(string folderPath);
+
+        /// <summary>
+        /// Deletes a folder for style sheets
+        /// </summary>
+        /// <param name="folderPath"></param>
+        void DeleteStyleSheetFolder(string folderPath);
+
+        /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
@@ -187,7 +200,7 @@ namespace Umbraco.Core.Services
         /// </returns>
         Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
 
-        ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
+        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = 0);
 
         /// <summary>
         /// Deletes a template by its alias

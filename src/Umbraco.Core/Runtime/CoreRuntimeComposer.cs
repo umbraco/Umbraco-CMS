@@ -11,6 +11,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
@@ -19,7 +20,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
 namespace Umbraco.Core.Runtime
@@ -73,16 +73,20 @@ namespace Umbraco.Core.Runtime
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
             {
-                if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
-                    return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
-                return new DatabaseServerRegistrar(
-                    new Lazy<IServerRegistrationService>(f.GetInstance<IServerRegistrationService>),
-                    new DatabaseServerRegistrarOptions());
+                // TODO: this is a hack, use proper configuration!
+                // also: we still register the full IServerMessenger because
+                // even on 1 single server we can have 2 concurrent app domains
+                var singleServer = "true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]);
+                return singleServer
+                    ? (IServerRegistrar) new SingleServerRegistrar(f.GetInstance<IRuntimeState>())
+                    : new DatabaseServerRegistrar(
+                        new Lazy<IServerRegistrationService>(f.GetInstance<IServerRegistrationService>),
+                        new DatabaseServerRegistrarOptions());
             });
 
             // by default we'll use the database server messenger with default options (no callbacks),
-            // this will be overridden by either the legacy thing or the db thing in the corresponding
-            // components in the web project - todo - should obsolete the legacy thing
+            // this will be overridden by the db thing in the corresponding components in the web
+            // project
             composition.RegisterUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Strings
         /// url per culture.</remarks>
         string GetUrlSegment(IContentBase content, string culture = null);
 
-        //TODO: For the 301 tracking, we need to add another extended interface to this so that
+        // TODO: For the 301 tracking, we need to add another extended interface to this so that
         // the RedirectTrackingEventHandler can ask the IUrlSegmentProvider if the URL is changing.
         // Currently the way it works is very hacky, see notes in: RedirectTrackingEventHandler.ContentService_Publishing
     }

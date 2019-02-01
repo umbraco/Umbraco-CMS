@@ -116,5 +116,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "blueprints")]
         [ReadOnly(true)]
         public IDictionary<int, string> Blueprints { get; set; }
+
+        [DataMember(Name = "isContainer")]
+        [ReadOnly(true)]
+        public bool IsContainer { get; set; }
+
+        [DataMember(Name = "isElement")]
+        [ReadOnly(true)]
+        public bool IsElement { get; set; }
     }
 }

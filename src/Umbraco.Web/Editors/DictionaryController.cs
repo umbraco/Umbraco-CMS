@@ -8,7 +8,6 @@ using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -22,7 +21,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     /// <remarks>
     /// The security for this controller is defined to allow full CRUD access to dictionary if the user has access to either:
-    /// Dictionar
+    /// Dictionary
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
@@ -30,7 +29,7 @@ namespace Umbraco.Web.Editors
     public class DictionaryController : BackOfficeNotificationsController
     {
         /// <summary>
-        /// Deletes a data type wth a given ID
+        /// Deletes a data type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns><see cref="HttpResponseMessage"/></returns>
@@ -49,7 +48,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Creates a new dictoinairy item
+        /// Creates a new dictionary item
         /// </summary>
         /// <param name="parentId">
         /// The parent id.
@@ -65,7 +64,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrEmpty(key))
                 return Request
-                    .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
+                    .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO: translate
 
             if (Services.LocalizationService.DictionaryItemExists(key))
             {
@@ -108,7 +107,7 @@ namespace Umbraco.Web.Editors
         /// The <see cref="DictionaryDisplay"/>.
         /// </returns>
         /// <exception cref="HttpResponseException">
-        ///  Returrns a not found response when dictionary item does not exist
+        ///  Returns a not found response when dictionary item does not exist
         /// </exception>
         public DictionaryDisplay GetById(int id)
         {
@@ -172,7 +171,7 @@ namespace Umbraco.Web.Editors
 
                 model.Notifications.Add(new Notification(
                     Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
-                    SpeechBubbleIcon.Success));
+                    NotificationStyle.Success));
 
                 return model;
             }

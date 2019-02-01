@@ -344,7 +344,6 @@
     <key alias="contentTypeAliasAndNameNotNull">新しいプロパティ型のエイリアスと名前の両方を設定してください！</key>
     <key alias="filePermissionsError">特定のファイルまたはフォルタの読み込み/書き込みアクセスに問題があります</key>
     <key alias="macroErrorLoadingPartialView">Partial View スクリプトの読み込みエラー (ファイル: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">userControl の読み込みエラー '%0%'</key>
     <key alias="missingTitle">タイトルを入力してください</key>
     <key alias="missingType">型を選択してください</key>
     <key alias="pictureResizeBiggerThanOrg">元画像より大きくしようとしていますが、本当によろしいのですか？</key>

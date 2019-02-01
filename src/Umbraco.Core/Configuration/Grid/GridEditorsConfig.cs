@@ -31,7 +31,7 @@ namespace Umbraco.Core.Configuration.Grid
             {
                 List<GridEditor> GetResult()
                 {
-                    // TODO should use the common one somehow! + ignoring _appPlugins here!
+                    // TODO: should use the common one somehow! + ignoring _appPlugins here!
                     var parser = new ManifestParser(_appCaches, Current.ManifestValidators, _logger);
 
                     var editors = new List<GridEditor>();

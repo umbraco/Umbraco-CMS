@@ -32,7 +32,7 @@ namespace Umbraco.Web.Search
                 var found = searchableTrees.FirstOrDefault(x => x.TreeAlias.InvariantEquals(appTree.TreeAlias));
                 if (found != null)
                 {
-                    dictionary[found.TreeAlias] = new SearchableApplicationTree(appTree.ApplicationAlias, appTree.TreeAlias, found);
+                    dictionary[found.TreeAlias] = new SearchableApplicationTree(appTree.SectionAlias, appTree.TreeAlias, found);
                 }
             }
             return dictionary;

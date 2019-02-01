@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Published
                 new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
-            });
+            }, Mock.Of<IUmbracoContextAccessor>());
             var value = content.Value("property1");
 
             // nested single converter returns proper TestModel value
@@ -189,7 +189,8 @@ namespace Umbraco.Tests.Published
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }},
                     {{ ""key"": ""{keyB}"", ""propertyN1"": ""bar"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
-            });
+            },
+                Mock.Of<IUmbracoContextAccessor>());
             var value = content.Value("property2");
 
             // nested many converter returns proper IEnumerable<TestModel> value
@@ -249,7 +250,7 @@ namespace Umbraco.Tests.Published
 
         class TestPublishedContent : PublishedContentBase
         {
-            public TestPublishedContent(PublishedContentType contentType, Guid key, IEnumerable<TestPublishedProperty> properties)
+            public TestPublishedContent(PublishedContentType contentType, Guid key, IEnumerable<TestPublishedProperty> properties, IUmbracoContextAccessor umbracoContextAccessor): base(umbracoContextAccessor)
             {
                 ContentType = contentType;
                 Key = key;
@@ -262,6 +263,7 @@ namespace Umbraco.Tests.Published
             // ReSharper disable UnassignedGetOnlyAutoProperty
             public override PublishedItemType ItemType { get; }
             public override bool IsDraft(string culture = null) => false;
+            public override bool IsPublished(string culture = null) => true;
             public override IPublishedContent Parent { get; }
             public override IEnumerable<IPublishedContent> Children { get; }
             public override PublishedContentType ContentType { get; }

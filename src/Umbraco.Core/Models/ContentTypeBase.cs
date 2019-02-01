@@ -431,7 +431,7 @@ namespace Umbraco.Core.Models
         /// PropertyTypes that are not part of a PropertyGroup
         /// </summary>
         [IgnoreDataMember]
-        //todo should we mark this as EditorBrowsable hidden since it really isn't ever used?
+        // TODO: should we mark this as EditorBrowsable hidden since it really isn't ever used?
         internal PropertyTypeCollection PropertyTypeCollection => _noGroupPropertyTypes;
 
         /// <summary>
@@ -504,9 +504,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public IContentType DeepCloneWithResetIdentities(string alias)
+        public ContentTypeBase DeepCloneWithResetIdentities(string alias)
         {
-            var clone = (ContentType)DeepClone();
+            var clone = (ContentTypeBase)DeepClone();
             clone.Alias = alias;
             clone.Key = Guid.Empty;
             foreach (var propertyGroup in clone.PropertyGroups)

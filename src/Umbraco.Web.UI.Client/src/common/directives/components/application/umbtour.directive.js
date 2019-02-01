@@ -137,7 +137,7 @@ In the following example you see how to run some custom logic before a step goes
                 <div>
                     <umb-button 
                         size="xs" 
-                        button-style="success" 
+                        button-style="action" 
                         type="button" 
                         action="vm.initNextStep()" 
                         label="Next">

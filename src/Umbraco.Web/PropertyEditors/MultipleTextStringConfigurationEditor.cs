@@ -6,7 +6,7 @@ using Umbraco.Core.PropertyEditors.Validators;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Represents the configuration editor for a multiple testring value editor.
+    /// Represents the configuration editor for a multiple textstring value editor.
     /// </summary>
     internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
     {
@@ -34,8 +34,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         public override MultipleTextStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTextStringConfiguration configuration)
         {
-            // todo this isn't pretty
-            //the values from the editor will be min/max fieds and we need to format to json in one field
+            // TODO: this isn't pretty
+            //the values from the editor will be min/max fields and we need to format to json in one field
             // is the editor sending strings or ints or?!
             var min = (editorValues.ContainsKey("min") ? editorValues["min"].ToString() : "0").TryConvertTo<int>();
             var max = (editorValues.ContainsKey("max") ? editorValues["max"].ToString() : "0").TryConvertTo<int>();

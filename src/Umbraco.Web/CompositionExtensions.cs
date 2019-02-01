@@ -1,22 +1,24 @@
 ﻿using System;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.Actions;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.ContentApps;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
+using Current = Umbraco.Web.Composing.Current;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
 // Umbraco.Core's own CompositionExtensions class
 
 // ReSharper disable once CheckNamespace
-namespace Umbraco.Core.Components
+namespace Umbraco.Web
 {
     /// <summary>
     /// Provides extension methods to the <see cref="Composition"/> class.
@@ -91,6 +93,13 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         public static BackOfficeSectionCollectionBuilder Sections(this Composition composition)
             => composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the backoffice dashboards collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static DashboardCollectionBuilder Dashboards(this Composition composition)
+            => composition.WithCollectionBuilder<DashboardCollectionBuilder>();
 
         #endregion
 

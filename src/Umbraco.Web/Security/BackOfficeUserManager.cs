@@ -125,13 +125,13 @@ namespace Umbraco.Web.Security
 
         #region What we support do not currently
 
-        //TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
+        // TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
         public override bool SupportsUserClaim
         {
             get { return false; }
         }
 
-        //TODO: Support this
+        // TODO: Support this
         public override bool SupportsQueryableUsers
         {
             get { return false; }
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Security
             get { return false; }
         }
 
-        //TODO: Support this
+        // TODO: Support this
         public override bool SupportsUserPhoneNumber
         {
             get { return false; }
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Security
                 contentSectionConfig.NotificationEmailAddress,
                 new EmailSender());
 
-            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to suport it
+            //NOTE: Not implementing these, if people need custom 2 factor auth, they'll need to implement their own UserStore to support it
 
             //// Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
             //// You can write your own provider and plug in here.
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         protected virtual IPasswordHasher GetDefaultPasswordHasher(MembershipProviderBase provider)
         {
-            //if the current user membership provider is unkown (this would be rare), then return the default password hasher
+            //if the current user membership provider is unknown (this would be rare), then return the default password hasher
             if (provider.IsUmbracoUsersProvider() == false)
                 return new PasswordHasher();
 
@@ -459,7 +459,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
@@ -471,7 +471,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <returns></returns>
         private IUserSecurityStampStore<BackOfficeIdentityUser, int> GetSecurityStore()
@@ -483,7 +483,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This is copied from the underlying .NET base class since they decied to not expose it
+        /// This is copied from the underlying .NET base class since they decided to not expose it
         /// </summary>
         /// <returns></returns>
         private static string NewSecurityStamp()
@@ -534,14 +534,14 @@ namespace Umbraco.Web.Security
 
 
         /// <summary>
-        /// Overides the microsoft ASP.NET user managment method
+        /// Overrides the Microsoft ASP.NET user management method
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>
         /// returns a Async Task<IdentityResult>
         /// </returns>
         /// <remarks>
-        /// Doesnt set fail attempts back to 0
+        /// Doesn't set fail attempts back to 0
         /// </remarks>
         public override async Task<IdentityResult> AccessFailedAsync(int userId)
         {
@@ -618,7 +618,7 @@ namespace Umbraco.Web.Security
             OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
+        // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
         internal void RaisePasswordResetEvent(int userId)
         {
             OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), affectedUser: userId));
@@ -702,7 +702,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         protected virtual string GetCurrentRequestIpAddress()
         {
-            //TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
+            // TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
             var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
             return httpContext.GetCurrentRequestIpAddress();
         }

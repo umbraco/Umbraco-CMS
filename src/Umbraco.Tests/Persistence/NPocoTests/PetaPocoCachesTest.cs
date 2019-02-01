@@ -15,7 +15,7 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.NPocoTests
 {
-    // fixme.npoco - what shall we do with those tests?
+    // FIXME: npoco - what shall we do with those tests?
     //
     [TestFixture, Ignore("fixme - ignored test")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

@@ -60,7 +60,6 @@ namespace Umbraco.Tests.Configurations
         [TestCase("/install")]
         [TestCase("/install/?installStep=asdf")]
         [TestCase("/install/test.aspx")]
-        [TestCase("/config/splashes/booting.aspx")]
         public void Is_Reserved_Path_Or_Url(string url)
         {
             var globalSettings = TestObjects.GetGlobalSettings();

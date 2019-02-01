@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Testing
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
-            // fixme - align to runtimes & components - don't redo everything here
+            // FIXME: align to runtimes & components - don't redo everything here
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Testing
 
             // web
             Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
-            Composition.RegisterUnique<PublishedRouter>();
+            Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
@@ -427,7 +427,7 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();
-            SettingsForTests.Reset(); // fixme - should it be optional?
+            SettingsForTests.Reset(); // FIXME: should it be optional?
 
             Mapper.Reset();
 

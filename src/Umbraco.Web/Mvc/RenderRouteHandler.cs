@@ -44,12 +44,12 @@ namespace Umbraco.Web.Mvc
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
-        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // todo inject
+        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // TODO: inject
 
         #region IRouteHandler Members
 
         /// <summary>
-        /// Assigns the correct controller based on the Umbraco request and returns a standard MvcHandler to prcess the response,
+        /// Assigns the correct controller based on the Umbraco request and returns a standard MvcHandler to process the response,
         /// this also stores the render model into the data tokens for the current RouteData.
         /// </summary>
         /// <param name="requestContext"></param>
@@ -347,13 +347,6 @@ namespace Umbraco.Web.Mvc
                 // to Mvc since Mvc can't do much
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
-            // so we have a template, so we should have a rendering engine
-            if (request.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?
-                return GetWebFormsHandler();
-
-            if (request.RenderingEngine != RenderingEngine.Mvc) // else ?
-                return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
-
             return null;
         }
 
@@ -376,13 +369,6 @@ namespace Umbraco.Web.Mvc
                 return HandlePostedValues(requestContext, postedInfo);
             }
 
-            //Now we can check if we are supposed to render WebForms when the route has not been hijacked
-            if (request.RenderingEngine == RenderingEngine.WebForms
-                && request.HasTemplate
-                && routeDef.HasHijackedRoute == false)
-            {
-                return GetWebFormsHandler();
-            }
 
             //Here we need to check if there is no hijacked route and no template assigned,
             //if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
@@ -391,7 +377,7 @@ namespace Umbraco.Web.Mvc
             if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
                 && routeDef.HasHijackedRoute == false)
             {
-                request.UpdateOnMissingTemplate(); // request will go 404
+                request.UpdateToNotFound(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
                 // not be processed any further, eg because it has been redirect. then, exit.
@@ -400,11 +386,8 @@ namespace Umbraco.Web.Mvc
 
                 var handler = GetHandlerOnMissingTemplate(request);
 
-                // if it's not null it can be either the PublishedContentNotFoundHandler (no document was
-                // found to handle 404, or document with no template was found) or the WebForms handler
-                // (a document was found and its template is WebForms)
-
-                // if it's null it means that a document was found and its template is Mvc
+                // if it's not null it's the PublishedContentNotFoundHandler (no document was found to handle 404, or document with no template was found)
+                // if it's null it means that a document was found
 
                 // if we have a handler, return now
                 if (handler != null)
@@ -428,22 +411,13 @@ namespace Umbraco.Web.Mvc
             // Set the session state requirements
             requestContext.HttpContext.SetSessionStateBehavior(GetSessionStateBehavior(requestContext, routeDef.ControllerName));
 
-            // reset the friendly path so in the controllers and anything occuring after this point in time,
+            // reset the friendly path so in the controllers and anything occurring after this point in time,
             //the URL is reset back to the original request.
             requestContext.HttpContext.RewritePath(UmbracoContext.OriginalRequestUrl.PathAndQuery);
 
             return new UmbracoMvcHandler(requestContext);
         }
-
-        /// <summary>
-        /// Returns the handler for webforms requests
-        /// </summary>
-        /// <returns></returns>
-        internal static IHttpHandler GetWebFormsHandler()
-        {
-            return (umbraco.UmbracoDefault) BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(umbraco.UmbracoDefault));
-        }
-
+        
         private SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext, string controllerName)
         {
             return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);

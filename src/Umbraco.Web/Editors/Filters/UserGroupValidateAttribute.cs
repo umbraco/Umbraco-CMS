@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors.Filters
             _userService = userService;
         }
 
-        private IUserService UserService => _userService ?? Current.Services.UserService; // todo inject
+        private IUserService UserService => _userService ?? Current.Services.UserService; // TODO: inject
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors.Filters
                 actionContext.ModelState.AddModelError("Alias", "A user group with this alias already exists");
             }
 
-            //TODO: Validate the name is unique?
+            // TODO: Validate the name is unique?
 
             if (actionContext.ModelState.IsValid == false)
             {

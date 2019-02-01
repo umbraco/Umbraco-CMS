@@ -65,8 +65,8 @@
                 <p><span>{{item.alias}}</span> <small>({{item.width}}px &times; {{item.height}}px)</small></p>
             </div>
             <div class="umb-prevalues-multivalues__right">
-                <a href="#" prevent-default class="umb-node-preview__action umb-node-preview__action--red" ng-click="edit(item, $event)" class="umb-prevalues-multivalues__action">Edit</a>
-                <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
+                <a href="#" prevent-default class="umb-node-preview__action" ng-click="edit(item, $event)"><localize key="general_edit">Edit</localize></a>
+                <a href="#" prevent-default class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
             </div>
         </div>
     </div>

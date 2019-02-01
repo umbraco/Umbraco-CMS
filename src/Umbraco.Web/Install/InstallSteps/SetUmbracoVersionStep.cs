@@ -35,7 +35,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             //During a new install we'll log the default user in (which is id = 0).
-            // During an upgrade, the user will already need to be logged in in order to run the installer.
+            // During an upgrade, the user will already need to be logged in order to run the installer.
 
             var security = new WebSecurity(_httpContext, _userService, _globalSettings);
             //we do this check here because for upgrades the user will already be logged in, for brand new installs,

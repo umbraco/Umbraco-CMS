@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Umbraco\Translation\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
@@ -106,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.33</Version>
+      <Version>8.0.0-alpha.34</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -134,46 +133,12 @@
     </Compile>
     <Compile Include="Config\splashes\NoNodes.aspx.designer.cs">
       <DependentUpon>noNodes.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Create.aspx.cs">
-      <DependentUpon>create.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create.aspx.designer.cs">
-      <DependentUpon>create.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.cs">
-      <DependentUpon>editMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.designer.cs">
-      <DependentUpon>editMacro.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\Default.Master.cs">
-      <DependentUpon>default.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\Default.Master.designer.cs">
-      <DependentUpon>default.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.designer.cs">
-      <DependentUpon>umbracoDialog.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoPage.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
-      <DependentUpon>umbracoPage.Master</DependentUpon>
     </Compile>
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
@@ -197,17 +162,13 @@
     <Content Include="Config\Lang\ru-RU.user.xml" />
     <Content Include="Config\Lang\sv-SE.user.xml" />
     <Content Include="Config\Lang\zh-CN.user.xml" />
+    <Content Include="Config\splashes\noNodes.aspx" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
-    <Content Include="Umbraco\create.aspx" />
-    <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
-    <None Include="Config\404handlers.Release.config">
-      <DependentUpon>404handlers.config</DependentUpon>
-    </None>
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -217,9 +178,6 @@
     <Content Include="Config\imageprocessor\cache.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Config\FileSystemProviders.Release.config">
-      <DependentUpon>FileSystemProviders.config</DependentUpon>
-    </None>
     <None Include="Config\EmbeddedMedia.Release.config">
       <DependentUpon>EmbeddedMedia.config</DependentUpon>
     </None>
@@ -245,26 +203,12 @@
       <DependentUpon>tinyMceConfig.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Config\scripting.Release.config">
-      <DependentUpon>scripting.config</DependentUpon>
-    </None>
-    <None Include="Config\feedProxy.Release.config">
-      <DependentUpon>feedProxy.config</DependentUpon>
-    </None>
-    <None Include="Config\Dashboard.Release.config">
-      <DependentUpon>Dashboard.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
     <Content Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </Content>
-    <None Include="Umbraco\Config\Create\UI.Release.xml">
-      <DependentUpon>UI.xml</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Global.asax" />
     <Content Include="Umbraco\Config\Lang\en_us.xml">
       <SubType>Designer</SubType>
@@ -276,8 +220,6 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
-    <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -288,7 +230,6 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -296,8 +237,6 @@
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\scripting.config" />
-    <Content Include="Config\feedProxy.config" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
@@ -348,29 +287,19 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
-    <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
-    <Content Include="Umbraco\Create\simple.ascx" />
-    <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\Masterpages\default.Master" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\404handlers.config" />
-    <Content Include="Config\Dashboard.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
     <Content Include="Config\BackOfficeTours\getting-started.json" />
   </ItemGroup>

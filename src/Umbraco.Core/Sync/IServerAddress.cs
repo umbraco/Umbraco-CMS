@@ -10,6 +10,6 @@
         /// </summary>
         string ServerAddress { get; }
 
-        //TODO : Should probably add things like port, protocol, server name, app id
+        // TODO: Should probably add things like port, protocol, server name, app id
     }
 }

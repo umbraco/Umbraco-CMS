@@ -130,7 +130,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
         });
       }
 
-      //TODO: This validation shouldn't really be done here, the validation on the login dialog
+      // TODO: This validation shouldn't really be done here, the validation on the login dialog
       // is pretty hacky which is why this is here, ideally validation on the login dialog would
       // be done properly.
       var emailRegex = /\S+@\S+\.\S+/;

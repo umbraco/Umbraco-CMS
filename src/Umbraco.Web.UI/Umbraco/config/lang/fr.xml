@@ -464,7 +464,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Veuillez remplir l'alias et le nom de la nouvelle propriété!</key>
     <key alias="filePermissionsError">Il y a un problème de droits en lecture/écriture sur un fichier ou dossier spécifique</key>
     <key alias="macroErrorLoadingPartialView">Erreur de chargement du script d'une Partial View (fichier : %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Erreur de chargement du userControl '%0%'</key>
     <key alias="missingTitle">Veuillez entrer un titre</key>
     <key alias="missingType">Veuillez choisir un type</key>
     <key alias="pictureResizeBiggerThanOrg">Vous allez définir une taille d'image supérieure à sa taille d'origine. Êtes-vous certain(e) de vouloir continuer?</key>

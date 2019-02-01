@@ -151,7 +151,7 @@ angular.module('umbraco.services')
 
             },
 
-            //TODO: This doesn't do anything!
+            // TODO: This doesn't do anything!
             setCurrent: function (sectionAlias) {
 
                 var currentSection = sectionAlias;

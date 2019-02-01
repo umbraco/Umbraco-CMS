@@ -122,6 +122,18 @@
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
+    <Compile Include="Dashboards\ContentDashboard.cs" />
+    <Compile Include="Dashboards\DashboardCollection.cs" />
+    <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
+    <Compile Include="Dashboards\ExamineDashboard.cs" />
+    <Compile Include="Dashboards\FormsDashboard.cs" />
+    <Compile Include="Dashboards\HealthCheckDashboard.cs" />
+    <Compile Include="Dashboards\MediaDashboard.cs" />
+    <Compile Include="Dashboards\MembersDashboard.cs" />
+    <Compile Include="Dashboards\ModelsBuilderDashboard.cs" />
+    <Compile Include="Dashboards\PublishedStatusDashboard.cs" />
+    <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
+    <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
@@ -170,8 +182,14 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
+    <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
+    <Compile Include="Routing\IPublishedRouter.cs" />
+    <Compile Include="Services\DashboardService.cs" />
+    <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
+    <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Mvc\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
@@ -184,6 +202,7 @@
     <Compile Include="Trees\SettingsBackOfficeSection.cs" />
     <Compile Include="Trees\TranslationBackOfficeSection.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
+    <Compile Include="Trees\TreeUse.cs" />
     <Compile Include="Trees\UsersBackOfficeSection.cs" />
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\ITree.cs" />
@@ -241,10 +260,9 @@
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="SignalR\PreviewHubComposer.cs" />
-    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="Trees\FilesTreeController.cs" />
     <Compile Include="Trees\TreeCollection.cs" />
-    <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
+    <Compile Include="JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
@@ -252,7 +270,6 @@
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
-    <Compile Include="Editors\Dashboards.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
@@ -327,7 +344,6 @@
     <Compile Include="HealthCheck\HealthCheckController.cs" />
     <Compile Include="Macros\MacroPropertyModel.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
-    <Compile Include="Macros\UserControlMacroEngine.cs" />
     <Compile Include="HealthCheck\HealthCheckGroup.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
@@ -516,15 +532,6 @@
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
     <Compile Include="PublishedCache\DefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\DictionaryPublishedContent.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\SafeXmlReaderWriter.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="Routing\ContentFinderByUrl.cs" />
@@ -563,9 +570,6 @@
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
-    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
-    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
@@ -665,7 +669,7 @@
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
-    <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
+    <Compile Include="JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
@@ -677,7 +681,6 @@
     <Compile Include="Scheduling\ThreadingTaskImmutable.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
-    <Compile Include="Mvc\UrlHelperExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
@@ -704,7 +707,6 @@
     <Compile Include="Editors\Filters\ContentSaveValidationAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
     <Compile Include="Editors\DashboardController.cs" />
-    <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
@@ -825,7 +827,6 @@
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
-    <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />
@@ -880,12 +881,9 @@
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="UI\JavaScript\AssetInitialization.cs" />
-    <Compile Include="UI\JavaScript\CssInitialization.cs" />
-    <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="JavaScript\AssetInitialization.cs" />
+    <Compile Include="JavaScript\CssInitialization.cs" />
+    <Compile Include="JavaScript\DependencyPathRenderer.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -912,7 +910,6 @@
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
-    <Compile Include="Editors\LegacyController.cs" />
     <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
@@ -929,7 +926,6 @@
     <Compile Include="Scheduling\KeepAlive.cs" />
     <Compile Include="Scheduling\LogScrubber.cs" />
     <Compile Include="Scheduling\ScheduledPublishing.cs" />
-    <Compile Include="Scheduling\ScheduledTasks.cs" />
     <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
@@ -993,7 +989,7 @@
     <Compile Include="Trees\ContentTreeController.cs" />
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
-    <Compile Include="UI\JavaScript\JsInitialization.cs" />
+    <Compile Include="JavaScript\JsInitialization.cs" />
     <Compile Include="Models\ContentEditing\ContentItemBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyCollectionDto.cs" />
@@ -1013,7 +1009,6 @@
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
@@ -1021,26 +1016,18 @@
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\UmbracoContextCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
-    <Compile Include="UI\JavaScript\Resources.Designer.cs">
+    <Compile Include="JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
+    <Compile Include="JavaScript\ServerVariablesParser.cs" />
     <Compile Include="Components\PublicAccessComponent.cs" />
-    <Compile Include="UI\Bundles\JsJQueryCore.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
-    <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
@@ -1113,7 +1100,7 @@
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
-    <Compile Include="Routing\ContentFinderByLegacy404.cs" />
+    <Compile Include="Routing\ContentFinderByConfigured404.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
@@ -1124,7 +1111,6 @@
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
     <Compile Include="Routing\UrlProvider.cs" />
-    <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Components\DatabaseServerRegistrarAndMessengerComponent.cs" />
@@ -1132,53 +1118,11 @@
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
-    <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="_Legacy\Controls\pane.cs" />
-    <Compile Include="_Legacy\Controls\Panel.cs" />
-    <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
-    <Compile Include="_Legacy\Controls\TabPage.cs" />
-    <Compile Include="_Legacy\Controls\TabView.cs" />
-    <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
-    <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
-    <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
-    <Compile Include="_Legacy\UI\ITask.cs" />
-    <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
-    <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
-    <Compile Include="_Legacy\UI\LegacyDialogTask.cs" />
-    <Compile Include="UI\Controls\ProgressBar.cs" />
-    <Compile Include="UI\Controls\UmbracoControl.cs" />
-    <Compile Include="UI\Controls\UmbracoUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Pages\BasePage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Pages\ClientTools.cs" />
-    <Compile Include="UI\Pages\UmbracoEnsuredPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\SpeechBubbleIcon.cs" />
-    <Compile Include="umbraco.presentation\AttributeCollectionAdapter.cs" />
-    <Compile Include="umbraco.presentation\Default.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
-    <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoPage.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="Models\ContentEditing\NotificationStyle.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedContentCache.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedContent.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
     <Compile Include="Mvc\MasterControllerFactory.cs" />
@@ -1207,10 +1151,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\item.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\page.cs">
+    <Compile Include="Macros\PublishedContentHashtableConverter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
@@ -1218,22 +1159,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
-      <DependentUpon>FeedProxy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
-      <DependentUpon>FeedProxy.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
-    <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Macro.cs" />
-    <Compile Include="umbraco.presentation\umbraco\templateControls\ContentType.cs" />
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
@@ -1249,11 +1174,10 @@
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Editors\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\JavaScript\Resources.resx">
+    <EmbeddedResource Include="JavaScript\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
@@ -1262,18 +1186,17 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\JavaScript\Main.js" />
-    <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
-    <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
+    <EmbeddedResource Include="JavaScript\Main.js" />
+    <EmbeddedResource Include="JavaScript\JsInitialize.js" />
+    <EmbeddedResource Include="JavaScript\ServerVariables.js" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
+    <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="PublishedCache\NuCache\notes.txt" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />

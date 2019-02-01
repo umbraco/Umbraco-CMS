@@ -12,7 +12,7 @@
             scope.editors = [];
 
             function addEditor(editor) {
-
+                
                 editor.animating = true;
 
                 showOverlayOnPrevEditor();
@@ -88,7 +88,7 @@
             }
 
             function removeEditor(editor) {
-
+                
                 editor.animating = true;
 
                 $timeout(function(){

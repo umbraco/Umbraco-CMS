@@ -24,7 +24,7 @@ namespace Umbraco.Web.Cache
         #region Core notification methods
 
         /// <summary>
-        /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
+        /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the invalidated items.</typeparam>
         /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Notifies the distributed cache of specifieds item removal, for a specified <see cref="ICacheRefresher"/>.
+        /// Notifies the distributed cache of specified item removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the removed items.</typeparam>
         /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>

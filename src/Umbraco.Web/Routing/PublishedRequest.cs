@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Web;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using RenderingEngine = Umbraco.Core.RenderingEngine;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.Routing
 {
@@ -19,18 +17,17 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedRequest
     {
-        private readonly PublishedRouter _publishedRouter;
+        private readonly IPublishedRouter _publishedRouter;
 
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
         private Uri _uri; // clean uri, no virtual dir, no trailing slash nor .aspx, nothing
-        private ITemplate _template; // template model if any else null
         private bool _is404;
         private DomainAndUri _domain;
         private CultureInfo _culture;
         private IPublishedContent _publishedContent;
         private IPublishedContent _initialPublishedContent; // found by finders before 404, redirects, etc
-        private page _umbracoPage; // legacy
+        private PublishedContentHashtableConverter _umbracoPage; // legacy
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
@@ -38,12 +35,11 @@ namespace Umbraco.Web.Routing
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        internal PublishedRequest(PublishedRouter publishedRouter, UmbracoContext umbracoContext, Uri uri = null)
+        internal PublishedRequest(IPublishedRouter publishedRouter, UmbracoContext umbracoContext, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
-            RenderingEngine = RenderingEngine.Unknown;
         }
 
         /// <summary>
@@ -93,7 +89,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <remarks>When the event triggers, no preparation has been done. It is still possible to
         /// modify the request's Uri property, for example to restore its original, public-facing value
-        /// that might have been modified by an in-between equipement such as a load-balancer.</remarks>
+        /// that might have been modified by an in-between equipment such as a load-balancer.</remarks>
         public static event EventHandler<EventArgs> Preparing;
 
         /// <summary>
@@ -174,8 +170,7 @@ namespace Umbraco.Web.Routing
             // else
 
             // save
-            var template = _template;
-            var renderingEngine = RenderingEngine;
+            var template = TemplateModel;
 
             // set published content - this resets the template, and sets IsInternalRedirect to false
             PublishedContent = content;
@@ -185,8 +180,7 @@ namespace Umbraco.Web.Routing
             if (isInternalRedirect && Current.Configs.Settings().WebRouting.InternalRedirectPreservesTemplate)
             {
                 // restore
-                _template = template;
-                RenderingEngine = renderingEngine;
+                TemplateModel = template;
             }
         }
 
@@ -234,26 +228,12 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets or sets the template model to use to display the requested content.
         /// </summary>
-        internal ITemplate TemplateModel
-        {
-            get
-            {
-                return _template;
-            }
-
-            set
-            {
-                _template = value;
-                RenderingEngine = RenderingEngine.Unknown; // reset
-                if (_template != null)
-                    RenderingEngine = _publishedRouter.FindTemplateRenderingEngine(_template.Alias);
-            }
-        }
+        internal ITemplate TemplateModel { get; set; }
 
         /// <summary>
         /// Gets the alias of the template to use to display the requested content.
         /// </summary>
-        public string TemplateAlias => _template?.Alias;
+        public string TemplateAlias => TemplateModel?.Alias;
 
         /// <summary>
         /// Tries to set the template to use to display the requested content.
@@ -274,7 +254,7 @@ namespace Umbraco.Web.Routing
                 return true;
             }
 
-            // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
+            // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
             alias = alias.Replace(" ", "");
 
             var model = _publishedRouter.GetTemplate(alias);
@@ -309,13 +289,13 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets a value indicating whether the content request has a template.
         /// </summary>
-        public bool HasTemplate => _template != null;
+        public bool HasTemplate => TemplateModel != null;
 
-        internal void UpdateOnMissingTemplate()
+        internal void UpdateToNotFound()
         {
             var __readonly = _readonly;
             _readonly = false;
-            _publishedRouter.UpdateRequestOnMissingTemplate(this);
+            _publishedRouter.UpdateRequestToNotFound(this);
             _readonly = __readonly;
         }
 
@@ -357,16 +337,7 @@ namespace Umbraco.Web.Routing
         }
 
         // note: do we want to have an ordered list of alternate cultures,
-        // to allow for fallbacks when doing dictionnary lookup and such?
-
-        #endregion
-
-        #region Rendering
-
-        /// <summary>
-        /// Gets or sets whether the rendering engine is MVC or WebForms.
-        /// </summary>
-        public RenderingEngine RenderingEngine { get; internal set; }
+        // to allow for fallbacks when doing dictionary lookup and such?
 
         #endregion
 
@@ -430,7 +401,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Indicates that the content requet should trigger a redirect, with a specified status code.
+        /// Indicates that the content request should trigger a redirect, with a specified status code.
         /// </summary>
         /// <param name="url">The url to redirect to.</param>
         /// <param name="status">The status code (300-308).</param>
@@ -491,24 +462,25 @@ namespace Umbraco.Web.Routing
         // Note: we used to set a default value here but that would then be the default
         // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
         // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-        internal HttpCacheability Cacheability { get; set; }
+        public HttpCacheability Cacheability { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Extensions to append to the Response.Cache object.
         /// </summary>
-        internal List<string> CacheExtensions { get; set; } = new List<string>();
+        public List<string> CacheExtensions { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a dictionary of Headers to append to the Response object.
         /// </summary>
-        internal Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
         #endregion
 
         #region Legacy
 
-        // for legacy/webforms code - todo - get rid of it eventually
-        internal page UmbracoPage
+        // for legacy/webforms/macro code -
+        // TODO: get rid of it eventually
+        internal PublishedContentHashtableConverter LegacyContentHashTable
         {
             get
             {
@@ -517,7 +489,7 @@ namespace Umbraco.Web.Routing
 
                 return _umbracoPage;
             }
-            set { _umbracoPage = value; }
+            set => _umbracoPage = value;
         }
 
         #endregion

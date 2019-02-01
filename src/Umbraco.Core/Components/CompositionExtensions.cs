@@ -9,7 +9,8 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Components
 {
@@ -296,6 +297,37 @@ namespace Umbraco.Core.Components
         /// <param name="filesystemFactory">A filesystem factory.</param>
         public static void SetMediaFileSystem(this Composition composition, Func<IFileSystem> filesystemFactory)
             => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(_ => filesystemFactory());
+
+        /// <summary>
+        /// Sets the log viewer.
+        /// </summary>
+        /// <typeparam name="T">The type of the log viewer.</typeparam>
+        /// <param name="composition">The composition.</param>
+        public static void SetLogViewer<T>(this Composition composition)
+            where T : ILogViewer
+        {
+            composition.RegisterUnique<ILogViewer, T>();
+        }
+
+        /// <summary>
+        /// Sets the log viewer.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="factory">A function creating a log viewer.</param>
+        public static void SetLogViewer(this Composition composition, Func<IFactory, ILogViewer> factory)
+        {
+            composition.RegisterUnique(factory);
+        }
+
+        /// <summary>
+        /// Sets the log viewer.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="helper">A log viewer.</param>
+        public static void SetLogViewer(this Composition composition, ILogViewer viewer)
+        {
+            composition.RegisterUnique(_ => viewer);
+        }
 
         #endregion
     }

@@ -29,7 +29,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructor
 
-        // todo - figure this out
+        // TODO: figure this out
         // after the current snapshot has been resync-ed
         // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
@@ -93,7 +93,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // if in a domain then start with the root node of the domain
                 // and follow the path
                 // note: if domain has a path (eg example.com/en) which is not recommended anymore
-                //  then then /en part of the domain is basically ignored here...
+                //  then /en part of the domain is basically ignored here...
                 content = GetById(preview, startNodeId);
                 content = FollowRoute(content, parts, 0, culture);
             }
@@ -243,7 +243,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var n = _snapshot.Get(contentId);
             if (n == null) return false;
 
-            return preview || n.Published != null;
+            return preview || n.PublishedModel != null;
         }
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
@@ -280,8 +280,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // both .Draft and .Published cannot be null at the same time
 
             return preview
-                ? node.Draft ?? GetPublishedContentAsDraft(node.Published)
-                : node.Published;
+                ? node.DraftModel ?? GetPublishedContentAsDraft(node.PublishedModel)
+                : node.PublishedModel;
         }
 
         // gets a published content as a previewing draft, if preview is true
@@ -302,7 +302,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return preview
                 ? _snapshot.IsEmpty == false
-                : _snapshot.GetAtRoot().Any(x => x.Published != null);
+                : _snapshot.GetAtRoot().Any(x => x.PublishedModel != null);
         }
 
         #endregion
