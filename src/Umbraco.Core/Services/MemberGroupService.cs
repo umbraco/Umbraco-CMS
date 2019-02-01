@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -69,6 +70,11 @@ namespace Umbraco.Core.Services
 
         public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
         {
+            if (string.IsNullOrWhiteSpace(memberGroup.Name))
+            {
+                throw new InvalidOperationException("The name of a MemberGroup can not be empty");
+            }
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var saveEventArgs = new SaveEventArgs<IMemberGroup>(memberGroup);

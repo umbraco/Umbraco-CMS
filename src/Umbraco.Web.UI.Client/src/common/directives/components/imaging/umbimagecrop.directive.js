@@ -103,34 +103,6 @@ angular.module("umbraco.directives")
 						scope.dimensions.cropper.height = _viewPortH; //  scope.dimensions.viewport.height - 2 * scope.dimensions.margin;
 					};
 
-
-					//when loading an image without any crop info, we center and fit it
-					var resizeImageToEditor = function(){
-						//returns size fitting the cropper
-						var size = cropperHelper.calculateAspectRatioFit(
-								scope.dimensions.image.width,
-								scope.dimensions.image.height,
-								scope.dimensions.cropper.width,
-								scope.dimensions.cropper.height,
-								true);
-
-						//sets the image size and updates the scope
-						scope.dimensions.image.width = size.width;
-						scope.dimensions.image.height = size.height;
-
-						//calculate the best suited ratios
-						scope.dimensions.scale.min = size.ratio;
-						scope.dimensions.scale.max = 2;
-						scope.dimensions.scale.current = size.ratio;
-
-						//center the image
-						var position = cropperHelper.centerInsideViewPort(scope.dimensions.image, scope.dimensions.cropper);
-						scope.dimensions.top = position.top;
-						scope.dimensions.left = position.left;
-
-						setConstraints();
-					};
-
 					//resize to a given ratio
 					var resizeImageToScale = function(ratio){
 						//do stuff
@@ -227,12 +199,19 @@ angular.module("umbraco.directives")
 						//set dimensions on image, viewport, cropper etc
 						setDimensions(image);
 
-						//if we have a crop already position the image
-						if(scope.crop){
-							resizeImageToCrop();
-						}else{
-							resizeImageToEditor();
-						}
+						//create a default crop if we haven't got one already
+                        var createDefaultCrop = !scope.crop;
+                        if (createDefaultCrop) {
+                            calculateCropBox();
+                        }
+
+						resizeImageToCrop();
+
+                        //if we're creating a new crop, make sure to zoom out fully
+                        if (createDefaultCrop) {
+                            scope.dimensions.scale.current = scope.dimensions.scale.min;
+    						resizeImageToScale(scope.dimensions.scale.min);
+                        }
 
 						//sets constaints for the cropper
 						setConstraints();
