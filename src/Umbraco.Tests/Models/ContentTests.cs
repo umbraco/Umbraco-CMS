@@ -75,6 +75,8 @@ namespace Umbraco.Tests.Models
 
             contentType.Variations = ContentVariation.Culture;
 
+            content.ChangeContentType(contentType);
+
             Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos"));    //hasn't been changed
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
@@ -301,20 +303,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone, content);
             Assert.AreEqual(clone.Id, content.Id);
             Assert.AreEqual(clone.VersionId, content.VersionId);
-            Assert.AreNotSame(clone.ContentType, content.ContentType);
             Assert.AreEqual(clone.ContentType, content.ContentType);
-            Assert.AreEqual(clone.ContentType.PropertyGroups.Count, content.ContentType.PropertyGroups.Count);
-            for (var index = 0; index < content.ContentType.PropertyGroups.Count; index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyGroups[index], content.ContentType.PropertyGroups[index]);
-                Assert.AreEqual(clone.ContentType.PropertyGroups[index], content.ContentType.PropertyGroups[index]);
-            }
-            Assert.AreEqual(clone.ContentType.PropertyTypes.Count(), content.ContentType.PropertyTypes.Count());
-            for (var index = 0; index < content.ContentType.PropertyTypes.Count(); index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyTypes.ElementAt(index), content.ContentType.PropertyTypes.ElementAt(index));
-                Assert.AreEqual(clone.ContentType.PropertyTypes.ElementAt(index), content.ContentType.PropertyTypes.ElementAt(index));
-            }
             Assert.AreEqual(clone.ContentTypeId, content.ContentTypeId);
             Assert.AreEqual(clone.CreateDate, content.CreateDate);
             Assert.AreEqual(clone.CreatorId, content.CreatorId);
@@ -407,8 +396,6 @@ namespace Umbraco.Tests.Models
             content.Trashed = true;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
-            
-            content.ContentType.UpdateDate = DateTime.Now;  //update a child object
 
             // Act
             content.ResetDirtyProperties();
@@ -446,8 +433,6 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Name"));
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
             }
-            //verify child objects were reset too
-            Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 
         [Test]
