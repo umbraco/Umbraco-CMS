@@ -17,7 +17,7 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedRequest
     {
-        private readonly PublishedRouter _publishedRouter;
+        private readonly IPublishedRouter _publishedRouter;
 
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Routing
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        internal PublishedRequest(PublishedRouter publishedRouter, UmbracoContext umbracoContext, Uri uri = null)
+        internal PublishedRequest(IPublishedRouter publishedRouter, UmbracoContext umbracoContext, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -290,11 +290,11 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasTemplate => TemplateModel != null;
 
-        internal void UpdateOnMissingTemplate()
+        internal void UpdateToNotFound()
         {
             var __readonly = _readonly;
             _readonly = false;
-            _publishedRouter.UpdateRequestOnMissingTemplate(this);
+            _publishedRouter.UpdateRequestToNotFound(this);
             _readonly = __readonly;
         }
 

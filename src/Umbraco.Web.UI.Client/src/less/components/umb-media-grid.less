@@ -21,11 +21,14 @@
 
     margin: 10px;
     position: relative;
-    overflow: hidden;
+    //overflow: hidden;
+    
+    user-select: none;
+    
     cursor: pointer;
     
-    border: 2px dashed transparent;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
+    //border: 2px solid transparent;
     
     transition: box-shadow 150ms ease-in-out;
 }
@@ -35,16 +38,31 @@
 }
 
 .umb-media-grid__item.-selected {
-    box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
     
     //background: @ui-selected;
     color:@ui-selected-type;
-    border-color:@ui-selected-border;
+    //border-color: @ui-selected-border;
+    //box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
     
-    &:hover {
-        color:@ui-selected-type-hover;
-        border-color:@ui-selected-border-hover;
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
     }
+    
+    .umb-media-grid__item-overlay {
+        color: @ui-selected-type;
+        //background: @ui-selected-border;
+    }
+    
 }
 
 .umb-media-grid__item-file-icon > span {
@@ -64,16 +82,22 @@
 }
 
 .umb-media-grid__item-image {
-   max-width: 100% !important;
-   height: auto;
+   //max-width: 100% !important;
+   //height: auto;
    position: relative;
+   
+   object-fit: contain;
+   height: 100%;
 }
 
 .umb-media-grid__item-image-placeholder {
     width: 100%;
-    max-width: 100%;
-    height: auto;
+    //max-width: 100%;
+    //height: auto;
     position: relative;
+    
+    object-fit: contain;
+    height: 100%;
 }
 
 .umb-media-grid__image-background {
@@ -95,17 +119,22 @@
    right: 0;
    bottom: 0;
    left: 0;
-   z-index: 100;
+   z-index: 1;
    padding: 5px 10px;
    box-sizing: border-box;
    font-size: 12px;
    overflow: hidden;
    color: @black;
    white-space: nowrap;
-   border-top:1px solid @gray-9;
-   background: @white;
+   border-top:1px solid fade(black, 4%);
+   background: fade(@white, 92%);
    transition: opacity 150ms;
+   
+   &:hover {
+       text-decoration: underline;
+   }
 }
+
 /*
 .umb-media-grid__item.-file .umb-media-grid__item-overlay {
     opacity: 1;
@@ -180,6 +209,10 @@
     align-items: center;
     color: @black;
     transition: opacity 150ms;
+    
+    &:hover {
+        color: @ui-action-disgrete-type-hover;
+    }
 }
 
 .umb-media-grid__item:hover .umb-media-grid__edit {

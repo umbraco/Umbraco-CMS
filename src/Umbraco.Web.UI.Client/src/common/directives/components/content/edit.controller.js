@@ -26,20 +26,43 @@
         $scope.allowOpen = true;
         $scope.app = null;
 
-        function init(content) {
-            if (!$scope.app) {
-                // set first app to active
+        function init() {
+            
+            var content = $scope.content;
+            
+            // we need to check wether an app is present in the current data, if not we will present the default app.
+            var isAppPresent = false;
+            
+            // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
+            if ($scope.app) {
+                
+                // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
+                _.forEach(content.apps, function(app) {
+                    if (app === $scope.app) {
+                        isAppPresent = true;
+                    }
+                });
+                
+                // if we did reload our DocType, but still have the same app we will try to find it by the alias.
+                if (isAppPresent === false) {
+                    _.forEach(content.apps, function(app) {
+                        if (app.alias === $scope.app.alias) {
+                            isAppPresent = true;
+                            app.active = true;
+                            $scope.appChanged(app);
+                        }
+                    });
+                }
+                
+            }
+            
+            // if we still dont have a app, lets show the first one:
+            if (isAppPresent === false) {
                 content.apps[0].active = true;
-                $scope.app = content.apps[0];
+                $scope.appChanged(content.apps[0]);
             }
-
-            if (infiniteMode) {
-                createInfiniteModeButtons(content);
-            } else {
-                createButtons(content);
-            }
-
-            editorState.set($scope.content);
+            
+            editorState.set(content);
 
             //We fetch all ancestors of the node to generate the footer breadcrumb navigation
             if (!$scope.page.isNew) {
@@ -129,7 +152,7 @@
                             "/content/content/edit/" + data.parentId;
                     }
 
-                    init($scope.content);
+                    init();
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -340,7 +363,7 @@
                 showNotifications: args.showNotifications
             }).then(function (data) {
                 //success
-                init($scope.content);
+                init();
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
@@ -414,7 +437,7 @@
 
                     $scope.content = data;
 
-                    init($scope.content);
+                    init();
 
                     resetLastListPageNumber($scope.content);
 
@@ -454,7 +477,7 @@
                             .then(function (data) {
                                 formHelper.resetForm({ scope: $scope });
                                 contentEditingHelper.reBindChangedProperties($scope.content, data);
-                                init($scope.content);
+                                init();
                                 syncTreeNode($scope.content, data.path);
                                 $scope.page.buttonGroupState = "success";
                                 eventsService.emit("content.unpublished", { content: $scope.content });
@@ -845,8 +868,14 @@
          * @param {any} app
          */
         $scope.appChanged = function (app) {
+            
             $scope.app = app;
-            createButtons($scope.content);
+            
+            if (infiniteMode) {
+                createInfiniteModeButtons($scope.content);
+            } else {
+                createButtons($scope.content);
+            }
         };
 
         // methods for infinite editing

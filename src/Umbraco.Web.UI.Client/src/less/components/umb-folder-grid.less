@@ -14,7 +14,7 @@
    padding: 10px 20px;
    box-sizing: border-box;
    flex: 1 1 200px;
-   border: 2px dashed transparent;
+   //border: 2px solid transparent;
    transition: border 0.2s;
    position: relative;
    justify-content: space-between;
@@ -27,15 +27,29 @@
 }
 
 .umb-folder-grid__folder.-selected {
-    box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
+    //box-shadow: 0 2px 8px 0 darken(@ui-selected-border, 20);
     
     //background: @ui-selected;
     color:@ui-selected-type;
-    border-color:@ui-selected-border;
+    //border-color:@ui-selected-border;
+    
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
+    }
     
     &:hover {
         color:@ui-selected-type-hover;
-        border-color:@ui-selected-border-hover;
+        //border-color:@ui-selected-border-hover;
     }
 }
 
@@ -59,12 +73,12 @@
 .umb-folder-grid__folder-icon[class*=" icon-"] {
    font-size: 20px;
    margin-right: 15px;
-   color: @black;
+   //color: @black;
 }
 
 .umb-folder-grid__folder-name {
    font-size: 13px;
-   color: @black;
+   //color: @black;
    font-weight: bold;
 }
 

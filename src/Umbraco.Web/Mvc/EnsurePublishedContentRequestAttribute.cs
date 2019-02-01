@@ -33,8 +33,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="contentId"></param>
         public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _contentId = contentId;
         }
 
@@ -63,8 +62,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="dataTokenName"></param>
         public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _dataTokenName = dataTokenName;
         }
 
@@ -74,7 +72,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
 
         // TODO: try lazy property injection?
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
+        private IPublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<IPublishedRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper

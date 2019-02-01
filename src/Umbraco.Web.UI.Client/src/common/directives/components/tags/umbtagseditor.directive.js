@@ -52,7 +52,8 @@
 
                 vm.isLoading = false;
 
-                configureViewModel();
+                //ensure that the models are formatted correctly
+                configureViewModel(true);
 
                 // Set the visible prompt to -1 to ensure it will not be visible
                 vm.promptIsVisible = "-1";
@@ -123,9 +124,13 @@
             });
         }
 
+        /**
+         * Watch for value changes
+         * @param {any} changes
+         */
         function onChanges(changes) {
 
-            // watch for value changes externally
+            //when the model 'value' changes, sync the viewModel object
             if (changes.value) {
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
@@ -145,13 +150,15 @@
             $element.find('.tags-' + vm.htmlId).typeahead('destroy');
         }
 
-        function configureViewModel() {
+        function configureViewModel(isInitLoad) {
             if (vm.value) {
                 if (angular.isString(vm.value) && vm.value.length > 0) {
                     if (vm.config.storageType === "Json") {
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
-                        updateModelValue(vm.viewModel);
+                        if (!isInitLoad) {
+                            updateModelValue(vm.viewModel);
+                        }
                     }
                     else {
                         //csv storage
@@ -165,7 +172,10 @@
                             return self.indexOf(v) === i;
                         });
 
-                        updateModelValue(vm.viewModel);
+                        if (!isInitLoad) {
+                            updateModelValue(vm.viewModel);
+                        }
+                        
                     }
                 }
                 else if (angular.isArray(vm.value)) {
@@ -175,12 +185,17 @@
         }
 
         function updateModelValue(val) {
-            if (val) {
-                vm.onValueChanged({ value: val });
+
+            //need to format the underlying model value for persistence based on the storage type
+            if (vm.config.storageType === "Json") {
+                val = val ? val : [];
             }
             else {
-                vm.onValueChanged({ value: [] });
+                //then it is csv and we need to format it like that
+                val = val ? val.join() : "";
             }
+
+            vm.onValueChanged({ value: val });
 
             reValidate();
         }
@@ -273,8 +288,10 @@
         }
 
         function reValidate() {
-            //this is required to re-validate
-            vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+            //this is required to re-validate for the mandatory validation
+            if (vm.tagEditorForm && vm.tagEditorForm.tagCount) {
+                vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+            }
         }
 
     }

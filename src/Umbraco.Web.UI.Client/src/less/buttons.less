@@ -197,7 +197,12 @@ input[type="button"] {
 }
 // Made for Umbraco, 2019
 .btn-action {
-  .buttonBackground(@pinkLight, @blueDark, @blueExtraDark, @u-white);
+  .buttonBackground(@blueExtraDark, @blueDark, @pinkLight, @u-white);
+}
+// Made for Umbraco, 2019
+.btn-selection {
+    @btnSelectionBackgroundHover: darken(@pinkLight, 10%);
+  .buttonBackground(@pinkLight, @btnSelectionBackgroundHover, @blueExtraDark, @blueDark);
 }
 // Made for Umbraco, 2019, used for buttons that has to stand back.
 .btn-white {
