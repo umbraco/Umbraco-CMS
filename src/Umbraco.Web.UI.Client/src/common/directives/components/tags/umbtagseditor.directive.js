@@ -24,10 +24,10 @@
 
     function umbTagsEditorController($rootScope, assetsService, umbRequestHelper, angularHelper, $timeout, $element) {
 
-        var vm = this;
+        let vm = this;
 
-        var typeahead;
-        var tagsHound;
+        let typeahead;
+        let tagsHound;
 
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
@@ -53,50 +53,51 @@
                 vm.isLoading = false;
 
                 //ensure that the models are formatted correctly
-                configureViewModel(true);
+                configureViewModel();
 
                 // Set the visible prompt to -1 to ensure it will not be visible
                 vm.promptIsVisible = "-1";
 
                 tagsHound = new Bloodhound({
-                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                    initialize: false,
+                    identify: function (obj) { return obj.id; },
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
                     queryTokenizer: Bloodhound.tokenizers.whitespace,
                     //pre-fetch the tags for this category
                     prefetch: {
                         url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture }),
                         //TTL = 5 minutes
-                        ttl: 300000,
-                        transform: dataTransform
+                        ttl: 300000
                     },
                     //dynamically get the tags for this category (they may have changed on the server)
                     remote: {
-                        url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture }),
-                        transform: dataTransform
+                        url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture, query: "%QUERY" }),
+                        wildcard: "%QUERY"
                     }
                 });
 
-                tagsHound.initialize(true);
+                tagsHound.initialize().then(function() {
 
-                //configure the type ahead
-                $timeout(function () {
-
+                    //configure the type ahead
+                    
                     var sources = {
                         //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
-                        // name = the data set name, we'll make this the tag group name
-                        name: vm.config.group,
-                        display: "value",
+                        // name = the data set name, we'll make this the tag group name + culture
+                        name: vm.config.group + (vm.culture ? vm.culture : ""),
+                        display: "text",
                         //source: tagsHound
-                        source: function (query, cb) {
+                        source: function (query, syncCallback, asyncCallback) {
                             tagsHound.search(query,
                                 function(suggestions) {
-                                    cb(removeCurrentTagsFromSuggestions(suggestions));
+                                    syncCallback(removeCurrentTagsFromSuggestions(suggestions));
+                                }, function(suggestions) {
+                                    asyncCallback(removeCurrentTagsFromSuggestions(suggestions));
                                 });
                         }
                     };
 
                     var opts = {
-                        //This causes some strangeness as it duplicates the textbox, best leave off for now.
-                        hint: false,
+                        hint: true,
                         highlight: true,
                         cacheKey: new Date(),  // Force a cache refresh each time the control is initialized
                         minLength: 1
@@ -105,22 +106,25 @@
                     typeahead = $element.find('.tags-' + vm.htmlId).typeahead(opts, sources)
                         .bind("typeahead:selected", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
-                                addTagInternal(datum["value"]);
+                                addTagInternal(datum["text"]);
                                 vm.tagToAdd = "";
                                 // clear the typed text
                                 typeahead.typeahead('val', '');
                             });
                         }).bind("typeahead:autocompleted", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
-                                addTagInternal(datum["value"]);
+                                addTagInternal(datum["text"]);
                                 vm.tagToAdd = "";
+                                // clear the typed text
+                                typeahead.typeahead('val', '');
                             });
 
                         }).bind("typeahead:opened", function (obj) {
 
                         });
-                });
 
+                });
+                
             });
         }
 
@@ -150,15 +154,13 @@
             $element.find('.tags-' + vm.htmlId).typeahead('destroy');
         }
 
-        function configureViewModel(isInitLoad) {
+        function configureViewModel() {
             if (vm.value) {
                 if (angular.isString(vm.value) && vm.value.length > 0) {
                     if (vm.config.storageType === "Json") {
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
-                        if (!isInitLoad) {
-                            updateModelValue(vm.viewModel);
-                        }
+                        updateModelValue(vm.viewModel);
                     }
                     else {
                         //csv storage
@@ -172,9 +174,7 @@
                             return self.indexOf(v) === i;
                         });
 
-                        if (!isInitLoad) {
-                            updateModelValue(vm.viewModel);
-                        }
+                        updateModelValue(vm.viewModel);
                         
                     }
                 }
@@ -186,14 +186,7 @@
 
         function updateModelValue(val) {
 
-            //need to format the underlying model value for persistence based on the storage type
-            if (vm.config.storageType === "Json") {
-                val = val ? val : [];
-            }
-            else {
-                //then it is csv and we need to format it like that
-                val = val ? val.join() : "";
-            }
+            val = val ? val : [];
 
             vm.onValueChanged({ value: val });
 
@@ -267,23 +260,11 @@
         function hidePrompt() {
             vm.promptIsVisible = "-1";
         }
-
-        //helper method to format the data for bloodhound
-        function dataTransform(list) {
-            //transform the result to what bloodhound wants
-            var tagList = _.map(list, function (i) {
-                return { value: i.text };
-            });
-            // remove current tags from the list
-            return $.grep(tagList, function (tag) {
-                return ($.inArray(tag.value, vm.viewModel) === -1);
-            });
-        }
-
+        
         // helper method to remove current tags
         function removeCurrentTagsFromSuggestions(suggestions) {
             return $.grep(suggestions, function (suggestion) {
-                return ($.inArray(suggestion.value, vm.viewModel) === -1);
+                return ($.inArray(suggestion.text, vm.viewModel) === -1);
             });
         }
 
