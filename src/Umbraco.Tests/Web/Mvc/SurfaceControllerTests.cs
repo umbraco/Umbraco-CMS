@@ -77,42 +77,15 @@ namespace Umbraco.Tests.Web.Mvc
 
             Assert.IsNotNull(ctrl.UmbracoContext);
         }
-
-        [Test]
-        public void Umbraco_Helper_Not_Null()
-        {
-            var globalSettings = TestObjects.GetGlobalSettings();
-            var umbracoContext = UmbracoContext.EnsureContext(
-                Current.UmbracoContextAccessor,
-                new Mock<HttpContextBase>().Object,
-                Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null, globalSettings).Object,
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
-                new TestVariationContextAccessor(),
-                true);
-
-            var controller = new TestSurfaceController(umbracoContext);
-            Composition.Register(_ => umbracoContext);
-
-            Assert.IsNotNull(controller.Umbraco);
-        }
-
+        
         [Test]
         public void Can_Lookup_Content()
         {
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
-            var contentCache = new Mock<IPublishedContentCache>();
             var content = new Mock<IPublishedContent>();
             content.Setup(x => x.Id).Returns(2);
-            contentCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(content.Object);
-            var mediaCache = new Mock<IPublishedMediaCache>();
-            publishedSnapshot.Setup(x => x.Content).Returns(contentCache.Object);
-            publishedSnapshot.Setup(x => x.Media).Returns(mediaCache.Object);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
-            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var umbracoContext = UmbracoContext.EnsureContext(
@@ -131,13 +104,14 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                Mock.Of<IPublishedContentQuery>(),
+                Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object),
                 new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>()));
 
             var ctrl = new TestSurfaceController(umbracoContext, helper);
             var result = ctrl.GetContent(2) as PublishedContentResult;
 
             Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Content);
             Assert.AreEqual(2, result.Content.Id);
         }
 
