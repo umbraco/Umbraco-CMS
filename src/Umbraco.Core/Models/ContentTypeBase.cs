@@ -504,9 +504,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public IContentType DeepCloneWithResetIdentities(string alias)
+        public ContentTypeBase DeepCloneWithResetIdentities(string alias)
         {
-            var clone = (ContentType)DeepClone();
+            var clone = (ContentTypeBase)DeepClone();
             clone.Alias = alias;
             clone.Key = Guid.Empty;
             foreach (var propertyGroup in clone.PropertyGroups)

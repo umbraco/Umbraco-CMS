@@ -160,5 +160,8 @@ namespace Umbraco.Core.Models
 
             return result;
         }
+
+        /// <inheritdoc />
+        IContentType IContentType.DeepCloneWithResetIdentities(string newAlias) => (IContentType)DeepCloneWithResetIdentities(newAlias);
     }
 }
