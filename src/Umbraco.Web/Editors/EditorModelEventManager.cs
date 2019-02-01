@@ -15,9 +15,9 @@ namespace Umbraco.Web.Editors
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<MediaItemDisplay>> SendingMediaModel;
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<MemberDisplay>> SendingMemberModel;
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<UserDisplay>> SendingUserModel;
-        public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboard>>>> SendingDashboardModel;
+        public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>> SendingDashboardModel;
 
-        private static void OnSendingDashboardModel(HttpActionExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<IDashboard>>> e)
+        private static void OnSendingDashboardModel(HttpActionExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>> e)
         {
             var handler = SendingDashboardModel;
             handler?.Invoke(sender, e);
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
                 OnSendingUserModel(sender, new EditorModelEventArgs<UserDisplay>(e));
 
             if (e.Model is IEnumerable<IDashboard>)
-                OnSendingDashboardModel(sender, new EditorModelEventArgs<IEnumerable<Tab<IDashboard>>>(e));
+                OnSendingDashboardModel(sender, new EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>(e));
         }
     }
 }
