@@ -23,8 +23,8 @@ namespace Umbraco.Web.Mvc
             ActionInvoker = new RenderActionInvoker();
         }
 
-        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger, umbracoHelper)
+        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContext, services, appCaches, profilingLogger, umbracoHelper)
         {
             ActionInvoker = new RenderActionInvoker();
         }

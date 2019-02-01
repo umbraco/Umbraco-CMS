@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -17,12 +18,15 @@ using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Runtime;
+using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Routing
@@ -136,7 +140,16 @@ namespace Umbraco.Tests.Routing
             var type = new AutoPublishedContentType(22, "CustomDocument", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>(), context =>
+            {
+                var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());
+                return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    new UmbracoHelper(umbracoContext, Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
+            }));
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
@@ -172,7 +185,8 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger, umbracoHelper)
+            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+                : base(globalSettings, umbracoContext, services, appCaches, profilingLogger, umbracoHelper)
             {
             }
 
