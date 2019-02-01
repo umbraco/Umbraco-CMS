@@ -26,7 +26,7 @@
             //dealing with requests:
             'request': function(config) {
                 if(config.method === "POST"){
-                    config.transformRequest.push(transform);
+                    transform(config.data);
                 }
                 
                 return config;

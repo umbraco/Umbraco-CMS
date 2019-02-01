@@ -617,7 +617,7 @@
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "save" })) {
+                if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
 
                     var dialog = {
                         parentScope: $scope,

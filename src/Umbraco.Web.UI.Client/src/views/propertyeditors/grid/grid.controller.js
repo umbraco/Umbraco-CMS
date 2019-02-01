@@ -909,9 +909,9 @@ angular.module("umbraco")
         // needs to be merged in at runtime to ensure that the real config values are used
         // if they are ever updated.
 
-        var unsubscribe = $scope.$on("formSubmitting", function () {
-
-            if ($scope.model.value && $scope.model.value.sections) {
+        var unsubscribe = $scope.$on("formSubmitting", function (e, args) {
+            
+            if (args.action === "save" && $scope.model.value && $scope.model.value.sections) {
                 _.each($scope.model.value.sections, function(section) {
                     if (section.rows) {
                         _.each(section.rows, function (row) {
