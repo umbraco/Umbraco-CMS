@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Media;
-using System.IO;
-using Umbraco.Core.IO;
+using Umbraco.Web.Media.EmbedProviders;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -18,60 +14,56 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class RteEmbedController : UmbracoAuthorizedJsonController
     {
-        public Result GetEmbed(string url, int width, int height)
+        private EmbedProvidersCollection _embedCollection;
+
+        public RteEmbedController(EmbedProvidersCollection embedCollection)
         {
-            var result = new Result();
+            _embedCollection = embedCollection ?? throw new ArgumentNullException(nameof(embedCollection));
+        }
 
-            // TODO: cache embed doc
-            var xmlConfig = new XmlDocument();
-            xmlConfig.Load(IOHelper.GetRootDirectorySafe() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
+        public OEmbedResult GetEmbed(string url, int width, int height)
+        {
+            var result = new OEmbedResult();
+            var foundMatch = false;
+            IEmbedProvider matchedProvider = null;
 
-            foreach (XmlNode node in xmlConfig.SelectNodes("//provider"))
+            foreach (var provider in _embedCollection)
             {
-                var regexPattern = new Regex(node.SelectSingleNode("./urlShemeRegex").InnerText, RegexOptions.IgnoreCase);
-
-                if (regexPattern.IsMatch(url))
+                //Url Scheme Regex is an array of possible regex patterns to match against the URL
+                foreach(var urlPattern in provider.UrlSchemeRegex)
                 {
-                    var prov = (IEmbedProvider)Activator.CreateInstance(Type.GetType(node.Attributes["type"].Value));
-
-                    if (node.Attributes["supportsDimensions"] != null)
-                        result.SupportsDimensions = node.Attributes["supportsDimensions"].Value == "True";
-                    else
-                        result.SupportsDimensions = prov.SupportsDimensions;
-
-                    var settings = node.ChildNodes.Cast<XmlNode>().ToDictionary(settingNode => settingNode.Name);
-
-                    foreach (var prop in prov.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(ProviderSetting), true)))
+                    var regexPattern = new Regex(urlPattern, RegexOptions.IgnoreCase);
+                    if (regexPattern.IsMatch(url))
                     {
-
-                        if (settings.Any(s => s.Key.ToLower() == prop.Name.ToLower()))
-                        {
-                            var setting = settings.FirstOrDefault(s => s.Key.ToLower() == prop.Name.ToLower()).Value;
-                            var settingType = typeof(Media.EmbedProviders.Settings.String);
-
-                            if (setting.Attributes["type"] != null)
-                                settingType = Type.GetType(setting.Attributes["type"].Value);
-
-                            var settingProv = (IEmbedSettingProvider)Activator.CreateInstance(settingType);
-                            prop.SetValue(prov, settingProv.GetSetting(settings.FirstOrDefault(s => s.Key.ToLower() == prop.Name.ToLower()).Value), null);
-                        }
+                        foundMatch = true;
+                        matchedProvider = provider;
+                        break;
                     }
-                    try
-                    {
-                        result.Markup = prov.GetMarkup(url, width, height);
-                        result.Status = Status.Success;
-                    }
-                    catch(Exception ex)
-                    {
-                        Logger.Error<RteEmbedController>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
-                        result.Status = Status.Error;
-                    }
-
-                    return result;
                 }
+
+                if (foundMatch)
+                    break;
             }
 
-            result.Status = Status.NotSupported;
+            if(foundMatch == false)
+            {
+                //No matches return/ exit
+                result.OEmbedStatus = OEmbedStatus.NotSupported;
+                return result;
+            }
+
+            try
+            {
+                result.SupportsDimensions = true;
+                result.Markup = matchedProvider.GetMarkup(url, width, height);
+                result.OEmbedStatus = OEmbedStatus.Success;
+            }
+            catch(Exception ex)
+            {
+                Logger.Error<RteEmbedController>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
+                result.OEmbedStatus = OEmbedStatus.Error;
+            }
+
             return result;
         }
     }
