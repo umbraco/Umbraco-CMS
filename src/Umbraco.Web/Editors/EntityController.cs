@@ -43,12 +43,16 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {
         private readonly ITreeService _treeService;
+        private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly SearchableTreeCollection _searchableTreeCollection;
 
         public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            ITreeService treeService)
+            ITreeService treeService, SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
             : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
             _treeService = treeService;
+            _searchableTreeCollection = searchableTreeCollection;
+            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -67,15 +71,6 @@ namespace Umbraco.Web.Editors
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
-        }
-
-        private readonly UmbracoTreeSearcher _treeSearcher;
-        private readonly SearchableTreeCollection _searchableTreeCollection;
-
-        public EntityController(SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
-        {
-            _searchableTreeCollection = searchableTreeCollection;
-            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
