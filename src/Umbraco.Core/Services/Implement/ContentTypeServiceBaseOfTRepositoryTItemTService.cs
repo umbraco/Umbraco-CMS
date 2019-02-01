@@ -594,7 +594,7 @@ namespace Umbraco.Core.Services.Implement
             //var originalb = (ContentTypeCompositionBase)original;
             // but we *know* it has to be a ContentTypeCompositionBase anyways
             var originalb = (ContentTypeCompositionBase) (object) original;
-            var clone = (TItem) originalb.DeepCloneWithResetIdentities(alias);
+            var clone = (TItem) (object) originalb.DeepCloneWithResetIdentities(alias);
 
             clone.Name = name;
 
@@ -645,7 +645,7 @@ namespace Umbraco.Core.Services.Implement
                     //var copyingb = (ContentTypeCompositionBase) copying;
                     // but we *know* it has to be a ContentTypeCompositionBase anyways
                     var copyingb = (ContentTypeCompositionBase) (object)copying;
-                    copy = (TItem) copyingb.DeepCloneWithResetIdentities(alias);
+                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
 
                     copy.Name = copy.Name + " (copy)"; // might not be unique
 
