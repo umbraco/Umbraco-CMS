@@ -147,6 +147,7 @@
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
     <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />
+    <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
