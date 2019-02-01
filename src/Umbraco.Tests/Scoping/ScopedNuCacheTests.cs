@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-            var contentTypeServiceBaseFactory = Current.Services.ContentTypeServiceBaseFactory;
+            var contentTypeServiceBaseFactory = Current.Services.ContentTypeBaseServices;
 
             return new PublishedSnapshotService(
                 options,

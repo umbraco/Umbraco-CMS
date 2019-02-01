@@ -3,20 +3,20 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services.Implement
 {
-    public class ContentTypeServiceBaseFactory : IContentTypeServiceBaseFactory
+    public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
     {
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
 
-        public ContentTypeServiceBaseFactory(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService)
+        public ContentTypeBaseServiceProvider(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
         }
 
-        public IContentTypeServiceBase Create(IContentBase contentBase)
+        public IContentTypeBaseService For(IContentBase contentBase)
         {
             switch (contentBase)
             {
@@ -30,6 +30,5 @@ namespace Umbraco.Core.Services.Implement
                     throw new ArgumentException($"Invalid contentBase type: {contentBase.GetType().FullName}" , nameof(contentBase));
             }
         }
-
     }
 }

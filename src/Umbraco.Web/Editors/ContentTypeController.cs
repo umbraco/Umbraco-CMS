@@ -403,7 +403,7 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var contentTypeService = Services.ContentTypeServiceBaseFactory.Create(contentItem);
+                var contentTypeService = Services.ContentTypeBaseServices.For(contentItem);
                 var contentType = contentTypeService.Get(contentItem.ContentTypeId);
                 var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 

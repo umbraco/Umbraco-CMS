@@ -13,10 +13,10 @@ using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services.Implement
 {
-    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
+    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeBaseService<TItem>
         where TRepository : IContentTypeRepositoryBase<TItem>
         where TItem : class, IContentTypeComposition
-        where TService : class, IContentTypeServiceBase<TItem>
+        where TService : class, IContentTypeBaseService<TItem>
     {
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityContainerRepository _containerRepository;
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Get, Has, Is, Count
 
-        IContentTypeComposition IContentTypeServiceBase.Get(int id)
+        IContentTypeComposition IContentTypeBaseService.Get(int id)
         {
             return Get(id);
         }

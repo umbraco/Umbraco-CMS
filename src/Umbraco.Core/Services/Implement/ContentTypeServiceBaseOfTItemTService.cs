@@ -8,7 +8,7 @@ namespace Umbraco.Core.Services.Implement
 {
     public abstract class ContentTypeServiceBase<TItem, TService> : ContentTypeServiceBase
         where TItem : class, IContentTypeComposition
-        where TService : class, IContentTypeServiceBase<TItem>
+        where TService : class, IContentTypeBaseService<TItem>
     {
         protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)

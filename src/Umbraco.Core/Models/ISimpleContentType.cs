@@ -1,79 +1,67 @@
-﻿using System.Collections.Generic;
-
-namespace Umbraco.Core.Models
+﻿namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Defines a ContentType, which Content is based on
+    /// Represents a simplified view of a content type.
     /// </summary>
     public interface ISimpleContentType
     {
+        /// <summary>
+        /// Gets the alias of the content type.
+        /// </summary>
         string Alias { get; }
+
+        /// <summary>
+        /// Gets the identifier of the content type.
+        /// </summary>
         int Id { get; }
+
+        /// <summary>
+        /// Gets the default template of the content type.
+        /// </summary>
         ITemplate DefaultTemplate { get; }
+
+        /// <summary>
+        /// Gets the content variation of the content type.
+        /// </summary>
         ContentVariation Variations { get; }
+
+        /// <summary>
+        /// Gets the icon of the content type.
+        /// </summary>
         string Icon { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the content type is a container.
+        /// </summary>
         bool IsContainer { get; }
+
+        /// <summary>
+        /// Gets the name of the content type.
+        /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether content of that type can be created at the root of the tree.
+        /// </summary>
         bool AllowedAsRoot { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the content type is an element content type.
+        /// </summary>
         bool IsElement { get; }
-        bool SupportsPropertyVariation(string culture, string s, bool b);
-    }
 
-    public class SimpleContentType : ISimpleContentType
-    {
-        public SimpleContentType(IContentType contentType)
-        {
-            Id = contentType.Id;
-            Alias = contentType.Alias;
-            DefaultTemplate = contentType.DefaultTemplate;
-            Variations = contentType.Variations;
-            Icon = contentType.Icon;
-            IsContainer = contentType.IsContainer;
-            Icon = contentType.Icon;
-            Name = contentType.Name;
-            AllowedAsRoot = contentType.AllowedAsRoot;
-            IsElement = contentType.IsElement;
-        }
-
-        public string Alias { get; }
-        public int Id { get;  }
-        public ITemplate DefaultTemplate { get;  }
-        public ContentVariation Variations { get; }
-        public string Icon { get; }
-        public bool IsContainer { get; }
-        public string Name { get; }
-        public bool AllowedAsRoot { get; }
-        public bool IsElement { get; }
-
-        /// <inheritdoc />
-        public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false)
-        {
-            // non-exact validation: can accept a 'null' culture if the property type varies
-            //  by culture, and likewise for segment
-            // wildcard validation: can accept a '*' culture or segment
-            return Variations.ValidateVariation(culture, segment, false, wildcards, false);
-        }
-
-
-        protected bool Equals(SimpleContentType other)
-        {
-            return string.Equals(Alias, other.Alias) && Id == other.Id;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SimpleContentType) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((Alias != null ? Alias.GetHashCode() : 0) * 397) ^ Id;
-            }
-        }
+        /// <summary>
+        /// Validates that a combination of culture and segment is valid for the content type properties.
+        /// </summary>
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="wildcards">A value indicating whether wildcard are supported.</param>
+        /// <returns>True if the combination is valid; otherwise false.</returns>
+        /// <remarks>
+        /// <para>The combination must be valid for properties of the content type. For instance, if the content type varies by culture,
+        /// then an invariant culture is valid, because some properties may be invariant. On the other hand, if the content type is invariant,
+        /// then a variant culture is invalid, because no property could possibly vary by culture.</para>
+        /// </remarks>
+        bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false);
     }
 }
