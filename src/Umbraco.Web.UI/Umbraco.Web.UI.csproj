@@ -452,6 +452,13 @@
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
+      <DependentUpon>editTemplate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Settings\EditTemplate.aspx.designer.cs">
+      <DependentUpon>editTemplate.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -501,7 +508,17 @@
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
+    <Content Include="Umbraco\Dialogs\insertMasterpageContent.aspx" />
+    <Content Include="Umbraco\Dialogs\insertMasterpagePlaceholder.aspx" />
+    <Content Include="Umbraco\Images\Editor\dictionaryItem.gif" />
+    <Content Include="Umbraco\Images\Editor\help.png" />
+    <Content Include="Umbraco\Images\Editor\insField.gif" />
+    <Content Include="Umbraco\Images\Editor\insMacroSB.png" />
+    <Content Include="Umbraco\Images\Editor\insRazorMacro.png" />
+    <Content Include="Umbraco\Images\Editor\masterpageContent.gif" />
+    <Content Include="Umbraco\Images\Editor\masterpagePlaceHolder.gif" />
     <Content Include="Umbraco\Logout.aspx" />
+    <Content Include="Umbraco\Settings\editTemplate.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">

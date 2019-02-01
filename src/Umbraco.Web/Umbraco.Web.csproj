@@ -543,7 +543,11 @@
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="umbraco.presentation\SafeXmlReaderWriter.cs" />
     <Compile Include="Trees\ScriptTreeController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
@@ -1917,7 +1921,9 @@
     <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
