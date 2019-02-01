@@ -71,7 +71,8 @@ function IconPickerController($scope, iconHelper, localizationService) {
     }
 
     function selectColor(color, $index, $event) {
-        $scope.model.color = color;
+        $scope.model.color = color.value;
+        vm.color = color.value;
     }
 
     function close() {
