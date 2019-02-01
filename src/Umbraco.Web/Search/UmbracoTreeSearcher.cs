@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using AutoMapper;
 using Examine;
+using Lucene.Net.Analysis.Standard;
+using Lucene.Net.QueryParsers;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
@@ -60,23 +62,16 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = new[] { "id", "__NodeId" };
+            var fields = new[] { "id", "__NodeId", UmbracoExamineIndex.NodeKeyFieldName };
 
             var umbracoContext = _umbracoHelper.UmbracoContext;
-
-            // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
-            // manipulation for things like start paths, member types, etc... 
-            //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
-            //{
-
-            //}
 
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
-                    fields = new[] { "id", "__NodeId", "email", "loginName" };
+                    fields = new[] { "id", "__NodeId", "email", "loginName", UmbracoExamineIndex.NodeKeyFieldName };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -132,6 +127,8 @@ namespace Umbraco.Web.Search
 
         private bool BuildQuery(StringBuilder sb, string query, string searchFrom, string[] fields, string type)
         {
+            //TODO: Fix this query so that it works properly, it isn't quite right, need to look at how Examine creates it's ManagedQuery for full text search
+
             //build a lucene query:
             // the nodeName will be boosted 10x without wildcards
             // then nodeName will be matched normally with wildcards
@@ -148,7 +145,7 @@ namespace Umbraco.Web.Search
                 //strip quotes, escape string, the replace again
                 query = query.Trim('\"', '\'');
 
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+                query = QueryParser.Escape(query);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
@@ -160,7 +157,7 @@ namespace Umbraco.Web.Search
                 if (query.IsNullOrWhiteSpace() == false)
                 {
                     //add back the surrounding quotes
-                    query = string.Format("{0}{1}{0}", "\"", query);
+                    query = string.Format("{0}{1}{0}", "\"", query);                    
 
                     sb.Append("+(");
 
@@ -191,7 +188,7 @@ namespace Umbraco.Web.Search
                 //update the query with the query term
                 if (trimmed.IsNullOrWhiteSpace() == false)
                 {
-                    query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+                    query = QueryParser.Escape(query);
 
                     var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -200,7 +197,10 @@ namespace Umbraco.Web.Search
                     AppendNodeNameExactWithBoost(sb, query, allLangs);
 
                     AppendNodeNameWithWildcards(sb, querywords, allLangs);
-                   
+
+                    AppendFieldExact(UmbracoExamineIndex.NodeKeyFieldName, sb, query);
+                    AppendFieldExact("__NodeId", sb, query);
+
                     foreach (var f in fields)
                     {
                         //additional fields normally
@@ -243,6 +243,16 @@ namespace Umbraco.Web.Search
                 sb.Append(")^10.0 ");
             }
         }
+
+        private void AppendFieldExact(string field, StringBuilder sb, string query)
+        {
+            sb.Append(field);
+            sb.Append(":");
+            sb.Append("\"");
+            sb.Append(query.ToLower());
+            sb.Append("\" ");
+        }
+
 
         private void AppendNodeNameExactWithBoost(StringBuilder sb, string query, IEnumerable<string> allLangs)
         {
