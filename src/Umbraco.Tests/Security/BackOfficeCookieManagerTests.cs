@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Security
         public void ShouldAuthenticateRequest_When_Not_Configured()
         {
             //should force app ctx to show not-configured
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
+            ConfigurationManager.AppSettings.Set(Constants.AppSettings.ConfigurationStatus, "");
 
             var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = new UmbracoContext(

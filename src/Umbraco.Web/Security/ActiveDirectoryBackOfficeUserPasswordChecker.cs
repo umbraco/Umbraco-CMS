@@ -13,6 +13,7 @@ namespace Umbraco.Web.Security
         {
             get
             {
+                // TODO: Verify this AppSetting key is used in .NET Framework & canot be changed to Umbraco.Core. prefix
                 return ConfigurationManager.AppSettings["ActiveDirectoryDomain"];
             }
         }

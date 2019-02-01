@@ -23,10 +23,10 @@ namespace Umbraco.Examine
         /// <summary>
         /// By default these are the member fields we index
         /// </summary>
-        public static readonly string[] DefaultMemberIndexFields = { "id", "nodeName", "updateDate", "loginName", "email" };
+        public static readonly string[] DefaultMemberIndexFields = { "id", "nodeName", "updateDate", "loginName", "email", UmbracoExamineIndex.NodeKeyFieldName };
 
         private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Member };
         protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
-        
+
     }
 }

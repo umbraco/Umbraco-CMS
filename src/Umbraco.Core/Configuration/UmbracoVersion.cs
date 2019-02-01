@@ -82,7 +82,7 @@ namespace Umbraco.Core.Configuration
                 try
                 {
                     // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
-                    var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
+                    var value = ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus];
                     return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }
                 catch

@@ -45,7 +45,7 @@ namespace Umbraco.Web
         private readonly UrlProviderCollection _urlProviders;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
-        private readonly PublishedRouter _publishedRouter;
+        private readonly IPublishedRouter _publishedRouter;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         public UmbracoInjectedModule(
@@ -56,7 +56,7 @@ namespace Umbraco.Web
             UrlProviderCollection urlProviders,
             IRuntimeState runtime,
             ILogger logger,
-            PublishedRouter publishedRouter,
+            IPublishedRouter publishedRouter,
             IVariationContextAccessor variationContextAccessor)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);

@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentUrlResolver : IValueResolver<IContent, ContentItemDisplay, UrlInfo[]>
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly PublishedRouter _publishedRouter;
+        private readonly IPublishedRouter _publishedRouter;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _textService;
         private readonly IContentService _contentService;
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentUrlResolver(
             IUmbracoContextAccessor umbracoContextAccessor,
-            PublishedRouter publishedRouter, 
+            IPublishedRouter publishedRouter, 
             ILocalizationService localizationService,
             ILocalizedTextService textService,
             IContentService contentService,

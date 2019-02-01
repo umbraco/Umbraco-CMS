@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -18,8 +19,10 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Routing
 {
-    // TODO: making sense to have an interface?
-    public class PublishedRouter
+    /// <summary>
+    /// Provides the default <see cref="IPublishedRouter"/> implementation.
+    /// </summary>
+    public class PublishedRouter : IPublishedRouter
     {
         private readonly IWebRoutingSection _webRoutingSection;
         private readonly ContentFinderCollection _contentFinders;
@@ -47,15 +50,9 @@ namespace Umbraco.Web.Routing
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
-
-            GetRolesForLogin = s => Roles.Provider.GetRolesForUser(s);
         }
 
-        // TODO: in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
-        // killing it entirely, if we need cache, just implement it properly !!
-        // this is all so weird
-        public Func<string, IEnumerable<string>> GetRolesForLogin { get; }
-
+        /// <inheritdoc />
         public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
         {
             return new PublishedRequest(this, umbracoContext, uri ?? umbracoContext.CleanedUmbracoUrl);
@@ -63,10 +60,8 @@ namespace Umbraco.Web.Routing
 
         #region Request
 
-        /// <summary>
-        /// Tries to route the request.
-        /// </summary>
-        internal bool TryRouteRequest(PublishedRequest request)
+        /// <inheritdoc />
+        public bool TryRouteRequest(PublishedRequest request)
         {
             // disabled - is it going to change the routing?
             //_pcr.OnPreparing();
@@ -96,12 +91,7 @@ namespace Umbraco.Web.Routing
             _variationContextAccessor.VariationContext = new VariationContext(culture);
         }
 
-        /// <summary>
-        /// Prepares the request.
-        /// </summary>
-        /// <returns>
-        /// Returns false if the request was not successfully prepared
-        /// </returns>
+        /// <inheritdoc />
         public bool PrepareRequest(PublishedRequest request)
         {
             // note - at that point the original legacy module did something do handle IIS custom 404 errors
@@ -213,11 +203,8 @@ namespace Umbraco.Web.Routing
             return true;
         }
 
-        /// <summary>
-        /// Updates the request when there is no template to render the content.
-        /// </summary>
-        /// <remarks>This is called from Mvc when there's a document to render but no template.</remarks>
-        public void UpdateRequestOnMissingTemplate(PublishedRequest request)
+        /// <inheritdoc />
+        public void UpdateRequestToNotFound(PublishedRequest request)
         {
             // clear content
             var content = request.PublishedContent;
@@ -386,11 +373,7 @@ namespace Umbraco.Web.Routing
 
         #region Document and template
 
-        /// <summary>
-        /// Gets a template.
-        /// </summary>
-        /// <param name="alias">The template alias</param>
-        /// <returns>The template.</returns>
+        /// <inheritdoc />
         public ITemplate GetTemplate(string alias)
         {
             return _services.FileService.GetTemplate(alias);
@@ -607,7 +590,7 @@ namespace Umbraco.Web.Routing
                     if (loginPageId != request.PublishedContent.Id)
                         request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(loginPageId);
                 }
-                else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, GetRolesForLogin(membershipHelper.CurrentUserName)) == false)
+                else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, membershipHelper.GetCurrentUserRoles()) == false)
                 {
                     _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
                     var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;

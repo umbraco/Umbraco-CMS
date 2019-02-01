@@ -13,10 +13,10 @@ using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services.Implement
 {
-    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
+    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeBaseService<TItem>
         where TRepository : IContentTypeRepositoryBase<TItem>
         where TItem : class, IContentTypeComposition
-        where TService : class, IContentTypeServiceBase<TItem>
+        where TService : class, IContentTypeBaseService<TItem>
     {
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityContainerRepository _containerRepository;
@@ -210,6 +210,11 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Get, Has, Is, Count
+
+        IContentTypeComposition IContentTypeBaseService.Get(int id)
+        {
+            return Get(id);
+        }
 
         public TItem Get(int id)
         {
@@ -594,7 +599,7 @@ namespace Umbraco.Core.Services.Implement
             //var originalb = (ContentTypeCompositionBase)original;
             // but we *know* it has to be a ContentTypeCompositionBase anyways
             var originalb = (ContentTypeCompositionBase) (object) original;
-            var clone = (TItem) originalb.DeepCloneWithResetIdentities(alias);
+            var clone = (TItem) (object) originalb.DeepCloneWithResetIdentities(alias);
 
             clone.Name = name;
 
@@ -645,7 +650,7 @@ namespace Umbraco.Core.Services.Implement
                     //var copyingb = (ContentTypeCompositionBase) copying;
                     // but we *know* it has to be a ContentTypeCompositionBase anyways
                     var copyingb = (ContentTypeCompositionBase) (object)copying;
-                    copy = (TItem) copyingb.DeepCloneWithResetIdentities(alias);
+                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
 
                     copy.Name = copy.Name + " (copy)"; // might not be unique
 
@@ -951,5 +956,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
     }
 }
