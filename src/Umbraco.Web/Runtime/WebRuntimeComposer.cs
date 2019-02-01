@@ -214,8 +214,8 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<TreeCollectionBuilder>()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
-            // register OEmbed providers
-            // no type scanning - all explicit opt-in of adding types
+            // register OEmbed providers - no type scanning - all explicit opt-in of adding types
+            // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
             composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
                 .Append<YouTube>()
                 .Append<Instagram>()
