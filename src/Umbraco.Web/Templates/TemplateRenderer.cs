@@ -36,7 +36,7 @@ namespace Umbraco.Web.Templates
         }
 
         private IFileService FileService => Current.Services.FileService; // TODO: inject
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>(); // TODO: inject
+        private IPublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<IPublishedRouter>(); // TODO: inject
 
 
         /// <summary>

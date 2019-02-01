@@ -377,7 +377,7 @@ namespace Umbraco.Web.Mvc
             if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
                 && routeDef.HasHijackedRoute == false)
             {
-                request.UpdateOnMissingTemplate(); // request will go 404
+                request.UpdateToNotFound(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
                 // not be processed any further, eg because it has been redirect. then, exit.

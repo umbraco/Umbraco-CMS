@@ -6,7 +6,10 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http, eventsService) {
+function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
+    entityResource, navigationService, notificationsService, angularHelper, 
+    serverValidationManager, contentEditingHelper, fileManager, formHelper, 
+    editorState, umbRequestHelper, $http, eventsService) {
     
     var evts = [];
     var nodeId = null;
@@ -41,7 +44,91 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
     $scope.page.submitButtonLabelKey = "buttons_save";
+    $scope.app = null;
 
+    if (create) {
+
+        $scope.page.loading = true;
+
+        mediaResource.getScaffold(nodeId, $routeParams.doctype)
+            .then(function (data) {
+                $scope.content = data;
+
+                init();
+
+                $scope.page.loading = false;
+
+            });
+    }
+    else {
+        $scope.page.loading = true;
+        loadMedia()
+            .then(function(){
+                $scope.page.loading = false;
+            });
+    }
+
+    function init() {
+        
+        var content = $scope.content;
+        
+        // we need to check wether an app is present in the current data, if not we will present the default app.
+        var isAppPresent = false;
+        
+        // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
+        if ($scope.app) {
+            
+            // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
+            _.forEach(content.apps, function(app) {
+                if (app === $scope.app) {
+                    isAppPresent = true;
+                }
+            });
+            
+            // if we did reload our DocType, but still have the same app we will try to find it by the alias.
+            if (isAppPresent === false) {
+                _.forEach(content.apps, function(app) {
+                    if (app.alias === $scope.app.alias) {
+                        isAppPresent = true;
+                        app.active = true;
+                        $scope.appChanged(app);
+                    }
+                });
+            }
+            
+        }
+        
+        // if we still dont have a app, lets show the first one:
+        if (isAppPresent === false) {
+            content.apps[0].active = true;
+            $scope.appChanged(content.apps[0]);
+        }
+        
+
+        editorState.set($scope.content);
+        
+        bindEvents();
+
+    }
+    
+    function bindEvents() {
+        //bindEvents can be called more than once and we don't want to have multiple bound events
+        for (var e in evts) {
+            eventsService.unsubscribe(evts[e]);
+        }
+        
+        evts.push(eventsService.on("editors.mediaType.saved", function(name, args) {
+            // if this media item uses the updated media type we need to reload the media item
+            if(args && args.mediaType && args.mediaType.key === $scope.content.contentType.key) {
+                $scope.page.loading = true;
+                loadMedia().then(function() {
+                    $scope.page.loading = false;
+                });
+            }
+        }));
+    }
+    $scope.page.submitButtonLabelKey = "buttons_save";
+    
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
 
@@ -67,45 +154,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                     $scope.page.menu.currentNode = node;
                 });
         }
-    }
-
-    if (create) {
-
-        $scope.page.loading = true;
-
-        mediaResource.getScaffold(nodeId, $routeParams.doctype)
-            .then(function (data) {
-                $scope.content = data;
-
-                editorState.set($scope.content);
-
-                init();
-
-                $scope.page.loading = false;
-
-            });
-    }
-    else {
-        $scope.page.loading = true;
-        loadMedia()
-            .then(function(){
-                $scope.page.loading = false;
-            });
-    }
-
-    function init() {
-
-        if (!$scope.app) {
-            // set first app to active
-            $scope.content.apps[0].active = true;
-            $scope.app = $scope.content.apps[0];
-        }
-
-        // setup infinite mode
-        if(infiniteMode) {
-            $scope.page.submitButtonLabelKey = "buttons_saveAndClose";
-        }
-
     }
     
     $scope.save = function () {
@@ -212,14 +260,12 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
     $scope.appChanged = function (app) {
         $scope.app = app;
-    }
-
-    evts.push(eventsService.on("editors.mediaType.saved", function(name, args) {
-        // if this media item uses the updated media type we need to reload the media item
-        if(args && args.mediaType && args.mediaType.key === $scope.content.contentType.key) {
-            loadMedia();
+        
+        // setup infinite mode
+        if(infiniteMode) {
+            $scope.page.submitButtonLabelKey = "buttons_saveAndClose";
         }
-    }));
+    }
 
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
