@@ -26,12 +26,12 @@ namespace Umbraco.Web.Templates
     internal class TemplateRenderer : ITemplateRenderer
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly PublishedRouter _publishedRouter;
+        private readonly IPublishedRouter _publishedRouter;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
         private readonly IWebRoutingSection _webRoutingSection;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, PublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
