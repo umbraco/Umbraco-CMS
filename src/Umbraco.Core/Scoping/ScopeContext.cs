@@ -13,9 +13,7 @@ namespace Umbraco.Core.Scoping
             if (_enlisted == null)
                 return;
 
-            // fixme - can we create infinite loops?
-            // fixme - what about nested events? will they just be plainly ignored = really bad?
-
+            // TODO: can we create infinite loops? - what about nested events? will they just be plainly ignored = really bad?
             List<Exception> exceptions = null;
             List<IEnlistedObject> orderedEnlisted;
             while ((orderedEnlisted = _enlisted.Values.OrderBy(x => x.Priority).ToList()).Count > 0)

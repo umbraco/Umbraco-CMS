@@ -23,11 +23,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
         private readonly PermissionRepository<IContent> _permissionRepository;
 
-        public UserGroupRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger)
-            : base(scopeAccessor, cacheHelper, logger)
+        public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger)
+            : base(scopeAccessor, appCaches, logger)
         {
-            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, cacheHelper, logger);
-            _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, cacheHelper, logger);
+            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, logger);
+            _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, logger);
         }
 
         public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
 
         /// <summary>
-        /// Gets explicilty defined permissions for the group for specified entities
+        /// Gets explicitly defined permissions for the group for specified entities
         /// </summary>
         /// <param name="groupIds"></param>
         /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// Gets explicilt and default permissions (if requested) permissions for the group for specified entities
+        /// Gets explicit and default permissions (if requested) permissions for the group for specified entities
         /// </summary>
         /// <param name="groups"></param>
         /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     foreach (var nodeId in nodeIds)
                     {
-                        //TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
+                        // TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
                         // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not
                         // going to be included in the result!
 
@@ -360,7 +360,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly UserGroupRepository _userGroupRepo;
 
-            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _userGroupRepo = userGroupRepo;
@@ -444,7 +444,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             /// <param name="userIds">Ids of users</param>
             private void AddUsersToGroup(int groupId, int[] userIds)
             {
-                //TODO: Check if the user exists?
+                // TODO: Check if the user exists?
                 foreach (var userId in userIds)
                 {
                     var dto = new User2UserGroupDto

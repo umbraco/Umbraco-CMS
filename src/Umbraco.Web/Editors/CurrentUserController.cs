@@ -157,7 +157,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.ApplicationCache.StaticCache, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Editors
                 var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
 
                 //raise the reset event
-                //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
+                // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
                 if (data.Reset.HasValue && data.Reset.Value)
                 {
                     userMgr.RaisePasswordResetEvent(Security.CurrentUser.Id);

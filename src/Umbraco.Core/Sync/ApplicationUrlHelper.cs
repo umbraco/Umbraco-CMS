@@ -26,7 +26,7 @@ namespace Umbraco.Core.Sync
         /// in config files but is determined programmatically.</para>
         /// <para>Must be assigned before resolution is frozen.</para>
         /// </remarks>
-        // FIXME need another way to do it, eg an interface, injected!
+        // TODO: need another way to do it, eg an interface, injected!
         public static Func<HttpRequestBase, string> ApplicationUrlProvider { get; set; }
 
         internal static string GetApplicationUrl(ILogger logger, IGlobalSettings globalSettings, IUmbracoSettingsSection settings, IServerRegistrar serverRegistrar, HttpRequestBase request = null)
@@ -63,22 +63,6 @@ namespace Umbraco.Core.Sync
             {
                 var umbracoApplicationUrl = url.TrimEnd('/');
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
-                return umbracoApplicationUrl;
-            }
-
-            // try umbracoSettings:settings/scheduledTasks/@baseUrl
-            // which is assumed to:
-            // - end with SystemDirectories.Umbraco
-            // - NOT contain any scheme (because, legacy)
-            // - end or not with a slash, it will be taken care of
-            // eg "mysite.com/umbraco"
-            url = settings.ScheduledTasks.BaseUrl;
-            if (url.IsNullOrWhiteSpace() == false)
-            {
-                var ssl = globalSettings.UseHttps ? "s" : "";
-                url = "http" + ssl + "://" + url;
-                var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using scheduledTasks/@baseUrl)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 

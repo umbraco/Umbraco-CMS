@@ -33,8 +33,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="contentId"></param>
         public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, int contentId)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _contentId = contentId;
         }
 
@@ -63,8 +62,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="dataTokenName"></param>
         public EnsurePublishedContentRequestAttribute(UmbracoContext umbracoContext, string dataTokenName)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _dataTokenName = dataTokenName;
         }
 
@@ -73,8 +71,8 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
 
-        // todo - try lazy property injection?
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
+        // TODO: try lazy property injection?
+        private IPublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<IPublishedRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper
@@ -86,7 +84,7 @@ namespace Umbraco.Web.Mvc
         {
             base.OnActionExecuted(filterContext);
 
-            //First we need to check if the pcr has been set, if it has we're going to ignore this and not actually do anything
+            // First we need to check if the published content request has been set, if it has we're going to ignore this and not actually do anything
             if (UmbracoContext.Current.PublishedRequest != null)
             {
                 return;

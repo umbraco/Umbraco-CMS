@@ -1,0 +1,43 @@
+﻿<umb-box>
+    <umb-box-header title="Info"></umb-box-header>
+    <umb-box-content>
+        <umb-control-group label="Id">
+            {{model.macro.id}}<br/>
+            {{model.macro.key}}
+        </umb-control-group>
+    </umb-box-content>
+</umb-box>
+<umb-box>
+    <umb-box-header title="Macro partial view"></umb-box-header>
+    <umb-box-content>
+        <umb-control-group label="Macro partial view">
+            <select class="input-block-level" ng-model="model.macro.view" ng-options="i as i for i in model.views" required>
+            </select>
+        </umb-control-group>
+    </umb-box-content>
+</umb-box>
+<umb-box>
+    <umb-box-header title="Editor settings"></umb-box-header>
+    <umb-box-content>
+        <umb-control-group label="Use in rich text editor and the grid">
+            <umb-toggle checked="model.macro.useInEditor" on-click="model.toggle('useInEditor')" ></umb-toggle>
+        </umb-control-group>
+        <umb-control-group label="Render in rich text editor and the grid" ng-if="model.macro.useInEditor">
+            <umb-toggle checked="model.macro.renderInEditor && model.macro.useInEditor"  on-click="model.toggle('renderInEditor')" ></umb-toggle>
+        </umb-control-group>
+    </umb-box-content>
+</umb-box>
+<umb-box>
+    <umb-box-header title="Cache settings"></umb-box-header>
+    <umb-box-content>
+        <umb-control-group label="Cache period">
+           <input type="number" min="0" ng-model="model.macro.cachePeriod"/>
+        </umb-control-group>
+        <umb-control-group label="Cache by page">
+            <umb-toggle checked="model.macro.cacheByPage" on-click="model.toggle('cacheByPage')"></umb-toggle>
+        </umb-control-group>
+        <umb-control-group label="Cache personalized">
+            <umb-toggle checked="model.macro.cacheByUser" on-click="model.toggle('cacheByUser')"></umb-toggle>
+        </umb-control-group>
+    </umb-box-content>
+</umb-box>

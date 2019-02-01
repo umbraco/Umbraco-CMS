@@ -92,7 +92,7 @@
                 vm.culture = null;
             }
 
-            //TODO: need to figure out what we can do for things like Nested Content
+            // TODO: need to figure out what we can do for things like Nested Content
 
             var existingClientFiles = checkPendingClientFiles();
             //create the property to show the list of files currently saved

@@ -118,12 +118,7 @@ namespace Umbraco.Core
                 /// RadioButton list.
                 /// </summary>
                 public const string RadioButtonList = "Umbraco.RadioButtonList";
-
-                /// <summary>
-                /// Related Links.
-                /// </summary>
-                public const string RelatedLinks = "Umbraco.RelatedLinks";
-
+                
                 /// <summary>
                 /// Slider.
                 /// </summary>
@@ -178,6 +173,11 @@ namespace Umbraco.Core
                 /// Nested Content.
                 /// </summary>
                 public const string NestedContent = "Umbraco.NestedContent";
+
+                /// <summary>
+                /// Alias for the multi url picker editor.
+                /// </summary>
+                public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
             }
 
             /// <summary>

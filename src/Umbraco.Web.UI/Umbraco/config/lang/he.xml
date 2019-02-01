@@ -192,10 +192,6 @@
     <key alias="siterepublishHelp">זיכרון המטמון של האתר ירוענן. כל התוכן שפורסם ירוענן בהתאם, שאר התוכן המיועד לפירסום ימתין לפירסום</key>
     <key alias="tableColumns">מספר עמודות</key>
     <key alias="tableRows">מספר שורות</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
-      choose Id's from the current template's master.]]></key>
     <key alias="thumbnailimageclickfororiginal">לחץ על התמונה לגודל מלא</key>
     <key alias="treepicker">בחר פריט</key>
     <key alias="viewCacheItem">צפה בפרטי זיכרון מטמון</key>
@@ -316,7 +312,6 @@
     <key alias="or">או</key>
     <key alias="password">סיסמה</key>
     <key alias="path">נתיב</key>
-    <key alias="placeHolderID">Placeholder קוד זיהוי</key>
     <key alias="pleasewait">אנא המתן בבקשה...</key>
     <key alias="previous">הקודם</key>
     <key alias="properties">הגדרות</key>
@@ -548,14 +543,12 @@ To manage your website, simply open the Umbraco back office and start adding con
          ויש לבחור את החבילה הרצויה. לחבילות Umbraco יש בד"כ יש סיומות בשם ".umb" או ".zip".
       ]]></key>
     <key alias="packageAuthor">יוצר החבילה</key>
-    <key alias="packageDemonstration">הדגמה</key>
     <key alias="packageDocumentation">תיעוד</key>
     <key alias="packageMetaData">מטה דטה עבור החבילה</key>
     <key alias="packageName">שם החבילה</key>
     <key alias="packageNoItemsHeader">החבילה לא מכילה אף פריט</key>
     <key alias="packageNoItemsText"><![CDATA[החבילה אינה מכילה פריטים למחיקה.<br/><br/>
       ניתן למחוק בבטיחות רבה את החבילה מהמערכת על ידי לחיצה על "הסר חבילה".]]></key>
-    <key alias="packageNoUpgrades">אין עידכונים זמינים</key>
     <key alias="packageOptions">אפשרויות חבילה</key>
     <key alias="packageReadme">תיאור החבילה</key>
     <key alias="packageRepository">מאגר חבילות</key>
@@ -566,12 +559,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUninstallText"><![CDATA[ניתן להוריד סימון מפריטים שאותם אינך רוצה להסיר, בזמן זה. כשילחץ כפתור "אשר הסרה" כל הפריטים המסומנים ימחקו.<br />
       <span style="color: Red; font-weight: bold;">הערה:</span>כל מסמך, מדיה וכו' התלוים בפריטים שהסרת יפסיקו לעבוד, ויכולים להביא למצב של אי יציבות למערכת,
       יש למחוק קבצים עם זהירות יתרה, אם יש ספק יש לפנות ליוצר החבילה.]]></key>
-    <key alias="packageUpgradeDownload">הורד עידכון מהמאגר</key>
-    <key alias="packageUpgradeHeader">שידרוג חבילה</key>
-    <key alias="packageUpgradeInstructions">הורדות שידרוג</key>
-    <key alias="packageUpgradeText"> קיים עידכון זמין עבור חבילה זו. ניתן להוריד אותו ישירות ממאגר החבילות של אומברקו.</key>
     <key alias="packageVersion">גירסת החבילה</key>
-    <key alias="viewPackageWebsite">צפה באתר החבילה</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">שמור עיצוב בהדבקה (לא מומלץ)</key>

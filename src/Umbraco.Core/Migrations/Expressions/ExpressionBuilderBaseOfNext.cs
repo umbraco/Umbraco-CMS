@@ -17,8 +17,6 @@ namespace Umbraco.Core.Migrations.Expressions
             : base(expression)
         { }
 
-        // FIXME WTF is this and what is TNext here?!
-
         public abstract ColumnDefinition GetColumnForType();
 
         private ColumnDefinition Column => GetColumnForType();

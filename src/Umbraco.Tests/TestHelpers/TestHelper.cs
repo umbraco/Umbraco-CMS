@@ -55,12 +55,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media, SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { SystemDirectories.MvcViews, SystemDirectories.Media, SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
+            CleanDirectories(new[] { SystemDirectories.MvcViews, SystemDirectories.Media });
         }
 
         public static void CreateDirectories(string[] directories)
@@ -77,7 +77,6 @@ namespace Umbraco.Tests.TestHelpers
         {
             var preserves = new Dictionary<string, string[]>
             {
-                { SystemDirectories.Masterpages, new[] {"dummy.txt"} },
                 { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
             };
             foreach (var directory in directories)
@@ -99,7 +98,7 @@ namespace Umbraco.Tests.TestHelpers
                 File.Delete(umbracoSettingsFile);
         }
 
-        // fixme obsolete the dateTimeFormat thing and replace with dateDelta
+        // FIXME: obsolete the dateTimeFormat thing and replace with dateDelta
         public static void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
         {
             const int dateDeltaMilliseconds = 500; // .5s

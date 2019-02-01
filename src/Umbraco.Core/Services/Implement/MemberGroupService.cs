@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -23,23 +24,10 @@ namespace Umbraco.Core.Services.Implement
             MemberGroupRepository.SavingMemberGroup += MemberGroupRepository_SavingMemberGroup;
         }
 
-        #region Proxied event handlers
+        #region Proxy event handlers
 
         void MemberGroupRepository_SavingMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
         {
-            // fixme - wtf?
-            // why is the repository triggering these events?
-            // and, the events are *dispatched* by the repository so it makes no sense dispatching them again!
-
-            // v7.6
-            //using (var scope = UowProvider.ScopeProvider.CreateScope())
-            //{
-            //    scope.Complete(); // always
-            //    if (scope.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberGroup>(e.SavedEntities)))
-            //        e.Cancel = true;
-            //}
-
-            // v8
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(e.SavedEntities), this))
                 e.Cancel = true;
         }
@@ -92,6 +80,10 @@ namespace Umbraco.Core.Services.Implement
 
         public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
         {
+            if (string.IsNullOrWhiteSpace(memberGroup.Name))
+            {
+                throw new InvalidOperationException("The name of a MemberGroup can not be empty");
+            }
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMemberGroup>(memberGroup);

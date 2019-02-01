@@ -24,7 +24,7 @@ namespace Umbraco.Web.Macros
         /// persist all macro formats like {?UMBRACO_MACRO macroAlias=\"myMacro\" /}
         /// </summary>
         /// <param name="persistedContent"></param>
-        /// <param name="htmlAttributes">The html attributes to be added to the div</param>
+        /// <param name="htmlAttributes">The HTML attributes to be added to the div</param>
         /// <returns></returns>
         /// <remarks>
         /// This converts the persisted macro format to this:
@@ -77,11 +77,11 @@ namespace Umbraco.Web.Macros
         /// <returns></returns>
         /// <remarks>
         ///
-        /// This is required because when editors are using the rte, the html that is contained in the editor might actually be displaying
+        /// This is required because when editors are using the rte, the HTML that is contained in the editor might actually be displaying
         /// the entire macro content, when the data is submitted the editor will clear most of this data out but we'll still need to parse it properly
-        /// and ensure the correct sytnax is persisted to the db.
+        /// and ensure the correct syntax is persisted to the db.
         ///
-        /// When a macro is inserted into the rte editor, the html will be:
+        /// When a macro is inserted into the rte editor, the HTML will be:
         ///
         ///     {div class='umb-macro-holder'}
         ///         <!-- <?UMBRACO_MACRO macroAlias=\"myMacro\" /> -->
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Macros
         }
 
         /// <summary>
-        /// This will accept a text block and seach/parse it for macro markup.
+        /// This will accept a text block and search/parse it for macro markup.
         /// When either a text block or a a macro is found, it will call the callback method.
         /// </summary>
         /// <param name="text"> </param>
@@ -162,8 +162,6 @@ namespace Umbraco.Web.Macros
             while (!stop)
             {
                 var tagIndex = fieldResult.ToString().ToLower().IndexOf("<?umbraco");
-                if (tagIndex < 0)
-                    tagIndex = fieldResult.ToString().ToLower().IndexOf("<umbraco:macro");
                 if (tagIndex > -1)
                 {
                     var tempElementContent = "";

@@ -120,7 +120,7 @@
     } finally {
         Pop-Location
 
-        # fixme - should we filter the log to find errors?
+        # FIXME: should we filter the log to find errors?
         #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
 
         # restore
@@ -177,7 +177,7 @@
   {
     Write-Host "Prepare Tests"
 
-    # fixme - idea is to avoid rebuilding everything for tests
+    # FIXME: - idea is to avoid rebuilding everything for tests
     # but because of our weird assembly versioning (with .* stuff)
     # everything gets rebuilt all the time...
     #Copy-Files "$tmp\bin" "." "$tmp\tests"
@@ -330,9 +330,6 @@
 
   $ubuild.DefineMethod("PrepareBuild",
   {
-    Write-Host "Clear folders and files"
-    $this.RemoveDirectory("$($this.SolutionRoot)\src\Umbraco.Web.UI.Client\bower_components")
-
     $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
     Write-Host "Create clean web.config"
     $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")

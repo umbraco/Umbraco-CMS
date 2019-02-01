@@ -27,7 +27,7 @@ namespace Umbraco.Web.Mvc
 
         // note
         // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
+        // order to keep the constructor as light as possible, so that ppl implementing eg a SurfaceController
         // don't need to implement complex constructors + need to refactor them each time we change ours.
         // this means that these properties have a setter.
         // what can go wrong?
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get;  }
+        public AppCaches AppCaches { get;  }
 
         /// <summary>
         /// Gets or sets the logger.
@@ -93,19 +93,19 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<UmbracoContext>(),
                   Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
                   Current.Factory.GetInstance<ServiceContext>(),
-                  Current.Factory.GetInstance<CacheHelper>(),
+                  Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<ILogger>(),
                   Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
+        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
         {
             UmbracoContext = umbracoContext;
             DatabaseFactory = databaseFactory;
             Services = services;
-            ApplicationCache = applicationCache;
+            AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
         }

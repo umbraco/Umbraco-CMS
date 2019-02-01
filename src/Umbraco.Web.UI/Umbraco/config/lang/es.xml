@@ -332,8 +332,6 @@
     <key alias="siterepublishHelp">La caché del sitio web será actualizada. Todos los contenidos publicados serán actualizados, mientras el contenido no publicado permanecerá no publicado.</key>
     <key alias="tableColumns">Número de columnas</key>
     <key alias="tableRows">Número de filas</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Coloca un 'placeholder' id</strong> al colocar un ID  en tu 'placeholder' puedes insertar contenido en esta plantilla desde una plantilla hija, referenciando este ID usando un elemento<code>&lt;asp:content /&gt;</code>.]]></key>
-        <key alias="templateContentPlaceHolderHelp">Selecciona una tecla de la lista abajo indicada. Sólo puedes elegir a partir de la ID de la plantilla actual del dominio.</key>
         <key alias="thumbnailimageclickfororiginal">Haz clic sobre la imagen para verla a tamaño completo.</key>
         <key alias="treepicker">Seleccionar elemento</key>
         <key alias="viewCacheItem">Ver elemento en la caché</key>
@@ -453,7 +451,6 @@
         <key alias="contentTypeAliasAndNameNotNull">Debes rellenar el alias y el nombre en el tipo de propiedad</key>
     <key alias="filePermissionsError">Hay un problema de lectura y escritura al acceder a un archivo o carpeta</key>
     <key alias="macroErrorLoadingPartialView">Error cargando Vista Parcial (archivo: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Error cargando userControl '%0%'</key>
     <key alias="missingTitle"><![CDATA[Por favor, introduzca un título
 ]]></key>
         <key alias="missingType">Por favor, elige un tipo </key>
@@ -545,7 +542,6 @@
     <key alias="orderBy">Ordenar por</key>
     <key alias="password">Contraseña</key>
     <key alias="path">Ruta</key>
-    <key alias="placeHolderID">ID de marcador de posición</key>
     <key alias="pleasewait">Un momento por favor...</key>
     <key alias="previous">Anterior</key>
     <key alias="properties">Propiedades</key>
@@ -863,14 +859,11 @@
     <key alias="packageCompatibilityDescription">Este paquete es compatible con las siguientes versiones de Umbraco, declaradas según miembros de la comunidad. No se puede garantizar compatibilidad completa para versiones declaradas debajo del 100%</key>
     <key alias="packageExternalSources">Fuentes externas</key>
     <key alias="packageAuthor">Autor</key>
-    <key alias="packageDemonstration"><![CDATA[Demostración
-]]></key>
     <key alias="packageDocumentation">Documentación</key>
     <key alias="packageMetaData">Meta datos del paquete</key>
     <key alias="packageName">Nombre del paquete</key>
     <key alias="packageNoItemsHeader">El paquete no contiene ningún elemento</key>
     <key alias="packageNoItemsText"><![CDATA[Este archivo de paquete no contiene ningún elemento para desinstalar.<br /><br />Puedes eliminarlo del sistema de forma segura seleccionando la opción "desinstalar paquete" de abajo.]]></key>
-    <key alias="packageNoUpgrades">No hay actualizaciones disponibles</key>
     <key alias="packageOptions">Opciones del paquete</key>
         <key alias="packageReadme">Léeme del paquete</key>
     <key alias="packageRepository">Repositorio de paquetes</key>
@@ -879,12 +872,7 @@
     <key alias="packageUninstalledText">El paquete se ha desinstalado correctamente</key>
     <key alias="packageUninstallHeader">Desinstalar paquete</key>
         <key alias="packageUninstallText"><![CDATA[Debajo puedes deseleccionar elementos que no desees eliminar en este momento. Cuando eliges "confirmar la desinstalación" todos los elementos marcados serán eliminados.<br /> <span style="color: Red; font-weight: bold;">Nota:</span> cualquier documento, archivo etc dependiente de los elementos eliminados, dejará de funcionar, y puede conllevar inestabilidad en el sistema, por lo que lleva cuidado al desinstalar elementos. En caso de duda, contacta con el autor del paquete.]]></key>
-    <key alias="packageUpgradeDownload">Descargar actualización del repositorio</key>
-    <key alias="packageUpgradeHeader">Actualizar paquete</key>
-    <key alias="packageUpgradeInstructions">Instrucciones de actualización</key>
-    <key alias="packageUpgradeText">Hay una actualización disponible para este paquete. Puedes descargarla directamente del repositorio de paquetes de Umbraco.</key>
     <key alias="packageVersion">Versión del paquete</key>
-    <key alias="viewPackageWebsite">Ver página web del paquete</key>
     <key alias="packageAlreadyInstalled">Paquete ya instalado</key>
     <key alias="targetVersionMismatch">Este paquete no se puede instalar, requiere un versión mínima de Umbraco de </key>
     <key alias="installStateUninstalling">Desinstalando...</key>

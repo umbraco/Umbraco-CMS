@@ -25,7 +25,6 @@ namespace Umbraco.Core
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
-        private RuntimeLevel _level = RuntimeLevel.Unknown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
@@ -87,14 +86,10 @@ namespace Umbraco.Core
         public string FinalMigrationState { get; internal set; }
 
         /// <inheritdoc />
-        public RuntimeLevel Level
-        {
-            get => _level;
-            internal set { _level = value; if (value == RuntimeLevel.Run) _runLevel.Set(); }
-        }
+        public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
 
         /// <inheritdoc />
-        public RuntimeLevelReason Reason { get; internal set; }
+        public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
@@ -115,18 +110,6 @@ namespace Umbraco.Core
 
             if (ApplicationUrl != null && !change) return;
             ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, _globalSettings, _settings, ServerRegistrar, request));
-        }
-
-        private readonly ManualResetEventSlim _runLevel = new ManualResetEventSlim(false);
-
-        /// <summary>
-        /// Waits for the runtime level to become RuntimeLevel.Run.
-        /// </summary>
-        /// <param name="timeout">A timeout.</param>
-        /// <returns>True if the runtime level became RuntimeLevel.Run before the timeout, otherwise false.</returns>
-        internal bool WaitForRunLevel(TimeSpan timeout)
-        {
-            return _runLevel.WaitHandle.WaitOne(timeout);
         }
 
         /// <inheritdoc />
@@ -169,7 +152,7 @@ namespace Umbraco.Core
             else if (databaseFactory.Configured == false)
             {
                 // local version *does* match code version, but the database is not configured
-                // install (again? this is a weird situation...)
+                // install - may happen with Deploy/Cloud/etc
                 logger.Debug<RuntimeState>("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
@@ -179,7 +162,7 @@ namespace Umbraco.Core
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
-            var tries = RuntimeStateOptions.InstallMissingDatabase ? 2 : 5;
+            var tries = RuntimeOptions.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = databaseFactory.CanConnect;
@@ -193,7 +176,7 @@ namespace Umbraco.Core
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<RuntimeState>("Could not connect to database.");
 
-                if (RuntimeStateOptions.InstallMissingDatabase)
+                if (RuntimeOptions.InstallMissingDatabase)
                 {
                     // ok to install on a configured but missing database
                     Level = RuntimeLevel.Install;
@@ -222,7 +205,7 @@ namespace Umbraco.Core
                 // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
 
-                if (RuntimeStateOptions.InstallEmptyDatabase)
+                if (RuntimeOptions.InstallEmptyDatabase)
                 {
                     // ok to install on an empty database
                     Level = RuntimeLevel.Install;

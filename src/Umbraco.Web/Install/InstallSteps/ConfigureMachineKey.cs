@@ -33,7 +33,7 @@ namespace Umbraco.Web.Install.InstallSteps
         /// <returns></returns>
         public override Task<InstallSetupResult> ExecuteAsync(bool? model)
         {
-            if (model.HasValue && model.Value == false) return null;
+            if (model.HasValue && model.Value == false) return Task.FromResult<InstallSetupResult>(null);
 
             //install the machine key
             var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
             var machineKey = systemWeb.Descendants("machineKey").FirstOrDefault();
-            if (machineKey != null) return null;
+            if (machineKey != null) return Task.FromResult<InstallSetupResult>(null);
 
             var generator = new MachineKeyGenerator();
             var generatedSection = generator.GenerateConfigurationBlock();

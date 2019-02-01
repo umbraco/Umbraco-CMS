@@ -35,12 +35,12 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string EntityType { get; set; }
 
-        //TODO: Should we have an index on this since we allow searching on it?
+        // TODO: Should we have an index on this since we allow searching on it?
         [Column("Datestamp")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime Datestamp { get; set; }
 
-        //TODO: Should we have an index on this since we allow searching on it?
+        // TODO: Should we have an index on this since we allow searching on it?
         [Column("logHeader")]
         [Length(50)]
         public string Header { get; set; }

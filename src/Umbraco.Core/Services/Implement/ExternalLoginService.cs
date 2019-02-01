@@ -36,7 +36,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <summary>
         /// Returns all logins matching the login info - generally there should only be one but in some cases
-        /// there might be more than one depending on if an adminstrator has been editing/removing members
+        /// there might be more than one depending on if an administrator has been editing/removing members
         /// </summary>
         /// <param name="login"></param>
         /// <returns></returns>

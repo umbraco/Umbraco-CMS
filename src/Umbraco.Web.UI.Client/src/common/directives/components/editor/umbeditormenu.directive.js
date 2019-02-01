@@ -30,8 +30,9 @@
                 }
 
                 //when the options item is selected, we need to set the current menu item in appState (since this is synonymous with a menu)
-                appState.setMenuState("currentNode", scope.currentNode);
-
+                // Niels: No i think we are wrong, we should not set the currentNode, cause it represents the currentNode of interaction.
+                //appState.setMenuState("currentNode", scope.currentNode);
+                
                 if (!scope.actions) {
                     treeService.getMenu({ treeNode: scope.currentNode })
                         .then(function (data) {

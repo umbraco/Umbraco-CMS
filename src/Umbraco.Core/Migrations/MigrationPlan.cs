@@ -61,7 +61,7 @@ namespace Umbraco.Core.Migrations
             // register the target state if we don't know it already
             // this is how we keep track of the final state - because
             // transitions could be defined in any order, that might
-            // be overriden afterwards.
+            // be overridden afterwards.
             if (!_transitions.ContainsKey(targetState))
                 _transitions.Add(targetState, null);
 

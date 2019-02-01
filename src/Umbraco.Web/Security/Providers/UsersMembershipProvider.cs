@@ -36,10 +36,7 @@ namespace Umbraco.Web.Security.Providers
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
 
-        public override string ProviderName
-        {
-            get { return Current.Configs.Settings().Providers.DefaultBackOfficeUserProvider; }
-        }
+        public override string ProviderName => Constants.Security.UserMembershipProviderName;
 
         protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {
@@ -55,18 +52,12 @@ namespace Umbraco.Web.Security.Providers
         /// </summary>
         /// <value></value>
         /// <returns>true if the membership provider supports password reset; otherwise, false. The default is FALSE for users.</returns>
-        public override bool EnablePasswordReset
-        {
-            get { return _enablePasswordReset; }
-        }
+        public override bool EnablePasswordReset => _enablePasswordReset;
 
         /// <summary>
         /// For backwards compatibility, this provider supports this option by default it is FALSE for users
         /// </summary>
-        public override bool AllowManuallyChangingPassword
-        {
-            get { return _allowManuallyChangingPassword; }
-        }
+        public override bool AllowManuallyChangingPassword => _allowManuallyChangingPassword;
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {

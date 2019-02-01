@@ -93,7 +93,11 @@ namespace Umbraco.Web.Editors
             service.Save(memberGroup);
 
             var display = Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/memberGroupSaved"), string.Empty);
+
+            display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/memberGroupSavedHeader"),
+                            string.Empty);
+
             return display;
         }
     }

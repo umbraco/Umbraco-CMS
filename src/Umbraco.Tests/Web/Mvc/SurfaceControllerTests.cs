@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<HttpContextBase>().Object,
                 publishedSnapshotService.Object,
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ITagQuery>(),
                 Mock.Of<ICultureDictionary>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>()),
+                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>()),
                 ServiceContext.CreatePartial());
 
             var ctrl = new TestSurfaceController(umbracoContext, helper);
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Mock_Current_Page()
         {
-            var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "AutoLegacy");
+            var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "Auto");
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var umbracoContext = UmbracoContext.EnsureContext(
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Web.Mvc
         public class TestSurfaceController : SurfaceController
         {
             public TestSurfaceController(UmbracoContext ctx, UmbracoHelper helper = null)
-                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<CacheHelper>(), null, null)
+                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null)
             {
                 if (helper != null)
                 {

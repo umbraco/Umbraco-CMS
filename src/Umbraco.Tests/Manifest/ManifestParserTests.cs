@@ -7,12 +7,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
+using Umbraco.Core.Dashboards;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Manifest
                 new RequiredValidator(Mock.Of<ILocalizedTextService>()),
                 new RegexValidator(Mock.Of<ILocalizedTextService>(), null)
             };
-            _parser = new ManifestParser(NullCacheProvider.Instance, new ManifestValueValidatorCollection(validators), Mock.Of<ILogger>());
+            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -337,12 +337,12 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(2, config.Count);
             Assert.IsTrue(config.ContainsKey("image"));
             var c = config["image"];
-            Assert.IsInstanceOf<JObject>(c); // fixme - is this what we want?
+            Assert.IsInstanceOf<JObject>(c); // FIXME: is this what we want?
             Assert.IsTrue(config.ContainsKey("link"));
             c = config["link"];
-            Assert.IsInstanceOf<JObject>(c); // fixme - is this what we want?
+            Assert.IsInstanceOf<JObject>(c); // FIXME: is this what we want?
 
-            // fixme - should we resolveUrl in configs?
+            // FIXME: should we resolveUrl in configs?
         }
 
         [Test]
@@ -387,7 +387,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         {
             const string json = @"{'dashboards': [
     {
-        'name': 'First One',
         'alias': 'something',
         'view': '~/App_Plugins/MyPackage/Dashboards/one.html',
         'sections': [ 'content' ],
@@ -395,7 +394,6 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 
     },
     {
-        'name': 'Second-One',
         'alias': 'something.else',
         'weight': -1,
         'view': '~/App_Plugins/MyPackage/Dashboards/two.html',
@@ -406,10 +404,9 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var manifest = _parser.ParseManifest(json);
             Assert.AreEqual(2, manifest.Dashboards.Length);
 
-            Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[0]);
+            Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[0]);
             var db0 = manifest.Dashboards[0];
             Assert.AreEqual("something", db0.Alias);
-            Assert.AreEqual("First One", db0.Name);
             Assert.AreEqual(100, db0.Weight);
             Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/one.html", db0.View);
             Assert.AreEqual(1, db0.Sections.Length);
@@ -420,14 +417,29 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(AccessRuleType.Deny, db0.AccessRules[1].Type);
             Assert.AreEqual("foo", db0.AccessRules[1].Value);
 
-            Assert.IsInstanceOf<ManifestDashboardDefinition>(manifest.Dashboards[1]);
+            Assert.IsInstanceOf<ManifestDashboard>(manifest.Dashboards[1]);
             var db1 = manifest.Dashboards[1];
             Assert.AreEqual("something.else", db1.Alias);
-            Assert.AreEqual("Second-One", db1.Name);
             Assert.AreEqual(-1, db1.Weight);
             Assert.AreEqual("/App_Plugins/MyPackage/Dashboards/two.html", db1.View);
             Assert.AreEqual(1, db1.Sections.Length);
             Assert.AreEqual("forms", db1.Sections[0]);
+        }
+
+        [Test]
+        public void CanParseManifest_Sections()
+        {
+            const string json = @"{'sections': [
+    { ""alias"": ""content"", ""name"": ""Content"" },
+    { ""alias"": ""hello"", ""name"": ""World"" }
+]}";
+
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Sections.Length);
+            Assert.AreEqual("content", manifest.Sections[0].Alias);
+            Assert.AreEqual("hello", manifest.Sections[1].Alias);
+            Assert.AreEqual("Content", manifest.Sections[0].Name);
+            Assert.AreEqual("World", manifest.Sections[1].Name);
         }
     }
 }

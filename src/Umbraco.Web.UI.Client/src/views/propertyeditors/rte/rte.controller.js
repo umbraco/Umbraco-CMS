@@ -2,7 +2,7 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
     function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, editorService, macroService, editorState) {
 
-            //TODO: A lot of the code below should be shared between the grid rte and the normal rte
+            // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
             $scope.isLoading = true;
 

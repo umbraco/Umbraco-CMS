@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class EntityMapperProfile : Profile
     {
-        private static string GetContentTypeIcon(EntitySlim entity)
+        private static string GetContentTypeIcon(IEntitySlim entity)
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         public EntityMapperProfile()
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
             // create, capture, cache
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
-            CreateMap<EntitySlim, EntityBasic>()
+            CreateMap<IEntitySlim, EntityBasic>()
                 .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => GetContentTypeIcon(src)))
@@ -36,6 +36,8 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         dest.Icon = "icon-user";
                     }
+
+                    dest.AdditionalData.Add("IsContainer", src.IsContainer);
                 });
 
             CreateMap<PropertyType, EntityBasic>()
@@ -122,7 +124,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                   .AfterMap((src, dest) =>
                       {
-                          //TODO: Properly map this (not aftermap)
+                          // TODO: Properly map this (not aftermap)
 
                           //get the icon if there is one
                           dest.Icon = src.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
@@ -186,9 +188,9 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Resolves the name for a content item/content variant
         /// </summary>
-        private class NameResolver : IValueResolver<EntitySlim, EntityBasic, string>
+        private class NameResolver : IValueResolver<IEntitySlim, EntityBasic, string>
         {
-            public string Resolve(EntitySlim source, EntityBasic destination, string destMember, ResolutionContext context)
+            public string Resolve(IEntitySlim source, EntityBasic destination, string destMember, ResolutionContext context)
             {
                 if (!(source is DocumentEntitySlim doc))
                     return source.Name;
@@ -202,7 +204,7 @@ namespace Umbraco.Web.Models.Mapping
                 // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
                 if (culture == null)
                     //throw new InvalidOperationException("Missing culture in mapping options.");
-                    // fixme we should throw, but this is used in various places that won't set a culture yet
+                    // TODO: we should throw, but this is used in various places that won't set a culture yet
                     return source.Name;
 
                 // if we don't have a name for a culture, it means the culture is not available, and

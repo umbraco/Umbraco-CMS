@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dtos = Database.Fetch<ContentTypeDto>(sql);
 
             return
-                //This returns a lookup from the GetAll cached looup
+                //This returns a lookup from the GetAll cached lookup
                 (dtos.Any()
                     ? GetMany(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
                     : Enumerable.Empty<IMediaType>())

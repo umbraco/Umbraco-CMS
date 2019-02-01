@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,9 +16,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:6)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, SortOrder = 6, TreeGroup = Constants.Trees.Groups.Templating)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
+    [CoreTree]
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -51,13 +50,13 @@ namespace Umbraco.Web.Trees
 
             nodes.AddRange(found.Select(template => CreateTreeNode(
                 template.Id.ToString(CultureInfo.InvariantCulture),
-                //TODO: Fix parent ID stuff for templates
+                // TODO: Fix parent ID stuff for templates
                 "-1",
                 queryStrings,
                 template.Name,
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
                 template.IsMasterTemplate,
-                GetEditorPath(template, queryStrings),
+                null,
                 Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
             )));
 
@@ -76,7 +75,7 @@ namespace Umbraco.Web.Trees
 
             //Create the normal create action
             var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-            item.NavigateToRoute($"{queryStrings.GetValue<string>("application")}/templates/edit/{id}?create=true");
+            item.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.Root.ToInvariantString())
             {
@@ -113,21 +112,11 @@ namespace Umbraco.Web.Trees
                 Key = template.Key,
                 Name = template.Name,
                 NodeObjectType = Constants.ObjectTypes.Template,
-                //TODO: Fix parent/paths on templates
+                // TODO: Fix parent/paths on templates
                 ParentId = -1,
                 Path = template.Path,
                 UpdateDate = template.UpdateDate
             };
-        }
-
-        private string GetEditorPath(ITemplate template, FormDataCollection queryStrings)
-        {
-            //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
-
-            return Services.FileService.DetermineTemplateRenderingEngine(template) == RenderingEngine.WebForms
-                ? "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                  Uri.EscapeDataString("settings/editTemplate.aspx?templateID=" + template.Id)
-                : null;
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

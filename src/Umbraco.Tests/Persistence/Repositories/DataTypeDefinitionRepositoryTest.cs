@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
         {
-            return new EntityContainerRepository(scopeAccessor, CacheHelper.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
+            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
         }
 
         [Test]

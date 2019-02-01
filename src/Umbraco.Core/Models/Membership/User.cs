@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Membership
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = Current.Configs.Global().DefaultUILanguage; //fixme inject somehow?
+            _language = Current.Configs.Global().DefaultUILanguage; // TODO: inject
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, Ps.Value.FailedPasswordAttemptsSelector); }
         }
 
-        //TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
+        // TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
         // we'll just have them as generic get/set which don't interact with the db.
 
         [IgnoreDataMember]

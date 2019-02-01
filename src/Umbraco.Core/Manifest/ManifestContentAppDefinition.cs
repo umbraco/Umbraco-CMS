@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Manifest
 {
@@ -30,6 +24,7 @@ namespace Umbraco.Core.Manifest
     /// <summary>
     /// Represents a content app definition, parsed from a manifest.
     /// </summary>
+    /// <remarks>Is used to create an actual <see cref="ManifestContentAppFactory"/>.</remarks>
     [DataContract(Name = "appdef", Namespace = "")]
     public class ManifestContentAppDefinition
     {

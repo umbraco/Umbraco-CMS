@@ -161,30 +161,30 @@ namespace Umbraco.Core.Packaging
             try
             {
                 //Init package file
-                var packageManifest = CreatePackageManifest(out var manifestRoot, out var filesXml);
+                var compiledPackageXml = CreateCompiledPackageXml(out var root, out var filesXml);
 
                 //Info section
-                manifestRoot.Add(GetPackageInfoXml(definition));
+                root.Add(GetPackageInfoXml(definition));
 
-                PackageDocumentsAndTags(definition, manifestRoot);
-                PackageDocumentTypes(definition, manifestRoot);
-                PackageTemplates(definition, manifestRoot);
-                PackageStylesheets(definition, manifestRoot);
-                PackageMacros(definition, manifestRoot, filesXml, temporaryPath);
-                PackageDictionaryItems(definition, manifestRoot);
-                PackageLanguages(definition, manifestRoot);
-                PackageDataTypes(definition, manifestRoot);
+                PackageDocumentsAndTags(definition, root);
+                PackageDocumentTypes(definition, root);
+                PackageTemplates(definition, root);
+                PackageStylesheets(definition, root);
+                PackageMacros(definition, root, filesXml, temporaryPath);
+                PackageDictionaryItems(definition, root);
+                PackageLanguages(definition, root);
+                PackageDataTypes(definition, root);
 
                 //Files
                 foreach (var fileName in definition.Files)
-                    AppendFileToManifest(fileName, temporaryPath, filesXml);
+                    AppendFileToPackage(fileName, temporaryPath, filesXml);
 
-                //Load control on install...
-                if (!string.IsNullOrEmpty(definition.Control))
+                //Load view on install...
+                if (!string.IsNullOrEmpty(definition.PackageView))
                 {
-                    var control = new XElement("control", definition.Control);
-                    AppendFileToManifest(definition.Control, temporaryPath, filesXml);
-                    manifestRoot.Add(control);
+                    var control = new XElement("view", definition.PackageView);
+                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml);
+                    root.Add(control);
                 }
 
                 //Actions
@@ -196,20 +196,20 @@ namespace Umbraco.Core.Packaging
                         //this will be formatted like a full xml block like <actions>...</actions> and we want the child nodes
                         var parsed = XElement.Parse(definition.Actions);
                         actionsXml.Add(parsed.Elements());
-                        manifestRoot.Add(actionsXml);
+                        root.Add(actionsXml);
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<PackagesRepository>(e, "Could not add package actions to the package manifest, the xml did not parse");
+                        _logger.Warn<PackagesRepository>(e, "Could not add package actions to the package, the xml did not parse");
                     }
                 }
 
-                var manifestFileName = temporaryPath + "/package.xml";
+                var packageXmlFileName = temporaryPath + "/package.xml";
 
-                if (File.Exists(manifestFileName))
-                    File.Delete(manifestFileName);
+                if (File.Exists(packageXmlFileName))
+                    File.Delete(packageXmlFileName);
 
-                packageManifest.Save(manifestFileName);
+                compiledPackageXml.Save(packageXmlFileName);
 
                 // check if there's a packages directory below media
                 
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Packaging
                 throw new InvalidOperationException("Validation failed, there is invalid data on the model: " + string.Join(", ", results.Select(x => x.ErrorMessage)));
         }
 
-        private void PackageDataTypes(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageDataTypes(PackageDefinition definition, XContainer root)
         {
             var dataTypes = new XElement("DataTypes");
             foreach (var dtId in definition.DataTypes)
@@ -252,10 +252,10 @@ namespace Umbraco.Core.Packaging
                 if (dataType == null) continue;
                 dataTypes.Add(_serializer.Serialize(dataType));
             }
-            manifestRoot.Add(dataTypes);
+            root.Add(dataTypes);
         }
 
-        private void PackageLanguages(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageLanguages(PackageDefinition definition, XContainer root)
         {
             var languages = new XElement("Languages");
             foreach (var langId in definition.Languages)
@@ -265,10 +265,10 @@ namespace Umbraco.Core.Packaging
                 if (lang == null) continue;
                 languages.Add(_serializer.Serialize(lang));
             }
-            manifestRoot.Add(languages);
+            root.Add(languages);
         }
 
-        private void PackageDictionaryItems(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageDictionaryItems(PackageDefinition definition, XContainer root)
         {
             var dictionaryItems = new XElement("DictionaryItems");
             foreach (var dictionaryId in definition.DictionaryItems)
@@ -278,10 +278,10 @@ namespace Umbraco.Core.Packaging
                 if (di == null) continue;
                 dictionaryItems.Add(_serializer.Serialize(di, false));
             }
-            manifestRoot.Add(dictionaryItems);
+            root.Add(dictionaryItems);
         }
 
-        private void PackageMacros(PackageDefinition definition, XContainer manifestRoot, XContainer filesXml, string temporaryPath)
+        private void PackageMacros(PackageDefinition definition, XContainer root, XContainer filesXml, string temporaryPath)
         {
             var macros = new XElement("Macros");
             foreach (var macroId in definition.Macros)
@@ -291,14 +291,14 @@ namespace Umbraco.Core.Packaging
                 var macroXml = GetMacroXml(outInt, out var macro);
                 if (macroXml == null) continue;
                 macros.Add(macroXml);
-                //if the macro has a file copy it to the manifest
+                //if the macro has a file copy it to the xml
                 if (!string.IsNullOrEmpty(macro.MacroSource))
-                    AppendFileToManifest(macro.MacroSource, temporaryPath, filesXml);
+                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml);
             }
-            manifestRoot.Add(macros);
+            root.Add(macros);
         }
 
-        private void PackageStylesheets(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageStylesheets(PackageDefinition definition, XContainer root)
         {
             var stylesheetsXml = new XElement("Stylesheets");
             foreach (var stylesheetName in definition.Stylesheets)
@@ -308,10 +308,10 @@ namespace Umbraco.Core.Packaging
                 if (xml != null)
                     stylesheetsXml.Add(xml);
             }
-            manifestRoot.Add(stylesheetsXml);
+            root.Add(stylesheetsXml);
         }
 
-        private void PackageTemplates(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageTemplates(PackageDefinition definition, XContainer root)
         {
             var templatesXml = new XElement("Templates");
             foreach (var templateId in definition.Templates)
@@ -321,10 +321,10 @@ namespace Umbraco.Core.Packaging
                 if (template == null) continue;
                 templatesXml.Add(_serializer.Serialize(template));
             }
-            manifestRoot.Add(templatesXml);
+            root.Add(templatesXml);
         }
 
-        private void PackageDocumentTypes(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageDocumentTypes(PackageDefinition definition, XContainer root)
         {
             var contentTypes = new HashSet<IContentType>();
             var docTypesXml = new XElement("DocumentTypes");
@@ -338,10 +338,10 @@ namespace Umbraco.Core.Packaging
             foreach (var contentType in contentTypes)
                 docTypesXml.Add(_serializer.Serialize(contentType));
 
-            manifestRoot.Add(docTypesXml);
+            root.Add(docTypesXml);
         }
 
-        private void PackageDocumentsAndTags(PackageDefinition definition, XContainer manifestRoot)
+        private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
         {
             //Documents and tags
             if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, out var contentNodeId))
@@ -356,13 +356,13 @@ namespace Umbraco.Core.Packaging
 
                         //Create the Documents/DocumentSet node
 
-                        manifestRoot.Add(
+                        root.Add(
                             new XElement("Documents",
                                 new XElement("DocumentSet",
                                     new XAttribute("importMode", "root"),
                                     contentXml)));
 
-                        //TODO: I guess tags has been broken for a very long time for packaging, we should get this working again sometime
+                        // TODO: I guess tags has been broken for a very long time for packaging, we should get this working again sometime
                         ////Create the TagProperties node - this is used to store a definition for all
                         //// document properties that are tags, this ensures that we can re-import tags properly
                         //XmlNode tagProps = new XElement("TagProperties");
@@ -438,12 +438,12 @@ namespace Umbraco.Core.Packaging
         }
 
         /// <summary>
-        /// Appends a file to package manifest and copies the file to the correct folder.
+        /// Appends a file to package and copies the file to the correct folder.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <param name="packageDirectory">The package directory.</param>
         /// <param name="filesXml">The files xml node</param>
-        private static void AppendFileToManifest(string path, string packageDirectory, XContainer filesXml)
+        private static void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml)
         {
             if (!path.StartsWith("~/") && !path.StartsWith("/"))
                 path = "~/" + path;
@@ -505,7 +505,7 @@ namespace Umbraco.Core.Packaging
         /// Converts a umbraco stylesheet to a package xml node
         /// </summary>
         /// <param name="name">The name of the stylesheet.</param>
-        /// <param name="includeProperties">if set to <c>true</c> [incluce properties].</param>
+        /// <param name="includeProperties">if set to <c>true</c> [include properties].</param>
         /// <returns></returns>
         private XElement GetStylesheetXml(string name, bool includeProperties)
         {
@@ -584,12 +584,12 @@ namespace Umbraco.Core.Packaging
             return info;
         }
 
-        private static XDocument CreatePackageManifest(out XElement root, out XElement files)
+        private static XDocument CreateCompiledPackageXml(out XElement root, out XElement files)
         {
             files = new XElement("files");
             root = new XElement("umbPackage", files);
-            var packageManifest = new XDocument(root);
-            return packageManifest;
+            var compiledPackageXml = new XDocument(root);
+            return compiledPackageXml;
         }
 
         private XDocument EnsureStorage(out string packagesFile)

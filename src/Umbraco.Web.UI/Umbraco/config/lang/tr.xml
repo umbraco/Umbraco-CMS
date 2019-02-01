@@ -224,10 +224,6 @@
     <key alias="siterepublishHelp">Web sitesi önbelleği yenilenir olacaktır. Yayınlanmamış içerik yayınlanmamış kalacak ise tüm yayınlanan içerik, güncellenecektir.</key>
     <key alias="tableColumns">Sütün sayısı</key>
     <key alias="tableRows">Satır sayısı</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Yer tutucu kimliği ayarla</strong> senin tutucu bir kimlik ayarlayarak Çocuğunuz şablonları bu şablon içine içerik enjekte edebilir,
-      Bir kullanarak bu kimliği bakarak <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Yer tutucu kimliği seçin</strong> Aşağıdaki listeden. You can sadece
-       Geçerli şablonun ustadan kimliği sitesinin seçin.]]></key>
     <key alias="thumbnailimageclickfororiginal">Tam boyutta görmek için resmin üzerine tıklayın</key>
     <key alias="treepicker">öğeyi seçin</key>
     <key alias="viewCacheItem">Görünüm Önbellek Öğe</key>
@@ -290,7 +286,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Yeni özellik tipine takma adını ve hem de doldurunuz!</key>
     <key alias="filePermissionsError">Belirli bir dosya veya klasör için okuma / yazma erişimi olan bir sorun var</key>
     <key alias="macroErrorLoadingPartialView">Error loading Partial View script (Dosya: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Error loading userControl '%0%'</key>
     <key alias="missingTitle">Lütfen bir başlık girin</key>
     <key alias="missingType">Lütfen bir tür seçin</key>
     <key alias="pictureResizeBiggerThanOrg">Orijinal boyutundan daha resmi büyütmek üzereyiz. Devam etmek istediğinizden emin misiniz?</key>
@@ -363,7 +358,6 @@
     <key alias="or">veya</key>
     <key alias="password">Parola</key>
     <key alias="path">Yol</key>
-    <key alias="placeHolderID">Yer tutucu ID</key>
     <key alias="pleasewait">Bir dakika lütfen...</key>
     <key alias="previous">Önceki</key>
     <key alias="properties">Özellikler</key>
@@ -609,14 +603,12 @@ To manage your website, simply open the Umbraco back office and start adding con
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
       ]]></key>
     <key alias="packageAuthor">Author</key>
-    <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Documentation</key>
     <key alias="packageMetaData">Package meta data</key>
     <key alias="packageName">Package name</key>
     <key alias="packageNoItemsHeader">Package doesn't contain any items</key>
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
-    <key alias="packageNoUpgrades">No upgrades available</key>
     <key alias="packageOptions">Package options</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Package repository</key>
@@ -627,12 +619,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageUninstallText"><![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
       <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,
       so uninstall with caution. If in doubt, contact the package author.]]></key>
-    <key alias="packageUpgradeDownload">Download update from the repository</key>
-    <key alias="packageUpgradeHeader">Upgrade package</key>
-    <key alias="packageUpgradeInstructions">Upgrade instructions</key>
-    <key alias="packageUpgradeText"> There's an upgrade available for this package. You can download it directly from the Umbraco package repository.</key>
     <key alias="packageVersion">Package version</key>
-    <key alias="viewPackageWebsite">View package website</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>

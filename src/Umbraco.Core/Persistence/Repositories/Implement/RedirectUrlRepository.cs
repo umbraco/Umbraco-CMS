@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

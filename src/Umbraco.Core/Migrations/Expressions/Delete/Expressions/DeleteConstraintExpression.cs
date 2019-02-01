@@ -1,6 +1,4 @@
-﻿using NPoco;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
@@ -16,19 +14,9 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         protected override string GetSql()
         {
-            return DatabaseType.IsMySql()
-                ? GetMySql()
-                : string.Format(SqlSyntax.DeleteConstraint,
+            return string.Format(SqlSyntax.DeleteConstraint,
                     SqlSyntax.GetQuotedTableName(Constraint.TableName),
                     SqlSyntax.GetQuotedName(Constraint.ConstraintName));
-        }
-
-        private string GetMySql()
-        {
-            return string.Format(SqlSyntax.DeleteConstraint,
-                SqlSyntax.GetQuotedTableName(Constraint.TableName),
-                Constraint.IsPrimaryKeyConstraint ? "PRIMARY KEY" : "FOREIGN KEY",
-                "");
         }
     }
 }

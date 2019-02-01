@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IRelationTypeRepository _relationTypeRepository;
 
         public RelationRepository(IScopeAccessor scopeAccessor, ILogger logger, IRelationTypeRepository relationTypeRepository)
-            : base(scopeAccessor, CacheHelper.NoCache, logger)
+            : base(scopeAccessor, AppCaches.NoCache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
         }

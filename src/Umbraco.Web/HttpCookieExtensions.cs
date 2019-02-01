@@ -12,7 +12,7 @@ namespace Umbraco.Web
     /// Extension methods used to check/set cookie values
     /// </summary>
     /// <remarks>
-    /// This should 100% supercede the StateManager.Cookies
+    /// This should 100% supersede the StateManager.Cookies
     /// </remarks>
     internal static class HttpCookieExtensions
     {

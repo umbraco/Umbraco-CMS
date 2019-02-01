@@ -65,11 +65,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 { SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
                 { SystemDirectories.Config, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Css, PermissionCheckRequirement.Optional },
-                { SystemDirectories.Masterpages, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Media, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Scripts, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Umbraco, PermissionCheckRequirement.Optional },
-                { SystemDirectories.UserControls, PermissionCheckRequirement.Optional },
                 { SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 
@@ -135,7 +133,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths,
             PermissionCheckFor checkingFor)
         {
-            // Return error if any required parths fail the check, or warning if any optional ones do
+            // Return error if any required paths fail the check, or warning if any optional ones do
             var resultType = StatusResultType.Success;
             var messageKey = string.Format("healthcheck/{0}PermissionsCheckMessage",
                 checkingFor == PermissionCheckFor.Folder ? "folder" : "file");

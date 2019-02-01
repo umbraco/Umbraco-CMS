@@ -17,6 +17,18 @@ namespace Umbraco.Web.Models.Mapping
     {
         public DictionaryMapperProfile(ILocalizationService localizationService)
         {
+            CreateMap<IDictionaryItem, EntityBasic>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(sheet => sheet.Id))
+                .ForMember(dest => dest.Alias, opt => opt.MapFrom(sheet => sheet.ItemKey))
+                .ForMember(dest => dest.Key, opt => opt.MapFrom(sheet => sheet.Key))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(sheet => sheet.ItemKey))
+                .ForMember(dest => dest.ParentId, opt => opt.Ignore())
+                .ForMember(dest => dest.Path, opt => opt.Ignore())
+                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.Udi, opt => opt.Ignore())
+                .ForMember(dest => dest.Icon, opt => opt.Ignore());
+
             CreateMap<IDictionaryItem, DictionaryDisplay>()
                 .ForMember(x => x.Translations, expression => expression.Ignore())
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
@@ -35,7 +47,7 @@ namespace Umbraco.Web.Models.Mapping
                     (src, dest) =>
                     {
                         // build up the path to make it possible to set active item in tree
-                        // TODO check if there is a better way
+                        // TODO: check if there is a better way
                         if (src.ParentId.HasValue)
                         {
                             var ids = new List<int> { -1 };
@@ -100,7 +112,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
-        /// Goes up the dictoinary tree to get all parent ids
+        /// Goes up the dictionary tree to get all parent ids
         /// </summary>
         /// <param name="parentId">
         /// The parent id.

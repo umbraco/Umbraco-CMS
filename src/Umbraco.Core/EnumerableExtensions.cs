@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core
 {
@@ -264,7 +265,7 @@ namespace Umbraco.Core
             return -1;
         }
 
-        ///<summary>Finds the index of the first occurence of an item in an enumerable.</summary>
+        ///<summary>Finds the index of the first occurrence of an item in an enumerable.</summary>
         ///<param name="items">The enumerable to search.</param>
         ///<param name="item">The item to find.</param>
         ///<returns>The index of the first matching item, or -1 if the item was not found.</returns>
@@ -336,6 +337,11 @@ namespace Umbraco.Core
                 for (var value = e.Current; e.MoveNext(); value = e.Current)
                     yield return value;
             }
+        }
+
+        public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Direction sortOrder)
+        {
+            return sortOrder == Direction.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
     }
 }

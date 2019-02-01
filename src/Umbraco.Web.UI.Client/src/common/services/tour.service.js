@@ -114,7 +114,7 @@
          * @returns {Object} Returns the current tour
          */
         function getCurrentTour() {
-            //TODO: This should be reset if a new user logs in
+            // TODO: This should be reset if a new user logs in
             return currentTour;
         }
 

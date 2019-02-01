@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web;
+﻿using System.Web;
 
 namespace Umbraco.Core.IO
 {
@@ -18,10 +17,6 @@ namespace Umbraco.Core.IO
 
         public static string Install => "~/install";
 
-        //fixme: remove this
-        [Obsolete("Master pages are obsolete and code should be removed")]
-        public static string Masterpages => "~/masterpages";
-
         public static string AppCode => "~/App_Code";
 
         public static string AppPlugins => "~/App_Plugins";
@@ -39,13 +34,6 @@ namespace Umbraco.Core.IO
         public static string Css => IOHelper.ReturnPath("umbracoCssPath", "~/css");
 
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
-
-        //fixme: remove this
-        [Obsolete("Usercontrols are obsolete and code should be removed")]
-        public static string UserControls => "~/usercontrols";
-
-        [Obsolete("Only used by legacy load balancing which is obsolete and should be removed")]
-        public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
 
         public static string Packages => Data + "/packages";
 

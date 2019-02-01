@@ -1,39 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Xml;
-using System.Xml.Linq;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Composing;
+using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UI;
-using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
-using Version = System.Version;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,15 +34,15 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
-        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache,
+        public PackageInstallController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
+            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
 
         /// <summary>
-        /// This checks if this package & version is alraedy installed
+        /// This checks if this package & version is already installed
         /// </summary>
         /// <param name="name"></param>
         /// <param name="version"></param>
@@ -200,7 +190,7 @@ namespace Umbraco.Web.Editors
                     model.Notifications.Add(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("media/disallowedFileType"),
-                        SpeechBubbleIcon.Warning));
+                        NotificationStyle.Warning));
                 }
 
             }
@@ -369,19 +359,17 @@ namespace Umbraco.Web.Editors
 
             var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
+            zipFile.Delete();
+
+            //bump cdf to be safe
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
-            zipFile.Delete();
-
             var redirectUrl = "";
-            if (packageInfo.Control.IsNullOrWhiteSpace() == false)
+            if (!packageInfo.PackageView.IsNullOrWhiteSpace())
             {
-                //fixme: this needs to be replaced with an angular view the installer.aspx no longer exists.
-                //redirectUrl = string.Format("/developer/framed/{0}",
-                //    Uri.EscapeDataString(
-                //        string.Format("/umbraco/developer/Packages/installer.aspx?installing=custominstaller&dir={0}&pId={1}&customControl={2}&customUrl={3}", tempDir, model.Id, ins.Control, ins.Url)));
+                redirectUrl = $"/packages/packages/options/{model.Id}";
             }
 
             return new PackageInstallResult

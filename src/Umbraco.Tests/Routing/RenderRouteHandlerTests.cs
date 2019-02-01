@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Routing
             base.Compose();
 
             // set the default RenderMvcController
-            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
+            Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // FIXME: Wrong!
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
             Composition.RegisterUnique(surfaceControllerTypes);
@@ -97,7 +97,6 @@ namespace Umbraco.Tests.Routing
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
             frequest.TemplateModel = template;
-            frequest.RenderingEngine = RenderingEngine.Mvc;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 
@@ -110,7 +109,7 @@ namespace Umbraco.Tests.Routing
 
         //test all template name styles to match the ActionName
 
-        //[TestCase("home-\\234^^*32page")]        //TODO: This fails!
+        //[TestCase("home-\\234^^*32page")]        // TODO: This fails!
         [TestCase("home-page")]
         [TestCase("home-page")]
         [TestCase("home-page")]
@@ -173,8 +172,8 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
-                : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
+            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+                : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
             {
             }
 

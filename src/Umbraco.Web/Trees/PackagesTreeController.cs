@@ -8,7 +8,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Packages)]
-    [Tree(Constants.Applications.Packages, Constants.Trees.Packages, null, sortOrder: 0, isSingleNodeTree: true)]
+    [Tree(Constants.Applications.Packages, Constants.Trees.Packages, SortOrder = 0, IsSingleNodeTree = true)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class PackagesTreeController : TreeController
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/overview";
+            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/repo";
             root.Icon = "icon-box";
 
             root.HasChildren = false;

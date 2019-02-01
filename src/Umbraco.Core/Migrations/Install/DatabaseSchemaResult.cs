@@ -12,12 +12,8 @@ namespace Umbraco.Core.Migrations.Install
     /// </summary>
     internal class DatabaseSchemaResult
     {
-        private readonly bool _isMySql;
-
         public DatabaseSchemaResult(ISqlSyntaxProvider sqlSyntax)
         {
-            _isMySql = sqlSyntax is MySqlSyntaxProvider;
-
             Errors = new List<Tuple<string, string>>();
             TableDefinitions = new List<TableDefinition>();
             ValidTables = new List<string>();
@@ -31,7 +27,7 @@ namespace Umbraco.Core.Migrations.Install
 
         public List<TableDefinition> TableDefinitions { get; }
 
-        // fixme TableDefinitions are those that should be there, IndexDefinitions are those that... are in DB?
+        // TODO: what are these exactly? TableDefinitions are those that should be there, IndexDefinitions are those that... are in DB?
         internal List<DbIndexDefinition> IndexDefinitions { get; }
 
         public List<string> ValidTables { get; }
@@ -100,11 +96,6 @@ namespace Umbraco.Core.Migrations.Install
                 sb.AppendLine("The following unknown constraints (Primary Keys, Foreign Keys and Indexes) were found in the database, but are not in the current schema:");
                 sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Unknown")).Select(x => x.Item2)));
                 sb.AppendLine(" ");
-            }
-
-            if (_isMySql)
-            {
-                sb.AppendLine("Please note that the constraints could not be validated because the current data provider is MySql.");
             }
 
             return sb.ToString();

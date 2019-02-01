@@ -14,7 +14,7 @@ namespace Umbraco.Web.HealthCheck
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
         public readonly bool AllChecksSuccessful;
 
-        private ILogger Logger => Current.Logger; // fixme inject
+        private ILogger Logger => Current.Logger; // TODO: inject
 
         public HealthCheckResults(IEnumerable<HealthCheck> checks)
         {
@@ -62,7 +62,7 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed succesfully.", checkName);
+                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed successfully.", checkName);
                 }
                 else
                 {
@@ -96,7 +96,7 @@ namespace Umbraco.Web.HealthCheck
 
                 if (checkIsSuccess)
                 {
-                    sb.AppendFormat("{0}Checks for '{1}' all completed succesfully.{2}", newItem, checkName, Environment.NewLine);
+                    sb.AppendFormat("{0}Checks for '{1}' all completed successfully.{2}", newItem, checkName, Environment.NewLine);
                 }
                 else
                 {

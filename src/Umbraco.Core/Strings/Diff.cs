@@ -76,10 +76,10 @@ namespace Umbraco.Core.Strings
         }
 
         /// <summary>
-        /// Find the difference in 2 texts, comparing by textlines.
+        /// Find the difference in 2 texts, comparing by text lines.
         /// </summary>
-        /// <param name="textA">A-version of the text (usualy the old one)</param>
-        /// <param name="textB">B-version of the text (usualy the new one)</param>
+        /// <param name="textA">A-version of the text (usually the old one)</param>
+        /// <param name="textB">B-version of the text (usually the new one)</param>
         /// <returns>Returns a array of Items that describe the differences.</returns>
         public static Item[] DiffText(string textA, string textB)
         {
@@ -87,12 +87,12 @@ namespace Umbraco.Core.Strings
         } // DiffText
 
         /// <summary>
-        /// Find the difference in 2 texts, comparing by textlines.
+        /// Find the difference in 2 texts, comparing by text lines.
         /// This method uses the DiffInt internally by 1st converting the string into char codes
         /// then uses the diff int method
         /// </summary>
-        /// <param name="textA">A-version of the text (usualy the old one)</param>
-        /// <param name="textB">B-version of the text (usualy the new one)</param>
+        /// <param name="textA">A-version of the text (usually the old one)</param>
+        /// <param name="textB">B-version of the text (usually the new one)</param>
         /// <returns>Returns a array of Items that describe the differences.</returns>
         public static Item[] DiffText1(string textA, string textB)
         {
@@ -101,17 +101,17 @@ namespace Umbraco.Core.Strings
 
 
         /// <summary>
-        /// Find the difference in 2 text documents, comparing by textlines.
+        /// Find the difference in 2 text documents, comparing by text lines.
         /// The algorithm itself is comparing 2 arrays of numbers so when comparing 2 text documents
         /// each line is converted into a (hash) number. This hash-value is computed by storing all
-        /// textlines into a common hashtable so i can find dublicates in there, and generating a
-        /// new number each time a new textline is inserted.
+        /// text lines into a common Hashtable so i can find duplicates in there, and generating a
+        /// new number each time a new text line is inserted.
         /// </summary>
-        /// <param name="textA">A-version of the text (usualy the old one)</param>
-        /// <param name="textB">B-version of the text (usualy the new one)</param>
-        /// <param name="trimSpace">When set to true, all leading and trailing whitespace characters are stripped out before the comparation is done.</param>
-        /// <param name="ignoreSpace">When set to true, all whitespace characters are converted to a single space character before the comparation is done.</param>
-        /// <param name="ignoreCase">When set to true, all characters are converted to their lowercase equivivalence before the comparation is done.</param>
+        /// <param name="textA">A-version of the text (usually the old one)</param>
+        /// <param name="textB">B-version of the text (usually the new one)</param>
+        /// <param name="trimSpace">When set to true, all leading and trailing whitespace characters are stripped out before the comparison is done.</param>
+        /// <param name="ignoreSpace">When set to true, all whitespace characters are converted to a single space character before the comparison is done.</param>
+        /// <param name="ignoreCase">When set to true, all characters are converted to their lowercase equivalence before the comparison is done.</param>
         /// <returns>Returns a array of Items that describe the differences.</returns>
         public static Item[] DiffText(string textA, string textB, bool trimSpace, bool ignoreSpace, bool ignoreCase)
         {
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Strings
             // The B-Version of the data (modified data) to be compared.
             var dataB = new DiffData(DiffCodes(textB, h, trimSpace, ignoreSpace, ignoreCase));
 
-            h = null; // free up hashtable memory (maybe)
+            h = null; // free up Hashtable memory (maybe)
 
             var max = dataA.Length + dataB.Length + 1;
             // vector for the (0,0) to (x,y) search
@@ -193,8 +193,8 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// Find the difference in 2 arrays of integers.
         /// </summary>
-        /// <param name="arrayA">A-version of the numbers (usualy the old one)</param>
-        /// <param name="arrayB">B-version of the numbers (usualy the new one)</param>
+        /// <param name="arrayA">A-version of the numbers (usually the old one)</param>
+        /// <param name="arrayB">B-version of the numbers (usually the new one)</param>
         /// <returns>Returns a array of Items that describe the differences.</returns>
         public static Item[] DiffInt(int[] arrayA, int[] arrayB)
         {
@@ -216,11 +216,11 @@ namespace Umbraco.Core.Strings
 
 
         /// <summary>
-        /// This function converts all textlines of the text into unique numbers for every unique textline
+        /// This function converts all text lines of the text into unique numbers for every unique text line
         /// so further work can work only with simple numbers.
         /// </summary>
         /// <param name="aText">the input text</param>
-        /// <param name="h">This extern initialized hashtable is used for storing all ever used textlines.</param>
+        /// <param name="h">This extern initialized Hashtable is used for storing all ever used text lines.</param>
         /// <param name="trimSpace">ignore leading and trailing space characters</param>
         /// <param name="ignoreSpace"></param>
         /// <param name="ignoreCase"></param>
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Strings
             // get all codes of the text
             var lastUsedCode = h.Count;
 
-            // strip off all cr, only use lf as textline separator.
+            // strip off all cr, only use lf as text line separator.
             aText = aText.Replace("\r", "");
             var lines = aText.Split('\n');
 
@@ -393,7 +393,7 @@ namespace Umbraco.Core.Strings
 
 
         /// <summary>
-        /// This is the divide-and-conquer implementation of the longes common-subsequence (LCS)
+        /// This is the divide-and-conquer implementation of the longest common-subsequence (LCS)
         /// algorithm.
         /// The published algorithm passes recursively parts of the A and B sequences.
         /// To avoid copying these arrays the lower and upper bounds are passed while the sequences stay constant.
@@ -408,15 +408,15 @@ namespace Umbraco.Core.Strings
         /// <param name="upVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
         private static void Lcs(DiffData dataA, int lowerA, int upperA, DiffData dataB, int lowerB, int upperB, int[] downVector, int[] upVector)
         {
-            // Debug.Write(2, "LCS", String.Format("Analyse the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
+            // Debug.Write(2, "LCS", String.Format("Analyze the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
 
-            // Fast walkthrough equal lines at the start
+            // Fast walk through equal lines at the start
             while (lowerA < upperA && lowerB < upperB && dataA.Data[lowerA] == dataB.Data[lowerB])
             {
                 lowerA++; lowerB++;
             }
 
-            // Fast walkthrough equal lines at the end
+            // Fast walk through equal lines at the end
             while (lowerA < upperA && lowerB < upperB && dataA.Data[upperA - 1] == dataB.Data[upperB - 1])
             {
                 --upperA; --upperB;
@@ -438,7 +438,7 @@ namespace Umbraco.Core.Strings
             }
             else
             {
-                // Find the middle snakea and length of an optimal path for A and B
+                // Find the middle snake and length of an optimal path for A and B
                 Smsrd smsrd = Sms(dataA, lowerA, upperA, dataB, lowerB, upperB, downVector, upVector);
                 // Debug.Write(2, "MiddleSnakeData", String.Format("{0},{1}", smsrd.x, smsrd.y));
 

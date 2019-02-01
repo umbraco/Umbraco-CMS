@@ -152,7 +152,7 @@ namespace Umbraco.Core.Xml
                     _iterator.ReadTo(_position);
 
                     // If we reached the end and our index is still
-                    // bigger, there're no more items.
+                    // bigger, there are no more items.
                     if (_iterator.Done && _position >= _iterator.CurrentPosition)
                         return false;
 

@@ -15,14 +15,14 @@ namespace Umbraco.Core.Security
 
         public string HashPassword(BackOfficeIdentityUser user, string password)
         {
-            //TODO: Implement the logic for this, we need to lookup the password format for the user and hash accordingly: http://issues.umbraco.org/issue/U4-10089
+            // TODO: Implement the logic for this, we need to lookup the password format for the user and hash accordingly: http://issues.umbraco.org/issue/U4-10089
             //NOTE: For now this just falls back to the hashing we are currently using
             return base.HashPassword(password);
         }
 
         public PasswordVerificationResult VerifyHashedPassword(BackOfficeIdentityUser user, string hashedPassword, string providedPassword)
         {
-            //TODO: Implement the logic for this, we need to lookup the password format for the user and hash accordingly: http://issues.umbraco.org/issue/U4-10089
+            // TODO: Implement the logic for this, we need to lookup the password format for the user and hash accordingly: http://issues.umbraco.org/issue/U4-10089
             //NOTE: For now this just falls back to the hashing we are currently using
             return base.VerifyHashedPassword(hashedPassword, providedPassword);
         }

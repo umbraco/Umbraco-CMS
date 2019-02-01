@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Scoping
 
             // the cache refresher component needs to trigger to refresh caches
             // but then, it requires a lot of plumbing ;(
-            // fixme - and we cannot inject a DistributedCache yet
+            // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
             Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
@@ -37,14 +37,13 @@ namespace Umbraco.Tests.Scoping
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
-        protected override CacheHelper GetCacheHelper()
+        protected override AppCaches GetAppCaches()
         {
             // this is what's created core web runtime
-            return new CacheHelper(
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+            return new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                NoAppCache.Instance,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
         [TearDown]
@@ -60,13 +59,13 @@ namespace Umbraco.Tests.Scoping
         {
             var scopeProvider = ScopeProvider;
             var service = Current.Services.UserService;
-            var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof(IUser));
+            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof(IUser));
 
             var user = (IUser)new User("name", "email", "username", "rawPassword");
             service.Save(user);
 
             // global cache contains the entity
-            var globalCached = (IUser) globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
+            var globalCached = (IUser) globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
@@ -85,20 +84,20 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
                 // scope has its own isolated cache
-                var scopedCache = scope.IsolatedRuntimeCache.GetOrCreateCache(typeof (IUser));
+                var scopedCache = scope.IsolatedCaches.GetOrCreate(typeof (IUser));
                 Assert.AreNotSame(globalCache, scopedCache);
 
                 user.Name = "changed";
                 service.Save(user);
 
                 // scoped cache contains the "new" entity
-                var scopeCached = (IUser) scopedCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
+                var scopeCached = (IUser) scopedCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
                 Assert.IsNotNull(scopeCached);
                 Assert.AreEqual(user.Id, scopeCached.Id);
                 Assert.AreEqual("changed", scopeCached.Name);
 
                 // global cache is unchanged
-                globalCached = (IUser) globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
+                globalCached = (IUser) globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
                 Assert.IsNotNull(globalCached);
                 Assert.AreEqual(user.Id, globalCached.Id);
                 Assert.AreEqual("name", globalCached.Name);
@@ -108,7 +107,7 @@ namespace Umbraco.Tests.Scoping
             }
             Assert.IsNull(scopeProvider.AmbientScope);
 
-            globalCached = (IUser) globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
+            globalCached = (IUser) globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
             if (complete)
             {
                 // global cache has been cleared
@@ -125,7 +124,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(complete ? "changed" : "name", user.Name);
 
             // global cache contains the entity again
-            globalCached = (IUser) globalCache.GetCacheItem(GetCacheIdKey<IUser>(user.Id), () => null);
+            globalCached = (IUser) globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual(complete ? "changed" : "name", globalCached.Name);
@@ -137,18 +136,18 @@ namespace Umbraco.Tests.Scoping
         {
             var scopeProvider = ScopeProvider;
             var service = Current.Services.LocalizationService;
-            var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (ILanguage));
+            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
 
             var lang = (ILanguage) new Language("fr-FR");
             service.Save(lang);
 
             // global cache has been flushed, reload
-            var globalFullCached = (IEnumerable<ILanguage>) globalCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+            var globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
             Assert.IsNull(globalFullCached);
             var reload = service.GetLanguageById(lang.Id);
 
             // global cache contains the entity
-            globalFullCached = (IEnumerable<ILanguage>) globalCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+            globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
             Assert.IsNotNull(globalFullCached);
             var globalCached = globalFullCached.First(x => x.Id == lang.Id);
             Assert.IsNotNull(globalCached);
@@ -166,19 +165,19 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
                 // scope has its own isolated cache
-                var scopedCache = scope.IsolatedRuntimeCache.GetOrCreateCache(typeof (ILanguage));
+                var scopedCache = scope.IsolatedCaches.GetOrCreate(typeof (ILanguage));
                 Assert.AreNotSame(globalCache, scopedCache);
 
                 lang.IsoCode = "de-DE";
                 service.Save(lang);
 
                 // scoped cache has been flushed, reload
-                var scopeFullCached = (IEnumerable<ILanguage>) scopedCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+                var scopeFullCached = (IEnumerable<ILanguage>) scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
                 Assert.IsNull(scopeFullCached);
                 reload = service.GetLanguageById(lang.Id);
 
                 // scoped cache contains the "new" entity
-                scopeFullCached = (IEnumerable<ILanguage>) scopedCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+                scopeFullCached = (IEnumerable<ILanguage>) scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
                 Assert.IsNotNull(scopeFullCached);
                 var scopeCached = scopeFullCached.First(x => x.Id == lang.Id);
                 Assert.IsNotNull(scopeCached);
@@ -186,7 +185,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreEqual("de-DE", scopeCached.IsoCode);
 
                 // global cache is unchanged
-                globalFullCached = (IEnumerable<ILanguage>) globalCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+                globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
                 Assert.IsNotNull(globalFullCached);
                 globalCached = globalFullCached.First(x => x.Id == lang.Id);
                 Assert.IsNotNull(globalCached);
@@ -198,7 +197,7 @@ namespace Umbraco.Tests.Scoping
             }
             Assert.IsNull(scopeProvider.AmbientScope);
 
-            globalFullCached = (IEnumerable<ILanguage>) globalCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+            globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
             if (complete)
             {
                 // global cache has been cleared
@@ -215,7 +214,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(complete ? "de-DE" : "fr-FR", lang.IsoCode);
 
             // global cache contains the entity again
-            globalFullCached = (IEnumerable<ILanguage>) globalCache.GetCacheItem(GetCacheTypeKey<ILanguage>(), () => null);
+            globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
             Assert.IsNotNull(globalFullCached);
             globalCached = globalFullCached.First(x => x.Id == lang.Id);
             Assert.IsNotNull(globalCached);
@@ -229,7 +228,7 @@ namespace Umbraco.Tests.Scoping
         {
             var scopeProvider = ScopeProvider;
             var service = Current.Services.LocalizationService;
-            var globalCache = Current.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
+            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
 
             var lang = (ILanguage)new Language("fr-FR");
             service.Save(lang);
@@ -242,7 +241,7 @@ namespace Umbraco.Tests.Scoping
             service.Save(item);
 
             // global cache contains the entity
-            var globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            var globalCached = (IDictionaryItem) globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
@@ -258,20 +257,20 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
                 // scope has its own isolated cache
-                var scopedCache = scope.IsolatedRuntimeCache.GetOrCreateCache(typeof (IDictionaryItem));
+                var scopedCache = scope.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
                 Assert.AreNotSame(globalCache, scopedCache);
 
                 item.ItemKey = "item-changed";
                 service.Save(item);
 
                 // scoped cache contains the "new" entity
-                var scopeCached = (IDictionaryItem) scopedCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+                var scopeCached = (IDictionaryItem) scopedCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
                 Assert.IsNotNull(scopeCached);
                 Assert.AreEqual(item.Id, scopeCached.Id);
                 Assert.AreEqual("item-changed", scopeCached.ItemKey);
 
                 // global cache is unchanged
-                globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+                globalCached = (IDictionaryItem) globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
                 Assert.IsNotNull(globalCached);
                 Assert.AreEqual(item.Id, globalCached.Id);
                 Assert.AreEqual("item-key", globalCached.ItemKey);
@@ -281,7 +280,7 @@ namespace Umbraco.Tests.Scoping
             }
             Assert.IsNull(scopeProvider.AmbientScope);
 
-            globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            globalCached = (IDictionaryItem) globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
             if (complete)
             {
                 // global cache has been cleared
@@ -298,7 +297,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(complete ? "item-changed" : "item-key", item.ItemKey);
 
             // global cache contains the entity again
-            globalCached = (IDictionaryItem) globalCache.GetCacheItem(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
+            globalCached = (IDictionaryItem) globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual(complete ? "item-changed" : "item-key", globalCached.ItemKey);

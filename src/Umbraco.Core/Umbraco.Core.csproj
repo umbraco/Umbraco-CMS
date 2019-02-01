@@ -69,7 +69,6 @@
       <Version>4.0.0</Version>
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
-    <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="Semver" Version="2.0.4" />
@@ -87,6 +86,9 @@
     </PackageReference>
     <PackageReference Include="Serilog.Formatting.Compact">
       <Version>1.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog.Formatting.Compact.Reader">
+      <Version>1.0.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Settings.AppSettings">
       <Version>2.2.2</Version>
@@ -109,38 +111,39 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
+    <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
-    <Compile Include="Cache\CacheHelper.cs" />
+    <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
-    <Compile Include="Cache\CacheProviderExtensions.cs" />
+    <Compile Include="Cache\AppCacheExtensions.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherCollection.cs" />
     <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
-    <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
+    <Compile Include="Cache\DeepCloneAppCache.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\DictionaryCacheProvider.cs" />
-    <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
+    <Compile Include="Cache\FastDictionaryAppCache.cs" />
+    <Compile Include="Cache\FastDictionaryAppCacheBase.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\HttpRequestCacheProvider.cs" />
-    <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
-    <Compile Include="Cache\ICacheProvider.cs" />
+    <Compile Include="Cache\HttpRequestAppCache.cs" />
+    <Compile Include="Cache\WebCachingAppCache.cs" />
+    <Compile Include="Cache\IAppCache.cs" />
     <Compile Include="Cache\ICacheRefresher.cs" />
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\IPayloadCacheRefresher.cs" />
     <Compile Include="Cache\IRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\IRuntimeCacheProvider.cs" />
-    <Compile Include="Cache\IsolatedRuntimeCache.cs" />
+    <Compile Include="Cache\IAppPolicyCache.cs" />
+    <Compile Include="Cache\IsolatedCaches.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NoCacheRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\NullCacheProvider.cs" />
-    <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
+    <Compile Include="Cache\NoAppCache.cs" />
+    <Compile Include="Cache\ObjectCacheAppCache.cs" />
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\StaticCacheProvider.cs" />
+    <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
@@ -208,29 +211,6 @@
     <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="Configuration\Configs.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
-    <Compile Include="Configuration\Dashboard\AccessElement.cs" />
-    <Compile Include="Configuration\Dashboard\AccessRule.cs" />
-    <Compile Include="Configuration\Dashboard\AccessRuleType.cs" />
-    <Compile Include="Configuration\Dashboard\AreaCollection.cs" />
-    <Compile Include="Configuration\Dashboard\AreaElement.cs" />
-    <Compile Include="Configuration\Dashboard\AreasElement.cs" />
-    <Compile Include="Configuration\Dashboard\ControlCollection.cs" />
-    <Compile Include="Configuration\Dashboard\ControlElement.cs" />
-    <Compile Include="Configuration\Dashboard\DashboardSection.cs" />
-    <Compile Include="Configuration\Dashboard\IAccess.cs" />
-    <Compile Include="Configuration\Dashboard\IAccessRule.cs" />
-    <Compile Include="Configuration\Dashboard\IArea.cs" />
-    <Compile Include="Configuration\Dashboard\IDashboardControl.cs" />
-    <Compile Include="Configuration\Dashboard\IDashboardSection.cs" />
-    <Compile Include="Configuration\Dashboard\IDashboardTab.cs" />
-    <Compile Include="Configuration\Dashboard\ISection.cs" />
-    <Compile Include="Configuration\Dashboard\SectionCollection.cs" />
-    <Compile Include="Configuration\Dashboard\SectionElement.cs" />
-    <Compile Include="Configuration\Dashboard\TabCollection.cs" />
-    <Compile Include="Configuration\Dashboard\TabElement.cs" />
-    <Compile Include="Configuration\FileSystemProviderElement.cs" />
-    <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
-    <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
@@ -252,8 +232,6 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
-    <Compile Include="Configuration\IFileSystemProviderElement.cs" />
-    <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\IGlobalSettings.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\LocalTempStorage.cs" />
@@ -261,8 +239,6 @@
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\BackOfficeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
@@ -271,45 +247,28 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentScriptEditorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\LogTypeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ProvidersElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ScheduledTasksElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Constants-Applications.cs" />
@@ -330,7 +289,15 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
+    <Compile Include="Dashboards\AccessRule.cs" />
+    <Compile Include="Dashboards\AccessRuleType.cs" />
+    <Compile Include="Dashboards\DashboardSlim.cs" />
+    <Compile Include="Dashboards\IAccessRule.cs" />
+    <Compile Include="Dashboards\IDashboard.cs" />
+    <Compile Include="Dashboards\IDashboardSlim.cs" />
+    <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
+    <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
@@ -345,6 +312,17 @@
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="IO\SupportingFileSystems.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\Viewer\CountingFilter.cs" />
+    <Compile Include="Logging\Viewer\ErrorCounterFilter.cs" />
+    <Compile Include="Logging\Viewer\ExpressionFilter.cs" />
+    <Compile Include="Logging\Viewer\ILogFilter.cs" />
+    <Compile Include="Logging\Viewer\LogTemplate.cs" />
+    <Compile Include="Logging\Viewer\ILogViewer.cs" />
+    <Compile Include="Logging\Viewer\LogLevelCounts.cs" />
+    <Compile Include="Logging\Viewer\JsonLogViewer.cs" />
+    <Compile Include="Logging\Viewer\LogMessage.cs" />
+    <Compile Include="Logging\Viewer\LogViewerComposer.cs" />
+    <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
     <Compile Include="Logging\IProfilingLogger.cs" />
     <Compile Include="Logging\LogHttpRequest.cs" />
     <Compile Include="Logging\LogLevel.cs" />
@@ -354,10 +332,13 @@
     <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
+    <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
+    <Compile Include="Manifest\ManifestBackOfficeSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
-    <Compile Include="Manifest\ManifestDashboardDefinition.cs" />
+    <Compile Include="Manifest\ManifestDashboard.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
@@ -377,6 +358,7 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\ConvertRelatedLinksToMultiUrlPicker.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentTypeIsElementColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLogTableColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddTypedLabels.cs" />
@@ -400,6 +382,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigrationFix.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
@@ -450,6 +433,9 @@
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
+    <Compile Include="Models\Trees\IBackOfficeSection.cs" />
+    <Compile Include="PackageActions\AllowDoctype.cs" />
+    <Compile Include="PackageActions\PublishRootDocument.cs" />
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
@@ -514,7 +500,7 @@
     <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeLevelReason.cs" />
-    <Compile Include="RuntimeStateOptions.cs" />
+    <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
@@ -549,7 +535,6 @@
     <Compile Include="Deploy\IImageSourceParser.cs" />
     <Compile Include="Deploy\ILocalLinkParser.cs" />
     <Compile Include="Deploy\IMacroParser.cs" />
-    <Compile Include="Deploy\IPreValueConnector.cs" />
     <Compile Include="Deploy\IServiceConnector.cs" />
     <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
     <Compile Include="Deploy\IValueConnector.cs" />
@@ -598,7 +583,6 @@
     <Compile Include="Events\RefreshContentEventArgs.cs" />
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
-    <Compile Include="Events\ScopeLifetimeMessagesFactory.cs" />
     <Compile Include="Events\SendEmailEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Events\SupersedeEventAttribute.cs" />
@@ -632,7 +616,6 @@
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />
-    <Compile Include="IO\MasterPageHelper.cs" />
     <Compile Include="IO\MediaFileSystem.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
@@ -680,7 +663,6 @@
     <Compile Include="Migrations\Upgrade\UmbracoUpgrader.cs" />
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
-    <Compile Include="Models\ApplicationTree.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\Content.cs" />
@@ -808,7 +790,6 @@
     <Compile Include="Models\PublishedContent\PublishedDataType.cs" />
     <Compile Include="Models\PublishedContent\PublishedElementModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedElementWrapped.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentEnumerable.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedModelAttribute.cs" />
@@ -877,7 +858,6 @@
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
-    <Compile Include="Models\Section.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\Stylesheet.cs" />
     <Compile Include="Models\StylesheetProperty.cs" />
@@ -1010,7 +990,6 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Migrations\DataLossException.cs" />
     <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
@@ -1253,7 +1232,6 @@
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\MicrosoftSqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\SqlSyntax\MySqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
@@ -1312,7 +1290,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="ReflectionUtilities.cs" />
-    <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreRuntimeComposer.cs" />
@@ -1392,7 +1369,6 @@
     <Compile Include="Services\Implement\EntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\ExternalLoginService.cs" />
     <Compile Include="Services\Implement\FileService.cs" />
-    <Compile Include="Services\IApplicationTreeService.cs" />
     <Compile Include="Services\IAuditService.cs" />
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
@@ -1422,7 +1398,6 @@
     <Compile Include="Services\IPublicAccessService.cs" />
     <Compile Include="Services\IRedirectUrlService.cs" />
     <Compile Include="Services\IRelationService.cs" />
-    <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IServerRegistrationService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
@@ -1523,13 +1498,10 @@
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
-    <Compile Include="_Legacy\PackageActions\IPackageAction.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollection.cs" />
-    <Compile Include="_Legacy\PackageActions\PackageActionCollectionBuilder.cs" />
+    <Compile Include="PackageActions\IPackageAction.cs" />
+    <Compile Include="PackageActions\PackageActionCollection.cs" />
+    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Sync\ServerSyncWebServiceClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\SolutionInfo.cs">

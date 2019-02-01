@@ -15,7 +15,7 @@ using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    // fixme - use SqlTemplate for these queries else it's going to be horribly slow!
+    // TODO: use SqlTemplate for these queries else it's going to be horribly slow!
 
     // provides efficient database access for NuCache
     internal class DatabaseDataSource : IDataSource

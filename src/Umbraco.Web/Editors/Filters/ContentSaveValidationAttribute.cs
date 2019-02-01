@@ -152,7 +152,7 @@ namespace Umbraco.Web.Editors.Filters
                 case ContentSaveAction.PublishWithDescendantsNew:
                 case ContentSaveAction.PublishWithDescendantsForceNew:
                     //Publish new requires both ActionNew AND ActionPublish
-                    //TODO: Shoudn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
+                    // TODO: Shouldn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
                     permissionToCheck.Add(ActionNew.ActionLetter);
                     permissionToCheck.Add(ActionPublish.ActionLetter);

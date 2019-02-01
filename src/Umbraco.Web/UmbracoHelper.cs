@@ -325,23 +325,14 @@ namespace Umbraco.Web
 
             var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
 
-            var entityService = Current.Services.EntityService;
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Document:
                     return Content(guidUdi.Guid);
                 case UmbracoObjectTypes.Media:
-                    // fixme - need to implement Media(guid)!
-                    var mediaAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
-                    if (mediaAttempt.Success)
-                        return Media(mediaAttempt.Result);
-                    break;
+                    return Media(guidUdi.Guid);
                 case UmbracoObjectTypes.Member:
-                    // fixme - need to implement Member(guid)!
-                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
-                    if (memberAttempt.Success)
-                        return Member(memberAttempt.Result);
-                    break;
+                    return Member(guidUdi.Guid);
             }
 
             return null;
@@ -647,10 +638,10 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(Guid id)
         {
-            //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
+            // TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
             // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
 
-            var entityService = Current.Services.EntityService; // fixme inject
+            var entityService = Current.Services.EntityService; // TODO: inject
             var mediaAttempt = entityService.GetId(id, UmbracoObjectTypes.Media);
             return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
         }
@@ -779,10 +770,10 @@ namespace Umbraco.Web
         #region Strings
 
         /// <summary>
-        /// Replaces text line breaks with html line breaks
+        /// Replaces text line breaks with HTML line breaks
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
+        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
         public IHtmlString ReplaceLineBreaksForHtml(string text)
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
@@ -800,7 +791,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
         public HtmlString StripHtml(IHtmlString html, params string[] tags)
         {
@@ -808,7 +799,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
         public HtmlString StripHtml(string html, params string[] tags)
         {
@@ -840,7 +831,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(IHtmlString html, int length)
         {
@@ -848,7 +839,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis)
         {
@@ -856,7 +847,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
         {
@@ -864,7 +855,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(string html, int length)
         {
@@ -872,7 +863,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(string html, int length, bool addElipsis)
         {
@@ -880,7 +871,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
@@ -890,7 +881,7 @@ namespace Umbraco.Web
         #region Truncate by Words
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words)
         {
@@ -900,7 +891,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
         {
@@ -910,7 +901,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words)
         {
@@ -920,7 +911,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
         {

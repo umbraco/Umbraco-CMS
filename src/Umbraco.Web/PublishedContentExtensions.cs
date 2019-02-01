@@ -13,8 +13,6 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
-
     /// <summary>
     /// Provides extension methods for <c>IPublishedContent</c>.
     /// </summary>
@@ -86,24 +84,21 @@ namespace Umbraco.Web
 
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
-            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates == true)
+            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
                 return content.TemplateId == templateId;
 
-            if (content.TemplateId != templateId && Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates == true)
-            {
-                // fixme - perfs? nothing cached here
-                var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
-                if (publishedContentContentType == null)
-                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
+                return true;
 
-                return publishedContentContentType.IsAllowedTemplate(templateId);
-            }
+            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
+            if (publishedContentContentType == null)
+                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
 
-            return true;
+            return publishedContentContentType.IsAllowedTemplate(templateId);
+
         }
         public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
         {
-            // fixme - perfs? nothing cached here
             var template = Current.Services.FileService.GetTemplate(templateAlias);
             return template != null && content.IsAllowedTemplate(template.Id);
         }
@@ -166,12 +161,7 @@ namespace Umbraco.Web
                 return true;
 
             // else let fallback try to get a value
-            // fixme - really?
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _))
-                return true;
-
-            // else... no
-            return false;
+            return PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _, out _);
         }
 
         /// <summary>
@@ -193,15 +183,12 @@ namespace Umbraco.Web
                 return property.GetValue(culture, segment);
 
             // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
                 return value;
-
-            if (property == null)
-                return null;
 
             // else... if we have a property, at least let the converter return its own
             // vision of 'no value' (could be an empty enumerable)
-            return property.GetValue(culture, segment);
+            return property?.GetValue(culture, segment);
         }
 
         /// <summary>
@@ -224,35 +211,12 @@ namespace Umbraco.Web
                 return property.Value<T>(culture, segment);
 
             // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
                 return value;
 
             // else... if we have a property, at least let the converter return its own
             // vision of 'no value' (could be an empty enumerable) - otherwise, default
             return property == null ? default : property.Value<T>(culture, segment);
-        }
-
-        // fixme - .Value() refactoring - in progress
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", int fallback = 0)
-        {
-            var aliasesA = aliases.Split(',');
-            if (aliasesA.Length == 0)
-                return new HtmlString(string.Empty);
-
-            throw new NotImplementedException("WorkInProgress");
-
-            var property = content.GetProperty(aliasesA[0]);
-
-            //var property = aliases.Split(',')
-            //    .Where(x => string.IsNullOrWhiteSpace(x) == false)
-            //    .Select(x => content.GetProperty(x.Trim(), recurse))
-            //    .FirstOrDefault(x => x != null);
-
-            //if (format == null) format = x => x.ToString();
-
-            //return property != null
-            //    ? new HtmlString(format(property.Value<T>()))
-            //    : new HtmlString(alt);
         }
 
         #endregion
@@ -264,7 +228,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <remarks>Culture is case-insensitive.</remarks>
         public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.ContainsKey(culture);
+            => content.Cultures.ContainsKey(culture ?? string.Empty);
 
         /// <summary>
         /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
@@ -287,7 +251,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
-            //fixme: pass in the IExamineManager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -308,7 +272,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
         {
-            //fixme: pass in the IExamineManager
+            // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
@@ -785,9 +749,9 @@ namespace Umbraco.Web
         /// <remarks>
         /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
         /// </remarks>
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string culture = null)
         {
-            return parentNodes.SelectMany(x => x.DescendantsOrSelf(docTypeAlias, culture));
+            return parentNodes.SelectMany(x => x.DescendantsOrSelfOfType(docTypeAlias, culture));
         }
 
         /// <summary>
@@ -835,7 +799,7 @@ namespace Umbraco.Web
             return content.DescendantsOrSelf(false, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias, culture);
         }
@@ -862,7 +826,7 @@ namespace Umbraco.Web
             return content.DescendantsOrSelf(true, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias, culture);
         }
@@ -889,7 +853,7 @@ namespace Umbraco.Web
             return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IPublishedContent DescendantOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
@@ -916,7 +880,7 @@ namespace Umbraco.Web
             return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string contentTypeAlias, string culture = null)
+        public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
             return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
@@ -957,65 +921,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Axes: following-sibling, preceding-sibling, following, preceding + pseudo-axes up, down, next, previous
-
-        // up pseudo-axe ~ ancestors
-        // bogus, kept for backward compatibility but we should get rid of it
-        // better use ancestors
-
-        public static IPublishedContent Up(this IPublishedContent content)
-        {
-            return content.Parent;
-        }
-
-        public static IPublishedContent Up(this IPublishedContent content, int number)
-        {
-            if (number < 0)
-                throw new ArgumentOutOfRangeException(nameof(number), "Must be greater than, or equal to, zero.");
-            return number == 0 ? content : content.EnumerateAncestors(false).Skip(number).FirstOrDefault();
-        }
-
-        public static IPublishedContent Up(this IPublishedContent content, string contentTypeAlias)
-        {
-            return string.IsNullOrEmpty(contentTypeAlias)
-                ? content.Parent
-                : content.Ancestor(contentTypeAlias);
-        }
-
-        // down pseudo-axe ~ children (not descendants)
-        // bogus, kept for backward compatibility but we should get rid of it
-        // better use descendants
-
-        public static IPublishedContent Down(this IPublishedContent content)
-        {
-            return content.Children.FirstOrDefault();
-        }
-
-        public static IPublishedContent Down(this IPublishedContent content, int number)
-        {
-            if (number < 0)
-                throw new ArgumentOutOfRangeException(nameof(number), "Must be greater than, or equal to, zero.");
-            if (number == 0) return content;
-
-            content = content.Children.FirstOrDefault();
-            while (content != null && --number > 0)
-                content = content.Children.FirstOrDefault();
-
-            return content;
-        }
-
-        public static IPublishedContent Down(this IPublishedContent content, string contentTypeAlias)
-        {
-            if (string.IsNullOrEmpty(contentTypeAlias))
-                return content.Children.FirstOrDefault();
-
-            // note: this is what legacy did, but with a broken Descendant
-            // so fixing Descendant will change how it works...
-            return content.Descendant(contentTypeAlias);
-        }
-
-        #endregion
-
         #region Axes: parent
 
         // Parent is native
@@ -1050,14 +955,6 @@ namespace Umbraco.Web
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-
-            //
-            return content.Children.Where(x =>
-            {
-                if (!x.ContentType.VariesByCulture()) return true; // invariant = always ok
-                return x.HasCulture(culture);
-                return false;
-            });
 
             return content.Children.WhereIsInvariantOrHasCulture(culture);
         }
@@ -1113,10 +1010,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The content type alias.</param>
-        /// <returns>The first child of content, of the given content type.</returns>
-        public static IPublishedContent FirstChild(this IPublishedContent content, string alias, string culture = null)
+        public static IPublishedContent FirstChildOfType(this IPublishedContent content, string alias, string culture = null)
         {
             return content.Children(culture,alias).FirstOrDefault();
         }
@@ -1124,6 +1018,11 @@ namespace Umbraco.Web
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate, string culture = null)
         {
             return content.Children(predicate, culture).FirstOrDefault();
+        }
+
+        public static IPublishedContent FirstChild(this IPublishedContent content, Guid uniqueId, string culture = null)
+        {
+            return content.Children(x=>x.Key == uniqueId, culture).FirstOrDefault();
         }
 
         public static T FirstChild<T>(this IPublishedContent content, string culture = null)

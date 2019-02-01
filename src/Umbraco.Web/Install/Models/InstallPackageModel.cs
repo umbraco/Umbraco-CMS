@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.Install.Models
 {
-    //fixme: do we need this?
+    // TODO: do we need this?
     [Obsolete("This is only used for the obsolete controller InstallPackageController")]
     [DataContract(Name = "installPackage", Namespace = "")]
     public class InstallPackageModel

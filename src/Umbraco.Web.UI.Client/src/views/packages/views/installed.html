@@ -9,7 +9,7 @@
 
             <table class="table">
                 <tbody>
-                    <tr ng-repeat="installedPackage in vm.installedPackages">
+                    <tr ng-repeat="installedPackage in vm.installedPackages track by installedPackage.id">
                         <td class="flex items-center">
                             <div class="umb-package-list__item-icon">
                                 <i ng-if="!installedPackage.iconUrl" class="icon-box"></i>
@@ -23,12 +23,19 @@
                             </div>
                         </td>
                         <td style="text-align: right;">
-                            <umb-button
-                                type="button"
-                                button-style="danger"
-                                size="xxs"
-                                label-key="packager_packageUninstallHeader"
-                                action="vm.confirmUninstall(installedPackage)">
+                            <umb-button ng-show="installedPackage.packageView"
+                                        type="button"
+                                        button-style="info"
+                                        size="xxs"
+                                        label-key="packager_packageOptions"
+                                        action="vm.packageOptions(installedPackage)">
+                            </umb-button>
+
+                            <umb-button type="button"
+                                        button-style="danger"
+                                        size="xxs"
+                                        label-key="packager_packageUninstallHeader"
+                                        action="vm.confirmUninstall(installedPackage)">
                             </umb-button>
                         </td>
                     </tr>

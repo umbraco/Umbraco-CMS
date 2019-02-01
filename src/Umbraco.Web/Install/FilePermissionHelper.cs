@@ -5,15 +5,14 @@ using System.IO;
 using System.Security.AccessControl;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Install
 {
     internal class FilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
-        private static readonly string[] PermissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.UserControls, SystemDirectories.Preview };
-        private static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.UserControls, SystemDirectories.Packages };
+        private static readonly string[] PermissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Preview };
+        private static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Packages };
 
         // ensure Umbraco can write to these files (the directories must exist)
         private static readonly string[] PermissionFiles = { };
@@ -212,9 +211,9 @@ namespace Umbraco.Web.Install
             }
             catch (Exception)
             {
-                //This is not 100% accurate btw because it could turn out that the current user doesn't
-                //have access to read the current permissions but does have write access.
-                //I think this is an edge case however
+                // This is not 100% accurate because it could turn out that the current user doesn't
+                // have access to read the current permissions but does have write access.
+                // I think this is an edge case however
                 return false;
             }
 

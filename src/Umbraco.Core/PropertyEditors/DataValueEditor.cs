@@ -59,45 +59,10 @@ namespace Umbraco.Core.PropertyEditors
             HideLabel = attribute.HideLabel;
         }
 
-        // fixme kabam!
-        // I don't understand the remarks in the code commented out below
-        // and then,
-        // IPropertyEditor come from a PropertyEditorCollection so they are singletons
-        // IValueEditor is the actual value editor used for editing the value,
-        //  and it has its own configuration, depending on the datatype, so it
-        //  should NOT be a singleton => do NOT cache it in PropertyEditor!
-
         /// <summary>
         /// Gets or sets the value editor configuration.
         /// </summary>
         public virtual object Configuration { get; set; }
-
-        //private PreValueCollection _preVals;
-        //protected PreValueCollection PreValues
-        //{
-        //    get
-        //    {
-        //        if (_preVals == null)
-        //        {
-        //            throw new InvalidOperationException("Pre values cannot be accessed until the Configure method has been called");
-        //        }
-        //        return _preVals;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// This is called to configure the editor for display with it's prevalues, useful when properties need to change dynamically
-        ///// depending on what is in the pre-values.
-        ///// </summary>
-        ///// <param name="preValues"></param>
-        ///// <remarks>
-        ///// This cannot be used to change the value being sent to the editor, ConfigureEditor will be called *after* ConvertDbToEditor, pre-values
-        ///// should not be used to modify values.
-        ///// </remarks>
-        //public virtual void ConfigureForDisplay(PreValueCollection preValues)
-        //{
-        //    _preVals = preValues ?? throw new ArgumentNullException(nameof(preValues));
-        //}
 
         /// <summary>
         /// Gets or sets the editor view.
@@ -128,7 +93,7 @@ namespace Umbraco.Core.PropertyEditors
 
             // mandatory and regex validators cannot be part of valueEditor.Validators because they
             // depend on values that are not part of the configuration, .Mandatory and .ValidationRegEx,
-            // so they have to be explicitely invoked here.
+            // so they have to be explicitly invoked here.
 
             if (required)
             {
@@ -163,7 +128,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual IValueFormatValidator FormatValidator => new RegexValidator();
 
         /// <summary>
-        /// If this is is true than the editor will be displayed full width without a label
+        /// If this is true than the editor will be displayed full width without a label
         /// </summary>
         [JsonProperty("hideLabel")]
         public bool HideLabel { get; set; }
@@ -225,20 +190,13 @@ namespace Umbraco.Core.PropertyEditors
             return value.TryConvertTo(valueType);
         }
 
-        // fixme - not dealing with variants here!
-        //
-        // editors should declare whether they support variants, and then we should have a common
-        // way of dealing with it, ie of sending and receiving values, etc.
-        // eg
-        // [ { "value": "hello" }, { "lang": "fr-fr", "value": "bonjour" } ]
-
         ///  <summary>
         ///  A method to deserialize the string value that has been saved in the content editor
         ///  to an object to be stored in the database.
         ///  </summary>
         ///  <param name="editorValue"></param>
         ///  <param name="currentValue">
-        ///  The current value that has been persisted to the database for this editor. This value may be usesful for
+        ///  The current value that has been persisted to the database for this editor. This value may be useful for
         ///  how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
         ///  </param>
         /// <param name="languageId"></param>
@@ -325,7 +283,7 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
-        // fixme - the methods below should be replaced by proper property value convert ToXPath usage!
+        // TODO: the methods below should be replaced by proper property value convert ToXPath usage!
 
         /// <summary>
         /// Converts a property to Xml fragments.
@@ -360,7 +318,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>
         /// <para>By default, this returns the value of ConvertDbToString but ensures that if the db value type is
-        /// NVarchar or NText, the value is returned as a CDATA fragment - elxe it's a Text fragment.</para>
+        /// NVarchar or NText, the value is returned as a CDATA fragment - else it's a Text fragment.</para>
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>

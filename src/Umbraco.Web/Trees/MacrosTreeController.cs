@@ -12,9 +12,9 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Macros, "Macros", sortOrder: 4)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class MacrosTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -39,10 +39,7 @@ namespace Umbraco.Web.Trees
                         queryStrings,
                         macro.Name,
                         "icon-settings-alt",
-                        false,
-                        //TODO: Rebuild the macro editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
-                        "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                        Uri.EscapeDataString("/umbraco/developer/macros/editMacro.aspx?macroID=" + macro.Id)));
+                        false));
                 }
             }
 
@@ -56,10 +53,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
-                    //Since we haven't implemented anything for macros in angular, this needs to be converted to
-                    //use the legacy format
-                    .ConvertLegacyMenuItem(null, "initmacros", queryStrings.GetValue<string>("application"));
+                menu.Items.Add<ActionNew>(Services.TextService);
 
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -71,16 +65,7 @@ namespace Umbraco.Web.Trees
             if (macro == null) return new MenuItemCollection();
 
             //add delete option for all macros
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true)
-                //Since we haven't implemented anything for macros in angular, this needs to be converted to
-                //use the legacy format
-                .ConvertLegacyMenuItem(new EntitySlim
-                {
-                    Id = macro.Id,
-                    Level = 1,
-                    ParentId = -1,
-                    Name = macro.Name
-                }, "macros", queryStrings.GetValue<string>("application"));
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             return menu;
         }

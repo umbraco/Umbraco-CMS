@@ -65,7 +65,7 @@
         /// </summary>
         /// <param name="text">The text to split.</param>
         /// <param name="separator">The separator.</param>
-        /// <returns>The splitted string.</returns>
+        /// <returns>The split string.</returns>
         /// <remarks>Supports Utf8 and Ascii strings, not Unicode strings.</remarks>
         string SplitPascalCasing(string text, char separator);
 

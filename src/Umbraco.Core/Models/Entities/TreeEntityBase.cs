@@ -33,9 +33,6 @@ namespace Umbraco.Core.Models.Entities
             public readonly PropertyInfo Trashed = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
         }
 
-        // fixme
-        // ParentId, Path, Level and Trashed all should be consistent, and all derive from parentId, really
-
         /// <inheritdoc />
         [DataMember]
         public string Name

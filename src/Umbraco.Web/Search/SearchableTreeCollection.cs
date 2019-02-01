@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
@@ -13,13 +14,13 @@ namespace Umbraco.Web.Search
     {
         private readonly Dictionary<string, SearchableApplicationTree> _dictionary;
 
-        public SearchableTreeCollection(IEnumerable<ISearchableTree> items, IApplicationTreeService treeService)
+        public SearchableTreeCollection(IEnumerable<ISearchableTree> items, ITreeService treeService)
             : base(items)
         {
             _dictionary = CreateDictionary(treeService);
         }
 
-        private Dictionary<string, SearchableApplicationTree> CreateDictionary(IApplicationTreeService treeService)
+        private Dictionary<string, SearchableApplicationTree> CreateDictionary(ITreeService treeService)
         {
             var appTrees = treeService.GetAll()
                 .OrderBy(x => x.SortOrder)
@@ -28,10 +29,10 @@ namespace Umbraco.Web.Search
             var searchableTrees = this.ToArray();
             foreach (var appTree in appTrees)
             {
-                var found = searchableTrees.FirstOrDefault(x => x.TreeAlias.InvariantEquals(appTree.Alias));
+                var found = searchableTrees.FirstOrDefault(x => x.TreeAlias.InvariantEquals(appTree.TreeAlias));
                 if (found != null)
                 {
-                    dictionary[found.TreeAlias] = new SearchableApplicationTree(appTree.ApplicationAlias, appTree.Alias, found);
+                    dictionary[found.TreeAlias] = new SearchableApplicationTree(appTree.SectionAlias, appTree.TreeAlias, found);
                 }
             }
             return dictionary;

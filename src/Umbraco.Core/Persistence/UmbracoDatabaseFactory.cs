@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.Data.Common;
 using System.Threading;
-using LightInject;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Exceptions;
@@ -23,6 +22,8 @@ namespace Umbraco.Core.Persistence
     /// <para>It wraps an NPoco UmbracoDatabaseFactory which is initializes with a proper IPocoDataFactory to ensure
     /// that NPoco's plumbing is cached appropriately for the whole application.</para>
     /// </remarks>
+    // TODO: these comments are not true anymore
+    // TODO: this class needs not be disposable!
     internal class UmbracoDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
     {
         private readonly Lazy<IMapperCollection> _mappers;
@@ -58,14 +59,18 @@ namespace Umbraco.Core.Persistence
         /// <remarks>Used by the other ctor and in tests.</remarks>
         public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers)
         {
-            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
+            if (string.IsNullOrWhiteSpace(connectionStringName))
+                throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
 
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
             if (settings == null)
+            {
+                logger.Debug<UmbracoDatabaseFactory>("Missing connection string, defer configuration.");
                 return; // not configured
+            }
 
             // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
             // so need to test the values too
@@ -73,7 +78,7 @@ namespace Umbraco.Core.Persistence
             var providerName = settings.ProviderName;
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
-                logger.Debug<UmbracoDatabaseFactory>("Missing connection string or provider name, defer configuration.");
+                logger.Debug<UmbracoDatabaseFactory>("Empty connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
@@ -246,8 +251,6 @@ namespace Umbraco.Core.Persistence
         {
             switch (providerName)
             {
-                case Constants.DbProviderNames.MySql:
-                    return new MySqlSyntaxProvider(_logger);
                 case Constants.DbProviderNames.SqlCe:
                     return new SqlCeSyntaxProvider();
                 case Constants.DbProviderNames.SqlServer:
@@ -285,7 +288,7 @@ namespace Umbraco.Core.Persistence
             // thread, so we don't really know what we are disposing here...
             // besides, we don't really want to dispose the factory, which is a singleton...
 
-            // fixme - does not make any sense!
+            // TODO: the class does not need be disposable
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();
@@ -296,7 +299,7 @@ namespace Umbraco.Core.Persistence
         // this method provides a way to force-reset the variable
         internal void ResetForTests()
         {
-            // fixme - does not make any sense!
+            // TODO: remove all this eventually
             //var db = _umbracoDatabaseAccessor.UmbracoDatabase;
             //_umbracoDatabaseAccessor.UmbracoDatabase = null;
             //db?.Dispose();

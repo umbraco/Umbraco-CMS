@@ -181,7 +181,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string culture, string defaultCulture)
         {
-            // fixme ignoring cultures entirely?
+            // TODO: ignoring cultures entirely?
 
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
             KeyValuePair<string, string[]>[] candidateSites = null;
@@ -279,7 +279,7 @@ namespace Umbraco.Web.Routing
             if (domainAndUris == null) throw new ArgumentNullException(nameof(domainAndUris));
             if (domainAndUris.Count == 0) throw new ArgumentException("Cannot be empty.", nameof(domainAndUris));
 
-            // fixme how shall we deal with cultures?
+            // TODO: how shall we deal with cultures?
 
             // we do our best, but can't do the impossible
             // get the "default" domain ie the first one for the culture, else the first one (exists, length > 0)

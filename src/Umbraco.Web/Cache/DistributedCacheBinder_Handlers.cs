@@ -46,20 +46,6 @@ namespace Umbraco.Web.Cache
 
             _logger.Info<DistributedCacheBinderComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
 
-            // bind to application tree events
-            Bind(() => ApplicationTreeService.Deleted += ApplicationTreeService_Deleted,
-                () => ApplicationTreeService.Deleted -= ApplicationTreeService_Deleted);
-            Bind(() => ApplicationTreeService.Updated += ApplicationTreeService_Updated,
-                () => ApplicationTreeService.Updated -= ApplicationTreeService_Updated);
-            Bind(() => ApplicationTreeService.New += ApplicationTreeService_New,
-                () => ApplicationTreeService.New -= ApplicationTreeService_New);
-
-            // bind to application events
-            Bind(() => SectionService.Deleted += SectionService_Deleted,
-                () => SectionService.Deleted -= SectionService_Deleted);
-            Bind(() => SectionService.New += SectionService_New,
-                () => SectionService.New -= SectionService_New);
-
             // bind to user and user group events
             Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
                 () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
@@ -85,7 +71,6 @@ namespace Umbraco.Web.Cache
                 () => DataTypeService.Saved -= DataTypeService_Saved);
 
             // bind to stylesheet events
-            // fixme why not in v8?
             Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
                 () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
             Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
@@ -211,7 +196,7 @@ namespace Umbraco.Web.Cache
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
 
-        // fixme our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
         private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
         private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
@@ -228,39 +213,6 @@ namespace Umbraco.Web.Cache
         //{
         //    _distributedCache.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
         //}
-
-        #endregion
-
-        #region ApplicationTreeService
-
-        private void ApplicationTreeService_New(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
-
-        private void ApplicationTreeService_Updated(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
-
-        private void ApplicationTreeService_Deleted(ApplicationTree sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationTreeCache();
-        }
-
-        #endregion
-
-        #region Application event handlers
-
-        private void SectionService_New(ISectionService sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationCache();
-        }
-
-        private void SectionService_Deleted(ISectionService sender, EventArgs e)
-        {
-            _distributedCache.RefreshAllApplicationCache();
-        }
 
         #endregion
 
@@ -315,7 +267,7 @@ namespace Umbraco.Web.Cache
         #region LocalizationService / Language
 
         /// <summary>
-        /// Fires when a langauge is deleted
+        /// Fires when a language is deleted
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -326,7 +278,7 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Fires when a langauge is saved
+        /// Fires when a language is saved
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -355,7 +307,7 @@ namespace Umbraco.Web.Cache
             _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        // fixme our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
         private void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
         private void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
@@ -367,10 +319,9 @@ namespace Umbraco.Web.Cache
 
         #region UserService
 
-        // fixme STATIC??
         private void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
         {
-            //TODO: Not sure if we need this yet depends if we start caching permissions
+            // TODO: Not sure if we need this yet depends if we start caching permissions
             //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
             //foreach (var groupId in groupIds)
             //{
@@ -428,7 +379,7 @@ namespace Umbraco.Web.Cache
                 _distributedCache.RefreshTemplateCache(entity.Id);
         }
 
-        // fixme our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e) { }
         private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e) { }
 
@@ -457,7 +408,7 @@ namespace Umbraco.Web.Cache
             _distributedCache.RefreshMediaCache(args.Changes.ToArray());
         }
 
-        // fixme our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
         private void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
         private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }

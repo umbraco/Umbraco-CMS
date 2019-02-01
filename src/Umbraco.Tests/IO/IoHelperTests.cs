@@ -7,7 +7,6 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class IoHelperTests
     {
-
         [TestCase("~/Scripts", "/Scripts", null)]
         [TestCase("/Scripts", "/Scripts", null)]
         [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]
@@ -37,15 +36,12 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Css, true), IOHelper.MapPath(SystemDirectories.Css, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Data, true), IOHelper.MapPath(SystemDirectories.Data, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Install, true), IOHelper.MapPath(SystemDirectories.Install, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Masterpages, true), IOHelper.MapPath(SystemDirectories.Masterpages, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Media, true), IOHelper.MapPath(SystemDirectories.Media, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Packages, true), IOHelper.MapPath(SystemDirectories.Packages, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Preview, true), IOHelper.MapPath(SystemDirectories.Preview, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Root, true), IOHelper.MapPath(SystemDirectories.Root, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Scripts, true), IOHelper.MapPath(SystemDirectories.Scripts, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Umbraco, true), IOHelper.MapPath(SystemDirectories.Umbraco, false));            
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.UserControls, true), IOHelper.MapPath(SystemDirectories.UserControls, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.WebServices, true), IOHelper.MapPath(SystemDirectories.WebServices, false));
+            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Umbraco, true), IOHelper.MapPath(SystemDirectories.Umbraco, false));
         }
 
         [Test]

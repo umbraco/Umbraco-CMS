@@ -18,14 +18,13 @@ namespace Umbraco.Web.Mvc
     {
         private PublishedRequest _publishedRequest;
 
-        // fixme - delete?
         public RenderMvcController()
         {
             ActionInvoker = new RenderActionInvoker();
         }
 
-        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
-            : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
+        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+            : base(globalSettings, umbracoContext, services, appCaches, logger, profilingLogger)
         {
             ActionInvoker = new RenderActionInvoker();
         }

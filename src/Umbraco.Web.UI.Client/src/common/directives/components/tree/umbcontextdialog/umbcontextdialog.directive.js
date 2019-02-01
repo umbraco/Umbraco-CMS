@@ -25,7 +25,7 @@
             transclude: true,
             templateUrl: "views/components/tree/umbcontextdialog/umb-context-dialog.html",
             scope: {
-                title: "<",
+                dialogTitle: "<",
                 currentNode: "<",
                 view: "<"
             },

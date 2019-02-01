@@ -109,7 +109,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
 
-            //TODO: PUT lock here!!
+            // TODO: PUT lock here!!
 
             User user;
             using (var scope = ScopeProvider.CreateScope())
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException)
                 {
-                    // fixme - refactor users/upgrade
+                    // TODO: refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
@@ -705,7 +705,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException)
                 {
-                    // fixme - refactor users/upgrade
+                    // TODO: refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
@@ -929,7 +929,7 @@ namespace Umbraco.Core.Services.Implement
         /// Get explicitly assigned permissions for a user and optional node ids
         /// </summary>
         /// <param name="user">User to retrieve permissions for</param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
         {
@@ -946,7 +946,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="fallbackToDefaultPermissions">
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
@@ -965,7 +965,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="fallbackToDefaultPermissions">
         ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
-        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
@@ -1073,7 +1073,7 @@ namespace Umbraco.Core.Services.Implement
                     {
                         if (entityPermission.IsDefaultPermissions == false)
                         {
-                            //explicit permision found so we'll append it and move on, the collection is a hashset anyways
+                            //explicit permission found so we'll append it and move on, the collection is a hashset anyways
                             //so only supports adding one element per groupid/contentid
                             resultPermissions.Add(entityPermission);
                             added = true;
@@ -1218,7 +1218,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletedUserGroup;
 
-        //TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
+        // TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
         // event on the ContentService since there's a method there to modify node permissions too, or we can proxy events if needed.
         internal static event TypedEventHandler<IUserService, SaveEventArgs<EntityPermission>> UserGroupPermissionsAssigned;
     }

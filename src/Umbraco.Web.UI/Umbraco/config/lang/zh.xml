@@ -270,10 +270,6 @@
     <key alias="siterepublishHelp">网站缓存将会刷新，所有已发布的内容将会更新。</key>
     <key alias="tableColumns">表格列数</key>
     <key alias="tableRows">表格行数</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>设置一个占位符id</strong> 您可以在子模板中通过该ID来插入内容，
-       引用格式： <code>&lt;asp:content /&gt;</code>。]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[从下面的列表中<strong>选择一个
-      占位符id</strong>。]]></key>
     <key alias="thumbnailimageclickfororiginal">点击图片查看完整大小</key>
     <key alias="treepicker">拾取项</key>
     <key alias="viewCacheItem">查看缓存项</key>
@@ -368,7 +364,6 @@
     <key alias="contentTypeAliasAndNameNotNull">请为新的属性类型填写名称和别名！</key>
     <key alias="filePermissionsError">权限有问题，访问指定文件或文件夹失败！</key>
     <key alias="macroErrorLoadingPartialView">加载Partial视图脚本时出错(文件: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">加载 userControl 时出错 '%0%'</key>
     <key alias="missingTitle">请输入标题</key>
     <key alias="missingType">请选择类型</key>
     <key alias="pictureResizeBiggerThanOrg">图片尺寸大于原始尺寸不会提高图片质量，您确定要把图片尺寸变大吗?</key>
@@ -445,7 +440,6 @@
     <key alias="or">或</key>
     <key alias="password">密码</key>
     <key alias="path">路径</key>
-    <key alias="placeHolderID">占位符ID</key>
     <key alias="pleasewait">请稍候…</key>
     <key alias="previous">上一步</key>
     <key alias="properties">属性</key>
@@ -728,14 +722,12 @@
       选择 ".umb" 或者 ".zip" 文件
     ]]></key>
     <key alias="packageAuthor">作者</key>
-    <key alias="packageDemonstration">演示</key>
     <key alias="packageDocumentation">文档</key>
     <key alias="packageMetaData">元数据</key>
     <key alias="packageName">名称</key>
     <key alias="packageNoItemsHeader">扩展包不含任何项</key>
     <key alias="packageNoItemsText"><![CDATA[该扩展包不包含任何项<br/><br/>
       点击下面的“卸载”，您可以安全的删除。]]></key>
-    <key alias="packageNoUpgrades">无可用更新</key>
     <key alias="packageOptions">选项</key>
     <key alias="packageReadme">说明</key>
     <key alias="packageRepository">程序库</key>
@@ -746,12 +738,7 @@
     <key alias="packageUninstallText"><![CDATA[选择想要卸载的项目，点击“卸载”<br />
       <span style="color: Red; font-weight: bold;">注意：</span>
       卸载包将导致所有依赖该包的东西失效，请确认。    ]]></key>
-    <key alias="packageUpgradeDownload">从程序库下载更新</key>
-    <key alias="packageUpgradeHeader">更新扩展包</key>
-    <key alias="packageUpgradeInstructions">更新说明</key>
-    <key alias="packageUpgradeText">此软件包有一个可用的升级。您可以直接从 Umbraco 软件包存储库下载。</key>
     <key alias="packageVersion">版本</key>
-    <key alias="viewPackageWebsite">访问扩展包网站</key>
     <key alias="packageAlreadyInstalled">已安装软件包</key>
     <key alias="targetVersionMismatch">此软件包无法安装, 它需要一个最小的 Umbraco 版本的%0%</key>
     <key alias="installStateUninstalling">卸载中...</key>

@@ -8,7 +8,7 @@
         <owners>Umbraco HQ</owners>
         <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
         <projectUrl>http://umbraco.com/</projectUrl>
-        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+        <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
@@ -28,7 +28,6 @@
             <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.6,5.999999)" />
             <dependency id="Microsoft.Owin" version="[4.0.0,4.999999)" />
             <dependency id="MiniProfiler" version="[3.2.0.157,3.999999)" />
-            <dependency id="MySql.Data" version="[6.10.7,6.999999)" />
             <dependency id="Newtonsoft.Json" version="[11.0.2,11.999999)" />
             <dependency id="Semver" version="[2.0.4,2.999999)" />
             <dependency id="Serilog" version="[2.7.1,2.999999)" />
@@ -36,6 +35,7 @@
             <dependency id="Serilog.Enrichers.Thread" version="[3.0.0,3.999999)" />
             <dependency id="Serilog.Filters.Expressions" version="[2.0.0,2.999999)" />
             <dependency id="Serilog.Formatting.Compact" version="[1.0.0,1.999999)" />
+            <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.2,1.999999)" />
             <dependency id="Serilog.Settings.AppSettings" version="[2.2.2,2.999999)" />
             <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
             <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" />

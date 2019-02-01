@@ -17,7 +17,7 @@ namespace Umbraco.Core.PropertyEditors
             if (v == null)
                 throw new InvalidOperationException($"Could not find a validator named \"{name}\".");
 
-            // FIXME
+            // TODO: what is this exactly?
             // we cannot return this instance, need to clone it?
             return (IManifestValueValidator) Activator.CreateInstance(v.GetType()); // ouch
         }

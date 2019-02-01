@@ -40,7 +40,7 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected override TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 

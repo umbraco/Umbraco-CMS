@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var config = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
-            // fixme - IDataValueEditor configuration - general issue
+            // TODO: IDataValueEditor configuration - general issue
             // GetValueEditor() returns a non-configured IDataValueEditor
             // - for richtext and nested, configuration determines HideLabel, so we need to configure the value editor
             // - could configuration also determines ValueType, everywhere?

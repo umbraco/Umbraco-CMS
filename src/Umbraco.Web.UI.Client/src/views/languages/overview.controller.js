@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($location, $timeout, navigationService, notificationsService, localizationService, languageResource, eventsService) {
+    function LanguagesOverviewController($location, $timeout, navigationService, localizationService, languageResource, eventsService, overlayService) {
 
         var vm = this;
 
@@ -65,28 +65,45 @@
         }
 
         function deleteLanguage(language, event) {
-            var confirmed = confirm("Are you sure you want to delete " + language.name + "?");
-            if(confirmed) {
-                language.deleteButtonState = "busy";
 
-                languageResource.deleteById(language.id).then(function () {
+            const dialog = {
+                view: "views/languages/overlays/delete.html",
+                language: language,
+                submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submit: function (model) {
+                    performDelete(model.language);
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
+            };
 
-                    // emit event
-                    var args = { language: language };
-                    eventsService.emit("editors.languages.languageDeleted", args);
+            localizationService.localize("general_delete").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
 
-                    // remove from list
-                    var index = vm.languages.indexOf(language);
-                    vm.languages.splice(index, 1);
-
-                }, function (err) {
-                    language.deleteButtonState = "error";
-
-                });
-                
-            }
             event.preventDefault()
             event.stopPropagation();
+        }
+
+        function performDelete(language) {
+            language.deleteButtonState = "busy";
+
+            languageResource.deleteById(language.id).then(function () {
+
+                // emit event
+                var args = { language: language };
+                eventsService.emit("editors.languages.languageDeleted", args);
+
+                // remove from list
+                var index = vm.languages.indexOf(language);
+                vm.languages.splice(index, 1);
+
+            }, function (err) {
+                language.deleteButtonState = "error";
+            });
         }
 
         init();

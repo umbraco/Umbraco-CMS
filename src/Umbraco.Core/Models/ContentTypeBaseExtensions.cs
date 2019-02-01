@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models
                     throw new Exception("oops");
 
                 // skip new properties
-                //TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
+                // TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
                 var isNewProperty = dirtyProperty.WasPropertyDirty("Id");
                 if (isNewProperty) return false;
 

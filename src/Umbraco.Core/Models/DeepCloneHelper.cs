@@ -91,7 +91,7 @@ namespace Umbraco.Core.Models
                                 || (propertyInfo.PropertyType.IsInterface && propertyInfo.PropertyType.IsGenericType == false))
                             {
                                 //if its an array, we'll create a list to work with first and then convert to array later
-                                //otherwise if its just a regular derivitave of IEnumerable, we can use a list too
+                                //otherwise if its just a regular derivative of IEnumerable, we can use a list too
                                 return new ClonePropertyInfo(propertyInfo) { GenericListType = typeof(List<object>) };
                             }
                             //skip instead of trying to create instance of abstract or interface

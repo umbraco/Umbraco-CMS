@@ -442,7 +442,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// This is here to take care of a hack - the DictionaryTranslation model contains an ILanguage reference which we don't want but
         /// we cannot remove it because it would be a large breaking change, so we need to make sure it's resolved lazily. This is because
-        /// if developers have a lot of dictionary items and translations, the caching and cloning size gets much much larger because of
+        /// if developers have a lot of dictionary items and translations, the caching and cloning size gets much larger because of
         /// the large object graphs. So now we don't cache or clone the attached ILanguage
         /// </summary>
         private void EnsureDictionaryItemLanguageCallback(IDictionaryItem d)

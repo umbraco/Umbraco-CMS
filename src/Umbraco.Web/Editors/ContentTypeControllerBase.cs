@@ -33,7 +33,8 @@ namespace Umbraco.Web.Editors
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
 
-        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
         {
             _cultureDictionaryFactory = cultureDictionaryFactory;
         }
@@ -173,7 +174,7 @@ namespace Umbraco.Web.Editors
                         break;
 
                     case UmbracoObjectTypes.MediaType:
-                        source = Services.ContentTypeService.Get(contentTypeId);
+                        source = Services.MediaTypeService.Get(contentTypeId);
                         break;
 
                     case UmbracoObjectTypes.MemberType:
@@ -258,7 +259,7 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
-            // execute the externam validators
+            // execute the external validators
             EditorValidator.Validate(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)

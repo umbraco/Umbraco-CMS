@@ -4,7 +4,7 @@ using Umbraco.Core.Composing;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// The IcacheRefresher Interface is used for loadbalancing.
+    /// The IcacheRefresher Interface is used for load balancing.
     ///
     /// </summary>
     public interface ICacheRefresher : IDiscoverable

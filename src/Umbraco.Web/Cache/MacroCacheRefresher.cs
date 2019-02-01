@@ -2,7 +2,6 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using umbraco;
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using Newtonsoft.Json;
@@ -12,8 +11,8 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
     {
-        public MacroCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public MacroCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -33,11 +32,9 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             foreach (var prefix in GetAllMacroCacheKeys())
-                CacheHelper.RuntimeCache.ClearCacheByKeySearch(prefix);
+                AppCaches.RuntimeCache.ClearByKey(prefix);
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
-
-            CacheHelper.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
 
             base.RefreshAll();
         }
@@ -49,12 +46,12 @@ namespace Umbraco.Web.Cache
             foreach (var payload in payloads)
             {
                 foreach (var alias in GetCacheKeysForAlias(payload.Alias))
-                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(alias);
+                    AppCaches.RuntimeCache.ClearByKey(alias);
 
-                var macroRepoCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMacro>();
+                var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
                 if (macroRepoCache)
                 {
-                    macroRepoCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
+                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
                 }
             };
 
@@ -108,11 +105,6 @@ namespace Umbraco.Web.Cache
         internal static string[] GetCacheKeysForAlias(string alias)
         {
             return GetAllMacroCacheKeys().Select(x => x + alias).ToArray();
-        }
-
-        public static void ClearMacroContentCache(CacheHelper cacheHelper)
-        {
-            cacheHelper.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
         }
 
         #endregion

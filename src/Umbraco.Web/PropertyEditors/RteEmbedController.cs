@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             var result = new Result();
 
-            //todo cache embed doc
+            // TODO: cache embed doc
             var xmlConfig = new XmlDocument();
             xmlConfig.Load(IOHelper.GetRootDirectorySafe() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
 

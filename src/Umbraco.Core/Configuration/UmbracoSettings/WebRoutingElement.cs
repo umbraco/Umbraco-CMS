@@ -22,7 +22,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("disableRedirectUrlTracking", DefaultValue = "false")]
         public bool DisableRedirectUrlTracking => (bool) base["disableRedirectUrlTracking"];
 
-        [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
+        [ConfigurationProperty("urlProviderMode", DefaultValue = "Auto")]
         public string UrlProviderMode => (string) base["urlProviderMode"];
 
         [ConfigurationProperty("umbracoApplicationUrl", DefaultValue = null)]

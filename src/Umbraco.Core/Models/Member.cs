@@ -189,7 +189,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public IEnumerable<string> Groups { get; set; }
 
-        //TODO: When get/setting all of these properties we MUST:
+        // TODO: When get/setting all of these properties we MUST:
         // * Check if we are using the umbraco membership provider, if so then we need to use the configured fields - not the explicit fields below
         // * If any of the fields don't exist, what should we do? Currently it will throw an exception!
 
@@ -226,7 +226,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the raw password answer value
         /// </summary>
         /// <remarks>
-        /// For security reasons this value should be encrypted, the encryption process is handled by the memberhip provider
+        /// For security reasons this value should be encrypted, the encryption process is handled by the membership provider
         /// Alias: umbracoMemberPasswordRetrievalAnswer
         ///
         /// Part of the standard properties collection.
@@ -338,7 +338,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return false;
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -371,7 +371,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(DateTime);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -404,7 +404,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(DateTime);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -437,7 +437,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(DateTime);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -471,7 +471,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(int);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {

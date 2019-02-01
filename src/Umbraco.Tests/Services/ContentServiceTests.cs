@@ -38,8 +38,8 @@ namespace Umbraco.Tests.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceTests : TestWithSomeContentBase
     {
-        //TODO Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
-        //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
+        // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
+        // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         public override void SetUp()
         {
@@ -2219,7 +2219,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
             Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
             Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
-            Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
+            Assert.That(sut.GetValue<string>("multiUrlPicker"), Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
         }
 
@@ -2426,13 +2426,13 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.Published);
             Assert.IsTrue(content.Edited);
 
-            // fixme - depending on 1 line in ContentBaseFactory.BuildEntity
+            // FIXME: depending on 1 line in ContentBaseFactory.BuildEntity
             // the published infos can be gone or not
             // if gone, it's not consistent with above
             Assert.AreEqual(vpk, ((Content) content).VersionId);
             Assert.AreEqual(ppk, ((Content) content).PublishedVersionId); // still there
 
-            // fixme - depending on 1 line in ContentRepository.MapDtoToContent
+            // FIXME: depending on 1 line in ContentRepository.MapDtoToContent
             // the published values can be null or not
             // if null, it's not consistent with above
             //Assert.IsNull(content.GetValue("title", published:  true));
@@ -2448,7 +2448,7 @@ namespace Umbraco.Tests.Services
             //
             //contentService.SaveAndPublish(content);
 
-            // fixme - what shall we do of all this?
+            // FIXME: what shall we do of all this?
             /*
             // this basically republishes a content
             // what if it never was published?
@@ -2459,11 +2459,11 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(content.Published);
             Assert.IsFalse(content.Edited);
 
-            // fixme - should it be 2 or 3
+            // FIXME: should it be 2 or 3
             versions = contentService.GetVersions(content.Id);
             Assert.AreEqual(2, versions.Count());
 
-            // fixme - now test rollbacks
+            // FIXME: now test rollbacks
             var version = contentService.GetByVersion(content.Id); // test that it gets a version - should be GetVersion
             var previousVersion = contentService.GetVersions(content.Id).Skip(1).FirstOrDefault(); // need an optimized way to do this
             content.CopyValues(version); // copies the edited value - always
@@ -2502,7 +2502,7 @@ namespace Umbraco.Tests.Services
             //the name will be set to the default culture variant name
             Assert.AreEqual("name-us", content.Name);
 
-            //fixme - should we always sync the invariant name even on update? see EnsureInvariantNameValues
+            // FIXME: should we always sync the invariant name even on update? see EnsureInvariantNameValues
             ////updating the default culture variant name should also update the invariant name so they stay in sync
             //content.SetName("name-us-2", langUk.IsoCode);
             //contentService.Save(content);
@@ -2667,7 +2667,7 @@ namespace Umbraco.Tests.Services
             var contentType = contentTypeService.Get("umbTextpage");
             contentType.Variations = ContentVariation.Culture;
             contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.Culture });
-            // fixme add test w/ an invariant prop
+            // FIXME: add test w/ an invariant prop
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
@@ -3041,11 +3041,11 @@ namespace Umbraco.Tests.Services
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
-            var tagRepository = new TagRepository(accessor, CacheHelper.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper.Disabled, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, CacheHelper.Disabled, Logger);
-            var repository = new DocumentRepository(accessor, CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
     }

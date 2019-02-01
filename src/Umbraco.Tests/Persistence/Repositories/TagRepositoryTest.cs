@@ -454,7 +454,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     contentType.PropertyTypes.First().Id,
                     tags, false);
 
-                //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
+                // TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
                 //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
                 var all = repository.GetMany().ToArray();
 
@@ -947,26 +947,26 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private TagRepository CreateRepository(IScopeProvider provider)
         {
-            return new TagRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
+            return new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
         }
 
         private DocumentRepository CreateContentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
-            var tagRepository = new TagRepository(accessor, CacheHelper.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper.Disabled, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, CacheHelper.Disabled, Logger);
-            var repository = new DocumentRepository(accessor, CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var tagRepository = new TagRepository(accessor, CacheHelper.Disabled, Logger);
-            mediaTypeRepository = new MediaTypeRepository(accessor, CacheHelper.Disabled, Logger);
-            var repository = new MediaRepository(accessor, CacheHelper.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
             return repository;
         }
     }

@@ -27,7 +27,7 @@ angular.module("umbraco")
                 disableFolderSelect: true,
                 onlyImages: true,
                 submit: function(model) {
-                    var selectedImage = model.selectedImages[0];
+                    var selectedImage = model.selection[0];
                    
                     $scope.control.value = {
                         focalPoint: selectedImage.focalPoint,

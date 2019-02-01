@@ -358,7 +358,7 @@ angular.module('umbraco.services').factory("editorState", function() {
         }
     };
 
-    //TODO: This shouldn't be removed! use getCurrent() method instead of a hacked readonly property which is confusing.
+    // TODO: This shouldn't be removed! use getCurrent() method instead of a hacked readonly property which is confusing.
 
     //create a get/set property but don't allow setting
     Object.defineProperty(state, "current", {

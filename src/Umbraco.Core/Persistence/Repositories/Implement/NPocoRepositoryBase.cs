@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/> class.
         /// </summary>
-        protected NPocoRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected NPocoRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Abstract Methods
 
-        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount); // fixme obsolete, use QueryType instead everywhere
+        protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount); // TODO: obsolete, use QueryType instead everywhere
         protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }

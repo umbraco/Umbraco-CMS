@@ -7,7 +7,8 @@
                 button-style="success"
                 type="button" 
                 action="vm.createPackage()"
-                label="Create package">
+                label="Create package"
+                label-key="packager_createPackage">
             </umb-button>
         </umb-editor-sub-header-content-left>
 
@@ -15,7 +16,7 @@
 
     <table class="table table-hover">
         <tbody>
-            <tr ng-repeat="createdPackage in vm.createdPackages" style="cursor: pointer;" ng-click="vm.goToPackage(createdPackage)">
+            <tr ng-repeat="createdPackage in vm.createdPackages track by createdPackage.id" style="cursor: pointer;" ng-click="vm.goToPackage(createdPackage)">
                 <td class="flex items-center">
                     <div class="umb-package-list__item-icon">
                         <i ng-if="!createdPackage.iconUrl" class="icon-box"></i>
@@ -24,17 +25,17 @@
                     <div class="umb-package-list__item-content">
                         <div class="umb-package-list__item-name">{{ createdPackage.name }}</div>
                         <div class="umb-package-list__item-description">
-                            {{ createdPackage.version }} | <a href="{{ createdPackage.url }}" target="_blank">{{ createdPackage.url }}</a>| {{ createdPackage.author }}
+                            {{ createdPackage.version }} | <a href="{{ createdPackage.url }}" target="_blank">{{ createdPackage.url }}</a> | {{ createdPackage.author }}
                         </div>
                     </div>
                 </td>
                 <td style="text-align: right;">
                     <umb-button
                         type="button"
-                        button-style="danger"
                         size="xxs"
+                        button-style="danger"
+                        state="createdPackage.deleteButtonState"
                         label-key="general_delete"
-                        add-ellipsis="true"
                         action="vm.deleteCreatedPackage($event, $index, createdPackage)">
                     </umb-button>
                 </td>
@@ -45,7 +46,7 @@
     <umb-empty-state
         ng-if="vm.createdPackages.length === 0"
         position="center">
-        No packages have been created yet
+        <localize key="packager_noPackagesCreated">No packages have been created yet</localize>
     </umb-empty-state>
 
 </div>

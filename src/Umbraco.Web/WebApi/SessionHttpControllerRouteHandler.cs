@@ -10,7 +10,7 @@ namespace Umbraco.Web.WebApi
     /// </summary>
     /// <remarks>
     /// WebApi controllers (and REST in general) shouldn't have session state enabled since it's stateless,
-    /// enabling session state puts additional locks on requests so only use this when absolutley needed
+    /// enabling session state puts additional locks on requests so only use this when absolutely needed
     /// </remarks>
     internal class SessionHttpControllerRouteHandler : HttpControllerRouteHandler
     {
