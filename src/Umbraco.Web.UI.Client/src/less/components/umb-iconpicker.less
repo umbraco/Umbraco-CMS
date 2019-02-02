@@ -15,7 +15,7 @@
     overflow: hidden;
 }
 
-.umb-iconpicker-item button {
+.umb-iconpicker-btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,11 +27,12 @@
     background: none;
     background: none;
 	border: none;
-	cursor: pointer;
+    cursor: pointer;
+    color: currentColor;
 }
 
-.umb-iconpicker-item button:hover,
-.umb-iconpicker-item button:focus {
+.umb-iconpicker-btn:hover,
+.umb-iconpicker-btn:focus {
     background: @gray-10;
     outline: none;
 }
@@ -43,8 +44,11 @@
     box-sizing: border-box;
 }
 
-.umb-iconpicker-item i {
-    font-size: 30px;
+.umb-iconpicker-svg svg{
+    display: block;
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
 }
 
 

@@ -45,9 +45,9 @@
 
                 <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
                     <ul class="umb-iconpicker" ng-class="vm.color" ng-show="vm.icons">
-                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon)">
-                            <button title="{{icon}}" ng-click="vm.selectIcon(icon, vm.color)" prevent-default>
-                                <i class="{{icon}} large"></i>
+                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon.name)">
+                            <button class="umb-iconpicker-btn" title="{{icon.name}}" ng-click="vm.selectIcon(icon.name, vm.color)" prevent-default>
+                                <span class="umb-iconpicker-svg" ng-bind-html="icon.svgString"></span>
                             </button>
                         </li>
                     </ul>

@@ -308,6 +308,10 @@ namespace Umbraco.Web.Editors
 						{
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                                 controller => controller.GetNumberOfErrors())
+                        },
+                        {
+                            "iconApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<IconController>(
+                                controller => controller.GetIcon(""))
                         }
                     }
                 },

@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor icon picker
  */
-function IconPickerController($scope, iconHelper, localizationService) {
+function IconPickerController($scope, $http, $sce, localizationService, umbRequestHelper) {
 
     var vm = this;
 
@@ -43,8 +43,26 @@ function IconPickerController($scope, iconHelper, localizationService) {
 
         setTitle();
     
-        iconHelper.getIcons().then(function (icons) {
-            vm.icons = icons;
+        // iconHelper.getIcons().then(function (icons) {
+        //     vm.icons = icons;
+        //     vm.loading = false;
+        // });
+
+        umbRequestHelper.resourcePromise(
+            $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + "GetAllIcons")
+        ,'Failed to retrieve icons')
+        .then(icons => {
+            var trustedIcons = [];
+            
+            icons.forEach(icon => {
+                trustedIcons.push({
+                    name: icon.Name,
+                    svgString: $sce.trustAsHtml(icon.SvgString)
+                })
+            });
+
+            vm.icons = trustedIcons;
+
             vm.loading = false;
         });
 
