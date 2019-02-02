@@ -42,7 +42,7 @@ Use this directive to generate color swatches to pick from.
             };
 
             scope.isSelectedColor = function (color) {
-                return scope.selectedColor && color.value === scope.selectedColor.value;
+                return scope.selectedColor && color === scope.selectedColor;
             }
         }
 
