@@ -15,7 +15,7 @@
     overflow: hidden;
 }
 
-.umb-iconpicker-item a {
+.umb-iconpicker-item button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,10 +24,14 @@
     padding: 15px 0;
     text-decoration: none;
     border-radius: 3px;
+    background: none;
+    background: none;
+	border: none;
+	cursor: pointer;
 }
 
-.umb-iconpicker-item a:hover,
-.umb-iconpicker-item a:focus {
+.umb-iconpicker-item button:hover,
+.umb-iconpicker-item button:focus {
     background: @gray-10;
     outline: none;
 }
@@ -37,10 +41,6 @@
     border: solid 1px @ui-active;
     border-radius: @baseBorderRadius;
     box-sizing: border-box;
-}
-
-.umb-iconpicker-item a:active {
-    background: @gray-10;
 }
 
 .umb-iconpicker-item i {
