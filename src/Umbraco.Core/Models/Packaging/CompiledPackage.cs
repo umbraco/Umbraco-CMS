@@ -22,6 +22,7 @@ namespace Umbraco.Core.Models.Packaging
         public RequirementsType UmbracoVersionRequirementsType { get; set; }
         public string Author { get; set; }
         public string AuthorUrl { get; set; }
+        public IList<string> Contributors => new List<string>();
         public string Readme { get; set; }
         public string PackageView { get; set; }
         public string IconUrl { get; set; }

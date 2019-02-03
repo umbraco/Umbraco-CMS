@@ -39,6 +39,7 @@ namespace Umbraco.Core.Packaging
                 LicenseUrl = xml.Element("license")?.AttributeValue<string>("url") ?? string.Empty,
                 Author = xml.Element("author")?.Value ?? string.Empty,
                 AuthorUrl = xml.Element("author")?.AttributeValue<string>("url") ?? string.Empty,
+                Contributors = xml.Element("contributors")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 Readme = xml.Element("readme")?.Value ?? string.Empty,
                 Actions = xml.Element("actions")?.ToString(SaveOptions.None) ?? "<actions></actions>", //take the entire outer xml value
                 ContentNodeId = xml.Element("content")?.AttributeValue<string>("nodeId") ?? string.Empty,
