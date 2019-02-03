@@ -3,13 +3,13 @@
     <div class="umb-child-selector__child -parent">
         <div class="umb-child-selector__child-description">
             <div class="umb-child-selector__child-icon-holder">
-                <i class="umb-child-selector__child-icon {{ parentIcon }}"></i>
+                <umb-icon class="umb-child-selector__child-icon {{ parentIcon }}" icon-name="{{parentIcon}}"></umb-icon>
             </div>
             <span class="umb-child-selector__child-name">
                 <strong>{{ parentName }}</strong>
             </span>
             <small>
-                (<localize key="general_current"></localize>)
+                &nbsp;(<localize key="general_current"></localize>)
             </small>
         </div>
     </div>
@@ -19,12 +19,12 @@
         <div class="umb-child-selector__child" ng-repeat="selectedChild in selectedChildren">
             <div class="umb-child-selector__child-description">
                 <div class="umb-child-selector__child-icon-holder">
-                    <i class="umb-child-selector__child-icon {{ selectedChild.icon }}"></i>
+                    <umb-icon class="umb-child-selector__child-icon {{ selectedChild.icon }}" icon-name="{{selectedChild.icon}}"></umb-icon>
                 </div>
                 <span class="umb-child-selector__child-name"> {{ selectedChild.name }}</span>
             </div>
             <div class="umb-child-selector__child-actions">
-                <i class="umb-child-selector__child-remove icon-trash" ng-click="removeChild(selectedChild, $index)"></i>
+                <umb-icon class="umb-child-selector__child-remove icon-trash" ng-click="removeChild(selectedChild, $index)"  icon-name="icon-trash"></umb-icon>
             </div>
         </div>
 

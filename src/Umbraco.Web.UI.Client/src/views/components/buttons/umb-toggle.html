@@ -6,9 +6,9 @@
     </span>
 
     <div class="umb-toggle__toggle">
-        <i ng-show="checked && hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--left icon-check"></i>
+        <umb-icon ng-show="checked && hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--left icon-check" icon-name="icon-check"></umb-icon>
         <div class="umb-toggle__handler shadow-depth-1"></div>
-        <i ng-show="!checked && hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--right icon-wrong"></i>
+        <umb-icon ng-show="!checked && hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--right icon-wrong" icon-name="icon-wrong"></umb-icon>
     </div>
 
     <span ng-if="labelPosition === 'right' && showLabels === 'true'">

@@ -110,11 +110,26 @@
     max-width:33.33%;
 }
 
+.umb-card-grid [class^="icon-"],
+.umb-card-grid [class*=" icon-"] {
+    font-size: 30px;
+    display: block;
+    color: @ui-option-type;
+ }
+
 .umb-card-grid .umb-card-grid-item {
 	display: block;
 	width: 100%;
 	height: 100%;
 	border-radius: 3px;
+    padding-bottom: 5px;
+}
+
+.umb-card-grid .umb-card-grid-item [class^="icon-"],
+.umb-card-grid .umb-card-grid-item [class*=" icon-"] {
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: 10px;
     padding-bottom: 5px;
 }
 
@@ -135,12 +150,7 @@
      text-decoration: none;
  }
 
-.umb-card-grid i {
-     font-size: 30px;
-     line-height: 50px;
-     display: block;
-	  color: @ui-option-type;
- }
+
 
  .umb-card-grid .umb-card-grid-item__loading {
 	 position: absolute;
@@ -175,7 +185,8 @@
      color: @white !important;
  }
 
- .umb-btn-round i {
+ .umb-btn-round [class^="icon-"],
+ .umb-btn-round [class*=" icon-"] {
      font-size:16px !important;
      color: @gray-8;
      display:block;

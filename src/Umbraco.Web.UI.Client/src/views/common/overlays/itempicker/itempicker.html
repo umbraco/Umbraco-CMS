@@ -16,7 +16,7 @@
             ng-click="selectItem(availableItem)"
             class="-three-in-row">
             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
-                <i class="{{ availableItem.icon }}"></i>
+                <umb-icon class="{{ availableItem.icon }}" icon-name="{{ availableItem.icon }}"></umb-icon>
                 {{ availableItem.name }}
             </a>
         </li>
