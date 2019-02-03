@@ -1,10 +1,8 @@
 ﻿namespace Umbraco.Core.Media
 {
-
-    // TODO: Could definitely have done with a better name
-    public class Result
+    public class OEmbedResult
     {
-        public Status Status { get; set; }
+        public OEmbedStatus OEmbedStatus { get; set; }
         public bool SupportsDimensions { get; set; }
         public string Markup { get; set; }
     }

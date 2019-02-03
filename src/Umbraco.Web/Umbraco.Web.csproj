@@ -143,6 +143,23 @@
     <Compile Include="Logging\WebProfilerComponent.cs" />
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
+    <Compile Include="Media\EmbedProviders\YouTube.cs" />
+    <Compile Include="Media\EmbedProviders\EmbedProviderBase.cs" />
+    <Compile Include="Media\EmbedProviders\EmbedProvidersCollection.cs" />
+    <Compile Include="Media\EmbedProviders\EmbedProvidersCollectionBuilder.cs" />
+    <Compile Include="Media\EmbedProviders\Flickr.cs" />
+    <Compile Include="Media\EmbedProviders\GettyImages.cs" />
+    <Compile Include="Media\EmbedProviders\DailyMotion.cs" />
+    <Compile Include="Media\EmbedProviders\SoundCloud.cs" />
+    <Compile Include="Media\EmbedProviders\Hulu.cs" />
+    <Compile Include="Media\EmbedProviders\Ted.cs" />
+    <Compile Include="Media\EmbedProviders\Issuu.cs" />
+    <Compile Include="Media\EmbedProviders\Vimeo.cs" />
+    <Compile Include="Media\EmbedProviders\Twitter.cs" />
+    <Compile Include="Media\EmbedProviders\Kickstarter.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
+    <Compile Include="Media\EmbedProviders\Instagram.cs" />
+    <Compile Include="Media\EmbedProviders\Slideshare.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
     <Compile Include="Media\Exif\ExifEnums.cs" />
@@ -657,9 +674,6 @@
     <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupDisplay.cs" />
-    <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
-    <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
-    <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Services\TreeService.cs" />
@@ -1071,13 +1085,6 @@
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
-    <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
-    <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
-    <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
-    <Compile Include="Media\EmbedProviders\OEmbedVideo.cs" />
-    <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />
-    <Compile Include="Media\EmbedProviders\Settings\String.cs" />
-    <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
     <Compile Include="ModelStateExtensions.cs" />
     <Compile Include="Mvc\HtmlTagWrapper.cs" />
     <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
