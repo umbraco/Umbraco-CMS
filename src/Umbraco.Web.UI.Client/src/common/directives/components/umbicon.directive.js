@@ -11,7 +11,7 @@ Use this directive to show an render an umbraco backoffice svg icon.
 <pre>
     <umb-icon
         name="icon-name"
-        get-icon="true" // defaults to false. When true will do a http request to get the svg icon
+        request-icon="true" // defaults to false. When true will do a http request to get the svg icon
         >
         // Empty state content
     </umb-icon>
@@ -22,7 +22,7 @@ Use this directive to show an render an umbraco backoffice svg icon.
 (function () {
     'use strict';
 
-    function UmbIconDirective($http, $sce, umbRequestHelper) {
+    function UmbIconDirective($http, $sce, iconHelper) {
 
         var directive = {
             replace: true,
@@ -31,23 +31,38 @@ Use this directive to show an render an umbraco backoffice svg icon.
             scope: {
                 iconName: '@',
                 svgString: '=?',
-                getIcon: '=?'
+                requestIcon: '=?'
             },
             link: function(scope) {
+                if(scope.requestIcon === true) {
+                    var iconName = scope.iconName.split(' ')[0]; // Ensure that only the first part of the iconName is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+
+                    _requestIcon(iconName);
+                }
+                scope.$watch('iconName', function(newValue, oldValue) {
+                    if(newValue && oldValue) {
+                        var newIconName = newValue.split(' ')[0];
+                        var oldIconName = oldValue.split(' ')[0];
+
+                        if(newIconName !== oldIconName) {
+                            _requestIcon(newIconName);
+                        }
+                    }
+                });
                 
-                if(scope.getIcon === true) {
-                    umbRequestHelper.resourcePromise(
-                        $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + "GetIcon?iconName=" + scope.iconName)
-                        ,'Failed to retrieve icon: ' + scope.iconName)
-                        .then(icon => {
-                            scope.svgString = $sce.trustAsHtml(icon.SvgString);
-                        });
+                function _requestIcon(iconName) {
+                    iconHelper.getIcon(iconName)
+                    .then(icon => {
+                        if(icon !== null && icon.svgString) {
+                            scope.svgString = icon.svgString;
+                        }
+                    });
                 }
             }
+
         };
 
         return directive;
-
     }
 
     angular.module('umbraco.directives').directive('umbIcon', UmbIconDirective);

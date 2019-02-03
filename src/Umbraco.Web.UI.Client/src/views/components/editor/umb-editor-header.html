@@ -9,11 +9,10 @@
         </div>
 
         <div class="flex items-center" style="flex: 1;">
-
-            <ng-form data-element="editor-icon" name="iconForm">
+                <ng-form data-element="editor-icon" name="iconForm">
                 <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
                      title="{{$parent.icon}}">
-                    <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                    <umb-icon icon-name="{{$parent.icon}}" request-icon="true" class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></umb-icon>
                     <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
                         <localize key="settings_addIcon"></localize>
                     </div>
