@@ -31,8 +31,6 @@
 
         function onInit() {
 
-            console.log("vm.contributorsEditor", vm.contributorsEditor);
-
             if (create) {
                 //pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
