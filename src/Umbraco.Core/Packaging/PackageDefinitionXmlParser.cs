@@ -88,6 +88,8 @@ namespace Umbraco.Core.Packaging
                     new XCData(def.Author ?? string.Empty),
                     new XAttribute("url", def.AuthorUrl ?? string.Empty)),
 
+                new XElement("contributors", (def.Contributors ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("contributor", x))),
+
                 new XElement("readme", new XCData(def.Readme ?? string.Empty)),
                 actionsXml,
                 new XElement("datatypes", string.Join(",", def.DataTypes ?? Array.Empty<string>())),
