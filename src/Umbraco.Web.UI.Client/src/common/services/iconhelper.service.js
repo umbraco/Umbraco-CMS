@@ -92,8 +92,9 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
     var collectedIcons;
 
     var iconCache = [];
+    var liveRequests = [];
     var allIconsRequested = false;
-            
+
     return {
         
         /** Used by the create dialogs for content/media types to format the data so that the thumbnails are styled properly */
@@ -235,26 +236,43 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         getIcon: function(iconName) {
             return $q((resolve, reject) => {
                 var icon = this._getIconFromCache(iconName);
+                
                 if(icon !== undefined) {
                     resolve(icon);
+                    count--;
                 } else {
-                    // TODO - fix bug where Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl is undefinied when help icon
-                    umbRequestHelper.resourcePromise(
-                        $http.get('/umbraco/UmbracoApi/Icon/GetIcon?iconName=' + iconName)
-                        ,'Failed to retrieve icon: ' + iconName)
-                    .then(icon => {
-                        if(icon) {
-                            var trustedIcon = {
-                                name: icon.Name,
-                                svgString: $sce.trustAsHtml(icon.SvgString)
-                            };
-                            this._cacheIcon(trustedIcon);
-                            resolve(trustedIcon);
-                        }
-                    })
-                    .catch(err => {
-                        console.warn(err);
-                    });
+                    var iconRequestPath = Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl +  'GetIcon?iconName=' + iconName;
+
+                    // If the current icon is being requested, wait a bit so that we don't have to make another http request and can instead get the icon from the cache.
+                    // This is a bit rough and ready and could probably be improved used an event based system
+                    if(liveRequests.includes(iconRequestPath)) {
+                        setTimeout(() => {
+                            resolve(this.getIcon(iconName));
+                        }, 10);
+                    } else {
+                        liveRequests.push(iconRequestPath);
+                        // TODO - fix bug where Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl is undefinied when help icon
+                        umbRequestHelper.resourcePromise(
+                            $http.get(iconRequestPath)
+                            ,'Failed to retrieve icon: ' + iconName)
+                        .then(icon => {
+                            if(icon) {
+                                var trustedIcon = {
+                                    name: icon.Name,
+                                    svgString: $sce.trustAsHtml(icon.SvgString)
+                                };
+                                this._cacheIcon(trustedIcon);
+
+                                liveRequests = _.filter(liveRequests, iconRequestPath);
+
+                                resolve(trustedIcon);
+                            }
+                        })
+                        .catch(err => {
+                            console.warn(err);
+                        });
+                    };
+
                 }
             });
         },
@@ -263,7 +281,6 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
             return $q((resolve, reject) => {
                 if(allIconsRequested === false) {
                     allIconsRequested = true;
-
 
                     umbRequestHelper.resourcePromise(
                         $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetAllIcons')

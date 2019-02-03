@@ -35,7 +35,7 @@ Use this directive to show an render an umbraco backoffice svg icon.
             },
 
             link: function(scope) {
-                if (scope.requestIcon === undefined) { scope.requestIcon = true; }
+                if(scope.requestIcon === undefined) { scope.requestIcon = true; }
                 if(scope.requestIcon === true) {
                     var iconName = scope.iconName.split(' ')[0]; // Ensure that only the first part of the iconName is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
 
