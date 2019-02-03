@@ -122,8 +122,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
                 //now, format the icon data
                 if (treeNode.iconIsClass === undefined || treeNode.iconIsClass) {
-                    var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
-                    treeNode.cssClass = standardCssClass + " " + converted;
+                var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
+                    treeNode.cssClass = converted + " " +standardCssClass;
                     if (converted.startsWith('.')) {
                         //its legacy so add some width/height
                         treeNode.style = "height:16px;width:16px;";

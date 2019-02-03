@@ -18,8 +18,8 @@
 
                     <div class="umb-control-group">
                         <div class="form-search">
-                            <i class="icon-search"></i>
-                            <input 
+                            <umb-icon icon-name="icon-search" class="icon-search"></umb-icon>
+                            <input
                                 type="text"
                                 style="width: 100%"
                                 ng-model="searchTerm"
@@ -30,12 +30,12 @@
                                 no-dirty-check />
                         </div>
                     </div>
-                        
+
                     <div class="umb-control-group">
                         <localize key="contentTypeEditor_compositionsDescription"></localize>
                     </div>
-                        
-                    <umb-empty-state 
+
+                    <umb-empty-state
                         ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
                         position="center">
                         <localize key="contentTypeEditor_noAvailableCompositions"></localize>
@@ -50,10 +50,11 @@
                         <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
                         <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
                         <ul class="umb-checkbox-list">
-                            <li class="umb-checkbox-list__item" 
+                            <li class="umb-checkbox-list__item"
                                 ng-repeat="contentTypeEntity in model.whereCompositionUsed">
                                 <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
                                     <i class="{{contentTypeEntity.contentType.icon}}"></i>
+                                    <umb-icon icon-name="{{contentTypeEntity.contentType.icon}}" class="{{contentTypeEntity.contentType.icon}}"></umb-icon>
                                     &nbsp;{{contentTypeEntity.contentType.name}}
                                 </a>
                             </li>
@@ -124,7 +125,7 @@
         </umb-editor-footer>
 
         </form>
-        
+
     </umb-editor-view>
 
 </div>

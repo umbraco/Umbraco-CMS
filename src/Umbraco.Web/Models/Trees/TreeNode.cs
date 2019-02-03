@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Trees
             MenuUrl = menuUrl;
             CssClasses = new List<string>();
              //default
-            Icon = "icon-folder-close";
+            Icon = "icon-folder";
             Path = "-1";
         }
 
