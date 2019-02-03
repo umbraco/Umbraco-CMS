@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource, notificationsService ) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -129,6 +129,7 @@
                     });
 
             }
+
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
                 //check if Redirect Url Management is enabled
@@ -140,6 +141,19 @@
                             .then(function (data) {
                                 scope.redirectUrls = data.searchResults;
                                 scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
+                                scope.redirectUrlOptions = {
+                                    pageNumber: 1,
+                                    pageSize: 10
+                                };
+                                if (scope.hasRedirects) {
+                                    scope.redirectUrlOptions.totalItems = data.searchResults.length;
+                                    scope.redirectUrlOptions.totalPages = Math.ceil(data.searchResults.length / scope.redirectUrlOptions.pageSize);
+                                    scope.pagedRedirectUrls = scope.redirectUrls.slice(0, scope.redirectUrlOptions.pageSize -1);
+                                }
+                                else {
+                                    scope.redirectUrlOptions.totalPages = 0;
+                                    scope.redirectUrlOptions.totalItems = 0;
+                                }
                                 scope.loadingRedirectUrls = false;
                             });
                     }
@@ -148,6 +162,43 @@
                     }
                 });
             }
+
+            scope.deleteRedirect = function (redirectUrl) {
+                console.log(redirectUrl);
+            }
+
+            scope.redirectUrlPageChange = function (pageNumber) {
+                if (pageNumber === scope.redirectUrlOptions.pageNumber) { return; }
+                scope.redirectUrlOptions.pageNumber = pageNumber;
+                var start = (pageNumber - 1) * scope.redirectUrlOptions.pageSize;
+                scope.pagedRedirectUrls = scope.redirectUrls.slice(start, start + scope.redirectUrlOptions.pageSize);
+            }
+
+            scope.openAddRedirectOverlay = function() {
+                scope.addRedirectOverlay = {
+                    view: "redirecturlpicker",
+                    show: true,
+                    submit: function (model) {
+                        scope.loadingRedirectUrls = true;
+                        redirectUrlsResource.addRedirect(model.originalUrl, model.entityId).then(function () {
+                            loadRedirectUrls();
+                            scope.addRedirectOverlay.show = false;
+                            scope.addRedirectOverlay = null;
+                            notificationsService.success(localizationService.localize("redirectUrls_redirectAddConfirm"));
+                        }, function (error) {
+                            scope.addRedirectOverlay.show = false;
+                            scope.loadingRedirectUrls = false;
+                            scope.addRedirectOverlay = null;
+                            notificationsService.error(localizationService.localize("redirectUrls_redirectAddError"));
+                        });
+                    },
+                    close: function (oldModel) {
+                        scope.addRedirectOverlay.show = false;
+                        scope.addRedirectOverlay = null;
+                    }
+                }
+
+            };
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {

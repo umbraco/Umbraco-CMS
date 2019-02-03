@@ -19,23 +19,67 @@
                 </ul>
             </umb-box-content>
         </umb-box>
-        <umb-box data-element="node-info-redirects" style="display:none;" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
-            <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
+
+        <umb-box data-element="node-info-redirects" style="display:none;" ng-cloak ng-show="!urlTrackerDisabled">
+            <umb-box-header title-key="redirectUrls_redirectUrlManagement">
+            </umb-box-header>
             <umb-box-content class="block-form">
                 <div style="position: relative;">
                     <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
                     <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
                     <div ng-show="hasRedirects">
                         <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
-                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
-                            <li ng-repeat="redirectUrl in redirectUrls">
-                                <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
-                            </li>
-                        </ul>
+
+                        <div class="umb-table">
+
+                            <div class="umb-table-head">
+                                <div class="umb-table-row">
+                                    <div class="umb-table-cell flx-s1 flx-g1 flx-b8 items-center not-fixed">
+                                    </div>
+                                    <div class="umb-table-cell flx-s1 flx-g1 flx-b2">
+                                        <a class="ng-scope btn btn-info" prevent-default href="#" ng-click="openAddRedirectOverlay()">
+                                            <localize key="redirectUrls_addRedirect" class="ng-isolate-scope ng-scope">Add Redirect</localize>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="umb-table-body">
+                                <div class="umb-table-row -solid ng-scope" ng-repeat="redirectUrl in pagedRedirectUrls" style="margin-bottom: 0;">
+                                    <div class="umb-table-cell flx-s1 flx-g1 flx-b6 items-center not-fixed">
+                                        <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
+                                            <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                                        </div>
+                                        <button class="umb-era-button umb-button--s -red" prevent-default ng-click="deleteRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-show="!hasRedirects && !loadingRedirectUrls" style="padding: 15px;">
+                        <umb-empty-state position="center" size="small">
+                            <localize key="redirectUrls_noRedirects"></localize>
+                            <br />
+                            <a class="ng-scope btn btn-info" prevent-default href="#" ng-click="openAddRedirectOverlay()">
+                                <localize key="redirectUrls_addRedirect" class="ng-isolate-scope ng-scope">Add Redirect</localize>
+                            </a>
+                        </umb-empty-state>
+                    </div>
+                    <div class="flex justify-center">
+                        <umb-pagination ng-if="redirectUrlOptions.totalPages > 1"
+                                        page-number="redirectUrlOptions.pageNumber"
+                                        total-pages="redirectUrlOptions.totalPages"
+                                        on-change="redirectUrlPageChange(pageNumber)">
+                        </umb-pagination>
                     </div>
                 </div>
             </umb-box-content>
         </umb-box>
+
+        <umb-overlay ng-if="addRedirectOverlay.show"
+        model="addRedirectOverlay"
+        view="addRedirectOverlay.view"
+        position="right">
+        </umb-overlay>
 
         <umb-box data-element="node-info-history">
             <umb-box-header title-key="general_history"></umb-box-header>
@@ -79,6 +123,8 @@
                                 <umb-badge size="xs"
                                            color="{{item.logTypeColor}}">
 
+
+
                                     <!--{{ item.logType }}-->
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
@@ -103,6 +149,7 @@
                 </div>
 
             </umb-box-content>
+            b-
         </umb-box>
     </div>
 
