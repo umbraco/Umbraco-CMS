@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function RedirectUrlsController($scope, redirectUrlsResource, notificationsService, localizationService, $q) {
+    function RedirectUrlsController($scope, $q, redirectUrlsResource, notificationsService, localizationService, overlayService) {
         // TODO: search by url or url part
         // TODO: search by domain
         // TODO: display domain in dashboard results?
