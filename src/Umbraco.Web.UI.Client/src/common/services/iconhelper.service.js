@@ -239,7 +239,6 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                 
                 if(icon !== undefined) {
                     resolve(icon);
-                    count--;
                 } else {
                     var iconRequestPath = Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl +  'GetIcon?iconName=' + iconName;
 
