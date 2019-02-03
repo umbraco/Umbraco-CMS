@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function RedirectUrlsController($scope, $q, redirectUrlsResource, notificationsService, localizationService, overlayService) {
+    function RedirectUrlsController($scope, $q, redirectUrlsResource, notificationsService, localizationService, eventsService, overlayService) {
         // TODO: search by url or url part
         // TODO: search by domain
         // TODO: display domain in dashboard results?
@@ -76,40 +76,6 @@
             });
         }
 
-        //function removeRedirect(redirectToDelete) {
-        //    localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, redirectToDelete.destinationUrl]).then(function (value) {
-        //        var toggleConfirm = confirm(value);
-
-        //        if (toggleConfirm) {
-        //            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
-
-        //                var index = vm.redirectUrls.indexOf(redirectToDelete);
-        //                vm.redirectUrls.splice(index, 1);
-
-        //                localizationService.localize("redirectUrls_redirectRemoved").then(function(value){
-        //                    notificationsService.success(value);
-        //                });
-
-        //                // check if new redirects needs to be loaded
-        //                if (vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
-
-        //                    // if we are not on the first page - get records from the previous
-        //                    if (vm.pagination.pageIndex > 0) {
-        //                        vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
-        //                        vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
-        //                    }
-
-        //                    search();
-        //                }
-        //            }, function (error) {
-        //                localizationService.localize("redirectUrls_redirectRemoveError").then(function(value){
-        //                    notificationsService.error(value);
-        //                });
-        //            });
-        //        }
-        //    });
-        //}
-
         function disableUrlTracker(event) {
 
             const dialog = {
@@ -133,6 +99,31 @@
             event.preventDefault()
             event.stopPropagation();
         }
+
+        function removeRedirect(redirect, event) {
+
+            const dialog = {
+                view: "views/dashboard/content/overlays/delete.html",
+                redirect: redirect,
+                submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submit: function (model) {
+                    performDelete(model.redirect);
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
+            };
+
+            localizationService.localize("general_delete").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
+
+            event.preventDefault()
+            event.stopPropagation();
+        }
+
         function performDisable() {
 
             redirectUrlsResource.toggleUrlTracker(true).then(function () {
@@ -147,8 +138,40 @@
             });
         }
 
+        function performDelete(redirect) {
+            redirect.deleteButtonState = "busy";
 
+            redirectUrlsResource.deleteRedirectUrl(redirect.redirectId).then(function () {
+
+                // emit event
+                var args = { redirect: redirect };
+                eventsService.emit("editors.redirects.redirectDeleted", args);
+
+                // remove from list
+                var index = vm.redirectUrls.indexOf(redirect);
+                vm.redirectUrls.splice(index, 1);
+
+                localizationService.localize("redirectUrls_redirectRemoved").then(function (value) {
+                    notificationsService.success(value);
+                });
+
+                // check if new redirects needs to be loaded
+                if (vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
+
+                    // if we are not on the first page - get records from the previous
+                    if (vm.pagination.pageIndex > 0) {
+                        vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
+                        vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
+                    }
+
+                    search();
                 }
+            }, function (error) {
+                redirect.deleteButtonState = "error";
+
+                localizationService.localize("redirectUrls_redirectRemoveError").then(function (value) {
+                    notificationsService.error(value);
+                });
             });
         }
 
