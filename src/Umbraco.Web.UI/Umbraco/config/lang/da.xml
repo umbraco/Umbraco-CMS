@@ -834,6 +834,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="notifications">Notificeringer</key>
   </area>
   <area alias="packager">
+    <key alias="actions">Handlinger</key>
     <key alias="created">Oprettet</key>
     <key alias="createPackage">Opret pakke</key>
     <key alias="chooseLocalPackageText">Vælg pakken fra din computer. Umbraco pakker er oftest en ".zip" fil</key>
@@ -847,7 +848,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="cancelAndUploadAnother">Annuller og upload en anden pakke</key>
     <key alias="accept">Jeg accepterer</key>
     <key alias="termsOfUse">betingelser for anvendelse</key>
-    <key alias="packageInstall">Installér pakke</key>
+    <key alias="pathToFile">Sti til fil</key>
+    <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
     <key alias="installedPackages">Installeret pakker</key>
     <key alias="installLocal">Installér lokal</key>
@@ -856,9 +858,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="noPackagesCreated">Der er ikke blevet oprettet nogle pakker endnu</key>
     <key alias="noPackages">Du har ingen pakker installeret</key>
     <key alias="noPackagesDescription"><![CDATA[Du har ikke nogen pakker installeret. Du kan enten installere en lokal pakke ved at vælge den fra din computer eller gennemse de tilgængelige pakker ved hjælp af ikonet <strong>'Pakker'</strong> øverst til højre på din skærm]]></key>
+    <key alias="packageActions">Pakkehandlinger</key>
     <key alias="packageAuthorUrl">Forfatter URL</key>
+    <key alias="packageContent">Pakkeindhold</key>
+    <key alias="packageFiles">Pakkefiler</key>
+    <key alias="packageInstall">Installér pakke</key>
     <key alias="packageLicense">Licens</key>
     <key alias="packageLicenseUrl">Licens URL</key>
+    <key alias="packageProperties">Pakkeegenskaber</key>
     <key alias="packageSearch">Søg efter pakker</key>
     <key alias="packageSearchResults">Resultater for</key>
     <key alias="packageNoResults">Vi kunne ikke finde resultater for</key>

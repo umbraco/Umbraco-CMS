@@ -1074,6 +1074,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notifications">Notifications</key>
   </area>
   <area alias="packager">
+    <key alias="actions">Actions</key>
     <key alias="created">Created</key>
     <key alias="createPackage">Create package</key>
     <key alias="chooseLocalPackageText"><![CDATA[
@@ -1090,7 +1091,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    <key alias="packageInstall">Install package</key>
+    
+    <key alias="pathToFile">Path to file</key>
+    <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
     <key alias="installedPackages">Installed packages</key>
     <key alias="installLocal">Install local</key>
@@ -1099,9 +1102,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
+    <key alias="packageActions">Package Actions</key>
     <key alias="packageAuthorUrl">Author URL</key>
+    <key alias="packageContent">Package Content</key>
+    <key alias="packageFiles">Package Files</key>
+    <key alias="packageInstall">Install package</key>
     <key alias="packageLicense">License</key>
     <key alias="packageLicenseUrl">License URL</key>
+    <key alias="packageProperties">Package Properties</key>
     <key alias="packageSearch">Search for packages</key>
     <key alias="packageSearchResults">Results for</key>
     <key alias="packageNoResults">We couldn’t find anything for</key>
