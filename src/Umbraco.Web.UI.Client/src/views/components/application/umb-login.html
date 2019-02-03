@@ -153,11 +153,8 @@
                         </div>
 
                         <div class="control-group" ng-class="{error: vm.loginForm.username.$invalid}">
-                            <label>
-                                <localize ng-hide="vm.usernameIsEmail" key="general_username">Username</localize>
-                                <localize ng-show="vm.usernameIsEmail" key="general_email">Email</localize>
-                            </label>
-                            <input type="text" ng-model="vm.login" name="username" class="-full-width-input" localize="placeholder" placeholder="@placeholders_usernameHint" focus-when="{{vm.view === 'login'}}" />
+                            <label>{{vm.labels.usernameLabel}}</label>
+                            <input type="text" ng-model="vm.login" name="username" class="-full-width-input" placeholder="{{vm.labels.usernamePlaceholder}}" focus-when="{{vm.view === 'login'}}" />
                         </div>
 
                         <div class="control-group" ng-class="{error: vm.loginForm.password.$invalid}">

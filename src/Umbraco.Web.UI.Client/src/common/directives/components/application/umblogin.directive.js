@@ -62,6 +62,15 @@
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
 
+        vm.labels = {};
+        localizationService.localizeMany([
+            vm.usernameIsEmail ? "general_email" : "general_username", 
+            vm.usernameIsEmail ? "placeholders_email" : "placeholders_usernameHint"]
+        ).then(function (data) {
+            vm.labels.usernameLabel = data[0];
+            vm.labels.usernamePlaceholder = data[1];
+        })                        
+
         function onInit() {
 
             // Check if it is a new user
