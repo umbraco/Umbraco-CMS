@@ -40,8 +40,6 @@
 
                     buildContributorsEditor(vm.package);
 
-                    console.log("create package", vm.package);
-
                     vm.loading = false;
                 });
 
@@ -54,7 +52,6 @@
                     vm.package = createdPackage;
 
                     buildContributorsEditor(vm.package);
-                    console.log("get package", vm.package);
 
                     vm.loading = false;
                     // get render model for content node
@@ -155,15 +152,9 @@
 
         function createOrUpdatePackage(editPackageForm) {
 
-            console.log("contributorsEditor", vm.contributorsEditor.value);
-
             let contributors = vm.contributorsEditor.value.map(o => o.value);
-            console.log("contributors", contributors);
 
             vm.package.contributors = contributors;
-
-            console.log("editPackageForm", editPackageForm);
-            console.log("vm.package", vm.package);
 
             if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
 
