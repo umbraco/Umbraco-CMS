@@ -862,6 +862,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageAuthorUrl">Forfatter URL</key>
     <key alias="packageContent">Pakkeindhold</key>
     <key alias="packageFiles">Pakkefiler</key>
+    <key alias="packageIconUrl">Ikon URL</key>
     <key alias="packageInstall">Installér pakke</key>
     <key alias="packageLicense">Licens</key>
     <key alias="packageLicenseUrl">Licens URL</key>

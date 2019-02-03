@@ -1106,6 +1106,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="packageAuthorUrl">Author URL</key>
     <key alias="packageContent">Package Content</key>
     <key alias="packageFiles">Package Files</key>
+    <key alias="packageIconUrl">Icon URL</key>
     <key alias="packageInstall">Install package</key>
     <key alias="packageLicense">License</key>
     <key alias="packageLicenseUrl">License URL</key>
