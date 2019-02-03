@@ -110,7 +110,7 @@
 
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
 
-                        <umb-control-group label="Content">
+                        <umb-control-group label="@general_content">
 
                             <umb-node-preview
                                 ng-if="vm.package.contentNodeId"
@@ -133,12 +133,12 @@
 
                             <label style="padding-left: 0;">
                                 <input type="checkbox" ng-model="vm.package.contentLoadChildNodes" ng-disabled="!vm.package.contentNodeId" />
-                                Include all child nodes
+                                <localize key="packager_includeAllChildNodes">Include all child nodes</localize>
                             </label>
 
                         </umb-control-group>
 
-                        <umb-control-group label="Document Types">
+                        <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
                                 <label>
                                     <input
@@ -151,7 +151,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Templates">
+                        <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
                                 <label>
                                     <input
@@ -163,7 +163,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Stylesheets">
+                        <umb-control-group label="@treeHeaders_stylesheets">
                             <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
                                 <label>
                                     <input
@@ -175,7 +175,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Macros">
+                        <umb-control-group label="@treeHeaders_macros">
                             <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
                                 <label>
                                     <input type="checkbox"
@@ -187,7 +187,7 @@
 
                         </umb-control-group>
 
-                        <umb-control-group label="Languages">
+                        <umb-control-group label="@treeHeaders_languages">
                             <div ng-repeat="language in ::vm.languages | orderBy:'name'">
                                 <label>
                                     <input
@@ -199,7 +199,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Dictionary Items">
+                        <umb-control-group label="@treeHeaders_dictionary">
                             <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
                                 <label>
                                     <input
@@ -211,7 +211,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Data Types">
+                        <umb-control-group label="@treeHeaders_dataTypes">
                             <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
                                 <label>
                                     <input

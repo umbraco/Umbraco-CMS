@@ -554,7 +554,6 @@
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
   </area>
   <area alias="general">
-    <key alias="options">Options</key>
     <key alias="about">About</key>
     <key alias="action">Action</key>
     <key alias="actions">Actions</key>
@@ -574,6 +573,7 @@
     <key alias="confirm">Confirm</key>
     <key alias="constrain">Constrain</key>
     <key alias="constrainProportions">Constrain proportions</key>
+    <key alias="content">Content</key>
     <key alias="continue">Continue</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
@@ -632,6 +632,7 @@
     <key alias="off">Off</key>
     <key alias="ok">OK</key>
     <key alias="open">Open</key>
+    <key alias="options">Options</key>
     <key alias="on">On</key>
     <key alias="or">or</key>
     <key alias="orderBy">Order by</key>
@@ -1081,6 +1082,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       ]]></key>
     <key alias="deletewarning">This will delete the package</key>
     <key alias="dropHere">Drop to upload</key>
+    <key alias="includeAllChildNodes">Include all child nodes</key>
     <key alias="orClickHereToUpload">or click here to choose package file</key>
     <key alias="uploadPackage">Upload package</key>
     <key alias="localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</key>

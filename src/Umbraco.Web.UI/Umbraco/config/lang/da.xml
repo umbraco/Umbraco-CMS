@@ -549,6 +549,7 @@
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
     <key alias="constrainProportions">Behold proportioner</key>
+    <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
     <key alias="copy">Kopiér</key>
     <key alias="create">Opret</key>
@@ -838,6 +839,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="chooseLocalPackageText">Vælg pakken fra din computer. Umbraco pakker er oftest en ".zip" fil</key>
     <key alias="deletewarning">Dette vil slette pakken</key>
     <key alias="dropHere">Slip her for at uploade</key>
+    <key alias="includeAllChildNodes">Inkludér alle underliggende sider</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
     <key alias="uploadPackage">Upload pakke</key>
     <key alias="localPackageDescription">Installer en lokal pakke ved at vælge den fra din computer. Installer kun pakker fra kilder, du kender og stoler på</key>
