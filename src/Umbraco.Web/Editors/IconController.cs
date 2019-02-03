@@ -16,8 +16,8 @@ namespace Umbraco.Web.Editors
     // TODO - I'm not sure how to correctly set up the authentication so that it only works for people logged into the backoffice 
 
     [PluginController("UmbracoApi")]
-    //[IsBackOffice]
-    //[WebApi.UmbracoAuthorize]
+    [IsBackOffice]
+    [WebApi.UmbracoAuthorize]
     public class IconController : UmbracoApiController
     {
 
