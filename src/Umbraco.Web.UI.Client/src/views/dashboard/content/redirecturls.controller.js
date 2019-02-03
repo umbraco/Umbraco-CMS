@@ -76,68 +76,90 @@
             });
         }
 
-        function removeRedirect(redirectToDelete) {
-            localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, redirectToDelete.destinationUrl]).then(function (value) {
-                var toggleConfirm = confirm(value);
+        //function removeRedirect(redirectToDelete) {
+        //    localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, redirectToDelete.destinationUrl]).then(function (value) {
+        //        var toggleConfirm = confirm(value);
 
-                if (toggleConfirm) {
-                    redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
+        //        if (toggleConfirm) {
+        //            redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
 
-                        var index = vm.redirectUrls.indexOf(redirectToDelete);
-                        vm.redirectUrls.splice(index, 1);
+        //                var index = vm.redirectUrls.indexOf(redirectToDelete);
+        //                vm.redirectUrls.splice(index, 1);
 
-                        localizationService.localize("redirectUrls_redirectRemoved").then(function(value){
-                            notificationsService.success(value);
-                        });
+        //                localizationService.localize("redirectUrls_redirectRemoved").then(function(value){
+        //                    notificationsService.success(value);
+        //                });
 
-                        // check if new redirects needs to be loaded
-                        if (vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
+        //                // check if new redirects needs to be loaded
+        //                if (vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
 
-                            // if we are not on the first page - get records from the previous
-                            if (vm.pagination.pageIndex > 0) {
-                                vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
-                                vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
-                            }
+        //                    // if we are not on the first page - get records from the previous
+        //                    if (vm.pagination.pageIndex > 0) {
+        //                        vm.pagination.pageIndex = vm.pagination.pageIndex - 1;
+        //                        vm.pagination.pageNumber = vm.pagination.pageNumber - 1;
+        //                    }
 
-                            search();
-                        }
-                    }, function (error) {
-                        localizationService.localize("redirectUrls_redirectRemoveError").then(function(value){
-                            notificationsService.error(value);
-                        });
-                    });
+        //                    search();
+        //                }
+        //            }, function (error) {
+        //                localizationService.localize("redirectUrls_redirectRemoveError").then(function(value){
+        //                    notificationsService.error(value);
+        //                });
+        //            });
+        //        }
+        //    });
+        //}
+
+        function disableUrlTracker(event) {
+
+            const dialog = {
+                view: "views/dashboard/content/overlays/disable.html",
+                submitButtonLabel: "Disable",
+                submitButtonLabelKey: "actions_disable",
+                submit: function (model) {
+                    performDisable();
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
                 }
+            };
+
+            localizationService.localize("redirectUrls_disableUrlTracker").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
+
+            event.preventDefault()
+            event.stopPropagation();
+        }
+        function performDisable() {
+
+            redirectUrlsResource.toggleUrlTracker(true).then(function () {
+                activate();
+                localizationService.localize("redirectUrls_disabledConfirm").then(function (value) {
+                    notificationsService.success(value);
+                });
+            }, function (error) {
+                localizationService.localize("redirectUrls_disableError").then(function (value) {
+                    notificationsService.warning(value);
+                });
             });
         }
 
-        function disableUrlTracker() {
-            localizationService.localize("redirectUrls_confirmDisable").then(function(value) {
-                var toggleConfirm = confirm(value);
-                if (toggleConfirm) {
-
-                    redirectUrlsResource.toggleUrlTracker(true).then(function () {
-                        activate();
-                        localizationService.localize("redirectUrls_disabledConfirm").then(function(value){
-                            notificationsService.success(value);
-                        });
-                    }, function (error) {
-                        localizationService.localize("redirectUrls_disableError").then(function(value){
-                            notificationsService.warning(value);
-                        });
-                    });
 
                 }
             });
         }
 
         function enableUrlTracker() {
-            redirectUrlsResource.toggleUrlTracker(false).then(function() {
+            redirectUrlsResource.toggleUrlTracker(false).then(function () {
                 activate();
-                localizationService.localize("redirectUrls_enabledConfirm").then(function(value){
+                localizationService.localize("redirectUrls_enabledConfirm").then(function (value) {
                     notificationsService.success(value);
                 });
-            }, function(error) {
-                localizationService.localize("redirectUrls_enableError").then(function(value){
+            }, function (error) {
+                localizationService.localize("redirectUrls_enableError").then(function (value) {
                     notificationsService.warning(value);
                 });
             });
@@ -167,7 +189,6 @@
         }
 
         activate();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Dashboard.RedirectUrlsController", RedirectUrlsController);
