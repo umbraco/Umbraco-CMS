@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models.Packaging
         public string AuthorUrl { get; set; } = string.Empty;
 
         [DataMember(Name = "contributors")]
-        public IList<string> Contributors { get; set; }
+        public IList<string> Contributors { get; set; } = new List<string>();
 
         [DataMember(Name = "license")]
         public string License { get; set; } = "MIT License";
