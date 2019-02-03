@@ -268,10 +268,10 @@
             vm.contributorsEditor = {
                 editor: "Umbraco.MultipleTextstring",
                 label: "Contributors",
-                description: "test...",
+                description: "",
                 hideLabel: false,
                 view: "views/propertyeditors/multipletextbox/multipletextbox.html",
-                alias: "test",
+                alias: "contributors",
                 value: vm.package.contributors,
                 validation: {
                     mandatory: false,
