@@ -1491,7 +1491,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="redirectedTo">Viderestillet til</key>
     <key alias="noRedirects">Der er ikke lavet nogen viderestillinger</key>
     <key alias="noRedirectsDescription">Når en udgivet side bliver omdøbt eller flyttet, vil en viderestilling automatisk blive lavet til den nye side.</key>
-    <key alias="removeButton">Fjern</key>
     <key alias="confirmRemove">Er du sikker på at du vil fjerne viderestillingen fra '%0%' til '%1%'?</key>
     <key alias="redirectRemoved">Viderestillings URL fjernet.</key>
     <key alias="redirectRemoveError">Fejl under fjernelse af viderestillings URL.</key>
