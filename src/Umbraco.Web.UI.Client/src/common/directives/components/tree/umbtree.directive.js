@@ -316,7 +316,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             $scope.selectEnabledNodeClass = function (node) {
                 return node ?
                     node.selected ?
-                        'icon umb-tree-icon sprTree icon-check green temporary' :
+                        'icon-check icon umb-tree-icon sprTree green temporary' :
                         '' :
                     '';
             };

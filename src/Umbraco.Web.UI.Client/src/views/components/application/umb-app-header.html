@@ -1,7 +1,7 @@
 <div>
 
     <div class="umb-app-header">
-        
+
         <umb-sections
             ng-if="authenticated"
             sections="sections">
@@ -16,7 +16,7 @@
                 </li>
                 <li data-element="global-help" class="umb-app-header__action">
                     <a href="#" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
-                        <i class="umb-app-header__action-icon icon-help-alt"></i>
+                        <umb-icon class="umb-app-header__action-icon icon-help-alt" icon-name="icon-help-alt"></umb-icon>
                     </a>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">

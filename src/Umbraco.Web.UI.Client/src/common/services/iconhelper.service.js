@@ -238,16 +238,22 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                 if(icon !== undefined) {
                     resolve(icon);
                 } else {
+                    // TODO - fix bug where Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl is undefinied when help icon
                     umbRequestHelper.resourcePromise(
-                        $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetIcon?iconName=' + iconName)
+                        $http.get('/umbraco/UmbracoApi/Icon/GetIcon?iconName=' + iconName)
                         ,'Failed to retrieve icon: ' + iconName)
                     .then(icon => {
-                        var trustedIcon = {
-                            name: icon.Name,
-                            svgString: $sce.trustAsHtml(icon.SvgString)
-                        };
-                        this._cacheIcon(trustedIcon);
-                        resolve(trustedIcon);
+                        if(icon) {
+                            var trustedIcon = {
+                                name: icon.Name,
+                                svgString: $sce.trustAsHtml(icon.SvgString)
+                            };
+                            this._cacheIcon(trustedIcon);
+                            resolve(trustedIcon);
+                        }
+                    })
+                    .catch(err => {
+                        console.warn(err);
                     });
                 }
             });
@@ -273,7 +279,10 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                         });
 
                         resolve(iconCache);
-                    });
+                    })
+                    .catch(err => {
+                        console.warn(err);
+                    });;
                 } else {
                     resolve(iconCache);
                 }

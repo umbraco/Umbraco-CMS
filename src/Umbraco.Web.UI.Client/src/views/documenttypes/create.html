@@ -8,7 +8,7 @@
             <ul class="umb-actions umb-actions-child">
                 <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
                     <a href="" ng-click="createDocType()" class="umb-action-link" umb-auto-focus>
-                        <i class="large icon icon-item-arrangement"></i>
+                        <umb-icon class="large icon" icon-name="icon-item-arrangement"></umb-icon>
                         <span class="menu-label">
                             <localize key="content_documentType">Document type</localize>
                         </span>
@@ -16,7 +16,8 @@
                 </li>
                 <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
                     <a href="" ng-click="createComponent()" class="umb-action-link">
-                        <i class="large icon icon-item-arrangement"></i>
+                        <umb-icon class="large icon" icon-name="icon-item-arrangement"></umb-icon>
+
                         <span class="menu-label">
                             <localize ng-if="model.disableTemplates === false" key="create_documentTypeWithoutTemplate"></localize>
                             <localize ng-if="model.disableTemplates === true" key="content_documentType">Document type></localize>
@@ -25,7 +26,7 @@
                 </li>
                 <li data-element="action-documentTypeCollection" class="umb-action">
                     <a href="" ng-click="showCreateDocTypeCollection()" class="umb-action-link">
-                        <i class="large icon icon-thumbnail-list"></i>
+                        <umb-icon class="large icon" icon-name="icon-thumbnail-list"></umb-icon>
                         <span class="menu-label">
                             Document Type Collection...
                             <!--                        <localize key="content_documentType_collection">Document Type Collection</localize>-->
@@ -34,7 +35,7 @@
                 </li>
                 <li data-element="action-folder" ng-if="model.allowCreateFolder" class="umb-action">
                     <a href="" ng-click="showCreateFolder()" class="umb-action-link">
-                        <i class="large icon icon-folder"></i>
+                        <umb-icon class="large icon" icon-name="icon-folder"></umb-icon>
                         <span class="menu-label"><localize key="general_folder"></localize>...</span>
                     </a>
                 </li>

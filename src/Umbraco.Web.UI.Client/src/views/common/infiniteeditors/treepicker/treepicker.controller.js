@@ -536,7 +536,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                                             child.children.unshift({
                                                 id: item.id,
                                                 name: item.name,
-                                                cssClass: "icon umb-tree-icon sprTree " + item.icon,
+                                                cssClass: item.icon + " icon umb-tree-icon sprTree",
                                                 level: child.level + 1,
                                                 metaData: {
                                                     isSearchResult: true

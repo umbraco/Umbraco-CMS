@@ -5,7 +5,8 @@
             ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
             ng-click="load(node)">&nbsp;</ins>
 
-        <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.routePath}}" ng-click="select(node, $event)" ng-style="::node.style"></i>
+        <umb-icon class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" icon-name="icon-folder" title="{{::node.routePath}}" ng-click="select(node, $event)" ng-style="::node.style"></umb-icon>
+
         <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)">{{node.name}}</a>
 
         <!-- NOTE: These are the 'option' elipses -->
