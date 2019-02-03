@@ -105,13 +105,17 @@
                             <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 
-
                         <div class="umb-package-info">
                             <h4 class="umb-info-local-item"><strong>{{ vm.localPackage.name }}</strong></h4>
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageAuthor">Author</localize></strong>
                                 <a href="{{ vm.localPackage.authorUrl }}" target="_blank">{{ vm.localPackage.author }}</a>
+                            </div>
+
+                            <div class="umb-info-local-item" ng-if="vm.localPackage.contributors && vm.localPackage.contributors.length > 0">
+                                <strong><localize key="packager_packageContrib">Contributors</localize></strong>
+                                <span>{{ vm.localPackage.contributors.join(', ')}}</span>
                             </div>
 
                             <div class="umb-info-local-item">
