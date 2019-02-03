@@ -1,7 +1,7 @@
 <div>
 
     <div ng-if="model.redirect" class="umb-alert umb-alert--warning mb2">
-        This will remove the redirect: <br><br>
+        <localize key="redirectUrls_redirectRemoveWarning">This will remove the redirect</localize><br><br>
         <localize key="redirectUrls_originalUrl">Original URL</localize>: {{model.redirect.originalUrl}}<br>
         <localize key="redirectUrls_redirectedTo">Redirected To</localize>: {{model.redirect.destinationUrl}}
     </div>
