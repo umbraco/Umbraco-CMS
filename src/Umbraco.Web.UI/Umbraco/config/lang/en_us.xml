@@ -1088,7 +1088,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</key>
     <key alias="uploadAnother">Upload another package</key>
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
-    <key alias="packageLicense">License</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
     <key alias="packageInstall">Install package</key>
@@ -1100,6 +1099,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
+    <key alias="packageAuthorUrl">Author URL</key>
+    <key alias="packageLicense">License</key>
+    <key alias="packageLicenseUrl">License URL</key>
     <key alias="packageSearch">Search for packages</key>
     <key alias="packageSearchResults">Results for</key>
     <key alias="packageNoResults">We couldn’t find anything for</key>

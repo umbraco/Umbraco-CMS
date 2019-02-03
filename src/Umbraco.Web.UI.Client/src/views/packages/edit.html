@@ -70,7 +70,7 @@
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="Author URL" required="true">
+                        <umb-control-group label="@packager_packageAuthorUrl" required="true">
                             <input class="umb-property-editor" name="authorUrl" type="text" ng-model="vm.package.authorUrl" val-server-field="model.AuthorUrl" required />
 
                             <span ng-messages="editPackageForm.authorUrl.$error" show-validation-on-submit >
@@ -85,15 +85,15 @@
                             </umb-property>
                         </umb-control-group>
 
-                        <umb-control-group label="License">
+                        <umb-control-group label="@packager_packageLicense">
                             <input class="umb-property-editor" name="license" type="text" ng-model="vm.package.license" />
                         </umb-control-group>
 
-                        <umb-control-group label="License URL">
+                        <umb-control-group label="@packager_packageLicenseUrl">
                             <input class="umb-property-editor" name="licenseUrl" type="text" ng-model="vm.package.licenseUrl" />
                         </umb-control-group>
 
-                        <umb-control-group label="Readme">
+                        <umb-control-group label="@packager_packageReadme">
                             <textarea class="umb-property-editor" name="readme" rows="10" ng-model="vm.package.readme"></textarea>
                         </umb-control-group>
 
