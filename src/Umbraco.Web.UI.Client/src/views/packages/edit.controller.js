@@ -22,6 +22,7 @@
         vm.openViewPicker = openViewPicker;
         vm.removePackageView = removePackageView;
         vm.downloadFile = downloadFile;
+        vm.contributorsEditor = null;
 
         vm.buttonLabel = "";
 
@@ -30,10 +31,17 @@
 
         function onInit() {
 
+            console.log("vm.contributorsEditor", vm.contributorsEditor);
+
             if (create) {
                 //pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
                     vm.package = scaffold;
+
+                    buildContributorsEditor(vm.package);
+
+                    console.log("create package", vm.package);
+
                     vm.loading = false;
                 });
 
@@ -44,6 +52,10 @@
                 // load package
                 packageResource.getCreatedById(packageId).then(createdPackage => {
                     vm.package = createdPackage;
+
+                    buildContributorsEditor(vm.package);
+                    console.log("get package", vm.package);
+
                     vm.loading = false;
                     // get render model for content node
                     if(vm.package.contentNodeId) {
@@ -142,6 +154,16 @@
         }
 
         function createOrUpdatePackage(editPackageForm) {
+
+            console.log("contributorsEditor", vm.contributorsEditor.value);
+
+            let contributors = vm.contributorsEditor.value.map(o => o.value);
+            console.log("contributors", contributors);
+
+            vm.package.contributors = contributors;
+
+            console.log("editPackageForm", editPackageForm);
+            console.log("vm.package", vm.package);
 
             if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
 
@@ -249,6 +271,26 @@
 
         function removePackageView() {
             vm.package.packageView = null;
+        }
+
+        function buildContributorsEditor() {
+            vm.contributorsEditor = {
+                editor: "Umbraco.MultipleTextstring",
+                label: "Contributors",
+                description: "test...",
+                hideLabel: false,
+                view: "views/propertyeditors/multipletextbox/multipletextbox.html",
+                alias: "test",
+                value: vm.package.contributors,
+                validation: {
+                    mandatory: false,
+                    pattern: ""
+                },
+                config: {
+                    min: 0,
+                    max: 0
+                }
+            };
         }
 
         onInit();
