@@ -264,24 +264,33 @@
             vm.package.packageView = null;
         }
 
-        function buildContributorsEditor() {
+        function buildContributorsEditor(pkg) {
+            
             vm.contributorsEditor = {
+                alias: "contributors",
                 editor: "Umbraco.MultipleTextstring",
                 label: "Contributors",
                 description: "",
-                hideLabel: false,
+                hideLabel: true,
                 view: "views/propertyeditors/multipletextbox/multipletextbox.html",
-                alias: "contributors",
-                value: vm.package.contributors,
+                value: getVals(pkg.contributors),
                 validation: {
                     mandatory: false,
-                    pattern: ""
+                    pattern: null
                 },
                 config: {
                     min: 0,
                     max: 0
                 }
             };
+        }
+
+        function getVals(array) {
+            var vals = [];
+            for (var i = 0; i < array.length; i++) {
+                vals.push({ value: array[i] });
+            }
+            return vals;
         }
 
         onInit();
