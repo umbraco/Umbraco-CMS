@@ -47,18 +47,21 @@
         }
 
         function init() {
-            if ($scope.model.entityId) {
-                entityResource.getById($scope.model.entityId, "Document").then(function (ent) {
-                    $scope.contentItem = ent;
-                    getContentItemUrl().then(function (url) {
-                        $scope.contentItem.url = url;
-                        $scope.loaded = true;
-                    });
-                });
+            if (!$scope.model.entityId && !$scope.enablePicker) {
+                $scope.model.entityId = editorState.current.id;
             }
             else {
                 $scope.loaded = true;
+                return;
             }
+            console.log($scope.model.entityId);
+            entityResource.getById($scope.model.entityId, "Document").then(function (ent) {
+                $scope.contentItem = ent;
+                getContentItemUrl().then(function (url) {
+                    $scope.contentItem.url = url;
+                    $scope.loaded = true;
+                });
+            });
         }
 
         init();
