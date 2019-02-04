@@ -367,12 +367,26 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual Property[] ValidateProperties(string culture = "*")
         {
-            var alsoInvariant = culture != null && culture != "*";
+            // select invalid properties
+            return Properties.Where(x =>
+            {
+                // if culture is null, we validate invariant properties only
+                // if culture is '*' we validate both variant and invariant properties, automatically
+                // if culture is specific eg 'en-US' we both too, but explicitly
 
-            return Properties.Where(x => // select properties...
-                    x.PropertyType.SupportsVariation(culture, "*", true) && // that support the variation
-                    (!x.IsValid(culture) || (alsoInvariant && !x.IsValid(null)))) // and are not valid
-                .ToArray();
+                var varies = x.PropertyType.VariesByCulture();
+
+                if (culture == null)
+                    return !(varies || x.IsValid(null)); // validate invariant property, invariant culture
+
+                if (culture == "*")
+                    return !x.IsValid(culture); // validate property, all cultures
+
+                return varies
+                    ? !x.IsValid(culture) // validate variant property, explicit culture
+                    : !x.IsValid(null); // validate invariant property, explicit culture
+            })
+            .ToArray();
         }
 
         #endregion

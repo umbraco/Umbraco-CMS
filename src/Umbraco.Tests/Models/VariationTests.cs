@@ -382,15 +382,12 @@ namespace Umbraco.Tests.Models
 
             Assert.IsFalse(content.PublishCulture(langFr)); // fails because prop1 is mandatory
             content.SetValue("prop1", "a", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr));
-            Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
-            //this will be null because we tried to publish values for a specific culture but this property is invariant
-            Assert.IsNull(content.GetValue("prop2", published: true));
+            Assert.IsFalse(content.PublishCulture(langFr)); // fails because prop2 is mandatory and invariant
+            content.SetValue("prop2", "x");
+            Assert.IsTrue(content.PublishCulture(langFr)); // now it's ok
 
-            Assert.IsFalse(content.PublishCulture()); // fails because prop2 is mandatory
-            content.SetValue("prop2", "b");
-            Assert.IsTrue(content.PublishCulture());
-            Assert.AreEqual("b", content.GetValue("prop2", published: true));
+            Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
+            Assert.AreEqual("x", content.GetValue("prop2", published: true));
         }
 
         [Test]
