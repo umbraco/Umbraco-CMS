@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using LightInject;
@@ -124,26 +125,24 @@ namespace Umbraco.Core.Composing.LightInject
 
         #endregion
 
-        private static string GetTargetedServiceName<TTarget>() => "TARGET:" + typeof(TTarget).FullName;
-
         #region Factory
 
         /// <inheritdoc />
         public object GetInstance(Type type)
-            => this.GetService(type);
+            => this.GetRequiredService(type);
 
         /// <inheritdoc />
         public TService GetInstanceFor<TService, TTarget>()
-            => Container.GetInstance<TService>(GetTargetedServiceName<TTarget>());
+            => lightinjectContainer.GetInstance<TService>(DefaultServiceCollection.GetTargetedServiceName<TService, TTarget>());
 
         /// <inheritdoc />
         public object TryGetInstance(Type type)
-            => this.GetRequiredService(type);
+            => this.GetService(type);
 
         /// <inheritdoc />
         public IEnumerable<T> GetAllInstances<T>()
             where T : class
-            => Container.GetAllInstances<T>();
+            => this.GetAllInstances(typeof(T)).Cast<T>();
 
         /// <inheritdoc />
         public IEnumerable<object> GetAllInstances(Type type)
