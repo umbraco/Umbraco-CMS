@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -23,7 +22,6 @@ namespace Umbraco.Core.Models
         {
         }
 
-        
         public Guid AccessEntryId { get; internal set; }
 
         public string RuleValue

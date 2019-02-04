@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -49,7 +47,6 @@ namespace Umbraco.Core.Models
             _value = value;
             Key = uniqueId;
         }
-
 
         /// <summary>
         /// Gets or sets the <see cref="Language"/> for the translation

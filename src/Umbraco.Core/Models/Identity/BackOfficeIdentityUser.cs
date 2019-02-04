@@ -3,20 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Models.Identity
 {
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {
-
         private string _email;
         private string _userName;
         private int _id;
@@ -419,9 +413,9 @@ namespace Umbraco.Core.Models.Identity
         private static readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> GroupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
             (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
             groups => groups.GetHashCode());
+
         private static readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
             (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
             groups => groups.GetHashCode());
-
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 
 namespace Umbraco.Core.Models.Entities
 {
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Models.Entities
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The new value.</param>
         /// <param name="valueRef">A reference to the value to set.</param>
-        /// <param name="propertyName">The property selector.</param>
+        /// <param name="propertyName">The property name.</param>
         /// <param name="comparer">A comparer to compare property values.</param>
         public new void SetPropertyValueAndDetectChanges<T>(T value, ref T valueRef, string propertyName, IEqualityComparer<T> comparer = null)
         {

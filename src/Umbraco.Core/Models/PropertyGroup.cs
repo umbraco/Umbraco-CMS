@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -15,7 +14,6 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
-
         private string _name;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -12,8 +11,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Tag : EntityBase, ITag
     {
-        private static PropertySelectors _selectors;
-
         private string _group;
         private string _text;
         private int? _languageId;
@@ -33,15 +30,6 @@ namespace Umbraco.Core.Models
             Text = text;
             Group = group;
             LanguageId = languageId;
-        }
-
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Group = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Group);
-            public readonly PropertyInfo Text = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
-            public readonly PropertyInfo LanguageId = ExpressionHelper.GetPropertyInfo<Tag, int?>(x => x.LanguageId);
         }
 
         /// <inheritdoc />

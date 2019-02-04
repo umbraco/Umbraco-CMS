@@ -1,9 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models

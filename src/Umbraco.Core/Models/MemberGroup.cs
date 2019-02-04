@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -16,7 +15,6 @@ namespace Umbraco.Core.Models
         private IDictionary<string, object> _additionalData;
         private string _name;
         private int _creatorId;
-
 
         /// <inheritdoc />
         [DataMember]

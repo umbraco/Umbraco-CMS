@@ -67,8 +67,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal int DefaultTemplateId
         {
-            get { return _defaultTemplate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, nameof(DefaultTemplateId)); }
+            get => _defaultTemplate;
+            set => SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, nameof(DefaultTemplateId));
         }
 
         /// <summary>

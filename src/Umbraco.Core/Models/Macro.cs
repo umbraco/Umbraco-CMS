@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
@@ -98,22 +97,6 @@ namespace Umbraco.Core.Models
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Alias);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Name);
-            public readonly PropertyInfo UseInEditorSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.UseInEditor);
-            public readonly PropertyInfo CacheDurationSelector = ExpressionHelper.GetPropertyInfo<Macro, int>(x => x.CacheDuration);
-            public readonly PropertyInfo CacheByPageSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByPage);
-            public readonly PropertyInfo CacheByMemberSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByMember);
-            public readonly PropertyInfo DontRenderSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.DontRender);
-            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.MacroSource);
-            public readonly PropertyInfo MacroTypeSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroTypes>(x => x.MacroType);
-            public readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
-        }
 
         void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

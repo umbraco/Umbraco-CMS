@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -130,7 +126,7 @@ namespace Umbraco.Core.Models
             _rawPasswordValue = rawPasswordValue;
             IsApproved = isApproved;
         }
-        
+
         /// <summary>
         /// Gets or sets the Username
         /// </summary>

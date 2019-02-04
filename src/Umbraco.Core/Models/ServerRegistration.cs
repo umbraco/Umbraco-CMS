@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Reflection;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -14,7 +13,7 @@ namespace Umbraco.Core.Models
         private string _serverIdentity;
         private bool _isActive;
         private bool _isMaster;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>

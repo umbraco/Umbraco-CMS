@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
 using Umbraco.Core.Configuration;
@@ -16,7 +14,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Language : EntityBase, ILanguage
     {
-
         private string _isoCode;
         private string _cultureName;
         private bool _isDefaultVariantLanguage;
@@ -27,7 +24,7 @@ namespace Umbraco.Core.Models
         {
             IsoCode = isoCode;
         }
-        
+
         /// <inheritdoc />
         [DataMember]
         public string IsoCode

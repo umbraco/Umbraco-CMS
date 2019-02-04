@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Models
         private string _affectedDetails;
         private string _eventType;
         private string _eventDetails;
-        
+
         /// <inheritdoc />
         public int PerformingUserId
         {
@@ -49,28 +48,28 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public int AffectedUserId 
+        public int AffectedUserId
         {
             get => _affectedUserId;
             set => SetPropertyValueAndDetectChanges(value, ref _affectedUserId, nameof(AffectedUserId));
         }
 
         /// <inheritdoc />
-        public string AffectedDetails 
+        public string AffectedDetails
         {
             get => _affectedDetails;
             set => SetPropertyValueAndDetectChanges(value, ref _affectedDetails, nameof(AffectedDetails));
         }
 
         /// <inheritdoc />
-        public string EventType 
+        public string EventType
         {
             get => _eventType;
             set => SetPropertyValueAndDetectChanges(value, ref _eventType, nameof(EventType));
         }
 
         /// <inheritdoc />
-        public string EventDetails 
+        public string EventDetails
         {
             get => _eventDetails;
             set => SetPropertyValueAndDetectChanges(value, ref _eventDetails, nameof(EventDetails));

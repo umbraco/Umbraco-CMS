@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -23,7 +22,7 @@ namespace Umbraco.Core.Models
         private int? _contentId;
         private int? _languageId;
         private string _domainName;
-        
+
         [DataMember]
         public int? LanguageId
         {

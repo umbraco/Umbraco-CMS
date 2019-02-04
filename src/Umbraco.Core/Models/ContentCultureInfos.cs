@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
@@ -13,7 +12,7 @@ namespace Umbraco.Core.Models
     {
         private DateTime _date;
         private string _name;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentCultureInfos"/> class.
         /// </summary>
@@ -101,6 +100,5 @@ namespace Umbraco.Core.Models
             Deconstruct(out culture, out name);
             date = Date;
         }
-        
     }
 }

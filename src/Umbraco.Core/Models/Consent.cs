@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Models
         private string _action;
         private ConsentState _state;
         private string _comment;
-        
+
         /// <inheritdoc />
         public bool Current
         {

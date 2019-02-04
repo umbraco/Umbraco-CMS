@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
@@ -84,7 +80,7 @@ namespace Umbraco.Core.Models
             _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
             _variations = ContentVariation.Nothing;
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether the content type, owning this property type, is publishing.
         /// </summary>
