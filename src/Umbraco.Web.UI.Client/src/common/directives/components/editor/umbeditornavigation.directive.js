@@ -17,14 +17,17 @@
                 name: "More"
             };
 
-            scope.clickNavigationItem = function (selectedItem) {
+            scope.openNavigationItem = function (item) {
+                
+                console.log("openNavigationItem", item)
+                
                 scope.showDropdown = false;
-                runItemAction(selectedItem);
-                setItemToActive(selectedItem);
+                runItemAction(item);
+                setItemToActive(item);
                 if(scope.onSelect) {
-                    scope.onSelect({"item": selectedItem});
+                    scope.onSelect({"item": item});
                 }
-                eventsService.emit("app.tabChange", selectedItem);
+                eventsService.emit("app.tabChange", item);
             };
 
             scope.toggleDropdown = function () {

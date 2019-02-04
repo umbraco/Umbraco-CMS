@@ -1,0 +1,12 @@
+<a data-element="sub-view-{{vm.item.alias}}"
+    tabindex="-1"
+    class="umb-sub-views-nav-item"
+    ng-href=""
+    ng-click="vm.callbackOpen(vm.item)"
+    hotkey="{{vm.index+1}}"
+    hotkey-when-hidden="true"
+    ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">
+    <i class="icon {{ vm.item.icon }}"></i>
+    <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>
+    <div ng-show="item.badge" class="badge -type-{{vm.item.badge.type}}">{{vm.item.badge.count}}</div>
+</a>
