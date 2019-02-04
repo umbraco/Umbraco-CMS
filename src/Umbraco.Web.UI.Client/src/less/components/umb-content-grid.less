@@ -15,10 +15,6 @@
    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
    border-radius: 3px;
    
-   color: @ui-option-type;
-   &:hover {
-       color:@ui-option-type-hover;
-   }
 }
 
 .umb-content-grid__item.-selected {
@@ -70,9 +66,13 @@
 .umb-content-grid__item-name {
    font-weight: bold;
    margin-bottom: 15px;
-   //color: @black;
    line-height: 1.4em;
    display: inline-flex;
+   
+   color: @ui-option-type;
+   &:hover {
+       color:@ui-option-type-hover;
+   }
 }
 
 .umb-content-grid__item-name:hover span {

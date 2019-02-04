@@ -76,7 +76,7 @@ namespace Umbraco.Core.Runtime
                 // TODO: this is a hack, use proper configuration!
                 // also: we still register the full IServerMessenger because
                 // even on 1 single server we can have 2 concurrent app domains
-                var singleServer = "true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]);
+                var singleServer = "true".InvariantEquals(ConfigurationManager.AppSettings[Constants.AppSettings.DisableElectionForSingleServer]);
                 return singleServer
                     ? (IServerRegistrar) new SingleServerRegistrar(f.GetInstance<IRuntimeState>())
                     : new DatabaseServerRegistrar(

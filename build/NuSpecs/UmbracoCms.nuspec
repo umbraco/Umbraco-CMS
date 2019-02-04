@@ -8,7 +8,7 @@
         <owners>Umbraco HQ</owners>
         <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
         <projectUrl>http://umbraco.com/</projectUrl>
-        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+        <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
         <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>

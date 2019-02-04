@@ -36,8 +36,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             get
             {
                 // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
-                    throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
+                if (!SemVersion.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus], out var currentVersion))
+                    throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
                 // we currently support upgrading from 7.10.0 and later
                 if (currentVersion < new SemVersion(7, 10))

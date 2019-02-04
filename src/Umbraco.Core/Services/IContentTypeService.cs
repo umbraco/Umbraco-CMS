@@ -7,7 +7,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Manages <see cref="IContentType"/> objects.
     /// </summary>
-    public interface IContentTypeService : IContentTypeServiceBase<IContentType>
+    public interface IContentTypeService : IContentTypeBaseService<IContentType>
     {
         /// <summary>
         /// Gets all property type aliases.

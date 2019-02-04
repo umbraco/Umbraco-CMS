@@ -6,4 +6,5 @@ angular.module('umbraco.interceptors', [])
 
         $httpProvider.interceptors.push('securityInterceptor');
         $httpProvider.interceptors.push('debugRequestInterceptor');
+        $httpProvider.interceptors.push('doNotPostDollarVariablesOnPostRequestInterceptor');
     }]);

@@ -31,18 +31,18 @@ namespace Umbraco.Web.Media.EmbedProviders
         public string ThumbnailUrl { get; set; }
 
         [JsonProperty("thumbnail_height")]
-        public int? ThumbnailHeight { get; set; }
+        public double? ThumbnailHeight { get; set; }
 
         [JsonProperty("thumbnail_width")]
-        public int? ThumbnailWidth { get; set; }
+        public double? ThumbnailWidth { get; set; }
 
         public string Html { get; set; }
 
         public string Url { get; set; }
 
-        public int? Height { get; set; }
+        public double? Height { get; set; }
 
-        public int? Width { get; set; }
+        public double? Width { get; set; }
 
         /// <summary>
         /// Gets the HTML.

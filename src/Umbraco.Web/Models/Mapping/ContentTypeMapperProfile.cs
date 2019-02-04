@@ -134,6 +134,10 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
+            CreateMap<IContentTypeComposition, ContentTypeBasic>()
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
+                .ForMember(dest => dest.Blueprints, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
             CreateMap<IMemberType, ContentTypeBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
                 .ForMember(dest => dest.Blueprints, opt => opt.Ignore())

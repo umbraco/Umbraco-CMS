@@ -290,6 +290,7 @@ namespace Umbraco.Tests.Models
             // change - now we vary by culture
             contentType.Variations |= ContentVariation.Culture;
             propertyType.Variations |= ContentVariation.Culture;
+            content.ChangeContentType(contentType);
 
             // can set value
             // and get values
@@ -408,6 +409,8 @@ namespace Umbraco.Tests.Models
             // change - now we vary by culture
             contentType.Variations |= ContentVariation.Culture;
             propertyType.Variations |= ContentVariation.Culture;
+
+            content.ChangeContentType(contentType);
 
             Assert.Throws<NotSupportedException>(() => content.SetValue("prop", "a")); // invariant = no
             content.SetValue("prop", "a-fr", langFr);

@@ -129,7 +129,7 @@ namespace Umbraco.Core
             }
             return false;
         }
-        
+
         /// <summary>
         /// Returns properties that do not belong to a group
         /// </summary>
@@ -158,16 +158,6 @@ namespace Umbraco.Core
                                                           .Contains(property.PropertyTypeId));
         }
 
-        public static IContentTypeComposition GetContentType(this IContentBase contentBase)
-        {
-            if (contentBase == null) throw new ArgumentNullException(nameof(contentBase));
-
-            if (contentBase is IContent content) return content.ContentType;
-            if (contentBase is IMedia media) return media.ContentType;
-            if (contentBase is IMember member) return member.ContentType;
-            throw new NotSupportedException("Unsupported IContentBase implementation: " + contentBase.GetType().FullName + ".");
-        }
-
         #region SetValue for setting file contents
 
         /// <summary>
@@ -176,7 +166,7 @@ namespace Umbraco.Core
         /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
         /// you need to store the file by yourself using Store and then figure out
         /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        public static void SetValue(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             if (filename == null || filestream == null) return;
 
@@ -185,12 +175,12 @@ namespace Umbraco.Core
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower();
 
-            SetUploadFile(content, propertyTypeAlias, filename, filestream, culture, segment);
+            SetUploadFile(content,contentTypeBaseServiceProvider, propertyTypeAlias, filename, filestream, culture, segment);
         }
 
-        private static void SetUploadFile(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        private static void SetUploadFile(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
-            var property = GetProperty(content, propertyTypeAlias);
+            var property = GetProperty(content, contentTypeBaseServiceProvider, propertyTypeAlias);
 
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
@@ -211,12 +201,14 @@ namespace Umbraco.Core
         }
 
         // gets or creates a property for a content item.
-        private static Property GetProperty(IContentBase content, string propertyTypeAlias)
+        private static Property GetProperty(IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (property != null) return property;
 
-            var propertyType = content.GetContentType().CompositionPropertyTypes
+            var contentTypeService = contentTypeBaseServiceProvider.For(content);
+            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var propertyType = contentType.CompositionPropertyTypes
                 .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
                 throw new Exception("No property type exists with alias " + propertyTypeAlias + ".");
@@ -242,9 +234,11 @@ namespace Umbraco.Core
         /// the "folder number" that was assigned to the previous file referenced by the property,
         /// if any.</para>
         /// </remarks>
-        public static string StoreFile(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string filepath)
+        public static string StoreFile(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
-            var propertyType = content.GetContentType()
+            var contentTypeService = contentTypeBaseServiceProvider.For(content);
+            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var propertyType = contentType
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
             return MediaFileSystem.StoreFile(content, propertyType, filename, filestream, filepath);
@@ -325,7 +319,7 @@ namespace Umbraco.Core
         {
             return serializer.Serialize(content, false, false);
         }
-        
+
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IMedia"/> object

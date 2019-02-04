@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
             // culture
             //
             // I assume that, on a site, all language names should be in the SAME language, in DB,
-            // and that would be the umbracoDefaultUILanguage (app setting) - BUT if by accident
+            // and that would be the Umbraco.Core.DefaultUILanguage (app setting) - BUT if by accident
             // ANY culture has been retrieved with another current thread culture - it's now corrupt
             //
             // so, the logic below ensures that the name always end up being the correct name
