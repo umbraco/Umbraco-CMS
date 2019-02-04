@@ -193,6 +193,9 @@
     <Compile Include="Composing\CompositionExtensions.cs" />
     <Compile Include="Composing\FactoryExtensions.cs" />
     <Compile Include="Composing\MSDI\DefaultServiceCollection.cs" />
+    <Compile Include="Composing\MSDI\Named\NamedDependency.cs" />
+    <Compile Include="Composing\MSDI\Named\NamedServiceFactory.cs" />
+    <Compile Include="Composing\MSDI\Named\ServiceCollectionExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
@@ -1525,6 +1528,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auditing\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Composing\MSDI\Named\_readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
