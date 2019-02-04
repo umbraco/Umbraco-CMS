@@ -92,7 +92,7 @@ namespace Umbraco.Web
             if (contentId == default)
                 throw new ArgumentException("Invalid content id " + contentId);
 
-            var content = _umbracoContextAccessor.UmbracoContext.ContentCache?.GetById(contentId);
+            var content = _umbracoContextAccessor.UmbracoContext.ContentCache?.GetById(true, contentId);
 
             if (content == null)
                 throw new InvalidOperationException("Cannot render a macro, no content found by id " + contentId);
