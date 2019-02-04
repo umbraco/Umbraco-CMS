@@ -23,16 +23,19 @@ namespace Umbraco.Web.Search
     public class UmbracoTreeSearcher
     {
         private readonly IExamineManager _examineManager;
+        private readonly UmbracoContext _umbracoContext;
         private readonly UmbracoHelper _umbracoHelper;
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
+            UmbracoContext umbracoContext,
             UmbracoHelper umbracoHelper,
             ILocalizationService languageService,
             IEntityService entityService)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
+            _umbracoContext = umbracoContext;
             _umbracoHelper = umbracoHelper ?? throw new ArgumentNullException(nameof(umbracoHelper));
             _languageService = languageService;
             _entityService = entityService;
@@ -61,9 +64,7 @@ namespace Umbraco.Web.Search
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = new[] { "id", "__NodeId" };
-
-            var umbracoContext = _umbracoHelper.UmbracoContext;
-
+            
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc... 
             //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
@@ -86,12 +87,12 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    var allMediaStartNodes = umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media,  allMediaStartNodes, searchFrom, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-                    var allContentStartNodes = umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, _entityService);
                     break;
                 default:

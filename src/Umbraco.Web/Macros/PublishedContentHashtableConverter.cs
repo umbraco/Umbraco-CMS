@@ -30,14 +30,13 @@ namespace Umbraco.Web.Macros
         /// </remarks>
         internal PublishedContentHashtableConverter(PublishedRequest frequest)
         {
-
             if (!frequest.HasPublishedContent)
-                throw new ArgumentException("Document request has no node.", "frequest");
+                throw new ArgumentException("Document request has no node.", nameof(frequest));
 
             PopulatePageData(frequest.PublishedContent.Id,
                 frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
-                frequest.PublishedContent.Path, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
+                frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
 
             if (frequest.HasTemplate)
             {
@@ -54,12 +53,12 @@ namespace Umbraco.Web.Macros
         /// <param name="doc"></param>
         internal PublishedContentHashtableConverter(IPublishedContent doc)
         {
-            if (doc == null) throw new ArgumentNullException("doc");
+            if (doc == null) throw new ArgumentNullException(nameof(doc));
 
             PopulatePageData(doc.Id,
                 doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
-                doc.Path, doc.Parent == null ? -1 : doc.Parent.Id);
+                doc.Path, doc.Parent?.Id ?? -1);
 
             if (doc.TemplateId.HasValue)
             {
@@ -131,6 +130,7 @@ namespace Umbraco.Web.Macros
         /// Returns a Hashtable of data for a published content item
         /// </summary>
         public Hashtable Elements { get; } = new Hashtable();
+
 
         #region PublishedContent
 

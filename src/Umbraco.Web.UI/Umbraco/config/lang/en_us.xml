@@ -1905,6 +1905,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidNull">Value cannot be null</key>
     <key alias="invalidEmpty">Value cannot be empty</key>
     <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
+    <key alias="customValidation">Custom validation</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:

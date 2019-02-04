@@ -8,16 +8,19 @@ using Moq;
 using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models
 {
@@ -34,6 +37,18 @@ namespace Umbraco.Tests.Models
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
             Composition.Register(_ => Mock.Of<IContentSection>());
+
+            // all this is required so we can validate properties...
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>()) { Alias = "test" };
+            Composition.Register(_ => new DataEditorCollection(new [] { editor }));
+            Composition.Register<PropertyEditorCollection>();
+            var dataType = Mock.Of<IDataType>();
+            Mock.Get(dataType).Setup(x => x.Configuration).Returns(() => new object());
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(() => dataType);
+            Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService));
         }
 
         [Test]

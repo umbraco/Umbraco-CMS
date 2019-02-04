@@ -19,6 +19,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
     {
         private readonly UmbracoContext _umbracoContext;
         private readonly ILogger _logger;
+        private readonly Func<RequestContext, IController> _factory;
 
         public TestControllerFactory(UmbracoContext umbracoContext, ILogger logger)
         {
@@ -26,8 +27,17 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             _logger = logger;
         }
 
+        public TestControllerFactory(UmbracoContext umbracoContext, ILogger logger, Func<RequestContext, IController> factory)
+        {
+            _umbracoContext = umbracoContext;
+            _logger = logger;
+            _factory = factory;
+        }
+
         public IController CreateController(RequestContext requestContext, string controllerName)
         {
+            if (_factory != null) return _factory(requestContext);
+
             var types = TypeFinder.FindClassesOfType<ControllerBase>(new[] { Assembly.GetExecutingAssembly() });
 
             var controllerTypes = types.Where(x => x.Name.Equals(controllerName + "Controller", StringComparison.InvariantCultureIgnoreCase));

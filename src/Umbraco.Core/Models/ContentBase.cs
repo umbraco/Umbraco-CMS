@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
@@ -19,7 +18,6 @@ namespace Umbraco.Core.Models
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
         protected static readonly ContentCultureInfosCollection NoInfos = new ContentCultureInfosCollection();
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
@@ -62,18 +60,9 @@ namespace Umbraco.Core.Models
             _properties.EnsurePropertyTypes(PropertyTypes);
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
-            public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
-            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo CultureInfosSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.CultureInfos);
-        }
-
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertyCollectionSelector);
+            OnPropertyChanged(nameof(Properties));
         }
 
         /// <summary>
@@ -83,7 +72,7 @@ namespace Umbraco.Core.Models
         public virtual int WriterId
         {
             get => _writerId;
-            set => SetPropertyValueAndDetectChanges(value, ref _writerId, Ps.Value.WriterSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _writerId, nameof(WriterId));
         }
 
         [IgnoreDataMember]
@@ -105,7 +94,7 @@ namespace Umbraco.Core.Models
                 }
                 return _contentTypeId;
             }
-            protected set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, Ps.Value.DefaultContentTypeIdSelector);
+            protected set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, nameof(ContentTypeId));
         }
 
         /// <summary>
@@ -251,7 +240,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         private void CultureInfosCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.CultureInfosSelector);
+            OnPropertyChanged(nameof(CultureInfos));
         }
 
         #endregion
@@ -378,12 +367,26 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public Property[] ValidateProperties(string culture = "*")
         {
-            var alsoInvariant = culture != null && culture != "*";
+            // select invalid properties
+            return Properties.Where(x =>
+            {
+                // if culture is null, we validate invariant properties only
+                // if culture is '*' we validate both variant and invariant properties, automatically
+                // if culture is specific eg 'en-US' we both too, but explicitly
 
-            return Properties.Where(x => // select properties...
-                    x.PropertyType.SupportsVariation(culture, "*", true) && // that support the variation
-                    (!x.IsValid(culture) || (alsoInvariant && !x.IsValid(null)))) // and are not valid
-                .ToArray();
+                var varies = x.PropertyType.VariesByCulture();
+
+                if (culture == null)
+                    return !(varies || x.IsValid(null)); // validate invariant property, invariant culture
+
+                if (culture == "*")
+                    return !x.IsValid(culture); // validate property, all cultures
+
+                return varies
+                    ? !x.IsValid(culture) // validate variant property, explicit culture
+                    : !x.IsValid(null); // validate invariant property, explicit culture
+            })
+            .ToArray();
         }
 
         #endregion
