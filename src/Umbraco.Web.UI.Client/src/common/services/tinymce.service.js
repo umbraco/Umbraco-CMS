@@ -1015,10 +1015,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         pinToolbar : function (editor) {
 
+            //we can't pin the toolbar if this doesn't exist (i.e. when in distraction free mode)
+            if (!editor.editorContainer) {
+                return;
+            }
+
             var tinyMce = $(editor.editorContainer);
             var toolbar = tinyMce.find(".mce-toolbar");
             var toolbarHeight = toolbar.height();
-            var tinyMceRect = tinyMce[0].getBoundingClientRect();
+            var tinyMceRect = editor.editorContainer.getBoundingClientRect();
             var tinyMceTop = tinyMceRect.top;
             var tinyMceBottom = tinyMceRect.bottom;
             var tinyMceWidth = tinyMceRect.width;
