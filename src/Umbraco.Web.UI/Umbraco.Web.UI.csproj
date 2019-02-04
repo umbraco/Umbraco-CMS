@@ -105,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.35</Version>
+      <Version>8.0.0-alpha.36</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>

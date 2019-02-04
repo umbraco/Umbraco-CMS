@@ -43,18 +43,9 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
-        /// <summary>
-        /// Initializes a new instance of the new <see cref="AuthenticationController"/> class with auto dependencies.
-        /// </summary>
-        public AuthenticationController()
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuthenticationController"/> class with all its dependencies.
-        /// </summary>
-        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
-        { }
+        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
             ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());

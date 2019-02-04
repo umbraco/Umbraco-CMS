@@ -20,8 +20,6 @@ namespace Umbraco.Web.Mvc
         private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage
             = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
-        private UmbracoHelper _umbracoHelper;
-
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
@@ -70,18 +68,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public UmbracoHelper Umbraco
-        {
-            get
-            {
-                return _umbracoHelper
-                    ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
-            }
-            internal set // tests
-            {
-                _umbracoHelper = value;
-            }
-        }
+        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets metadata for this instance.
@@ -95,12 +82,13 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<ILogger>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<UmbracoHelper>()
             )
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
             UmbracoContext = umbracoContext;
             DatabaseFactory = databaseFactory;
@@ -108,6 +96,7 @@ namespace Umbraco.Web.Mvc
             AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
+            Umbraco = umbracoHelper;
         }
 
         /// <summary>

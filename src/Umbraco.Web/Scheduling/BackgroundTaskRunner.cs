@@ -355,6 +355,8 @@ namespace Umbraco.Web.Scheduling
                 // break latched tasks
                 // stop processing the queue
                 _shutdownTokenSource.Cancel(false); // false is the default
+                _shutdownTokenSource.Dispose();
+                _shutdownTokenSource = null;
             }
 
             // tasks in the queue will be executed...
@@ -379,28 +381,38 @@ namespace Umbraco.Web.Scheduling
                     _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_shutdownToken);
                 }
 
-                // wait for latch should return the task
-                // if it returns null it's either that the task has been cancelled
-                // or the whole runner is going down - in both cases, continue,
-                // and GetNextBackgroundTask will take care of shutdowns
-                bgTask = await WaitForLatch(bgTask, _cancelTokenSource.Token);
-                if (bgTask == null) continue;
-
-                // executes & be safe - RunAsync should NOT throw but only raise an event,
-                // but... just make sure we never ever take everything down
                 try
                 {
-                    await RunAsync(bgTask, _cancelTokenSource.Token).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task runner exception", _logPrefix);
-                }
+                    // wait for latch should return the task
+                    // if it returns null it's either that the task has been cancelled
+                    // or the whole runner is going down - in both cases, continue,
+                    // and GetNextBackgroundTask will take care of shutdowns
+                    bgTask = await WaitForLatch(bgTask, _cancelTokenSource.Token);
 
-                // done
-                lock (_locker)
+                    if (bgTask != null)
+                    {
+                        // executes & be safe - RunAsync should NOT throw but only raise an event,
+                        // but... just make sure we never ever take everything down
+                        try
+                        {
+                            await RunAsync(bgTask, _cancelTokenSource.Token).ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task runner exception", _logPrefix);
+                        }
+                    }
+                }
+                finally
                 {
-                    _cancelTokenSource = null;
+                    // done
+                    lock (_locker)
+                    {
+                        // always dispose CancellationTokenSource when you are done using them
+                        // https://lowleveldesign.org/2015/11/30/catch-in-cancellationtokensource/
+                        _cancelTokenSource.Dispose();
+                        _cancelTokenSource = null;
+                    }
                 }
             }
         }

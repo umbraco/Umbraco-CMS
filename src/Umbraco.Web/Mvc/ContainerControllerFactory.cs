@@ -16,7 +16,14 @@ namespace Umbraco.Web.Mvc
 
         protected override IController GetControllerInstance(RequestContext requestContext, Type controllerType)
         {
-            return (IController) _container.GetInstance(controllerType);
+            try
+            {
+                return (IController) _container.GetInstance(controllerType);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Failed to create an instance of controller type {controllerType.FullName} (see inner exception).", e);
+            }
         }
 
         public override void ReleaseController(IController controller)

@@ -2,19 +2,10 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Web.UI.JavaScript
-{
-    //fixme delete this when Models Builder is updated
-    public sealed class ServerVariablesParser : global::Umbraco.Web.JavaScript.ServerVariablesParser
-    {
-    }
-}
-
 namespace Umbraco.Web.JavaScript
 {
     public class ServerVariablesParser
     {
-
         /// <summary>
         /// Allows developers to add custom variables on parsing
         /// </summary>
@@ -31,8 +22,6 @@ namespace Umbraco.Web.JavaScript
 
             var json = JObject.FromObject(items);
             return vars.Replace(Token, json.ToString());
-
         }
-
     }
 }
