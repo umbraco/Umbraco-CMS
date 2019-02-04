@@ -102,18 +102,13 @@ namespace Umbraco.Web.Editors
 
         private HttpResponseMessage GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
         {
-            // note - here we should be using the cache, provided that the preview content is in the cache...
-
-            var doc = _contentService.GetById(pageId);
-            if (doc == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
             var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
-            if (!m.UseInEditor)
+            //currently we cannot render a macro if the page doesn't yet exist
+            if (pageId == -1 || !m.UseInEditor)
             {
                 var response = Request.CreateResponse();
                 //need to create a specific content result formatted as HTML since this controller has been configured
@@ -130,7 +125,7 @@ namespace Umbraco.Web.Editors
             // When rendering the macro in the backoffice the default setting would be to use the Culture of the logged in user.
             // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
             // to set the current culture to the culture related to the content item. This is hacky but it works.
-            var publishedContent = UmbracoContext.ContentCache.GetById(doc.Id);
+            var publishedContent = UmbracoContext.ContentCache.GetById(pageId);
             var culture = publishedContent?.GetCulture();
             _variationContextAccessor.VariationContext = new VariationContext(); //must have an active variation context!
             if (culture != null)
@@ -143,7 +138,7 @@ namespace Umbraco.Web.Editors
             //need to create a specific content result formatted as HTML since this controller has been configured
             //with only json formatters.
             result.Content = new StringContent(
-                _componentRenderer.RenderMacro(doc.Id, m.Alias, macroParams).ToString(),
+                _componentRenderer.RenderMacro(pageId, m.Alias, macroParams).ToString(),
                 Encoding.UTF8,
                 "text/html");
             return result;
