@@ -446,7 +446,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Proszę uzupełnij zarówno alias, jak i nazwę dla nowego typu właściwości</key>
     <key alias="filePermissionsError">Wystąpił problem podczas zapisu/odczytu wymaganego pliku lub folderu</key>
     <key alias="macroErrorLoadingPartialView">Wystąpił błąd podczas ładowania skryptu Częściowego Widoku (plik: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Wystąpił błąd podczas ładowania userControl '%0%'</key>
     <key alias="missingTitle">Proszę podać tytuł</key>
     <key alias="missingType">Proszę wybrać typ</key>
     <key alias="pictureResizeBiggerThanOrg">Chcesz utworzyć obraz większy niż rozmiar oryginalny. Czy na pewno chcesz kontynuować?</key>

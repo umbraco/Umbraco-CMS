@@ -5,14 +5,36 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Services
 {
     /// <summary>
+    /// Provides a common base interface for <see cref="IContentTypeBase"/>.
+    /// </summary>
+    public interface IContentTypeBaseService
+    {
+        /// <summary>
+        /// Gets a content type.
+        /// </summary>
+        IContentTypeComposition Get(int id);
+    }
+
+    /// <summary>
     /// Provides a common base interface for <see cref="IContentTypeService"/>, <see cref="IMediaTypeService"/> and <see cref="IMemberTypeService"/>.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
-    public interface IContentTypeServiceBase<TItem> : IService
+    public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IService
         where TItem : IContentTypeComposition
     {
+        /// <summary>
+        /// Gets a content type.
+        /// </summary>
         TItem Get(int id);
+
+        /// <summary>
+        /// Gets a content type.
+        /// </summary>
         TItem Get(Guid key);
+
+        /// <summary>
+        /// Gets a content type.
+        /// </summary>
         TItem Get(string alias);
 
         int Count();

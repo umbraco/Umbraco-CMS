@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
 
@@ -14,8 +13,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
         private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
         internal List<int> RemovedContentTypeKeyTracker = new List<int>();
 
@@ -32,13 +29,6 @@ namespace Umbraco.Core.Models
             AddContentType(parent);
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ContentTypeCompositionSelector =
-                ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(x => x.ContentTypeComposition);
-        }
-
         /// <summary>
         /// Gets or sets the content types that compose this content type.
         /// </summary>
@@ -49,7 +39,7 @@ namespace Umbraco.Core.Models
             set
             {
                 _contentTypeComposition = value.ToList();
-                OnPropertyChanged(Ps.Value.ContentTypeCompositionSelector);
+                OnPropertyChanged(nameof(ContentTypeComposition));
             }
         }
 
@@ -161,7 +151,7 @@ namespace Umbraco.Core.Models
                     throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
 
                 _contentTypeComposition.Add(contentType);
-                OnPropertyChanged(Ps.Value.ContentTypeCompositionSelector);
+                OnPropertyChanged(nameof(ContentTypeComposition));
                 return true;
             }
             return false;
@@ -187,7 +177,7 @@ namespace Umbraco.Core.Models
                 if (compositionIdsToRemove.Any())
                     RemovedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
 
-                OnPropertyChanged(Ps.Value.ContentTypeCompositionSelector);
+                OnPropertyChanged(nameof(ContentTypeComposition));
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
             return false;

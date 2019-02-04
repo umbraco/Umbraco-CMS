@@ -6,6 +6,7 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -100,6 +101,13 @@ namespace Umbraco.Web
         /// <param name="composition">The composition.</param>
         public static DashboardCollectionBuilder Dashboards(this Composition composition)
             => composition.WithCollectionBuilder<DashboardCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the backoffice OEmbed Providers collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static EmbedProvidersCollectionBuilder OEmbedProviders(this Composition composition)
+            => composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
 
         #endregion
 

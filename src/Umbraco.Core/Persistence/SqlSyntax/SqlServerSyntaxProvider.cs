@@ -134,7 +134,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
-                        version = new ServerVersionInfo(reader.GetString(0), reader.GetString(2), reader.GetString(3), (EngineEdition) reader.GetInt32(5), reader.GetString(7), reader.GetString(9));
+                        // InstanceName can be NULL for the default instance
+                        version = new ServerVersionInfo(reader.GetString(0), reader.GetString(2), reader.IsDBNull(3) ? "(default)" : reader.GetString(3), (EngineEdition) reader.GetInt32(5), reader.GetString(7), reader.GetString(9));
                     }
                     connection.Close();
                 }

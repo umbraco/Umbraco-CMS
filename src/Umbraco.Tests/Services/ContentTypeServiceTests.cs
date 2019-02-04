@@ -408,46 +408,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
-        {
-            IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
-            ServiceContext.MediaTypeService.Save(contentType1);
-            IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
-            ServiceContext.MediaTypeService.Save(contentType2);
-            IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
-            ServiceContext.MediaTypeService.Save(contentType3);
-
-            var contentTypes = new[] { contentType1, contentType2, contentType3 };
-            var parentId = -1;
-
-            var ids = new List<int>();
-
-            for (int i = 0; i < 2; i++)
-            {
-                for (var index = 0; index < contentTypes.Length; index++)
-                {
-                    var contentType = contentTypes[index];
-                    var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                    ServiceContext.MediaService.Save(contentItem);
-                    parentId = contentItem.Id;
-
-                    ids.Add(contentItem.Id);
-                }
-            }
-
-            //delete the first content type, all other content of different content types should be in the recycle bin
-            ServiceContext.MediaTypeService.Delete(contentTypes[0]);
-
-            var found = ServiceContext.MediaService.GetByIds(ids);
-
-            Assert.AreEqual(4, found.Count());
-            foreach (var content in found)
-            {
-                Assert.IsTrue(content.Trashed);
-            }
-        }
-
-        [Test]
         public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
         {
             IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
@@ -488,60 +448,6 @@ namespace Umbraco.Tests.Services
             foreach (var content in found)
             {
                 Assert.IsTrue(content.Trashed);
-            }
-        }
-
-        [Test]
-        public void Deleting_Media_Types_With_Hierarchy_Of_Media_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
-        {
-            MediaService.Trashed += MediaServiceOnTrashed;
-
-            try
-            {
-                IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
-                ServiceContext.MediaTypeService.Save(contentType1);
-                IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
-                ServiceContext.MediaTypeService.Save(contentType2);
-                IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
-                ServiceContext.MediaTypeService.Save(contentType3);
-
-                var contentTypes = new[] { contentType1, contentType2, contentType3 };
-                var parentId = -1;
-
-                var ids = new List<int>();
-
-                for (int i = 0; i < 2; i++)
-                {
-                    for (var index = 0; index < contentTypes.Length; index++)
-                    {
-                        var contentType = contentTypes[index];
-                        var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                        ServiceContext.MediaService.Save(contentItem);
-                        parentId = contentItem.Id;
-
-                        ids.Add(contentItem.Id);
-                    }
-                }
-
-                foreach (var contentType in contentTypes.Reverse())
-                {
-                    ServiceContext.MediaTypeService.Delete(contentType);
-                }
-            }
-            finally
-            {
-                MediaService.Trashed -= MediaServiceOnTrashed;
-            }
-        }
-
-        private void MediaServiceOnTrashed(IMediaService sender, MoveEventArgs<IMedia> e)
-        {
-            foreach (var item in e.MoveInfoCollection)
-            {
-                //if this item doesn't exist then Fail!
-                var exists = ServiceContext.MediaService.GetById(item.Entity.Id);
-                if (exists == null)
-                    Assert.Fail("The item doesn't exist");
             }
         }
 
@@ -1109,12 +1015,13 @@ namespace Umbraco.Tests.Services
             var metaContentType = MockedContentTypes.CreateMetaContentType();
             service.Save(metaContentType);
 
-            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", metaContentType);
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", metaContentType) as IContentType;
             service.Save(simpleContentType);
             var categoryId = simpleContentType.Id;
 
             // Act
             var sut = simpleContentType.DeepCloneWithResetIdentities("newcategory");
+            Assert.IsNotNull(sut);
             service.Save(sut);
 
             // Assert
@@ -1146,11 +1053,12 @@ namespace Umbraco.Tests.Services
             var parentContentType2 = MockedContentTypes.CreateSimpleContentType("parent2", "Parent2", null, true);
             service.Save(parentContentType2);
 
-            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1, true);
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", parentContentType1, true) as IContentType;
             service.Save(simpleContentType);
 
             // Act
             var clone = simpleContentType.DeepCloneWithResetIdentities("newcategory");
+            Assert.IsNotNull(clone);
             clone.RemoveContentType("parent1");
             clone.AddContentType(parentContentType2);
             clone.ParentId = parentContentType2.Id;
@@ -2112,22 +2020,6 @@ namespace Umbraco.Tests.Services
 
             Assert.IsNull(contentType.Description);
             Assert.IsNull(contentType2.Description);
-        }
-
-        [Test]
-        public void Empty_Description_Is_Always_Null_After_Saving_Media_Type()
-        {
-            var service = ServiceContext.MediaTypeService;
-            var mediaType = MockedContentTypes.CreateSimpleMediaType("mediaType", "Media Type");
-            mediaType.Description = null;
-            service.Save(mediaType);
-
-            var mediaType2 = MockedContentTypes.CreateSimpleMediaType("mediaType2", "Media Type 2");
-            mediaType2.Description = string.Empty;
-            service.Save(mediaType2);
-
-            Assert.IsNull(mediaType.Description);
-            Assert.IsNull(mediaType2.Description);
         }
 
         [Test]

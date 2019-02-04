@@ -645,7 +645,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private static void InitializeCacheConfig()
         {
-            var value = ConfigurationManager.AppSettings["Umbraco.PublishedMediaCache.Seconds"];
+            var value = ConfigurationManager.AppSettings[Constants.AppSettings.PublishedMediaCacheSeconds];
             int seconds;
             if (int.TryParse(value, out seconds) == false)
                 seconds = PublishedMediaCacheTimespanSeconds;

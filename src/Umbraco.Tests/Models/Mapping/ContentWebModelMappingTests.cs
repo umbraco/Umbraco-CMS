@@ -26,6 +26,7 @@ namespace Umbraco.Tests.Models.Mapping
             base.Compose();
 
             Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
+            Composition.RegisterUnique(f => Mock.Of<IContentTypeService>());
         }
 
         [DataEditor("Test.Test", "Test", "~/Test.html")]
@@ -116,7 +117,12 @@ namespace Umbraco.Tests.Models.Mapping
         public void To_Display_Model()
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
+            var contentTypeServiceMock = Mock.Get(Current.Services.ContentTypeService);
+            contentTypeServiceMock.Setup(x => x.Get(contentType.Id)).Returns(() => contentType);
+
             var content = MockedContent.CreateSimpleContent(contentType);
+
+
             FixUsers(content);
 
             // need ids for tabs
@@ -145,6 +151,10 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             contentType.PropertyGroups.Clear();
+            var contentTypeServiceMock = Mock.Get(Current.Services.ContentTypeService);
+            contentTypeServiceMock.Setup(x => x.Get(contentType.Id)).Returns(() => contentType);
+
+
             var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
@@ -176,6 +186,10 @@ namespace Umbraco.Tests.Models.Mapping
                 p.Id = idSeed;
                 idSeed++;
             }
+            var contentTypeServiceMock = Mock.Get(Current.Services.ContentTypeService);
+            contentTypeServiceMock.Setup(x => x.Get(contentType.Id)).Returns(() => contentType);
+
+
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 

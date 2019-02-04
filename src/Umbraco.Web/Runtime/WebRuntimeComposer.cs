@@ -23,6 +23,7 @@ using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -151,7 +152,7 @@ namespace Umbraco.Web.Runtime
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
@@ -178,7 +179,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterAuto(typeof(UmbracoViewPage<>));
 
             // register published router
-            composition.RegisterUnique<PublishedRouter>();
+            composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             composition.Register(_ => Current.Configs.Settings().WebRouting);
 
             // register preview SignalR hub
@@ -212,6 +213,24 @@ namespace Umbraco.Web.Runtime
             // and will filter out those that are not attributed with TreeAttribute
             composition.WithCollectionBuilder<TreeCollectionBuilder>()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
+
+            // register OEmbed providers - no type scanning - all explicit opt-in of adding types
+            // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
+            composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
+                .Append<YouTube>()
+                .Append<Instagram>()
+                .Append<Twitter>()
+                .Append<Vimeo>()
+                .Append<DailyMotion>()
+                .Append<Flickr>()
+                .Append<Slideshare>()
+                .Append<Kickstarter>()
+                .Append<GettyImages>()
+                .Append<Ted>()
+                .Append<Soundcloud>()
+                .Append<Issuu>()
+                .Append<Hulu>();
         }
     }
 }
+

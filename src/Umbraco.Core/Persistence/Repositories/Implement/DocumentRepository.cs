@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
 
-        public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IContentSection settings)
+        public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
             : base(scopeAccessor, appCaches, languageRepository, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
@@ -39,12 +39,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _appCaches = appCaches;
             _scopeAccessor = scopeAccessor;
             _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, appCaches, logger);
-            EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
         protected override DocumentRepository This => this;
 
-        public bool EnsureUniqueNaming { get; set; }
+        /// <summary>
+        /// Default is to always ensure all documents have unique names
+        /// </summary>
+        protected virtual bool EnsureUniqueNaming { get; } = true;
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository

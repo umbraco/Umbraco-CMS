@@ -41,6 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
@@ -84,7 +85,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IEntityXmlSerializer entitySerializer)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -103,6 +104,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -1202,7 +1204,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            if (content.GetContentType().VariesByCulture())
+            var contentTypeService = _contentTypeBaseServiceProvider.For(content);
+            var contentType = contentTypeService.Get(content.ContentTypeId);
+            if (contentType.VariesByCulture())
             {
                 var infos = content is IContent document
                     ? (published

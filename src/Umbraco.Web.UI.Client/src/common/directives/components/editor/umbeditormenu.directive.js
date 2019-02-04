@@ -18,6 +18,10 @@
             //adds a handler to the context menu item click, we need to handle this differently
             //depending on what the menu item is supposed to do.
             scope.executeMenuItem = function (action) {
+                //the action is called as it would be by the tree. to ensure that the action targets the correct node, 
+                //we need to set the current node in appState before calling the action. otherwise we break all actions
+                //that use the current node (and that's pretty much all of them)
+                appState.setMenuState("currentNode", scope.currentNode);                
                 navigationService.executeMenuAction(action, scope.currentNode, scope.currentSection);
                 scope.dropdown.isOpen = false;
             };
@@ -28,9 +32,6 @@
                 if (!scope.currentNode) {
                     return;
                 }
-
-                //when the options item is selected, we need to set the current menu item in appState (since this is synonymous with a menu)
-                appState.setMenuState("currentNode", scope.currentNode);
 
                 if (!scope.actions) {
                     treeService.getMenu({ treeNode: scope.currentNode })

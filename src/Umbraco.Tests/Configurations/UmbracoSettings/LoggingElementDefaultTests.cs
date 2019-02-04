@@ -12,16 +12,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public override void DisabledLogTypes()
-        {
-            Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.Any() == false);
-        }
-        [Test]
-        public override void CleaningMiliseconds()
-        {
-            Assert.IsTrue(SettingsSection.Logging.CleaningMiliseconds == -1);
-        }
-        [Test]
         public override void MaxLogAge()
         {
             Assert.IsTrue(SettingsSection.Logging.MaxLogAge == -1);

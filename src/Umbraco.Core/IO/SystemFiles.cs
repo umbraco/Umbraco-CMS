@@ -8,7 +8,8 @@ namespace Umbraco.Core.IO
     public class SystemFiles
     {
         public static string TinyMceConfig => SystemDirectories.Config + "/tinyMceConfig.config";
-        
+
+        // TODO: Kill this off we don't have umbraco.config XML cache we now have NuCache
         public static string GetContentCacheXml(IGlobalSettings globalSettings)
         {
             switch (globalSettings.LocalTempStorageLocation)
@@ -24,7 +25,7 @@ namespace Umbraco.Core.IO
                         appDomainHash);
                     return Path.Combine(cachePath, "umbraco.config");
                 case LocalTempStorage.Default:
-                    return IOHelper.ReturnPath("umbracoContentXML", "~/App_Data/umbraco.config");
+                    return IOHelper.ReturnPath(Constants.AppSettings.ContentXML, "~/App_Data/umbraco.config");
                 default:
                     throw new ArgumentOutOfRangeException();
             }

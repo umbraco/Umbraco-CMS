@@ -1346,7 +1346,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     dialogData: dialogData,
                     submit: function (model) {
                         var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
-                        self.insertMacroInEditor(args.editor, macroObject, $scope);
+                        self.insertMacroInEditor(args.editor, macroObject);
                         editorService.close();
                     },
                     close: function () {

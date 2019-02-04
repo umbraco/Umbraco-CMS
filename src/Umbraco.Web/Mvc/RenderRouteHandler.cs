@@ -377,7 +377,7 @@ namespace Umbraco.Web.Mvc
             if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
                 && routeDef.HasHijackedRoute == false)
             {
-                request.UpdateOnMissingTemplate(); // request will go 404
+                request.UpdateToNotFound(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should
                 // not be processed any further, eg because it has been redirect. then, exit.
@@ -386,11 +386,8 @@ namespace Umbraco.Web.Mvc
 
                 var handler = GetHandlerOnMissingTemplate(request);
 
-                // if it's not null it can be either the PublishedContentNotFoundHandler (no document was
-                // found to handle 404, or document with no template was found) or the WebForms handler
-                // (a document was found and its template is WebForms)
-
-                // if it's null it means that a document was found and its template is Mvc
+                // if it's not null it's the PublishedContentNotFoundHandler (no document was found to handle 404, or document with no template was found)
+                // if it's null it means that a document was found
 
                 // if we have a handler, return now
                 if (handler != null)

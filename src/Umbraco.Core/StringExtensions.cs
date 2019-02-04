@@ -1108,29 +1108,6 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
 
-        /// <summary>
-        /// Cleans (but only if required) a string to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="alias">The text to filter.</param>
-        /// <returns>The safe alias.</returns>
-        /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
-        public static string ToSafeAliasWithForcingCheck(this string alias)
-        {
-            return Current.Configs.Settings().Content.ForceSafeAliases ? alias.ToSafeAlias() : alias;
-        }
-
-        /// <summary>
-        /// Cleans (but only if required) a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="alias">The text to filter.</param>
-        /// <param name="culture">The culture.</param>
-        /// <returns>The safe alias.</returns>
-        /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
-        public static string ToSafeAliasWithForcingCheck(this string alias, string culture)
-        {
-            return Current.Configs.Settings().Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
-        }
-
         // the new methods to get a url segment
 
         /// <summary>

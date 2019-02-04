@@ -91,7 +91,6 @@ namespace Umbraco.Web.Scheduling
 
                 tasks.Add(RegisterKeepAlive());
                 tasks.Add(RegisterScheduledPublishing());
-                tasks.Add(RegisterTaskRunner(settings));
                 tasks.Add(RegisterLogScrubber(settings));
 
                 var healthCheckConfig = Current.Configs.HealthChecks();
@@ -119,14 +118,7 @@ namespace Umbraco.Web.Scheduling
             _publishingRunner.TryAdd(task);
             return task;
         }
-
-        private IBackgroundTask RegisterTaskRunner(IUmbracoSettingsSection settings)
-        {
-            var task = new ScheduledTasks(_tasksRunner, 60000, 60000, _runtime, settings, _logger);
-            _tasksRunner.TryAdd(task);
-            return task;
-        }
-
+        
         private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecks healthCheckConfig,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IProfilingLogger logger)

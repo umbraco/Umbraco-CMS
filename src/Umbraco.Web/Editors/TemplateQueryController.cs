@@ -118,7 +118,7 @@ namespace Umbraco.Web.Editors
             foreach (var condition in model.Filters.Where(x => !x.ConstraintValue.IsNullOrWhiteSpace()))
             {
                 //x is passed in as the parameter alias for the linq where statement clause
-                var operation = condition.BuildCondition("x", contents, Properties);
+                var operation = condition.BuildCondition<IPublishedContent>("x");
 
                     //for review - this uses a tonized query rather then the normal linq query.
                 contents = contents.Where(operation.Compile());

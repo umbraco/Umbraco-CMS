@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
@@ -22,24 +21,11 @@ namespace Umbraco.Core.Models.Membership
         private IEnumerable<string> _permissions;
         private readonly List<string> _sectionCollection;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        // ReSharper disable once ClassNeverInstantiated.Local // lazy-instantiated in Ps
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Name);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Alias);
-            public readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserGroup, IEnumerable<string>>(x => x.Permissions);
-            public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Icon);
-            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int?>(x => x.StartContentId);
-            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int?>(x => x.StartMediaId);
-
-            //Custom comparer for enumerable
-            public readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
-                new DelegateEqualityComparer<IEnumerable<string>>(
-                    (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-                    enum1 => enum1.GetHashCode());
-        }
+        //Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
+            new DelegateEqualityComparer<IEnumerable<string>>(
+                (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+                enum1 => enum1.GetHashCode());
 
         /// <summary>
         /// Constructor to create a new user group
@@ -71,35 +57,35 @@ namespace Umbraco.Core.Models.Membership
         public int? StartMediaId
         {
             get => _startMediaId;
-            set => SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _startMediaId, nameof(StartMediaId));
         }
 
         [DataMember]
         public int? StartContentId
         {
             get => _startContentId;
-            set => SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _startContentId, nameof(StartContentId));
         }
 
         [DataMember]
         public string Icon
         {
             get => _icon;
-            set => SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
         }
 
         [DataMember]
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, Ps.Value.AliasSelector);
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, nameof(Alias));
         }
 
         [DataMember]
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -112,7 +98,7 @@ namespace Umbraco.Core.Models.Membership
         public IEnumerable<string> Permissions
         {
             get => _permissions;
-            set => SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector, Ps.Value.StringEnumerableComparer);
+            set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);
         }
 
         public IEnumerable<string> AllowedSections => _sectionCollection;
