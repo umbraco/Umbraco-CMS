@@ -37,7 +37,7 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<Section> GetSections()
         {
-            var sections = _sectionService.GetAllowedSections(Security.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(Security.GetUserId().ResultOr(0)).OrderBy(section => section.SortOrder);
 
             var sectionModels = sections.Select(Mapper.Map<Section>).ToArray();
             

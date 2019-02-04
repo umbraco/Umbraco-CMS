@@ -13,5 +13,8 @@ namespace Umbraco.Web.Trees
 
         /// <inheritdoc />
         public string Name => "Translation";
+
+        /// <inheritdoc />
+        public int SortOrder => 70;
     }
 }

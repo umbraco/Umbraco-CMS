@@ -372,7 +372,7 @@ namespace Umbraco.Web.Models.Mapping
         private void MapUserGroupBasic(ISectionService sectionService, IEntityService entityService, ILocalizedTextService textService, dynamic group, UserGroupBasic display)
         {
             var allSections = sectionService.GetSections();
-            display.Sections = allSections.Where(x => Enumerable.Contains(group.AllowedSections, x.Alias)).Select(Mapper.Map<ContentEditing.Section>);
+            display.Sections = allSections.Where(x => Enumerable.Contains(group.AllowedSections, x.Alias)).OrderBy(section => section.SortOrder).Select(Mapper.Map<ContentEditing.Section>);
 
             if (group.StartMediaId > 0)
             {

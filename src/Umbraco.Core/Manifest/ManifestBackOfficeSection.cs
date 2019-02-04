@@ -11,5 +11,8 @@ namespace Umbraco.Core.Manifest
 
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
     }
 }

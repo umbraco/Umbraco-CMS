@@ -13,5 +13,8 @@ namespace Umbraco.Web.Trees
 
         /// <inheritdoc />
         public string Name => "Settings";
+
+        /// <inheritdoc />
+        public int SortOrder => 30;
     }
 }

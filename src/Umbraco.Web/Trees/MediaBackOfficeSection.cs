@@ -9,6 +9,9 @@ namespace Umbraco.Web.Trees
     public class MediaBackOfficeSection : IBackOfficeSection
     {
         public string Alias => Constants.Applications.Media;
+
         public string Name => "Media";
+
+        public int SortOrder => 20;
     }
 }
