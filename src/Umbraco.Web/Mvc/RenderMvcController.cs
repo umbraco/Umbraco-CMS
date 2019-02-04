@@ -7,6 +7,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
@@ -24,9 +25,11 @@ namespace Umbraco.Web.Mvc
         }
 
         public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, services, appCaches, profilingLogger, umbracoHelper)
+            : base(globalSettings, umbracoContext, services, appCaches, profilingLogger)
         {
             ActionInvoker = new RenderActionInvoker();
+
+            Umbraco = umbracoHelper;
         }
 
         /// <summary>
@@ -38,6 +41,16 @@ namespace Umbraco.Web.Mvc
         /// Gets the current content item.
         /// </summary>
         protected IPublishedContent CurrentPage => PublishedRequest.PublishedContent;
+
+        /// <summary>
+        /// Gets the membership helper.
+        /// </summary>
+        public MembershipHelper Members => Umbraco.MembershipHelper;
+
+        /// <summary>
+        /// Gets the Umbraco helper.
+        /// </summary>
+        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets the current published content request.

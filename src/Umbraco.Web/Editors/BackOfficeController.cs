@@ -49,8 +49,8 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, services, appCaches, profilingLogger, umbracoHelper)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, services, appCaches, profilingLogger)
         {
             _manifestParser = manifestParser;
             _features = features;

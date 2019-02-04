@@ -53,16 +53,6 @@ namespace Umbraco.Web.Mvc
         protected IOwinContext OwinContext => Request.GetOwinContext();
 
         /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
-
-        /// <summary>
-        /// Gets the Umbraco helper.
-        /// </summary>
-        public UmbracoHelper Umbraco { get; }
-
-        /// <summary>
         /// Gets the web security helper.
         /// </summary>
         public virtual WebSecurity Security => UmbracoContext.Security;
@@ -73,13 +63,12 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<UmbracoContext>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
-                  Current.Factory.GetInstance<IProfilingLogger>(),
-                  Current.Factory.GetInstance<UmbracoHelper>()
+                  Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;
@@ -87,7 +76,6 @@ namespace Umbraco.Web.Mvc
             AppCaches = appCaches;
             Logger = profilingLogger;
             ProfilingLogger = profilingLogger;
-            Umbraco = umbracoHelper;
         }
     }
 }
