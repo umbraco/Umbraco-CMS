@@ -66,14 +66,12 @@
                 }
                 
                 editor.style._tx = 100;
-                //editor.style.opacity = 0;
                 editor.style.transform = "translateX("+editor.style._tx+"%)";
                 
                 // animation config
                 anime({
                     targets: editor.style,
                     _tx: [100, 0],
-                    //opacity: [0, 1],
                     easing: 'easeOutExpo',
                     duration: 480,
                     update: () => {
@@ -81,10 +79,8 @@
                         scope.$digest();
                     },
                     complete: function() {
-                        //$timeout(function(){
-                            editor.animating = false;
-                            scope.$digest();
-                        //});
+                        editor.animating = false;
+                        scope.$digest();
                     }
                 });
                 
@@ -102,7 +98,6 @@
                 anime({
                     targets: editor.style,
                     _tx: [0, 100],
-                    //opacity: [1, 0],
                     easing: 'easeInExpo',
                     duration: 360,
                     update: () => {
@@ -110,11 +105,9 @@
                         scope.$digest();
                     },
                     complete: function() {
-                        //$timeout(function(){
                         scope.editors.splice(-1,1);
                         removeOverlayFromPrevEditor();
                         scope.$digest();
-                        //})
                     }
                 });
                 
