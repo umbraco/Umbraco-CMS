@@ -115,15 +115,15 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
             for (var i = 0; i < keys.length; i++) {
                 var key = keys[i];
 
-                if (keys[i] === 'partialViews') {
+                if (key === 'partialViews') {
                     vm.views = values[key];
                 }
 
-                if (keys[i] === 'parameterEditors') {
+                if (key === 'parameterEditors') {
                     vm.parameterEditors = values[key];                    
                 }
 
-                if (keys[i] === 'macro') {
+                if (key === 'macro') {
                     bindMacro(values[key]);
                 }
             }
