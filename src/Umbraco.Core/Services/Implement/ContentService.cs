@@ -857,7 +857,7 @@ namespace Umbraco.Core.Services.Implement
 
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
+                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
 
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -891,7 +891,31 @@ namespace Umbraco.Core.Services.Implement
 
             // finally, "save publishing"
             // what happens next depends on whether the content can be published or not
-            return SavePublishing(content, userId, raiseEvents);
+            return CommitDocumentChanges(content, userId, raiseEvents);
+        }
+
+        /// <inheritdoc />
+        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true)
+        {
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (cultures == null) throw new ArgumentNullException(nameof(cultures));
+
+            var evtMsgs = EventMessagesFactory.Get();
+
+            var varies = content.ContentType.VariesByCulture();
+            
+            if (cultures.Length == 0)
+            {
+                //no cultures specified and doesn't vary, so publish it, else nothing to publish
+                return !varies
+                    ? SaveAndPublish(content, userId: userId, raiseEvents: raiseEvents)
+                    : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+            }
+
+            if (cultures.Select(content.PublishCulture).Any(isValid => !isValid))
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content); //fixme: no way to know which one failed?
+
+            return CommitDocumentChanges(content, userId, raiseEvents);
         }
 
         /// <inheritdoc />
@@ -903,7 +927,7 @@ namespace Umbraco.Core.Services.Implement
 
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
+                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
 
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -938,22 +962,22 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // finally, "save publishing"
-            return SavePublishing(content, userId);
+            return CommitDocumentChanges(content, userId);
         }
 
         /// <inheritdoc />
-        public PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true)
+        public PublishResult CommitDocumentChanges(IContent content, int userId = 0, bool raiseEvents = true)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
-                var result = SavePublishingInternal(scope, content, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
         }
 
-        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
+        private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
@@ -961,7 +985,7 @@ namespace Umbraco.Core.Services.Implement
 
             // nothing set = republish it all
             if (content.PublishedState != PublishedState.Publishing && content.PublishedState != PublishedState.Unpublishing)
-                ((Content)content).PublishedState = PublishedState.Publishing;
+                ((Content)content).PublishedState = PublishedState.Publishing; //TODO: fix this https://github.com/umbraco/Umbraco-CMS/issues/4234
 
             // state here is either Publishing or Unpublishing
             // (even though, Publishing to unpublish a culture may end up unpublishing everything)
@@ -1217,7 +1241,7 @@ namespace Umbraco.Core.Services.Implement
                         else if (!publishing)
                             result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
                         else
-                            result = SavePublishing(d, d.WriterId);
+                            result = CommitDocumentChanges(d, d.WriterId);
 
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1261,7 +1285,7 @@ namespace Umbraco.Core.Services.Implement
 
                         if (pendingCultures.Count > 0)
                         {
-                            result = SavePublishing(d, d.WriterId);
+                            result = CommitDocumentChanges(d, d.WriterId);
                             if (result.Success == false)
                                 Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                             yield return result;
@@ -1495,7 +1519,7 @@ namespace Umbraco.Core.Services.Implement
             if (!publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
-            var result = SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
+            var result = CommitDocumentChangesInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
             if (result.Success)
                 publishedDocuments.Add(document);
             return result;

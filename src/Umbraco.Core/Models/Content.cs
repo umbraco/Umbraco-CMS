@@ -420,7 +420,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        public void ChangeContentType(IContentType contentType)
+        internal void ChangeContentType(IContentType contentType)
         {
             ContentTypeId = contentType.Id;
             ContentType = new SimpleContentType(contentType);
@@ -437,7 +437,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        public void ChangeContentType(IContentType contentType, bool clearProperties)
+        internal void ChangeContentType(IContentType contentType, bool clearProperties)
         {
             if(clearProperties)
             {

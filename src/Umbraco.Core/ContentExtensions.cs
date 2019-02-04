@@ -67,21 +67,7 @@ namespace Umbraco.Core
                             content.WasCulturePublished(x))   // but was published before
                 .ToList();
         }
-
-        /// <summary>
-        /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is helpful for determining if the published event will execute during the saved event for a content item.
-        /// </remarks>
-        internal static bool JustPublished(this IContent entity)
-        {
-            var dirty = (IRememberBeingDirty)entity;
-            return dirty.WasPropertyDirty("Published") && entity.Published;
-        }
-
+        
         #endregion
 
         /// <summary>

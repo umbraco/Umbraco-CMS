@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models
         /// and the content published name for this culture is non-null. It becomes non-published
         /// whenever values for this culture are unpublished.</para>
         /// <para>A culture becomes published as soon as PublishCulture has been invoked,
-        /// even though the document might now have been saved yet (and can have no identity).</para>
+        /// even though the document might not have been saved yet (and can have no identity).</para>
         /// <para>Does not support the '*' wildcard (returns false).</para>
         /// </remarks>
         bool IsCulturePublished(string culture);
@@ -136,23 +136,6 @@ namespace Umbraco.Core.Models
         /// Gets the edited cultures.
         /// </summary>
         IEnumerable<string> EditedCultures { get; }
-
-        // TODO: these two should move to some kind of service
-
-        /// <summary>
-        /// Changes the <see cref="IContentType"/> for the current content object
-        /// </summary>
-        /// <param name="contentType">New ContentType for this content</param>
-        /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        void ChangeContentType(IContentType contentType);
-
-        /// <summary>
-        /// Changes the <see cref="IContentType"/> for the current content object and removes PropertyTypes,
-        /// which are not part of the new ContentType.
-        /// </summary>
-        /// <param name="contentType">New ContentType for this content</param>
-        /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        void ChangeContentType(IContentType contentType, bool clearProperties);
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset

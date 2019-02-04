@@ -376,7 +376,7 @@ namespace Umbraco.Core.Models
         #region Validation
 
         /// <inheritdoc />
-        public virtual Property[] ValidateProperties(string culture = "*")
+        public Property[] ValidateProperties(string culture = "*")
         {
             var alsoInvariant = culture != null && culture != "*";
 

@@ -336,29 +336,47 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>
         /// <para>By default, publishes all variations of the document, but it is possible to specify a culture to be published.</para>
-        /// <para>When a culture is being published, it includes all varying values along with all invariant values. For
-        /// anything more complicated, see <see cref="SavePublishing"/>.</para>
+        /// <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
         /// <para>The document is *always* saved, even when publishing fails.</para>
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
         /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
         /// </remarks>
+        /// <param name="content"></param>
+        /// <param name="culture"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns></returns>
         PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Saves and publishes a publishing document.
+        /// Saves and publishes a document.
         /// </summary>
         /// <remarks>
-        /// <para>A publishing document is a document with values that are being published, i.e.
-        /// that have been published or cleared via <see cref="IContent.PublishCulture"/> and
-        /// <see cref="IContent.UnpublishCulture"/>.</para>
-        /// <para>When one needs to publish or unpublish a single culture, or all cultures, using <see cref="SaveAndPublish"/>
-        /// and <see cref="Unpublish"/> is the way to go. But if one needs to, say, publish two cultures and unpublish a third
-        /// one, in one go, then one needs to invoke <see cref="IContent.PublishCulture"/> and <see cref="IContent.UnpublishCulture"/>
-        /// on the content itself - this prepares the content, but does not commit anything - and then, invoke
-        /// <see cref="SavePublishing"/> to actually commit the changes to the database.</para>
+        /// <para>By default, publishes all variations of the document, but it is possible to specify a culture to be published.</para>
+        /// <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
         /// <para>The document is *always* saved, even when publishing fails.</para>
         /// </remarks>
-        PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
+        /// <param name="content"></param>
+        /// <param name="cultures">The cultures to publish.</param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns></returns>
+        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Expert: Saves a document and publishes/unpublishes any pending publishing changes made to the document.
+        /// </summary>
+        /// <remarks>
+        /// <para>Pending publishing/unpublishing changes on a document are made with calls to <see cref="IContent.PublishCulture"/> and
+        /// <see cref="IContent.UnpublishCulture"/>.</para>
+        /// <para>When publishing or unpublishing a single culture, or all cultures, use <see cref="SaveAndPublish"/>
+        /// and <see cref="Unpublish"/>. But if the flexibility to both publish and unpublish in a single operation is required
+        /// then this method needs to be used in combination with <see cref="IContent.PublishCulture"/> and <see cref="IContent.UnpublishCulture"/>
+        /// on the content itself - this prepares the content, but does not commit anything - and then, invoke
+        /// <see cref="CommitDocumentChanges"/> to actually commit the changes to the database.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// </remarks>
+        PublishResult CommitDocumentChanges(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves and publishes a document branch.
