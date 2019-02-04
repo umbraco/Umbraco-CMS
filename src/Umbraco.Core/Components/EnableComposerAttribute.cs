@@ -12,19 +12,13 @@ namespace Umbraco.Core.Components
     /// <para>Assembly-level <see cref="DisableComposerAttribute"/> has greater priority than <see cref="DisableAttribute"/>
     /// attribute when it is marking the composer itself, but lower priority that when it is referencing another composer.</para>
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class EnableAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
+    public class EnableComposerAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EnableAttribute"/> class.
+        /// Initializes a new instance of the <see cref="EnableComposerAttribute"/> class.
         /// </summary>
-        public EnableAttribute()
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EnableAttribute"/> class.
-        /// </summary>
-        public EnableAttribute(Type enabledType)
+        public EnableComposerAttribute(Type enabledType)
         {
             EnabledType = enabledType;
         }
