@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
 using Newtonsoft.Json;
@@ -20,7 +21,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// This is the first UI step for a brand new install
     /// </summary>
     /// <remarks>
-    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an
+    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interrupted because of an
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
     /// display a simple continue installation view.
     /// </remarks>
@@ -41,7 +42,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _globalSettings = globalSettings;
         }
 
-        //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
+        // TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
         private MembershipProvider CurrentProvider
         {
             get
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        public override InstallSetupResult Execute(UserModel user)
+        public override Task<InstallSetupResult> ExecuteAsync(UserModel user)
         {
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
@@ -99,7 +100,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 catch { /* fail in silence */ }
             }
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         /// <summary>

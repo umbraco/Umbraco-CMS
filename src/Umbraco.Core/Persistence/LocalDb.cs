@@ -275,7 +275,7 @@ namespace Umbraco.Core.Persistence
             /// <remarks>
             /// The database should not exist in the LocalDb instance.
             /// It will be attached with its name being its MDF filename (full path), uppercased, when
-            /// the first connection is opened, and remain attached until explicitely detached.
+            /// the first connection is opened, and remain attached until explicitly detached.
             /// </remarks>
             public string GetAttachedConnectionString(string databaseName, string filesPath)
             {
@@ -317,8 +317,8 @@ namespace Umbraco.Core.Persistence
                         if (dbname == "master" || dbname == "tempdb" || dbname == "model" || dbname == "msdb")
                             continue;
 
-                        // fixme - shall we deal with stale databases?
-                        // fixme - is it always ok to assume file names?
+                        // TODO: shall we deal with stale databases?
+                        // TODO: is it always ok to assume file names?
                         //var mdf = database.Value;
                         //var ldf = mdf.Replace(".mdf", "_log.ldf");
                         //if (staleOnly && File.Exists(mdf) && File.Exists(ldf))

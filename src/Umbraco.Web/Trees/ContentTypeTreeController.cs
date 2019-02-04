@@ -15,9 +15,9 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Trees
                         var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
-                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                         node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Trees
                     .Select(dt =>
                     {
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
-                        // need this check to keep supporting sites where childs have already been created.
+                        // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
                         var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, "icon-item-arrangement", hasChildren);
 
@@ -72,8 +72,6 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedDocumentTypes = Current.Configs.Settings().Content.EnableInheritedDocumentTypes;
-
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //set the default to create
@@ -84,7 +82,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add(new MenuItem("importDocumentType", Services.TextService)
                 {
                     Icon = "page-up",
-                    SeperatorBefore = true,
+                    SeparatorBefore = true,
                     OpensDialog = true
                 });
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -117,10 +115,7 @@ namespace Umbraco.Web.Trees
                 var ct = Services.ContentTypeService.Get(int.Parse(id));
                 var parent = ct == null ? null : Services.ContentTypeService.Get(ct.ParentId);
 
-                if (enableInheritedDocumentTypes)
-                {
-                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                }
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 //no move action if this is a child doc type
                 if (parent == null)
                 {
@@ -130,12 +125,12 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add(new MenuItem("export", Services.TextService)
                 {
                     Icon = "download-alt",
-                    SeperatorBefore = true,
+                    SeparatorBefore = true,
                     OpensDialog = true
                 });
                 menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
-                if (enableInheritedDocumentTypes)
-                    menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
             }
 
             return menu;

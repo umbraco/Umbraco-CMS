@@ -61,7 +61,7 @@ namespace Umbraco.Core.Events
             {
                 if (CanCancel == false)
                 {
-                    throw new InvalidOperationException("This event argument class does not support cancelling.");
+                    throw new InvalidOperationException("This event argument class does not support canceling.");
                 }
                 return _cancel;
             }
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Events
             {
                 if (CanCancel == false)
                 {
-                    throw new InvalidOperationException("This event argument class does not support cancelling.");
+                    throw new InvalidOperationException("This event argument class does not support canceling.");
                 }
                 _cancel = value;
             }

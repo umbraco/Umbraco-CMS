@@ -1,8 +1,10 @@
 ﻿using NUnit.Framework;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Services
 {
@@ -14,15 +16,7 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class SectionServiceTests : TestWithSomeContentBase
     {
-        public override void CreateTestData()
-        {
-            base.CreateTestData();
-
-            ServiceContext.SectionService.MakeNew("Content", "content", "icon-content");
-            ServiceContext.SectionService.MakeNew("Media", "media", "icon-media");
-            ServiceContext.SectionService.MakeNew("Settings", "settings", "icon-settings");
-            ServiceContext.SectionService.MakeNew("Developer", "developer", "icon-developer");
-        }
+        private ISectionService SectionService => Factory.GetInstance<ISectionService>();
 
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
@@ -31,7 +25,7 @@ namespace Umbraco.Tests.Services
             var user = CreateTestUser();
 
             // Act
-            var result = ServiceContext.SectionService.GetAllowedSections(user.Id).ToList();
+            var result = SectionService.GetAllowedSections(user.Id).ToList();
 
             // Assert
             Assert.AreEqual(3, result.Count);
@@ -54,7 +48,7 @@ namespace Umbraco.Tests.Services
             };
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
-            //TODO: This is failing the test
+            // TODO: This is failing the test
             ServiceContext.UserService.Save(userGroupA, new[] { user.Id }, false);
 
             var userGroupB = new UserGroup
@@ -63,7 +57,7 @@ namespace Umbraco.Tests.Services
                 Name = "Group B"
             };
             userGroupB.AddAllowedSection("settings");
-            userGroupB.AddAllowedSection("developer");
+            userGroupB.AddAllowedSection("member");
             ServiceContext.UserService.Save(userGroupB, new[] { user.Id }, false);
 
             return ServiceContext.UserService.GetUserById(user.Id);

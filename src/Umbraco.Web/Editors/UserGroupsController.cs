@@ -31,6 +31,7 @@ namespace Umbraco.Web.Editors
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+
             var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
@@ -50,6 +51,14 @@ namespace Umbraco.Web.Editors
                 userGroupSave.StartMediaId);
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
+
+            //current user needs to be added to a new group if not an admin (possibly only if no other users are added?) to avoid a 401
+            if(!Security.CurrentUser.IsAdmin() && (userGroupSave.Id == null || Convert.ToInt32(userGroupSave.Id) >= 0)/* && !userGroupSave.Users.Any() */)
+            {
+                var userIds = userGroupSave.Users.ToList();
+                userIds.Add(Security.CurrentUser.Id);
+                userGroupSave.Users = userIds;
+            }
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
@@ -103,7 +112,7 @@ namespace Umbraco.Web.Editors
 
             if (onlyCurrentUserGroups == false)
             {
-                //this user is not an admin so in that case we need to exlude all admin users
+                //this user is not an admin so in that case we need to exclude all admin users
                 allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)));
                 return allGroups;
             }

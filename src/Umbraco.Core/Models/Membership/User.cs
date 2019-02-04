@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
@@ -27,7 +21,7 @@ namespace Umbraco.Core.Models.Membership
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = Current.Configs.Global().DefaultUILanguage; //fixme inject somehow?
+            _language = Current.Configs.Global().DefaultUILanguage; // TODO: inject
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -123,126 +117,95 @@ namespace Umbraco.Core.Models.Membership
         private IDictionary<string, object> _additionalData;
         private object _additionalDataLock = new object();
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo FailedPasswordAttemptsSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.FailedPasswordAttempts);
-            public readonly PropertyInfo LastLockoutDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime>(x => x.LastLockoutDate);
-            public readonly PropertyInfo LastLoginDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime>(x => x.LastLoginDate);
-            public readonly PropertyInfo LastPasswordChangeDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime>(x => x.LastPasswordChangeDate);
-
-            public readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
-            public readonly PropertyInfo AvatarSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Avatar);
-            public readonly PropertyInfo TourDataSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.TourData);
-            public readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
-            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartContentIds);
-            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartMediaIds);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
-
-            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
-            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Email);
-            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.RawPasswordValue);
-            public readonly PropertyInfo IsLockedOutSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsLockedOut);
-            public readonly PropertyInfo IsApprovedSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsApproved);
-            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
-            public readonly PropertyInfo EmailConfirmedDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime?>(x => x.EmailConfirmedDate);
-            public readonly PropertyInfo InvitedDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime?>(x => x.InvitedDate);
-
-            public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
-
-            public readonly PropertyInfo UserGroupsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<IReadOnlyUserGroup>>(x => x.Groups);
-
-            //Custom comparer for enumerable
-            public readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
-                new DelegateEqualityComparer<IEnumerable<int>>(
-                    (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-                    enum1 => enum1.GetHashCode());
-        }
+        //Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
+            new DelegateEqualityComparer<IEnumerable<int>>(
+                (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+                enum1 => enum1.GetHashCode());
 
         #region Implementation of IMembershipUser
 
         [IgnoreDataMember]
         public object ProviderUserKey
         {
-            get { return Id; }
-            set { throw new NotSupportedException("Cannot set the provider user key for a user"); }
+            get => Id;
+            set => throw new NotSupportedException("Cannot set the provider user key for a user");
         }
 
         [DataMember]
         public DateTime? EmailConfirmedDate
         {
-            get { return _emailConfirmedDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, Ps.Value.EmailConfirmedDateSelector); }
+            get => _emailConfirmedDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, nameof(EmailConfirmedDate));
         }
         [DataMember]
         public DateTime? InvitedDate
         {
-            get { return _invitedDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _invitedDate, Ps.Value.InvitedDateSelector); }
+            get => _invitedDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _invitedDate, nameof(InvitedDate));
         }
         [DataMember]
         public string Username
         {
-            get { return _username; }
-            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
+            get => _username;
+            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
         [DataMember]
         public string Email
         {
-            get { return _email; }
-            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
+            get => _email;
+            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
         [DataMember]
         public string RawPasswordValue
         {
-            get { return _rawPasswordValue; }
-            set { SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector); }
+            get => _rawPasswordValue;
+            set => SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
         }
 
         [DataMember]
         public bool IsApproved
         {
-            get { return _isApproved; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isApproved, Ps.Value.IsApprovedSelector); }
+            get => _isApproved;
+            set => SetPropertyValueAndDetectChanges(value, ref _isApproved, nameof(IsApproved));
         }
 
         [IgnoreDataMember]
         public bool IsLockedOut
         {
-            get { return _isLockedOut; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isLockedOut, Ps.Value.IsLockedOutSelector); }
+            get => _isLockedOut;
+            set => SetPropertyValueAndDetectChanges(value, ref _isLockedOut, nameof(IsLockedOut));
         }
 
         [IgnoreDataMember]
         public DateTime LastLoginDate
         {
-            get { return _lastLoginDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _lastLoginDate, Ps.Value.LastLoginDateSelector); }
+            get => _lastLoginDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastLoginDate, nameof(LastLoginDate));
         }
 
         [IgnoreDataMember]
         public DateTime LastPasswordChangeDate
         {
-            get { return _lastPasswordChangedDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangedDate, Ps.Value.LastPasswordChangeDateSelector); }
+            get => _lastPasswordChangedDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangedDate, nameof(LastPasswordChangeDate));
         }
 
         [IgnoreDataMember]
         public DateTime LastLockoutDate
         {
-            get { return _lastLockoutDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _lastLockoutDate, Ps.Value.LastLockoutDateSelector); }
+            get => _lastLockoutDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _lastLockoutDate, nameof(LastLockoutDate));
         }
 
         [IgnoreDataMember]
         public int FailedPasswordAttempts
         {
-            get { return _failedLoginAttempts; }
-            set { SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, Ps.Value.FailedPasswordAttemptsSelector); }
+            get => _failedLoginAttempts;
+            set => SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, nameof(FailedPasswordAttempts));
         }
 
-        //TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
+        // TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
         // we'll just have them as generic get/set which don't interact with the db.
 
         [IgnoreDataMember]
@@ -279,8 +242,8 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         public IEnumerable<string> AllowedSections
@@ -295,10 +258,7 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         internal List<IUserGroup> GroupsToSave = new List<IUserGroup>();
 
-        public IProfile ProfileData
-        {
-            get { return new WrappedUserProfile(this); }
-        }
+        public IProfile ProfileData => new WrappedUserProfile(this);
 
         /// <summary>
         /// The security stamp used by ASP.Net identity
@@ -306,15 +266,15 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public string SecurityStamp
         {
-            get { return _securityStamp; }
-            set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
+            get => _securityStamp;
+            set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
         }
 
         [DataMember]
         public string Avatar
         {
-            get { return _avatar; }
-            set { SetPropertyValueAndDetectChanges(value, ref _avatar, Ps.Value.AvatarSelector); }
+            get => _avatar;
+            set => SetPropertyValueAndDetectChanges(value, ref _avatar, nameof(Avatar));
         }
 
         /// <summary>
@@ -323,8 +283,8 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public string TourData
         {
-            get { return _tourData; }
-            set { SetPropertyValueAndDetectChanges(value, ref _tourData, Ps.Value.TourDataSelector); }
+            get => _tourData;
+            set => SetPropertyValueAndDetectChanges(value, ref _tourData, nameof(TourData));
         }
 
         /// <summary>
@@ -336,8 +296,8 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public int SessionTimeout
         {
-            get { return _sessionTimeout; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sessionTimeout, Ps.Value.SessionTimeoutSelector); }
+            get => _sessionTimeout;
+            set => SetPropertyValueAndDetectChanges(value, ref _sessionTimeout, nameof(SessionTimeout));
         }
 
         /// <summary>
@@ -350,8 +310,8 @@ namespace Umbraco.Core.Models.Membership
         [DoNotClone]
         public int[] StartContentIds
         {
-            get { return _startContentIds; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdSelector, Ps.Value.IntegerEnumerableComparer); }
+            get => _startContentIds;
+            set => SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), IntegerEnumerableComparer);
         }
 
         /// <summary>
@@ -364,32 +324,29 @@ namespace Umbraco.Core.Models.Membership
         [DoNotClone]
         public int[] StartMediaIds
         {
-            get { return _startMediaIds; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startMediaIds, Ps.Value.StartMediaIdSelector, Ps.Value.IntegerEnumerableComparer); }
+            get => _startMediaIds;
+            set => SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), IntegerEnumerableComparer);
         }
 
         [DataMember]
         public string Language
         {
-            get { return _language; }
-            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
+            get => _language;
+            set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
         }
 
         [IgnoreDataMember]
         internal bool DefaultToLiveEditing
         {
-            get { return _defaultToLiveEditing; }
-            set { SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, Ps.Value.DefaultToLiveEditingSelector); }
+            get => _defaultToLiveEditing;
+            set => SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, nameof(DefaultToLiveEditing));
         }
 
         /// <summary>
         /// Gets the groups that user is part of
         /// </summary>
         [DataMember]
-        public IEnumerable<IReadOnlyUserGroup> Groups
-        {
-            get { return _userGroups; }
-        }
+        public IEnumerable<IReadOnlyUserGroup> Groups => _userGroups;
 
         public void RemoveGroup(string group)
         {
@@ -400,7 +357,7 @@ namespace Umbraco.Core.Models.Membership
                     _userGroups.Remove(userGroup);
                     //reset this flag so it's rebuilt with the assigned groups
                     _allowedSections = null;
-                    OnPropertyChanged(Ps.Value.UserGroupsSelector);
+                    OnPropertyChanged(nameof(Groups));
                 }
             }
         }
@@ -412,7 +369,7 @@ namespace Umbraco.Core.Models.Membership
                 _userGroups.Clear();
                 //reset this flag so it's rebuilt with the assigned groups
                 _allowedSections = null;
-                OnPropertyChanged(Ps.Value.UserGroupsSelector);
+                OnPropertyChanged(nameof(Groups));
             }
         }
 
@@ -422,7 +379,7 @@ namespace Umbraco.Core.Models.Membership
             {
                 //reset this flag so it's rebuilt with the assigned groups
                 _allowedSections = null;
-                OnPropertyChanged(Ps.Value.UserGroupsSelector);
+                OnPropertyChanged(nameof(Groups));
             }
         }
 
@@ -446,7 +403,7 @@ namespace Umbraco.Core.Models.Membership
 
         [IgnoreDataMember]
         [DoNotClone]
-        internal object AdditionalDataLock { get { return _additionalDataLock; } }
+        internal object AdditionalDataLock => _additionalDataLock;
 
         protected override void PerformDeepClone(object clone)
         {
@@ -498,15 +455,9 @@ namespace Umbraco.Core.Models.Membership
                 _user = user;
             }
 
-            public int Id
-            {
-                get { return _user.Id; }
-            }
+            public int Id => _user.Id;
 
-            public string Name
-            {
-                get { return _user.Name; }
-            }
+            public string Name => _user.Name;
 
             private bool Equals(WrappedUserProfile other)
             {

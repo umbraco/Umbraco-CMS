@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -131,24 +127,14 @@ namespace Umbraco.Core.Models
             IsApproved = isApproved;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
-            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
-            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
-            public readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
-        }
-
         /// <summary>
         /// Gets or sets the Username
         /// </summary>
         [DataMember]
         public string Username
         {
-            get { return _username; }
-            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
+            get => _username;
+            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
 
         /// <summary>
@@ -157,8 +143,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Email
         {
-            get { return _email; }
-            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
+            get => _email;
+            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
 
         /// <summary>
@@ -167,7 +153,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public string RawPasswordValue
         {
-            get { return _rawPasswordValue; }
+            get => _rawPasswordValue;
             set
             {
                 if (value == null)
@@ -178,7 +164,7 @@ namespace Umbraco.Core.Models
                 }
                 else
                 {
-                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector);
+                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
                 }
             }
         }
@@ -189,7 +175,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public IEnumerable<string> Groups { get; set; }
 
-        //TODO: When get/setting all of these properties we MUST:
+        // TODO: When get/setting all of these properties we MUST:
         // * Check if we are using the umbraco membership provider, if so then we need to use the configured fields - not the explicit fields below
         // * If any of the fields don't exist, what should we do? Currently it will throw an exception!
 
@@ -226,7 +212,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the raw password answer value
         /// </summary>
         /// <remarks>
-        /// For security reasons this value should be encrypted, the encryption process is handled by the memberhip provider
+        /// For security reasons this value should be encrypted, the encryption process is handled by the membership provider
         /// Alias: umbracoMemberPasswordRetrievalAnswer
         ///
         /// Part of the standard properties collection.
@@ -338,7 +324,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return false;
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -371,7 +357,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(DateTime);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -404,7 +390,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(DateTime);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -437,7 +423,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(DateTime);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -471,7 +457,7 @@ namespace Umbraco.Core.Models
                     return tryConvert.Result;
                 }
                 return default(int);
-                //TODO: Use TryConvertTo<T> instead
+                // TODO: Use TryConvertTo<T> instead
             }
             set
             {
@@ -487,10 +473,7 @@ namespace Umbraco.Core.Models
         /// String alias of the default ContentType
         /// </summary>
         [DataMember]
-        public virtual string ContentTypeAlias
-        {
-            get { return _contentTypeAlias; }
-        }
+        public virtual string ContentTypeAlias => _contentTypeAlias;
 
         /// <summary>
         /// User key from the Provider.
@@ -504,11 +487,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual object ProviderUserKey
         {
-            get
-            {
-                return _providerUserKey;
-            }
-            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
+            get => _providerUserKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _providerUserKey, nameof(ProviderUserKey));
         }
 
 
@@ -528,10 +508,7 @@ namespace Umbraco.Core.Models
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IMemberType ContentType
-        {
-            get { return _contentType; }
-        }
+        public IMemberType ContentType => _contentType;
 
         /* Internal experiment - only used for mapping queries.
          * Adding these to have first level properties instead of the Properties collection.

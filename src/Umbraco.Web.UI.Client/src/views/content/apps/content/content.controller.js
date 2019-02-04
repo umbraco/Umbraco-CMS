@@ -26,7 +26,7 @@
                     if (newVal !== oldVal) {
                         vm.loading = true;
 
-                        //TODO: Can we minimize the flicker?
+                        // TODO: Can we minimize the flicker?
                         $timeout(function () {
                             onInit();
                         }, 100);

@@ -12,6 +12,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
@@ -21,6 +22,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers
@@ -77,16 +79,18 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="globalSettings"></param>
+        /// <param name="umbracoSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
         /// <param name="urlSegmentProviders">Some url segment providers.</param>
-        /// <param name="container">A container.</param>
+        /// <param name="typeLoader"></param>
+        /// <param name="factory">A container.</param>
         /// <param name="scopeProvider"></param>
         /// <returns>A ServiceContext.</returns>
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
         public ServiceContext GetServiceContext(
             IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
-            CacheHelper cache,
+            AppCaches cache,
             ILogger logger,
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,
@@ -136,7 +140,7 @@ namespace Umbraco.Tests.TestHelpers
 
                         return new LocalizedTextServiceFileSources(
                             logger,
-                            cache.RuntimeCache,
+                            cache,
                             mainLangFolder,
                             pluginLangFolders.Concat(userLangFolders));
 
@@ -167,13 +171,27 @@ namespace Umbraco.Tests.TestHelpers
                     GetRepo<IEntityRepository>(c)));
 
             var macroService = GetLazyService<IMacroService>(factory, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
-            var packagingService = GetLazyService<IPackagingService>(factory, c => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, scopeProvider, urlSegmentProviders, GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()))));
+            var packagingService = GetLazyService<IPackagingService>(factory, c =>
+            {
+                var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+                var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value));
+                return new PackagingService(
+                    auditService.Value,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config"),
+                    new PackageInstallation(
+                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection),
+                        new PackageFileInstallation(compiledPackageXmlParser, new ProfilingLogger(logger, new TestProfiler())),
+                        compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
+                        new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
+            });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
-            var treeService = GetLazyService<IApplicationTreeService>(factory, c => new ApplicationTreeService(logger, cache, typeLoader));
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
-            var sectionService = GetLazyService<ISectionService>(factory, c => new SectionService(userService.Value, treeService.Value, scopeProvider, cache));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
+            var contentTypeServiceBaseFactory = GetLazyService<IContentTypeBaseServiceProvider>(factory, c => new ContentTypeBaseServiceProvider(factory.GetInstance<IContentTypeService>(),factory.GetInstance<IMediaTypeService>(),factory.GetInstance<IMemberTypeService>()));
 
             return new ServiceContext(
                 publicAccessService,
@@ -194,15 +212,14 @@ namespace Umbraco.Tests.TestHelpers
                 serverRegistrationService,
                 entityService,
                 relationService,
-                treeService,
-                sectionService,
                 macroService,
                 memberTypeService,
                 memberGroupService,
                 notificationService,
                 externalLoginService,
                 redirectUrlService,
-                consentService);
+                consentService,
+                contentTypeServiceBaseFactory);
         }
 
         private Lazy<T> GetLazyService<T>(IFactory container, Func<IFactory, T> ctor)
@@ -221,9 +238,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (databaseFactory == null)
             {
-                //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
-                //mappersBuilder.AddCore();
-                //var mappers = mappersBuilder.CreateCollection();
+                // var mappersBuilder = new MapperCollectionBuilder(Current.Container); // FIXME:
+                // mappersBuilder.AddCore();
+                // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }

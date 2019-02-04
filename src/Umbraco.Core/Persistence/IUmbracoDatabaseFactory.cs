@@ -19,6 +19,12 @@ namespace Umbraco.Core.Persistence
         bool Configured { get; }
 
         /// <summary>
+        /// Gets the connection string.
+        /// </summary>
+        /// <remarks>Throws if the factory is not configured.</remarks>
+        string ConnectionString { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the database can connect.
         /// </summary>
         bool CanConnect { get; }

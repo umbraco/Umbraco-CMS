@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -59,16 +60,22 @@ namespace Umbraco.Tests.PublishedContent
 
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
-            var prop1Type = factory.CreatePropertyType("prop1", 1);
-            var welcomeType = factory.CreatePropertyType("welcomeText", 1);
-            var welcome2Type = factory.CreatePropertyType("welcomeText2", 1);
+            var prop1Type = factory.CreatePropertyType("prop1", 1, variations: ContentVariation.Culture);
+            var welcomeType = factory.CreatePropertyType("welcomeText", 1, variations: ContentVariation.Culture);
+            var welcome2Type = factory.CreatePropertyType("welcomeText2", 1, variations: ContentVariation.Culture);
+            var nopropType = factory.CreatePropertyType("noprop", 1, variations: ContentVariation.Culture);
+
             var props = new[]
                 {
                     prop1Type,
                     welcomeType,
                     welcome2Type,
+                    nopropType
                 };
             var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
+
+            var prop3Type = factory.CreatePropertyType("prop3", 1, variations: ContentVariation.Culture);
+            var contentType2 = factory.CreateContentType(2, "contentType2", Enumerable.Empty<string>(), new[] { prop3Type });
 
             var prop1 = new SolidPublishedPropertyWithLanguageVariants
             {
@@ -98,6 +105,14 @@ namespace Umbraco.Tests.PublishedContent
             prop3.SetSourceValue("en-US", "Welcome", true);
             prop3.SetValue("en-US", "Welcome", true);
 
+            var noprop = new SolidPublishedProperty
+            {
+                Alias = "noprop",
+                PropertyType = nopropType
+            };
+            noprop.SolidHasValue = false; // has no value
+            noprop.SolidValue = "xxx"; // but returns something
+
             var item1 = new SolidPublishedContent(contentType1)
             {
                 Id = 1,
@@ -111,7 +126,7 @@ namespace Umbraco.Tests.PublishedContent
                 ChildIds = new[] { 2 },
                 Properties = new Collection<IPublishedProperty>
                     {
-                        prop1, prop2
+                        prop1, prop2, noprop
                     }
             };
 
@@ -125,18 +140,47 @@ namespace Umbraco.Tests.PublishedContent
                 Level = 2,
                 Url = "/content-1/content-2",
                 ParentId = 1,
-                ChildIds = new int[] { },
+                ChildIds = new int[] { 3 },
                 Properties = new Collection<IPublishedProperty>
                     {
                         prop3
                     }
             };
 
+            var prop4 = new SolidPublishedPropertyWithLanguageVariants
+            {
+                Alias = "prop3",
+                PropertyType = prop3Type
+            };
+            prop4.SetSourceValue("en-US", "Oxxo", true);
+            prop4.SetValue("en-US", "Oxxo", true);
+
+            var item3 = new SolidPublishedContent(contentType2)
+            {
+                Id = 3,
+                SortOrder = 0,
+                Name = "Content 3",
+                UrlSegment = "content-3",
+                Path = "/1/2/3",
+                Level = 3,
+                Url = "/content-1/content-2/content-3",
+                ParentId = 2,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
+                {
+                    prop4
+                }
+            };
+
             item1.Children = new List<IPublishedContent> { item2 };
             item2.Parent = item1;
 
+            item2.Children = new List<IPublishedContent> { item3 };
+            item3.Parent = item2;
+
             cache.Add(item1);
             cache.Add(item2);
+            cache.Add(item3);
         }
 
         [Test]
@@ -212,9 +256,39 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        public void Do_Not_Get_Content_Recursively_Unless_Requested2()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First().Children().First();
+            Assert.IsNull(content.GetProperty("welcomeText2"));
+            var value = content.Value("welcomeText2");
+            Assert.IsNull(value);
+        }
+
+        [Test]
+        public void Can_Get_Content_Recursively2()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First().Children().First();
+            Assert.IsNull(content.GetProperty("welcomeText2"));
+            var value = content.Value("welcomeText2", fallback: Fallback.ToAncestors);
+            Assert.AreEqual("Welcome", value);
+        }
+
+        [Test]
+        public void Can_Get_Content_Recursively3()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First().Children().First();
+            Assert.IsNull(content.GetProperty("noprop"));
+            var value = content.Value("noprop", fallback: Fallback.ToAncestors);
+            // property has no value but we still get the value (ie, the converter would do something)
+            Assert.AreEqual("xxx", value);
+        }
+
+        [Test]
         public void Can_Get_Content_With_Recursive_Priority()
         {
+            Current.VariationContextAccessor.VariationContext = new VariationContext("nl");
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+
             var value = content.Value("welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
             // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
@@ -261,7 +335,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
 
-            // hack the value, pretend the converter would return something
+            // HACK: the value, pretend the converter would return something
             var prop = content.GetProperty("welcomeText") as SolidPublishedPropertyWithLanguageVariants;
             Assert.IsNotNull(prop);
             prop.SetValue("nl", "nope"); // HasValue false but getting value returns this

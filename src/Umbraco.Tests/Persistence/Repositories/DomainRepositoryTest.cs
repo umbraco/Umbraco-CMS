@@ -4,9 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -22,12 +20,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DomainRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository, out DocumentRepository documentRepository, out LanguageRepository languageRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
-            var tagRepository = new TagRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger, templateRepository);
-            languageRepository = new LanguageRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger);
-            documentRepository = new DocumentRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
-            var domainRepository = new DomainRepository(accessor, Core.Cache.CacheHelper.Disabled, Logger);
+            var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, templateRepository);
+            languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
+            documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var domainRepository = new DomainRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             return domainRepository;
         }
 

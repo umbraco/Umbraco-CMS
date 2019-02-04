@@ -22,13 +22,13 @@ namespace Umbraco.Web.Models.ContentEditing
 
         // note
         // once a [DataContract] has been defined on a class, with a [DataMember] property,
-        // one simply cannot ignore that property anymore - [IgnoreDataMember] on an overriden
+        // one simply cannot ignore that property anymore - [IgnoreDataMember] on an overridden
         // property is ignored, and 'newing' the property means that it's the base property
         // which is used
         //
         // OTOH, Json.NET is happy having [JsonIgnore] on overrides, even though the base
         // property is [JsonProperty]. so, forcing [JsonIgnore] here, but really, we should
-        // rething the whole thing.
+        // rethink the whole thing.
 
         /// <summary>
         /// Override the properties property to ensure we don't serialize this

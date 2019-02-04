@@ -1,0 +1,19 @@
+﻿<div ng-controller="Umbraco.Editors.Macros.CreateController as vm">
+  
+    <div class="umb-pane">
+        <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+    </div>
+  
+    <div class="umb-pane">
+        <form name="createDictionaryForm"
+              ng-submit="vm.createItem()"
+              val-form-manager>
+
+            <umb-control-group label="Enter a item-name" hide-label="true">
+                <input type="text" name="itemKey" ng-model="vm.itemKey" class="umb-textstring textstring input-block-level" required />
+            </umb-control-group>
+
+            <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+        </form>
+    </div>  
+</div>

@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
         /// <param name="contextStartsWith">Determines whether <paramref name="context"/> is a start pattern.</param>
         /// <param name="actionStartsWith">Determines whether <paramref name="action"/> is a start pattern.</param>
         /// <param name="includeHistory">Determines whether to include the history of consents.</param>
-        /// <returns>Consents matching the paramters.</returns>
+        /// <returns>Consents matching the parameters.</returns>
         IEnumerable<IConsent> LookupConsent(string source = null, string context = null, string action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false);

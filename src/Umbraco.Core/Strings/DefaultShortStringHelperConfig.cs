@@ -14,7 +14,6 @@ namespace Umbraco.Core.Strings
             var config = new DefaultShortStringHelperConfig
             {
                 DefaultCulture = DefaultCulture,
-                ForceSafeAliases = ForceSafeAliases,
                 UrlReplaceCharacters = UrlReplaceCharacters
             };
 
@@ -31,9 +30,7 @@ namespace Umbraco.Core.Strings
         public string DefaultCulture { get; set; } = ""; // invariant
 
         public Dictionary<string, string> UrlReplaceCharacters { get; set; }
-
-        public bool ForceSafeAliases { get; set; }
-
+        
         public DefaultShortStringHelperConfig WithConfig(Config config)
         {
             return WithConfig(DefaultCulture, CleanStringType.RoleMask, config);
@@ -62,7 +59,6 @@ namespace Umbraco.Core.Strings
         /// <returns>The short string helper.</returns>
         public DefaultShortStringHelperConfig WithDefault(IUmbracoSettingsSection umbracoSettings)
         {
-            ForceSafeAliases = umbracoSettings.Content.ForceSafeAliases;
             UrlReplaceCharacters = umbracoSettings.RequestHandler.CharCollection
                 .Where(x => string.IsNullOrEmpty(x.Char) == false)
                 .ToDictionary(x => x.Char, x => x.Replacement);
@@ -188,7 +184,7 @@ namespace Umbraco.Core.Strings
             public bool GreedyAcronyms { get; set; }
 
             // the separator char
-            // but then how can we tell we dont want any?
+            // but then how can we tell we don't want any?
             public char Separator { get; set; }
 
             // extends the config

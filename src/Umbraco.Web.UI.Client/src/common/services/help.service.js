@@ -1,9 +1,9 @@
 angular.module('umbraco.services')
-	.factory('helpService', function ($http, $q, umbRequestHelper) {
+	.factory('helpService', function ($http, $q, umbRequestHelper, dashboardResource) {
 		var helpTopics = {};
 
-		var defaultUrl = "https://our.umbraco.com/rss/help";
-		var tvUrl = "https://umbraco.tv/feeds/help";
+		var defaultUrl = "rss/help";
+		var tvUrl = "feeds/help";
 
 		function getCachedHelp(url){
 			if(helpTopics[url]){
@@ -17,16 +17,14 @@ angular.module('umbraco.services')
 			helpTopics[url] = data;
 		}
 
-		function fetchUrl(url){
+		function fetchUrl(site, url){
 			var deferred = $q.defer();
 			var found = getCachedHelp(url);
 
 			if(found){
 				deferred.resolve(found);
 			}else{
-
-				var proxyUrl = "dashboard/feedproxy.aspx?url=" + url; 
-				$http.get(proxyUrl).then(function(data){
+				dashboardResource.getRemoteXmlData(site, url).then(function (data) {
 					var feed = $(data.data);
 					var topics = [];
 
@@ -41,7 +39,12 @@ angular.module('umbraco.services')
 
 					setCachedHelp(topics);
 					deferred.resolve(topics);
+
+				},
+				function (exception) {
+					console.error('ex from remote data', exception);
 				});
+
 			}
 
 			return deferred.promise;
@@ -50,12 +53,12 @@ angular.module('umbraco.services')
 		var service = {
 			findHelp: function (args) {
 				var url = service.getUrl(defaultUrl, args);
-				return fetchUrl(url);
+				return fetchUrl('OUR', url);
 			},
 
 			findVideos: function (args) {
 				var url = service.getUrl(tvUrl, args);
-				return fetchUrl(url);
+				return fetchUrl('TV', url);
 			},
 
 			getContextHelpForPage: function (section, tree, baseurl) {

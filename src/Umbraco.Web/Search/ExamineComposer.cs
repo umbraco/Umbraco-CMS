@@ -33,19 +33,19 @@ namespace Umbraco.Web.Search
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
+                    factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<IEnumerable<IUrlSegmentProvider>>(),
+                    factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
 
-            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
+            //We want to manage Examine's AppDomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
             //is instantiated, as the value is used during instantiation
             ExamineManager.DisableDefaultHostingEnvironmentRegistration();

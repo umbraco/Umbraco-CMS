@@ -13,6 +13,9 @@ namespace Umbraco.Core.Composing.LightInject
     // of PerWebRequestScopeManagerProvider - but all delegates see is the mixed one - and therefore
     // they can transition without issues.
     //
+    // The PerWebRequestScopeManager maintains the scope in HttpContext and LightInject registers a
+    // module (PreApplicationStartMethod) which disposes it on EndRequest
+    //
     // the mixed provider is installed in container.ConfigureUmbracoCore() and then,
     // when doing eg container.EnableMvc() or anything that does container.EnablePerWebRequestScope()
     // we need to take great care to preserve the mixed scope manager provider!

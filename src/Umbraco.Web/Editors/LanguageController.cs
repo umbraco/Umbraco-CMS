@@ -100,7 +100,7 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid)
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
 
-            // this is prone to race conds but the service will not let us proceed anyways
+            // this is prone to race conditions but the service will not let us proceed anyways
             var existing = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
 
             if (existing != null && language.Id != existing.Id)
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Editors
             existing.FallbackLanguageId = language.FallbackLanguageId;
 
             // modifying an existing language can create a fallback, verify
-            // note that the service will check again, dealing with race conds
+            // note that the service will check again, dealing with race conditions
             if (existing.FallbackLanguageId.HasValue)
             {
                 var languages = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);

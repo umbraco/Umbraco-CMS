@@ -36,9 +36,9 @@ namespace Umbraco.Tests.PublishedContent
         public void Resync()
         { }
 
-        public ICacheProvider SnapshotCache => null;
+        public IAppCache SnapshotCache => null;
 
-        public ICacheProvider ElementsCache => null;
+        public IAppCache ElementsCache => null;
     }
 
     class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
@@ -192,6 +192,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft(string culture = null) => false;
+        public bool IsPublished(string culture = null) => true;
 
         #endregion
 

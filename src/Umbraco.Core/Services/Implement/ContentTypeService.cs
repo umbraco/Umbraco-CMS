@@ -12,7 +12,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType"/>
     /// </summary>
-    internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
+    public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
         public ContentTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
             IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository)
@@ -43,47 +43,47 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets all property type aliases accross content, media and member types.
+        /// Gets all property type aliases across content, media and member types.
         /// </summary>
         /// <returns>All property type aliases.</returns>
-        /// <remarks>Beware! Works accross content, media and member types.</remarks>
+        /// <remarks>Beware! Works across content, media and member types.</remarks>
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                // that one is special because it works accross content, media and member types
+                // that one is special because it works across content, media and member types
                 scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 return Repository.GetAllPropertyTypeAliases();
             }
         }
 
         /// <summary>
-        /// Gets all content type aliases accross content, media and member types.
+        /// Gets all content type aliases across content, media and member types.
         /// </summary>
         /// <param name="guids">Optional object types guid to restrict to content, and/or media, and/or member types.</param>
         /// <returns>All content type aliases.</returns>
-        /// <remarks>Beware! Works accross content, media and member types.</remarks>
+        /// <remarks>Beware! Works across content, media and member types.</remarks>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                // that one is special because it works accross content, media and member types
+                // that one is special because it works across content, media and member types
                 scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 return Repository.GetAllContentTypeAliases(guids);
             }
         }
 
         /// <summary>
-        /// Gets all content type id for aliases accross content, media and member types.
+        /// Gets all content type id for aliases across content, media and member types.
         /// </summary>
         /// <param name="aliases">Aliases to look for.</param>
         /// <returns>All content type ids.</returns>
-        /// <remarks>Beware! Works accross content, media and member types.</remarks>
+        /// <remarks>Beware! Works across content, media and member types.</remarks>
         public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                // that one is special because it works accross content, media and member types
+                // that one is special because it works across content, media and member types
                 scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
                 return Repository.GetAllContentTypeIds(aliases);
             }

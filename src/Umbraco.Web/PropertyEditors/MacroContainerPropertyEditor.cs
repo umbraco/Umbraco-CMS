@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    // fixme - MacroContainerPropertyEditor is deprecated, but what's the alternative?
+    // TODO: MacroContainerPropertyEditor is deprecated, but what's the alternative?
     [DataEditor(Constants.PropertyEditors.Aliases.MacroContainer, "(Obsolete) Macro Picker", "macrocontainer", ValueType = ValueTypes.Text, Group="rich content", Icon="icon-settings-alt", IsDeprecated = true)]
     public class MacroContainerPropertyEditor : DataEditor
     {

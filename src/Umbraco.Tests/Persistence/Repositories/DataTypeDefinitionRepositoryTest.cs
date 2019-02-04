@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
         {
-            return new EntityContainerRepository(scopeAccessor, CacheHelper.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
+            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository();
                 // Act
-                var dataTypeDefinition = repository.Get(-42);
+                var dataTypeDefinition = repository.Get(Constants.DataTypes.DropDownSingle);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);

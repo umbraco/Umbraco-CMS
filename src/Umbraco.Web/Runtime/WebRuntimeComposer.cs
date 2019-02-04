@@ -1,11 +1,12 @@
-﻿using System.Web;
+﻿using System.Linq;
+using System.Web;
 using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
@@ -17,10 +18,13 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Macros;
+using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -30,6 +34,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
@@ -80,11 +85,22 @@ namespace Umbraco.Web.Runtime
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
             // a way to inject the UmbracoContext - and register it per-request to be more efficient
-            //TODO: stop doing this
+            // TODO: stop doing this
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
-            // register the umbraco helper
-            composition.RegisterUnique<UmbracoHelper>();
+            composition.Register<IPublishedContentQuery>(factory =>
+            {
+                var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
+                return new PublishedContentQuery(umbCtx.UmbracoContext.ContentCache, umbCtx.UmbracoContext.MediaCache, factory.GetInstance<IVariationContextAccessor>());
+            }, Lifetime.Request);
+            composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
+
+            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+
+            // register the umbraco helper - this is Transient! very important!
+            composition.Register<UmbracoHelper>();
 
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
@@ -92,23 +108,22 @@ namespace Umbraco.Web.Runtime
             // replace some services
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
+
+            composition.RegisterUnique<IDashboardService, DashboardService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
             // configure the container for web
             composition.ConfigureForWeb();
 
-
-            composition.RegisterUnique<Dashboards>();
-
             composition
                 .ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
 
             composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
-                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
+                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
 
             composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
 
@@ -122,9 +137,11 @@ namespace Umbraco.Web.Runtime
             composition.WithCollectionBuilder<ActionCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
+            //we need to eagerly scan controller types since they will need to be routed
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(composition.TypeLoader.GetSurfaceControllers());
             composition.RegisterUnique(surfaceControllerTypes);
 
+            //we need to eagerly scan controller types since they will need to be routed
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(composition.TypeLoader.GetUmbracoApiControllers());
             composition.RegisterUnique(umbracoApiControllerTypes);
 
@@ -148,7 +165,7 @@ namespace Umbraco.Web.Runtime
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
@@ -175,7 +192,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterAuto(typeof(UmbracoViewPage<>));
 
             // register published router
-            composition.RegisterUnique<PublishedRouter>();
+            composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             composition.Register(_ => Current.Configs.Settings().WebRouting);
 
             // register preview SignalR hub
@@ -189,6 +206,44 @@ namespace Umbraco.Web.Runtime
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
                 .Append<ContentInfoContentAppFactory>();
+
+            // register back office sections in the order we want them rendered
+            composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>()
+                .Append<ContentBackOfficeSection>()
+                .Append<MediaBackOfficeSection>()
+                .Append<SettingsBackOfficeSection>()
+                .Append<PackagesBackOfficeSection>()
+                .Append<UsersBackOfficeSection>()
+                .Append<MembersBackOfficeSection>()
+                .Append<TranslationBackOfficeSection>();
+
+            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
+            composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+                .Add(composition.TypeLoader.GetTypes<IDashboard>());
+
+            // register back office trees
+            // the collection builder only accepts types inheriting from TreeControllerBase
+            // and will filter out those that are not attributed with TreeAttribute
+            composition.WithCollectionBuilder<TreeCollectionBuilder>()
+                .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
+
+            // register OEmbed providers - no type scanning - all explicit opt-in of adding types
+            // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
+            composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
+                .Append<YouTube>()
+                .Append<Instagram>()
+                .Append<Twitter>()
+                .Append<Vimeo>()
+                .Append<DailyMotion>()
+                .Append<Flickr>()
+                .Append<Slideshare>()
+                .Append<Kickstarter>()
+                .Append<GettyImages>()
+                .Append<Ted>()
+                .Append<Soundcloud>()
+                .Append<Issuu>()
+                .Append<Hulu>();
         }
     }
 }
+

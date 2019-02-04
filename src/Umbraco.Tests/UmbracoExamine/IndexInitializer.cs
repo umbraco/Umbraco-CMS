@@ -31,7 +31,7 @@ namespace Umbraco.Tests.UmbracoExamine
     {
         public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, GetMockUserService(), publishedValuesOnly);
+            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), publishedValuesOnly);
             return contentValueSetBuilder;
         }
 
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
-                        m.ContentType == Mock.Of<IContentType>(mt =>
+                        m.ContentType == Mock.Of<ISimpleContentType>(mt =>
                             mt.Icon == "test" &&
                             mt.Alias == x.Name.LocalName &&
                             mt.Id == (int)x.Attribute("nodeType"))))

@@ -15,7 +15,7 @@
         /// <summary>
         /// One unique instance per request.
         /// </summary>
-        // fixme - not what you think!
+        // TODO: review lifetimes for LightInject vs other containers
         // currently, corresponds to 'Request' in LightInject which is 'Transient + disposed by Scope'
         // but NOT (in LightInject) a per-web-request lifetime, more a TransientScoped
         //

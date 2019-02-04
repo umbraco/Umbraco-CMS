@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.IO;
@@ -30,9 +31,9 @@ namespace Umbraco.Web.Install.InstallSteps
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public override InstallSetupResult Execute(bool? model)
+        public override Task<InstallSetupResult> ExecuteAsync(bool? model)
         {
-            if (model.HasValue && model.Value == false) return null;
+            if (model.HasValue && model.Value == false) return Task.FromResult<InstallSetupResult>(null);
 
             //install the machine key
             var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
             var machineKey = systemWeb.Descendants("machineKey").FirstOrDefault();
-            if (machineKey != null) return null;
+            if (machineKey != null) return Task.FromResult<InstallSetupResult>(null);
 
             var generator = new MachineKeyGenerator();
             var generatedSection = generator.GenerateConfigurationBlock();
@@ -50,7 +51,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         public override bool RequiresExecution(bool? model)

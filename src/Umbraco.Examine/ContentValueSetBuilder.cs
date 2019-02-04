@@ -13,11 +13,11 @@ namespace Umbraco.Examine
     /// </summary>
     public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder, IPublishedContentValueSetBuilder
     {
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
+        private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
 
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            UrlSegmentProviderCollection urlSegmentProviders,
             IUserService userService,
             bool publishedValuesOnly)
             : base(propertyEditors, publishedValuesOnly)
@@ -29,7 +29,7 @@ namespace Umbraco.Examine
         /// <inheritdoc />
         public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
         {
-            //TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
+            // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
             // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
             // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
             // references and then each array is an array of `FieldValue[]` and values are assigned accordingly. Not sure if it will make a difference or not.

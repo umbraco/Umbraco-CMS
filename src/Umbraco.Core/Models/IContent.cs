@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the content type of this content.
         /// </summary>
-        IContentType ContentType { get; }
+        ISimpleContentType ContentType { get; }
 
         /// <summary>
         /// Gets a value indicating whether a culture is published.
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         IEnumerable<string> EditedCultures { get; }
 
-        // fixme - these two should move to some kind of service
+        // TODO: these two should move to some kind of service
 
         /// <summary>
         /// Changes the <see cref="IContentType"/> for the current content object

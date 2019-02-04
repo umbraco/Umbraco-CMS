@@ -56,17 +56,16 @@ namespace Umbraco.Tests.Testing.TestingTests
             Composition.Register(_ => Mock.Of<IMemberService>());
             Composition.Register(_ => Mock.Of<IMemberTypeService>());
             Composition.Register(_ => Mock.Of<IUserService>());
-            Composition.Register(_ => CacheHelper.Disabled);
+            Composition.Register(_ => AppCaches.Disabled);
             Composition.Register<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,
-                Mock.Of<IPublishedContent>(),
                 Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionary>(),
+                Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>()),
-                ServiceContext.CreatePartial());
+                Mock.Of<IPublishedContentQuery>(),
+                new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>()));
             Assert.Pass();
         }
 

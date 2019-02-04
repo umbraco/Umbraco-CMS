@@ -20,14 +20,12 @@ namespace Umbraco.Web.Mvc
         private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage
             = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
-        private UmbracoHelper _umbracoHelper;
-
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
         // note
         // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
+        // order to keep the constructor as light as possible, so that ppl implementing eg a SurfaceController
         // don't need to implement complex constructors + need to refactor them each time we change ours.
         // this means that these properties have a setter.
         // what can go wrong?
@@ -50,7 +48,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get;  }
+        public AppCaches AppCaches { get;  }
 
         /// <summary>
         /// Gets or sets the logger.
@@ -70,18 +68,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public UmbracoHelper Umbraco
-        {
-            get
-            {
-                return _umbracoHelper
-                    ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
-            }
-            internal set // tests
-            {
-                _umbracoHelper = value;
-            }
-        }
+        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets metadata for this instance.
@@ -93,21 +80,23 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<UmbracoContext>(),
                   Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
                   Current.Factory.GetInstance<ServiceContext>(),
-                  Current.Factory.GetInstance<CacheHelper>(),
+                  Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<ILogger>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<UmbracoHelper>()
             )
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
+        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
             UmbracoContext = umbracoContext;
             DatabaseFactory = databaseFactory;
             Services = services;
-            ApplicationCache = applicationCache;
+            AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
+            Umbraco = umbracoHelper;
         }
 
         /// <summary>

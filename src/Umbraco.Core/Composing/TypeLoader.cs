@@ -29,7 +29,7 @@ namespace Umbraco.Core.Composing
     {
         private const string CacheKey = "umbraco-types.list";
 
-        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly IAppPolicyCache _runtimeCache;
         private readonly IProfilingLogger _logger;
 
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
+        public TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger)
             : this(runtimeCache, localTempStorage, logger, true)
         { }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempStorage">Files storage mode.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IRuntimeCacheProvider runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
+        internal TypeLoader(IAppPolicyCache runtimeCache, LocalTempStorage localTempStorage, IProfilingLogger logger, bool detectChanges)
         {
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempStorage = localTempStorage == LocalTempStorage.Unknown ? LocalTempStorage.Default : localTempStorage;
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Composing
         /// Gets or sets the set of assemblies to scan.
         /// </summary>
         /// <remarks>
-        /// <para>If not explicitely set, defaults to all assemblies except those that are know to not have any of the
+        /// <para>If not explicitly set, defaults to all assemblies except those that are know to not have any of the
         /// types we might scan. Because we only scan for application types, this means we can safely exclude GAC assemblies
         /// for example.</para>
         /// <para>This is for unit tests.</para>
@@ -185,9 +185,7 @@ namespace Umbraco.Core.Composing
                         // the app code folder and everything in it
                         new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath("~/App_Code")), false),
                         // global.asax (the app domain also monitors this, if it changes will do a full restart)
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
-                        // trees.config - use the contents to create the hash since this gets resaved on every app startup!
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
+                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false)
                     }, _logger);
 
                 return _currentAssembliesHash;
@@ -213,7 +211,7 @@ namespace Umbraco.Core.Composing
         /// file properties (false) or the file contents (true).</remarks>
         private static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, IProfilingLogger logger)
         {
-            using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
                 // get the distinct file infos to hash
                 var uniqInfos = new HashSet<string>();
@@ -271,7 +269,7 @@ namespace Umbraco.Core.Composing
         // internal for tests
         internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
         {
-            using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
                 using (var generator = new HashGenerator())
                 {
@@ -405,7 +403,7 @@ namespace Umbraco.Core.Composing
                         break;
                     case LocalTempStorage.Default:
                     default:
-                        var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
+                        var tempFolder = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "TypesCache");
                         _fileBasePath = Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName);
                         break;
                 }
@@ -478,7 +476,7 @@ namespace Umbraco.Core.Composing
             var typesHashFilePath = GetTypesHashFilePath();
             DeleteFile(typesHashFilePath, FileDeleteTimeout);
 
-            _runtimeCache.ClearCacheItem(CacheKey);
+            _runtimeCache.Clear(CacheKey);
         }
 
         private Stream GetFileStream(string path, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int timeoutMilliseconds)
@@ -668,7 +666,7 @@ namespace Umbraco.Core.Composing
             var name = GetName(baseType, attributeType);
 
             lock (_locko)
-            using (_logger.TraceDuration<TypeLoader>(
+            using (_logger.DebugDuration<TypeLoader>(
                 "Getting " + name,
                 "Got " + name)) // cannot contain typesFound.Count as it's evaluated before the find
             {

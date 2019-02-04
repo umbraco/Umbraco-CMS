@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -19,7 +20,7 @@ namespace Umbraco.Web.Editors.Binders
         public TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
             where TModelSave : IHaveUploadedFiles
         {
-            var result = actionContext.ReadAsMultipart("~/App_Data/TEMP/FileUploads");
+            var result = actionContext.ReadAsMultipart(SystemDirectories.TempFileUploads);
 
             var model = actionContext.GetModelFromMultipartRequest<TModelSave>(result, "contentItem");
 
@@ -49,7 +50,7 @@ namespace Umbraco.Web.Editors.Binders
                     }
                 }
 
-                //TODO: anything after 3 parts we can put in metadata
+                // TODO: anything after 3 parts we can put in metadata
 
                 var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
 

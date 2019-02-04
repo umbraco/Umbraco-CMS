@@ -69,11 +69,12 @@ namespace Umbraco.Tests.PublishedContent
                 factory.CreatePropertyType("testRecursive", 1),
             };
             var compositionAliases = new[] { "MyCompositionAlias" };
-            var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
-            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
+            var anythingType = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
+            var homeType = new AutoPublishedContentType(0, "home", compositionAliases, propertyTypes);
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
-        protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected override TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 
@@ -233,10 +234,10 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void Is_Last_From_Where_Filter2()
         {
             var doc = GetNode(1173);
+            var ct = doc.ContentType;
 
             var items = doc.Children
                 .Select(x => x.CreateModel()) // linq, returns IEnumerable<IPublishedContent>
@@ -455,11 +456,11 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1046); // has child nodes
 
-            var model = doc.FirstChild<Anything>(x => true); // predicate
+            var model = doc.FirstChild<Home>(x => true); // predicate
 
             Assert.IsNotNull(model);
             Assert.IsTrue(model.Id == 1173);
-            Assert.IsInstanceOf<Anything>(model);
+            Assert.IsInstanceOf<Home>(model);
             Assert.IsInstanceOf<IPublishedContent>(model);
 
             doc = GetNode(1175); // does not have child nodes
@@ -791,29 +792,6 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsTrue(customDoc3.IsDescendantOrSelf(customDoc3));
         }
 
-        [Test]
-        public void Up()
-        {
-            var doc = GetNode(1173);
-
-            var result = doc.Up();
-
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(1046, result.Id);
-        }
-
-        [Test]
-        public void Down()
-        {
-            var doc = GetNode(1173);
-
-            var result = doc.Down();
-
-            Assert.IsNotNull(result);
-
-            Assert.AreEqual(1174, result.Id);
-        }
 
         [Test]
         public void FragmentProperty()

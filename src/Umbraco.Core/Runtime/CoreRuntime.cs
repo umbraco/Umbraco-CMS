@@ -100,9 +100,11 @@ namespace Umbraco.Core.Runtime
                 // throws if not full-trust
                 new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
 
+                // run handlers
+                RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
+
                 // application caches
                 var appCaches = GetAppCaches();
-                var runtimeCache = appCaches.RuntimeCache;
 
                 // database factory
                 var databaseFactory = GetDatabaseFactory();
@@ -112,7 +114,7 @@ namespace Umbraco.Core.Runtime
 
                 // type loader
                 var localTempStorage = configs.Global().LocalTempStorageLocation;
-                var typeLoader = new TypeLoader(runtimeCache, localTempStorage, ProfilingLogger);
+                var typeLoader = new TypeLoader(appCaches.RuntimeCache, localTempStorage, ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -132,12 +134,17 @@ namespace Umbraco.Core.Runtime
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
 
+                // run handlers
+                RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
+
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
                 Compose(composition);
 
-                // acquire the main domain, determine our runtime level
+                // acquire the main domain
                 AcquireMainDom(mainDom);
+
+                // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
                 // get composers, and compose
@@ -252,7 +259,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.DetermineRuntimeLevel(databaseFactory, profilingLogger);
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel}", _state.Level);
+                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {
@@ -263,6 +270,7 @@ namespace Umbraco.Core.Runtime
                 catch
                 {
                     _state.Level = RuntimeLevel.BootFailed;
+                    _state.Reason = RuntimeLevelReason.BootFailedOnException;
                     timer.Fail();
                     throw;
                 }
@@ -288,7 +296,7 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual void Terminate()
         {
-            _components.Terminate();
+            _components?.Terminate();
         }
 
         /// <summary>
@@ -324,17 +332,16 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the application caches.
         /// </summary>
-        protected virtual CacheHelper GetAppCaches()
+        protected virtual AppCaches GetAppCaches()
         {
             // need the deep clone runtime cache provider to ensure entities are cached properly, ie
             // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // is overriden by the web runtime
+            // is overridden by the web runtime
 
-            return new CacheHelper(
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+            return new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                NoAppCache.Instance,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
         }
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.

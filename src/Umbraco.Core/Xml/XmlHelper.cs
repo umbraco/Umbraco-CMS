@@ -14,7 +14,7 @@ namespace Umbraco.Core.Xml
     /// <summary>
     /// The XmlHelper class contains general helper methods for working with xml in umbraco.
     /// </summary>
-    public class XmlHelper
+    internal class XmlHelper
     {
         /// <summary>
         /// Creates or sets an attribute on the XmlNode if an Attributes collection is available
@@ -126,44 +126,6 @@ namespace Umbraco.Core.Xml
             return false;
         }
 
-        /// <summary>
-        /// Tries to create a new <c>XElement</c> from a property value.
-        /// </summary>
-        /// <param name="value">The value of the property.</param>
-        /// <param name="elt">The Xml element.</param>
-        /// <returns>A value indicating whether it has been possible to create the element.</returns>
-        /// <remarks>The value can be anything... Performance-wise, this is bad.</remarks>
-        public static bool TryCreateXElementFromPropertyValue(object value, out XElement elt)
-        {
-            // see note above in TryCreateXPathDocumentFromPropertyValue...
-
-            elt = null;
-            var xml = value as string;
-            if (xml == null) return false; // not a string
-            if (CouldItBeXml(xml) == false) return false; // string does not look like it's xml
-            if (IsXmlWhitespace(xml)) return false; // string is whitespace, xml-wise
-
-            try
-            {
-                elt = XElement.Parse(xml, LoadOptions.None);
-            }
-            catch
-            {
-                elt = null;
-                return false; // string can't be parsed into xml
-            }
-
-            //SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
-            // used apart from for tests so don't think this matters. In any case, we no longer check for this!
-
-            //var name = elt.Name.LocalName; // must not match an excluded tag
-            //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false))
-            //    return true;
-            //elt = null;
-            //return false;
-
-            return true;
-        }
 
         /// <summary>
         /// Sorts the children of a parentNode.
@@ -186,47 +148,6 @@ namespace Umbraco.Core.Xml
                 parentNode.AppendChild(node); // moves the node to the last position
         }
 
-        /// <summary>
-        /// Sorts the children of a parentNode if needed.
-        /// </summary>
-        /// <param name="parentNode">The parent node.</param>
-        /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode"/> to sort.</param>
-        /// <param name="orderBy">A function returning the value to order the nodes by.</param>
-        /// <returns>A value indicating whether sorting was needed.</returns>
-        /// <remarks>same as SortNodes but will do nothing if nodes are already sorted - should improve performances.</remarks>
-        internal static bool SortNodesIfNeeded(
-            XmlNode parentNode,
-            string childNodesXPath,
-            Func<XmlNode, int> orderBy)
-        {
-            // ensure orderBy runs only once per node
-            // checks whether nodes are already ordered
-            // and actually sorts only if needed
-
-            var childNodesAndOrder = parentNode.SelectNodes(childNodesXPath).Cast<XmlNode>()
-                .Select(x => Tuple.Create(x, orderBy(x))).ToArray();
-
-            var a = 0;
-            foreach (var x in childNodesAndOrder)
-            {
-                if (a > x.Item2)
-                {
-                    a = -1;
-                    break;
-                }
-                a = x.Item2;
-            }
-
-            if (a >= 0)
-                return false;
-
-            // append child nodes to last position, in sort-order
-            // so all child nodes will go after the property nodes
-            foreach (var x in childNodesAndOrder.OrderBy(x => x.Item2))
-                parentNode.AppendChild(x.Item1); // moves the node to the last position
-
-            return true;
-        }
 
         /// <summary>
         /// Sorts a single child node of a parentNode.
@@ -281,90 +202,22 @@ namespace Umbraco.Core.Xml
             return false;
         }
 
-        // used by DynamicNode only, see note in TryCreateXPathDocumentFromPropertyValue
-        public static string StripDashesInElementOrAttributeNames(string xml)
-        {
-            using (var outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        using (var tw = new StreamWriter(ms))
-                        {
-                            tw.Write(xml);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (var tr = new StreamReader(ms))
-                            {
-                                bool IsInsideElement = false, IsInsideQuotes = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<' && !IsInsideQuotes)
-                                    {
-                                        if (tr.Peek() != (int)'!')
-                                        {
-                                            IsInsideElement = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>' && !IsInsideQuotes)
-                                    {
-                                        IsInsideElement = false;
-                                    }
-                                    if (ic == (int)'"')
-                                    {
-                                        IsInsideQuotes = !IsInsideQuotes;
-                                    }
-                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
-                    {
-                        return outputtr.ReadToEnd();
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Imports a XML node from text.
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <param name="xmlDoc">The XML doc.</param>
-        /// <returns></returns>
-        public static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
-        {
-            xmlDoc.LoadXml(text);
-            return xmlDoc.FirstChild;
-        }
 
         /// <summary>
         /// Opens a file as a XmlDocument.
         /// </summary>
-        /// <param name="filePath">The relative file path. ei. /config/umbraco.config</param>
+        /// <param name="filePath">The relative file path. ie. /config/umbraco.config</param>
         /// <returns>Returns a XmlDocument class</returns>
         public static XmlDocument OpenAsXmlDocument(string filePath)
         {
-
-            var reader = new XmlTextReader(IOHelper.MapPath(filePath)) {WhitespaceHandling = WhitespaceHandling.All};
-
-            var xmlDoc = new XmlDocument();
-            //Load the file into the XmlDocument
-            xmlDoc.Load(reader);
-            //Close off the connection to the file.
-            reader.Close();
-
-            return xmlDoc;
+            using (var reader = new XmlTextReader(IOHelper.MapPath(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
+            {
+                var xmlDoc = new XmlDocument();
+                //Load the file into the XmlDocument
+                xmlDoc.Load(reader);
+                
+                return xmlDoc;
+            }   
         }
 
         /// <summary>

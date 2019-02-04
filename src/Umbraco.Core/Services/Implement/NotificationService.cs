@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services.Implement
             //exit if there are no entities
             if (entitiesL.Count == 0) return;
 
-            //put all entity's paths into a list with the same indicies
+            //put all entity's paths into a list with the same indices
             var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
@@ -301,13 +301,13 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (!_contentSection.DisableHtmlEmail)
                 {
-                    //create the html summary for invariant content
+                    //create the HTML summary for invariant content
 
                     //list all of the property values like we used to
                     summary.Append("<table style=\"width: 100 %; \">");
                     foreach (var p in content.Properties)
                     {
-                        //fixme doesn't take into account variants
+                        // TODO: doesn't take into account variants
 
                         var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
                         var oldText = newText;
@@ -318,7 +318,7 @@ namespace Umbraco.Core.Services.Implement
                             var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
                             oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
 
-                            // replace html with char equivalent
+                            // replace HTML with char equivalent
                             ReplaceHtmlSymbols(ref oldText);
                             ReplaceHtmlSymbols(ref newText);
                         }
@@ -343,7 +343,7 @@ namespace Umbraco.Core.Services.Implement
 
                 if (!_contentSection.DisableHtmlEmail)
                 {
-                    //Create the html based summary (ul of culture names)
+                    //Create the HTML based summary (ul of culture names)
 
                     var culturesChanged = content.CultureInfos.Where(x => x.Value.WasDirty())
                         .Select(x => x.Key)
@@ -394,7 +394,7 @@ namespace Umbraco.Core.Services.Implement
                 content.Id.ToString(CultureInfo.InvariantCulture),
                 string.Format("{2}://{0}/{1}",
                     string.Concat(siteUri.Authority),
-                    //TODO: RE-enable this so we can have a nice url
+                    // TODO: RE-enable this so we can have a nice url
                     /*umbraco.library.NiceUrl(documentObject.Id))*/
                     string.Concat(content.Id, ".aspx"),
                     protocol),

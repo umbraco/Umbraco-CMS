@@ -137,8 +137,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         void CopyFrom(IContent other, string culture = "*");
 
-        // fixme validate published cultures?
-        
         /// <summary>
         /// Validates the content item's properties pass variant rules
         /// </summary>

@@ -32,15 +32,15 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing)
+        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
-            return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations);
+            return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
         }
 
         // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing)
+        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
-            return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations);
+            return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
         }
 
         /// <inheritdoc />
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
 
             if (!publishedDataTypes.TryGetValue(id, out var dataType))
-                throw new ArgumentException("Not a valid datatype identifier.", nameof(id));
+                throw new ArgumentException($"Could not find a datatype with identifier {id}.", nameof(id));
 
             return dataType;
         }

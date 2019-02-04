@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class PublicAccessRepository : NPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
-        public PublicAccessRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public PublicAccessRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

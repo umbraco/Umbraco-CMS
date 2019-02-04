@@ -245,13 +245,19 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
+                    
                     switch (item.logType) {
+                        case "Save":
+                            item.logTypeColor = "primary";
+                            break;
                         case "Publish":
                         case "PublishVariant":
                             item.logTypeColor = "success";
                             break;
                         case "Unpublish":
                         case "UnpublishVariant":
+                            item.logTypeColor = "warning";
+                        break;
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;

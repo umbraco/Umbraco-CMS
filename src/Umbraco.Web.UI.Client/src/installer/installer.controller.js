@@ -1,7 +1,7 @@
 angular.module("umbraco.install").controller("Umbraco.InstallerController",
 	function ($scope, installerService) {
 
-	    //TODO: Decouple the service from the controller - the controller should be responsible
+	    // TODO: Decouple the service from the controller - the controller should be responsible
 	    // for the model (state) and the service should be responsible for helping the controller,
 	    // the controller should be passing the model into it's methods for manipulation and not hold
 	    // state. We should not be assigning properties from a service to a controller's scope.

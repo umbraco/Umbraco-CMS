@@ -14,8 +14,8 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresher>
     {
-        public UserGroupCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public UserGroupCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define
@@ -35,10 +35,10 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             ClearAllIsolatedCacheByEntityType<IUserGroup>();
-            var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
+                userGroupCache.Result.ClearByKey(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
 
             //We'll need to clear all user cache too
@@ -55,11 +55,11 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
+            var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IUserGroup>(id));
-                userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
+                userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup>(id));
+                userGroupCache.Result.ClearByKey(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
 
             //we don't know what user's belong to this group without doing a look up so we'll need to just clear them all

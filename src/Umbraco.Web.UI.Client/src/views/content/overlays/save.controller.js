@@ -32,7 +32,10 @@
         }
 
         function hasAnyData(variant) {
-            var result = variant.isDirty != null || (variant.name != null && variant.name.length > 0);
+            if(variant.name == null || variant.name.length === 0) {
+                return false;
+            }
+            var result = variant.isDirty != null;
 
             if(result) return true;
 

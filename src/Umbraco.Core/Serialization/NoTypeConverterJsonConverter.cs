@@ -9,7 +9,7 @@ namespace Umbraco.Core.Serialization
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <remarks>
-    /// In some cases thsi is required if your model has an explicit type converter, see: http://stackoverflow.com/a/31328131/694494
+    /// In some cases this is required if your model has an explicit type converter, see: http://stackoverflow.com/a/31328131/694494
     ///
     /// NOTE: I was going to use this for the ImageCropDataSetConverter to convert to String, which would have worked by putting this attribute:
     /// [JsonConverter(typeof(NoTypeConverterJsonConverter{ImageCropDataSet}))] on top of the ImageCropDataSet class, however it turns out we

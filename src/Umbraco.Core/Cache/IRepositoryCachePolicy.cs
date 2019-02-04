@@ -48,7 +48,7 @@ namespace Umbraco.Core.Cache
         /// Updates an entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        /// <param name="persistUpdated">The reopsitory PersistUpdatedItem method.</param>
+        /// <param name="persistUpdated">The repository PersistUpdatedItem method.</param>
         /// <remarks>Updates the entity in the repository, and updates the cache accordingly.</remarks>
         void Update(TEntity entity, Action<TEntity> persistUpdated);
 

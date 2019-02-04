@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -23,20 +22,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
-        private readonly IFileSystem _masterpagesFileSystem;
         private readonly IFileSystem _viewsFileSystem;
-        private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
-        private readonly MasterPageHelper _masterPageHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplatesSection templateConfig, IFileSystems fileSystems)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IFileSystems fileSystems)
             : base(scopeAccessor, cache, logger)
         {
-            _masterpagesFileSystem = fileSystems.MasterPagesFileSystem;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
-            _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
         protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy()
@@ -255,18 +248,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else
             {
                 // else, create or write template.Content to disk
-                if (DetermineTemplateRenderingEngine(template) == RenderingEngine.Mvc)
-                {
-                    content = originalAlias == null
-                        ? _viewHelper.CreateView(template, true)
-                        : _viewHelper.UpdateViewFile(template, originalAlias);
-                }
-                else
-                {
-                    content = originalAlias == null
-                        ? _masterPageHelper.CreateMasterPage(template, this, true)
-                        : _masterPageHelper.UpdateMasterPageFile(template, originalAlias, this);
-                }
+                content = originalAlias == null
+                    ? _viewHelper.CreateView(template, true)
+                    : _viewHelper.UpdateViewFile(template, originalAlias);
             }
 
             // once content has been set, "template on disk" are not "on disk" anymore
@@ -298,16 +282,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(delete, new { id = GetEntityId(entity) });
             }
 
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var viewName = string.Concat(entity.Alias, ".cshtml");
-                _viewsFileSystem.DeleteFile(viewName);
-            }
-            else
-            {
-                var masterpageName = string.Concat(entity.Alias, ".master");
-                _masterpagesFileSystem.DeleteFile(masterpageName);
-            }
+            var viewName = string.Concat(entity.Alias, ".cshtml");
+            _viewsFileSystem.DeleteFile(viewName);
 
             entity.DeleteDate = DateTime.Now;
         }
@@ -388,27 +364,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     template.VirtualPath = _viewsFileSystem.GetUrl(path);
                     return;
                 }
-                path = string.Concat(template.Alias, ".master");
-                if (_masterpagesFileSystem.FileExists(path))
-                {
-                    template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
-                    return;
-                }
             }
             else
             {
                 // we know the path already
-                var ext = Path.GetExtension(path);
-                switch (ext)
-                {
-                    case ".cshtml":
-                    case ".vbhtml":
-                        template.VirtualPath = _viewsFileSystem.GetUrl(path);
-                        return;
-                    case ".master":
-                        template.VirtualPath = _masterpagesFileSystem.GetUrl(path);
-                        return;
-                }
+                template.VirtualPath = _viewsFileSystem.GetUrl(path);
             }
 
             template.VirtualPath = string.Empty; // file not found...
@@ -426,25 +386,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 path = string.Concat(template.Alias, ".vbhtml");
                 if (_viewsFileSystem.FileExists(path))
                     return GetFileContent(template, _viewsFileSystem, path, init);
-                path = string.Concat(template.Alias, ".master");
-                if (_masterpagesFileSystem.FileExists(path))
-                    return GetFileContent(template, _masterpagesFileSystem, path, init);
             }
             else
             {
                 // we know the path already
-                var ext = Path.GetExtension(path);
-                switch (ext)
-                {
-                    case ".cshtml":
-                    case ".vbhtml":
-                        return GetFileContent(template, _viewsFileSystem, path, init);
-                    case ".master":
-                        return GetFileContent(template, _masterpagesFileSystem, path, init);
-                }
+                return GetFileContent(template, _viewsFileSystem, path, init);
             }
 
             template.VirtualPath = string.Empty; // file not found...
+
             return string.Empty;
         }
 
@@ -457,13 +407,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
             }
 
-            // TODO
-            //  see if this could enable us to update UpdateDate without messing with change tracking
-            //  and then we'd want to do it for scripts, stylesheets and partial views too (ie files)
-            //var xtemplate = template as Template;
-            //xtemplate.DisableChangeTracking();
-            //template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
-            //xtemplate.EnableChangeTracking();
+            // TODO: see if this could enable us to update UpdateDate without messing with change tracking
+            // and then we'd want to do it for scripts, stylesheets and partial views too (ie files)
+            // var xtemplate = template as Template;
+            // xtemplate.DisableChangeTracking();
+            // template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
+            // xtemplate.EnableChangeTracking();
 
             template.VirtualPath = fs.GetUrl(filename);
 
@@ -514,9 +463,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 case ".vbhtml":
                     fs = _viewsFileSystem;
                     break;
-                case ".master":
-                    fs = _masterpagesFileSystem;
-                    break;
                 default:
                     throw new Exception("Unsupported extension " + ext + ".");
             }
@@ -533,7 +479,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<ITemplate> GetAll(params string[] aliases)
         {
             //We must call the base (normal) GetAll method
-            // which is cached. This is a specialized method and unfortunatley with the params[] it
+            // which is cached. This is a specialized method and unfortunately with the params[] it
             // overlaps with the normal GetAll method.
             if (aliases.Any() == false) return base.GetMany();
 
@@ -626,56 +572,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already
-        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate
-        /// rendering engine to use.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
-        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml
-        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page.
-        /// This is mostly related to installing packages since packages install file templates to the file system and then create the
-        /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
-        /// </remarks>
-        public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
-        {
-            var engine = _templateConfig.DefaultRenderingEngine;
-            var viewHelper = new ViewHelper(_viewsFileSystem);
-            if (viewHelper.ViewExists(template) == false)
-            {
-                if (template.Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(template.Content))
-                {
-                    //there is a design but its definitely a webforms design and we haven't got a MVC view already for it
-                    return RenderingEngine.WebForms;
-                }
-            }
-
-            var masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
-
-            switch (engine)
-            {
-                case RenderingEngine.Mvc:
-                    //check if there's a view in ~/masterpages
-                    if (masterPageHelper.MasterPageExists(template) && viewHelper.ViewExists(template) == false)
-                    {
-                        //change this to webforms since there's already a file there for this template alias
-                        engine = RenderingEngine.WebForms;
-                    }
-                    break;
-                case RenderingEngine.WebForms:
-                    //check if there's a view in ~/views
-                    if (viewHelper.ViewExists(template) && masterPageHelper.MasterPageExists(template) == false)
-                    {
-                        //change this to mvc since there's already a file there for this template alias
-                        engine = RenderingEngine.Mvc;
-                    }
-                    break;
-            }
-            return engine;
-        }
-
-        /// <summary>
         /// Validates a <see cref="ITemplate"/>
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to validate</param>
@@ -683,27 +579,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public bool ValidateTemplate(ITemplate template)
         {
             // get path
-            // TODO
-            //  templates should have a real Path somehow - but anyways
-            //  are we using Path for something else?!
+            // TODO: templates should have a real Path somehow - but anyways
+            // are we using Path for something else?!
             var path = template.VirtualPath;
 
             // get valid paths
-            var validDirs = _templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc
-                ? new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews }
-                : new[] { SystemDirectories.Masterpages };
+            var validDirs = new[] { SystemDirectories.MvcViews };
 
             // get valid extensions
             var validExts = new List<string>();
-            if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
-            {
-                validExts.Add("cshtml");
-                validExts.Add("vbhtml");
-            }
-            else
-            {
-                validExts.Add("master");
-            }
+            validExts.Add("cshtml");
+            validExts.Add("vbhtml");
 
             // validate path and extension
             var validFile = IOHelper.VerifyEditPath(path, validDirs);
@@ -764,7 +650,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private string EnsureUniqueAlias(ITemplate template, int attempts)
         {
-            //TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
+            // TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
             if (AliasAlreadExists(template))
                 return template.Alias + attempts;
             attempts++;

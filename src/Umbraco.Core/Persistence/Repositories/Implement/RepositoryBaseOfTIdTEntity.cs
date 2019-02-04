@@ -19,18 +19,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
 
-        protected RepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger)
         {
             ScopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            GlobalCache = cache ?? throw new ArgumentNullException(nameof(cache));
+            AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
         protected ILogger Logger { get; }
 
-        protected CacheHelper GlobalCache { get; }
+        protected AppCaches AppCaches { get; }
 
-        protected IRuntimeCacheProvider GlobalIsolatedCache => GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+        protected IAppPolicyCache GlobalIsolatedCache => AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
 
         protected IScopeAccessor ScopeAccessor { get; }
 
@@ -60,25 +60,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// Gets the isolated cache.
         /// </summary>
         /// <remarks>Depends on the ambient scope cache mode.</remarks>
-        protected IRuntimeCacheProvider IsolatedCache
+        protected IAppPolicyCache IsolatedCache
         {
             get
             {
                 switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
-                        return GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                        return AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.Scoped:
-                        return AmbientScope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                        return AmbientScope.IsolatedCaches.GetOrCreate<TEntity>();
                     case RepositoryCacheMode.None:
-                        return NullCacheProvider.Instance;
+                        return NoAppCache.Instance;
                     default:
                         throw new Exception("oops: cache mode.");
                 }
             }
         }
 
-        // fixme - but now that we have 1 unique repository?
+        // TODO: but now that we have 1 unique repository?
         // this is a *bad* idea because PerformCount captures the current repository and its UOW
         //
         //private static RepositoryCachePolicyOptions _defaultOptions;
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             get
             {
-                if (GlobalCache == CacheHelper.NoCache)
+                if (AppCaches == AppCaches.NoCache)
                     return NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
 
                 // create the cache policy using IsolatedCache which is either global
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Adds or Updates an entity of type TEntity
         /// </summary>
-        /// <remarks>This method is backed by an <see cref="IRuntimeCacheProvider"/> cache</remarks>
+        /// <remarks>This method is backed by an <see cref="IAppPolicyCache"/> cache</remarks>
         /// <param name="entity"></param>
         public void Save(TEntity entity)
         {
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids.Distinct()
                 //don't query by anything that is a default of T (like a zero)
-                //TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
+                // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
                 //.Where(x => Equals(x, default(TId)) == false)
                 .ToArray();
 

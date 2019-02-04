@@ -143,12 +143,11 @@ namespace Umbraco.Tests.Composing
         }
 
         [Test]
-        public void SingletonServiceIsUnique() // fixme - but what is LightInject actually doing
+        public void SingletonServiceIsUnique() // FIXME: but what is LightInject actually doing
         {
             var register = GetRegister();
 
-            // fixme
-            // LightInject is 'unique' per serviceType+serviceName
+            // FIXME: LightInject is 'unique' per serviceType+serviceName
             // but that's not how all containers work
             // and we should not rely on it
             // if we need unique, use RegisterUnique
@@ -194,8 +193,8 @@ namespace Umbraco.Tests.Composing
             var register = GetRegister();
 
             // define two instances
-            register.RegisterInstance(typeof(Thing1), new Thing1());
-            register.RegisterInstance(typeof(Thing1), new Thing2());
+            register.Register(typeof(Thing1), new Thing1());
+            register.Register(typeof(Thing1), new Thing2());
 
             var factory = register.CreateFactory();
 
@@ -212,8 +211,8 @@ namespace Umbraco.Tests.Composing
             var register = GetRegister();
 
             // define two instances
-            register.RegisterInstance(typeof(IThing), new Thing1());
-            register.RegisterInstance(typeof(IThing), new Thing2());
+            register.Register(typeof(IThing), new Thing1());
+            register.Register(typeof(IThing), new Thing2());
 
             var factory = register.CreateFactory();
 

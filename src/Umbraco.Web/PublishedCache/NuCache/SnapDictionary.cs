@@ -30,7 +30,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private Task _collectTask;
         private volatile int _wlocked;
 
-        // fixme - collection trigger (ok for now)
         // minGenDelta to be adjusted
         // we may want to throttle collects even if delta is reached
         // we may want to force collect if delta is not reached but very old
@@ -59,7 +58,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //
         // so when getting a read-lock,
         //  either we are write-locked or not, but if not, we won't be write-locked
-        //  otoh the write-lock may be released in the meantime
+        //  on the other hand the write-lock may be released in the meantime
 
         // Lock has a 'forceGen' parameter:
         //  used to start a set of changes that may not commit, to isolate the set from any pending
@@ -107,7 +106,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // gets a scope contextual representing a locked writer to the dictionary
-        // fixme GetScopedWriter? should the dict have a ref onto the scope provider?
+        // GetScopedWriter? should the dict have a ref onto the scope provider?
         public IDisposable GetWriter(IScopeProvider scopeProvider)
         {
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new SnapDictionaryWriter(this, scoped));

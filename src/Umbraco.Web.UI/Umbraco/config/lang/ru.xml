@@ -384,10 +384,6 @@
     <key alias="siterepublishHelp">Кэш сайта будет полностью обновлен. Все опубликованное содержимое будет обновлено, в то время как неопубликованное содержимое по-прежнему останется неопубликованным</key>
     <key alias="tableColumns">Количество столбцов</key>
     <key alias="tableRows">Количество строк</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Идентификация контейнера (placeholder)</strong>
-		путем назначения Вашему элементу-контейнеру уникального идентификатора (ID) позволит Вам автоматически включать в шаблон содержимое из дочерних шаблонов путем указания этого идентификатора (ID) в конструкции <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Выберите идентификатор элемента-контейнера (placeholder)</strong>
-		из нижеследующего списка. Список ограничивается идентификаторами, определенными в родительском шаблоне данного шаблона.]]></key>
     <key alias="thumbnailimageclickfororiginal">Кликните на изображении, чтобы увидеть полноразмерную версию</key>
     <key alias="treepicker">Выберите элемент</key>
     <key alias="urlLinkPicker">Ссылка</key>
@@ -487,7 +483,6 @@
     <key alias="dissallowedMediaType">Использование данного типа файлов на сайте запрещено администратором</key>
     <key alias="filePermissionsError">Ошибка доступа к указанному файлу или папке</key>
     <key alias="macroErrorLoadingPartialView">Ошибка загрузки кода в частичном представлении (файл: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Ошибка загрузки пользовательского элемента управления '%0%'</key>
     <key alias="missingTitle">Укажите заголовок</key>
     <key alias="missingType">Выберите тип</key>
     <key alias="pictureResizeBiggerThanOrg">Вы пытаетесь увеличить изображение по сравнению с его исходным размером. Уверены, что хотите сделать это?</key>
@@ -582,7 +577,6 @@
     <key alias="orderBy">Сортировка по</key>
     <key alias="password">Пароль</key>
     <key alias="path">Путь</key>
-    <key alias="placeHolderID">Идентификатор контейнера</key>
     <key alias="pleasewait">Минуточку...</key>
     <key alias="previous">Пред</key>
     <key alias="properties">Свойства</key>
@@ -1182,14 +1176,12 @@
     <key alias="packageCompatibilityDescription">Этот пакет совместим со следующими версиями Umbraco, по сообщениям участников сообщества. Полная совместимость не гарантируется для версий со значением ниже 100%</key>
     <key alias="packageExternalSources">Внешние источники</key>
     <key alias="packageAuthor">Автор</key>
-    <key alias="packageDemonstration">Демонстрация</key>
     <key alias="packageDocumentation">Документация (описание)</key>
     <key alias="packageMetaData">Мета-данные пакета</key>
     <key alias="packageName">Название пакета</key>
     <key alias="packageNoItemsHeader">Пакет ничего не содержит</key>
     <key alias="packageNoItemsText"><![CDATA[Этот файл пакета не содержит ни одного элемента
 		для удаления.<br/><br/>Вы можете безопасно удалить данный пакет из системы, нажав на кнопку "Деинсталлировать пакет".]]></key>
-    <key alias="packageNoUpgrades">Нет доступных обновлений</key>
     <key alias="packageOptions">Опции пакета</key>
     <key alias="packageReadme">Краткий обзор пакета</key>
     <key alias="packageRepository">Репозиторий пакета</key>
@@ -1200,13 +1192,7 @@
     <key alias="packageUninstallText"><![CDATA[Сейчас Вы можете снять отметки с тех опций пакета, которые НЕ хотите удалять. После нажатия кнопки "Подтверждение деинсталляции" все отмеченные опции будут удалены.<br />
 		<span style="color: Red; font-weight: bold;">Обратите внимание:</span> все документы, медиа-файлы и другой контент, зависящий от этого пакета, перестанет нормально работать, что может привести к нестабильному поведению системы,
 		поэтому удаляйте пакеты очень осторожно. При наличии сомнений, свяжитесь с автором пакета.]]></key>
-    <key alias="packageUpgradeDownload">Скачать обновление из репозитория</key>
-    <key alias="packageUpgradeHeader">Обновление пакета</key>
-    <key alias="packageUpgradeInstructions">Руководство по обновлению</key>
-    <key alias="packageUpgradeText">Для данного пакета доступно обновление. Вы можете загрузить это обновление непосредственно из центрального репозитория пакетов Umbraco.</key>
     <key alias="packageVersion">Версия пакета</key>
-    <key alias="packageVersionHistory">История версий пакета</key>
-    <key alias="viewPackageWebsite">Перейти на веб-сайт пакета</key>
     <key alias="packageAlreadyInstalled">Этот пакет уже установлен в системе</key>
     <key alias="targetVersionMismatch">Этот пакет не может быть установлен, он требует наличия Umbraco версии как минимум</key>
     <key alias="installStateUninstalling">Удаление...</key>

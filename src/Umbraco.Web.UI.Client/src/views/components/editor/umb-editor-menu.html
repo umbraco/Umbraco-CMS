@@ -2,14 +2,14 @@
 
     <umb-button
         type="button"
-        button-style="info"
+        button-style="white"
         action="dropdown.isOpen = !dropdown.isOpen"
         label-key="general_actions"
         show-caret="true">
     </umb-button>
 
     <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false">
-        <umb-dropdown-item class="umb-action" ng-class="{'sep':action.seperatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
+        <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
             <a href="" ng-click="executeMenuItem(action)" prevent-default>
                 <i class="icon icon-{{action.cssclass}}"></i>
                 <span class="menu-label">{{action.name}}</span>

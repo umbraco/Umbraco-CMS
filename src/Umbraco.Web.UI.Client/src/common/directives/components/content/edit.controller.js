@@ -26,20 +26,43 @@
         $scope.allowOpen = true;
         $scope.app = null;
 
-        function init(content) {
-            if (!$scope.app) {
-                // set first app to active
+        function init() {
+            
+            var content = $scope.content;
+            
+            // we need to check wether an app is present in the current data, if not we will present the default app.
+            var isAppPresent = false;
+            
+            // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
+            if ($scope.app) {
+                
+                // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
+                _.forEach(content.apps, function(app) {
+                    if (app === $scope.app) {
+                        isAppPresent = true;
+                    }
+                });
+                
+                // if we did reload our DocType, but still have the same app we will try to find it by the alias.
+                if (isAppPresent === false) {
+                    _.forEach(content.apps, function(app) {
+                        if (app.alias === $scope.app.alias) {
+                            isAppPresent = true;
+                            app.active = true;
+                            $scope.appChanged(app);
+                        }
+                    });
+                }
+                
+            }
+            
+            // if we still dont have a app, lets show the first one:
+            if (isAppPresent === false) {
                 content.apps[0].active = true;
-                $scope.app = content.apps[0];
+                $scope.appChanged(content.apps[0]);
             }
-
-            if (infiniteMode) {
-                createInfiniteModeButtons(content);
-            } else {
-                createButtons(content);
-            }
-
-            editorState.set($scope.content);
+            
+            editorState.set(content);
 
             //We fetch all ancestors of the node to generate the footer breadcrumb navigation
             if (!$scope.page.isNew) {
@@ -129,7 +152,7 @@
                             "/content/content/edit/" + data.parentId;
                     }
 
-                    init($scope.content);
+                    init();
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -150,6 +173,9 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
+
+            // for trashed items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.trashed ? "primary" : "info";
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
@@ -302,8 +328,8 @@
                 var fieldControl = item.control;
                 var fieldErrorKeys = item.errorKeys;
 
-                for (var i = 0; i < fieldErrorKeys.length; i++) {
-                    fieldControl.$setValidity(fieldErrorKeys[i], false);
+                for (var j = 0; j < fieldErrorKeys.length; j++) {
+                    fieldControl.$setValidity(fieldErrorKeys[j], false);
                 }
             }
         }
@@ -337,7 +363,7 @@
                 showNotifications: args.showNotifications
             }).then(function (data) {
                 //success
-                init($scope.content);
+                init();
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
@@ -401,34 +427,6 @@
             }
         }
 
-        function moveNode(node, target) {
-
-            contentResource.move({ "parentId": target.id, "id": node.id })
-                .then(function (path) {
-
-                    // remove the node that we're working on
-                    if ($scope.page.menu.currentNode) {
-                        treeService.removeNode($scope.page.menu.currentNode);
-                    }
-
-                    // sync the destination node
-                    if (!infiniteMode) {
-                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
-                    }
-
-                    $scope.page.buttonRestore = "success";
-                    notificationsService.success("Successfully restored " + node.name + " to " + target.name);
-
-                    // reload the node
-                    loadContent();
-
-                }, function (err) {
-                    $scope.page.buttonRestore = "error";
-                    notificationsService.error("Cannot automatically restore this item", err);
-                });
-
-        }
-
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -439,7 +437,7 @@
 
                     $scope.content = data;
 
-                    init($scope.content);
+                    init();
 
                     resetLastListPageNumber($scope.content);
 
@@ -467,6 +465,7 @@
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "content_unpublish",
+                    submitButtonStyle: "warning",
                     submit: function (model) {
 
                         model.submitButtonState = "busy";
@@ -478,7 +477,7 @@
                             .then(function (data) {
                                 formHelper.resetForm({ scope: $scope });
                                 contentEditingHelper.reBindChangedProperties($scope.content, data);
-                                init($scope.content);
+                                init();
                                 syncTreeNode($scope.content, data.path);
                                 $scope.page.buttonGroupState = "success";
                                 eventsService.emit("content.unpublished", { content: $scope.content });
@@ -508,7 +507,7 @@
                         view: "views/content/overlays/sendtopublish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabel: "Send for approval",
+                        submitButtonLabelKey: "buttons_saveToPublish",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -564,7 +563,7 @@
                         view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabel: "Publish",
+                        submitButtonLabelKey: "buttons_saveAndPublish",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -618,14 +617,14 @@
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "save" })) {
+                if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
 
                     var dialog = {
                         parentScope: $scope,
                         view: "views/content/overlays/save.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabel: "Save",
+                        submitButtonLabelKey: "buttons_save",
                         submit: function (model) {
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
@@ -697,7 +696,7 @@
                     view: "views/content/overlays/schedule.html",
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                    submitButtonLabel: "Schedule",
+                    submitButtonLabelKey: "buttons_schedulePublish",
                     submit: function (model) {
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
@@ -809,7 +808,7 @@
                 // Build the correct path so both /#/ and #/ work.
                 var query = 'id=' + content.id;
                 if ($scope.culture) {
-                    query += "&culture=" + $scope.culture;
+                    query += "#?culture=" + $scope.culture;
                 }
                 var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
@@ -838,52 +837,6 @@
                     });
                 }
             }
-        };
-
-        $scope.restore = function (content) {
-
-            $scope.page.buttonRestore = "busy";
-
-            relationResource.getByChildId(content.id, "relateParentDocumentOnDelete").then(function (data) {
-
-                var relation = null;
-                var target = null;
-                var error = { headline: "Cannot automatically restore this item", content: "Use the Move menu item to move it manually" };
-
-                if (data.length === 0) {
-                    notificationsService.error(error.headline, "There is no 'restore' relation found for this node. Use the Move menu item to move it manually.");
-                    $scope.page.buttonRestore = "error";
-                    return;
-                }
-
-                relation = data[0];
-
-                if (relation.parentId === -1) {
-                    target = { id: -1, name: "Root" };
-                    moveNode(content, target);
-                } else {
-                    contentResource.getById(relation.parentId).then(function (data) {
-                        target = data;
-
-                        // make sure the target item isn't in the recycle bin
-                        if (target.path.indexOf("-20") !== -1) {
-                            notificationsService.error(error.headline, "The item you want to restore it under (" + target.name + ") is in the recycle bin. Use the Move menu item to move the item manually.");
-                            $scope.page.buttonRestore = "error";
-                            return;
-                        }
-
-                        moveNode(content, target);
-
-                    }, function (err) {
-                        $scope.page.buttonRestore = "error";
-                        notificationsService.error(error.headline, error.content);
-                    });
-                }
-
-            }, function (err) {
-                $scope.page.buttonRestore = "error";
-                notificationsService.error(error.headline, error.content);
-            });
         };
 
         /* publish method used in infinite editing */
@@ -915,8 +868,14 @@
          * @param {any} app
          */
         $scope.appChanged = function (app) {
+            
             $scope.app = app;
-            createButtons($scope.content);
+            
+            if (infiniteMode) {
+                createInfiniteModeButtons($scope.content);
+            } else {
+                createButtons($scope.content);
+            }
         };
 
         // methods for infinite editing

@@ -38,8 +38,12 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Macros;
+using Umbraco.Web.PublishedCache;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Testing
 {
@@ -101,7 +105,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected CacheHelper CacheHelper => Factory.GetInstance<CacheHelper>();
+        protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
 
         protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();
 
@@ -121,13 +125,13 @@ namespace Umbraco.Tests.Testing
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
-            // fixme - align to runtimes & components - don't redo everything here
+            // FIXME: align to runtimes & components - don't redo everything here
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
-            var cacheHelper = GetCacheHelper();
+            var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var typeLoader = GetTypeLoader(cacheHelper.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
+            var typeLoader = GetTypeLoader(appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
 
             var register = RegisterFactory.Create();
 
@@ -137,8 +141,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
-            Composition.RegisterUnique(cacheHelper);
-            Composition.RegisterUnique(cacheHelper.RuntimeCache);
+            Composition.RegisterUnique(appCaches);
 
             TestObjects = new TestObjects(register);
             Compose();
@@ -199,9 +202,9 @@ namespace Umbraco.Tests.Testing
             return (logger, profiler);
         }
 
-        protected virtual CacheHelper GetCacheHelper()
+        protected virtual AppCaches GetAppCaches()
         {
-            return CacheHelper.Disabled;
+            return AppCaches.Disabled;
         }
 
         protected virtual void ComposeWeb()
@@ -212,10 +215,22 @@ namespace Umbraco.Tests.Testing
 
             // web
             Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
-            Composition.RegisterUnique<PublishedRouter>();
+            Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
+            Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
+
+            // register back office sections in the order we want them rendered
+            Composition.WithCollectionBuilder<BackOfficeSectionCollectionBuilder>().Append<ContentBackOfficeSection>()
+                .Append<MediaBackOfficeSection>()
+                .Append<SettingsBackOfficeSection>()
+                .Append<PackagesBackOfficeSection>()
+                .Append<UsersBackOfficeSection>()
+                .Append<MembersBackOfficeSection>()
+                .Append<TranslationBackOfficeSection>();
+            Composition.RegisterUnique<ISectionService, SectionService>();
+
         }
 
         protected virtual void ComposeWtf()
@@ -245,7 +260,7 @@ namespace Umbraco.Tests.Testing
                 .ComposeWebMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
@@ -260,13 +275,13 @@ namespace Umbraco.Tests.Testing
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected virtual TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             return CreateCommonTypeLoader(runtimeCache, globalSettings, logger);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        private static TypeLoader CreateCommonTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             return new TypeLoader(runtimeCache, globalSettings.LocalTempStorageLocation, logger, false)
             {
@@ -304,7 +319,6 @@ namespace Umbraco.Tests.Testing
 
             // register basic stuff that might need to be there for some container resolvers to work
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
             Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
@@ -342,7 +356,7 @@ namespace Umbraco.Tests.Testing
             Composition.ComposeServices();
 
             // composition root is doing weird things, fix
-            Composition.RegisterUnique<IApplicationTreeService, ApplicationTreeService>();
+            Composition.RegisterUnique<ITreeService, TreeService>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
@@ -416,7 +430,7 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();
-            SettingsForTests.Reset(); // fixme - should it be optional?
+            SettingsForTests.Reset(); // FIXME: should it be optional?
 
             Mapper.Reset();
 

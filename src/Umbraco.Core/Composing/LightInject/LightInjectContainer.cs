@@ -124,6 +124,8 @@ namespace Umbraco.Core.Composing.LightInject
 
         #endregion
 
+        private static string GetTargetedServiceName<TTarget>() => "TARGET:" + typeof(TTarget).FullName;
+
         #region Factory
 
         /// <inheritdoc />
@@ -131,12 +133,17 @@ namespace Umbraco.Core.Composing.LightInject
             => this.GetService(type);
 
         /// <inheritdoc />
+        public TService GetInstanceFor<TService, TTarget>()
+            => Container.GetInstance<TService>(GetTargetedServiceName<TTarget>());
+
+        /// <inheritdoc />
         public object TryGetInstance(Type type)
             => this.GetRequiredService(type);
 
         /// <inheritdoc />
         public IEnumerable<T> GetAllInstances<T>()
-            => this.GetServices<T>();
+            where T : class
+            => Container.GetAllInstances<T>();
 
         /// <inheritdoc />
         public IEnumerable<object> GetAllInstances(Type type)
@@ -177,21 +184,14 @@ namespace Umbraco.Core.Composing.LightInject
 
         private class AssemblyScanner : IAssemblyScanner
         {
-            //private readonly IAssemblyScanner _scanner;
-
-            //public AssemblyScanner(IAssemblyScanner scanner)
-            //{
-            //    _scanner = scanner;
-            //}
-
             public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
             {
-                // nothing - we *could* scan non-Umbraco assemblies, though
+                // nothing - we don't want LightInject to scan
             }
 
             public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
             {
-                // nothing - we *could* scan non-Umbraco assemblies, though
+                // nothing - we don't want LightInject to scan
             }
         }
 

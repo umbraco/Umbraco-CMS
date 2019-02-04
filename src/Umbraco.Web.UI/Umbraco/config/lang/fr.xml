@@ -346,10 +346,6 @@
     <key alias="siterepublishHelp">Le cache du site va être mis à jour. Tous les contenus publiés seront mis à jour. Et tous les contenus dépubliés resteront invisibles.</key>
     <key alias="tableColumns">Nombre de colonnes</key>
     <key alias="tableRows">Nombre de lignes</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Définir un placeholder ID</strong>. En mettant un ID sur votre placeholder, vous pouvez injecter du contenu à cet endroit depuis les modèles enfants,
-      en faisant référence à cet ID au sein d'un élément <code>&lt;asp:content /&gt;</code>.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Séléctionnez un placeholder ID</strong> dans la liste ci-dessous. Vous pouvez seulement
-      choisir un ID se trouvant dans le parent du modèle actuel.]]></key>
     <key alias="thumbnailimageclickfororiginal">Cliquez sur l'image pour la voir en taille réelle</key>
     <key alias="treepicker">Sélectionner un élément</key>
     <key alias="viewCacheItem">Voir l'élément de cache</key>
@@ -468,7 +464,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Veuillez remplir l'alias et le nom de la nouvelle propriété!</key>
     <key alias="filePermissionsError">Il y a un problème de droits en lecture/écriture sur un fichier ou dossier spécifique</key>
     <key alias="macroErrorLoadingPartialView">Erreur de chargement du script d'une Partial View (fichier : %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Erreur de chargement du userControl '%0%'</key>
     <key alias="missingTitle">Veuillez entrer un titre</key>
     <key alias="missingType">Veuillez choisir un type</key>
     <key alias="pictureResizeBiggerThanOrg">Vous allez définir une taille d'image supérieure à sa taille d'origine. Êtes-vous certain(e) de vouloir continuer?</key>
@@ -561,7 +556,6 @@
     <key alias="orderBy">Trier par</key>
     <key alias="password">Mot de passe</key>
     <key alias="path">Chemin</key>
-    <key alias="placeHolderID">Placeholder ID</key>
     <key alias="pleasewait">Un moment s'il vous plaît...</key>
     <key alias="previous">Précédent</key>
     <key alias="properties">Propriétés</key>
@@ -1025,14 +1019,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="packageCompatibilityDescription">Ce package est compatible avec les versions suivantes de Umbraco, selon les rapports des membres de la communauté. Une compatibilité complète ne peut pas être garantie pour les versions rapportées sous 100%</key>
     <key alias="packageExternalSources">Sources externes</key>
     <key alias="packageAuthor">Auteur</key>
-    <key alias="packageDemonstration">Démo</key>
     <key alias="packageDocumentation">Documentation</key>
     <key alias="packageMetaData">Meta data du package</key>
     <key alias="packageName">Nom du package</key>
     <key alias="packageNoItemsHeader">Le package ne contient aucun élément</key>
     <key alias="packageNoItemsText"><![CDATA[Ce fichier de package ne contient aucun élément à désinstaller.<br/><br/>
       Vous pouvez supprimer tranquillement ce package de votre installation en cliquant sur "Désinstaller le package" ci-dessous.]]></key>
-    <key alias="packageNoUpgrades">Aucune mise à jour disponible</key>
     <key alias="packageOptions">Options du package</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Repository des packages</key>
@@ -1043,13 +1035,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="packageUninstallText"><![CDATA[Vous pouvez désélectionner ci-dessous les éléments que vous ne souhaitez pas supprimer pour le moment. Lorsque vous cliquerez sur "Confirmer la désinstallation", tous les éléments cochés seront supprimés.<br />
       <span style="color: Red; font-weight: bold;">Remarque :</span> tous les documents, media etc. dépendant des éléments que vous supprimez vont cesser de fonctionner, ce qui peut provoquer une instabilité du système,
       désinstallez donc avec prudence. En cas de doute, contactez l'auteur du package.]]></key>
-    <key alias="packageUpgradeDownload">Télécharger la mise à jour depuis le repository</key>
-    <key alias="packageUpgradeHeader">Mettre à jour le package</key>
-    <key alias="packageUpgradeInstructions">Instructions de mise à jour</key>
-    <key alias="packageUpgradeText">Il y a une mise à jour disponible pour ce package. Vous pouvez la télécharger directement depuis le repository des packages Umbraco.</key>
     <key alias="packageVersion">Version du package</key>
-    <key alias="packageVersionHistory">Historique des versions du package</key>
-    <key alias="viewPackageWebsite">Voir le site internet du package</key>
     <key alias="packageAlreadyInstalled">Package déjà installé</key>
     <key alias="targetVersionMismatch">Ce package ne peut pas être installé, il nécessite au minimum la version Umbraco %0%</key>
     <key alias="installStateUninstalling">Désinstallation...</key>

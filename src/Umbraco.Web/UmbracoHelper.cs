@@ -8,139 +8,89 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
-using Umbraco.Core.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
-
     /// <summary>
     /// A helper class that provides many useful methods and functionality for using Umbraco in templates
     /// </summary>
-    public class UmbracoHelper : IUmbracoComponentRenderer
+    /// <remarks>
+    /// This object is a request based lifetime
+    /// </remarks>
+    public class UmbracoHelper
     {
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
         private readonly UmbracoContext _umbracoContext;
-        private readonly IPublishedContent _currentPage;
-        private readonly ServiceContext _services;
+        private IPublishedContent _currentPage;
         
-        private IUmbracoComponentRenderer _componentRenderer;
-        private IPublishedContentQuery _query;
-        private MembershipHelper _membershipHelper;
-        private ITagQuery _tag;
+        private readonly IUmbracoComponentRenderer _componentRenderer;
+        private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class.
+        /// Initializes a new instance of <see cref="UmbracoHelper"/>.
         /// </summary>
-        /// <remarks>For tests.</remarks>
-        internal UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content,
-            ITagQuery tagQuery,
-            ICultureDictionary cultureDictionary,
+        /// <param name="umbracoContext">An Umbraco context.</param>
+        /// <param name="tagQuery"></param>
+        /// <param name="cultureDictionary"></param>
+        /// <param name="componentRenderer"></param>
+        /// <param name="publishedContentQuery"></param>
+        /// <param name="membershipHelper"></param>
+        /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
+        public UmbracoHelper(UmbracoContext umbracoContext, ITagQuery tagQuery,
+            ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            MembershipHelper membershipHelper,
-            ServiceContext services)
+            IPublishedContentQuery publishedContentQuery,
+            MembershipHelper membershipHelper)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _tag = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
-            _cultureDictionary = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
+            TagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
+            _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
-            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
-            _currentPage = content ?? throw new ArgumentNullException(nameof(content));
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            MembershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
+            ContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
+
+            if (_umbracoContext.IsFrontEndUmbracoRequest)
+                _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class.
+        /// Initializes a new empty instance of <see cref="UmbracoHelper"/>.
         /// </summary>
         /// <remarks>For tests - nothing is initialized.</remarks>
         internal UmbracoHelper()
         { }
-
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class with an Umbraco context
-        /// and a specific content item.
-        /// </summary>
-        /// <param name="umbracoContext">An Umbraco context.</param>
-        /// <param name="content">A content item.</param>
-        /// <param name="services">A services context.</param>
-        /// <remarks>Sets the current page to the supplied content item.</remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services, IPublishedContent content)
-            : this(umbracoContext, services)
-        {
-            _currentPage = content ?? throw new ArgumentNullException(nameof(content));
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoHelper"/> class with an Umbraco context.
-        /// </summary>
-        /// <param name="umbracoContext">An Umbraco context.</param>
-        /// <param name="services">A services context.</param>
-        /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
-        public UmbracoHelper(UmbracoContext umbracoContext, ServiceContext services)
-        {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            if (_umbracoContext.IsFrontEndUmbracoRequest)
-                _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
-        }
 
         #endregion
 
         /// <summary>
         /// Gets the tag context.
         /// </summary>
-        public ITagQuery TagQuery => _tag ??
-            (_tag = new TagQuery(_services.TagService, ContentQuery));
+        public ITagQuery TagQuery { get; }
 
         /// <summary>
         /// Gets the query context.
         /// </summary>
-        public IPublishedContentQuery ContentQuery => _query ??
-            (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache, UmbracoContext.VariationContextAccessor));
-
-        /// <summary>
-        /// Gets the Umbraco context.
-        /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get
-            {
-                if (_umbracoContext == null)
-                    throw new NullReferenceException("UmbracoContext has not been set.");
-                return _umbracoContext;
-            }
-        }
-
+        public IPublishedContentQuery ContentQuery { get; }
+        
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
-        public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = Current.Factory.GetInstance<MembershipHelper>());
+        public MembershipHelper MembershipHelper { get; }
 
         /// <summary>
         /// Gets the url provider.
         /// </summary>
-        public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
+        public UrlProvider UrlProvider => _umbracoContext.UrlProvider;
 
         /// <summary>
-        /// Gets the component renderer.
-        /// </summary>
-        public IUmbracoComponentRenderer UmbracoComponentRenderer => _componentRenderer
-            ?? (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext));
-
-        /// <summary>
-        /// Returns the current <seealso cref="IPublishedContent"/> item
-        /// assigned to the UmbracoHelper.
+        /// Gets (or sets) the current <see cref="IPublishedContent"/> item assigned to the UmbracoHelper.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -173,17 +123,18 @@ namespace Umbraco.Web
                     );
 
             }
+            set => _currentPage = value;
         }
 
         /// <summary>
         /// Renders the template for the specified pageId and an optional altTemplateId
         /// </summary>
-        /// <param name="pageId"></param>
+        /// <param name="contentId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
         /// <returns></returns>
-        public IHtmlString RenderTemplate(int pageId, int? altTemplateId = null)
+        public IHtmlString RenderTemplate(int contentId, int? altTemplateId = null)
         {
-            return UmbracoComponentRenderer.RenderTemplate(pageId, altTemplateId);
+            return _componentRenderer.RenderTemplate(contentId, altTemplateId);
         }
 
         #region RenderMacro
@@ -195,7 +146,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return UmbracoComponentRenderer.RenderMacro(alias, new { });
+            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, new { });
         }
 
         /// <summary>
@@ -206,7 +157,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, object parameters)
         {
-            return UmbracoComponentRenderer.RenderMacro(alias, parameters.ToDictionary<object>());
+            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters.ToDictionary<object>());
         }
 
         /// <summary>
@@ -217,7 +168,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return UmbracoComponentRenderer.RenderMacro(alias, parameters);
+            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters);
         }
 
         #endregion
@@ -254,7 +205,7 @@ namespace Umbraco.Web
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
         public ICultureDictionary CultureDictionary => _cultureDictionary
-            ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
+            ?? (_cultureDictionary = _cultureDictionaryFactory.CreateDictionary());
 
         #endregion
 
@@ -287,6 +238,7 @@ namespace Umbraco.Web
         /// Gets the url of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
         /// <returns>The url for the content.</returns>
         public string Url(int contentId, string culture = null)
         {
@@ -325,23 +277,14 @@ namespace Umbraco.Web
 
             var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
 
-            var entityService = Current.Services.EntityService;
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Document:
                     return Content(guidUdi.Guid);
                 case UmbracoObjectTypes.Media:
-                    // fixme - need to implement Media(guid)!
-                    var mediaAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
-                    if (mediaAttempt.Success)
-                        return Media(mediaAttempt.Result);
-                    break;
+                    return Media(guidUdi.Guid);
                 case UmbracoObjectTypes.Member:
-                    // fixme - need to implement Member(guid)!
-                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
-                    if (memberAttempt.Success)
-                        return Member(memberAttempt.Result);
-                    break;
+                    return Member(guidUdi.Guid);
             }
 
             return null;
@@ -463,11 +406,9 @@ namespace Umbraco.Web
         private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids)
         {
             var idsA = ids.ToArray();
-            IEnumerable<int> intIds;
-            if (ConvertIdsObjectToInts(idsA, out intIds))
+            if (ConvertIdsObjectToInts(idsA, out var intIds))
                 return ContentQuery.Content(intIds);
-            IEnumerable<Guid> guidIds;
-            if (ConvertIdsObjectToGuids(idsA, out guidIds))
+            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
                 return ContentQuery.Content(guidIds);
             return Enumerable.Empty<IPublishedContent>();
         }
@@ -647,12 +588,7 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(Guid id)
         {
-            //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and
-            // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
-
-            var entityService = Current.Services.EntityService; // fixme inject
-            var mediaAttempt = entityService.GetId(id, UmbracoObjectTypes.Media);
-            return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
+            return ContentQuery.Media(id);
         }
 
         /// <summary>
@@ -705,12 +641,10 @@ namespace Umbraco.Web
         private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids)
         {
             var idsA = ids.ToArray();
-            IEnumerable<int> intIds;
-            if (ConvertIdsObjectToInts(idsA, out intIds))
+            if (ConvertIdsObjectToInts(idsA, out var intIds))
                 return ContentQuery.Media(intIds);
-            //IEnumerable<Guid> guidIds;
-            //if (ConvertIdsObjectToGuids(idsA, out guidIds))
-            //    return ContentQuery.Media(guidIds);
+            if (ConvertIdsObjectToGuids(idsA, out var guidIds))
+                return ContentQuery.Media(guidIds);
             return Enumerable.Empty<IPublishedContent>();
         }
 
@@ -779,10 +713,10 @@ namespace Umbraco.Web
         #region Strings
 
         /// <summary>
-        /// Replaces text line breaks with html line breaks
+        /// Replaces text line breaks with HTML line breaks
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
+        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
         public IHtmlString ReplaceLineBreaksForHtml(string text)
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
@@ -800,7 +734,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
         public HtmlString StripHtml(IHtmlString html, params string[] tags)
         {
@@ -808,7 +742,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
         public HtmlString StripHtml(string html, params string[] tags)
         {
@@ -832,7 +766,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Joins any number of int/string/objects into one string and seperates them with the string seperator parameter.
+        /// Joins any number of int/string/objects into one string and separates them with the string separator parameter.
         /// </summary>
         public string Join(string separator, params object[] args)
         {
@@ -840,7 +774,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(IHtmlString html, int length)
         {
@@ -848,7 +782,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis)
         {
@@ -856,7 +790,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
         {
@@ -864,7 +798,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(string html, int length)
         {
@@ -872,7 +806,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(string html, int length, bool addElipsis)
         {
@@ -880,7 +814,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given length, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
         {
@@ -890,7 +824,7 @@ namespace Umbraco.Web
         #region Truncate by Words
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words)
         {
@@ -900,7 +834,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
         {
@@ -910,7 +844,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words)
         {
@@ -920,7 +854,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
         {

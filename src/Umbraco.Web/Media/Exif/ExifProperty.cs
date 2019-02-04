@@ -17,7 +17,7 @@ namespace Umbraco.Web.Media.Exif
         /// </summary>
         public ExifTag Tag { get { return mTag; } }
         /// <summary>
-        /// Gets the IFD section contaning this property.
+        /// Gets the IFD section containing this property.
         /// </summary>
         public IFD IFD { get { return mIFD; } }
         /// <summary>

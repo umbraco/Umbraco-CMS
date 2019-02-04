@@ -17,15 +17,17 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install;
+using Umbraco.Web.JavaScript;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Web.UI.JavaScript;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
 using Current = Umbraco.Web.Composing.Current;
@@ -76,8 +78,6 @@ namespace Umbraco.Web.Runtime
 
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
-
-            InstallHelper.DeleteLegacyInstaller();
 
             // wrap view engines in the profiling engine
             WrapViewEngines(ViewEngines.Engines);
@@ -245,16 +245,16 @@ namespace Umbraco.Web.Runtime
         private static void ConfigureClientDependency(IGlobalSettings globalSettings)
         {
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-            XmlFileMapper.FileMapDefaultFolder = "~/App_Data/TEMP/ClientDependency";
+            XmlFileMapper.FileMapDefaultFolder = SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
             BaseCompositeFileProcessingProvider.UrlTypeDefault = CompositeUrlType.Base64QueryStrings;
 
-            // Now we need to detect if we are running umbracoLocalTempStorage as EnvironmentTemp and in that case we want to change the CDF file
+            // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file
             // location to be there
             if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
                 var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
                 var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
-                    //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                    //include the AppDomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
                     // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                     // utilizing an old path
                     appDomainHash);

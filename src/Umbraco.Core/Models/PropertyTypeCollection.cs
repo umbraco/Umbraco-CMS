@@ -13,13 +13,13 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract]
-    //TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
+    // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyTypeCollection : KeyedCollection<string, PropertyType>, INotifyCollectionChanged, IDeepCloneable
     {
         [IgnoreDataMember]
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        //fixme: This doesn't seem to be used
+        // TODO: This doesn't seem to be used
         [IgnoreDataMember]
         internal Action OnAdd;
 
@@ -76,12 +76,12 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        //TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
+        // TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
         internal new void Add(PropertyType item)
         {
             item.IsPublishing = IsPublishing;
 
-            // fixme redo this entirely!!!
+            // TODO: this is not pretty and should be refactored
             try
             {
                 _addLocker.EnterWriteLock();

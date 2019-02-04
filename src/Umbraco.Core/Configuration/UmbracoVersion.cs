@@ -31,7 +31,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        // TODO rename to Version
+        // TODO: rename to Version
         public static Version Current { get; }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <remarks>
         /// <para>The assembly version is the value of the <see cref="AssemblyVersionAttribute"/>.</para>
-        /// <para>Is is the one that the CLR checks for compatibility. Therefore, it changes only on
+        /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
         public static Version AssemblyVersion {get; }
@@ -81,8 +81,8 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    // fixme - this should live in its own independent file! NOT web.config!
-                    var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
+                    // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
+                    var value = ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus];
                     return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }
                 catch

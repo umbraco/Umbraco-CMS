@@ -13,9 +13,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
         {
             var database = Database;
             //Now we need to check if we can actually do this because we won't be able to if there's data in there that is too long
-            var colLen = (SqlSyntax is MySqlSyntaxProvider)
-                ? database.ExecuteScalar<int?>(string.Format("select max(LENGTH({0})) from cmsDictionary", SqlSyntax.GetQuotedColumnName("key")))
-                : database.ExecuteScalar<int?>(string.Format("select max(datalength({0})) from cmsDictionary", SqlSyntax.GetQuotedColumnName("key")));
+            var colLen = database.ExecuteScalar<int?>(string.Format("select max(datalength({0})) from cmsDictionary", SqlSyntax.GetQuotedColumnName("key")));
 
             if (colLen < 900 == false && colLen != null)
             {

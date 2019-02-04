@@ -3,46 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Caching;
-using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Macros
 {
-    public class MacroRenderer
+    internal class MacroRenderer : IMacroRenderer
     {
         private readonly IProfilingLogger _plogger;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IContentSection _contentSection;
+        private readonly ILocalizedTextService _textService;
+        private readonly AppCaches _appCaches;
+        private readonly IMacroService _macroService;
 
-        // todo: there are many more things that would need to be injected in here
-
-        public MacroRenderer(IProfilingLogger plogger)
+        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService)
         {
-            _plogger = plogger;
+            _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _contentSection = contentSection ?? throw new ArgumentNullException(nameof(contentSection));
+            _textService = textService;
+            _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
+            _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
         }
-
-        // probably can do better - just porting from v7
-        public IList<Exception> Exceptions { get; } = new List<Exception>();
 
         #region MacroContent cache
 
         // gets this macro content cache identifier
-        private static string GetContentCacheIdentifier(MacroModel model, int pageId)
+        private string GetContentCacheIdentifier(MacroModel model, int pageId)
         {
             var id = new StringBuilder();
 
@@ -56,8 +54,9 @@ namespace Umbraco.Web.Macros
             {
                 object key = 0;
 
-                if (HttpContext.Current.User.Identity.IsAuthenticated)
+                if (_umbracoContextAccessor.UmbracoContext.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
                 {
+                    //ugh, membershipproviders :(
                     var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
                     var member = Core.Security.MembershipProviderExtensions.GetCurrentUser(provider);
                     key = member?.ProviderUserKey ?? 0;
@@ -72,34 +71,19 @@ namespace Umbraco.Web.Macros
             return id.ToString();
         }
 
-        private static string GenerateCacheKeyFromCode(string input)
-        {
-            if (string.IsNullOrEmpty(input)) throw new ArgumentNullException(nameof(input));
-
-            // step 1, calculate MD5 hash from input
-            var md5 = MD5.Create();
-            var inputBytes = Encoding.ASCII.GetBytes(input);
-            var hash = md5.ComputeHash(inputBytes);
-
-            // step 2, convert byte array to hex string
-            var sb = new StringBuilder();
-            foreach (var h in hash) sb.Append(h.ToString("X2"));
-            return sb.ToString();
-        }
-
         // gets this macro content from the cache
         // ensuring that it is appropriate to use the cache
-        private static MacroContent GetMacroContentFromCache(MacroModel model)
+        private MacroContent GetMacroContentFromCache(MacroModel model)
         {
             // only if cache is enabled
-            if (UmbracoContext.Current.InPreviewMode || model.CacheDuration <= 0) return null;
+            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0) return null;
 
-            var cache = Current.ApplicationCache.RuntimeCache;
+            var cache = _appCaches.RuntimeCache;
             var macroContent = cache.GetCacheItem<MacroContent>(CacheKeys.MacroContentCacheKey + model.CacheIdentifier);
 
             if (macroContent == null) return null;
 
-            Current.Logger.Debug<MacroRenderer>("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
+            _plogger.Debug<MacroRenderer>("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
 
             // ensure that the source has not changed
             // note: does not handle dependencies, and never has
@@ -108,13 +92,13 @@ namespace Umbraco.Web.Macros
             {
                 if (macroSource.Exists == false)
                 {
-                    Current.Logger.Debug<MacroRenderer>("Macro source does not exist anymore, ignore cache.");
+                    _plogger.Debug<MacroRenderer>("Macro source does not exist anymore, ignore cache.");
                     return null;
                 }
 
                 if (macroContent.Date < macroSource.LastWriteTime)
                 {
-                    Current.Logger.Debug<MacroRenderer>("Macro source has changed, ignore cache.");
+                    _plogger.Debug<MacroRenderer>("Macro source has changed, ignore cache.");
                     return null;
                 }
             }
@@ -127,10 +111,10 @@ namespace Umbraco.Web.Macros
         }
 
         // stores macro content into the cache
-        private static void AddMacroContentToCache(MacroModel model, MacroContent macroContent)
+        private void AddMacroContentToCache(MacroModel model, MacroContent macroContent)
         {
             // only if cache is enabled
-            if (UmbracoContext.Current.InPreviewMode || model.CacheDuration <= 0) return;
+            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0) return;
 
             // just make sure...
             if (macroContent == null) return;
@@ -151,15 +135,15 @@ namespace Umbraco.Web.Macros
             // remember when we cache the content
             macroContent.Date = DateTime.Now;
 
-            var cache = Current.ApplicationCache.RuntimeCache;
-            cache.InsertCacheItem(
+            var cache = _appCaches.RuntimeCache;
+            cache.Insert(
                 CacheKeys.MacroContentCacheKey + model.CacheIdentifier,
                 () => macroContent,
                 new TimeSpan(0, 0, model.CacheDuration),
                 priority: CacheItemPriority.NotRemovable
                 );
 
-            Current.Logger.Debug<MacroRenderer>("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
+            _plogger.Debug<MacroRenderer>("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
         }
 
         // gets the macro source file name
@@ -171,8 +155,7 @@ namespace Umbraco.Web.Macros
             switch (model.MacroType)
             {
                 case MacroTypes.PartialView:
-                case MacroTypes.UserControl:
-                    filename = model.MacroSource; //user controls & partial views are saved with their full virtual path
+                    filename = model.MacroSource; // partial views are saved with their full virtual path
                     break;
                 default:
                     // not file-based, or not supported
@@ -185,7 +168,7 @@ namespace Umbraco.Web.Macros
 
         // gets the macro source file
         // null if macro is not file-based
-        internal static FileInfo GetMacroFile(MacroModel model)
+        private static FileInfo GetMacroFile(MacroModel model)
         {
             var filename = GetMacroFileName(model);
             if (filename == null) return null;
@@ -197,47 +180,38 @@ namespace Umbraco.Web.Macros
             return file.Exists ? file : null;
         }
 
-        #endregion
-
-        #region MacroModel properties
-
         // updates the model properties values according to the attributes
-        private static void UpdateMacroModelProperties(MacroModel model, Hashtable attributes)
+        private static void UpdateMacroModelProperties(MacroModel model, IDictionary<string, object> macroParams)
         {
             foreach (var prop in model.Properties)
             {
                 var key = prop.Key.ToLowerInvariant();
-                prop.Value = attributes.ContainsKey(key)
-                    ? attributes[key]?.ToString() ?? string.Empty
+                prop.Value = macroParams.ContainsKey(key)
+                    ? macroParams[key]?.ToString() ?? string.Empty
                     : string.Empty;
             }
-        }
-
-        // generates the model properties according to the attributes
-        public static void GenerateMacroModelPropertiesFromAttributes(MacroModel model, Hashtable attributes)
-        {
-            foreach (string key in attributes.Keys)
-                model.Properties.Add(new MacroPropertyModel(key, attributes[key].ToString()));
-        }
-
+        } 
         #endregion
 
         #region Render/Execute
 
-        // still, this is ugly. The macro should have a Content property
-        // referring to IPublishedContent we're rendering the macro against,
-        // this is all soooo convoluted ;-(
-
-        public MacroContent Render(MacroModel macro, Hashtable pageElements, int pageId, Hashtable attributes)
+        public MacroContent Render(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
         {
-            UpdateMacroModelProperties(macro, attributes);
-            return Render(macro, pageElements, pageId);
+            var m = _macroService.GetByAlias(macroAlias);
+            if (m == null)
+                throw new InvalidOperationException("No macro found by alias " + macroAlias);
+
+            var page = new PublishedContentHashtableConverter(content);
+
+            var macro = new MacroModel(m);
+
+            UpdateMacroModelProperties(macro, macroParams);
+            return Render(macro, content, page.Elements);
         }
 
-        public MacroContent Render(MacroModel macro, Hashtable pageElements, int pageId)
+        private MacroContent Render(MacroModel macro, IPublishedContent content, IDictionary pageElements)
         {
-            // trigger MacroRendering event so that the model can be manipulated before rendering
-            OnMacroRendering(new MacroRenderingEventArgs(pageElements, pageId));
+            if (content == null) throw new ArgumentNullException(nameof(content));
 
             var macroInfo = $"Render Macro: {macro.Name}, type: {macro.MacroType}, cache: {macro.CacheDuration}";
             using (_plogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
@@ -246,7 +220,7 @@ namespace Umbraco.Web.Macros
                 foreach (var prop in macro.Properties)
                     prop.Value = ParseAttribute(pageElements, prop.Value);
 
-                macro.CacheIdentifier = GetContentCacheIdentifier(macro, pageId);
+                macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id);
 
                 // get the macro from cache if it is there
                 var macroContent = GetMacroContentFromCache(macro);
@@ -260,7 +234,7 @@ namespace Umbraco.Web.Macros
                 // this will take care of errors
                 // it may throw, if we actually want to throw, so better not
                 // catch anything here and let the exception be thrown
-                var attempt = ExecuteMacroOfType(macro);
+                var attempt = ExecuteMacroOfType(macro, content);
 
                 // by convention ExecuteMacroByType must either throw or return a result
                 // just check to avoid internal errors
@@ -302,8 +276,6 @@ namespace Umbraco.Web.Macros
             }
             catch (Exception e)
             {
-                Exceptions.Add(e);
-
                 _plogger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
@@ -312,10 +284,8 @@ namespace Umbraco.Web.Macros
                     Alias = macro.Alias,
                     MacroSource = macro.MacroSource,
                     Exception = e,
-                    Behaviour = Current.Configs.Settings().Content.MacroErrorBehaviour
+                    Behaviour = _contentSection.MacroErrorBehaviour
                 };
-
-                OnError(macroErrorEventArgs);
 
                 switch (macroErrorEventArgs.Behaviour)
                 {
@@ -343,16 +313,17 @@ namespace Umbraco.Web.Macros
         /// <remarks>Returns an attempt that is successful if the macro ran successfully. If the macro failed
         /// to run properly, the attempt fails, though it may contain a content. But for instance that content
         /// should not be cached. In that case the attempt may also contain an exception.</remarks>
-        private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model)
+        private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
-            if (UmbracoContext.Current.PublishedRequest == null
-                || UmbracoContext.Current.PublishedRequest.HasPublishedContent == false)
-                return Attempt.Fail(new MacroContent { Text = "[macro]" });
+            if (content == null)
+                return Attempt.Fail(new MacroContent { Text = "[macro failed (no content)]" });
 
-            var textService = Current.Services.TextService;
+            var textService = _textService;
 
             switch (model.MacroType)
             {
@@ -360,17 +331,9 @@ namespace Umbraco.Web.Macros
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                         "Executed PartialView.",
-                        () => ExecutePartialView(model),
+                        () => ExecutePartialView(model, content),
                         () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
 
-                case MacroTypes.UserControl:
-                    return ExecuteMacroWithErrorWrapper(model,
-                        $"Loading UserControl: MacroSource=\"{model.MacroSource}\".",
-                        "Loaded UserControl.",
-                        () => ExecuteUserControl(model),
-                        () => textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { model.MacroSource }));
-
-                //case MacroTypes.Script:
                 default:
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Execute macro with unsupported type \"{model.MacroType}\".",
@@ -380,21 +343,6 @@ namespace Umbraco.Web.Macros
             }
         }
 
-        // raised when a macro triggers an error
-        public static event TypedEventHandler<MacroRenderer, MacroErrorEventArgs> Error;
-
-        protected void OnError(MacroErrorEventArgs e)
-        {
-            Error?.Invoke(this, e);
-        }
-
-        // raised before the macro renders, allowing devs to modify it
-        public static event TypedEventHandler<MacroRenderer, MacroRenderingEventArgs> MacroRendering;
-
-        protected void OnMacroRendering(MacroRenderingEventArgs e)
-        {
-            MacroRendering?.Invoke(this, e);
-        }
 
         #endregion
 
@@ -404,22 +352,10 @@ namespace Umbraco.Web.Macros
         /// Renders a PartialView Macro.
         /// </summary>
         /// <returns>The text output of the macro execution.</returns>
-        private static MacroContent ExecutePartialView(MacroModel macro)
+        private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
         {
             var engine = new PartialViewMacroEngine();
-            var content = UmbracoContext.Current.PublishedRequest.PublishedContent;
             return engine.Execute(macro, content);
-        }
-
-        public static MacroContent ExecuteUserControl(MacroModel macro)
-        {
-            // add tilde for v4 defined macros
-            if (string.IsNullOrEmpty(macro.MacroSource) == false
-                && macro.MacroSource.StartsWith("~") == false)
-                macro.MacroSource = "~/" + macro.MacroSource;
-
-            var engine = new UserControlMacroEngine();
-            return engine.Execute(macro);
         }
 
         #endregion
@@ -428,8 +364,9 @@ namespace Umbraco.Web.Macros
 
         // parses attribute value looking for [@requestKey], [%sessionKey], [#pageElement], [$recursiveValue]
         // supports fallbacks eg "[@requestKey],[%sessionKey],1234"
-        public static string ParseAttribute(IDictionary pageElements, string attributeValue)
+        private string ParseAttribute(IDictionary pageElements, string attributeValue)
         {
+            if (pageElements == null) throw new ArgumentNullException(nameof(pageElements));
 
             // check for potential querystring/cookie variables
             attributeValue = attributeValue.Trim();
@@ -452,7 +389,7 @@ namespace Umbraco.Web.Macros
                 return attributeValue;
             }
 
-            var context = HttpContext.Current;
+            var context = _umbracoContextAccessor.UmbracoContext.HttpContext;
 
             foreach (var token in tokens)
             {
@@ -479,11 +416,9 @@ namespace Umbraco.Web.Macros
                             attributeValue = context?.Request.GetCookieValue(name);
                         break;
                     case '#':
-                        if (pageElements == null) pageElements = GetPageElements();
                         attributeValue = pageElements[name]?.ToString();
                         break;
                     case '$':
-                        if (pageElements == null) pageElements = GetPageElements();
                         attributeValue = pageElements[name]?.ToString();
                         if (string.IsNullOrEmpty(attributeValue))
                             attributeValue = ParseAttributeOnParents(pageElements, name);
@@ -498,12 +433,13 @@ namespace Umbraco.Web.Macros
             return attributeValue;
         }
 
-        private static string ParseAttributeOnParents(IDictionary pageElements, string name)
+        private string ParseAttributeOnParents(IDictionary pageElements, string name)
         {
+            if (pageElements == null) throw new ArgumentNullException(nameof(pageElements));
             // this was, and still is, an ugly piece of nonsense
 
             var value = string.Empty;
-            var cache = UmbracoContext.Current.ContentCache; // should be injected
+            var cache = _umbracoContextAccessor.UmbracoContext.ContentCache;
 
             var splitpath = (string[])pageElements["splitpath"];
             for (var i = splitpath.Length - 1; i > 0; i--) // at 0 we have root (-1)
@@ -516,195 +452,9 @@ namespace Umbraco.Web.Macros
 
             return value;
         }
-
-        private static IDictionary GetPageElements()
-        {
-            IDictionary pageElements = null;
-            if (HttpContext.Current.Items["pageElements"] != null)
-                pageElements = (IDictionary)HttpContext.Current.Items["pageElements"];
-            return pageElements;
-        }
-
+        
         #endregion
-
-        #region RTE macros
-
-        public static string RenderMacroStartTag(Hashtable attributes, int pageId, Guid versionId)
-        {
-            var div = "<div ";
-
-            var ide = attributes.GetEnumerator();
-            while (ide.MoveNext())
-            {
-                div += $"umb_{ide.Key}=\"{EncodeMacroAttribute((ide.Value ?? String.Empty).ToString())}\" ";
-            }
-
-            div += $"ismacro=\"true\" onresizestart=\"return false;\" umbVersionId=\"{versionId}\" umbPageid=\"{pageId}\""
-                + " title=\"This is rendered content from macro\" class=\"umbMacroHolder\"><!-- startUmbMacro -->";
-
-            return div;
-        }
-
-        private static string EncodeMacroAttribute(string attributeContents)
-        {
-            // replace linebreaks
-            attributeContents = attributeContents.Replace("\n", "\\n").Replace("\r", "\\r");
-
-            // replace quotes
-            attributeContents = attributeContents.Replace("\"", "&quot;");
-
-            // replace tag start/ends
-            attributeContents = attributeContents.Replace("<", "&lt;").Replace(">", "&gt;");
-
-            return attributeContents;
-        }
-
-        public static string RenderMacroEndTag()
-        {
-            return "<!-- endUmbMacro --></div>";
-        }
-
-        private static readonly Regex HrefRegex = new Regex("href=\"([^\"]*)\"",
-            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
-        public static string GetRenderedMacro(int macroId, Hashtable elements, Hashtable attributes, int pageId, IMacroService macroService, IProfilingLogger plogger)
-        {
-            var m = macroService.GetById(macroId);
-            if (m == null) return string.Empty;
-            var model = new MacroModel(m);
-
-            // get as text, will render the control if any
-            var renderer = new MacroRenderer(plogger);
-            var macroContent = renderer.Render(model, elements, pageId);
-            var text = macroContent.GetAsText();
-
-            // remove hrefs
-            text = HrefRegex.Replace(text, match => "href=\"javascript:void(0)\"");
-
-            return text;
-        }
-
-        public static string MacroContentByHttp(int pageId, Guid pageVersion, Hashtable attributes, IMacroService macroService)
-        {
-            // though... we only support FullTrust now?
-            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted)
-                return "<span style='color: red'>Cannot render macro content in the rich text editor when the application is running in a Partial Trust environment</span>";
-
-            var tempAlias = attributes["macroalias"]?.ToString() ?? attributes["macroAlias"].ToString();
-
-            var m = macroService.GetByAlias(tempAlias);
-            if (m == null) return string.Empty;
-            var macro = new MacroModel(m);
-            if (macro.RenderInEditor == false)
-                return ShowNoMacroContent(macro);
-
-            var querystring = $"umbPageId={pageId}&umbVersionId={pageVersion}";
-            var ide = attributes.GetEnumerator();
-            while (ide.MoveNext())
-                querystring += $"&umb_{ide.Key}={HttpContext.Current.Server.UrlEncode((ide.Value ?? String.Empty).ToString())}";
-
-            // create a new 'HttpWebRequest' object to the mentioned URL.
-            var useSsl = Current.Configs.Global().UseHttps;
-            var protocol = useSsl ? "https" : "http";
-            var currentRequest = HttpContext.Current.Request;
-            var serverVars = currentRequest.ServerVariables;
-            var umbracoDir = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
-            var url = $"{protocol}://{serverVars["SERVER_NAME"]}:{serverVars["SERVER_PORT"]}{umbracoDir}/macroResultWrapper.aspx?{querystring}";
-
-            var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-
-            // allows for validation of SSL conversations (to bypass SSL errors in debug mode!)
-            ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
-
-            // propagate the user's context
-            // TODO: this is the worst thing ever.
-            // also will not work if people decide to put their own custom auth system in place.
-            var inCookie = currentRequest.Cookies[Current.Configs.Settings().Security.AuthCookieName];
-            if (inCookie == null) throw new NullReferenceException("No auth cookie found");
-            var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path, serverVars["SERVER_NAME"]);
-            myHttpWebRequest.CookieContainer = new CookieContainer();
-            myHttpWebRequest.CookieContainer.Add(cookie);
-
-            // assign the response object of 'HttpWebRequest' to a 'HttpWebResponse' variable.
-            HttpWebResponse myHttpWebResponse = null;
-            var text = string.Empty;
-            try
-            {
-                myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    var streamResponse = myHttpWebResponse.GetResponseStream();
-                    if (streamResponse == null)
-                        throw new Exception("Internal error, no response stream.");
-                    var streamRead = new StreamReader(streamResponse);
-                    var readBuff = new char[256];
-                    var count = streamRead.Read(readBuff, 0, 256);
-                    while (count > 0)
-                    {
-                        var outputData = new string(readBuff, 0, count);
-                        text += outputData;
-                        count = streamRead.Read(readBuff, 0, 256);
-                    }
-
-                    streamResponse.Close();
-                    streamRead.Close();
-
-                    // find the content of a form
-                    const string grabStart = "<!-- grab start -->";
-                    const string grabEnd = "<!-- grab end -->";
-
-                    var grabStartPos = text.InvariantIndexOf(grabStart) + grabStart.Length;
-                    var grabEndPos = text.InvariantIndexOf(grabEnd) - grabStartPos;
-                    text = text.Substring(grabStartPos, grabEndPos);
-                }
-                else
-                {
-                    text = ShowNoMacroContent(macro);
-                }
-            }
-            catch (Exception)
-            {
-                text = ShowNoMacroContent(macro);
-            }
-            finally
-            {
-                // release the HttpWebResponse Resource.
-                myHttpWebResponse?.Close();
-            }
-
-            return text.Replace("\n", string.Empty).Replace("\r", string.Empty);
-        }
-
-        private static string ShowNoMacroContent(MacroModel model)
-        {
-            var name = HttpUtility.HtmlEncode(model.Name); // safe
-            return $"<span style=\"color: green\"><strong>{name}</strong><br />No macro content available for WYSIWYG editing</span>";
-        }
-
-        private static bool ValidateRemoteCertificate(
-            object sender,
-            X509Certificate certificate,
-            X509Chain chain,
-            SslPolicyErrors policyErrors
-            )
-        {
-            // allow any old dodgy certificate in debug mode
-            return GlobalSettings.DebugMode || policyErrors == SslPolicyErrors.None;
-        }
-
-        #endregion
+        
     }
 
-    public class MacroRenderingEventArgs : EventArgs
-    {
-        public MacroRenderingEventArgs(Hashtable pageElements, int pageId)
-        {
-            PageElements = pageElements;
-            PageId = pageId;
-        }
-
-        public int PageId { get; }
-
-        public Hashtable PageElements { get; }
-    }
 }

@@ -45,7 +45,7 @@ namespace Umbraco.Web
         private readonly UrlProviderCollection _urlProviders;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
-        private readonly PublishedRouter _publishedRouter;
+        private readonly IPublishedRouter _publishedRouter;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         public UmbracoInjectedModule(
@@ -56,7 +56,7 @@ namespace Umbraco.Web
             UrlProviderCollection urlProviders,
             IRuntimeState runtime,
             ILogger logger,
-            PublishedRouter publishedRouter,
+            IPublishedRouter publishedRouter,
             IVariationContextAccessor variationContextAccessor)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
@@ -107,7 +107,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Processses the Umbraco Request
+        /// Processes the Umbraco Request
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks>
@@ -150,9 +150,9 @@ namespace Umbraco.Web
 
             // note: requestModule.UmbracoRewrite also did some stripping of &umbPage
             // from the querystring... that was in v3.x to fix some issues with pre-forms
-            // auth. Paul Sterling confirmed in jan. 2013 that we can get rid of it.
+            // auth. Paul Sterling confirmed in Jan. 2013 that we can get rid of it.
 
-            // instanciate, prepare and process the published content request
+            // instantiate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
             var request = _publishedRouter.CreateRequest(umbracoContext);
             umbracoContext.PublishedRequest = request;
@@ -217,18 +217,15 @@ namespace Umbraco.Web
             var lpath = uri.AbsolutePath.ToLowerInvariant();
 
             // handle directory-urls used for asmx
-            // legacy - what's the point really?
-            if (/*maybeDoc &&*/ _globalSettings.UseDirectoryUrls)
+            // TODO: legacy - what's the point really?
+            var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
+            if (asmxPos >= 0)
             {
-                var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
-                if (asmxPos >= 0)
-                {
-                    // use uri.AbsolutePath, not path, 'cos path has been lowercased
-                    httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
-                        uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                        uri.Query.TrimStart('?'));
-                    maybeDoc = false;
-                }
+                // use uri.AbsolutePath, not path, 'cos path has been lowercased
+                httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
+                    uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
+                    uri.Query.TrimStart('?'));
+                maybeDoc = false;
             }
 
             // a document request should be
@@ -260,35 +257,18 @@ namespace Umbraco.Web
 
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
-            var debug = _runtime.Debug;
             var level = _runtime.Level;
             switch (level)
             {
+                // we should never handle Unknown nor Boot: the runtime boots in Application_Start
+                // and as long as it has not booted, no request other than the initial request is
+                // going to be served (see https://stackoverflow.com/a/21402100)
+                // we should never handle BootFailed: if boot failed, the pipeline should not run
+                // at all
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
-                    // not ready yet, but wait
-                    ReportRuntime(level, "Umbraco is booting.");
-
-                    // let requests pile up and wait for 10s then show the splash anyway
-                    if (Current.Configs.Settings().Content.EnableSplashWhileLoading == false
-                        && ((RuntimeState) _runtime).WaitForRunLevel(TimeSpan.FromSeconds(10))) return true;
-
-                    // redirect to booting page
-                    httpContext.Response.StatusCode = 503; // temp not available
-                    const string bootUrl = "~/config/splashes/booting.aspx";
-                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "30"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
-                    return false; // cannot serve content
-
                 case RuntimeLevel.BootFailed:
-                    // redirect to death page
-                    ReportRuntime(level, "Umbraco has failed.");
-
-                    httpContext.Response.StatusCode = 503; // temp not available
-                    const string deathUrl = "~/config/splashes/death.aspx";
-                    httpContext.Response.AddHeader("Retry-After", debug ? "1" : "300"); // seconds
-                    httpContext.RewritePath(UriUtility.ToAbsolute(deathUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
-                    return false; // cannot serve content
+                    throw new Exception($"panic: Unexpected runtime level: {level}.");
 
                 case RuntimeLevel.Run:
                     // ok
@@ -304,7 +284,7 @@ namespace Umbraco.Web
                     return false; // cannot serve content
 
                 default:
-                    throw new NotSupportedException($"Unexpected runtime level: {Current.RuntimeState.Level}.");
+                    throw new NotSupportedException($"Unexpected runtime level: {level}.");
             }
         }
 
@@ -347,7 +327,7 @@ namespace Umbraco.Web
             context.RewritePath(rewritePath, "", "", false);
 
             //if it is MVC we need to do something special, we are not using TransferRequest as this will
-            //require us to rewrite the path with query strings and then reparse the query strings, this would
+            //require us to rewrite the path with query strings and then re-parse the query strings, this would
             //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
             //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
             // * Looks up the route based on the new rewritten URL
@@ -380,7 +360,7 @@ namespace Umbraco.Web
             context.RewritePath(rewritePath, "", query, false);
 
             //if it is MVC we need to do something special, we are not using TransferRequest as this will
-            //require us to rewrite the path with query strings and then reparse the query strings, this would
+            //require us to rewrite the path with query strings and then re-parse the query strings, this would
             //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
             //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
             // * Looks up the route based on the new rewritten URL

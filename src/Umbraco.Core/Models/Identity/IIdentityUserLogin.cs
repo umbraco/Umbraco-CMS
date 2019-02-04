@@ -5,7 +5,7 @@ namespace Umbraco.Core.Models.Identity
     public interface IIdentityUserLogin : IEntity, IRememberBeingDirty
     {
         /// <summary>
-        /// The login provider for the login (i.e. facebook, google)
+        /// The login provider for the login (i.e. Facebook, Google)
         ///
         /// </summary>
         string LoginProvider { get; set; }

@@ -5,13 +5,14 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PackageActions;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core.Composing
 {
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Composing
     {
         private static IFactory _factory;
 
-        // fixme - refactor
+        // TODO: get rid of these oddities
         // we don't want Umbraco tests to die because the container has not been properly initialized,
         // for some too-important things such as IShortStringHelper or loggers, so if it's not
         // registered we setup a default one. We should really refactor our tests so that it does
@@ -161,6 +162,9 @@ namespace Umbraco.Core.Composing
         internal static PackageActionCollection PackageActions
             => Factory.GetInstance<PackageActionCollection>();
 
+        internal static IPackageActionRunner PackageActionRunner
+            => Factory.GetInstance<IPackageActionRunner>();
+
         internal static PropertyValueConverterCollection PropertyValueConverters
             => Factory.GetInstance<PropertyValueConverterCollection>();
 
@@ -176,8 +180,8 @@ namespace Umbraco.Core.Composing
         public static ICultureDictionaryFactory CultureDictionaryFactory
             => Factory.GetInstance<ICultureDictionaryFactory>();
 
-        public static CacheHelper ApplicationCache
-            => Factory.GetInstance<CacheHelper>();
+        public static AppCaches AppCaches
+            => Factory.GetInstance<AppCaches>();
 
         public static ServiceContext Services
             => Factory.GetInstance<ServiceContext>();

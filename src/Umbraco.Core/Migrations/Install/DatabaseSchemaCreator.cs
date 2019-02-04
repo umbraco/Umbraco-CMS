@@ -14,7 +14,7 @@ namespace Umbraco.Core.Migrations.Install
     /// <summary>
     /// Creates the initial database schema during install.
     /// </summary>
-    internal class DatabaseSchemaCreator
+    public class DatabaseSchemaCreator
     {
         private readonly IUmbracoDatabase _database;
         private readonly ILogger _logger;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Migrations.Install
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
 
         // all tables, in order
-        public static readonly List<Type> OrderedTables = new List<Type>
+        internal static readonly List<Type> OrderedTables = new List<Type>
         {
             typeof (UserDto),
             typeof (NodeDto),
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <summary>
         /// Validates the schema of the current database.
         /// </summary>
-        public DatabaseSchemaResult ValidateSchema()
+        internal DatabaseSchemaResult ValidateSchema()
         {
             var result = new DatabaseSchemaResult(SqlSyntax);
 
@@ -161,17 +161,11 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         /// <param name="result"></param>
         /// <remarks>
-        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK contraints.
+        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK constraints.
         /// Any unique "constraints" in the database are done with unique indexes.
         /// </remarks>
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
-            //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
-            //TODO: At a later point we do other checks for MySql, but ideally it should be necessary to do special checks for different providers.
-            // ALso note that to get the constraints for MySql we have to open a connection which we currently have not.
-            if (SqlSyntax is MySqlSyntaxProvider)
-                return;
-
             //Check constraints in configured database against constraints in schema
             var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
@@ -186,8 +180,8 @@ namespace Umbraco.Core.Migrations.Install
             var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
                 .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
-            //Add valid and invalid foreign key differences to the result object
-            // We'll need to do invariant contains with case insensitivity because foreign key, primary key, and even index naming w/ MySQL is not standardized
+            // Add valid and invalid foreign key differences to the result object
+            // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
             // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
@@ -374,9 +368,11 @@ namespace Umbraco.Core.Migrations.Install
         /// attribute will be used for the table name. If the attribute is not present, the name
         /// <typeparamref name="T"/> will be used instead.
         /// </remarks>
-        public bool TableExists<T>()        {
+        public bool TableExists<T>()
+        {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            return table != null && TableExists(table.Name);        }
+            return table != null && TableExists(table.Name);
+        }
 
         /// <summary>
         /// Creates a new table in the database based on the type of <typeparamref name="T"/>.
@@ -387,7 +383,7 @@ namespace Umbraco.Core.Migrations.Install
         /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
         /// attribute will be used for the table name. If the attribute is not present, the name
         /// <typeparamref name="T"/> will be used instead.
-        /// 
+        ///
         /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
         /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
         /// not do anything if the parameter is <c>false</c>.
@@ -403,20 +399,20 @@ namespace Umbraco.Core.Migrations.Install
         /// Creates a new table in the database for the specified <paramref name="modelType"/>.
         /// </summary>
         /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
-        /// <param name="modelType">The the representing the table.</param>
+        /// <param name="modelType">The representing the table.</param>
         /// <param name="dataCreation"></param>
         /// <remarks>
         /// If <paramref name="modelType"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from
         /// that  attribute will be used for the table name. If the attribute is not present, the name
         /// <paramref name="modelType"/> will be used instead.
-        /// 
+        ///
         /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
         /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
         /// not do anything if the parameter is <c>false</c>.
         ///
         /// This need to execute as part of a transaction.
         /// </remarks>
-        public void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
+        internal void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
         {
             if (!_database.InTransaction)
                 throw new InvalidOperationException("Database is not in a transaction.");
@@ -432,7 +428,7 @@ namespace Umbraco.Core.Migrations.Install
             var tableExist = TableExists(tableName);
             if (overwrite && tableExist)
             {
-                _logger.Info<DatabaseSchemaCreator>("Table '{TableName}' already exists, but will be recreated", tableName);
+                _logger.Info<DatabaseSchemaCreator>("Table {TableName} already exists, but will be recreated", tableName);
 
                 DropTable(tableName);
                 tableExist = false;
@@ -441,13 +437,13 @@ namespace Umbraco.Core.Migrations.Install
             if (tableExist)
             {
                 // The table exists and was not recreated/overwritten.
-                _logger.Info<Database>("Table '{TableName}' already exists - no changes were made", tableName);
+                _logger.Info<Database>("Table {TableName} already exists - no changes were made", tableName);
                 return;
             }
 
             //Execute the Create Table sql
             var created = _database.Execute(new Sql(createSql));
-            _logger.Info<DatabaseSchemaCreator>("Create Table '{TableName}' ({Created}): \n {Sql}", tableName, created, createSql);
+                    _logger.Info<DatabaseSchemaCreator>("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
 
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
@@ -456,7 +452,6 @@ namespace Umbraco.Core.Migrations.Install
                 _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
             }
 
-            //Turn on identity insert if db provider is not mysql
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} ON "));
 
@@ -465,15 +460,8 @@ namespace Umbraco.Core.Migrations.Install
 
             dataCreation.InitializeBaseData(tableName);
 
-            //Turn off identity insert if db provider is not mysql
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                 _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
-
-            //Special case for MySql
-            if (SqlSyntax is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
-            {
-                _database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
-            }
 
             //Loop through index statements and execute sql
             foreach (var sql in indexSql)
@@ -491,11 +479,12 @@ namespace Umbraco.Core.Migrations.Install
 
             if (overwrite)
             {
-                _logger.Info<Database>("Table '{TableName}' was recreated", tableName);
+                        _logger.Info<Database>("Table {TableName} was recreated", tableName);
             }
             else
             {
-                _logger.Info<Database>("New table '{TableName}' was created", tableName);
+                        _logger.Info<Database>("New table {TableName} was created", tableName);
+
             }
         }
 

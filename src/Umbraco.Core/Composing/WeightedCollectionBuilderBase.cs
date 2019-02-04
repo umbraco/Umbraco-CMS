@@ -12,7 +12,7 @@ namespace Umbraco.Core.Composing
     /// <typeparam name="TItem">The type of the items.</typeparam>
     public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TBuilder : WeightedCollectionBuilderBase<TBuilder, TCollection, TItem>
-        where TCollection : IBuilderCollection<TItem>
+        where TCollection : class, IBuilderCollection<TItem>
     {
         protected abstract TBuilder This { get; }
 
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Composing
             return list;
         }
 
-        protected virtual int DefaultWeight { get; set; } = 10;
+        public virtual int DefaultWeight { get; set; } = 100;
 
         protected virtual int GetWeight(Type type)
         {

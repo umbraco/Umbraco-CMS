@@ -25,7 +25,6 @@ namespace Umbraco.Core
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
-        private RuntimeLevel _level = RuntimeLevel.Unknown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
@@ -87,11 +86,10 @@ namespace Umbraco.Core
         public string FinalMigrationState { get; internal set; }
 
         /// <inheritdoc />
-        public RuntimeLevel Level
-        {
-            get => _level;
-            internal set { _level = value; if (value == RuntimeLevel.Run) _runLevel.Set(); }
-        }
+        public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
+
+        /// <inheritdoc />
+        public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
@@ -114,18 +112,6 @@ namespace Umbraco.Core
             ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, _globalSettings, _settings, ServerRegistrar, request));
         }
 
-        private readonly ManualResetEventSlim _runLevel = new ManualResetEventSlim(false);
-
-        /// <summary>
-        /// Waits for the runtime level to become RuntimeLevel.Run.
-        /// </summary>
-        /// <param name="timeout">A timeout.</param>
-        /// <returns>True if the runtime level became RuntimeLevel.Run before the timeout, otherwise false.</returns>
-        internal bool WaitForRunLevel(TimeSpan timeout)
-        {
-            return _runLevel.WaitHandle.WaitOne(timeout);
-        }
-
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
 
@@ -143,6 +129,7 @@ namespace Umbraco.Core
                 // there is no local version, we are not installed
                 logger.Debug<RuntimeState>("No local version, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
+                Reason = RuntimeLevelReason.InstallNoVersion;
                 return;
             }
 
@@ -152,30 +139,34 @@ namespace Umbraco.Core
                 // need to upgrade
                 logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
                 Level = RuntimeLevel.Upgrade;
+                Reason = RuntimeLevelReason.UpgradeOldVersion;
             }
             else if (localVersion > codeVersion)
             {
                 logger.Warn<RuntimeState>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
 
                 // in fact, this is bad enough that we want to throw
+                Reason = RuntimeLevelReason.BootFailedCannotDowngrade;
                 throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
             }
             else if (databaseFactory.Configured == false)
             {
                 // local version *does* match code version, but the database is not configured
-                // install (again? this is a weird situation...)
+                // install - may happen with Deploy/Cloud/etc
                 logger.Debug<RuntimeState>("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
+                Reason = RuntimeLevelReason.InstallNoDatabase;
                 return;
             }
 
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
-            for (var i = 0; i < 5; i++)
+            var tries = RuntimeOptions.InstallMissingDatabase ? 2 : 5;
+            for (var i = 0;;)
             {
                 connect = databaseFactory.CanConnect;
-                if (connect) break;
+                if (connect || ++i == tries) break;
                 logger.Debug<RuntimeState>("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }
@@ -185,7 +176,16 @@ namespace Umbraco.Core
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<RuntimeState>("Could not connect to database.");
 
-                // in fact, this is bad enough that we want to throw
+                if (RuntimeOptions.InstallMissingDatabase)
+                {
+                    // ok to install on a configured but missing database
+                    Level = RuntimeLevel.Install;
+                    Reason = RuntimeLevelReason.InstallMissingDatabase;
+                    return;
+                }
+
+                // else it is bad enough that we want to throw
+                Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
                 throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
             }
 
@@ -195,7 +195,6 @@ namespace Umbraco.Core
 
             // else
             // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
-            // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
             bool noUpgrade;
             try
             {
@@ -205,6 +204,17 @@ namespace Umbraco.Core
             {
                 // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
+
+                if (RuntimeOptions.InstallEmptyDatabase)
+                {
+                    // ok to install on an empty database
+                    Level = RuntimeLevel.Install;
+                    Reason = RuntimeLevelReason.InstallEmptyDatabase;
+                    return;
+                }
+
+                // else it is bad enough that we want to throw
+                Reason = RuntimeLevelReason.BootFailedCannotCheckUpgradeState;
                 throw new BootFailedException("Could not check the upgrade state.", e);
             }
 
@@ -216,6 +226,7 @@ namespace Umbraco.Core
             {
                 // the database version matches the code & files version, all clear, can run
                 Level = RuntimeLevel.Run;
+                Reason = RuntimeLevelReason.Run;
                 return;
             }
 
@@ -226,6 +237,7 @@ namespace Umbraco.Core
             // which means the local files have been upgraded but not the database - need to upgrade
             logger.Debug<RuntimeState>("Has not reached the final upgrade step, need to upgrade Umbraco.");
             Level = RuntimeLevel.Upgrade;
+            Reason = RuntimeLevelReason.UpgradeMigrations;
         }
 
         protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)

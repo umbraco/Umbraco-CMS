@@ -11,6 +11,8 @@ using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -33,6 +35,7 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
@@ -54,7 +57,7 @@ namespace Umbraco.Web.Editors
 
         public object Domains { get; private set; }
 
-        public ContentController(PropertyEditorCollection propertyEditors)
+        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -94,10 +97,8 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
-            //fixme what about cultures?
-
             var foundContent = Services.ContentService.GetByIds(ids);
-            return foundContent.Select(x => MapToDisplay(x));
+            return foundContent.Select(MapToDisplay);
         }
 
         /// <summary>
@@ -106,14 +107,14 @@ namespace Umbraco.Web.Editors
         /// <param name="saveModel"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to to update
+        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to update
         /// </remarks>
         [EnsureUserPermissionForContent("saveModel.ContentId", 'R')]
         public IEnumerable<AssignedUserGroupPermissions> PostSaveUserGroupPermissions(UserGroupPermissionsSave saveModel)
         {
             if (saveModel.ContentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            //TODO: Should non-admins be alowed to set granular permissions?
+            // TODO: Should non-admins be allowed to set granular permissions?
 
             var content = Services.ContentService.GetById(saveModel.ContentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -168,7 +169,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to to view
+        /// Permission check is done for letter 'R' which is for <see cref="ActionRights"/> which the user must have access to view
         /// </remarks>
         [EnsureUserPermissionForContent("contentId", 'R')]
         public IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(int contentId)
@@ -177,7 +178,7 @@ namespace Umbraco.Web.Editors
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            //TODO: Should non-admins be able to see detailed permissions?
+            // TODO: Should non-admins be able to see detailed permissions?
 
             var allUserGroups = Services.UserService.GetAllUserGroups();
 
@@ -248,7 +249,6 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
-        //fixme what about cultures?
         public ContentItemDisplay GetBlueprintById(int id)
         {
             var foundContent = Services.ContentService.GetBlueprintById(id);
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Editors
             content.AllowedActions = new[] { "A" };
             content.IsBlueprint = true;
 
-            //fixme - exclude the content apps here
+            // TODO: exclude the content apps here
             //var excludeProps = new[] { "_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template" };
             //var propsTab = content.Tabs.Last();
             //propsTab.Properties = propsTab.Properties
@@ -436,7 +436,7 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
-                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageNumber = 0,  // TODO: This should be '1' as it's not the index
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
@@ -460,7 +460,7 @@ namespace Umbraco.Web.Editors
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
                 string filter = "",
-                string cultureName = "") // TODO it's not a NAME it's the ISO CODE
+                string cultureName = "") // TODO: it's not a NAME it's the ISO CODE
         {
             long totalChildren;
             List<IContent> children;
@@ -586,7 +586,7 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
-            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
             //uploaded files to being *only* the actual file name (as it should be).
             if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
@@ -650,7 +650,7 @@ namespace Umbraco.Web.Editors
                             .Any(x => x == false))
                     {
                         //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-                        // add the modelstate to the outgoing object and throw a validation message
+                        // add the model state to the outgoing object and throw a validation message
                         var forDisplay = MapToDisplay(contentItem.PersistedContent);
                         forDisplay.Errors = ModelState.ToErrorDictionary();
                         throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
@@ -800,7 +800,7 @@ namespace Umbraco.Web.Editors
                     v.Notifications.AddRange(n.Notifications);
             }
 
-            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
             if (wasCancelled)
@@ -1043,7 +1043,7 @@ namespace Umbraco.Web.Editors
         /// <param name="msg"></param>
         /// <remarks>
         /// global notifications will be shown if all variant processing is successful and the save/publish dialog is closed, otherwise
-        /// variant specific notifications are used to show success messagse in the save/publish dialog.
+        /// variant specific notifications are used to show success messages in the save/publish dialog.
         /// </remarks>
         private static void AddSuccessNotification(IDictionary<string, SimpleNotificationModel> notifications, string culture, string header, string msg)
         {
@@ -1094,7 +1094,7 @@ namespace Umbraco.Web.Editors
             {
                 //its invariant, proceed normally
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
-                //TODO: Deal with multiple cancelations
+                // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = Array.Empty<string>();
                 return publishStatus;
@@ -1127,7 +1127,7 @@ namespace Umbraco.Web.Editors
             {
                 //proceed to publish if all validation still succeeds
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, Security.CurrentUser.Id);
-                //TODO: Deal with multiple cancelations
+                // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
                 return publishStatus;
@@ -1352,7 +1352,7 @@ namespace Umbraco.Web.Editors
         /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
         /// does not have Delete access to this node.
         /// </remarks>
-        [EnsureUserPermissionForContent("id", 'D')]
+        [EnsureUserPermissionForContent("id", ActionDelete.ActionLetter)]
         [HttpDelete]
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
@@ -1398,7 +1398,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.ContentService.EmptyRecycleBin();
@@ -1434,7 +1434,7 @@ namespace Umbraco.Web.Editors
                 if (!sortResult.Success)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
-                    //TODO: Now you can cancel sorting, does the event messages bubble up automatically?
+                    // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
 
@@ -1735,7 +1735,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentSave"></param>
         private void MapValuesForPersistence(ContentItemSave contentSave)
         {
-            //inline method to determine if a property type varies
+            // inline method to determine if a property type varies
             bool Varies(Property property) => property.PropertyType.VariesByCulture();
 
             var variantIndex = 0;
@@ -1841,8 +1841,10 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
+                var contentTypeService = Services.ContentTypeBaseServices.For(parent);
+                var parentContentType = contentTypeService.Get(parent.ContentTypeId);
                 //check if the item is allowed under this one
-                if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     throw new HttpResponseException(
@@ -1868,7 +1870,7 @@ namespace Umbraco.Web.Editors
         /// <param name="status"></param>
         /// <param name="display"></param>
         /// <param name="successfulCultures">
-        /// This is null when dealing with invariant content, else it's the cultures that were succesfully published
+        /// This is null when dealing with invariant content, else it's the cultures that were successfully published
         /// </param>
         private void AddMessageForPublishStatus(IEnumerable<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null)
         {
@@ -1910,7 +1912,7 @@ namespace Umbraco.Web.Editors
                 {
                     case PublishResultType.SuccessPublishAlready:
                         {
-                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
                             // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
                             // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
 
@@ -1941,7 +1943,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.SuccessPublish:
                         {
-                            //TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
+                            // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
                             // but this will take a bit of effort because we need to deal with variants, different messaging, etc... A quick attempt was made here:
                             // http://github.com/umbraco/Umbraco-CMS/commit/9b3de7b655e07c612c824699b48a533c0448131a
 
@@ -2021,7 +2023,7 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
-                            "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
+                            "publish/contentPublishedFailedByCulture");
                         break;
                     default:
                         throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");
@@ -2037,10 +2039,11 @@ namespace Umbraco.Web.Editors
         private ContentItemDisplay MapToDisplay(IContent content)
         {
             var display = Mapper.Map<ContentItemDisplay>(content);
+            display.AllowPreview = display.AllowPreview && content.Trashed == false;
             return display;
         }
 
-        [EnsureUserPermissionForContent("contentId", 'R')]
+        [EnsureUserPermissionForContent("contentId", ActionBrowse.ActionLetter)]
         public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
         {
             var notifications = new List<NotifySetting>();
@@ -2080,8 +2083,6 @@ namespace Umbraco.Web.Editors
             var rollbackVersions = new List<RollbackVersion>();
             var writerIds = new HashSet<int>();
 
-            //Return a list of all versions of a specific content node
-            // fixme - cap at 50 versions for now?
             var versions = Services.ContentService.GetVersionsSlim(contentId, 0, 50);
 
             //Not all nodes are variants & thus culture can be null
@@ -2152,7 +2153,7 @@ namespace Umbraco.Web.Editors
                 default:
                     notificationModel.AddErrorNotification(
                                     Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                                    null); //TODO: There is no specific failed to save error message AFAIK
+                                    null); // TODO: There is no specific failed to save error message AFAIK
                     break;
                 case OperationResultType.FailedCancelledByEvent:
                     notificationModel.AddErrorNotification(

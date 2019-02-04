@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Migrations.SqlScripts {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SqlResources {
@@ -57,31 +57,6 @@ namespace Umbraco.Tests.Migrations.SqlScripts {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to /*******************************************************************************************
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///    Umbraco database installation script for MySQL
-        /// 
-        ///IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
-        /// 
-        ///    Database version: 4.8.0.4
-        ///    
-        ///    Please increment this version number if ANY change is made to this script,
-        ///    so compatibility with scripts for other database systems can be verified easily.
-        ///    The first 3 digits depict the Umbraco version, t [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string MySqlTotal_480 {
-            get {
-                return ResourceManager.GetString("MySqlTotal_480", resourceCulture);
             }
         }
         

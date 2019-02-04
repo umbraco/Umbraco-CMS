@@ -8,16 +8,19 @@ using Moq;
 using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models
 {
@@ -34,6 +37,18 @@ namespace Umbraco.Tests.Models
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
             Composition.Register(_ => Mock.Of<IContentSection>());
+
+            // all this is required so we can validate properties...
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>()) { Alias = "test" };
+            Composition.Register(_ => new DataEditorCollection(new [] { editor }));
+            Composition.Register<PropertyEditorCollection>();
+            var dataType = Mock.Of<IDataType>();
+            Mock.Get(dataType).Setup(x => x.Configuration).Returns(() => new object());
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(() => dataType);
+            Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService));
         }
 
         [Test]
@@ -74,6 +89,8 @@ namespace Umbraco.Tests.Models
             const string langFr = "fr-FR";
 
             contentType.Variations = ContentVariation.Culture;
+
+            content.ChangeContentType(contentType);
 
             Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos"));    //hasn't been changed
 
@@ -232,8 +249,8 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var runtimeCache = new ObjectCacheRuntimeCacheProvider();
-            runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
+            var runtimeCache = new ObjectCacheAppCache();
+            runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();
 
@@ -241,7 +258,7 @@ namespace Umbraco.Tests.Models
             {
                 for (int j = 0; j < 1000; j++)
                 {
-                    var clone = runtimeCache.GetCacheItem(content.Id.ToString(CultureInfo.InvariantCulture));
+                    var clone = runtimeCache.Get(content.Id.ToString(CultureInfo.InvariantCulture));
                 }
             }
 
@@ -301,20 +318,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone, content);
             Assert.AreEqual(clone.Id, content.Id);
             Assert.AreEqual(clone.VersionId, content.VersionId);
-            Assert.AreNotSame(clone.ContentType, content.ContentType);
             Assert.AreEqual(clone.ContentType, content.ContentType);
-            Assert.AreEqual(clone.ContentType.PropertyGroups.Count, content.ContentType.PropertyGroups.Count);
-            for (var index = 0; index < content.ContentType.PropertyGroups.Count; index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyGroups[index], content.ContentType.PropertyGroups[index]);
-                Assert.AreEqual(clone.ContentType.PropertyGroups[index], content.ContentType.PropertyGroups[index]);
-            }
-            Assert.AreEqual(clone.ContentType.PropertyTypes.Count(), content.ContentType.PropertyTypes.Count());
-            for (var index = 0; index < content.ContentType.PropertyTypes.Count(); index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyTypes.ElementAt(index), content.ContentType.PropertyTypes.ElementAt(index));
-                Assert.AreEqual(clone.ContentType.PropertyTypes.ElementAt(index), content.ContentType.PropertyTypes.ElementAt(index));
-            }
             Assert.AreEqual(clone.ContentTypeId, content.ContentTypeId);
             Assert.AreEqual(clone.CreateDate, content.CreateDate);
             Assert.AreEqual(clone.CreatorId, content.CreatorId);
@@ -407,8 +411,6 @@ namespace Umbraco.Tests.Models
             content.Trashed = true;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
-            
-            content.ContentType.UpdateDate = DateTime.Now;  //update a child object
 
             // Act
             content.ResetDirtyProperties();
@@ -446,8 +448,6 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Name"));
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
             }
-            //verify child objects were reset too
-            Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 
         [Test]

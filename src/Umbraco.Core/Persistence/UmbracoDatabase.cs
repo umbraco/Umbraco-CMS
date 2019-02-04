@@ -159,7 +159,7 @@ namespace Umbraco.Core.Persistence
 
         #region OnSomething
 
-        // fixme.poco - has new interceptors to replace OnSomething?
+        // TODO: has new interceptors to replace OnSomething?
 
         protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
@@ -167,15 +167,7 @@ namespace Umbraco.Core.Persistence
 
 #if DEBUG_DATABASES
             // determines the database connection SPID for debugging
-            if (DatabaseType.IsMySql())
-            {
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "SELECT CONNECTION_ID()";
-                    _spid = Convert.ToInt32(command.ExecuteScalar());
-                }
-            }
-            else if (DatabaseType.IsSqlServer())
+            if (DatabaseType.IsSqlServer())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -226,7 +218,7 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
+                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)

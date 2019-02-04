@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         /// <summary>
         /// This is used to generate a delete query that uses a sub-query to select the data, it is required because there's a very particular syntax that
-        /// needs to be used to work for all servers: MySql, SQLCE and MSSQL
+        /// needs to be used to work for all servers: SQLCE and MSSQL
         /// </summary>
         /// <returns></returns>
         /// <remarks>

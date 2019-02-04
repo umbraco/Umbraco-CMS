@@ -23,9 +23,7 @@
 
 .umb-packages-search {
     width: 100%;
-    background: @gray-10;
     border-radius: 3px;
-    padding: 30px;
     box-sizing: border-box;
 }
 
@@ -49,60 +47,14 @@
 }
 
 .umb-packages {
-    margin: 0 -10px;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
 // Cards
 .umb-package {
-    padding: 10px;
     box-sizing: border-box;
-    flex: 0 0 100%;
-    max-width: 100%;
-}
-
-@media (min-width: 768px) {
-    .umb-package {
-        flex: 0 0 50%;
-        max-width: 50%;
-    }
-}
-
-@media (min-width: 1200px) {
-    .umb-package {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-}
-
-@media (min-width: 1400px) {
-    .umb-package {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
-
-@media (min-width: 1700px) {
-    .umb-package {
-        flex: 0 0 20%;
-        max-width: 20%;
-    }
-}
-
-
-@media (min-width: 1900px) {
-    .umb-package {
-        flex: 0 0 16.66%;
-        max-width: 16.66%;
-    }
-}
-
-@media (min-width: 2200px) {
-    .umb-package {
-        flex: 0 0 14.28%;
-        max-width: 14.28%;
-    }
 }
 
 .umb-package-link {
@@ -114,13 +66,14 @@
     box-sizing: border-box;
     height: 100%;
     width: 100%;
-    border: 1px solid @gray-9;
     border-radius: 3px;
     text-decoration: none !important;
     transition: border-color 100ms ease;
+    background-color: @white;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 
     &:hover {
-        border-color: @turquoise;
+        border-color: @blueMid;
     }
 }
 
@@ -151,15 +104,8 @@
 
 // Info
 .umb-package-info {
-    padding-right: 15px;
-    padding-bottom: 15px;
-    padding-left: 15px;
-    padding-top: 15px;
+    padding: 15px;
     text-align: center;
-    background: @gray-10;
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
-    border-top: 1px solid @gray-9;
 }
 
 
@@ -251,6 +197,7 @@
     border-bottom: 1px solid @gray-8;
     border-right: 1px solid @gray-8;
     padding: 10px 0;
+    background: @white; 
 }
 
 
@@ -289,10 +236,13 @@
 }
 
 
-.umb-packages-category:hover,
-.umb-packages-category.-active {
+.umb-packages-category:hover {
+    color: @ui-active-type-hover;
     text-decoration: none;
-    color: @turquoise;
+}
+.umb-packages-category.-active {
+    color: @ui-active-type;
+    background-color: @ui-active;
 }
 
 .umb-packages-category.-first {
@@ -456,7 +406,7 @@ a.umb-package-details__back-link {
 
 .umb-gallery__thumbnail {
     flex: 0 1 100px;
-    border: 1px solid @gray-8;
+    border: 1px solid @ui-action-disgrete-border;
     border-radius: 3px;
     margin: 5px;
     padding: 10px;
@@ -466,7 +416,7 @@ a.umb-package-details__back-link {
 
 .umb-gallery__thumbnail:hover {
     cursor: pointer;
-    border-color: @turquoise;
+    border-color: @ui-action-disgrete-border-hover;
 }
 
 /* PACKAGE LIST */

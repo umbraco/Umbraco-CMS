@@ -34,7 +34,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 appState.setTreeState("selectedNode", args.node);
                 //when a node is activated, this is the same as clicking it and we need to set the
                 //current menu item to be this node as well.
-                appState.setMenuState("currentNode", args.node);
+                //appState.setMenuState("currentNode", args.node);// Niels: No, we are setting it from the dialog.
             }
         });
 
@@ -44,7 +44,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             args.event.preventDefault();
 
             //Set the current action node (this is not the same as the current selected node!)
-            appState.setMenuState("currentNode", args.node);
+            //appState.setMenuState("currentNode", args.node);// Niels: No, we are setting it from the dialog.
 
             if (args.event && args.event.altKey) {
                 args.skipDefault = true;
@@ -96,7 +96,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 //put this node into the tree state
                 appState.setTreeState("selectedNode", args.node);
                 //when a node is clicked we also need to set the active menu node to this node
-                appState.setMenuState("currentNode", args.node);
+                //appState.setMenuState("currentNode", args.node);
 
                 //not legacy, lets just set the route value and clear the query string if there is one.
                 $location.path(n.routePath);
@@ -137,7 +137,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         navigationService.showSearch();
     });
 
-    ////TODO: remove this it's not a thing
+    //// TODO: remove this it's not a thing
     //$scope.selectedId = navigationService.currentId;
 
     var evts = [];
@@ -216,7 +216,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Emitted when a language is created or an existing one saved/edited
     evts.push(eventsService.on("editors.languages.languageSaved", function (e, args) {
-        console.log('lang event listen args', args);
         if(args.isNew){
             //A new language has been created - reload languages for tree
             loadLanguages().then(function (languages) {
@@ -355,7 +354,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 if (!currCulture) {
                     // no culture in the request, let's look for one in the cookie that's set when changing language
                     var defaultCulture = $cookies.get("UMB_MCULTURE");
-                    if (!defaultCulture) {
+                    if (!defaultCulture || !_.find($scope.languages, function (l) {
+                            return l.culture.toLowerCase() === defaultCulture.toLowerCase();
+                        })) {
                         // no luck either, look for the default language
                         var defaultLang = _.find($scope.languages, function (l) {
                             return l.isDefault;
@@ -399,9 +400,10 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     $scope.selectLanguage = function (language) {
 
         $location.search("mculture", language.culture);
-        // add the selected culture to a cookie so the user will log back into the same culture later on (cookie max age is one year = 31536000 seconds)
-        // NOTE: $cookies doesn't support max-age, so we need to go the good ol' JS way about setting the cookie
-        document.cookie = "UMB_MCULTURE=" +language.culture + ";path=/;max-age=31536000;";
+        // add the selected culture to a cookie so the user will log back into the same culture later on (cookie lifetime = one year)
+        var expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 365);
+        $cookies.put("UMB_MCULTURE", language.culture, {path: "/", expires: expireDate});
 
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
@@ -420,7 +422,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 var path = treeService.getPath(currNode);
                 promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
             }
-            //TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
+            // TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
             //for (var i = 0; i < expandedPaths.length; i++) {
             //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
             //}
@@ -438,16 +440,16 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     };
 
     //this reacts to the options item in the tree
-    //TODO: migrate to nav service
-    //TODO: is this used?
+    // TODO: migrate to nav service
+    // TODO: is this used?
     $scope.searchShowMenu = function (ev, args) {
         //always skip default
         args.skipDefault = true;
         navigationService.showMenu(args);
     };
 
-    //TODO: migrate to nav service
-    //TODO: is this used?
+    // TODO: migrate to nav service
+    // TODO: is this used?
     $scope.searchHide = function () {
         navigationService.hideSearch();
     };

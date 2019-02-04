@@ -8,8 +8,8 @@ namespace Umbraco.Web.Cache
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class UserGroupPermissionsCacheRefresher : CacheRefresherBase<UserGroupPermissionsCacheRefresher>
     {
-        public UserGroupPermissionsCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
+        public UserGroupPermissionsCacheRefresher(AppCaches appCaches)
+            : base(appCaches)
         { }
 
         #region Define

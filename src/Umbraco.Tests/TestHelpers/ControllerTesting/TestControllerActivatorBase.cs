@@ -60,12 +60,11 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 memberTypeService: mockedMemberTypeService,
                 dataTypeService: mockedDataTypeService,
                 contentTypeService: mockedContentTypeService,
-                localizedTextService:Mock.Of<ILocalizedTextService>(),
-                sectionService:Mock.Of<ISectionService>());
+                localizedTextService:Mock.Of<ILocalizedTextService>());
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
-            // fixme v8?
+            // FIXME: v8?
             ////new app context
             //var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             ////ensure these are set so that the appctx is 'Configured'
@@ -151,19 +150,18 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
-            var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbCtx), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), null, Mock.Of<CacheHelper>(), Mock.Of<ILogger>());
+            var membershipHelper = new MembershipHelper(new TestUmbracoContextAccessor(umbCtx), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>());
 
-            var umbHelper = new UmbracoHelper(umbCtx,
-                Mock.Of<IPublishedContent>(),
+            var umbHelper = new UmbracoHelper(umbCtx,                
                 Mock.Of<ITagQuery>(),
-                Mock.Of<ICultureDictionary>(),
+                Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
-                membershipHelper,
-                serviceContext);
+                Mock.Of<IPublishedContentQuery>(),
+                membershipHelper);
 
-            return CreateController(controllerType, request, umbHelper);
+            return CreateController(controllerType, request, umbCtx, umbHelper);
         }
 
-        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoHelper helper);
+        protected abstract ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoContext umbracoContext, UmbracoHelper helper);
     }
 }

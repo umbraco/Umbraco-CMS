@@ -43,48 +43,47 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository, AppCaches appCaches = null)
         {
-            cacheHelper = cacheHelper ?? CacheHelper;
+            appCaches = appCaches ?? AppCaches;
 
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
             var editors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>()));
-            dtdRepository = new DataTypeRepository(scopeAccessor, cacheHelper, new Lazy<PropertyEditorCollection>(() => editors), Logger);
+            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), Logger);
             return ctRepository;
         }
 
-        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, AppCaches appCaches = null)
         {
             TemplateRepository tr;
-            return CreateRepository(scopeAccessor, out contentTypeRepository, out tr, cacheHelper);
+            return CreateRepository(scopeAccessor, out contentTypeRepository, out tr, appCaches);
         }
 
-        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, AppCaches appCaches = null)
         {
-            cacheHelper = cacheHelper ?? CacheHelper;
+            appCaches = appCaches ?? AppCaches;
 
-            templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
-            var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(scopeAccessor, cacheHelper, Logger);
-            var repository = new DocumentRepository(scopeAccessor, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock());
+            var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
+            contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
+            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
         [Test]
         public void CacheActiveForIntsAndGuids()
         {
-            var realCache = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(),
-                new StaticCacheProvider(),
-                new StaticCacheProvider(),
-                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()));
+            var realCache = new AppCaches(
+                new ObjectCacheAppCache(),
+                new DictionaryAppCache(),
+                new IsolatedCaches(t => new ObjectCacheAppCache()));
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, cacheHelper: realCache);
+                var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, appCaches: realCache);
 
                 var udb = (UmbracoDatabase)scope.Database;
 
@@ -302,13 +301,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var emptyContentType = MockedContentTypes.CreateBasicContentType();
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                contentTypeRepository.Save(emptyContentType);
+                contentTypeRepository.Save(hasPropertiesContentType);
+
                 ServiceContext.FileService.SaveTemplate(hasPropertiesContentType.DefaultTemplate); // else, FK violation on contentType!
                 var content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
                 var content2 = MockedContent.CreateBasicContent(emptyContentType);
                 var content3 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
-                contentTypeRepository.Save(emptyContentType);
-                contentTypeRepository.Save(hasPropertiesContentType);
+
                 repository.Save(content1);
                 repository.Save(content2);
                 repository.Save(content3);
@@ -424,9 +425,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 contentType.AllowedTemplates = Enumerable.Empty<ITemplate>(); // because CreateSimpleContentType assigns one already
                 contentType.SetDefaultTemplate(template);
-                var textpage = MockedContent.CreateSimpleContent(contentType);
-
                 contentTypeRepository.Save(contentType);
+
+                var textpage = MockedContent.CreateSimpleContent(contentType);
                 repository.Save(textpage);
 
 

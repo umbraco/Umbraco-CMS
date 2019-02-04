@@ -25,9 +25,6 @@ namespace Umbraco.Core.Composing
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
         /// If it cannot be done, null is returned.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        // fixme wtf is this and do we need it in v8?
         internal static IList CreateGenericEnumerableFromObject(object obj)
         {
             var type = obj.GetType();
@@ -156,7 +153,7 @@ namespace Umbraco.Core.Composing
             {
                 var others = types.Except(new[] {curr});
 
-                //is the curr type a common denominator for all others ?
+                //is the current type a common denominator for all others ?
                 var isBase = others.All(curr.IsAssignableFrom);
 
                 //if this type is the base for all others
@@ -281,7 +278,7 @@ namespace Umbraco.Core.Composing
 
         #region Match Type
 
-        //TODO: Need to determine if these methods should replace/combine/merge etc with IsTypeAssignableFrom, IsAssignableFromGeneric
+        // TODO: Need to determine if these methods should replace/combine/merge etc with IsTypeAssignableFrom, IsAssignableFromGeneric
 
         // readings:
         // http://stackoverflow.com/questions/2033912/c-sharp-variance-problem-assigning-listderived-as-listbase

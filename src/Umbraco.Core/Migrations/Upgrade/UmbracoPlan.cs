@@ -3,6 +3,7 @@ using System.Configuration;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
+using Umbraco.Core.Migrations.Upgrade.V_7_14_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
@@ -35,8 +36,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             get
             {
                 // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
-                    throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
+                if (!SemVersion.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus], out var currentVersion))
+                    throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
                 // we currently support upgrading from 7.10.0 and later
                 if (currentVersion < new SemVersion(7, 10))
@@ -121,6 +122,11 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<DropTaskTables>("{648A2D5F-7467-48F8-B309-E99CEEE00E2A}"); // fixed version
             To<MakeTagsVariant>("{C39BF2A7-1454-4047-BBFE-89E40F66ED63}");
             To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
+            To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
+            To<UpdateMemberGroupPickerData>("{8A027815-D5CD-4872-8B88-9A51AB5986A6}"); // from 7.14.0
+            To<ConvertRelatedLinksToMultiUrlPicker>("{ED28B66A-E248-4D94-8CDB-9BDF574023F0}");
+            To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
+
 
             //FINAL
 
@@ -143,12 +149,23 @@ namespace Umbraco.Core.Migrations.Upgrade
             // main chain, skipping the migrations
             //
             From("{init-7.12.0}");
-            //  start            stop                                      target
+            // clone start / clone stop / target
             ToWithClone("{init-7.10.0}", "{1350617A-4930-4D61-852F-E3AA9E692173}", "{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}");
 
             From("{init-7.12.1}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.12.2}").To("{init-7.10.0}"); // same as 7.12.0
             From("{init-7.12.3}").To("{init-7.10.0}"); // same as 7.12.0
+            From("{init-7.12.4}").To("{init-7.10.0}"); // same as 7.12.0
+            From("{init-7.13.0}").To("{init-7.10.0}"); // same as 7.12.0
+            From("{init-7.13.1}").To("{init-7.10.0}"); // same as 7.12.0
+
+            // 7.14.0 has migrations, handle it...
+            //  clone going from 7.10 to 1350617A (the last one before we started to merge 7.12 migrations), then
+            //  clone going from CF51B39B (after 7.12 migrations) to 0009109C (the last one before we started to merge 7.12 migrations),
+            //  ending in 8A027815 (after 7.14 migrations)
+            From("{init-7.14.0}")
+                .ToWithClone("{init-7.10.0}", "{1350617A-4930-4D61-852F-E3AA9E692173}", "{9109B8AF-6B34-46EE-9484-7434196D0C79}")
+                .ToWithClone("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}", "{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}", "{8A027815-D5CD-4872-8B88-9A51AB5986A6}");
         }
     }
 }

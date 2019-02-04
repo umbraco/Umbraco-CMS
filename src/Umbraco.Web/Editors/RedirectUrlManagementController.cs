@@ -35,7 +35,7 @@ namespace Umbraco.Web.Editors
         public IHttpActionResult GetEnableState()
         {
             var enabled = Current.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false;
-            var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
+            var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult ToggleUrlTracker(bool disable)
         {
-            var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
+            var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";

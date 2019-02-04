@@ -18,14 +18,13 @@ namespace Umbraco.Web.Mvc
     {
         private PublishedRequest _publishedRequest;
 
-        // fixme - delete?
         public RenderMvcController()
         {
             ActionInvoker = new RenderActionInvoker();
         }
 
-        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
-            : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
+        public RenderMvcController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContext, services, appCaches, profilingLogger, umbracoHelper)
         {
             ActionInvoker = new RenderActionInvoker();
         }
@@ -33,7 +32,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public override UmbracoContext UmbracoContext => PublishedRequest.UmbracoContext;
+        public override UmbracoContext UmbracoContext => PublishedRequest.UmbracoContext; //TODO: Why?
 
         /// <summary>
         /// Gets the current content item.

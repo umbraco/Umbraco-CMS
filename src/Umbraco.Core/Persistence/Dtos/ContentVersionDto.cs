@@ -21,16 +21,16 @@ namespace Umbraco.Core.Persistence.Dtos
         [ForeignKey(typeof(ContentDto))]
         public int NodeId { get; set; }
 
-        [Column("versionDate")] // fixme: db rename to 'updateDate'
+        [Column("versionDate")] // TODO: db rename to 'updateDate'
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime VersionDate { get; set; }
 
-        [Column("userId")] // fixme: db rename to 'updateUserId'
+        [Column("userId")] // TODO: db rename to 'updateUserId'
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
-        //fixme - we need an index on this it is used almost always in querying and sorting
+        // TODO: we need an index on this it is used almost always in querying and sorting
         [Column("current")]
         public bool Current { get; set; }
 

@@ -13,19 +13,18 @@
     position: relative;
     width: 500px;
     height: 300px;
-    border: 2px dashed @gray-8;
+    border: 2px dashed @ui-action-border;
     border-radius: 3px;
-    background: @gray-10;
+    background: @white;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-bottom: 30px;
     transition: 100ms box-shadow ease, 100ms border ease;
-
-    &:hover,
+    
     &.drag-over {
-        border-color: @turquoise;
+        border-color: @ui-action-border-hover;
         border-style: solid;
         box-shadow: 0 3px 8px rgba(0,0,0, .1);
         transition: 100ms box-shadow ease, 100ms border ease;
@@ -34,18 +33,19 @@
 
 .umb-upload-local__dropzone i {
     display: block;
-    color: @gray-8;
+    color: @ui-action-type;
     font-size: 110px;
     line-height: 1;
 }
 
 .umb-upload-local__select-file {
     font-weight: bold;
-    color: @turquoise-d1;
+    color: @ui-action-type;
     cursor: pointer;
 
     &:hover {
         text-decoration: underline;
+        color: @ui-action-type-hover;
     }
 }
 
@@ -74,7 +74,6 @@
 
 // Info state
 .umb-info-local-items {
-    border: 2px solid @gray-8;
     border-radius: 3px;
     background: @gray-10;
     display: flex;
@@ -84,6 +83,8 @@
     margin: 0 20px;
     width: 100%;
     max-width: 540px;
+    background: @white;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.16);
 }
 
 .umb-info-local-items a {

@@ -3,8 +3,7 @@ using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
 {
-    // FIXME
-    // no need for Attempt<OperationResult> - the operation result SHOULD KNOW if it's a success or a failure!
+    // TODO: no need for Attempt<OperationResult> - the operation result SHOULD KNOW if it's a success or a failure!
     // but then each WhateverResultType must 
 
     /// <summary>
@@ -119,7 +118,7 @@ namespace Umbraco.Core.Services
             return new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages);
         }
 
-        // fixme - this exists to support services that still return Attempt<OperationResult>
+        // TODO: this exists to support services that still return Attempt<OperationResult>
         // these services should directly return an OperationResult, and then this static class should be deleted
         internal static class Attempt
         {

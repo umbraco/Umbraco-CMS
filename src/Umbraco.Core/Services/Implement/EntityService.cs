@@ -258,6 +258,9 @@ namespace Umbraco.Core.Services.Implement
         public virtual IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, params int[] ids)
         {
             var entityType = objectType.GetClrType();
+            if (entityType == null)
+                throw new NotSupportedException($"Type \"{objectType}\" is not supported here.");
+
             GetGetters(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
@@ -385,7 +388,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
 
-                //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+                // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
                 return ((EntityRepository)_entityRepository).GetMediaByQueryWithoutPropertyData(query);
             }
         }

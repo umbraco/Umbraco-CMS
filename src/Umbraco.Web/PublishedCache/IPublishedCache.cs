@@ -209,7 +209,7 @@ namespace Umbraco.Web.PublishedCache
         /// <remarks>The alias is case-insensitive.</remarks>
         PublishedContentType GetContentType(string alias);
 
-        // fixme - can we implement this, now? maybe only with NuCache else will throw NotImplemented...
+        // TODO: can we implement this, now? maybe only with NuCache else will throw NotImplemented...
         IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType);
     }
 }

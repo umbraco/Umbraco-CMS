@@ -28,8 +28,6 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
         vm.hideHeader = (typeof $scope.model.hideHeader) === "boolean" ? $scope.model.hideHeader : true;
-        // if you need to load a not initialized tree set this value to false - default is true
-        vm.onlyInitialized = $scope.model.onlyInitialized;
         vm.searchInfo = {
             searchFromId: $scope.model.startNodeId,
             searchFromName: null,
@@ -54,6 +52,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.toggleLanguageSelector = toggleLanguageSelector;
         vm.selectLanguage = selectLanguage;
         vm.onSearchResults = onSearchResults;
+        vm.selectResult = selectResult;
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
@@ -62,7 +61,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
-            //TODO: Also deal with unexpanding!!
+            // TODO: Also deal with unexpanding!!
             vm.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
             vm.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
         }
@@ -110,7 +109,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                 }
             }
 
-            //TODO: Seems odd this logic is here, i don't think it needs to be and should just exist on the property editor using this
+            // TODO: Seems odd this logic is here, i don't think it needs to be and should just exist on the property editor using this
             if ($scope.model.minNumber) {
                 $scope.model.minNumber = parseInt($scope.model.minNumber, 10);
             }

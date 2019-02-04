@@ -9,7 +9,8 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Components
 {
@@ -26,15 +27,16 @@ namespace Umbraco.Core.Components
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
         /// <typeparam name="TImplementing">The implementing type.</typeparam>
         /// <param name="composition">The composition.</param>
-        /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
         /// <returns>The register.</returns>
-        public static void RegisterFileSystem<TFileSystem, TImplementing>(this Composition composition, Func<IFactory, IFileSystem> supportingFileSystemFactory)
+        public static void RegisterFileSystem<TFileSystem, TImplementing>(this Composition composition)
             where TImplementing : FileSystemWrapper, TFileSystem
+            where TFileSystem : class
         {
             composition.RegisterUnique<TFileSystem>(factory =>
             {
                 var fileSystems = factory.GetInstance<FileSystems>();
-                return fileSystems.GetFileSystem<TImplementing>(supportingFileSystemFactory(factory));
+                var supporting = factory.GetInstance<SupportingFileSystems>();
+                return fileSystems.GetFileSystem<TImplementing>(supporting.For<TFileSystem>());
             });
         }
 
@@ -43,15 +45,15 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
         /// <param name="composition">The composition.</param>
-        /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
         /// <returns>The register.</returns>
-        public static void RegisterFileSystem<TFileSystem>(this Composition composition, Func<IFactory, IFileSystem> supportingFileSystemFactory)
+        public static void RegisterFileSystem<TFileSystem>(this Composition composition)
             where TFileSystem : FileSystemWrapper
         {
             composition.RegisterUnique(factory =>
             {
                 var fileSystems = factory.GetInstance<FileSystems>();
-                return fileSystems.GetFileSystem<TFileSystem>(supportingFileSystemFactory(factory));
+                var supporting = factory.GetInstance<SupportingFileSystems>();
+                return fileSystems.GetFileSystem<TFileSystem>(supporting.For<TFileSystem>());
             });
         }
 
@@ -202,7 +204,7 @@ namespace Umbraco.Core.Components
         /// Sets the server registrar.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        /// <param name="factory">A function creating a server registar.</param>
+        /// <param name="factory">A function creating a server registrar.</param>
         public static void SetServerRegistrar(this Composition composition, Func<IFactory, IServerRegistrar> factory)
         {
             composition.RegisterUnique(factory);
@@ -278,6 +280,53 @@ namespace Umbraco.Core.Components
         public static void SetShortStringHelper(this Composition composition, IShortStringHelper helper)
         {
             composition.RegisterUnique(_ => helper);
+        }
+
+        /// <summary>
+        /// Sets the underlying media filesystem.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="filesystemFactory">A filesystem factory.</param>
+        public static void SetMediaFileSystem(this Composition composition, Func<IFactory, IFileSystem> filesystemFactory)
+            => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(filesystemFactory);
+
+        /// <summary>
+        /// Sets the underlying media filesystem.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="filesystemFactory">A filesystem factory.</param>
+        public static void SetMediaFileSystem(this Composition composition, Func<IFileSystem> filesystemFactory)
+            => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(_ => filesystemFactory());
+
+        /// <summary>
+        /// Sets the log viewer.
+        /// </summary>
+        /// <typeparam name="T">The type of the log viewer.</typeparam>
+        /// <param name="composition">The composition.</param>
+        public static void SetLogViewer<T>(this Composition composition)
+            where T : ILogViewer
+        {
+            composition.RegisterUnique<ILogViewer, T>();
+        }
+
+        /// <summary>
+        /// Sets the log viewer.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="factory">A function creating a log viewer.</param>
+        public static void SetLogViewer(this Composition composition, Func<IFactory, ILogViewer> factory)
+        {
+            composition.RegisterUnique(factory);
+        }
+
+        /// <summary>
+        /// Sets the log viewer.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="helper">A log viewer.</param>
+        public static void SetLogViewer(this Composition composition, ILogViewer viewer)
+        {
+            composition.RegisterUnique(_ => viewer);
         }
 
         #endregion

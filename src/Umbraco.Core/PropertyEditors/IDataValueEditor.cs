@@ -47,7 +47,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>
         /// <para>Use this property to add validators, not to validate. Use <see cref="Validate"/> instead.</para>
-        /// fixme replace with AddValidator? WithValidator?
+        /// TODO: replace with AddValidator? WithValidator?
         /// </remarks>
         List<IValueValidator> Validators { get; }
 
@@ -56,14 +56,12 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         object FromEditor(ContentPropertyData editorValue, object currentValue);
 
-        // fixme - editing - services should be injected
-
         /// <summary>
         /// Converts a property value to a value for the editor.
         /// </summary>
         object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null);
 
-        // fixme - editing - document or remove these
+        // TODO: / deal with this when unplugging the xml cache
         // why property vs propertyType? services should be injected! etc...
         IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published);
         XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService);

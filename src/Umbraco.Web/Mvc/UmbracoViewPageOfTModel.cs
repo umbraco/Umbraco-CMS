@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -39,10 +40,9 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get; set; }
+        public AppCaches AppCaches { get; set; }
 
-        // fixme
-        // previously, Services and ApplicationCache would derive from UmbracoContext.Application, which
+        // TODO: previously, Services and ApplicationCache would derive from UmbracoContext.Application, which
         // was an ApplicationContext - so that everything derived from UmbracoContext.
         // UmbracoContext is fetched from the data tokens, thus allowing the view to be rendered with a
         // custom context and NOT the Current.UmbracoContext - eg outside the normal Umbraco routing
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public virtual UmbracoHelper Umbraco
+        public UmbracoHelper Umbraco
         {
             get
             {
@@ -95,9 +95,12 @@ namespace Umbraco.Web.Mvc
                 var content = model as IPublishedContent;
                 if (content == null && model is IContentModel)
                     content = ((IContentModel) model).Content;
-                _helper = content == null
-                    ? new UmbracoHelper(UmbracoContext, Services)
-                    : new UmbracoHelper(UmbracoContext, Services, content);
+
+                _helper = Current.UmbracoHelper;
+
+                if (content != null)
+                    _helper.AssignedContentItem = content;
+                
                 return _helper;
             }
         }
@@ -110,15 +113,15 @@ namespace Umbraco.Web.Mvc
         protected UmbracoViewPage()
             : this(
                 Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<CacheHelper>()
+                Current.Factory.GetInstance<AppCaches>()
             )
         {
         }
 
-        protected UmbracoViewPage(ServiceContext services, CacheHelper applicationCache)
+        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches)
         {
             Services = services;
-            ApplicationCache = applicationCache;
+            AppCaches = appCaches;
         }
 
         // view logic below:
@@ -218,7 +221,7 @@ namespace Umbraco.Web.Mvc
                             markupToInject =
                                 string.Format(Current.Configs.Settings().Content.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                                    Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
+                                    Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Url?.PathAndQuery));
                         }
                         else
                         {

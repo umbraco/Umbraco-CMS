@@ -11,7 +11,6 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using NUnit.Framework;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -90,7 +89,7 @@ namespace Umbraco.Tests.Composing
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
             typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof (UmbracoContext).Assembly });
-            Assert.AreEqual(21, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
+            Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
         }
 
         private static IProfilingLogger GetTestProfilingLogger()
@@ -367,7 +366,6 @@ namespace Umbraco.Tests.Composing
                     "umbraco.interfaces,",
                     "umbraco.providers,",
                     "Umbraco.Web.UI,",
-                    "umbraco.webservices",
                     "Lucene.",
                     "Examine,",
                     "Examine.",

@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -103,7 +103,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-            // fixme v8 are we sorting only for 7.6 relators?
             var sql = translator.Translate()
                 .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
@@ -121,7 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
-            //Cannot add a duplicate content type type
+            //Cannot add a duplicate content type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
 WHERE cmsContentType." + SqlSyntax.GetQuotedColumnName("alias") + @"= @alias
@@ -272,7 +271,7 @@ AND umbracoNode.id <> @id",
                 compositionBase.RemovedContentTypeKeyTracker != null &&
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
-                //TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
+                // TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
 
                 // find Content based on the current ContentType
                 var sql = Sql()
@@ -292,7 +291,7 @@ AND umbracoNode.id <> @id",
                     // based on the PropertyTypes that belong to the removed ContentType.
                     foreach (var contentDto in contentDtos)
                     {
-                        //TODO: This could be done with bulk SQL statements
+                        // TODO: This could be done with bulk SQL statements
                         foreach (var propertyType in propertyTypes)
                         {
                             var nodeId = contentDto.NodeId;
@@ -344,8 +343,7 @@ AND umbracoNode.id <> @id",
             List<int> orphanPropertyTypeIds = null;
             if (entity.IsPropertyDirty("PropertyGroups"))
             {
-                // todo
-                // we used to try to propagate tabs renaming downstream, relying on ParentId, but
+                // TODO: we used to try to propagate tabs renaming downstream, relying on ParentId, but
                 // 1) ParentId makes no sense (if a tab can be inherited from multiple composition
                 //    types) so we would need to figure things out differently, visiting downstream
                 //    content types and looking for tabs with the same name...
@@ -439,7 +437,7 @@ AND umbracoNode.id <> @id",
                         case ContentVariation.CultureAndSegment:
                         case ContentVariation.Segment:
                         default:
-                            throw new NotSupportedException(); //TODO: Support this
+                            throw new NotSupportedException(); // TODO: Support this
                     }
                 }
 
@@ -629,7 +627,7 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private void ClearScheduledPublishing(IContentTypeComposition contentType)
         {
-            //TODO: Fill this in when scheduled publishing is enabled for variants
+            // TODO: Fill this in when scheduled publishing is enabled for variants
         }
 
         /// <summary>
@@ -672,7 +670,7 @@ AND umbracoNode.id <> @id",
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
                     default:
-                        throw new NotSupportedException(); //TODO: Support this
+                        throw new NotSupportedException(); // TODO: Support this
                 }
             }
         }
@@ -755,7 +753,7 @@ AND umbracoNode.id <> @id",
                 case ContentVariation.CultureAndSegment:
                 case ContentVariation.Segment:
                 default:
-                    throw new NotSupportedException(); //TODO: Support this
+                    throw new NotSupportedException(); // TODO: Support this
             }
         }
 
@@ -764,7 +762,6 @@ AND umbracoNode.id <> @id",
         {
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
-            // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
                 throw new NotSupportedException("Too many property/content types.");
@@ -903,7 +900,6 @@ AND umbracoNode.id <> @id",
         {
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
-            // fixme - should we batch then?
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
             if (whereInArgsCount > 2000)
                 throw new NotSupportedException("Too many property/content types.");
@@ -1041,7 +1037,7 @@ AND umbracoNode.id <> @id",
 
             var dtos = Database.Fetch<PropertyTypeDto>(sql);
 
-            //TODO Move this to a PropertyTypeFactory
+            // TODO: Move this to a PropertyTypeFactory
             var list = new List<PropertyType>();
             foreach (var dto in dtos.Where(x => x.PropertyTypeGroupId <= 0))
             {
@@ -1283,7 +1279,7 @@ AND umbracoNode.id <> @id",
                 if (db == null) throw new ArgumentNullException(nameof(db));
 
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc, cmsContentType.variations as ctVariations,
-                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
+                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.IsElement as ctIsElement, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
@@ -1320,7 +1316,7 @@ AND umbracoNode.id <> @id",
                 parentMediaTypeIds = new Dictionary<int, List<int>>();
                 var mappedMediaTypes = new List<IMediaType>();
 
-                //loop through each result and fill in our required values, each row will contain different requried data than the rest.
+                //loop through each result and fill in our required values, each row will contain different required data than the rest.
                 // it is much quicker to iterate each result and populate instead of looking up the values over and over in the result like
                 // we used to do.
                 var queue = new Queue<dynamic>(result);
@@ -1384,6 +1380,7 @@ AND umbracoNode.id <> @id",
                     Description = currCt.ctDesc,
                     Icon = currCt.ctIcon,
                     IsContainer = currCt.ctIsContainer,
+                    IsElement = currCt.ctIsElement,
                     NodeId = currCt.ctId,
                     PrimaryKey = currCt.ctPk,
                     Thumbnail = currCt.ctThumb,
@@ -1422,7 +1419,7 @@ AND umbracoNode.id <> @id",
 
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc, cmsContentType.variations as ctVariations,
-                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
+                                cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.IsElement as ctIsElement, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
@@ -1559,6 +1556,7 @@ AND umbracoNode.id <> @id",
                         Description = currCt.ctDesc,
                         Icon = currCt.ctIcon,
                         IsContainer = currCt.ctIsContainer,
+                        IsElement = currCt.ctIsElement,
                         NodeId = currCt.ctId,
                         PrimaryKey = currCt.ctPk,
                         Thumbnail = currCt.ctThumb,
@@ -1725,7 +1723,7 @@ ORDER BY contentTypeId, groupId, id";
         }
 
         /// <summary>
-        /// Gets all entities of the spefified type
+        /// Gets all entities of the specified type
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
@@ -1749,7 +1747,7 @@ ORDER BY contentTypeId, groupId, id";
 
         public string GetUniqueAlias(string alias)
         {
-            // alias is unique accross ALL content types!
+            // alias is unique across ALL content types!
             var aliasColumn = SqlSyntax.GetQuotedColumnName("alias");
             var aliases = Database.Fetch<string>(@"SELECT cmsContentType." + aliasColumn + @" FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id

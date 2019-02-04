@@ -267,8 +267,6 @@
     <key alias="siterepublishHelp">網站緩存將會刷新，所有已發佈的內容將會更新。</key>
     <key alias="tableColumns">表格列數</key>
     <key alias="tableRows">表格行數</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>設定預留位置代碼</strong> 以便您要在子範本中插入內容到本範本時，填入此代碼到 <code>&lt;asp:content /&gt;</code> 裡面。]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>選擇預留位置代碼</strong> 於此清單中。您只能選擇目前父範本中的代碼。]]></key>
     <key alias="thumbnailimageclickfororiginal">點擊圖片查看完整大小</key>
     <key alias="treepicker">拾取項</key>
     <key alias="viewCacheItem">查看緩存項</key>
@@ -359,7 +357,6 @@
     <key alias="contentTypeAliasAndNameNotNull">請為新的屬性類型填寫名稱和別名！</key>
     <key alias="filePermissionsError">許可權有問題，訪問指定文檔或資料夾失敗！</key>
     <key alias="macroErrorLoadingPartialView">讀取片段視圖腳本錯誤（檔案：%0%）</key>
-    <key alias="macroErrorLoadingUsercontrol">讀取使用者控制項 %0% 錯誤</key>
     <key alias="missingTitle">請輸入標題</key>
     <key alias="missingType">請選擇類型</key>
     <key alias="pictureResizeBiggerThanOrg">圖片尺寸大於原始尺寸不會提高圖片品質，您確定要把圖片尺寸變大嗎?</key>
@@ -436,7 +433,6 @@
     <key alias="or">或</key>
     <key alias="password">密碼</key>
     <key alias="path">路徑</key>
-    <key alias="placeHolderID">預留位置代碼</key>
     <key alias="pleasewait">請稍候…</key>
     <key alias="previous">上一步</key>
     <key alias="properties">屬性</key>
@@ -714,14 +710,12 @@
          按鈕並點選該檔案。Umbraco擴展包通常有「.zip」的副檔名。
       ]]></key>
     <key alias="packageAuthor">作者</key>
-    <key alias="packageDemonstration">演示</key>
     <key alias="packageDocumentation">文檔</key>
     <key alias="packageMetaData">中繼資料</key>
     <key alias="packageName">名稱</key>
     <key alias="packageNoItemsHeader">擴展包不含任何項</key>
     <key alias="packageNoItemsText"><![CDATA[這個擴展包檔案裡面沒有任何移除項目資訊。<br/><br/>
       您可以點選下方「移除擴展包」來安全地移除此項目。]]></key>
-    <key alias="packageNoUpgrades">無可用更新</key>
     <key alias="packageOptions">選項</key>
     <key alias="packageReadme">說明</key>
     <key alias="packageRepository">程式庫</key>
@@ -732,13 +726,7 @@
     <key alias="packageUninstallText"><![CDATA[您可以取消選取任何不想要現在移除的項目。當您點選「確認移除」按鈕後，所有點選項目將被移除。<br />
       <span style="color: Red; font-weight: bold;">注意：</span> 任何文檔，媒體或需要這些項目才能運作的物件將會停止運作，並可能使得系統不穩定，
       請小心移除。若有疑慮，請聯絡擴展包作者。]]></key>
-    <key alias="packageUpgradeDownload">從程式庫下載更新</key>
-    <key alias="packageUpgradeHeader">更新擴展包</key>
-    <key alias="packageUpgradeInstructions">更新說明</key>
-    <key alias="packageUpgradeText">擴展包有可用的更新，您可以從程式庫網站更新。</key>
     <key alias="packageVersion">版本</key>
-    <key alias="packageVersionHistory">版本歷史</key>
-    <key alias="viewPackageWebsite">訪問擴展包網站</key>
     <key alias="packageAlreadyInstalled">擴展包已安裝</key>
     <key alias="targetVersionMismatch">這個擴展包無法安裝，它需要Umbraco至少是版本 %0%</key>
     <key alias="installStateUninstalling">移除中...</key>

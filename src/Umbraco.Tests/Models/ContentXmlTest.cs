@@ -2,7 +2,9 @@
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -25,11 +27,11 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Root Home", -1);
             ServiceContext.ContentService.Save(content, Constants.Security.SuperUserId);
 
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = content.ContentType.Alias.ToSafeAlias();
             var urlName = content.GetUrlSegment(new[]{new DefaultUrlSegmentProvider() });
 
             // Act
-            XElement element = content.ToXml();
+            XElement element = content.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);

@@ -1,0 +1,11 @@
+<div>
+    <p>
+        <strong>Query:</strong><br/>
+        {{ model.query }}
+    </p>
+
+    <p>
+        <strong>Name:</strong><br/>
+        <input ng-model="model.name" type="text" name="queryName" ng-change="model.disableSubmitButton = model.name.length === 0"/>
+    </p>
+</div>

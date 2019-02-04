@@ -268,7 +268,7 @@
             expect(numCalled).toEqual(3);
         });
         
-        //TODO: Finish testing the rest!
+        // TODO: Finish testing the rest!
 
     });
 

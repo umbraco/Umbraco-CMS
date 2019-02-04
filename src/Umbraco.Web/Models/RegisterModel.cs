@@ -77,7 +77,7 @@ namespace Umbraco.Web.Models
         public bool UsernameIsEmail { get; set; }
 
         /// <summary>
-        /// Specifies if the member should be logged in if they are succesfully created
+        /// Specifies if the member should be logged in if they are successfully created
         /// </summary>
         public bool LoginOnSuccess { get; set; }
 

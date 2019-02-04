@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TagRepository : NPocoRepositoryBase<int, ITag>, ITagRepository
     {
-        public TagRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -254,8 +254,7 @@ WHERE r.tagId IS NULL";
 
         #region Queries
 
-        // TODO
-        // consider caching implications
+        // TODO: consider caching implications
         // add lookups for parentId or path (ie get content in tag group, that are descendants of x)
 
         // ReSharper disable once ClassNeverInstantiated.Local

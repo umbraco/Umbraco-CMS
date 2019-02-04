@@ -6,7 +6,7 @@
 
         <umb-editor-view ng-if="!page.loading">
 
-            <umb-variant-content-editors 
+            <umb-variant-content-editors
                 page="page"
                 content="content"
                 culture="culture"
@@ -17,9 +17,9 @@
 
                 <umb-editor-footer-content-left>
 
-                    <umb-breadcrumbs 
-                        ng-if="ancestors && ancestors.length > 0" 
-                        ancestors="ancestors" 
+                    <umb-breadcrumbs
+                        ng-if="ancestors && ancestors.length > 0"
+                        ancestors="ancestors"
                         entity-type="content">
                     </umb-breadcrumbs>
 
@@ -36,32 +36,32 @@
                         type="button">
                     </umb-button>
 
-                    <umb-button 
-                        alias="preview" 
+                    <umb-button
+                        alias="preview"
                         ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
                         type="button"
-                        button-style="outline"
+                        button-style="info"
                         action="preview(content)"
                         label-key="buttons_showPage">
                     </umb-button>
 
-                    <umb-button 
+                    <umb-button
                         ng-if="page.showSaveButton"
                         alias="save"
                         type="button"
-                        button-style="info"
+                        button-style="{{page.saveButtonStyle}}"
                         state="page.saveButtonState"
                         action="save(content)"
                         label-key="buttons_save"
                         shortcut="ctrl+s"
                         add-ellipsis="{{page.saveButtonEllipsis}}">
                     </umb-button>
-                    
-                    <umb-button-group 
-                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
+
+                    <umb-button-group
+                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode"
                         button-style="success"
-                        default-button="defaultButton" 
-                        sub-buttons="subButtons" 
+                        default-button="defaultButton"
+                        sub-buttons="subButtons"
                         state="page.buttonGroupState"
                         direction="up"
                         float="right">
@@ -83,16 +83,6 @@
                         state="publishAndCloseButtonState"
                         label-key="buttons_publishAndClose"
                         type="button">
-                    </umb-button>
-
-                    <umb-button 
-                        alias="restore" 
-                        ng-if="content.trashed" 
-                        type="button" 
-                        button-style="primary" 
-                        action="restore(content)" 
-                        state="page.buttonRestore"
-                        label="Restore">
                     </umb-button>
 
                 </umb-editor-footer-content-right>

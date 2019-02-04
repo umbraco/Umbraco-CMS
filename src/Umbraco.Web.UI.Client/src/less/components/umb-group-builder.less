@@ -17,7 +17,7 @@
 }
 
 .umb-group-builder__group.-active {
-  border-color: @turquoise;
+  border-color: @ui-active;
 }
 
 .umb-group-builder__group.-inherited {
@@ -33,10 +33,15 @@
   align-items: center;
   cursor: pointer;
   border: 1px dashed @gray-7;
-  color: @turquoise-d1;
+  color: @ui-action-type;
   font-weight: bold;
   position: relative;
   box-shadow: none;
+  &:hover {
+      color:@ui-action-type-hover;
+      text-decoration: none;
+      border-color: @ui-active-type-hover;
+  }
 }
 
 .umb-group-builder__group.-sortable {
@@ -61,11 +66,12 @@
   position: relative;
   margin-left: auto;
   font-size: 18px;
+  color: @ui-icon;
 }
 
 .umb-group-builder__group-remove:hover {
   cursor: pointer;
-  color: @turquoise;
+  color: @ui-icon-hover;
 }
 
 .umb-group-builder__group-title-wrapper {
@@ -87,7 +93,7 @@
 }
 
 .umb-group-builder__group-title.-active {
-  border-color: @turquoise;
+  border-color: @blueMid;
 }
 
 .umb-group-builder__group-title.-placeholder {
@@ -296,10 +302,11 @@ input.umb-group-builder__group-title-input:disabled:hover {
   font-size: 18px;
   position: relative;
   cursor: pointer;
+  color: @ui-icon;
 }
 
 .umb-group-builder__property-action:hover {
-    color: @turquoise;
+    color: @ui-icon-hover;
 }
 
 .umb-group-builder__property-tags {
@@ -409,20 +416,21 @@ input.umb-group-builder__group-sort-value {
     }
 
     .editor-placeholder {
-        border: 1px dashed @gray-8;
+        border: 1px dashed @ui-action-border;
         width: 100%;
         height: 80px;
         line-height: 80px;
         text-align: center;
         display: block;
         border-radius: 5px;
-        color: @gray-3;
         font-weight: bold;
         font-size: 14px;
-        color: @turquoise-d1;
-
+        color: @ui-action-type;
+        
         &:hover {
             text-decoration: none;
+            color:@ui-action-type-hover;
+            border-color:@ui-action-border-hover;
         }
     }
 

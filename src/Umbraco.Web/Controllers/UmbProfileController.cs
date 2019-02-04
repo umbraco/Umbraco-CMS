@@ -14,14 +14,12 @@ namespace Umbraco.Web.Controllers
     [MemberAuthorize]
     public class UmbProfileController : SurfaceController
     {
-        // fixme - delete?
         public UmbProfileController()
-        {
-        }
+        { }
 
-        public UmbProfileController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger) : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
-        {
-        }
+        public UmbProfileController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        { }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

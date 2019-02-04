@@ -200,12 +200,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return "NVARCHAR";
         }
-
-        public virtual bool? SupportsCaseInsensitiveQueries(IDatabase db)
-        {
-            return true;
-        }
-
+        
         public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             return new List<string>();
@@ -482,7 +477,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var dbTypeDefinition = column.Size != default(int)
                 ? $"{definition}({column.Size})"
                 : definition;
-            //NOTE Percision is left out
+            //NOTE Precision is left out
             return dbTypeDefinition;
         }
 
@@ -505,7 +500,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             if (column.DefaultValue == null)
                 return string.Empty;
 
-            //hack - probably not needed with latest changes
+            // HACK: probably not needed with latest changes
             if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
                 column.DefaultValue = SystemMethods.CurrentDateTime;
 

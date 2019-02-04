@@ -84,9 +84,18 @@
                     
                             <h5><localize key="validation_validation"></localize></h5>
                     
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}" />
+                            <label>                                
                                 <localize key="validation_fieldIsMandatory"></localize>
+                            </label>
+
+                            <umb-toggle data-element="validation_mandatory"
+                                        checked="model.property.validation.mandatory"
+                                        on-click="vm.toggleValidation()"
+                            >
+                            </umb-toggle>
+
+                            <label class="mt3">                                
+                                <localize key="validation_customValidation"></localize>
                             </label>
                     
                             <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
@@ -106,38 +115,52 @@
                     
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
-                    
-                            <h5>Property Type Variation</h5>
-                    
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.allowCultureVariant" />
-                                Allow varying by Culture
-                            </label>
-                    
+                           
+                                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
+                             
+                                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                                checked="model.property.allowCultureVariant"
+                                                on-click="vm.toggleAllowCultureVariants()"
+                                    >
+                                    </umb-toggle>
+
                         </div>
                     
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
-                    
+
                             <h5><localize key="general_options"></localize></h5>
-                    
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+
+                            <label class="mt3">
                                 <localize key="contentTypeEditor_showOnMemberProfile"></localize>
                                 <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
                             </label>
-                    
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.memberCanEdit">
+
+                            <umb-toggle data-element="settings_show_member_on_profile"
+                                        checked="model.property.showOnMemberProfile"
+                                        on-click="vm.toggleShowOnMemberProfile()">
+                            </umb-toggle>
+
+                            <label class="mt3">
                                 <localize key="contentTypeEditor_memberCanEdit"></localize>
                                 <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
                             </label>
-                    
-                            <label ng-if="vm.showSensitiveData" class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.isSensitiveData">
+
+                            <umb-toggle data-element="settings_member_can_edit"
+                                        checked="model.property.memberCanEdit"
+                                        on-click="vm.toggleMemberCanEdit()">
+                            </umb-toggle>
+
+                            <label class="mt3" ng-if="vm.showSensitiveData">
                                 <localize key="contentTypeEditor_isSensitiveData"></localize>
                                 <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
                             </label>
-                    
+
+                            <umb-toggle ng-if="vm.showSensitiveData" data-element="settings_is_sensitive_data"
+                                        checked="model.property.isSensitiveData"
+                                        on-click="vm.toggleIsSensitiveData()">
+                            </umb-toggle>
+                                                      
+
                         </div>
                     </div>
 
@@ -155,6 +178,7 @@
                     type="button"
                     button-style="link"
                     label-key="general_close"
+                    shortcut="esc"
                     action="vm.close()">
                 </umb-button>
 

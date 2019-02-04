@@ -56,8 +56,7 @@ namespace Umbraco.Web.Scheduling
                 // ensure we run with an UmbracoContext, because this may run in a background task,
                 // yet developers may be using the 'current' UmbracoContext in the event handlers
                 //
-                // fixme
-                // - or maybe not, CacheRefresherComponent already ensures a context when handling events
+                // TODO: or maybe not, CacheRefresherComponent already ensures a context when handling events
                 // - UmbracoContext 'current' needs to be refactored and cleaned up
                 // - batched messenger should not depend on a current HttpContext
                 //    but then what should be its "scope"? could we attach it to scopes?

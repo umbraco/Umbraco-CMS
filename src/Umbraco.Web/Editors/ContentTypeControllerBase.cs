@@ -7,9 +7,13 @@ using System.Text;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
@@ -26,7 +30,16 @@ namespace Umbraco.Web.Editors
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition
     {
+        private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
+
+        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _cultureDictionaryFactory = cultureDictionaryFactory;
+        }
+
+        
 
         /// <summary>
         /// Returns the available composite content types for a given content type
@@ -161,7 +174,7 @@ namespace Umbraco.Web.Editors
                         break;
 
                     case UmbracoObjectTypes.MediaType:
-                        source = Services.ContentTypeService.Get(contentTypeId);
+                        source = Services.MediaTypeService.Get(contentTypeId);
                         break;
 
                     case UmbracoObjectTypes.MemberType:
@@ -246,7 +259,7 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
-            // execute the externam validators
+            // execute the external validators
             EditorValidator.Validate(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)
@@ -536,6 +549,6 @@ namespace Umbraco.Web.Editors
         }
 
         private ICultureDictionary CultureDictionary
-            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
+            => _cultureDictionary ?? (_cultureDictionary = _cultureDictionaryFactory.CreateDictionary());
     }
 }

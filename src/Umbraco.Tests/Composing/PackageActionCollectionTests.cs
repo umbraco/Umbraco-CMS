@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Core.PackageActions;
 using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Composing
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.Composing
 
         public class PackageAction1 : IPackageAction
         {
-            public bool Execute(string packageName, XmlNode xmlData)
+            public bool Execute(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Composing
                 return "pa1";
             }
 
-            public bool Undo(string packageName, XmlNode xmlData)
+            public bool Undo(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.Composing
 
         public class PackageAction2 : IPackageAction
         {
-            public bool Execute(string packageName, XmlNode xmlData)
+            public bool Execute(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Composing
                 return "pa2";
             }
 
-            public bool Undo(string packageName, XmlNode xmlData)
+            public bool Undo(string packageName, XElement xmlData)
             {
                 throw new NotImplementedException();
             }

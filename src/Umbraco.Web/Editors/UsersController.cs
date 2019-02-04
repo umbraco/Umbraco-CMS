@@ -17,10 +17,12 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
@@ -43,13 +45,17 @@ namespace Umbraco.Web.Editors
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
+        public UsersController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(AppCaches.RuntimeCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -60,17 +66,17 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath(SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -117,7 +123,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(staticCache));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(cache));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -150,7 +156,7 @@ namespace Umbraco.Web.Editors
                     Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache));
         }
 
         /// <summary>
@@ -200,7 +206,7 @@ namespace Umbraco.Web.Editors
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
             {
-                //this user is not an admin so in that case we need to exlude all admin users
+                //this user is not an admin so in that case we need to exclude all admin users
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
@@ -208,7 +214,7 @@ namespace Umbraco.Web.Editors
 
             if (!Security.CurrentUser.IsSuper())
             {
-                // only super can see super - but don't use IsSuper, cannot be mapped to SQL - fixme NOW
+                // only super can see super - but don't use IsSuper, cannot be mapped to SQL
                 //filterQuery.Where(x => !x.IsSuper());
                 filterQuery.Where(x => x.Id != Constants.Security.SuperUserId);
             }

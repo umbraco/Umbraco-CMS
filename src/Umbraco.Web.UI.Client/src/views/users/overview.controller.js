@@ -1,17 +1,11 @@
 (function () {
     "use strict";
 
-    function UsersOverviewController($scope, $location, $timeout, navigationService, localizationService) {
+    function UsersOverviewController($scope, $location, $routeParams, localizationService) {
 
         var vm = this;
-        var usersUri = $location.search().subview;
-        if (!usersUri) {
-            $location.search("subview", "users");
-            //exit after this, we don't want to initialize anything further since this
-            //is going to change the route
-            return;
-        }
-
+        let usersUri = $routeParams.method;
+        
         //note on the below, we dont assign a view unless it's the right route since if we did that it will load in that controller
         //for the view which is unecessary and will cause extra overhead/requests to occur
         vm.page = {};
@@ -24,18 +18,13 @@
             loadNavigation();
 
             setPageName();
-
-            $timeout(function () {
-                navigationService.syncTree({ tree: "users", path: "-1" });
-            });
-
         }
 
         function loadNavigation() {
 
             var labels = ["sections_users", "general_groups"];
 
-            localizationService.localizeMany(labels).then(function(data){
+            localizationService.localizeMany(labels).then(function (data) {
                 vm.page.labels.users = data[0];
                 vm.page.labels.groups = data[1];
 
@@ -43,8 +32,8 @@
                     {
                         "name": vm.page.labels.users,
                         "icon": "icon-user",
-                        "action": function() {
-                          $location.search("subview", "users")
+                        "action": function () {
+                            $location.path("/users/users/users").search("create", null);
                         },
                         "view": !usersUri || usersUri === "users" ? "views/users/views/users/users.html" : null,
                         "active": !usersUri || usersUri === "users",
@@ -54,7 +43,7 @@
                         "name": vm.page.labels.groups,
                         "icon": "icon-users",
                         "action": function () {
-                          $location.search("subview", "groups")
+                            $location.path("/users/users/groups").search("create", null);
                         },
                         "view": usersUri === "groups" ? "views/users/views/groups/groups.html" : null,
                         "active": usersUri === "groups",
@@ -65,11 +54,11 @@
         }
 
         function setPageName() {
-            localizationService.localize("user_userManagement").then(function(data){
+            localizationService.localize("user_userManagement").then(function (data) {
                 vm.page.name = data;
             })
         }
- 
+
         onInit();
 
     }

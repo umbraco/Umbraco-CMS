@@ -97,7 +97,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetContent(true, 1);
             //change a doc type alias
-            var c = (TestPublishedContent) doc.Children.ElementAt(0);
+            var c = (TestPublishedContent)doc.Children.ElementAt(0);
             c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
 
             var dt = doc.ChildrenAsTable(Current.Services, "Child");
@@ -217,6 +217,7 @@ namespace Umbraco.Tests.PublishedContent
             public Guid Version { get; set; }
             public int Level { get; set; }
             public bool IsDraft(string culture = null) => false;
+            public bool IsPublished(string culture = null) => true;
 
             public IEnumerable<IPublishedProperty> Properties { get; set; }
 

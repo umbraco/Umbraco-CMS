@@ -12,6 +12,16 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines whether the content type is invariant.
         /// </summary>
+        public static bool VariesByNothing(this ISimpleContentType contentType) => contentType.Variations.VariesByNothing();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture.
+        /// </summary>
+        public static bool VariesByCulture(this ISimpleContentType contentType) => contentType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the content type is invariant.
+        /// </summary>
         public static bool VariesByNothing(this IContentTypeBase contentType) => contentType.Variations.VariesByNothing();
 
         /// <summary>

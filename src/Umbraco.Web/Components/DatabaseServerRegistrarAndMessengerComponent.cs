@@ -34,7 +34,7 @@ namespace Umbraco.Web.Components
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
 
     // during Initialize / Startup, we end up checking Examine, which needs to be initialized beforehand
-    // todo - should not be a strong dependency on "examine" but on an "indexing component"
+    // TODO: should not be a strong dependency on "examine" but on an "indexing component"
     [ComposeAfter(typeof(ExamineComposer))]
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
@@ -106,30 +106,36 @@ namespace Umbraco.Web.Components
 
         public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IndexRebuilder indexRebuilder)
         {
-            _registrar = serverRegistrar as DatabaseServerRegistrar;
-            if (_registrar == null) throw new Exception("panic: registar.");
-
-            _messenger = serverMessenger as BatchedDatabaseServerMessenger;
-            if (_messenger == null) throw new Exception("panic: messenger");
-
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
             _indexRebuilder = indexRebuilder;
 
-            _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
-                new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
-            _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
-                new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+            // create task runner for DatabaseServerRegistrar
+            _registrar = serverRegistrar as DatabaseServerRegistrar;
+            if (_registrar != null)
+            {
+                _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+            }
+
+            // create task runner for BatchedDatabaseServerMessenger
+            _messenger = serverMessenger as BatchedDatabaseServerMessenger;
+            if (_messenger != null)
+            {
+                _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+            }
         }
 
         public void Initialize()
         { 
             //We will start the whole process when a successful request is made
-            UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
+            if (_registrar != null || _messenger != null)
+                UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
 
             // must come last, as it references some _variables
-            _messenger.Startup();
+            _messenger?.Startup();
         }
 
         public void Terminate()
@@ -175,6 +181,9 @@ namespace Umbraco.Web.Components
 
         private IBackgroundTask RegisterInstructionProcess()
         {
+            if (_messenger == null)
+                return null;
+
             var task = new InstructionProcessTask(_processTaskRunner,
                 60000, //delay before first execution
                 _messenger.Options.ThrottleSeconds*1000, //amount of ms between executions
@@ -186,6 +195,9 @@ namespace Umbraco.Web.Components
 
         private IBackgroundTask RegisterTouchServer(IServerRegistrationService registrationService, string serverAddress)
         {
+            if (_registrar == null)
+                return null;
+
             var task = new TouchServerTask(_touchTaskRunner,
                 15000, //delay before first execution
                 _registrar.Options.RecurringSeconds*1000, //amount of ms between executions

@@ -17,19 +17,21 @@ namespace Umbraco.Core.Deploy
         IEnumerable<string> PropertyEditorAliases { get; }
 
         /// <summary>
-        /// Gets the deploy property corresponding to a content property.
+        /// Gets the deploy property value corresponding to a content property value, and gather dependencies.
         /// </summary>
-        /// <param name="property">The content property.</param>
+        /// <param name="value">The content property value.</param>
+        /// <param name="propertyType">The value property type</param>
         /// <param name="dependencies">The content dependencies.</param>
         /// <returns>The deploy property value.</returns>
-        string GetValue(Property property, ICollection<ArtifactDependency> dependencies);
+        string ToArtifact(object value, PropertyType propertyType, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
-        /// Sets a content property value using a deploy property.
+        /// Gets the content property value corresponding to a deploy property value.
         /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="alias">The property alias.</param>
         /// <param name="value">The deploy property value.</param>
-        void SetValue(IContentBase content, string alias, string value);
+        /// <param name="propertyType">The value property type<</param>
+        /// <param name="currentValue">The current content property value.</param>
+        /// <returns>The content property value.</returns>
+        object FromArtifact(string value, PropertyType propertyType, object currentValue);
     }
 }

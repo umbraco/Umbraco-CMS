@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Find_All_Event_Handlers()
         {
-            // fixme - cannot work with mocks
+            // FIXME: cannot work with mocks
             // because the events are defined on actual static classes, not on the interfaces, so name matching fails
             // we should really refactor events entirely - in the meantime, let it be an UmbracoTestBase ;(
             //var testObjects = new TestObjects(null);
@@ -46,13 +46,6 @@ namespace Umbraco.Tests.Cache
                 //Permission.Updated += PermissionUpdated;
                 //Permission.Deleted += PermissionDeleted;
                 //PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
-
-                new EventDefinition<IApplicationTreeService, EventArgs>(null, serviceContext.ApplicationTreeService, new EventArgs(), "Deleted"),
-                new EventDefinition<IApplicationTreeService, EventArgs>(null, serviceContext.ApplicationTreeService, new EventArgs(), "Updated"),
-                new EventDefinition<IApplicationTreeService, EventArgs>(null, serviceContext.ApplicationTreeService, new EventArgs(), "New"),
-
-                new EventDefinition<ISectionService, EventArgs>(null, serviceContext.SectionService, new EventArgs(), "Deleted"),
-                new EventDefinition<ISectionService, EventArgs>(null, serviceContext.SectionService, new EventArgs(), "New"),
 
                 new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, serviceContext.UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, serviceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),

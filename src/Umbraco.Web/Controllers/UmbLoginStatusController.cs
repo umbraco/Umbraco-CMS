@@ -13,12 +13,11 @@ namespace Umbraco.Web.Controllers
     [MemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
-        // fixme - delete?
         public UmbLoginStatusController()
         {
         }
 
-        public UmbLoginStatusController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger) : base(umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+        public UmbLoginStatusController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper) : base(umbracoContext, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
         {
         }
 

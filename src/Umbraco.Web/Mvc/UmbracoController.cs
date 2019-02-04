@@ -17,23 +17,13 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoController : Controller
     {
-        private UmbracoHelper _umbracoHelper;
-
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
-
-        // note
-        // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
-        // don't need to implement complex constructors + need to refactor them each time we change ours.
-        // this means that these properties have a setter.
-        // what can go wrong?
-        // fixme clear this comment
 
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        public virtual IGlobalSettings GlobalSettings { get; set; }
+        public IGlobalSettings GlobalSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the Umbraco context.
@@ -48,7 +38,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get; set; }
+        public AppCaches AppCaches { get; set; }
 
         /// <summary>
         /// Gets or sets the logger.
@@ -70,8 +60,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public UmbracoHelper Umbraco => _umbracoHelper
-            ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
+        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets the web security helper.
@@ -83,21 +72,22 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<IGlobalSettings>(),
                   Current.Factory.GetInstance<UmbracoContext>(),
                   Current.Factory.GetInstance<ServiceContext>(),
-                  Current.Factory.GetInstance<CacheHelper>(),
-                  Current.Factory.GetInstance<ILogger>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<AppCaches>(),
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<UmbracoHelper>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;
             Services = services;
-            ApplicationCache = applicationCache;
-            Logger = logger;
+            AppCaches = appCaches;
+            Logger = profilingLogger;
             ProfilingLogger = profilingLogger;
+            Umbraco = umbracoHelper;
         }
     }
 }

@@ -22,10 +22,10 @@ namespace Umbraco.Web.Models
             MacroId = macroId;
         }
        
-        public IPublishedContent Content { get; private set; }
-        public string MacroName { get; private set; }
-        public string MacroAlias { get; private set; }
-        public int MacroId { get; private set; }
-        public IDictionary<string, object> MacroParameters { get; private set; }
+        public IPublishedContent Content { get; }
+        public string MacroName { get; }
+        public string MacroAlias { get; }
+        public int MacroId { get; }
+        public IDictionary<string, object> MacroParameters { get; }
     }
 }

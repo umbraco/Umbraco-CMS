@@ -14,10 +14,28 @@
    user-select: none;
    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
    border-radius: 3px;
+   
 }
 
 .umb-content-grid__item.-selected {
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.35);
+    //box-shadow: 0 2px 8px 0 rgba(0,0,0,0.35);
+    
+    //color:@ui-selected-type;
+    
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
+    }
+    
 }
 
 .umb-content-grid__icon-container {
@@ -31,12 +49,12 @@
 .umb-content-grid__icon[class^="icon-"],
 .umb-content-grid__icon[class*=" icon-"] {
    font-size: 20px;
-   color: @gray-8;
+//color: @gray-8;
    margin-right: 5px;
 }
 
 .umb-content-grid__icon.-light {
-   color: @gray-5;
+   //color: @gray-5;
 }
 
 
@@ -48,12 +66,16 @@
 .umb-content-grid__item-name {
    font-weight: bold;
    margin-bottom: 15px;
-   color: @black;
    line-height: 1.4em;
    display: inline-flex;
+   
+   color: @ui-option-type;
+   &:hover {
+       color:@ui-option-type-hover;
+   }
 }
 
-.umb-content-grid__item-name:hover {
+.umb-content-grid__item-name:hover span {
     text-decoration: underline;
 }
 

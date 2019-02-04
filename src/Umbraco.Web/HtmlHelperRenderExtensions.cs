@@ -12,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -91,20 +92,20 @@ namespace Umbraco.Web
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
-                cacheKey.AppendFormat("{0}-", UmbracoContext.Current.PageId);
+                cacheKey.AppendFormat("{0}-", UmbracoContext.Current.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
             if (cacheByMember)
             {
                 var helper = Current.Factory.GetInstance<MembershipHelper>();
                 var currentMember = helper.GetCurrentMember();
-                cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
+                cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(model, viewData);
                 cacheKey.AppendFormat("c{0}-", contextualKey);
             }
-            return Current.ApplicationCache.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+            return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
         }
 
         public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
@@ -139,7 +140,7 @@ namespace Umbraco.Web
                 return htmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
             }
 
-            //if there's a prefix applied, we need to create a new html helper with a filtered ModelState collection so that it only looks for
+            //if there's a prefix applied, we need to create a new HTML helper with a filtered ModelState collection so that it only looks for
             //specific model state with the prefix.
             var filteredHtmlHelper = new HtmlHelper(htmlHelper.ViewContext, htmlHelper.ViewDataContainer.FilterContainer(prefix));
             return filteredHtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
@@ -735,7 +736,7 @@ namespace Umbraco.Web
                                           object additionalRouteVals = null)
         {
 
-            //ensure that the multipart/form-data is added to the html attributes
+            //ensure that the multipart/form-data is added to the HTML attributes
             if (htmlAttributes.ContainsKey("enctype") == false)
             {
                 htmlAttributes.Add("enctype", "multipart/form-data");
@@ -829,7 +830,5 @@ namespace Umbraco.Web
         }
 
         #endregion
-
-
     }
 }

@@ -16,8 +16,11 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
+using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web.Editors
 {
@@ -36,7 +39,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
 
-        public DataTypeController(PropertyEditorCollection propertyEditors)
+        public DataTypeController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors;
         }
@@ -68,7 +71,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a data type wth a given ID
+        /// Deletes a data type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -120,7 +123,7 @@ namespace Umbraco.Web.Editors
         {
             var dt = Services.DataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
 
-            //if it doesnt exist yet, we will create it.
+            //if it doesn't exist yet, we will create it.
             if (dt == null)
             {
                 var editor = _propertyEditors[Constants.PropertyEditors.Aliases.ListView];
@@ -172,7 +175,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a data type container wth a given ID
+        /// Deletes a data type container with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -204,7 +207,7 @@ namespace Umbraco.Web.Editors
         {
             //If we've made it here, then everything has been wired up and validated by the attribute
 
-            //TODO: Check if the property editor has changed, if it has ensure we don't pass the
+            // TODO: Check if the property editor has changed, if it has ensure we don't pass the
             // existing values to the new property editor!
 
             // get the current configuration,

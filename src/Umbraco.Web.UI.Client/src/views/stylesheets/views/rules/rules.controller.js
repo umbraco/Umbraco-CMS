@@ -67,7 +67,7 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
         }
 
         function init() {
-            localizationService.localizeMany(["stylesheet_overlayTitleAddRule", "stylesheet_overlayTitleEditRule"]).then(function (data) {
+            localizationService.localizeMany(["stylesheet_addRule", "stylesheet_editRule"]).then(function (data) {
                 $scope.labels = {
                     addRule: data[0],
                     editRule: data[1]

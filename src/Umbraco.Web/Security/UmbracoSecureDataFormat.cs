@@ -38,7 +38,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Unprotects the cookie
+        /// Un-protects the cookie
         /// </summary>
         /// <param name="protectedText"></param>
         /// <returns></returns>

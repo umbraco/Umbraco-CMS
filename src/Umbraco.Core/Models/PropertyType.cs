@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
@@ -20,8 +16,6 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyType : EntityBase, IEquatable<PropertyType>
     {
-        private static PropertySelectors _selectors;
-
         private readonly bool _forceValueStorageType;
         private string _name;
         private string _alias;
@@ -87,23 +81,6 @@ namespace Umbraco.Core.Models
             _variations = ContentVariation.Nothing;
         }
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
-            public readonly PropertyInfo Alias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
-            public readonly PropertyInfo Description = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-            public readonly PropertyInfo DataTypeId = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
-            public readonly PropertyInfo PropertyEditorAlias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
-            public readonly PropertyInfo ValueStorageType = ExpressionHelper.GetPropertyInfo<PropertyType, ValueStorageType>(x => x.ValueStorageType);
-            public readonly PropertyInfo Mandatory = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
-            public readonly PropertyInfo SortOrder = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
-            public readonly PropertyInfo ValidationRegExp = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
-            public readonly PropertyInfo PropertyGroupId = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
-            public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<PropertyType, ContentVariation>(x => x.Variations);
-        }
-
         /// <summary>
         /// Gets a value indicating whether the content type, owning this property type, is publishing.
         /// </summary>
@@ -116,7 +93,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -126,7 +103,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, Selectors.Alias);
+            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -136,7 +113,7 @@ namespace Umbraco.Core.Models
         public string Description
         {
             get => _description;
-            set => SetPropertyValueAndDetectChanges(value, ref _description, Selectors.Description);
+            set => SetPropertyValueAndDetectChanges(value, ref _description, nameof(Description));
         }
 
         /// <summary>
@@ -146,7 +123,7 @@ namespace Umbraco.Core.Models
         public int DataTypeId
         {
             get => _dataTypeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, Selectors.DataTypeId);
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, nameof(DataTypeId));
         }
 
         /// <summary>
@@ -156,7 +133,7 @@ namespace Umbraco.Core.Models
         public string PropertyEditorAlias
         {
             get => _propertyEditorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Selectors.PropertyEditorAlias);
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, nameof(PropertyEditorAlias));
         }
 
         /// <summary>
@@ -169,7 +146,7 @@ namespace Umbraco.Core.Models
             set
             {
                 if (_forceValueStorageType) return; // ignore changes
-                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Selectors.ValueStorageType);
+                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, nameof(ValueStorageType));
             }
         }
 
@@ -181,7 +158,7 @@ namespace Umbraco.Core.Models
         internal Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Selectors.PropertyGroupId);
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));
         }
 
         /// <summary>
@@ -191,7 +168,7 @@ namespace Umbraco.Core.Models
         public bool Mandatory
         {
             get => _mandatory;
-            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Selectors.Mandatory);
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
         }
 
         /// <summary>
@@ -201,7 +178,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Selectors.SortOrder);
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
         }
 
         /// <summary>
@@ -211,7 +188,7 @@ namespace Umbraco.Core.Models
         public string ValidationRegExp
         {
             get => _validationRegExp;
-            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Selectors.ValidationRegExp);
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
         }
 
         /// <summary>
@@ -220,7 +197,7 @@ namespace Umbraco.Core.Models
         public ContentVariation Variations
         {
             get => _variations;
-            set => SetPropertyValueAndDetectChanges(value, ref _variations, Selectors.VaryBy);
+            set => SetPropertyValueAndDetectChanges(value, ref _variations, nameof(Variations));
         }
 
         /// <summary>
@@ -287,7 +264,7 @@ namespace Umbraco.Core.Models
         /// Converts a value assigned to a property.
         /// </summary>
         /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual Clr type
+        /// <para>The input value can be pretty much anything, and is converted to the actual CLR type
         /// expected by the property (eg an integer if the property values are integers).</para>
         /// <para>Throws if the value cannot be converted.</para>
         /// </remarks>
@@ -345,7 +322,7 @@ namespace Umbraco.Core.Models
                     var convDecimal = value.TryConvertTo<decimal>();
                     if (convDecimal)
                     {
-                        // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                        // need to normalize the value (change the scaling factor and remove trailing zeros)
                         // because the underlying database is going to mess with the scaling factor anyways.
                         converted = convDecimal.Result.Normalize();
                         return true;
@@ -378,14 +355,14 @@ namespace Umbraco.Core.Models
         }
 
 
-        //fixme - this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
+        // TODO: this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
         internal bool IsPropertyValueValid(object value)
         {
-            var editor = Current.PropertyEditors[_propertyEditorAlias]; // fixme inject?
-            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // fixme inject?
+            var editor = Current.PropertyEditors[_propertyEditorAlias]; // TODO: inject
+            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // TODO: inject
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, Mandatory, ValidationRegExp).Any();
         }

@@ -54,7 +54,8 @@ function confirmDirective() {
         scope: {
             onConfirm: '=',
             onCancel: '=',
-            caption: '@'
+            caption: '@',
+            confirmButtonStyle: '@'
         },
         link: function (scope, element, attr, ctrl) {
             scope.showCancel = false;

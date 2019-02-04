@@ -7,12 +7,15 @@
 
         vm.confirmUninstall = confirmUninstall;
         vm.uninstallPackage = uninstallPackage;
+        vm.packageOptions = packageOptions;
         vm.state = "list";
         vm.installState = {
             status: ""
         };
         vm.package = {};
 
+        var labels = {};
+        
         function init() {
             packageResource.getInstalled()
                 .then(function (packs) {
@@ -20,6 +23,21 @@
                 });
             vm.installState.status = "";
             vm.state = "list";
+
+            var labelKeys = [
+                "packager_installStateUninstalling",
+                "packager_installStateComplete"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                labels.installStateUninstalling = values[0];
+                labels.installStateComplete = values[1];
+            });
+        }
+
+        function packageOptions(pck) {
+            $location.path("packages/packages/options/" + pck.id)
+                .search("packageId", null); //ensure the installId flag is gone, it's only available on first install
         }
 
         function confirmUninstall(pck) {
@@ -28,18 +46,18 @@
         }
 
         function uninstallPackage(installedPackage) {
-            vm.installState.status = localizationService.localize("packager_installStateUninstalling");
+            vm.installState.status = labels.installStateUninstalling;
             vm.installState.progress = "0";
 
             packageResource.uninstall(installedPackage.id)
                 .then(function () {
 
                     if (installedPackage.files.length > 0) {
-                        vm.installState.status = localizationService.localize("packager_installStateComplete");
+                        vm.installState.status = labels.installStateComplete;
                         vm.installState.progress = "100";
 
                         //set this flag so that on refresh it shows the installed packages list
-                        localStorageService.set("packageInstallUri", "installed");
+                        localStorageService.set("packageInstallData", "installed");
                         
                         //reload on next digest (after cookie)
                         $timeout(function () {

@@ -1,0 +1,230 @@
+<div data-element="editor-logs" ng-controller="Umbraco.Editors.LogViewer.SearchController as vm" class="clearfix">
+
+    <umb-editor-view footer="false">
+
+        <umb-editor-header
+            name="'Log Search'"
+            name-locked="true"
+            on-back="vm.back()"
+            show-back-button="vm.showBackButton"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <form ng-submit="vm.search()">
+                <umb-editor-sub-header>
+                    <umb-editor-sub-header-content-left style="width:100%; line-height:30px;">
+                        <!-- Log Level filter -->
+                        <div style="position: relative;">
+                            <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
+                                <span>Log Levels:</span>
+                                <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.logLevels) }}</span>
+                                <span class="caret"></span>
+                            </a>
+                            <umb-dropdown class="pull-right" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
+                                <umb-dropdown-item ng-repeat="level in vm.logLevels" style="padding: 8px 20px 8px 16px;">
+                                    <div class="flex items-center">
+                                        <input
+                                            id="loglevel-{{$index}}"
+                                            type="checkbox"
+                                            ng-model="level.selected"
+                                            ng-change="vm.setLogLevelFilter(level)"
+                                            style="margin-right: 10px; margin-top: -3px;" />
+                                        <label for="loglevel-{{$index}}">
+                                            <umb-badge size="s" color="{{ level.logTypeColor }}">{{ level.name }}</umb-badge>
+                                        </label>
+                                    </div>
+                                </umb-dropdown-item>
+                            </umb-dropdown>
+                        </div>
+
+                    </umb-editor-sub-header-content-left>
+                </umb-editor-sub-header>
+
+                <umb-editor-sub-header>
+                    <umb-editor-sub-header-content-left style="width:100%">
+
+                        <div style="position:relative; width:100%;">
+                            <!-- Search/expression filter -->
+                            <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" placeholder="Search logs&hellip;" />
+
+                            <!-- Save Search & Clear Search icon buttons -->
+                            <ins class="icon-rate" ng-if="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 160px; color: #fdb45c; cursor: pointer;">&nbsp;</ins>
+                            <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
+
+                            <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top:0;">
+                                <span class="ng-binding">Example Searches</span>
+                                <ins class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                            </a>
+
+                            <!-- Common Searches Dropdown -->
+                            <umb-dropdown ng-if="vm.dropdownOpen"  style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: -10px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                                <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
+                                    <a href="" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)" prevent-default>
+                                        <span class="umb-variant-switcher__name">{{search.name}}</span>
+                                        <span>{{ search.query }}</span>
+                                    </a>
+                                    <a href=""><span><i class="icon icon-trash text-error" title="Delete this search" ng-click="vm.deleteSavedSearch(search)"></i></span></a>
+                                </umb-dropdown-item>
+                            </umb-dropdown>
+                        </div>
+
+                        <!-- Search Button -->
+                        <umb-button
+                            button-style="button"
+                            type="submit"
+                            action="vm.search()"
+                            label-key="general_search">
+                        </umb-button>
+
+                    </umb-editor-sub-header-content-left>
+                </umb-editor-sub-header>
+            </form>
+
+            <div class=" ng-if="!vm.loading">
+
+                <div class="">
+
+                    <!-- Loader for the main logs content when paging -->
+                    <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
+
+                    <!-- Empty states -->
+                    <umb-empty-state ng-if="vm.logItems.totalItems === 0" position="center">
+                        <localize key="general_searchNoResult"></localize>
+                    </umb-empty-state>
+
+                    <!-- Main Log Table -->
+                    <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">
+                        <umb-box-content class="block-form">
+
+                            <div ng-if="vm.logItems.totalItems > 0">
+                                Total Items: {{ vm.logItems.totalItems }}
+                            </div>
+
+                            <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:100px;" ng-click="vm.toggleOrderBy()">
+                                            Timestamp
+                                            <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
+                                        </th>
+                                        <th>Level</th>
+                                        <th>Machine</th>
+                                        <th>Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
+                                        <td>{{ log.Timestamp | date:'medium' }}</td>
+                                        <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
+                                        <td><small>{{ log.Properties.MachineName.Value }}</small></td>
+                                        <td>{{ log.RenderedMessage }}</td>
+                                    </tr>
+
+                                    <!-- Log Details (Exception & Properties) -->
+                                    <tr ng-repeat-end ng-if="log.open">
+                                        <td colspan="4">
+                                            <div ng-if="log.Exception" style="border-left:4px solid #fe6561; padding:0 10px 10px 10px; box-shadow:rgba(0,0,0,0.07) 2px 2px 10px">
+                                                <h3 style="color:#fe6561;">Exception</h3>
+                                                <p style="white-space: pre-wrap;">{{ log.Exception }}</p>
+                                            </div>
+
+                                            <h3>Properties</h3>
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Timestamp</th>
+                                                        <td>{{log.Timestamp}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>@MessageTemplate</th>
+                                                        <td>{{log.MessageTemplateText}}</td>
+                                                    </tr>
+                                                    <tr ng-repeat="(key, val) in log.Properties">
+                                                        <th>{{key}}</th>
+                                                        <td ng-switch on="key">
+                                                            <a ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Request ID">{{val.Value}} <i class="icon-search"></i></a>
+                                                            <a ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Namespace">{{val.Value}} <i class="icon-search"></i></a>
+                                                            <a ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Machine Name">{{val.Value}} <i class="icon-search"></i></a>
+                                                            <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" title="Open">{{val.Value}} <i class="icon-link"></i></a>
+                                                            <span ng-switch-default>{{val.Value}}</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="btn-group">
+                                                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                                    <i class="icon-search"></i> <localize key="general_search">Search</localize>
+                                                    <span class="caret"></span>
+                                                </a>
+
+                                                <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
+                                                    <umb-dropdown-item>
+                                                        <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Google">
+                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search With Google
+                                                        </a>
+                                                    </umb-dropdown-item>
+
+                                                    <umb-dropdown-item>
+                                                        <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Bing">
+                                                            <img src="https://www.bing.com/favicon.ico" width="16" height="16" /> Search With Bing
+                                                        </a>
+                                                    </umb-dropdown-item>
+
+                                                    <umb-dropdown-item>
+                                                        <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" target="_blank" title="Search this message on Our Umbraco forums and docs">
+                                                            <img src="https://our.umbraco.com/assets/images/app-icons/favicon.png" width="16" height="16" /> Search Our Umbraco
+                                                        </a>
+                                                    </umb-dropdown-item>
+
+                                                    <umb-dropdown-item>
+                                                        <a ng-href="https://www.google.co.uk/?q=site:our.umbraco.org {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.org {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" target="_blank" title="Search Our Umbraco forums using Google">
+                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search Our Umbraco with Google
+                                                        </a>
+                                                    </umb-dropdown-item>
+
+                                                    <umb-dropdown-item>
+                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" target="_blank" title="Search within Umbraco source code on Github">
+                                                            <img src="https://www.github.com/favicon.ico" width="16" height="16" /> Search Umbraco Source
+                                                        </a>
+                                                    </umb-dropdown-item>
+
+                                                    <umb-dropdown-item>
+                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" target="_blank" title="Search Umbraco Issues on Github">
+                                                            <img src="https://www.github.com/favicon.ico" width="16" height="16" /> Search Umbraco Issues
+                                                        </a>
+                                                    </umb-dropdown-item>
+                                                </umb-dropdown>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Pagination -->
+                            <div ng-if="!vm.loading" class="flex justify-center">
+                                <umb-pagination
+                                    ng-if="vm.logItems.totalPages"
+                                    page-number="vm.logItems.pageNumber"
+                                    total-pages="vm.logItems.totalPages"
+                                    on-change="vm.changePageNumber(pageNumber)">
+                                </umb-pagination>
+                            </div>
+
+                        </umb-box-content>
+                    </umb-box>
+                </div>
+            </div>
+
+        </umb-editor-container>
+
+    </umb-editor-view>
+
+</div>

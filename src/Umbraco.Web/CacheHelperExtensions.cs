@@ -19,7 +19,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Outputs and caches a partial view in MVC
         /// </summary>
-        /// <param name="cacheHelper"></param>
+        /// <param name="appCaches"></param>
         /// <param name="htmlHelper"></param>
         /// <param name="partialViewName"></param>
         /// <param name="model"></param>
@@ -28,7 +28,7 @@ namespace Umbraco.Web
         /// <param name="viewData"></param>
         /// <returns></returns>
         public static IHtmlString CachedPartialView(
-            this CacheHelper cacheHelper,
+            this AppCaches appCaches,
             HtmlHelper htmlHelper,
             string partialViewName,
             object model,
@@ -43,7 +43,7 @@ namespace Umbraco.Web
                 return htmlHelper.Partial(partialViewName, model, viewData);
             }
 
-            return cacheHelper.RuntimeCache.GetCacheItem<IHtmlString>(
+            return appCaches.RuntimeCache.GetCacheItem<IHtmlString>(
                 PartialViewCacheKey + cacheKey,
                 () => htmlHelper.Partial(partialViewName, model, viewData),
                 priority: CacheItemPriority.NotRemovable, //not removable, the same as macros (apparently issue #27610)
@@ -53,10 +53,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Clears the cache for partial views
         /// </summary>
-        /// <param name="cacheHelper"></param>
-        public static void ClearPartialViewCache(this CacheHelper cacheHelper)
+        /// <param name="appCaches"></param>
+        public static void ClearPartialViewCache(this AppCaches appCaches)
         {
-            cacheHelper.RuntimeCache.ClearCacheByKeySearch(PartialViewCacheKey);
+            appCaches.RuntimeCache.ClearByKey(PartialViewCacheKey);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -46,11 +47,11 @@ namespace Umbraco.Tests.Models
             media.SetValue(Constants.Conventions.Media.Bytes, "100");
             media.SetValue(Constants.Conventions.Media.Extension, "png");
 
-            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = media.ContentType.Alias.ToSafeAlias();
             var urlName = media.GetUrlSegment(new[] { new DefaultUrlSegmentProvider() });
 
             // Act
-            XElement element = media.ToXml();
+            XElement element = media.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);

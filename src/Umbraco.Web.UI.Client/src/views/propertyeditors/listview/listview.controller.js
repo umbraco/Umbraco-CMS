@@ -437,7 +437,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/listviewpublish.html",
             submitButtonLabelKey: "actions_publish",
             submit: function (model) {
-                // create a comma seperated array of selected cultures
+                // create a comma separated array of selected cultures
                 let selectedCultures = [];
                 if (model.languages && model.languages.length > 0) {
                     model.languages.forEach(language => {
@@ -492,7 +492,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             submitButtonLabelKey: "actions_unpublish",
             submit: function (model) {
 
-                // create a comma seperated array of selected cultures
+                // create a comma separated array of selected cultures
                 let selectedCultures = [];
                 if (model.languages && model.languages.length > 0) {
                     model.languages.forEach(language => {
@@ -766,7 +766,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             case "published":
                 return "content_isPublished";
             case "contentTypeAlias":
-                //TODO: Check for members
+                // TODO: Check for members
                 return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
             case "email":
                 return "general_email";

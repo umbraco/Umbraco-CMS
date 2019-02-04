@@ -16,7 +16,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
         var mediaPicker = {
             disableFolderSelect: true,
             submit: function(model) {
-                var selectedImagePath = model.selectedImages[0].image;
+                var selectedImagePath = model.selection[0].image;
                 callback(selectedImagePath);
                 editorService.close();
             },
@@ -69,7 +69,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
                 }, 200);
             });
 
-            //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
+            // HACK: load the separate css for the editor to avoid it blocking our js loading TEMP HACK
             assetsService.loadCss("lib/markdown/markdown.css", $scope);
         })
 }

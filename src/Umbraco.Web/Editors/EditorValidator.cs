@@ -16,7 +16,7 @@ namespace Umbraco.Web.Editors
         {
             var modelType = model.GetType();
 
-            var validationResults = Current.EditorValidators // fixme inject
+            var validationResults = Current.EditorValidators // TODO: inject
                 .Where(x => x.ModelType == modelType)
                 .SelectMany(x => x.Validate(model))
                 .Where(x => !string.IsNullOrWhiteSpace(x.ErrorMessage) && x.MemberNames.Any());
