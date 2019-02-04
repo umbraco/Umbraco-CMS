@@ -763,36 +763,29 @@ namespace Umbraco.Tests.Services
             content.PublishCulture(langFr.IsoCode);
             content.PublishCulture(langUk.IsoCode);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));    //not persisted yet, will be false
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsFalse(content.WasCulturePublished(langUk.IsoCode));    //not persisted yet, will be false
 
             var published = ServiceContext.ContentService.SaveAndPublish(content, new[]{ langFr.IsoCode , langUk.IsoCode });
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(published.Success);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
 
             var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             Assert.IsTrue(unpublished.Success);
             Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            //this is slightly confusing but this will be false because this method is used for checking the state of the current model,
-            //but the state on the model has changed with the above Unpublish call
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            //this is slightly confusing but this will be false because this method is used for checking the state of a current model,
-            //but we've re-fetched from the database
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
+            
 
         }
 

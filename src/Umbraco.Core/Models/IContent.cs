@@ -85,14 +85,6 @@ namespace Umbraco.Core.Models
         bool IsCulturePublished(string culture);
 
         /// <summary>
-        /// Gets a value indicating whether a culture was published.
-        /// </summary>
-        /// <remarks>
-        /// <para>Mirrors <see cref="IsCulturePublished"/> whenever the content item is saved.</para>
-        /// </remarks>
-        bool WasCulturePublished(string culture);
-
-        /// <summary>
         /// Gets the date a culture was published.
         /// </summary>
         DateTime? GetPublishDate(string culture);

@@ -1127,7 +1127,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // TODO: shall we get published properties or not?
                 //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-                var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
+                var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
                 var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
                 var ltemp = new List<TempContent<Content>> { temp };
@@ -1424,6 +1424,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class CultureNodeName
         {
             public int Id { get; set; }

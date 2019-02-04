@@ -19,7 +19,6 @@ namespace Umbraco.Core.Models
         private bool _published;
         private PublishedState _publishedState;
         private ContentCultureInfosCollection _publishInfos;
-        private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
 
         /// <summary>
@@ -201,11 +200,6 @@ namespace Umbraco.Core.Models
             // a non-available culture could not become published anyways
             => _publishInfos != null && _publishInfos.ContainsKey(culture);
 
-        /// <inheritdoc />
-        public bool WasCulturePublished(string culture)
-            // just check _publishInfosOrig - a copy of _publishInfos
-            // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
 
         // adjust dates to sync between version, cultures etc
         // used by the repo when persisting
@@ -216,9 +210,8 @@ namespace Umbraco.Core.Models
                 if (_publishInfos == null || !_publishInfos.TryGetValue(culture, out var publishInfos))
                     continue;
 
-                if (_publishInfosOrig != null && _publishInfosOrig.TryGetValue(culture, out var publishInfosOrig)
-                    && publishInfosOrig.Date == publishInfos.Date)
-                    continue;
+                //fixme: Removing the logic here for the old WasCulturePublished and the _publishInfosOrig has broken
+                // the test Can_Rollback_Version_On_Multilingual, but we need to understand what it's doing since I don't
 
                 _publishInfos.AddOrUpdate(culture, publishInfos.Name, date);
 
@@ -448,12 +441,6 @@ namespace Umbraco.Core.Models
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
-
-            // Make a copy of the _publishInfos, this is purely so that we can detect
-            // if this entity's previous culture publish state (regardless of the rememberDirty flag)
-            _publishInfosOrig = _publishInfos == null
-                ? null
-                : new ContentCultureInfosCollection(_publishInfos);
 
             if (_publishInfos == null) return;
 

@@ -921,6 +921,8 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public PublishResult Unpublish(IContent content, string culture = "*", int userId = 0)
         {
+            if (content == null) throw new ArgumentNullException(nameof(content));
+
             var evtMsgs = EventMessagesFactory.Get();
 
             culture = culture.NullOrWhiteSpaceAsNull();
@@ -949,12 +951,16 @@ namespace Umbraco.Core.Services.Implement
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
+                //TODO: Stop casting https://github.com/umbraco/Umbraco-CMS/issues/4234
                 ((Content)content).PublishedState = PublishedState.Unpublishing;
             }
             else
             {
-                // if the culture we want to unpublish was already unpublished, nothing to do
-                if (!content.WasCulturePublished(culture))
+                // If the culture we want to unpublish was already unpublished, nothing to do.
+                // To check for that we need to lookup the persisted content item
+                var persisted = content.HasIdentity ? GetById(content.Id) : null;
+
+                if (persisted != null && !persisted.IsCulturePublished(culture))
                     return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
 
                 // unpublish the culture
@@ -1025,7 +1031,10 @@ namespace Umbraco.Core.Services.Implement
 
             if (publishing)
             {
-                culturesUnpublishing = content.GetCulturesUnpublishing();
+                //to continue, we need to have a reference to the original IContent item that is currently persisted
+                var persisted = content.HasIdentity ? GetById(content.Id) : null;
+
+                culturesUnpublishing = content.GetCulturesUnpublishing(persisted);
                 culturesPublishing = variesByCulture
                         ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                         : null;
