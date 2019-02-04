@@ -92,13 +92,13 @@ namespace Umbraco.Web
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
-                cacheKey.AppendFormat("{0}-", UmbracoContext.Current.PageId);
+                cacheKey.AppendFormat("{0}-", UmbracoContext.Current.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
             if (cacheByMember)
             {
                 var helper = Current.Factory.GetInstance<MembershipHelper>();
                 var currentMember = helper.GetCurrentMember();
-                cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
+                cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
             if (contextualKeyBuilder != null)
             {

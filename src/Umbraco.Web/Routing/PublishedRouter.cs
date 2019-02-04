@@ -197,9 +197,6 @@ namespace Umbraco.Web.Routing
             // handlers like default.aspx will want it and most macros currently need it
             frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest);
 
-            // used by many legacy objects
-            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.LegacyContentHashTable.Elements;
-
             return true;
         }
 
@@ -239,9 +236,7 @@ namespace Umbraco.Web.Routing
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
             request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
-
-            // this is used by many legacy objects
-            request.UmbracoContext.HttpContext.Items["pageElements"] = request.LegacyContentHashTable.Elements;
+            
         }
 
         #endregion
