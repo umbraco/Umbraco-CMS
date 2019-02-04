@@ -17,10 +17,7 @@ namespace Umbraco.Tests.Cache
     {
         private DeepCloneAppCache _provider;
 
-        protected override int GetTotalItemCount
-        {
-            get { return HttpRuntime.Cache.Count; }
-        }
+        protected override int GetTotalItemCount => HttpRuntime.Cache.Count;
 
         public override void Setup()
         {
@@ -28,15 +25,9 @@ namespace Umbraco.Tests.Cache
             _provider = new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache));
         }
 
-        internal override IAppCache AppCache
-        {
-            get { return _provider; }
-        }
+        internal override IAppCache AppCache => _provider;
 
-        internal override IAppPolicyCache AppPolicyCache
-        {
-            get { return _provider; }
-        }
+        internal override IAppPolicyCache AppPolicyCache => _provider;
 
         [Test]
         public void Clones_List()
@@ -101,18 +92,11 @@ namespace Umbraco.Tests.Cache
                 CloneId = Guid.NewGuid();
             }
 
-            private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-            private class PropertySelectors
-            {
-                public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
-            }
-
             private string _name;
             public string Name
             {
-                get { return _name; }
-                set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.WriterSelector); }
+                get => _name;
+                set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
             }
 
             public Guid CloneId { get; set; }

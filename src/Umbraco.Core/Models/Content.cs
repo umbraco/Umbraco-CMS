@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
 
@@ -22,8 +21,6 @@ namespace Umbraco.Core.Models
         private ContentCultureInfosCollection _publishInfos;
         private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -81,15 +78,6 @@ namespace Umbraco.Core.Models
             PublishedVersionId = 0;
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, int?>(x => x.TemplateId);
-            public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo ContentScheduleSelector = ExpressionHelper.GetPropertyInfo<Content, ContentScheduleCollection>(x => x.ContentSchedule);
-            public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
-        }
-
         /// <inheritdoc />
         [DoNotClone]
         public ContentScheduleCollection ContentSchedule
@@ -107,7 +95,7 @@ namespace Umbraco.Core.Models
             {
                 if(_schedule != null)
                     _schedule.CollectionChanged -= ScheduleCollectionChanged;
-                SetPropertyValueAndDetectChanges(value, ref _schedule, Ps.Value.ContentScheduleSelector);
+                SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
                 if (_schedule != null)
                     _schedule.CollectionChanged += ScheduleCollectionChanged;
             }
@@ -120,7 +108,7 @@ namespace Umbraco.Core.Models
         /// <param name="e"></param>
         private void ScheduleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.ContentScheduleSelector);
+            OnPropertyChanged(nameof(ContentSchedule));
         }
 
         /// <summary>
@@ -135,7 +123,7 @@ namespace Umbraco.Core.Models
         public int? TemplateId
         {
             get => _templateId;
-            set => SetPropertyValueAndDetectChanges(value, ref _templateId, Ps.Value.TemplateSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _templateId, nameof(TemplateId));
         }
 
         /// <summary>
@@ -151,7 +139,7 @@ namespace Umbraco.Core.Models
             // - the ContentRepository when updating a content entity
             internal set
             {
-                SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector);
+                SetPropertyValueAndDetectChanges(value, ref _published, nameof(Published));
                 _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
             }
         }
@@ -332,7 +320,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PublishCultureInfosSelector);
+            OnPropertyChanged(nameof(PublishCultureInfos));
         }
 
         [IgnoreDataMember]

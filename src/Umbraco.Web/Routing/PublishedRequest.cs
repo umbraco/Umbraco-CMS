@@ -279,7 +279,6 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Resets the template.
         /// </summary>
-        /// <remarks>The <c>RenderingEngine</c> becomes unknown.</remarks>
         public void ResetTemplate()
         {
             EnsureWriteable();

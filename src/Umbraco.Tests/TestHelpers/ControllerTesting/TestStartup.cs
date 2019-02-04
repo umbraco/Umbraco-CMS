@@ -16,10 +16,10 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
     /// </summary>
     public class TestStartup
     {
-        private readonly Func<HttpRequestMessage, UmbracoHelper, ApiController> _controllerFactory;
+        private readonly Func<HttpRequestMessage, UmbracoContext, UmbracoHelper, ApiController> _controllerFactory;
         private readonly Action<HttpConfiguration> _initialize;
 
-        public TestStartup(Action<HttpConfiguration> initialize, Func<HttpRequestMessage, UmbracoHelper, ApiController> controllerFactory)
+        public TestStartup(Action<HttpConfiguration> initialize, Func<HttpRequestMessage, UmbracoContext, UmbracoHelper, ApiController> controllerFactory)
         {
             _controllerFactory = controllerFactory;
             _initialize = initialize;

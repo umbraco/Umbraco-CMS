@@ -3,21 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Models.Identity
 {
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
         private string _email;
         private string _userName;
         private int _id;
@@ -118,7 +111,7 @@ namespace Umbraco.Core.Models.Identity
         public override string Email
         {
             get => _email;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
 
         /// <summary>
@@ -127,7 +120,7 @@ namespace Umbraco.Core.Models.Identity
         public override string UserName
         {
             get => _userName;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, nameof(UserName));
         }
 
         /// <summary>
@@ -136,7 +129,7 @@ namespace Umbraco.Core.Models.Identity
         public override DateTime? LastPasswordChangeDateUtc
         {
             get { return _lastPasswordChangeDateUtc; }
-            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
+            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, nameof(LastPasswordChangeDateUtc)); }
         }
 
         /// <summary>
@@ -145,7 +138,7 @@ namespace Umbraco.Core.Models.Identity
         public override DateTime? LastLoginDateUtc
         {
             get => _lastLoginDateUtc;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, nameof(LastLoginDateUtc));
         }
 
         /// <summary>
@@ -154,7 +147,7 @@ namespace Umbraco.Core.Models.Identity
         public override bool EmailConfirmed
         {
             get => _emailConfirmed;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, Ps.Value.EmailConfirmedSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, nameof(EmailConfirmed));
         }
 
         /// <summary>
@@ -163,7 +156,7 @@ namespace Umbraco.Core.Models.Identity
         public string Name
         {
             get => _name;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -172,7 +165,7 @@ namespace Umbraco.Core.Models.Identity
         public override int AccessFailedCount
         {
             get => _accessFailedCount;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, Ps.Value.AccessFailedCountSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, nameof(AccessFailedCount));
         }
 
         /// <summary>
@@ -181,7 +174,7 @@ namespace Umbraco.Core.Models.Identity
         public override string PasswordHash
         {
             get => _passwordHash;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, Ps.Value.PasswordHashSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, nameof(PasswordHash));
         }
 
 
@@ -194,7 +187,7 @@ namespace Umbraco.Core.Models.Identity
             set
             {
                 if (value == null) value = new int[0];
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdsSelector, Ps.Value.StartIdsComparer);
+                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), StartIdsComparer);
             }
         }
 
@@ -207,7 +200,7 @@ namespace Umbraco.Core.Models.Identity
             set
             {
                 if (value == null) value = new int[0];
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, Ps.Value.StartMediaIdsSelector, Ps.Value.StartIdsComparer);
+                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), StartIdsComparer);
             }
         }
 
@@ -222,7 +215,7 @@ namespace Umbraco.Core.Models.Identity
         public string Culture
         {
             get => _culture;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector);
+            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, nameof(Culture));
         }
 
         public IReadOnlyUserGroup[] Groups
@@ -246,7 +239,7 @@ namespace Umbraco.Core.Models.Identity
                 }
                 _roles.CollectionChanged += _roles_CollectionChanged;
 
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, Ps.Value.GroupsSelector, Ps.Value.GroupsComparer);
+                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, nameof(Groups), GroupsComparer);
             }
         }
 
@@ -302,12 +295,12 @@ namespace Umbraco.Core.Models.Identity
 
         void Logins_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            _beingDirty.OnPropertyChanged(Ps.Value.LoginsSelector);
+            _beingDirty.OnPropertyChanged(nameof(Logins));
         }
 
         private void _roles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            _beingDirty.OnPropertyChanged(Ps.Value.RolesSelector);
+            _beingDirty.OnPropertyChanged(nameof(Roles));
         }
 
         private readonly ObservableCollection<IdentityUserRole<string>> _roles;
@@ -416,33 +409,13 @@ namespace Umbraco.Core.Models.Identity
 
         #endregion
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Email);
-            public readonly PropertyInfo UserNameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.UserName);
-            public readonly PropertyInfo LastLoginDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastLoginDateUtc);
-            public readonly PropertyInfo LastPasswordChangeDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastPasswordChangeDateUtc);
-            public readonly PropertyInfo EmailConfirmedSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, bool>(x => x.EmailConfirmed);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Name);
-            public readonly PropertyInfo AccessFailedCountSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int>(x => x.AccessFailedCount);
-            public readonly PropertyInfo PasswordHashSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.PasswordHash);
-            public readonly PropertyInfo CultureSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Culture);
-            public readonly PropertyInfo StartMediaIdsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int[]>(x => x.StartMediaIds);
-            public readonly PropertyInfo StartContentIdsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int[]>(x => x.StartContentIds);
-            public readonly PropertyInfo GroupsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, IReadOnlyUserGroup[]>(x => x.Groups);
-            public readonly PropertyInfo LoginsSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, IEnumerable<IIdentityUserLogin>>(x => x.Logins);
-            public readonly PropertyInfo RolesSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, IEnumerable<IdentityUserRole<string>>>(x => x.Roles);
+        //Custom comparer for enumerables
+        private static readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> GroupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
+            (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
+            groups => groups.GetHashCode());
 
-            //Custom comparer for enumerables
-            public readonly DelegateEqualityComparer<IReadOnlyUserGroup[]> GroupsComparer = new DelegateEqualityComparer<IReadOnlyUserGroup[]>(
-                (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
-                groups => groups.GetHashCode());
-            public readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
-                (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
-                groups => groups.GetHashCode());
-
-        }
-
+        private static readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
+            (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
+            groups => groups.GetHashCode());
     }
 }

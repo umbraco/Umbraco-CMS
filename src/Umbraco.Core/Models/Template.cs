@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Strings;
 
@@ -17,16 +16,6 @@ namespace Umbraco.Core.Models
         private string _masterTemplateAlias;
         private Lazy<int> _masterTemplateId;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
-            public readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Alias);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Name);
-        }
-
         public Template(string name, string alias)
             : this(name, alias, (Func<File, string>) null)
         { }
@@ -42,28 +31,28 @@ namespace Umbraco.Core.Models
         [DataMember]
         public Lazy<int> MasterTemplateId
         {
-            get { return _masterTemplateId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, Ps.Value.MasterTemplateIdSelector); }
+            get => _masterTemplateId;
+            set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateId, nameof(MasterTemplateId));
         }
 
         public string MasterTemplateAlias
         {
-            get { return _masterTemplateAlias; }
-            set { SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, Ps.Value.MasterTemplateAliasSelector); }
+            get => _masterTemplateAlias;
+            set => SetPropertyValueAndDetectChanges(value, ref _masterTemplateAlias, nameof(MasterTemplateAlias));
         }
 
         [DataMember]
         public new string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         [DataMember]
         public new string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.UnderscoreAlias), ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.UnderscoreAlias), ref _alias, nameof(Alias));
         }
 
         /// <summary>

@@ -1891,6 +1891,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidEmail">Invalid email</key>
+    <key alias="customValidation">Custom validation</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:

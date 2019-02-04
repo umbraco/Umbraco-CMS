@@ -17,15 +17,13 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoController : Controller
     {
-        private UmbracoHelper _umbracoHelper;
-
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        public virtual IGlobalSettings GlobalSettings { get; set; }
+        public IGlobalSettings GlobalSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the Umbraco context.
@@ -62,8 +60,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public UmbracoHelper Umbraco => _umbracoHelper
-            ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services));
+        public UmbracoHelper Umbraco { get; }
 
         /// <summary>
         /// Gets the web security helper.
@@ -76,20 +73,21 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<UmbracoContext>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
-                  Current.Factory.GetInstance<ILogger>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<UmbracoHelper>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;
             Services = services;
             AppCaches = appCaches;
-            Logger = logger;
+            Logger = profilingLogger;
             ProfilingLogger = profilingLogger;
+            Umbraco = umbracoHelper;
         }
     }
 }
