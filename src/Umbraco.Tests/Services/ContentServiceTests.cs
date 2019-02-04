@@ -1035,6 +1035,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
         {
+            //TODO: This is using an internal API - we aren't exposing this publicly (at least for now) but we'll keep the test around
+
             var langFr = new Language("fr");
             var langDa = new Language("da");
             ServiceContext.LocalizationService.Save(langFr);
@@ -1049,7 +1051,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("name-da", langDa.IsoCode);
 
             content.PublishCulture(langFr.IsoCode);
-            var result = ServiceContext.ContentService.CommitDocumentChanges(content);
+            var result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -1058,7 +1060,7 @@ namespace Umbraco.Tests.Services
             content.UnpublishCulture(langFr.IsoCode);
             content.PublishCulture(langDa.IsoCode);
 
-            result = ServiceContext.ContentService.CommitDocumentChanges(content);
+            result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
 
@@ -2893,8 +2895,10 @@ namespace Umbraco.Tests.Services
             // act
 
             // that HAS to be SavePublishing, because SaveAndPublish would just republish everything!
-
-            contentService.CommitDocumentChanges(content);
+            //TODO: This is using an internal API - the test can't pass without this but we want to keep the test here
+            // will need stephane to have a look at this test at some stage since there is a lot of logic here that we
+            // want to keep on testing but don't need the public API to do these more complicated things.
+            ((ContentService)contentService).CommitDocumentChanges(content);
 
             // content has been re-published,
             // everything is back to what it was before being unpublished

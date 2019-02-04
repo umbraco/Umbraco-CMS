@@ -965,8 +965,21 @@ namespace Umbraco.Core.Services.Implement
             return CommitDocumentChanges(content, userId);
         }
 
-        /// <inheritdoc />
-        public PublishResult CommitDocumentChanges(IContent content, int userId = 0, bool raiseEvents = true)
+        /// <summary>
+        /// Saves a document and publishes/unpublishes any pending publishing changes made to the document.
+        /// </summary>
+        /// <remarks>
+        /// <para>This is the underlying logic for both publishing and unpublishing any document</para>
+        /// <para>Pending publishing/unpublishing changes on a document are made with calls to <see cref="IContent.PublishCulture"/> and
+        /// <see cref="IContent.UnpublishCulture"/>.</para>
+        /// <para>When publishing or unpublishing a single culture, or all cultures, use <see cref="SaveAndPublish"/>
+        /// and <see cref="Unpublish"/>. But if the flexibility to both publish and unpublish in a single operation is required
+        /// then this method needs to be used in combination with <see cref="IContent.PublishCulture"/> and <see cref="IContent.UnpublishCulture"/>
+        /// on the content itself - this prepares the content, but does not commit anything - and then, invoke
+        /// <see cref="CommitDocumentChanges"/> to actually commit the changes to the database.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// </remarks>
+        internal PublishResult CommitDocumentChanges(IContent content, int userId = 0, bool raiseEvents = true)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
