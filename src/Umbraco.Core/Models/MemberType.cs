@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
@@ -12,7 +11,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
         public const bool IsPublishingConst = false;
 
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
@@ -46,12 +44,6 @@ namespace Umbraco.Core.Models
             set => throw new NotSupportedException("Variations are not supported on members.");
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
-        }
-
         /// <summary>
         /// The Alias of the ContentType
         /// </summary>
@@ -74,7 +66,7 @@ namespace Umbraco.Core.Models
                         ? value
                         : (value == null ? string.Empty : value.ToSafeAlias());
 
-                SetPropertyValueAndDetectChanges(newVal, ref _alias, Ps.Value.AliasSelector);
+                SetPropertyValueAndDetectChanges(newVal, ref _alias, nameof(Alias));
             }
         }
 
