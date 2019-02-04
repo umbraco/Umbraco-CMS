@@ -29,18 +29,15 @@ function MacrosSettingsController($scope, editorService, localizationService) {
             },
             filterCssClass: "not-allowed",
             select: function (node) {
-
-                console.log("node", node);
                 const id = unescape(node.id);
-                console.log("id", id);
 
                 //vm.macro.view = id;
-                $scope.model.macro.view = "~/" + id;
+                $scope.model.macro.view = "~/Views/MacroPartials/" + id;
 
-                //$scope.model.macro.view = {
-                //    "type": "partial",
-                //    "node": node
-                //};
+                $scope.model.macro.node = {
+                    icon: node.icon,
+                    name: $scope.model.macro.view
+                };
 
                 //$scope.model.submit($scope.model); 
 
@@ -55,6 +52,7 @@ function MacrosSettingsController($scope, editorService, localizationService) {
 
     function removeMacroView() {
         //vm.macro.view = null;
+        $scope.model.macro.node = null;
         $scope.model.macro.view = null;
     }
 

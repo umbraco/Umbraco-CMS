@@ -13,11 +13,9 @@
         <umb-box-content>
             <umb-control-group label="Macro partial view">
 
-                {{model.macro.view}}
-
-                <umb-node-preview ng-if="model.macro.view"
-                                  icon="'icon-document'"
-                                  name="model.macro.view"
+                <umb-node-preview ng-if="model.macro.node"
+                                  icon="model.macro.node.icon"
+                                  name="model.macro.node.name"
                                   allow-edit="true"
                                   allow-remove="true"
                                   on-edit="model.openViewPicker()"
@@ -25,7 +23,7 @@
                 </umb-node-preview>
 
                 <a href=""
-                   ng-show="!model.macro.view"
+                   ng-show="!model.macro.node"
                    class="umb-node-preview-add"
                    ng-click="model.openViewPicker()"
                    prevent-default>
