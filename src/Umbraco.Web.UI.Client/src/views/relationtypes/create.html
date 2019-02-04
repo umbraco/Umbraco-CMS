@@ -1,6 +1,9 @@
 <div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.RelationTypes.CreateController as vm" ng-cloak>
     <div class="umb-pane">
-        <form name="createRelationTypeForm" val-form-manager ng-submit="vm.createRelationType()">
+        <form novalidate name="createRelationTypeForm"
+              val-form-manager
+              ng-submit="vm.createRelationType()">
+
             <!-- Name -->
             <umb-control-group label="@relationType_name">
                 <input type="text" name="relationTypeName" ng-model="vm.relationType.name" class="umb-textstring textstring input-block-level" umb-auto-focus required />
