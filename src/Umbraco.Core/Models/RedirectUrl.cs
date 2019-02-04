@@ -20,18 +20,6 @@ namespace Umbraco.Core.Models
             CreateDateUtc = DateTime.UtcNow;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ContentIdSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, int>(x => x.ContentId);
-            public readonly PropertyInfo ContentKeySelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, Guid>(x => x.ContentKey);
-            public readonly PropertyInfo CreateDateUtcSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, DateTime>(x => x.CreateDateUtc);
-            public readonly PropertyInfo CultureSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, string>(x => x.Culture);
-            public readonly PropertyInfo UrlSelector = ExpressionHelper.GetPropertyInfo<RedirectUrl, string>(x => x.Url);
-        }
-
         private int _contentId;
         private Guid _contentKey;
         private DateTime _createDateUtc;
@@ -41,36 +29,36 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public int ContentId
         {
-            get { return _contentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _contentId, Ps.Value.ContentIdSelector); }
+            get => _contentId;
+            set => SetPropertyValueAndDetectChanges(value, ref _contentId, nameof(ContentId));
         }
 
         /// <inheritdoc />
         public Guid ContentKey
         {
-            get { return _contentKey; }
-            set { SetPropertyValueAndDetectChanges(value, ref _contentKey, Ps.Value.ContentKeySelector); }
+            get => _contentKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _contentKey, nameof(ContentKey));
         }
 
         /// <inheritdoc />
         public DateTime CreateDateUtc
         {
-            get {  return _createDateUtc; }
-            set { SetPropertyValueAndDetectChanges(value, ref _createDateUtc, Ps.Value.CreateDateUtcSelector); }
+            get => _createDateUtc;
+            set => SetPropertyValueAndDetectChanges(value, ref _createDateUtc, nameof(CreateDateUtc));
         }
 
         /// <inheritdoc />
         public string Culture
         {
-            get { return _culture; }
-            set { SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector); }
+            get => _culture;
+            set => SetPropertyValueAndDetectChanges(value, ref _culture, nameof(Culture));
         }
 
         /// <inheritdoc />
         public string Url
         {
-            get { return _url; }
-            set { SetPropertyValueAndDetectChanges(value, ref _url, Ps.Value.UrlSelector); }
+            get => _url;
+            set => SetPropertyValueAndDetectChanges(value, ref _url, nameof(Url));
         }
     }
 }

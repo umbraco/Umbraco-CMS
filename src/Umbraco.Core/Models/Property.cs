@@ -103,9 +103,6 @@ namespace Umbraco.Core.Models
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            // TODO: This allows us to track changes for an entire Property, but doesn't allow us to track changes at the variant level
-            public readonly PropertyInfo ValuesSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Values);
-
             public readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
                 (o, o1) =>
                 {
@@ -258,7 +255,7 @@ namespace Umbraco.Core.Models
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
-            DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+            DetectChanges(pvalue.EditedValue, origValue, nameof(Values), Ps.Value.PropertyValueComparer, false);
         }
 
         private void UnpublishValue(PropertyValue pvalue)
@@ -269,7 +266,7 @@ namespace Umbraco.Core.Models
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
-            DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+            DetectChanges(pvalue.EditedValue, origValue, nameof(Values), Ps.Value.PropertyValueComparer, false);
         }
 
         /// <summary>
@@ -290,7 +287,7 @@ namespace Umbraco.Core.Models
 
             pvalue.EditedValue = setValue;
 
-            DetectChanges(setValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+            DetectChanges(setValue, origValue, nameof(Values), Ps.Value.PropertyValueComparer, change);
         }
 
         // bypasses all changes detection and is the *only* way to set the published value

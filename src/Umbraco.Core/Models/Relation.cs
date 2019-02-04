@@ -25,16 +25,7 @@ namespace Umbraco.Core.Models
             _childId = childId;
             _relationType = relationType;
         }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ParentId);
-            public readonly PropertyInfo ChildIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ChildId);
-            public readonly PropertyInfo RelationTypeSelector = ExpressionHelper.GetPropertyInfo<Relation, IRelationType>(x => x.RelationType);
-            public readonly PropertyInfo CommentSelector = ExpressionHelper.GetPropertyInfo<Relation, string>(x => x.Comment);
-        }
+        
 
         /// <summary>
         /// Gets or sets the Parent Id of the Relation (Source)
@@ -42,8 +33,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int ParentId
         {
-            get { return _parentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
+            get => _parentId;
+            set => SetPropertyValueAndDetectChanges(value, ref _parentId, nameof(ParentId));
         }
 
         /// <summary>
@@ -52,8 +43,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int ChildId
         {
-            get { return _childId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _childId, Ps.Value.ChildIdSelector); }
+            get => _childId;
+            set => SetPropertyValueAndDetectChanges(value, ref _childId, nameof(ChildId));
         }
 
         /// <summary>
@@ -62,8 +53,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public IRelationType RelationType
         {
-            get { return _relationType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _relationType, Ps.Value.RelationTypeSelector); }
+            get => _relationType;
+            set => SetPropertyValueAndDetectChanges(value, ref _relationType, nameof(RelationType));
         }
 
         /// <summary>
@@ -72,18 +63,14 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Comment
         {
-            get { return _comment; }
-            set { SetPropertyValueAndDetectChanges(value, ref _comment, Ps.Value.CommentSelector); }
+            get => _comment;
+            set => SetPropertyValueAndDetectChanges(value, ref _comment, nameof(Comment));
         }
 
         /// <summary>
         /// Gets the Id of the <see cref="RelationType"/> that this Relation is based on.
         /// </summary>
         [IgnoreDataMember]
-        public int RelationTypeId
-        {
-            get { return _relationType.Id; }
-        }
-
+        public int RelationTypeId => _relationType.Id;
     }
 }

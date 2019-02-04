@@ -13,18 +13,10 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberGroup : EntityBase, IMemberGroup
     {
-        private static PropertySelectors _selectors;
         private IDictionary<string, object> _additionalData;
         private string _name;
         private int _creatorId;
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
-            public readonly PropertyInfo CreatorId = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
-        }
 
         /// <inheritdoc />
         [DataMember]
@@ -49,7 +41,7 @@ namespace Umbraco.Core.Models
                     AdditionalData["previousName"] = _name;
                 }
 
-                SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
+                SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
             }
         }
 
@@ -57,7 +49,7 @@ namespace Umbraco.Core.Models
         public int CreatorId
         {
             get => _creatorId;
-            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Selectors.CreatorId);
+            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, nameof(CreatorId));
         }
     }
 }

@@ -48,21 +48,21 @@ namespace Umbraco.Core.Models
         public string Group
         {
             get => _group;
-            set => SetPropertyValueAndDetectChanges(value, ref _group, Selectors.Group);
+            set => SetPropertyValueAndDetectChanges(value, ref _group, nameof(Group));
         }
 
         /// <inheritdoc />
         public string Text
         {
             get => _text;
-            set => SetPropertyValueAndDetectChanges(value, ref _text, Selectors.Text);
+            set => SetPropertyValueAndDetectChanges(value, ref _text, nameof(Text));
         }
 
         /// <inheritdoc />
         public int? LanguageId
         {
             get => _languageId;
-            set => SetPropertyValueAndDetectChanges(value, ref _languageId, Selectors.LanguageId);
+            set => SetPropertyValueAndDetectChanges(value, ref _languageId, nameof(LanguageId));
         }
 
         /// <inheritdoc />

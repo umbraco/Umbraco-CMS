@@ -130,25 +130,15 @@ namespace Umbraco.Core.Models
             _rawPasswordValue = rawPasswordValue;
             IsApproved = isApproved;
         }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
-            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
-            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
-            public readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
-        }
-
+        
         /// <summary>
         /// Gets or sets the Username
         /// </summary>
         [DataMember]
         public string Username
         {
-            get { return _username; }
-            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
+            get => _username;
+            set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
 
         /// <summary>
@@ -157,8 +147,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Email
         {
-            get { return _email; }
-            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
+            get => _email;
+            set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
 
         /// <summary>
@@ -167,7 +157,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public string RawPasswordValue
         {
-            get { return _rawPasswordValue; }
+            get => _rawPasswordValue;
             set
             {
                 if (value == null)
@@ -178,7 +168,7 @@ namespace Umbraco.Core.Models
                 }
                 else
                 {
-                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector);
+                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, nameof(RawPasswordValue));
                 }
             }
         }
@@ -487,10 +477,7 @@ namespace Umbraco.Core.Models
         /// String alias of the default ContentType
         /// </summary>
         [DataMember]
-        public virtual string ContentTypeAlias
-        {
-            get { return _contentTypeAlias; }
-        }
+        public virtual string ContentTypeAlias => _contentTypeAlias;
 
         /// <summary>
         /// User key from the Provider.
@@ -504,11 +491,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual object ProviderUserKey
         {
-            get
-            {
-                return _providerUserKey;
-            }
-            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
+            get => _providerUserKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _providerUserKey, nameof(ProviderUserKey));
         }
 
 
@@ -528,10 +512,7 @@ namespace Umbraco.Core.Models
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IMemberType ContentType
-        {
-            get { return _contentType; }
-        }
+        public IMemberType ContentType => _contentType;
 
         /* Internal experiment - only used for mapping queries.
          * Adding these to have first level properties instead of the Properties collection.

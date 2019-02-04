@@ -20,8 +20,6 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyType : EntityBase, IEquatable<PropertyType>
     {
-        private static PropertySelectors _selectors;
-
         private readonly bool _forceValueStorageType;
         private string _name;
         private string _alias;
@@ -86,24 +84,7 @@ namespace Umbraco.Core.Models
             _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
             _variations = ContentVariation.Nothing;
         }
-
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
-            public readonly PropertyInfo Alias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
-            public readonly PropertyInfo Description = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-            public readonly PropertyInfo DataTypeId = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
-            public readonly PropertyInfo PropertyEditorAlias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
-            public readonly PropertyInfo ValueStorageType = ExpressionHelper.GetPropertyInfo<PropertyType, ValueStorageType>(x => x.ValueStorageType);
-            public readonly PropertyInfo Mandatory = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
-            public readonly PropertyInfo SortOrder = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
-            public readonly PropertyInfo ValidationRegExp = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
-            public readonly PropertyInfo PropertyGroupId = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
-            public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<PropertyType, ContentVariation>(x => x.Variations);
-        }
-
+        
         /// <summary>
         /// Gets a value indicating whether the content type, owning this property type, is publishing.
         /// </summary>
@@ -116,7 +97,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -126,7 +107,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, Selectors.Alias);
+            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -136,7 +117,7 @@ namespace Umbraco.Core.Models
         public string Description
         {
             get => _description;
-            set => SetPropertyValueAndDetectChanges(value, ref _description, Selectors.Description);
+            set => SetPropertyValueAndDetectChanges(value, ref _description, nameof(Description));
         }
 
         /// <summary>
@@ -146,7 +127,7 @@ namespace Umbraco.Core.Models
         public int DataTypeId
         {
             get => _dataTypeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, Selectors.DataTypeId);
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, nameof(DataTypeId));
         }
 
         /// <summary>
@@ -156,7 +137,7 @@ namespace Umbraco.Core.Models
         public string PropertyEditorAlias
         {
             get => _propertyEditorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Selectors.PropertyEditorAlias);
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, nameof(PropertyEditorAlias));
         }
 
         /// <summary>
@@ -169,7 +150,7 @@ namespace Umbraco.Core.Models
             set
             {
                 if (_forceValueStorageType) return; // ignore changes
-                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Selectors.ValueStorageType);
+                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, nameof(ValueStorageType));
             }
         }
 
@@ -181,7 +162,7 @@ namespace Umbraco.Core.Models
         internal Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Selectors.PropertyGroupId);
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));
         }
 
         /// <summary>
@@ -191,7 +172,7 @@ namespace Umbraco.Core.Models
         public bool Mandatory
         {
             get => _mandatory;
-            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Selectors.Mandatory);
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
         }
 
         /// <summary>
@@ -201,7 +182,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Selectors.SortOrder);
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
         }
 
         /// <summary>
@@ -211,7 +192,7 @@ namespace Umbraco.Core.Models
         public string ValidationRegExp
         {
             get => _validationRegExp;
-            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Selectors.ValidationRegExp);
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
         }
 
         /// <summary>
@@ -220,7 +201,7 @@ namespace Umbraco.Core.Models
         public ContentVariation Variations
         {
             get => _variations;
-            set => SetPropertyValueAndDetectChanges(value, ref _variations, Selectors.VaryBy);
+            set => SetPropertyValueAndDetectChanges(value, ref _variations, nameof(Variations));
         }
 
         /// <summary>

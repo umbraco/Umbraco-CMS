@@ -50,13 +50,6 @@ namespace Umbraco.Core.Models
             Key = uniqueId;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, ILanguage>(x => x.Language);
-            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, string>(x => x.Value);
-        }
 
         /// <summary>
         /// Gets or sets the <see cref="Language"/> for the translation
@@ -84,7 +77,7 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector);
+                SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
                 _languageId = _language == null ? -1 : _language.Id;
             }
         }
@@ -101,7 +94,7 @@ namespace Umbraco.Core.Models
         public string Value
         {
             get { return _value; }
-            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value)); }
         }
 
         protected override void PerformDeepClone(object clone)

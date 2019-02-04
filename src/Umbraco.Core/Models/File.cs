@@ -33,14 +33,6 @@ namespace Umbraco.Core.Models
             _content = getFileContent != null ? null : string.Empty;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Content);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Path);
-        }
-
         private string _alias;
         private string _name;
 
@@ -96,7 +88,7 @@ namespace Umbraco.Core.Models
                 _alias = null;
                 _name = null;
 
-                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, Ps.Value.PathSelector);
+                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, nameof(Path));
             }
         }
 
@@ -138,7 +130,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(
                     value ?? string.Empty, // cannot set to null
-                    ref _content, Ps.Value.ContentSelector);
+                    ref _content, nameof(Content));
             }
         }
 

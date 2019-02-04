@@ -117,7 +117,7 @@ namespace Umbraco.Core.Models
 
         void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertiesSelector);
+            OnPropertyChanged(nameof(Properties));
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -155,7 +155,7 @@ namespace Umbraco.Core.Models
         /// <param name="e"></param>
         void PropertyDataChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertiesSelector);
+            OnPropertyChanged(nameof(Properties));
         }
 
         public override void ResetDirtyProperties(bool rememberDirty)
@@ -172,18 +172,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Used internally to check if we need to add a section in the repository to the db
         /// </summary>
-        internal IEnumerable<string> AddedProperties
-        {
-            get { return _addedProperties; }
-        }
+        internal IEnumerable<string> AddedProperties => _addedProperties;
 
         /// <summary>
         /// Used internally to check if we need to remove  a section in the repository to the db
         /// </summary>
-        internal IEnumerable<string> RemovedProperties
-        {
-            get { return _removedProperties; }
-        }
+        internal IEnumerable<string> RemovedProperties => _removedProperties;
 
         /// <summary>
         /// Gets or sets the alias of the Macro
@@ -191,8 +185,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -201,8 +195,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -211,8 +205,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool UseInEditor
         {
-            get { return _useInEditor; }
-            set { SetPropertyValueAndDetectChanges(value, ref _useInEditor, Ps.Value.UseInEditorSelector); }
+            get => _useInEditor;
+            set => SetPropertyValueAndDetectChanges(value, ref _useInEditor, nameof(UseInEditor));
         }
 
         /// <summary>
@@ -221,8 +215,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int CacheDuration
         {
-            get { return _cacheDuration; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cacheDuration, Ps.Value.CacheDurationSelector); }
+            get => _cacheDuration;
+            set => SetPropertyValueAndDetectChanges(value, ref _cacheDuration, nameof(CacheDuration));
         }
 
         /// <summary>
@@ -231,8 +225,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool CacheByPage
         {
-            get { return _cacheByPage; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cacheByPage, Ps.Value.CacheByPageSelector); }
+            get => _cacheByPage;
+            set => SetPropertyValueAndDetectChanges(value, ref _cacheByPage, nameof(CacheByPage));
         }
 
         /// <summary>
@@ -241,8 +235,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool CacheByMember
         {
-            get { return _cacheByMember; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cacheByMember, Ps.Value.CacheByMemberSelector); }
+            get => _cacheByMember;
+            set => SetPropertyValueAndDetectChanges(value, ref _cacheByMember, nameof(CacheByMember));
         }
 
         /// <summary>
@@ -251,8 +245,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool DontRender
         {
-            get { return _dontRender; }
-            set { SetPropertyValueAndDetectChanges(value, ref _dontRender, Ps.Value.DontRenderSelector); }
+            get => _dontRender;
+            set => SetPropertyValueAndDetectChanges(value, ref _dontRender, nameof(DontRender));
         }
 
         /// <summary>
@@ -261,8 +255,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string MacroSource
         {
-            get { return _macroSource; }
-            set { SetPropertyValueAndDetectChanges(value, ref _macroSource, Ps.Value.ScriptPathSelector); }
+            get => _macroSource;
+            set => SetPropertyValueAndDetectChanges(value, ref _macroSource, nameof(MacroSource));
         }
 
         /// <summary>
@@ -271,18 +265,15 @@ namespace Umbraco.Core.Models
         [DataMember]
         public MacroTypes MacroType
         {
-            get { return _macroType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _macroType, Ps.Value.MacroTypeSelector); }
+            get => _macroType;
+            set => SetPropertyValueAndDetectChanges(value, ref _macroType, nameof(MacroType));
         }
 
         /// <summary>
         /// Gets or sets a list of Macro Properties
         /// </summary>
         [DataMember]
-        public MacroPropertyCollection Properties
-        {
-            get { return _properties; }
-        }
+        public MacroPropertyCollection Properties => _properties;
 
         protected override void PerformDeepClone(object clone)
         {

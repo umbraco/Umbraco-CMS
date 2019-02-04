@@ -54,7 +54,7 @@ namespace Umbraco.Core.Models
 
         void _ruleCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.AllowedSectionsSelector);
+            OnPropertyChanged(nameof(Rules));
 
             //if (e.Action == NotifyCollectionChangedAction.Add)
             //{
@@ -77,26 +77,10 @@ namespace Umbraco.Core.Models
 
             }
         }
+        
+        internal IEnumerable<Guid> RemovedRules => _removedRules;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ProtectedNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, int>(x => x.ProtectedNodeId);
-            public readonly PropertyInfo LoginNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, int>(x => x.LoginNodeId);
-            public readonly PropertyInfo NoAccessNodeIdSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, int>(x => x.NoAccessNodeId);
-            public readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<PublicAccessEntry, IEnumerable<PublicAccessRule>>(x => x.Rules);
-        }
-
-        internal IEnumerable<Guid> RemovedRules
-        {
-            get { return _removedRules; }
-        }
-
-        public IEnumerable<PublicAccessRule> Rules
-        {
-            get { return _ruleCollection; }
-        }
+        public IEnumerable<PublicAccessRule> Rules => _ruleCollection;
 
         public PublicAccessRule AddRule(string ruleValue, string ruleType)
         {
@@ -129,22 +113,22 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int LoginNodeId
         {
-            get { return _loginNodeId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _loginNodeId, Ps.Value.LoginNodeIdSelector); }
+            get => _loginNodeId;
+            set => SetPropertyValueAndDetectChanges(value, ref _loginNodeId, nameof(LoginNodeId));
         }
 
         [DataMember]
         public int NoAccessNodeId
         {
-            get { return _noAccessNodeId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _noAccessNodeId, Ps.Value.NoAccessNodeIdSelector); }
+            get => _noAccessNodeId;
+            set => SetPropertyValueAndDetectChanges(value, ref _noAccessNodeId, nameof(NoAccessNodeId));
         }
 
         [DataMember]
         public int ProtectedNodeId
         {
-            get { return _protectedNodeId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, Ps.Value.ProtectedNodeIdSelector); }
+            get => _protectedNodeId;
+            set => SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, nameof(ProtectedNodeId));
         }
 
         public override void ResetDirtyProperties(bool rememberDirty)

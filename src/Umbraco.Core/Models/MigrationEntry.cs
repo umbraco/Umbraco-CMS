@@ -19,27 +19,19 @@ namespace Umbraco.Core.Models
             _version = version;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MigrationEntry, string>(x => x.MigrationName);
-            public readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<MigrationEntry, SemVersion>(x => x.Version);
-        }
-
         private string _migrationName;
         private SemVersion _version;
 
         public string MigrationName
         {
-            get { return _migrationName; }
-            set { SetPropertyValueAndDetectChanges(value, ref _migrationName, Ps.Value.NameSelector); }
+            get => _migrationName;
+            set => SetPropertyValueAndDetectChanges(value, ref _migrationName, nameof(MigrationName));
         }
 
         public SemVersion Version
         {
-            get { return _version; }
-            set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
+            get => _version;
+            set => SetPropertyValueAndDetectChanges(value, ref _version, nameof(Version));
         }
     }
 }

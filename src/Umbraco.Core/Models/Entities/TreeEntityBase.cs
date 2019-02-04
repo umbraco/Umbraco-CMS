@@ -9,9 +9,6 @@ namespace Umbraco.Core.Models.Entities
     /// </summary>
     public abstract class TreeEntityBase : EntityBase, ITreeEntity
     {
-        private static PropertySelectors _selectors;
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
         private string _name;
         private int _creatorId;
         private int _parentId;
@@ -22,23 +19,12 @@ namespace Umbraco.Core.Models.Entities
         private int _sortOrder;
         private bool _trashed;
 
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
-            public readonly PropertyInfo CreatorId = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
-            public readonly PropertyInfo ParentId = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ParentId);
-            public readonly PropertyInfo Level = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
-            public readonly PropertyInfo Path = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-            public readonly PropertyInfo SortOrder = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
-            public readonly PropertyInfo Trashed = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
-        }
-
         /// <inheritdoc />
         [DataMember]
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <inheritdoc />
@@ -46,7 +32,7 @@ namespace Umbraco.Core.Models.Entities
         public int CreatorId
         {
             get => _creatorId;
-            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Selectors.CreatorId);
+            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, nameof(CreatorId));
         }
 
         /// <inheritdoc />
@@ -72,7 +58,7 @@ namespace Umbraco.Core.Models.Entities
             {
                 if (value == 0)
                     throw new ArgumentException("Value cannot be zero.", nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _parentId, Selectors.ParentId);
+                SetPropertyValueAndDetectChanges(value, ref _parentId, nameof(ParentId));
                 _hasParentId = true;
                 _parent = null;
             }
@@ -83,7 +69,7 @@ namespace Umbraco.Core.Models.Entities
         {
             _hasParentId = false;
             _parent = parent;
-            OnPropertyChanged(Selectors.ParentId);
+            OnPropertyChanged(nameof(ParentId));
         }
 
         /// <inheritdoc />
@@ -91,7 +77,7 @@ namespace Umbraco.Core.Models.Entities
         public int Level
         {
             get => _level;
-            set => SetPropertyValueAndDetectChanges(value, ref _level, Selectors.Level);
+            set => SetPropertyValueAndDetectChanges(value, ref _level, nameof(Level));
         }
 
         /// <inheritdoc />
@@ -99,7 +85,7 @@ namespace Umbraco.Core.Models.Entities
         public string Path
         {
             get => _path;
-            set => SetPropertyValueAndDetectChanges(value, ref _path, Selectors.Path);
+            set => SetPropertyValueAndDetectChanges(value, ref _path, nameof(Path));
         }
 
         /// <inheritdoc />
@@ -107,7 +93,7 @@ namespace Umbraco.Core.Models.Entities
         public int SortOrder
         {
             get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Selectors.SortOrder);
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
         }
 
         /// <inheritdoc />
@@ -115,7 +101,7 @@ namespace Umbraco.Core.Models.Entities
         public bool Trashed
         {
             get => _trashed;
-            set => SetPropertyValueAndDetectChanges(value, ref _trashed, Selectors.Trashed);
+            set => SetPropertyValueAndDetectChanges(value, ref _trashed, nameof(Trashed));
         }
     }
 }

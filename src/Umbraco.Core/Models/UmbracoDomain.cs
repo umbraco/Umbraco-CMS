@@ -23,41 +23,29 @@ namespace Umbraco.Core.Models
         private int? _contentId;
         private int? _languageId;
         private string _domainName;
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.RootContentId);
-            public readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.LanguageId);
-            public readonly PropertyInfo DomainNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, string>(x => x.DomainName);
-        }
-
+        
         [DataMember]
         public int? LanguageId
         {
-            get { return _languageId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _languageId, Ps.Value.DefaultLanguageSelector); }
+            get => _languageId;
+            set => SetPropertyValueAndDetectChanges(value, ref _languageId, nameof(LanguageId));
         }
 
         [DataMember]
         public string DomainName
         {
-            get { return _domainName; }
-            set { SetPropertyValueAndDetectChanges(value, ref _domainName, Ps.Value.DomainNameSelector); }
+            get => _domainName;
+            set => SetPropertyValueAndDetectChanges(value, ref _domainName, nameof(DomainName));
         }
 
         [DataMember]
         public int? RootContentId
         {
-            get { return _contentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _contentId, Ps.Value.ContentSelector); }
+            get => _contentId;
+            set => SetPropertyValueAndDetectChanges(value, ref _contentId, nameof(RootContentId));
         }
 
-        public bool IsWildcard
-        {
-            get { return string.IsNullOrWhiteSpace(DomainName) || DomainName.StartsWith("*"); }
-        }
+        public bool IsWildcard => string.IsNullOrWhiteSpace(DomainName) || DomainName.StartsWith("*");
 
         /// <summary>
         /// Readonly value of the language ISO code for the domain

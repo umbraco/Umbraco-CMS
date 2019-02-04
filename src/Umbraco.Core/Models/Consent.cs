@@ -13,33 +13,18 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     internal class Consent : EntityBase, IConsent
     {
-        private static PropertySelectors _selector;
-
         private bool _current;
         private string _source;
         private string _context;
         private string _action;
         private ConsentState _state;
         private string _comment;
-
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Current = ExpressionHelper.GetPropertyInfo<Consent, bool>(x => x.Current);
-            public readonly PropertyInfo Source = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Source);
-            public readonly PropertyInfo Context = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Context);
-            public readonly PropertyInfo Action = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Action);
-            public readonly PropertyInfo State = ExpressionHelper.GetPropertyInfo<Consent, ConsentState>(x => x.State);
-            public readonly PropertyInfo Comment = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Comment);
-        }
-
-        private static PropertySelectors Selectors => _selector ?? (_selector = new PropertySelectors());
-
+        
         /// <inheritdoc />
         public bool Current
         {
             get => _current;
-            set => SetPropertyValueAndDetectChanges(value, ref _current, Selectors.Current);
+            set => SetPropertyValueAndDetectChanges(value, ref _current, nameof(Current));
         }
 
         /// <inheritdoc />
@@ -49,7 +34,7 @@ namespace Umbraco.Core.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _source, Selectors.Source);
+                SetPropertyValueAndDetectChanges(value, ref _source, nameof(Source));
             }
         }
 
@@ -60,7 +45,7 @@ namespace Umbraco.Core.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _context, Selectors.Context);
+                SetPropertyValueAndDetectChanges(value, ref _context, nameof(Context));
             }
         }
 
@@ -71,7 +56,7 @@ namespace Umbraco.Core.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _action, Selectors.Action);
+                SetPropertyValueAndDetectChanges(value, ref _action, nameof(Action));
             }
         }
 
@@ -81,14 +66,14 @@ namespace Umbraco.Core.Models
             get => _state;
             // note: we probably should validate the state here, but since the
             //  enum is [Flags] with many combinations, this could be expensive
-            set => SetPropertyValueAndDetectChanges(value, ref _state, Selectors.State);
+            set => SetPropertyValueAndDetectChanges(value, ref _state, nameof(State));
         }
 
         /// <inheritdoc />
         public string Comment
         {
             get => _comment;
-            set => SetPropertyValueAndDetectChanges(value, ref _comment, Selectors.Comment);
+            set => SetPropertyValueAndDetectChanges(value, ref _comment, nameof(Comment));
         }
 
         /// <inheritdoc />
