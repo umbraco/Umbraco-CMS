@@ -1514,4 +1514,31 @@ Mange hilsner fra Umbraco robotten
     <key alias="itemCannotBeRestoredHelpText">Der er ikke nogen placering hvor dette element automatisk kan genoprettes. Du kan flytte elementet manuelt i træet nedenfor.</key>
     <key alias="wasRestored">blev genoprettet under</key>
   </area>
+  <area alias="relationType">
+    <key alias="direction">Retning</key>
+    <key alias="parentToChild">Forælder til barn</key>
+    <key alias="bidirectional">Tovejs</key>
+    <key alias="parent">Forælder</key>
+    <key alias="child">Barn</key>
+    <key alias="count">Antal</key>
+    <key alias="relations">Relationer</key>
+    <key alias="created">Oprettet</key>
+    <key alias="comment">Kommentar</key>
+    <key alias="name">Navn</key>
+    <key alias="noRelations">Der er ingen relationer for denne relationstype.</key>
+    <key alias="tabRelationType">Relationstype</key>
+    <key alias="tabRelations">Relationer</key>
+  </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Kom godt i gang</key>
+    <key alias="contentRedirectManager">Redirects håndtering</key>
+    <key alias="mediaFolderBrowser">Indhold</key>
+    <key alias="settingsWelcome">Velkommen</key>
+    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsModelsBuilder">Models Builder</key>
+    <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="memberIntro">Kom godt i gang</key>
+    <key alias="formsInstall">Installer Umbraco Forms</key>
+  </area>
 </language>
