@@ -37,7 +37,7 @@ namespace Umbraco.Web.Trees
         public ApplicationTreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
             IRuntimeState runtimeState, ITreeService treeService, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
             _treeService = treeService;
         }

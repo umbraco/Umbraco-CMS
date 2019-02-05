@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class RelationTypeController : BackOfficeNotificationsController
     {
-        public RelationTypeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public RelationTypeController(UmbracoHelper umbracoHelper, IGlobalSettings globalSettings, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
 

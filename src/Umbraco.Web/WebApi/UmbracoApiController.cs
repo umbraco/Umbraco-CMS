@@ -17,7 +17,8 @@ namespace Umbraco.Web.WebApi
         {
         }
 
-        protected UmbracoApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        protected UmbracoApiController(UmbracoHelper umbracoHelper, IGlobalSettings globalSettings, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
     }

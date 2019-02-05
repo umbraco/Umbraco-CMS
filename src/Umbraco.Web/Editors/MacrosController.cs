@@ -32,7 +32,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMacroService _macroService;
 
-        public MacrosController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public MacrosController(UmbracoHelper umbracoHelper, IGlobalSettings globalSettings, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
             _macroService = Services.MacroService;
         }

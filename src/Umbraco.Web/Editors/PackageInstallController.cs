@@ -37,7 +37,7 @@ namespace Umbraco.Web.Editors
         public PackageInstallController(IGlobalSettings globalSettings, UmbracoContext umbracoContext,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
         }
 

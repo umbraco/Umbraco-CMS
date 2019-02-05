@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Web.Mvc
         public class TestSurfaceController : SurfaceController
         {
             public TestSurfaceController(UmbracoContext ctx, UmbracoHelper helper = null)
-                : base(ctx, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null, helper)
+                : base(helper, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null)
             {
             }
 

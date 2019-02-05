@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
 
         public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
             ITreeService treeService, UmbracoHelper umbracoHelper, SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;

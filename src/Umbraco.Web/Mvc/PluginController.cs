@@ -33,7 +33,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; }
+        public UmbracoContext UmbracoContext { get; }
 
         /// <summary>
         /// Gets or sets the database context.
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public AppCaches AppCaches { get;  }
+        public AppCaches AppCaches { get; }
 
         /// <summary>
         /// Gets or sets the logger.
@@ -77,26 +77,25 @@ namespace Umbraco.Web.Mvc
 
         protected PluginController()
             : this(
-                  Current.Factory.GetInstance<UmbracoContext>(),
+                  Current.Factory.GetInstance<UmbracoHelper>(),
                   Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<ILogger>(),
-                  Current.Factory.GetInstance<IProfilingLogger>(),
-                  Current.Factory.GetInstance<UmbracoHelper>()
+                  Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+        protected PluginController(UmbracoHelper umbracoHelper, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
         {
-            UmbracoContext = umbracoContext;
             DatabaseFactory = databaseFactory;
             Services = services;
             AppCaches = appCaches;
             Logger = logger;
             ProfilingLogger = profilingLogger;
             Umbraco = umbracoHelper;
+            UmbracoContext = umbracoHelper.UmbracoContext;
         }
 
         /// <summary>

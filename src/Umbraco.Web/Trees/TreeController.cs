@@ -18,8 +18,8 @@ namespace Umbraco.Web.Trees
 
         private readonly TreeAttribute _treeAttribute;
 
-        protected TreeController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        protected TreeController(UmbracoHelper umbracoHelper, IGlobalSettings globalSettings, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
             _treeAttribute = GetTreeAttribute();
         }

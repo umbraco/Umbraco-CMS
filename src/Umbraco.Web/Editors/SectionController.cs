@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
 
         public SectionController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(umbracoHelper, globalSettings, sqlContext, services, appCaches, logger, runtimeState)
         {
             _dashboardService = dashboardService;
             _sectionService = sectionService;

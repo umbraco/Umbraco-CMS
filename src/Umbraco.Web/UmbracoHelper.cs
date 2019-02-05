@@ -24,9 +24,7 @@ namespace Umbraco.Web
     {
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
-        private readonly UmbracoContext _umbracoContext;
-        private IPublishedContent _currentPage;
-        
+        private IPublishedContent _currentPage;        
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
         private ICultureDictionary _cultureDictionary;
@@ -49,15 +47,15 @@ namespace Umbraco.Web
             IPublishedContentQuery publishedContentQuery,
             MembershipHelper membershipHelper)
         {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             TagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
             MembershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
             ContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
 
-            if (_umbracoContext.IsFrontEndUmbracoRequest)
-                _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
+            if (UmbracoContext.IsFrontEndUmbracoRequest)
+                _currentPage = UmbracoContext.PublishedRequest.PublishedContent;
         }
 
         /// <summary>
@@ -68,6 +66,11 @@ namespace Umbraco.Web
         { }
 
         #endregion
+
+        /// <summary>
+        /// Gets the <see cref="UmbracoContext"/>
+        /// </summary>
+        public UmbracoContext UmbracoContext { get; }
 
         /// <summary>
         /// Gets the tag context.
@@ -87,7 +90,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the url provider.
         /// </summary>
-        public UrlProvider UrlProvider => _umbracoContext.UrlProvider;
+        public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
 
         /// <summary>
         /// Gets (or sets) the current <see cref="IPublishedContent"/> item assigned to the UmbracoHelper.
@@ -146,7 +149,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, new { });
+            return _componentRenderer.RenderMacro(UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, new { });
         }
 
         /// <summary>
@@ -157,7 +160,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, object parameters)
         {
-            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters.ToDictionary<object>());
+            return _componentRenderer.RenderMacro(UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters.ToDictionary<object>());
         }
 
         /// <summary>
@@ -168,7 +171,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters);
+            return _componentRenderer.RenderMacro(UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters);
         }
 
         #endregion

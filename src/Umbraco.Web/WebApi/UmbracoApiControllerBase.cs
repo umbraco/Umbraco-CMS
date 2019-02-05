@@ -32,21 +32,20 @@ namespace Umbraco.Web.WebApi
         /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
         protected UmbracoApiControllerBase()
             : this(
+                Current.Factory.GetInstance<UmbracoHelper>(),
                 Current.Factory.GetInstance<IGlobalSettings>(),
-                Current.Factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext,
                 Current.Factory.GetInstance<ISqlContext>(),
                 Current.Factory.GetInstance<ServiceContext>(),
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
-                Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoHelper>()
+                Current.Factory.GetInstance<IRuntimeState>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        protected UmbracoApiControllerBase(UmbracoHelper umbracoHelper, IGlobalSettings globalSettings, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
         {
             GlobalSettings = globalSettings;
             SqlContext = sqlContext;
@@ -54,7 +53,7 @@ namespace Umbraco.Web.WebApi
             AppCaches = appCaches;
             Logger = logger;
             RuntimeState = runtimeState;
-            UmbracoContext = umbracoContext;
+            UmbracoContext = umbracoHelper.UmbracoContext;
             Umbraco = umbracoHelper;
         }
 

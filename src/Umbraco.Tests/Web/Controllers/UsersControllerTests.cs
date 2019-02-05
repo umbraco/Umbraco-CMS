@@ -73,14 +73,13 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
                 var usersController = new UsersController(
+                    helper,
                     Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContext,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
-                    Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    Factory.GetInstance<IRuntimeState>());
                 return usersController;
             }
 
@@ -137,14 +136,13 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
                 var usersController = new UsersController(
-                    Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContext,
+                    helper,
+                    Factory.GetInstance<IGlobalSettings>(),                    
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
-                    Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    Factory.GetInstance<IRuntimeState>());
                 return usersController;
             }
 
@@ -172,14 +170,13 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(() => users);
 
                 var usersController = new UsersController(
+                    helper,
                     Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContext,
                     Factory.GetInstance<ISqlContext>(),
                     Factory.GetInstance<ServiceContext>(),
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
-                    Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    Factory.GetInstance<IRuntimeState>());
                 return usersController;
             }
 
