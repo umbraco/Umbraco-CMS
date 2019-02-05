@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the version identifier.
         /// </summary>
-        int VersionId { get; }
+        int VersionId { get; set; }
 
         /// <summary>
         /// Sets the name of the content item for a specified culture.
@@ -57,8 +57,8 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos { get; }
-
+        ContentCultureInfosCollection CultureInfos { get; set; }
+        
         /// <summary>
         /// Gets the available cultures.
         /// </summary>

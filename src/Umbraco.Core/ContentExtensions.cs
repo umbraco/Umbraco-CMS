@@ -67,7 +67,7 @@ namespace Umbraco.Core
             if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
                 return Array.Empty<string>();
 
-            var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);
+            var culturesChanging = content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture);
             return culturesChanging
                 .Where(x => !content.IsCulturePublished(x) && // is not published anymore
                             persisted != null && persisted.IsCulturePublished(x))   // but was published before

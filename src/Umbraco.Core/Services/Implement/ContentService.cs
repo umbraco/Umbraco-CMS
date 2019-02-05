@@ -776,7 +776,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures that have changed
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                    ? content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                     : null;
                 // TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
@@ -1017,7 +1017,7 @@ namespace Umbraco.Core.Services.Implement
             IReadOnlyList<string> culturesPublishing = null;
             IReadOnlyList<string> culturesUnpublishing = null;
             IReadOnlyList<string> culturesChanging = variesByCulture
-                ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                ? content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
 
             var isNew = !content.HasIdentity;
@@ -1036,7 +1036,7 @@ namespace Umbraco.Core.Services.Implement
 
                 culturesUnpublishing = content.GetCulturesUnpublishing(persisted);
                 culturesPublishing = variesByCulture
-                        ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                        ? content.PublishCultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                         : null;
 
                 // ensure that the document can be published, and publish handling events, business rules, etc
@@ -2043,7 +2043,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures changing for auditing
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    ? string.Join(",", content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture))
                     : null;
 
                 // TODO: Currently there's no way to change track which variant properties have changed, we only have change
@@ -2781,7 +2781,7 @@ namespace Umbraco.Core.Services.Implement
             content.WriterId = userId;
 
             var now = DateTime.Now;
-            var cultures = blueprint.CultureInfos.Any() ? blueprint.CultureInfos.Select(x=>x.Key) : ArrayOfOneNullString;
+            var cultures = blueprint.CultureInfos.Count > 0 ? blueprint.CultureInfos.Values.Select(x => x.Culture) : ArrayOfOneNullString;
             foreach (var culture in cultures)
             {
                 foreach (var property in blueprint.Properties)

@@ -437,16 +437,16 @@ namespace Umbraco.Tests.Models
             Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
             foreach(var culture in content.CultureInfos)
             {
-                Assert.IsTrue(culture.Value.WasDirty());
-                Assert.IsTrue(culture.Value.WasPropertyDirty("Name"));
-                Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
+                Assert.IsTrue(culture.WasDirty());
+                Assert.IsTrue(culture.WasPropertyDirty("Name"));
+                Assert.IsTrue(culture.WasPropertyDirty("Date"));
             }
             Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
             foreach (var culture in content.PublishCultureInfos)
             {
-                Assert.IsTrue(culture.Value.WasDirty());
-                Assert.IsTrue(culture.Value.WasPropertyDirty("Name"));
-                Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
+                Assert.IsTrue(culture.WasDirty());
+                Assert.IsTrue(culture.WasPropertyDirty("Name"));
+                Assert.IsTrue(culture.WasPropertyDirty("Date"));
             }
         }
 

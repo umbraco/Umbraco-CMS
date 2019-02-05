@@ -25,46 +25,46 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content is published.
         /// </summary>
-        bool Published { get; }
+        bool Published { get; set; }
 
-        PublishedState PublishedState { get; }
+        PublishedState PublishedState { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content has been edited.
         /// </summary>
-        bool Edited { get; }
+        bool Edited { get; set; }
 
         /// <summary>
         /// Gets the published version identifier.
         /// </summary>
-        int PublishedVersionId { get; }
+        int PublishedVersionId { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content item is a blueprint.
         /// </summary>
-        bool Blueprint { get; }
+        bool Blueprint { get; set; }
 
         /// <summary>
         /// Gets the template id used to render the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the template can change, but this will not until the content is published.</remarks>
-        int? PublishTemplateId { get; }
+        int? PublishTemplateId { get; set; }
 
         /// <summary>
         /// Gets the name of the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the name can change, but this will not until the content is published.</remarks>
-        string PublishName { get; }
+        string PublishName { get; set; }
 
         /// <summary>
         /// Gets the identifier of the user who published the content.
         /// </summary>
-        int? PublisherId { get; }
+        int? PublisherId { get; set; }
 
         /// <summary>
         /// Gets the date and time the content was published.
         /// </summary>
-        DateTime? PublishDate { get; }
+        DateTime? PublishDate { get; set; }
 
         /// <summary>
         /// Gets the content type of this content.
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, ContentCultureInfos> PublishCultureInfos { get; }
+        ContentCultureInfosCollection PublishCultureInfos { get; set; }
 
         /// <summary>
         /// Gets the published cultures.
@@ -127,30 +127,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the edited cultures.
         /// </summary>
-        IEnumerable<string> EditedCultures { get; }
+        IEnumerable<string> EditedCultures { get; set; }
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-
-        /// <summary>
-        /// Registers a culture to be published.
-        /// </summary>
-        /// <returns>A value indicating whether the culture can be published.</returns>
-        /// <remarks>
-        /// <para>Fails if properties don't pass variant validation rules.</para>
-        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
-        /// </remarks>
-        bool PublishCulture(string culture = "*");
-
-        /// <summary>
-        /// Registers a culture to be unpublished.
-        /// </summary>
-        /// <remarks>
-        /// <para>Unpublishing must be finalized via the content service SavePublishing method.</para>
-        /// </remarks>
-        void UnpublishCulture(string culture = "*");
+        
     }
 }
