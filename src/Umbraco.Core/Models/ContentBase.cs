@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentType.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
         protected static readonly ContentCultureInfosCollection NoInfos = new ContentCultureInfosCollection();

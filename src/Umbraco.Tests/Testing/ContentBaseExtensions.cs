@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Testing
@@ -7,7 +9,7 @@ namespace Umbraco.Tests.Testing
     public static class ContentBaseExtensions
     {
         /// <summary>
-        /// Set property values by alias with an annonymous object.
+        /// Set property values by alias with an anonymous object.
         /// </summary>
         /// <remarks>Does not support variants.</remarks>
         public static void PropertyValues(this IContentBase content, object value, string culture = null, string segment = null)
@@ -15,11 +17,13 @@ namespace Umbraco.Tests.Testing
             if (value == null)
                 throw new Exception("No properties has been passed in");
 
+            var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(content);
+
             var propertyInfos = value.GetType().GetProperties();
             foreach (var propertyInfo in propertyInfos)
             {
                 //Check if a PropertyType with alias exists thus being a valid property
-                var propertyType = content.PropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
+                var propertyType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
                 if (propertyType == null)
                     throw new Exception($"The property alias {propertyInfo.Name} is not valid, because no PropertyType with this alias exists");
 

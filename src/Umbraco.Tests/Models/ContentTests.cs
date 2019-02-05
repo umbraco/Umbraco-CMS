@@ -17,6 +17,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
@@ -28,6 +29,8 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests : UmbracoTestBase
     {
+        private IContentTypeService _contentTypeService;
+
         protected override void Compose()
         {
             base.Compose();
@@ -48,18 +51,23 @@ namespace Umbraco.Tests.Models
             Mock.Get(dataTypeService)
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(() => dataType);
-            Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService));
+
+            _contentTypeService = Mock.Of<IContentTypeService>();
+            var mediaTypeService = Mock.Of<IMediaTypeService>();
+            var memberTypeService = Mock.Of<IMemberTypeService>();
+            Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService, contentTypeBaseServiceProvider: new ContentTypeBaseServiceProvider(_contentTypeService, mediaTypeService, memberTypeService)));
         }
 
         [Test]
         public void Variant_Culture_Names_Track_Dirty_Changes()
         {
             var contentType = new ContentType(-1) { Alias = "contentType" };
+            contentType.Variations = ContentVariation.Culture;
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             const string langFr = "fr-FR";
-
-            contentType.Variations = ContentVariation.Culture;
 
             Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //hasn't been changed
 
@@ -123,6 +131,7 @@ namespace Umbraco.Tests.Models
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
 
             var content = MockedContent.CreateSimpleContent(contentType);
@@ -138,6 +147,8 @@ namespace Umbraco.Tests.Models
         public void All_Dirty_Properties_Get_Reset()
         {
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             content.ResetDirtyProperties(false);
@@ -154,6 +165,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -167,6 +180,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -183,6 +198,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -199,6 +216,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             content.Id = 10;
             content.Key = new Guid("29181B97-CB8F-403F-86DE-5FEB497F4800");
@@ -278,6 +297,8 @@ namespace Umbraco.Tests.Models
             var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
             contentType.Variations = ContentVariation.Culture;
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             content.SetCultureName("Hello", "en-US");
@@ -387,6 +408,8 @@ namespace Umbraco.Tests.Models
             var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
             contentType.Variations = ContentVariation.Culture;
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             content.SetCultureName("Hello", "en-US");
@@ -458,6 +481,8 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
             var i = 200;
             foreach (var property in content.Properties)
@@ -509,6 +534,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -527,6 +554,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -591,6 +620,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -613,6 +644,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -642,6 +675,8 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
@@ -663,6 +698,8 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             var simpleContentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -680,6 +717,8 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             var simpleContentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -697,6 +736,8 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             var simpleContentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -716,6 +757,8 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             var simpleContentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
@@ -731,6 +774,8 @@ namespace Umbraco.Tests.Models
         public void Can_Verify_Content_Is_Published()
         {
             var contentType = MockedContentTypes.CreateTextPageContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             content.ResetDirtyProperties();
@@ -800,6 +845,8 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.ResetDirtyProperties(); //reset
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateTextpageContent(contentType, "test", -1);
             content.ResetDirtyProperties();
 
