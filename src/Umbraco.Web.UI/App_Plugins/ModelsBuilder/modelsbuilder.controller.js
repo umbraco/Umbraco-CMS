@@ -1,28 +1,35 @@
-﻿function modelsBuilderController($scope, umbRequestHelper, $log, $http, modelsBuilderResource) {
+﻿function modelsBuilderController($scope, $http, umbRequestHelper, modelsBuilderResource) {
 
-    $scope.generate = function() {
-        $scope.generating = true;
+    var vm = this;
+
+    vm.reload = reload;
+    vm.generate = generate;
+    vm.dashboard = null;
+
+    function generate() {
+        vm.generating = true;
         umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "BuildModels")),
                 'Failed to generate.')
             .then(function (result) {
-                $scope.generating = false;
-                $scope.dashboard = result;
+                vm.generating = false;
+                vm.dashboard = result;
             });
-    };
+    }
 
-    $scope.reload = function () {
-        $scope.ready = false;
+    function reload() {
+        vm.loading = true;
         modelsBuilderResource.getDashboard().then(function (result) {
-            $scope.dashboard = result;
-            $scope.ready = true;
+            vm.dashboard = result;
+            vm.loading = false;
         });
-    };
+    }
 
     function init() {
+        vm.loading = true;
         modelsBuilderResource.getDashboard().then(function(result) {
-            $scope.dashboard = result;
-            $scope.ready = true;
+            vm.dashboard = result;
+            vm.loading = false;
         });
     }
 
