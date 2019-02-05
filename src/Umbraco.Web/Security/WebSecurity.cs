@@ -33,30 +33,7 @@ namespace Umbraco.Web.Security
             _userService = userService;
             _globalSettings = globalSettings;
         }
-
-        /// <summary>
-        /// Returns true or false if the currently logged in member is authorized based on the parameters provided
-        /// </summary>
-        /// <param name="allowAll"></param>
-        /// <param name="allowTypes"></param>
-        /// <param name="allowGroups"></param>
-        /// <param name="allowMembers"></param>
-        /// <returns></returns>
-        [Obsolete("Use MembershipHelper.IsMemberAuthorized instead")]
-        public bool IsMemberAuthorized(
-            bool allowAll = false,
-            IEnumerable<string> allowTypes = null,
-            IEnumerable<string> allowGroups = null,
-            IEnumerable<int> allowMembers = null)
-        {
-            if (Current.UmbracoContext == null)
-            {
-                return false;
-            }
-            var helper = Current.Factory.GetInstance<MembershipHelper>();
-            return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
-        }
-
+        
         private IUser _currentUser;
 
         /// <summary>

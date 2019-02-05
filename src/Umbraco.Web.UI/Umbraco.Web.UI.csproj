@@ -105,7 +105,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.34</Version>
+      <Version>8.0.0-alpha.36</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -178,9 +178,6 @@
     <Content Include="Config\imageprocessor\cache.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Config\EmbeddedMedia.Release.config">
-      <DependentUpon>EmbeddedMedia.config</DependentUpon>
-    </None>
     <Content Include="Config\HealthChecks.config">
       <SubType>Designer</SubType>
     </Content>
@@ -300,7 +297,6 @@
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\EmbeddedMedia.config" />
     <Content Include="Config\BackOfficeTours\getting-started.json" />
   </ItemGroup>
   <!-- determine VSToolsPath -->

@@ -248,7 +248,7 @@ namespace Umbraco.Web.Runtime
             XmlFileMapper.FileMapDefaultFolder = SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
             BaseCompositeFileProcessingProvider.UrlTypeDefault = CompositeUrlType.Base64QueryStrings;
 
-            // Now we need to detect if we are running umbracoLocalTempStorage as EnvironmentTemp and in that case we want to change the CDF file
+            // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file
             // location to be there
             if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {

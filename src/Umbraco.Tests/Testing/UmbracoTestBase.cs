@@ -38,9 +38,11 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Macros;
 using Umbraco.Web.PublishedCache;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Testing
@@ -228,6 +230,7 @@ namespace Umbraco.Tests.Testing
                 .Append<MembersBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
+
         }
 
         protected virtual void ComposeWtf()

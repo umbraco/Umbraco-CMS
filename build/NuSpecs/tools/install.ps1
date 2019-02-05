@@ -54,7 +54,7 @@ if ($project) {
 			[xml]$config = Get-Content $destinationWebConfig
 			
 			$config.configuration.appSettings.ChildNodes | ForEach-Object { 
-				if($_.key -eq "umbracoConfigurationStatus") 
+				if($_.key -eq "Umbraco.Core.ConfigurationStatus") 
 				{
 					# The web.config has an umbraco-specific appSetting in it
 					# don't overwrite it and let config transforms do their thing

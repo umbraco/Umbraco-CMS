@@ -109,29 +109,33 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Create_Content_From_Blueprint()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var contentService = ServiceContext.ContentService;
+                var contentTypeService = ServiceContext.ContentTypeService;
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentTypeService.Save(contentType);
+                var contentType = MockedContentTypes.CreateTextPageContentType();
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+                contentTypeService.Save(contentType);
 
-            var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
-            blueprint.SetValue("title", "blueprint 1");
-            blueprint.SetValue("bodyText", "blueprint 2");
-            blueprint.SetValue("keywords", "blueprint 3");
-            blueprint.SetValue("description", "blueprint 4");
+                var blueprint = MockedContent.CreateTextpageContent(contentType, "hello", -1);
+                blueprint.SetValue("title", "blueprint 1");
+                blueprint.SetValue("bodyText", "blueprint 2");
+                blueprint.SetValue("keywords", "blueprint 3");
+                blueprint.SetValue("description", "blueprint 4");
 
-            contentService.SaveBlueprint(blueprint);
+                contentService.SaveBlueprint(blueprint);
 
-            var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
-            contentService.Save(fromBlueprint);
+                var fromBlueprint = contentService.CreateContentFromBlueprint(blueprint, "hello world");
+                contentService.Save(fromBlueprint);
 
-            Assert.IsTrue(fromBlueprint.HasIdentity);
-            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
-            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
-            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
-            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+                Assert.IsTrue(fromBlueprint.HasIdentity);
+                Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
+                Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
+                Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
+                Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+            }
+
         }
 
         [Test]

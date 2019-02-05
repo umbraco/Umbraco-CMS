@@ -285,6 +285,7 @@
     <Compile Include="Constants-Security.cs" />
     <Compile Include="Constants-System.cs" />
     <Compile Include="Constants-Indexes.cs" />
+    <Compile Include="Constants-AppSettings.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
@@ -411,6 +412,7 @@
     <Compile Include="Models\IAuditEntry.cs" />
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
+    <Compile Include="Models\ISimpleContentType.cs" />
     <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
@@ -433,6 +435,7 @@
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
+    <Compile Include="Models\SimpleContentType.cs" />
     <Compile Include="Models\Trees\IBackOfficeSection.cs" />
     <Compile Include="PackageActions\AllowDoctype.cs" />
     <Compile Include="PackageActions\PublishRootDocument.cs" />
@@ -648,10 +651,8 @@
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
     <Compile Include="Media\IEmbedProvider.cs" />
-    <Compile Include="Media\IEmbedSettingProvider.cs" />
-    <Compile Include="Media\ProviderSetting.cs" />
-    <Compile Include="Media\Result.cs" />
-    <Compile Include="Media\Status.cs" />
+    <Compile Include="Media\OEmbedResult.cs" />
+    <Compile Include="Media\OEmbedStatus.cs" />
     <Compile Include="Migrations\IPostMigration.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
@@ -1346,6 +1347,7 @@
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="Services\IConsentService.cs" />
+    <Compile Include="Services\IContentTypeBaseServiceProvider.cs" />
     <Compile Include="Services\IEntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
@@ -1363,6 +1365,7 @@
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTItemTService.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTRepositoryTItemTService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
+    <Compile Include="Services\Implement\ContentTypeBaseServiceProvider.cs" />
     <Compile Include="Services\Implement\DataTypeService.cs" />
     <Compile Include="Services\Implement\DomainService.cs" />
     <Compile Include="Services\Implement\EntityService.cs" />

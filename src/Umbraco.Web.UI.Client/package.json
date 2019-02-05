@@ -39,7 +39,7 @@
     "npm": "^6.4.1",
     "signalr": "2.4.0",
     "spectrum-colorpicker": "1.8.0",
-    "tinymce": "4.9.0",
+    "tinymce": "4.9.2",
     "typeahead.js": "0.11.1",
     "underscore": "1.9.1"
   },

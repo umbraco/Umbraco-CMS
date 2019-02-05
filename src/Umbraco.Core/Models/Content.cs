@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
 
@@ -21,8 +20,6 @@ namespace Umbraco.Core.Models
         private PublishedState _publishedState;
         private HashSet<string> _editedCultures;
         private ContentCultureInfosCollection _publishInfos, _publishInfos1, _publishInfos2;
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -46,7 +43,8 @@ namespace Umbraco.Core.Models
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parent, contentType, properties, culture)
         {
-            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+            ContentType = new SimpleContentType(contentType);
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -73,18 +71,10 @@ namespace Umbraco.Core.Models
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
-            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+            ContentType = new SimpleContentType(contentType);
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
-        }
-
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, int?>(x => x.TemplateId);
-            public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo ContentScheduleSelector = ExpressionHelper.GetPropertyInfo<Content, ContentScheduleCollection>(x => x.ContentSchedule);
-            public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
         }
 
         /// <inheritdoc />
@@ -104,7 +94,7 @@ namespace Umbraco.Core.Models
             {
                 if(_schedule != null)
                     _schedule.CollectionChanged -= ScheduleCollectionChanged;
-                SetPropertyValueAndDetectChanges(value, ref _schedule, Ps.Value.ContentScheduleSelector);
+                SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
                 if (_schedule != null)
                     _schedule.CollectionChanged += ScheduleCollectionChanged;
             }
@@ -117,7 +107,7 @@ namespace Umbraco.Core.Models
         /// <param name="e"></param>
         private void ScheduleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.ContentScheduleSelector);
+            OnPropertyChanged(nameof(ContentSchedule));
         }
 
         /// <summary>
@@ -132,7 +122,7 @@ namespace Umbraco.Core.Models
         public int? TemplateId
         {
             get => _templateId;
-            set => SetPropertyValueAndDetectChanges(value, ref _templateId, Ps.Value.TemplateSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _templateId, nameof(TemplateId));
         }
 
         /// <summary>
@@ -148,7 +138,7 @@ namespace Umbraco.Core.Models
             // - the ContentRepository when updating a content entity
             internal set
             {
-                SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector);
+                SetPropertyValueAndDetectChanges(value, ref _published, nameof(Published));
                 _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
             }
         }
@@ -178,7 +168,7 @@ namespace Umbraco.Core.Models
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IContentType ContentType { get; private set; }
+        public ISimpleContentType ContentType { get; private set; }
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -347,7 +337,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PublishCultureInfosSelector);
+            OnPropertyChanged(nameof(PublishCultureInfos));
         }
 
         [IgnoreDataMember]
@@ -438,7 +428,7 @@ namespace Umbraco.Core.Models
         public void ChangeContentType(IContentType contentType)
         {
             ContentTypeId = contentType.Id;
-            ContentType = contentType;
+            ContentType = new SimpleContentType(contentType);
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
 
@@ -457,7 +447,7 @@ namespace Umbraco.Core.Models
             if(clearProperties)
             {
                 ContentTypeId = contentType.Id;
-                ContentType = contentType;
+                ContentType = new SimpleContentType(contentType);
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
 
@@ -472,9 +462,6 @@ namespace Umbraco.Core.Models
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
-
-            if (ContentType != null)
-                ContentType.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
@@ -517,7 +504,7 @@ namespace Umbraco.Core.Models
             var clonedContent = (Content)clone;
 
             //need to manually clone this since it's not settable
-            clonedContent.ContentType = (IContentType) ContentType.DeepClone();
+            clonedContent.ContentType = ContentType;
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._publishInfos != null)

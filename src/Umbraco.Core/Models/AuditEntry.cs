@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -12,8 +11,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     internal class AuditEntry : EntityBase, IAuditEntry
     {
-        private static PropertySelectors _selectors;
-
         private int _performingUserId;
         private string _performingDetails;
         private string _performingIp;
@@ -22,38 +19,25 @@ namespace Umbraco.Core.Models
         private string _eventType;
         private string _eventDetails;
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo PerformingUserId = ExpressionHelper.GetPropertyInfo<AuditEntry, int>(x => x.PerformingUserId);
-            public readonly PropertyInfo PerformingDetails = ExpressionHelper.GetPropertyInfo<AuditEntry, string>(x => x.PerformingDetails);
-            public readonly PropertyInfo PerformingIp = ExpressionHelper.GetPropertyInfo<AuditEntry, string>(x => x.PerformingIp);
-            public readonly PropertyInfo AffectedUserId = ExpressionHelper.GetPropertyInfo<AuditEntry, int>(x => x.AffectedUserId);
-            public readonly PropertyInfo AffectedDetails = ExpressionHelper.GetPropertyInfo<AuditEntry, string>(x => x.AffectedDetails);
-            public readonly PropertyInfo EventType = ExpressionHelper.GetPropertyInfo<AuditEntry, string>(x => x.EventType);
-            public readonly PropertyInfo EventDetails = ExpressionHelper.GetPropertyInfo<AuditEntry, string>(x => x.EventDetails);
-        }
-
         /// <inheritdoc />
         public int PerformingUserId
         {
             get => _performingUserId;
-            set => SetPropertyValueAndDetectChanges(value, ref _performingUserId, Selectors.PerformingUserId);
+            set => SetPropertyValueAndDetectChanges(value, ref _performingUserId, nameof(PerformingUserId));
         }
 
         /// <inheritdoc />
         public string PerformingDetails
         {
             get => _performingDetails;
-            set => SetPropertyValueAndDetectChanges(value, ref _performingDetails, Selectors.PerformingDetails);
+            set => SetPropertyValueAndDetectChanges(value, ref _performingDetails, nameof(PerformingDetails));
         }
 
         /// <inheritdoc />
         public string PerformingIp
         {
             get => _performingIp;
-            set => SetPropertyValueAndDetectChanges(value, ref _performingIp, Selectors.PerformingIp);
+            set => SetPropertyValueAndDetectChanges(value, ref _performingIp, nameof(PerformingIp));
         }
 
         /// <inheritdoc />
@@ -64,31 +48,31 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public int AffectedUserId 
+        public int AffectedUserId
         {
             get => _affectedUserId;
-            set => SetPropertyValueAndDetectChanges(value, ref _affectedUserId, Selectors.AffectedUserId);
+            set => SetPropertyValueAndDetectChanges(value, ref _affectedUserId, nameof(AffectedUserId));
         }
 
         /// <inheritdoc />
-        public string AffectedDetails 
+        public string AffectedDetails
         {
             get => _affectedDetails;
-            set => SetPropertyValueAndDetectChanges(value, ref _affectedDetails, Selectors.AffectedDetails);
+            set => SetPropertyValueAndDetectChanges(value, ref _affectedDetails, nameof(AffectedDetails));
         }
 
         /// <inheritdoc />
-        public string EventType 
+        public string EventType
         {
             get => _eventType;
-            set => SetPropertyValueAndDetectChanges(value, ref _eventType, Selectors.EventType);
+            set => SetPropertyValueAndDetectChanges(value, ref _eventType, nameof(EventType));
         }
 
         /// <inheritdoc />
-        public string EventDetails 
+        public string EventDetails
         {
             get => _eventDetails;
-            set => SetPropertyValueAndDetectChanges(value, ref _eventDetails, Selectors.EventDetails);
+            set => SetPropertyValueAndDetectChanges(value, ref _eventDetails, nameof(EventDetails));
         }
     }
 }

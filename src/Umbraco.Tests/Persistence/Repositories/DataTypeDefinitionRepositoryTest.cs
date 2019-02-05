@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository();
                 // Act
-                var dataTypeDefinition = repository.Get(-42);
+                var dataTypeDefinition = repository.Get(Constants.DataTypes.DropDownSingle);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);
