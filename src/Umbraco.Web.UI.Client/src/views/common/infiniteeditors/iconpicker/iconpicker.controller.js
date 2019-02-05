@@ -55,7 +55,7 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
         });
 
         // set a default color if nothing is passed in
-        vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors[0];
+        vm.color = $scope.model.color ? $scope.model.color : vm.colors[0];
 
         // if an icon is passed in - preselect it
         vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
@@ -76,12 +76,8 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
         submit();
     }
 
-    function findColor(value) {
-        return _.findWhere(vm.colors, {value: value});
-    }
-
     function selectColor(color, $index, $event) {
-        $scope.model.color = color.value;
+        $scope.model.color = color;
         vm.color = color;
     }
 
