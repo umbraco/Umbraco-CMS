@@ -235,6 +235,15 @@
                 treeAlias: "files",
                 entityType: "file",
                 onlyInitialized: false,
+                filter: function (i) {
+                    if (i.name.indexOf(".cshtml") === -1 &&
+                        i.name.indexOf(".vbhtml") === -1 &&
+                        i.name.indexOf(".html") === -1 &&
+                        i.name.indexOf(".htm") === -1) {
+                        return true;
+                    }
+                },
+                filterCssClass: "not-allowed",
                 select: function(node) {
                     const id = unescape(node.id);
                     vm.package.packageView = id;
