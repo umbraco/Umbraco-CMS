@@ -25,11 +25,6 @@ namespace Umbraco.Core.Configuration
         string Path { get; }
 
         /// <summary>
-        /// Gets the path to folder containing the icons used in the umbraco backoffice (/umbraco/assets/icons by default).
-        /// </summary>
-        string IconsPath { get; }
-
-        /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
         /// </summary>
         string ConfigurationStatus { get; set; }
