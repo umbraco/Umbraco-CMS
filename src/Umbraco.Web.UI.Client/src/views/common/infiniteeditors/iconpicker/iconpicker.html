@@ -37,16 +37,16 @@
                         colors="vm.colors"
                         selected-color="vm.color"
                         size="s"
-                        on-select="vm.selectColor">
+                        on-select="vm.selectColor(color)">
                     </umb-color-swatches>
                 </div>
 
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
                 <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
-                    <ul class="umb-iconpicker" ng-class="vm.color" ng-show="vm.icons">
+                    <ul class="umb-iconpicker" ng-class="vm.color.value" ng-show="vm.icons">
                         <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon)">
-                            <a href="#" title="{{icon}}" ng-click="vm.selectIcon(icon, vm.color)" prevent-default>
+                            <a href="#" title="{{icon}}" ng-click="vm.selectIcon(icon, vm.color.value)" prevent-default>
                                 <i class="{{icon}} large"></i>
                             </a>
                         </li>
