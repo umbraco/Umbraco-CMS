@@ -173,27 +173,46 @@ namespace Umbraco.Core.Components
             // what happens in case of conflicting remote declarations is unspecified. more
             // precisely, the last declaration to be processed wins, but the order of the
             // declarations depends on the type finder and is unspecified.
+
+            void UpdateEnableInfo(Type composerType, int weight2, Dictionary<Type, EnableInfo> enabled2, bool value)
+            {
+                if (enabled.TryGetValue(composerType, out var enableInfo) == false) enableInfo = enabled2[composerType] = new EnableInfo();
+                if (enableInfo.Weight > weight2) return;
+
+                enableInfo.Enabled = value;
+                enableInfo.Weight = weight2;
+            }
+
+            var assemblies = types.Select(x => x.Assembly).Distinct();
+            foreach (var assembly in assemblies)
+            {
+                foreach (var attr in assembly.GetCustomAttributes<EnableComposerAttribute>())
+                {
+                    var type = attr.EnabledType;
+                    UpdateEnableInfo(type, 2, enabled, true);
+                }
+
+                foreach (var attr in assembly.GetCustomAttributes<DisableComposerAttribute>())
+                {
+                    var type = attr.DisabledType;
+                    UpdateEnableInfo(type, 2, enabled, false);
+                }
+            }
+
             foreach (var composerType in types)
             {
                 foreach (var attr in composerType.GetCustomAttributes<EnableAttribute>())
                 {
                     var type = attr.EnabledType ?? composerType;
-                    if (enabled.TryGetValue(type, out var enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
-                    var weight = type == composerType ? 1 : 2;
-                    if (enableInfo.Weight > weight) continue;
-
-                    enableInfo.Enabled = true;
-                    enableInfo.Weight = weight;
+                    var weight = type == composerType ? 1 : 3;
+                    UpdateEnableInfo(type, weight, enabled, true);
                 }
+
                 foreach (var attr in composerType.GetCustomAttributes<DisableAttribute>())
                 {
                     var type = attr.DisabledType ?? composerType;
-                    if (enabled.TryGetValue(type, out var enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
-                    var weight = type == composerType ? 1 : 2;
-                    if (enableInfo.Weight > weight) continue;
-
-                    enableInfo.Enabled = false;
-                    enableInfo.Weight = weight;
+                    var weight = type == composerType ? 1 : 3;
+                    UpdateEnableInfo(type, weight, enabled, false);
                 }
             }
 

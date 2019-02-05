@@ -163,7 +163,9 @@
     <Compile Include="Components\Composition.cs" />
     <Compile Include="Components\CompositionExtensions.cs" />
     <Compile Include="Components\DisableAttribute.cs" />
+    <Compile Include="Components\DisableComposerAttribute.cs" />
     <Compile Include="Components\EnableAttribute.cs" />
+    <Compile Include="Components\EnableComposerAttribute.cs" />
     <Compile Include="Components\IComposer.cs" />
     <Compile Include="Components\ICoreComposer.cs" />
     <Compile Include="Components\IRuntimeComposer.cs" />
