@@ -1,21 +1,24 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.Macros
 {
     public class MacroModel
     {
+        /// <summary>
+        /// The Macro Id
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// The Macro Name
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// The Macro Alias
+        /// </summary>
         public string Alias { get; set; }
-
-        public string MacroControlIdentifier { get; set; }
 
         public MacroTypes MacroType { get; set; }
 

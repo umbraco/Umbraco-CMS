@@ -20,18 +20,13 @@ namespace Umbraco.Web.Controllers
     // TODO: This controller should be moved to a more suitable place.
     public class TagsController : UmbracoApiController
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TagsController"/> with auto dependencies.
-        /// </summary>
         public TagsController()
-        { }
+        {
+        }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TagsController"/> with all its dependencies.
-        /// </summary>
-        public TagsController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
-        { }
+        public TagsController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
 
         /// <summary>
         /// Get every tag stored in the database (with optional group)

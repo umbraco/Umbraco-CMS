@@ -14,19 +14,16 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContext, Current.Services)
+            : this(Current.UmbracoContext, Current.UmbracoHelper, Current.Services, Current.ProfilingLogger)
         { }
 
-        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
+        protected UmbracoHttpHandler(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
-            Umbraco = new UmbracoHelper(umbracoContext, services);
-
-            // TODO: inject somehow
-            Logger = Current.Logger;
-            ProfilingLogger = Current.ProfilingLogger;
-            Services = Current.Services;
+            Logger = plogger;
+            ProfilingLogger = plogger;
+            Services = service;
+            Umbraco = umbracoHelper;
         }
 
         public abstract void ProcessRequest(HttpContext context);

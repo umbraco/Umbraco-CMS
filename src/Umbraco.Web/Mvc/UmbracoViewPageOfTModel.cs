@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco helper.
         /// </summary>
-        public virtual UmbracoHelper Umbraco
+        public UmbracoHelper Umbraco
         {
             get
             {
@@ -94,9 +95,12 @@ namespace Umbraco.Web.Mvc
                 var content = model as IPublishedContent;
                 if (content == null && model is IContentModel)
                     content = ((IContentModel) model).Content;
-                _helper = content == null
-                    ? new UmbracoHelper(UmbracoContext, Services)
-                    : new UmbracoHelper(UmbracoContext, Services, content);
+
+                _helper = Current.UmbracoHelper;
+
+                if (content != null)
+                    _helper.AssignedContentItem = content;
+                
                 return _helper;
             }
         }
@@ -217,7 +221,7 @@ namespace Umbraco.Web.Mvc
                             markupToInject =
                                 string.Format(Current.Configs.Settings().Content.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                                    Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
+                                    Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Url?.PathAndQuery));
                         }
                         else
                         {

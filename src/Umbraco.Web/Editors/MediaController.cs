@@ -21,7 +21,9 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
 using System.Web.Http.Controllers;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.Querying;
@@ -47,9 +49,10 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        public MediaController(PropertyEditorCollection propertyEditors)
+        public MediaController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
         }
 
         /// <summary>
@@ -233,6 +236,7 @@ namespace Umbraco.Web.Editors
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
 
         protected int[] UserStartNodes
         {
@@ -292,7 +296,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //better to not use this without paging where possible, currently only the sort dialog does
-                children = Services.MediaService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
+                children = Services.MediaService.GetPagedChildren(id,0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -724,7 +728,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(Constants.Conventions.Media.File, fileName, fs);
+                        f.SetValue(_contentTypeBaseServiceProvider, Constants.Conventions.Media.File,fileName, fs);
                     }
 
                     var saveResult = mediaService.Save(f, Security.CurrentUser.Id);

@@ -11,6 +11,8 @@ using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -33,6 +35,7 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
@@ -54,7 +57,7 @@ namespace Umbraco.Web.Editors
 
         public object Domains { get; private set; }
 
-        public ContentController(PropertyEditorCollection propertyEditors)
+        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -1838,8 +1841,10 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
+                var contentTypeService = Services.ContentTypeBaseServices.For(parent);
+                var parentContentType = contentTypeService.Get(parent.ContentTypeId);
                 //check if the item is allowed under this one
-                if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     throw new HttpResponseException(

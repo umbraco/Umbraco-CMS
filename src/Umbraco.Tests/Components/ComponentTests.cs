@@ -12,6 +12,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 
+[assembly:DisableComposer(typeof(Umbraco.Tests.Components.ComponentTests.Composer26))]
+
 namespace Umbraco.Tests.Components
 {
     [TestFixture]
@@ -104,7 +106,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));
 
             var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - stays with RuntimeLevel.Run
@@ -120,7 +122,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Composer20, Composer21>();
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 21 is required by 20
             // => reorder components accordingly
@@ -135,7 +137,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Composer22, Composer24, Composer25>();
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // i23 requires 22
             // 24, 25 implement i23
@@ -152,7 +154,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Composer1, Composer2, Composer3>();
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             try
             {
@@ -175,7 +177,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = TypeArray<Composer2, Composer4, Composer13>();
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 13 is required by 1
@@ -234,7 +236,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Composer6), typeof(Composer7), typeof(Composer8) };
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             components.Compose();
             Assert.AreEqual(2, Composed.Count);
@@ -249,7 +251,7 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Composer9), typeof(Composer2), typeof(Composer4) };
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             components.Compose();
             Assert.AreEqual(2, Composed.Count);
@@ -285,24 +287,24 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Composer10) };
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             components.Compose();
             Assert.AreEqual(1, Composed.Count);
             Assert.AreEqual(typeof(Composer10), Composed[0]);
 
             types = new[] { typeof(Composer11) };
-            components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             Assert.Throws<Exception>(() => components.Compose());
 
             types = new[] { typeof(Composer2) };
-            components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             Assert.Throws<Exception>(() => components.Compose());
 
             types = new[] { typeof(Composer12) };
-            components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             components.Compose();
             Assert.AreEqual(1, Composed.Count);
@@ -316,12 +318,33 @@ namespace Umbraco.Tests.Components
             var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
 
             var types = new[] { typeof(Composer6), typeof(Composer8) }; // 8 disables 7 which is not in the list
-            var components = new Core.Components.Composers(composition, types, Mock.Of<IProfilingLogger>());
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             components.Compose();
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Composer6), Composed[0]);
             Assert.AreEqual(typeof(Composer8), Composed[1]);
+        }
+
+        [Test]
+        public void AttributesPriorities()
+        {
+            var register = MockRegister();
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown));
+
+            var types = new[] { typeof(Composer26) }; // 26 disabled by assembly attribute
+            var components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
+            Composed.Clear();
+            components.Compose();
+            Assert.AreEqual(0, Composed.Count); // 26 gone
+
+            types = new[] { typeof(Composer26), typeof(Composer27) }; // 26 disabled by assembly attribute, enabled by 27
+            components = new Composers(composition, types, Mock.Of<IProfilingLogger>());
+            Composed.Clear();
+            components.Compose();
+            Assert.AreEqual(2, Composed.Count); // both
+            Assert.AreEqual(typeof(Composer26), Composed[0]);
+            Assert.AreEqual(typeof(Composer27), Composed[1]);
         }
 
         #region Components
@@ -438,6 +461,14 @@ namespace Umbraco.Tests.Components
         [ComposeBefore(typeof(IComposer23))]
         //[RequireComponent(typeof(Component22))] - not needed, implement i23
         public class Composer25 : TestComposerBase, IComposer23
+        { }
+
+        // disabled by assembly attribute
+        public class Composer26 : TestComposerBase
+        { }
+
+        [Enable(typeof(Composer26))]
+        public class Composer27 : TestComposerBase
         { }
 
         #endregion

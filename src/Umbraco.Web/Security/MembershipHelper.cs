@@ -599,20 +599,15 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
         /// </summary>
-        /// <param name="allowAll"></param>
         /// <param name="allowTypes"></param>
         /// <param name="allowGroups"></param>
         /// <param name="allowMembers"></param>
         /// <returns></returns>
         public virtual bool IsMemberAuthorized(
-            bool allowAll = false,
             IEnumerable<string> allowTypes = null,
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
-            if (allowAll)
-                return true;
-
             if (allowTypes == null)
                 allowTypes = Enumerable.Empty<string>();
             if (allowGroups == null)

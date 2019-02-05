@@ -124,6 +124,9 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(contentTypeService).Setup(x => x.GetAll()).Returns(contentTypes);
             Mock.Get(contentTypeService).Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
 
+            var contentTypeServiceBaseFactory = Mock.Of<IContentTypeBaseServiceProvider>();
+            Mock.Get(contentTypeServiceBaseFactory).Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService);
+
             var dataTypeService = Mock.Of<IDataTypeService>();
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
 
@@ -177,6 +180,7 @@ namespace Umbraco.Tests.PublishedContent
                 dataSource,
                 globalSettings,
                 new SiteDomainHelper(),
+                contentTypeServiceBaseFactory,
                 Mock.Of<IEntityXmlSerializer>());
 
             // invariant is the current default

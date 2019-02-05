@@ -12,32 +12,35 @@ namespace Umbraco.Web
         /// <summary>
         /// Renders the template for the specified pageId and an optional altTemplateId
         /// </summary>
-        /// <param name="pageId"></param>
+        /// <param name="contentId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
         /// <returns></returns>
-        IHtmlString RenderTemplate(int pageId, int? altTemplateId = null);
+        IHtmlString RenderTemplate(int contentId, int? altTemplateId = null);
 
         /// <summary>
         /// Renders the macro with the specified alias.
         /// </summary>
+        /// <param name="contentId"></param>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        IHtmlString RenderMacro(string alias);
+        IHtmlString RenderMacro(int contentId, string alias);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
         /// </summary>
+        /// <param name="contentId"></param>
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        IHtmlString RenderMacro(string alias, object parameters);
+        IHtmlString RenderMacro(int contentId, string alias, object parameters);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
         /// </summary>
+        /// <param name="contentId"></param>
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters);
+        IHtmlString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters);
     }
 }

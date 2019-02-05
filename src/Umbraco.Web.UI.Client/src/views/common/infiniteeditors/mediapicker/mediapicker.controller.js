@@ -104,7 +104,7 @@ angular.module("umbraco")
             }
 
             $scope.upload = function(v) {
-                angular.element(".umb-file-dropzone-directive .file-select").trigger("click");
+                angular.element(".umb-file-dropzone .file-select").trigger("click");
             };
 
             $scope.dragLeave = function(el, event) {

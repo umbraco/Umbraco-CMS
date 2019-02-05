@@ -43,12 +43,16 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {
         private readonly ITreeService _treeService;
+        private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly SearchableTreeCollection _searchableTreeCollection;
 
         public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            ITreeService treeService)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+            ITreeService treeService, UmbracoHelper umbracoHelper, SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
+            _searchableTreeCollection = searchableTreeCollection;
+            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -67,15 +71,6 @@ namespace Umbraco.Web.Editors
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
-        }
-
-        private readonly UmbracoTreeSearcher _treeSearcher;
-        private readonly SearchableTreeCollection _searchableTreeCollection;
-
-        public EntityController(SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
-        {
-            _searchableTreeCollection = searchableTreeCollection;
-            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -112,6 +107,8 @@ namespace Umbraco.Web.Editors
 
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
+
+            //TODO: This uses the internal UmbracoTreeSearcher, this instead should delgate to the ISearchableTree implementation for the type
 
             return ExamineSearch(query, type, searchFrom);
         }
@@ -455,6 +452,9 @@ namespace Umbraco.Web.Editors
 
             //the EntityService cannot search members of a certain type, this is currently not supported and would require
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
+
+            //TODO: We should really fix this in the EntityService but if we don't we should allow the ISearchableTree for the members controller
+            // to be used for this search instead of the built in/internal searcher
 
             var searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out long total, id);
 

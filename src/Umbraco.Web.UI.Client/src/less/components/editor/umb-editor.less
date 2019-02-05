@@ -4,6 +4,7 @@
     right: 0;
     bottom: 0;
     left: 0;
+    overflow: hidden;
 }
 
 .umb-editor {
@@ -17,20 +18,62 @@
 }
 
 .umb-editor--animating {
-    will-change: transform, opacity, width, left;
+    //will-change: transform, width, left;
+}
+.umb-editor--infinityMode {
+    transform: none;
+    will-change: transform;
+    transition: transform 400ms ease-in-out;
+    &.moveRight {
+        transform: translateX(110%);
+    }
+}
+
+.umb-editor--outOfRange {
+    //left:0;
+    transform: none;
+    display: none;
+    will-change: auto;
+    transition: display 0s 320ms;
+}
+.umb-editor--level0 {
+    //left:0;
+    transform: none;
+}
+.umb-editor--level1 {
+    //left:60px;
+    transform: translateX(60px);
+}
+.umb-editor--level2 {
+    //left:120px;
+    transform: translateX(120px);
+}
+.umb-editor--level3 {
+    //left:180px;
+    transform: translateX(180px);
+}
+
+.umb-editor--n1 {
+    right:60px;
+}
+.umb-editor--n2 {
+    right:120px;
+}
+.umb-editor--n3 {
+    right:180px;
 }
 
 // hide all infinite editors by default
 // will be shown through animation
 .umb-editors .umb-editor {
-    opacity: 0;
     box-shadow: 0px 0 30px 0 rgba(0,0,0,.3);
 }
 
 .umb-editor--small {
     width: 500px;
+    will-change: transform;
     left: auto;
-
+    
     .umb-editor-container {
         max-width: 500px;
     }
@@ -44,4 +87,14 @@
     left: 0;
     background: rgba(0,0,0,0.4);
     z-index: @zIndexEditor;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 320ms 20ms, visibility 0s 400ms;
+}
+
+#contentcolumn > .umb-editor__overlay,
+.--notInFront .umb-editor__overlay {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 320ms 20ms, visibility 0s;
 }

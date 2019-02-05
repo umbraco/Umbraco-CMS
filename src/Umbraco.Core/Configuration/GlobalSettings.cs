@@ -85,8 +85,8 @@ namespace Umbraco.Core.Configuration
             {
                 if (_reservedUrls != null) return _reservedUrls;
 
-                var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
-                    ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                var urls = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ReservedUrls)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ReservedUrls]
                     : string.Empty;
 
                 //ensure the built on (non-changeable) reserved paths are there at all times
@@ -107,14 +107,14 @@ namespace Umbraco.Core.Configuration
                 if (_reservedPaths != null) return _reservedPaths;
 
                 var reservedPaths = StaticReservedPaths;
-                var umbPath = ConfigurationManager.AppSettings.ContainsKey("umbracoPath") && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace()
-                    ? ConfigurationManager.AppSettings["umbracoPath"]
+                var umbPath = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path) && !ConfigurationManager.AppSettings[Constants.AppSettings.Path].IsNullOrWhiteSpace()
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.Path]
                     : "~/umbraco";
                 //always add the umbraco path to the list
                 reservedPaths += umbPath.EnsureEndsWith(',');
 
-                var allPaths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-                    ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+                var allPaths = ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ReservedPaths)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ReservedPaths]
                     : string.Empty;
 
                 _reservedPaths = reservedPaths + allPaths;
@@ -133,8 +133,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXML")
-                    ? ConfigurationManager.AppSettings["umbracoContentXML"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentXML)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentXML]
                     : "~/App_Data/umbraco.config";
             }
         }
@@ -147,8 +147,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
-                    ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"])
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
+                    ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
                     : string.Empty;
             }
         }
@@ -175,13 +175,13 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoConfigurationStatus")
-                    ? ConfigurationManager.AppSettings["umbracoConfigurationStatus"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ConfigurationStatus)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus]
                     : string.Empty;
             }
             set
             {
-                SaveSetting("umbracoConfigurationStatus", value);
+                SaveSetting(Constants.AppSettings.ConfigurationStatus, value);
             }
         }
         
@@ -263,7 +263,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return int.Parse(ConfigurationManager.AppSettings["umbracoTimeOutInMinutes"]);
+                    return int.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.TimeOutInMinutes]);
                 }
                 catch
                 {
@@ -282,7 +282,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return int.Parse(ConfigurationManager.AppSettings["umbracoVersionCheckPeriod"]);
+                    return int.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.VersionCheckPeriod]);
                 }
                 catch
                 {
@@ -301,7 +301,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                var setting = ConfigurationManager.AppSettings["umbracoLocalTempStorage"];
+                var setting = ConfigurationManager.AppSettings[Constants.AppSettings.LocalTempStorage];
                 if (!string.IsNullOrWhiteSpace(setting))
                     return Enum<LocalTempStorage>.Parse(setting);
 
@@ -318,8 +318,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoDefaultUILanguage")
-                    ? ConfigurationManager.AppSettings["umbracoDefaultUILanguage"]
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.DefaultUILanguage)
+                    ? ConfigurationManager.AppSettings[Constants.AppSettings.DefaultUILanguage]
                     : string.Empty;
             }
         }
@@ -336,7 +336,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.HideTopLevelNodeFromPath]);
                 }
                 catch
                 {
@@ -354,7 +354,7 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoUseHttps"]);
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.UseHttps]);
                 }
                 catch
                 {

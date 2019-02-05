@@ -16,8 +16,11 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
+using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web.Editors
 {
@@ -36,7 +39,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
 
-        public DataTypeController(PropertyEditorCollection propertyEditors)
+        public DataTypeController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors;
         }
