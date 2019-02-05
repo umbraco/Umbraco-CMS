@@ -17,7 +17,6 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
-        protected static readonly ContentCultureInfosCollection NoInfos = new ContentCultureInfosCollection();
 
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
@@ -69,20 +68,20 @@ namespace Umbraco.Core.Models
         /// Id of the user who wrote/updated this entity
         /// </summary>
         [DataMember]
-        public virtual int WriterId
+        public int WriterId
         {
             get => _writerId;
             set => SetPropertyValueAndDetectChanges(value, ref _writerId, nameof(WriterId));
         }
 
         [IgnoreDataMember]
-        public int VersionId { get; internal set; }
+        public int VersionId { get; set; }
 
         /// <summary>
         /// Integer Id of the default ContentType
         /// </summary>
         [DataMember]
-        public virtual int ContentTypeId
+        public int ContentTypeId
         {
             get
             {
@@ -105,11 +104,12 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [DataMember]
         [DoNotClone]
-        public virtual PropertyCollection Properties
+        public PropertyCollection Properties
         {
             get => _properties;
             set
             {
+                if (_properties != null) _properties.CollectionChanged -= PropertiesChanged;
                 _properties = value;
                 _properties.CollectionChanged += PropertiesChanged;
             }
@@ -147,7 +147,23 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos => _cultureInfos ?? NoInfos;
+        public ContentCultureInfosCollection CultureInfos
+        {
+            get
+            {
+                if (_cultureInfos != null) return _cultureInfos;
+                _cultureInfos = new ContentCultureInfosCollection();
+                _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
+                return _cultureInfos;
+            }
+            set
+            {
+                if (_cultureInfos != null) _cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;
+                _cultureInfos = value;
+                if (_cultureInfos != null)
+                    _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
+            }
+        }
 
         /// <inheritdoc />
         public string GetCultureName(string culture)
@@ -182,7 +198,7 @@ namespace Umbraco.Core.Models
                 }
                 else // set
                 {
-                    SetCultureInfo(culture, name, DateTime.Now);
+                    this.SetCultureInfo(culture, name, DateTime.Now);
                 }
             }
             else // set on invariant content type
@@ -194,13 +210,13 @@ namespace Umbraco.Core.Models
             }
         }
 
-        protected void ClearCultureInfos()
+        private void ClearCultureInfos()
         {
             _cultureInfos?.Clear();
             _cultureInfos = null;
         }
 
-        protected void ClearCultureInfo(string culture)
+        private void ClearCultureInfo(string culture)
         {
             if (culture.IsNullOrWhiteSpace())
                 throw new ArgumentNullOrEmptyException(nameof(culture));
@@ -209,31 +225,6 @@ namespace Umbraco.Core.Models
             _cultureInfos.Remove(culture);
             if (_cultureInfos.Count == 0)
                 _cultureInfos = null;
-        }
-
-        /// <inheritdoc />
-        public void TouchCulture(string culture)
-        {
-            if (_cultureInfos == null || !_cultureInfos.TryGetValue(culture, out var infos)) return;
-            _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
-        }
-
-        // internal for repository
-        internal void SetCultureInfo(string culture, string name, DateTime date)
-        {
-            if (name.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(name));
-
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
-
-            if (_cultureInfos == null)
-            {
-                _cultureInfos = new ContentCultureInfosCollection();
-                _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
-            }
-
-            _cultureInfos.AddOrUpdate(culture, name, date);
         }
 
         /// <summary>
@@ -249,11 +240,11 @@ namespace Umbraco.Core.Models
         #region Has, Get, Set, Publish Property Value
 
         /// <inheritdoc />
-        public virtual bool HasProperty(string propertyTypeAlias)
+        public bool HasProperty(string propertyTypeAlias)
             => Properties.Contains(propertyTypeAlias);
 
         /// <inheritdoc />
-        public virtual object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
+        public object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
         {
             return Properties.TryGetValue(propertyTypeAlias, out var property)
                 ? property.GetValue(culture, segment, published)
@@ -261,7 +252,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
+        public TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
         {
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
@@ -271,7 +262,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
+        public void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
         {
             if (Properties.Contains(propertyTypeAlias))
             {
@@ -293,7 +284,7 @@ namespace Umbraco.Core.Models
         #region Copy
 
         /// <inheritdoc />
-        public virtual void CopyFrom(IContent other, string culture = "*")
+        public void CopyFrom(IContent other, string culture = "*")
         {
             if (other.ContentTypeId != ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
@@ -354,10 +345,11 @@ namespace Umbraco.Core.Models
             if (culture == null || culture == "*")
                 Name = other.Name;
 
-            foreach (var (otherCulture, otherInfos) in other.CultureInfos)
+            // ReSharper disable once UseDeconstruction
+            foreach (var cultureInfo in other.CultureInfos)
             {
-                if (culture == "*" || culture == otherCulture)
-                    SetCultureName(otherInfos.Name, otherCulture);
+                if (culture == "*" || culture == cultureInfo.Culture)
+                    SetCultureName(cultureInfo.Name, cultureInfo.Culture);
             }
         }
 
@@ -366,7 +358,7 @@ namespace Umbraco.Core.Models
         #region Validation
 
         /// <inheritdoc />
-        public virtual Property[] ValidateProperties(string culture = "*")
+        public Property[] ValidateProperties(string culture = "*")
         {
             // select invalid properties
             return Properties.Where(x =>

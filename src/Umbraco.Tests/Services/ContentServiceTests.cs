@@ -733,36 +733,29 @@ namespace Umbraco.Tests.Services
             content.PublishCulture(langFr.IsoCode);
             content.PublishCulture(langUk.IsoCode);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));    //not persisted yet, will be false
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsFalse(content.WasCulturePublished(langUk.IsoCode));    //not persisted yet, will be false
 
-            var published = ServiceContext.ContentService.SavePublishing(content);
+            var published = ServiceContext.ContentService.SaveAndPublish(content, new[]{ langFr.IsoCode , langUk.IsoCode });
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(published.Success);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
 
             var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             Assert.IsTrue(unpublished.Success);
             Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
-
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            //this is slightly confusing but this will be false because this method is used for checking the state of the current model,
-            //but the state on the model has changed with the above Unpublish call
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            //this is slightly confusing but this will be false because this method is used for checking the state of a current model,
-            //but we've re-fetched from the database
-            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
+            
 
         }
 
@@ -789,9 +782,8 @@ namespace Umbraco.Tests.Services
             IContent content = new Content("content", -1, contentType);
             content.SetCultureName("content-en", langGB.IsoCode);
             content.SetCultureName("content-fr", langFr.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content).Success);
+            
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content, new []{ langGB.IsoCode , langFr.IsoCode }).Success);
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
@@ -831,8 +823,7 @@ namespace Umbraco.Tests.Services
 
             IContent content = new Content("content", -1, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            var published = ServiceContext.ContentService.SavePublishing(content);
+            var published = ServiceContext.ContentService.SaveAndPublish(content, langFr.IsoCode);
             //audit log will only show that french was published
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: French (France)", lastLog.Comment);
@@ -840,8 +831,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             content.SetCultureName("content-en", langGB.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            published = ServiceContext.ContentService.SavePublishing(content);
+            published = ServiceContext.ContentService.SaveAndPublish(content, langGB.IsoCode);
             //audit log will only show that english was published
             lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: English (United Kingdom)", lastLog.Comment);
@@ -865,15 +855,12 @@ namespace Umbraco.Tests.Services
             IContent content = new Content("content", -1, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
             content.SetCultureName("content-gb", langGB.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
-            var published = ServiceContext.ContentService.SavePublishing(content);
+            var published = ServiceContext.ContentService.SaveAndPublish(content, new[] {langGB.IsoCode, langFr.IsoCode});
             Assert.IsTrue(published.Success);
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
-            content.UnpublishCulture(langFr.IsoCode); //unpublish non-mandatory lang
-            var unpublished = ServiceContext.ContentService.SavePublishing(content);
+            var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             //audit log will only show that french was unpublished
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Unpublished languages: French (France)", lastLog.Comment);
@@ -881,8 +868,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             content.SetCultureName("content-en", langGB.IsoCode);
-            content.UnpublishCulture(langGB.IsoCode); //unpublish mandatory lang
-            unpublished = ServiceContext.ContentService.SavePublishing(content);
+            unpublished = ServiceContext.ContentService.Unpublish(content, langGB.IsoCode);
             //audit log will only show that english was published
             var logs = ServiceContext.AuditService.GetLogs(content.Id).ToList();
             Assert.AreEqual($"Unpublished languages: English (United Kingdom)", logs[logs.Count - 2].Comment);
@@ -897,8 +883,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(published.Success, Is.True);
@@ -952,8 +937,7 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("Home", content.Name);
 
                 content.Name = "foo";
-                content.PublishCulture();
-                var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+                var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
                 Assert.That(published.Success, Is.True);
                 Assert.That(content.Published, Is.True);
@@ -1000,10 +984,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(parentPublished.Success);
             Assert.IsTrue(parent.Published);
 
-            var contentCanPublishValues = content.PublishCulture();
-
             // content cannot publish values because they are invalid
-            Assert.IsFalse(contentCanPublishValues);
             Assert.IsNotEmpty(content.ValidateProperties());
 
             // and therefore cannot be published,
@@ -1017,6 +998,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
         {
+            //TODO: This is using an internal API - we aren't exposing this publicly (at least for now) but we'll keep the test around
+
             var langFr = new Language("fr");
             var langDa = new Language("da");
             ServiceContext.LocalizationService.Save(langFr);
@@ -1031,7 +1014,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("name-da", langDa.IsoCode);
 
             content.PublishCulture(langFr.IsoCode);
-            var result = ServiceContext.ContentService.SavePublishing(content);
+            var result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -1040,7 +1023,7 @@ namespace Umbraco.Tests.Services
             content.UnpublishCulture(langFr.IsoCode);
             content.PublishCulture(langDa.IsoCode);
 
-            result = ServiceContext.ContentService.SavePublishing(content);
+            result = ((ContentService)ServiceContext.ContentService).CommitDocumentChanges(content);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
 
@@ -1119,12 +1102,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishCulture();
-            var parentPublished = contentService.SavePublishing(parent, Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            var parentPublished = contentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(parentPublished.Success, Is.True);
@@ -1162,12 +1143,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, Constants.Security.SuperUserId);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishCulture();
-            var parentPublished = contentService.SavePublishing(parent, Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            var parentPublished = contentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(parentPublished.Success, Is.True);
@@ -1219,8 +1198,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(published.Success, Is.False);
@@ -1237,8 +1215,7 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
@@ -1262,15 +1239,13 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.PublishCulture();
-            var published = contentService.SavePublishing(content, Constants.Security.SuperUserId);
+            var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
             var childContent = contentService.Create("Child", content.Id, "umbTextpage", Constants.Security.SuperUserId);
             // Reset all identity properties
             childContent.Id = 0;
             childContent.Path = null;
             ((Content)childContent).ResetIdentity();
-            childContent.PublishCulture();
-            var childPublished = contentService.SavePublishing(childContent, Constants.Security.SuperUserId);
+            var childPublished = contentService.SaveAndPublish(childContent, userId: Constants.Security.SuperUserId);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
@@ -1609,14 +1584,12 @@ namespace Umbraco.Tests.Services
             content1.PropertyValues(obj);
             content1.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content1, Constants.Security.SuperUserId);
-            content1.PublishCulture();
-            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content1, 0).Success);
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content1, userId: 0).Success);
             var content2 = MockedContent.CreateBasicContent(contentType);
             content2.PropertyValues(obj);
             content2.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content2, Constants.Security.SuperUserId);
-            content2.PublishCulture();
-            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content2, 0).Success);
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, userId: 0).Success);
 
             var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
             editorGroup.StartContentId = content1.Id;
@@ -2691,9 +2664,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishCulture(langFr.IsoCode);
-            content.PublishCulture(langUk.IsoCode);
-            contentService.SavePublishing(content);
+            contentService.SaveAndPublish(content, new[]{ langFr.IsoCode, langUk.IsoCode });
 
             // both FR and UK have been published,
             // and content has been published,
@@ -2797,8 +2768,7 @@ namespace Umbraco.Tests.Services
             // act
             // cannot just 'save' since we are changing what's published!
 
-            content.UnpublishCulture(langFr.IsoCode);
-            contentService.SavePublishing(content);
+            contentService.Unpublish(content, langFr.IsoCode);
 
             // content has been published,
             // the french culture is gone
@@ -2888,8 +2858,10 @@ namespace Umbraco.Tests.Services
             // act
 
             // that HAS to be SavePublishing, because SaveAndPublish would just republish everything!
-
-            contentService.SavePublishing(content);
+            //TODO: This is using an internal API - the test can't pass without this but we want to keep the test here
+            // will need stephane to have a look at this test at some stage since there is a lot of logic here that we
+            // want to keep on testing but don't need the public API to do these more complicated things.
+            ((ContentService)contentService).CommitDocumentChanges(content);
 
             // content has been re-published,
             // everything is back to what it was before being unpublished
@@ -2929,8 +2901,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishCulture(langUk.IsoCode);
-            contentService.SavePublishing(content);
+            contentService.SaveAndPublish(content, langUk.IsoCode);
 
             content2 = contentService.GetById(content.Id);
 
