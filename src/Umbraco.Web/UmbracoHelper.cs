@@ -24,11 +24,14 @@ namespace Umbraco.Web
     {
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
-        private readonly UmbracoContext _umbracoContext;
-        private IPublishedContent _currentPage;
-        
+        private readonly IPublishedContentQuery _publishedContentQuery;
+        private readonly ITagQuery _tagQuery;
+        private readonly MembershipHelper _membershipHelper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
+        private readonly UmbracoContext _umbracoContext;
+
+        private IPublishedContent _currentPage;
         private ICultureDictionary _cultureDictionary;
 
         #region Constructors
@@ -50,11 +53,11 @@ namespace Umbraco.Web
             MembershipHelper membershipHelper)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            TagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
+            _tagQuery = tagQuery ?? throw new ArgumentNullException(nameof(tagQuery));
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
-            MembershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
-            ContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
+            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
+            _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
 
             if (_umbracoContext.IsFrontEndUmbracoRequest)
                 _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
@@ -69,25 +72,32 @@ namespace Umbraco.Web
 
         #endregion
 
+        // ensures that we can return the specified value
+        T Ensure<T>(T o) where T : class => o ?? throw new InvalidOperationException(""); // fixme
+
+        private IUmbracoComponentRenderer ComponentRenderer => Ensure(_componentRenderer);
+        private ICultureDictionaryFactory CultureDictionaryFactory => Ensure(_cultureDictionaryFactory);
+        private UmbracoContext UmbracoContext => Ensure(_umbracoContext);
+
         /// <summary>
         /// Gets the tag context.
         /// </summary>
-        public ITagQuery TagQuery { get; }
+        public ITagQuery TagQuery => Ensure(_tagQuery);
 
         /// <summary>
         /// Gets the query context.
         /// </summary>
-        public IPublishedContentQuery ContentQuery { get; }
-        
+        public IPublishedContentQuery ContentQuery => Ensure(_publishedContentQuery);
+
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
-        public MembershipHelper MembershipHelper { get; }
+        public MembershipHelper MembershipHelper => Ensure(_membershipHelper);
 
         /// <summary>
         /// Gets the url provider.
         /// </summary>
-        public UrlProvider UrlProvider => _umbracoContext.UrlProvider;
+        public UrlProvider UrlProvider => UmbracoContext.UrlProvider;
 
         /// <summary>
         /// Gets (or sets) the current <see cref="IPublishedContent"/> item assigned to the UmbracoHelper.
@@ -134,7 +144,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderTemplate(int contentId, int? altTemplateId = null)
         {
-            return _componentRenderer.RenderTemplate(contentId, altTemplateId);
+            return ComponentRenderer.RenderTemplate(contentId, altTemplateId);
         }
 
         #region RenderMacro
@@ -146,7 +156,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, new { });
+            return ComponentRenderer.RenderMacro(UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, new { });
         }
 
         /// <summary>
@@ -157,7 +167,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, object parameters)
         {
-            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters.ToDictionary<object>());
+            return ComponentRenderer.RenderMacro(UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters.ToDictionary<object>());
         }
 
         /// <summary>
@@ -168,7 +178,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return _componentRenderer.RenderMacro(_umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters);
+            return ComponentRenderer.RenderMacro(UmbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0, alias, parameters);
         }
 
         #endregion
@@ -205,7 +215,7 @@ namespace Umbraco.Web
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
         public ICultureDictionary CultureDictionary => _cultureDictionary
-            ?? (_cultureDictionary = _cultureDictionaryFactory.CreateDictionary());
+            ?? (_cultureDictionary = CultureDictionaryFactory.CreateDictionary());
 
         #endregion
 
