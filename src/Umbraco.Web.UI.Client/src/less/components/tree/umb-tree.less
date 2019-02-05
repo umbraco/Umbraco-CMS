@@ -218,17 +218,24 @@ body.touch .umb-tree {
 
 // Tree item states
 // -------------------------
-.not-published {
-    > i.icon,
-    a {
-        opacity: 0.6;
+.umb-tree-item {
+    &.not-published {
+        > .umb-tree-item__inner {
+            > i.icon,
+            > a {
+                opacity: 0.6;
+            }
+        }
     }
-}
 
-.not-allowed {
-    > i.icon,
-    a {
-        cursor: not-allowed;
+    &.not-allowed {
+        > .umb-tree-item__inner {
+            > i.icon,
+            > a {
+                cursor: not-allowed;
+                opacity: 0.6;
+            }
+        }
     }
 }
 
