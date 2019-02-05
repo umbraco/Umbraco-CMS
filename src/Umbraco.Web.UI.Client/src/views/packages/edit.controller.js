@@ -236,9 +236,7 @@
                 entityType: "file",
                 onlyInitialized: false,
                 filter: function (i) {
-                    if (i.name.indexOf(".cshtml") === -1 &&
-                        i.name.indexOf(".vbhtml") === -1 &&
-                        i.name.indexOf(".html") === -1 &&
+                    if (i.name.indexOf(".html") === -1 &&
                         i.name.indexOf(".htm") === -1) {
                         return true;
                     }
