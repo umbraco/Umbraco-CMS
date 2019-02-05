@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models
+﻿using System;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Implements <see cref="ISimpleContentType"/>.
@@ -10,6 +12,9 @@
         /// </summary>
         public SimpleContentType(IContentType contentType)
         {
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+
+
             Id = contentType.Id;
             Alias = contentType.Alias;
             DefaultTemplate = contentType.DefaultTemplate;
@@ -20,6 +25,42 @@
             Name = contentType.Name;
             AllowedAsRoot = contentType.AllowedAsRoot;
             IsElement = contentType.IsElement;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleContentType"/> class.
+        /// </summary>
+        public SimpleContentType(IMediaType mediaType)
+        {
+            if (mediaType == null) throw new ArgumentNullException(nameof(mediaType));
+
+            Id = mediaType.Id;
+            Alias = mediaType.Alias;
+            Variations = mediaType.Variations;
+            Icon = mediaType.Icon;
+            IsContainer = mediaType.IsContainer;
+            Icon = mediaType.Icon;
+            Name = mediaType.Name;
+            AllowedAsRoot = mediaType.AllowedAsRoot;
+            IsElement = mediaType.IsElement;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleContentType"/> class.
+        /// </summary>
+        public SimpleContentType(IMemberType memberType)
+        {
+            if (memberType == null) throw new ArgumentNullException(nameof(memberType));
+
+            Id = memberType.Id;
+            Alias = memberType.Alias;
+            Variations = memberType.Variations;
+            Icon = memberType.Icon;
+            IsContainer = memberType.IsContainer;
+            Icon = memberType.Icon;
+            Name = memberType.Name;
+            AllowedAsRoot = memberType.AllowedAsRoot;
+            IsElement = memberType.IsElement;
         }
 
         /// <inheritdoc />

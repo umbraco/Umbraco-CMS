@@ -543,14 +543,12 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
             contentType.PropertyGroups.Add(new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 });
 
             // Assert
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(3));
-            Assert.That(content.PropertyGroups.Count(), Is.EqualTo(3));
         }
 
         [Test]
@@ -573,7 +571,6 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
             contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "subtitle")
@@ -587,7 +584,6 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.That(contentType.PropertyGroups["Content"].PropertyTypes.Count, Is.EqualTo(3));
-            Assert.That(content.PropertyGroups.First(x => x.Name == "Content").PropertyTypes.Count, Is.EqualTo(3));
         }
 
         [Test]
@@ -637,8 +633,6 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.That(content.Properties.Count, Is.EqualTo(5));
-            Assert.That(content.PropertyTypes.Count(), Is.EqualTo(5));
-            Assert.That(content.PropertyGroups.Count(), Is.EqualTo(3));
             Assert.That(content.Properties["subtitle"].GetValue(), Is.EqualTo("Subtitle Test"));
             Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
         }
@@ -676,8 +670,6 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.That(content.Properties.Contains("author"), Is.True);
-            Assert.That(content.PropertyGroups.Count(), Is.EqualTo(1));
-            Assert.That(content.PropertyTypes.Count(), Is.EqualTo(3));
             //Note: There was 4 properties, after changing ContentType 1 has been added (no properties are deleted)
             Assert.That(content.Properties.Count, Is.EqualTo(5));
         }

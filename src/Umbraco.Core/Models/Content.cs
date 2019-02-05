@@ -45,7 +45,6 @@ namespace Umbraco.Core.Models
             : base(name, parent, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
-            ContentType = new SimpleContentType(contentType);
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -73,7 +72,6 @@ namespace Umbraco.Core.Models
             : base(name, parentId, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
-            ContentType = new SimpleContentType(contentType);
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -165,12 +163,6 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public bool Edited { get; internal set; }
 
-        /// <summary>
-        /// Gets the ContentType used by this content object
-        /// </summary>
-        [IgnoreDataMember]
-        public ISimpleContentType ContentType { get; private set; }
-
         /// <inheritdoc />
         [IgnoreDataMember]
         public DateTime? PublishDate { get; internal set; } // set by persistence
@@ -241,7 +233,7 @@ namespace Umbraco.Core.Models
         public string GetPublishName(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return PublishName;
-            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (!ContentType.VariesByCulture()) return null;
             if (_publishInfos == null) return null;
             return _publishInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
@@ -250,7 +242,7 @@ namespace Umbraco.Core.Models
         public DateTime? GetPublishDate(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return PublishDate;
-            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (!ContentType.VariesByCulture()) return null;
             if (_publishInfos == null) return null;
             return _publishInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
         }
@@ -410,13 +402,7 @@ namespace Umbraco.Core.Models
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
         public void ChangeContentType(IContentType contentType)
         {
-            ContentTypeId = contentType.Id;
-            ContentType = new SimpleContentType(contentType);
-            ContentTypeBase = contentType;
-            Properties.EnsurePropertyTypes(PropertyTypes);
-
-            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
-            Properties.CollectionChanged += PropertiesChanged;
+            ChangeContentType(contentType, false);
         }
 
         /// <summary>
@@ -427,19 +413,15 @@ namespace Umbraco.Core.Models
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
         public void ChangeContentType(IContentType contentType, bool clearProperties)
         {
-            if(clearProperties)
-            {
-                ContentTypeId = contentType.Id;
-                ContentType = new SimpleContentType(contentType);
-                ContentTypeBase = contentType;
-                Properties.EnsureCleanPropertyTypes(PropertyTypes);
+            ChangeContentType(new SimpleContentType(contentType));
 
-                Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
-                Properties.CollectionChanged += PropertiesChanged;
-                return;
-            }
+            if (clearProperties)
+                Properties.EnsureCleanPropertyTypes(contentType.CompositionPropertyTypes);
+            else
+                Properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
 
-            ChangeContentType(contentType);
+            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
+            Properties.CollectionChanged += PropertiesChanged;
         }
 
         public override void ResetDirtyProperties(bool rememberDirty)
@@ -483,9 +465,6 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedContent = (Content)clone;
-
-            //need to manually clone this since it's not settable
-            clonedContent.ContentType = ContentType;
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._publishInfos != null)

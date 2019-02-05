@@ -67,11 +67,6 @@ namespace Umbraco.Core.Models
         DateTime? PublishDate { get; }
 
         /// <summary>
-        /// Gets the content type of this content.
-        /// </summary>
-        ISimpleContentType ContentType { get; }
-
-        /// <summary>
         /// Gets a value indicating whether a culture is published.
         /// </summary>
         /// <remarks>

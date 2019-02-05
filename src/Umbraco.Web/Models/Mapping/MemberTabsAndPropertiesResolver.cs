@@ -25,16 +25,18 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService)
+        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService)
             : base(localizedTextService)
         {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
-            _localizedTextService = localizedTextService ?? throw new System.ArgumentNullException(nameof(localizedTextService));
-            _memberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
-            _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         }
 
         /// <inheritdoc />
@@ -43,7 +45,9 @@ namespace Umbraco.Web.Models.Mapping
         {
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
-            IgnoreProperties = source.PropertyTypes
+            var memberType = _memberTypeService.Get(source.ContentTypeId);
+
+            IgnoreProperties = memberType.CompositionPropertyTypes
                 .Where(x => x.HasIdentity == false)
                 .Select(x => x.Alias)
                 .ToArray();
@@ -176,7 +180,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var result = base.MapProperties(content, properties, context);
             var member = (IMember)content;
-            var memberType = member.ContentType;
+            var memberType = _memberTypeService.Get(member.ContentTypeId);
 
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 

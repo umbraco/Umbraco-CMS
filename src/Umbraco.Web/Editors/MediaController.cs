@@ -887,7 +887,8 @@ namespace Umbraco.Web.Editors
                 }
 
                 //check if the item is allowed under this one
-                if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                var parentContentType = Services.MediaTypeService.Get(parent.ContentTypeId);
+                if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     var notificationModel = new SimpleNotificationModel();

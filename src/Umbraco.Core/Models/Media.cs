@@ -10,8 +10,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Media : ContentBase, IMedia
     {
-        private IMediaType _contentType;
-
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
@@ -31,9 +29,7 @@ namespace Umbraco.Core.Models
         /// <param name="properties">Collection of properties</param>
         public Media(string name, IMedia parent, IMediaType contentType, PropertyCollection properties)
             : base(name, parent, contentType, properties)
-        {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-        }
+        { }
 
         /// <summary>
         /// Constructor for creating a Media object
@@ -54,15 +50,7 @@ namespace Umbraco.Core.Models
         /// <param name="properties">Collection of properties</param>
         public Media(string name, int parentId, IMediaType contentType, PropertyCollection properties)
             : base(name, parentId, contentType, properties)
-        {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-        }
-
-        /// <summary>
-        /// Gets the ContentType used by this Media object
-        /// </summary>
-        [IgnoreDataMember]
-        public IMediaType ContentType => _contentType;
+        { }
 
         /// <summary>
         /// Changes the <see cref="IMediaType"/> for the current Media object
@@ -71,13 +59,7 @@ namespace Umbraco.Core.Models
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
         public void ChangeContentType(IMediaType contentType)
         {
-            ContentTypeId = contentType.Id;
-            _contentType = contentType;
-            ContentTypeBase = contentType;
-            Properties.EnsurePropertyTypes(PropertyTypes);
-            
-            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
-            Properties.CollectionChanged += PropertiesChanged;
+            ChangeContentType(contentType, false);
         }
 
         /// <summary>
@@ -88,19 +70,15 @@ namespace Umbraco.Core.Models
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
         public void ChangeContentType(IMediaType contentType, bool clearProperties)
         {
+            ChangeContentType(new SimpleContentType(contentType));
+
             if (clearProperties)
-            {
-                ContentTypeId = contentType.Id;
-                _contentType = contentType;
-                ContentTypeBase = contentType;
-                Properties.EnsureCleanPropertyTypes(PropertyTypes);
+                Properties.EnsureCleanPropertyTypes(contentType.CompositionPropertyTypes);
+            else
+                Properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
 
-                Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
-                Properties.CollectionChanged += PropertiesChanged;
-                return;
-            }
-
-            ChangeContentType(contentType);
+            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
+            Properties.CollectionChanged += PropertiesChanged;
         }
 
         /// <summary>

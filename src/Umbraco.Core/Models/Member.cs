@@ -15,8 +15,6 @@ namespace Umbraco.Core.Models
     public class Member : ContentBase, IMember
     {
         private IDictionary<string, object> _additionalData;
-        private IMemberType _contentType;
-        private readonly string _contentTypeAlias;
         private string _username;
         private string _email;
         private string _rawPasswordValue;
@@ -29,8 +27,6 @@ namespace Umbraco.Core.Models
         public Member(IMemberType contentType)
             : base("", -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -49,8 +45,6 @@ namespace Umbraco.Core.Models
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
 
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -73,8 +67,6 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
 
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             _email = email;
             _username = username;
             IsApproved = isApproved;
@@ -96,9 +88,6 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
-
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
@@ -119,8 +108,6 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
@@ -473,7 +460,7 @@ namespace Umbraco.Core.Models
         /// String alias of the default ContentType
         /// </summary>
         [DataMember]
-        public virtual string ContentTypeAlias => _contentTypeAlias;
+        public virtual string ContentTypeAlias => ContentType.Alias;
 
         /// <summary>
         /// User key from the Provider.
@@ -503,12 +490,6 @@ namespace Umbraco.Core.Models
             if (ProviderUserKey == null)
                 ProviderUserKey = Key;
         }
-
-        /// <summary>
-        /// Gets the ContentType used by this content object
-        /// </summary>
-        [IgnoreDataMember]
-        public IMemberType ContentType => _contentType;
 
         /* Internal experiment - only used for mapping queries.
          * Adding these to have first level properties instead of the Properties collection.
@@ -573,17 +554,6 @@ namespace Umbraco.Core.Models
             }
 
             return true;
-        }
-
-        protected override void PerformDeepClone(object clone)
-        {
-            base.PerformDeepClone(clone);
-
-            var clonedEntity = (Member)clone;
-
-            //need to manually clone this since it's not settable
-            clonedEntity._contentType = (IMemberType)ContentType.DeepClone();
-            
         }
 
         /// <inheritdoc />

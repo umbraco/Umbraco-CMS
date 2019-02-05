@@ -2,6 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -15,7 +16,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static string GetUrl(this IMedia media, string propertyAlias, ILogger logger)
         {
-            var propertyType = media.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
+            var contentType = Current.Services.MediaTypeService.Get(media.ContentTypeId);
+            var propertyType = contentType.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
             if (propertyType == null) return string.Empty;
 
             var val = media.Properties[propertyType];

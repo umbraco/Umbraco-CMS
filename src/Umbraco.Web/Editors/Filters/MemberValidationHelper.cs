@@ -7,6 +7,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -117,8 +118,9 @@ namespace Umbraco.Web.Editors.Filters
             //if a sensitive value is being submitted.
             if (UmbracoContextAccessor.UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
             {
-                var sensitiveProperties = model.PersistedContent.ContentType
-                    .PropertyTypes.Where(x => model.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                var contentType = Current.Services.MemberTypeService.Get(model.PersistedContent.ContentTypeId);
+                var sensitiveProperties = contentType
+                    .PropertyTypes.Where(x => contentType.IsSensitiveProperty(x.Alias))
                     .ToList();
 
                 foreach (var sensitiveProperty in sensitiveProperties)

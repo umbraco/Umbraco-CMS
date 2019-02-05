@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
@@ -20,7 +21,6 @@ namespace Umbraco.Core.Models
         protected static readonly ContentCultureInfosCollection NoInfos = new ContentCultureInfosCollection();
 
         private int _contentTypeId;
-        protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
         private ContentCultureInfosCollection _cultureInfos;
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Models
 
         private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
         {
-            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
             // initially, all new instances have
             Id = 0; // no identity
@@ -57,7 +57,16 @@ namespace Umbraco.Core.Models
 
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
-            _properties.EnsurePropertyTypes(PropertyTypes);
+            _properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
+        }
+
+        [IgnoreDataMember]
+        public ISimpleContentType ContentType { get; private set; }
+
+        protected void ChangeContentType(ISimpleContentType contentType)
+        {
+            ContentType = contentType;
+            ContentTypeId = contentType.Id;
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -88,13 +97,13 @@ namespace Umbraco.Core.Models
             {
                 //There will be cases where this has not been updated to reflect the true content type ID.
                 //This will occur when inserting new content.
-                if (_contentTypeId == 0 && ContentTypeBase != null && ContentTypeBase.HasIdentity)
+                if (_contentTypeId == 0 && ContentType != null)
                 {
-                    _contentTypeId = ContentTypeBase.Id;
+                    _contentTypeId = ContentType.Id;
                 }
                 return _contentTypeId;
             }
-            protected set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, nameof(ContentTypeId));
+            private set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, nameof(ContentTypeId));
         }
 
         /// <summary>
@@ -114,20 +123,6 @@ namespace Umbraco.Core.Models
                 _properties.CollectionChanged += PropertiesChanged;
             }
         }
-
-        /// <summary>
-        /// Gets the enumeration of property groups for the entity.
-        /// TODO: remove this proxy method
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
-
-        /// <summary>
-        /// Gets the numeration of property types for the entity.
-        /// TODO: remove this proxy method
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
 
         #region Cultures
 
@@ -153,7 +148,7 @@ namespace Umbraco.Core.Models
         public string GetCultureName(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return Name;
-            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (!ContentType.VariesByCulture()) return null;
             if (_cultureInfos == null) return null;
             return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
@@ -162,7 +157,7 @@ namespace Umbraco.Core.Models
         public DateTime? GetUpdateDate(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return null;
-            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (!ContentType.VariesByCulture()) return null;
             if (_cultureInfos == null) return null;
             return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
         }
@@ -170,7 +165,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public void SetCultureName(string name, string culture)
         {
-            if (ContentTypeBase.VariesByCulture()) // set on variant content type
+            if (ContentType.VariesByCulture()) // set on variant content type
             {
                 if (culture.IsNullOrWhiteSpace()) // invariant is ok
                 {
@@ -278,7 +273,8 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            var propertyTypes = Current.Services.ContentTypeBaseServices.GetContentTypeOf(this).CompositionPropertyTypes;
+            var propertyType = propertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
                 throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
@@ -302,8 +298,8 @@ namespace Umbraco.Core.Models
             // the variation should be supported by the content type properties
             //  if the content type is invariant, only '*' and 'null' is ok
             //  if the content type varies, everything is ok because some properties may be invariant
-            if (!ContentTypeBase.SupportsPropertyVariation(culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentTypeBase.Alias}\" with variation \"{ContentTypeBase.Variations}\".");
+            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
 
             // copying from the same Id and VersionPk
             var copyingFromSelf = Id == other.Id && VersionId == other.VersionId;
@@ -489,6 +485,9 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedContent = (ContentBase)clone;
+
+            //need to manually clone this since it's not settable
+            clonedContent.ContentType = ContentType;
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._cultureInfos != null)

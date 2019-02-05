@@ -202,8 +202,8 @@ namespace Umbraco.Web.Macros
                 CreatorName = _inner.GetCreatorProfile().Name;
                 WriterName = _inner.GetWriterProfile().Name;
 
-                var contentTypeService = Current.Services.ContentTypeBaseServices.For(_inner);
-                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentTypeService.Get(_inner.ContentTypeId));
+                var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
+                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
 
                 _properties = ContentType.PropertyTypes
                     .Select(x =>
