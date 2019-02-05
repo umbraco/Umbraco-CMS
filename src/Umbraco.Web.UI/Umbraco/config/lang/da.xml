@@ -1283,6 +1283,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
     <key alias="editParameter">Rediger parameter</key>
+    <key alias="enterMacroName">Indtast makronavn</key>
     <key alias="parameters">Parametre</key>
     <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
   </area>

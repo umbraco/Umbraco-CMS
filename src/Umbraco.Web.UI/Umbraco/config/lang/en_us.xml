@@ -488,8 +488,8 @@
     <key alias="enterMessage">Enter a message...</key>
     <key alias="usernameHint">Your username is usually your email</key>
     <key alias="anchor">#value or ?key=value</key>
-        <key alias="enterAlias">Enter alias...</key>
-        <key alias="generatingAlias">Generating alias...</key>
+    <key alias="enterAlias">Enter alias...</key>
+    <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child node types</key>
@@ -1575,6 +1575,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
     <key alias="editParameter">Edit parameter</key>
+    <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
   </area>
