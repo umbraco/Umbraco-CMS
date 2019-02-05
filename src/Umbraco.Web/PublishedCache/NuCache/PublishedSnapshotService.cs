@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Web;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -140,8 +142,33 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (registered)
                 {
-                    var localContentDbPath = IOHelper.MapPath("~/App_Data/NuCache.Content.db");
-                    var localMediaDbPath = IOHelper.MapPath("~/App_Data/NuCache.Media.db");
+                    string path;
+                    var tempLocation = globalSettings.LocalTempStorageLocation;
+                    switch (tempLocation)
+                    {
+                        case LocalTempStorage.AspNetTemp:
+                            path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "NuCache");
+                            break;
+                        case LocalTempStorage.EnvironmentTemp:
+                            // TODO: why has this to be repeated everywhere?!
+                            // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                            // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                            var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
+                            path = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash, "NuCache");
+                            break;
+                        //case LocalTempStorage.Default:
+                        //case LocalTempStorage.Unknown:
+                        default:
+                            path = IOHelper.MapPath("~/App_Data/TEMP/NuCache");
+                            break;
+                    }
+
+                    if (!Directory.Exists(path))
+                        Directory.CreateDirectory(path);
+
+                    var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+                    var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
 
                     // if both local databases exist then GetTree will open them, else new databases will be created
