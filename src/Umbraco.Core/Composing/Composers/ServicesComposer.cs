@@ -99,7 +99,6 @@ namespace Umbraco.Core.Composing.Composers
                 : appPlugins.GetDirectories()
                     .SelectMany(x => x.GetDirectories("Lang"))
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
-                    .Where(x => Path.GetFileNameWithoutExtension(x.FullName).Length == 5)
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
 
             //user defined langs that overwrite the default, these should not be used by plugin creators
@@ -107,7 +106,6 @@ namespace Umbraco.Core.Composing.Composers
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : configLangFolder
                     .GetFiles("*.user.xml", SearchOption.TopDirectoryOnly)
-                    .Where(x => Path.GetFileNameWithoutExtension(x.FullName).Length == 10)
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
             return new LocalizedTextServiceFileSources(
