@@ -185,10 +185,10 @@ namespace Umbraco.Core.Services.Implement
                 var found = _supplementFileSources.Where(x =>
                 {
                     var extension = Path.GetExtension(x.File.FullName);
-                    var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(x.File.FullName);
+                    var fileCultureName = Path.GetFileNameWithoutExtension(x.File.FullName).Replace("_", "-").Replace(".user", "");
                     return extension.InvariantEquals(".xml") && (
-                        fileNameWithoutExtension.Replace("_", "-").InvariantEquals(culture.Name)
-                        || fileNameWithoutExtension.InvariantEquals(culture.TwoLetterISOLanguageName)
+                        fileCultureName.InvariantEquals(culture.Name)
+                        || fileCultureName.InvariantEquals(culture.TwoLetterISOLanguageName)
                     );
                 });
 
