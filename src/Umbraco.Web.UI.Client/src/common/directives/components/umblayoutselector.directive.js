@@ -10,7 +10,7 @@
             bindings: {
                 layouts: '<',
                 activeLayout: '<',
-                onLayoutSelect: "&"
+                onLayoutSelect: '&'
             }
         });
 
