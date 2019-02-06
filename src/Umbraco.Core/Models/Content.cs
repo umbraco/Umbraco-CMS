@@ -357,7 +357,7 @@ namespace Umbraco.Core.Models
 
             if (rememberDirty)
             {
-
+                //fixme if it's empty don't allocate
                 _previousPublishCultureChanges.addedCultures = _currentPublishCultureChanges.addedCultures == null ? null : new HashSet<string>(_currentPublishCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
                 _previousPublishCultureChanges.removedCultures = _currentPublishCultureChanges.removedCultures == null ? null : new HashSet<string>(_currentPublishCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
                 _previousPublishCultureChanges.updatedCultures = _currentPublishCultureChanges.updatedCultures == null ? null : new HashSet<string>(_currentPublishCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
@@ -451,6 +451,8 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedContent = (Content)clone;
+
+            //fixme - need to reset change tracking bits
 
             //need to manually clone this since it's not settable
             clonedContent.ContentType = ContentType;

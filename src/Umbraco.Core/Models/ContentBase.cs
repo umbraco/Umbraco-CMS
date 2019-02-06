@@ -473,6 +473,8 @@ namespace Umbraco.Core.Models
 
             var clonedContent = (ContentBase)clone;
 
+            //fixme - need to reset change tracking bits
+
             //if culture infos exist then deal with event bindings
             if (clonedContent._cultureInfos != null)
             {
