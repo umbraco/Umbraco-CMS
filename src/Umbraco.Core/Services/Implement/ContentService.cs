@@ -908,8 +908,9 @@ namespace Umbraco.Core.Services.Implement
                     : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
 
+            // TODO: currently, no way to know which one failed
             if (cultures.Select(content.PublishCulture).Any(isValid => !isValid))
-                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content); //fixme: no way to know which one failed?
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
             return CommitDocumentChanges(content, userId, raiseEvents);
         }
@@ -1055,9 +1056,10 @@ namespace Umbraco.Core.Services.Implement
                     }
 
                     // reset published state from temp values (publishing, unpublishing) to original value
-                    // (published, unpublished) in order to save the document, unchanged
-                    //TODO: why? this seems odd, were just setting the exact same value that it already has
-                    // instead do we want to just set the PublishState?
+                    // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
+                    // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
+                    // PublishState to anything other than Publishing or Unpublishing - which is precisely
+                    // what we want to do here - throws
                     content.Published = content.Published; 
                 }
             }
@@ -1080,9 +1082,10 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         // reset published state from temp values (publishing, unpublishing) to original value
-                        // (published, unpublished) in order to save the document, unchanged
-                        //TODO: why? this seems odd, were just setting the exact same value that it already has
-                        // instead do we want to just set the PublishState?
+                        // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
+                        // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
+                        // PublishState to anything other than Publishing or Unpublishing - which is precisely
+                        // what we want to do here - throws
                         content.Published = content.Published;
                     }
                 }
@@ -1507,9 +1510,8 @@ namespace Umbraco.Core.Services.Implement
                 Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 // trigger events for the entire branch
+                // (SaveAndPublishBranchOne does *not* do it)
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
-
-                //fixme - in the SaveAndPublishBranchOne -> CommitDocumentChangesInternal publishing/published is going to be raised there, so are we raising it 2x for the same thing?
                 scope.Events.Dispatch(Published, this, new ContentPublishedEventArgs(publishedDocuments, false, evtMsgs), nameof(Published));
 
                 scope.Complete();

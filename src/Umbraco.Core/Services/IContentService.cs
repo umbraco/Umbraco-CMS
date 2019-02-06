@@ -341,11 +341,10 @@ namespace Umbraco.Core.Services
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
         /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
         /// </remarks>
-        /// <param name="content"></param>
-        /// <param name="culture"></param>
-        /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
-        /// <returns></returns>
+        /// <param name="content">The document to publish.</param>
+        /// <param name="culture">The culture to publish.</param>
+        /// <param name="userId">The identifier of the user performing the action.</param>
+        /// <param name="raiseEvents">A value indicating whether to raise events.</param>
         PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -356,11 +355,10 @@ namespace Umbraco.Core.Services
         /// <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
         /// <para>The document is *always* saved, even when publishing fails.</para>
         /// </remarks>
-        /// <param name="content"></param>
+        /// <param name="content">The document to publish.</param>
         /// <param name="cultures">The cultures to publish.</param>
-        /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
-        /// <returns></returns>
+        /// <param name="userId">The identifier of the user performing the action.</param>
+        /// <param name="raiseEvents">A value indicating whether to raise events.</param>
         PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true);
 
         /// <summary>

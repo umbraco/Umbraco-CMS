@@ -302,6 +302,7 @@
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
+    <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
     <Compile Include="Events\ContentSavedEventArgs.cs" />
