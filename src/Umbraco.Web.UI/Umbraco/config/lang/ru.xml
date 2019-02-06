@@ -1344,7 +1344,6 @@
     <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
     <key alias="contentTypeUses">Данный тип контента использует</key>
     <key alias="defaulttemplate">Шаблон по-умолчанию</key>
-    <key alias="dictionary editor egenskab">Словарная статья</key>
     <key alias="importDocumentTypeHelp">Чтобы импортировать тип документа, найдите файл ".udt" на своем компьютере, нажав на кнопку "Обзор", затем нажмите "Импортировать" (на следующем экране будет запрошено подтверждение для этой операции).</key>
     <key alias="newtabname">Заголовок новой вкладки</key>
     <key alias="nodetype">Тип узла (документа)</key>
@@ -1352,7 +1351,6 @@
     <key alias="objecttype">Тип</key>
     <key alias="script">Скрипт</key>
     <key alias="stylesheet">Стили CSS</key>
-    <key alias="stylesheet editor egenskab">Правило стиля CSS</key>
     <key alias="tab">Вкладка</key>
     <key alias="tabname">Заголовок вкладки</key>
     <key alias="tabs">Вкладки</key>
