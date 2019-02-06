@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             where TPropertyTypeBasic : PropertyTypeBasic
         {
             return mapping
-                .ConstructUsing(x => new PropertyGroup(false)) // TODO: we have NO idea of isPublishing here = wtf?
+                .ConstructUsing(x => new PropertyGroup(false)) // TODO: we have NO idea of isPublishing here = so what?
                 .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(src => src.Id > 0))
                 .ForMember(dest => dest.Key, map => map.Ignore())

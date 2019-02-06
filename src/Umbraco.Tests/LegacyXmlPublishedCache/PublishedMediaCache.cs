@@ -587,7 +587,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             {
                 int id;
                 if (int.TryParse(itemm.GetAttribute("id", ""), out id) == false)
-                    continue; // wtf?
+                    continue; // uh?
                 var captured = itemm;
                 var cacheValues = GetCacheValues(id, idd => ConvertFromXPathNavigator(captured));
                 mediaList.Add(CreateFromCacheValues(cacheValues));
