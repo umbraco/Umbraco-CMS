@@ -989,7 +989,7 @@
   <area alias="settings">
     <key alias="defaulttemplate">Plantilla por defecto</key>
     <key alias="dictionary editor egenskab">Clave de diccionario</key>
-        <key alias="importDocumentTypeHelp">Para importar un tipo de documento encuentra el fichero ".udt" en tu ordenador haciendo clic sobre el botón "Navegar" y pulsando "Importar" (se te solicitará confirmación en la siguiente pantalla)</key>
+    <key alias="importDocumentTypeHelp">Para importar un tipo de documento encuentra el fichero ".udt" en tu ordenador haciendo clic sobre el botón "Navegar" y pulsando "Importar" (se te solicitará confirmación en la siguiente pantalla)</key>
     <key alias="newtabname">Nuevo nombre de la pestaña</key>
     <key alias="nodetype">Tipo de nodo</key>
     <key alias="objecttype">Tipo</key>
