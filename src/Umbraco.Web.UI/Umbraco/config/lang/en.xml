@@ -468,6 +468,10 @@
     <key alias="overviewTitle">Dictionary overview</key>
   </area>
   <area alias="examineManagement">
+    <key alias="healthStatus">Health status</key>
+    <key alias="healthStatusDescription">The health status of the index and if it can be read</key>
+    <key alias="indexInfo">Index info</key>
+    <key alias="indexInfoDescription">Lists the properties of the index</key>
     <key alias="rebuildIndex">Rebuild index</key>
     <key alias="rebuildIndexWarning"><![CDATA[
       This will cause the index to be rebuilt.<br />

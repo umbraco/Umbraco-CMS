@@ -449,6 +449,10 @@
     <key alias="overviewTitle">Ordbog</key>
   </area>
   <area alias="examineManagement">
+    <key alias="healthStatus">Sundhedstilstand</key>
+    <key alias="healthStatusDescription">Indeksets sundhedstilstand, og hvis det kan læses</key>
+    <key alias="indexInfo">Indeksinfo</key>
+    <key alias="indexInfoDescription">Viser indeksets egenskaber</key>
     <key alias="rebuildIndex">Genopbyg indeks</key>
     <key alias="rebuildIndexWarning"><![CDATA[
         Dette vil medføre, at indekset genopbygges.<br />
