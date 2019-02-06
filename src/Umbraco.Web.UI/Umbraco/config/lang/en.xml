@@ -467,6 +467,18 @@
    ]]></key>
     <key alias="overviewTitle">Dictionary overview</key>
   </area>
+  <area alias="examineManagement">
+    <key alias="rebuildIndex">Rebuild index</key>
+    <key alias="rebuildIndexWarning"><![CDATA[
+      This will cause the index to be rebuilt.<br />
+      Depending on how much content there is in your site this could take a while.<br />
+      It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.
+     ]]>
+    </key>
+    <key alias="searchDescription">Search the index and view the results</key>
+    <key alias="tools">Tools</key>
+    <key alias="toolsDescription">Tools to manage the index</key>
+  </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
@@ -563,6 +575,7 @@
     <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
     <key alias="back">Back</key>
+    <key alias="backToOverview">Back to overview</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>

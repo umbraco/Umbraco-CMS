@@ -448,6 +448,18 @@
    ]]></key>
     <key alias="overviewTitle">Ordbog</key>
   </area>
+  <area alias="examineManagement">
+    <key alias="rebuildIndex">Genopbyg indeks</key>
+    <key alias="rebuildIndexWarning"><![CDATA[
+        Dette vil medføre, at indekset genopbygges.<br />
+        Afhængigt af hvor meget indhold der er på dit website, kan det tage et stykke tid.<br />
+        Det anbefales ikke at genopbygge et indeks i perioder med høj websitetrafik eller når redaktører redigerer indhold.
+     ]]>
+    </key>
+    <key alias="searchDescription">Søg i indekset og se resultaterne</key>
+    <key alias="tools">Værktøjer</key>
+    <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
+  </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
     <key alias="password">Indtast dit kodeord</key>
@@ -539,6 +551,7 @@
     <key alias="alias">Alias</key>
     <key alias="areyousure">Er du sikker?</key>
     <key alias="back">Tilbage</key>
+    <key alias="backToOverview">Back to overview</key>
     <key alias="border">Kant</key>
     <key alias="by">af</key>
     <key alias="cancel">Fortryd</key>

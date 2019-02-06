@@ -197,7 +197,7 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                    <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                    <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; <localize key="general_backToOverview">Back to overview</localize></a>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
@@ -248,8 +248,8 @@
                         <div class="umb-healthcheck-group__details-check">
 
                             <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Search</div>
-                                <div class="umb-healthcheck-group__details-check-description">Search the index and view the results</div>
+                                <div class="umb-healthcheck-group__details-check-name"><localize key="general_search">Search</localize></div>
+                                <div class="umb-healthcheck-group__details-check-description"><localize key="examineManagement_searchDescription">Search the index and view the results</localize></div>
                             </div>
 
                             <div class="umb-healthcheck-group__details-status">
@@ -358,8 +358,8 @@
                         <div class="umb-healthcheck-group__details-check">
 
                             <div class="umb-healthcheck-group__details-check-title">
-                                <div class="umb-healthcheck-group__details-check-name">Tools</div>
-                                <div class="umb-healthcheck-group__details-check-description">Tools to manage the index</div>
+                                <div class="umb-healthcheck-group__details-check-name"><localize key="examineManagement_tools">Tools</localize></div>
+                                <div class="umb-healthcheck-group__details-check-description"><localize key="examineManagement_toolsDescription">Tools to manage the index</localize></div>
                             </div>
 
                             <div class="umb-healthcheck-group__details-status">
@@ -375,7 +375,8 @@
                                                             type="button"
                                                             button-style="success"
                                                             action="vm.rebuildIndex(vm.selectedIndex, $event)"
-                                                            label="Rebuild index">
+                                                            label="Rebuild index"
+                                                            label-key="examineManagement_rebuildIndex">
                                                 </umb-button>
 
                                                 <div ng-show="vm.selectedIndex.isProcessing">
