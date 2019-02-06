@@ -79,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="Examine" Version="1.0.0-beta078" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
@@ -101,13 +101,13 @@
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.0.1" />
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
-    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
-    <PackageReference Include="NUnit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Owin" Version="1.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.11.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="SharpZipLib" Version="0.86.0" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
