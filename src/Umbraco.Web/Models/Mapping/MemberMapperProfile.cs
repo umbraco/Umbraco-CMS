@@ -56,6 +56,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.FailedPasswordAttempts, opt => opt.Ignore())
                 .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
                 .ForMember(dest => dest.WriterId, opt => opt.Ignore())
+                .ForMember(dest => dest.VersionId, opt => opt.Ignore())
                 // TODO: Support these eventually
                 .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
                 .ForMember(dest => dest.RawPasswordAnswerValue, opt => opt.Ignore());
