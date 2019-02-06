@@ -109,7 +109,6 @@
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Semver" Version="2.0.4" />
-    <PackageReference Include="SharpZipLib" Version="0.86.0" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
   </ItemGroup>
