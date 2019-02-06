@@ -99,7 +99,7 @@
       <PrivateAssets>all</PrivateAssets>
       <!-- development dependency -->
     </PackageReference>
-    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />

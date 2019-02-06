@@ -32,12 +32,12 @@
             <dependency id="LightInject.WebApi" version="[2.0.0,2.999999)" />
             <dependency id="Markdown" version="[2.2.1,2.999999)" />
             <dependency id="Microsoft.AspNet.Identity.Owin" version="[2.2.2,2.999999)" />
-            <dependency id="Microsoft.AspNet.Mvc" version="[5.2.6,5.999999)" />
-            <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3,2.999999)" />
-            <dependency id="Microsoft.AspNet.WebApi" version="[5.2.6,5.999999)" />
-            <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.0,4.999999)" />
-            <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.0,4.999999)" />
-            <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.0,4.999999)" />
+            <dependency id="Microsoft.AspNet.Mvc" version="[5.2.7,5.999999)" />
+            <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.4.0,2.999999)" />
+            <dependency id="Microsoft.AspNet.WebApi" version="[5.2.7,5.999999)" />
+            <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.1,4.999999)" />
+            <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.1,4.999999)" />
+            <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.1,4.999999)" />
             <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0,4.999999)" />
         </dependencies>
     </metadata>

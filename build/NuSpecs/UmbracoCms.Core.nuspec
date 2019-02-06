@@ -25,8 +25,8 @@
             <dependency id="LightInject.Annotation" version="[1.1.0,1.999999)" />
             <dependency id="LightInject.Web" version="[2.0.0,2.999999)" />
             <dependency id="Microsoft.AspNet.Identity.Core" version="[2.2.2,2.999999)" />
-            <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.6,5.999999)" />
-            <dependency id="Microsoft.Owin" version="[4.0.0,4.999999)" />
+            <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.7,5.999999)" />
+            <dependency id="Microsoft.Owin" version="[4.0.1,4.999999)" />
             <dependency id="MiniProfiler" version="[3.2.0.157,3.999999)" />
             <dependency id="Newtonsoft.Json" version="[12.0.1,12.999999)" />
             <dependency id="Semver" version="[2.0.4,2.999999)" />
