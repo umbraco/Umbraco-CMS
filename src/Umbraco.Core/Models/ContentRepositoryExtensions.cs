@@ -284,6 +284,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static void TouchCulture(this IContentBase content, string culture)
         {
+            if (culture.IsNullOrWhiteSpace()) return;
             if (!content.CultureInfos.TryGetValue(culture, out var infos)) return;
             content.CultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
         }
