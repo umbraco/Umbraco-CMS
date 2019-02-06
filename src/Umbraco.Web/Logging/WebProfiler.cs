@@ -74,7 +74,7 @@ namespace Umbraco.Web.Logging
         /// <inheritdoc/>
         public string Render()
         {
-            return MiniProfiler.Current.RenderIncludes(RenderPosition.Left).ToString();
+            return MiniProfiler.Current.RenderIncludes(RenderPosition.Right).ToString();
         }
 
         /// <inheritdoc/>
