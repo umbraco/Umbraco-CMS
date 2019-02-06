@@ -106,13 +106,17 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     }
 
     function saveRelationType() {
-        vm.page.saveButtonState = "busy";
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+
+            vm.page.saveButtonState = "busy";
+
             relationTypeResource.save(vm.relationType).then(function (data) {
                 formHelper.resetForm({ scope: $scope, notifications: data.notifications });
                 bindRelationType(data);
+
                 vm.page.saveButtonState = "success";
+
             }, function (error) {
                 contentEditingHelper.handleSaveError({
                     redirectOnFailure: false,
@@ -120,6 +124,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
                 });
 
                 notificationsService.error(error.data.message);
+
                 vm.page.saveButtonState = "error";
             });
         }
