@@ -142,7 +142,15 @@ namespace Umbraco.Core.Models
             content.PublishCultureInfos.AddOrUpdate(culture, name, date);
         }
 
-        // adjust dates to sync between version, cultures etc used by the repo when persisting
+        /// <summary>
+        /// Used to synchronize all culture dates to the same date if they've been modified
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="date"></param>
+        /// <remarks>
+        /// This is so that in an operation where (for example) 2 languages are updates like french and english, it is possible that
+        /// these dates assigned to them differ by a couple of Ticks, but we need to ensure they are persisted at the exact same time.
+        /// </remarks>
         public static void AdjustDates(this IContent content, DateTime date)
         {
             foreach (var culture in content.PublishedCultures.ToList())
@@ -150,11 +158,9 @@ namespace Umbraco.Core.Models
                 if (!content.PublishCultureInfos.TryGetValue(culture, out var publishInfos))
                     continue;
 
-                //fixme: Removing the logic here for the old WasCulturePublished and the _publishInfosOrig has broken
-                // the test Can_Rollback_Version_On_Multilingual, but we need to understand what it's doing since I don't
-
-                //fixme: Because this is being called, we end up updating a culture which triggers the dirty change tracking
-                // which ends up in error because the culture is not actually being updated which causes the tests to fail
+                if (!publishInfos.IsDirty())
+                    continue; //if it's not dirty, it means it hasn't changed so there's nothing to adjust
+                
                 content.PublishCultureInfos.AddOrUpdate(culture, publishInfos.Name, date);
 
                 if (content.CultureInfos.TryGetValue(culture, out var infos))
@@ -276,7 +282,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Updates a culture date, if the culture exists.
         /// </summary>
-        public static void TouchCulture(this IContent content, string culture)
+        public static void TouchCulture(this IContentBase content, string culture)
         {
             if (!content.CultureInfos.TryGetValue(culture, out var infos)) return;
             content.CultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);

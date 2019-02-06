@@ -302,6 +302,8 @@ namespace Umbraco.Core.Models
             if (Properties.Contains(propertyTypeAlias))
             {
                 Properties[propertyTypeAlias].SetValue(value, culture, segment);
+                //bump the culture to be flagged for updating
+                this.TouchCulture(culture);
                 return;
             }
 
@@ -312,6 +314,9 @@ namespace Umbraco.Core.Models
             var property = propertyType.CreateProperty();
             property.SetValue(value, culture, segment);
             Properties.Add(property);
+
+            //bump the culture to be flagged for updating
+            this.TouchCulture(culture);
         }
 
         #endregion

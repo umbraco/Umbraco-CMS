@@ -64,8 +64,8 @@ namespace Umbraco.Tests.Services
 
                 Assert.AreSame(document, saved);
 
-                Assert.IsTrue(e.IsSavingCulture(saved, "fr-FR"));
-                Assert.IsFalse(e.IsSavingCulture(saved, "en-UK"));
+                Assert.IsTrue(e.IsSavingCulture(saved, "en-US"));
+                Assert.IsFalse(e.IsSavingCulture(saved, "fr-FR"));
             }
 
             void OnSaved(IContentService sender, ContentSavedEventArgs e)
@@ -74,8 +74,8 @@ namespace Umbraco.Tests.Services
 
                 Assert.AreSame(document, saved);
 
-                Assert.IsTrue(e.HasSavedCulture(saved, "fr-FR"));
-                Assert.IsFalse(e.HasSavedCulture(saved, "en-UK"));
+                Assert.IsTrue(e.HasSavedCulture(saved, "en-US"));
+                Assert.IsFalse(e.HasSavedCulture(saved, "fr-FR"));
             }
 
             ContentService.Saving += OnSaving;
