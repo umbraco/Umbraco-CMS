@@ -357,10 +357,9 @@ namespace Umbraco.Core.Models
 
             if (rememberDirty)
             {
-                //fixme if it's empty don't allocate
-                _previousPublishCultureChanges.addedCultures = _currentPublishCultureChanges.addedCultures == null ? null : new HashSet<string>(_currentPublishCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
-                _previousPublishCultureChanges.removedCultures = _currentPublishCultureChanges.removedCultures == null ? null : new HashSet<string>(_currentPublishCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
-                _previousPublishCultureChanges.updatedCultures = _currentPublishCultureChanges.updatedCultures == null ? null : new HashSet<string>(_currentPublishCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.addedCultures = _currentPublishCultureChanges.addedCultures == null || _currentPublishCultureChanges.addedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.removedCultures = _currentPublishCultureChanges.removedCultures == null || _currentPublishCultureChanges.removedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.updatedCultures = _currentPublishCultureChanges.updatedCultures == null || _currentPublishCultureChanges.updatedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
             }
             else
             {

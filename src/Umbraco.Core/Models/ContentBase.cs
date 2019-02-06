@@ -339,9 +339,9 @@ namespace Umbraco.Core.Models
 
             if (rememberDirty)
             {
-                _previousCultureChanges.addedCultures = _currentCultureChanges.addedCultures == null ? null : new HashSet<string>(_currentCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
-                _previousCultureChanges.removedCultures = _currentCultureChanges.removedCultures == null ? null : new HashSet<string>(_currentCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
-                _previousCultureChanges.updatedCultures = _currentCultureChanges.updatedCultures == null ? null : new HashSet<string>(_currentCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousCultureChanges.addedCultures = _currentCultureChanges.addedCultures == null || _currentCultureChanges.addedCultures.Count == 0 ? null : new HashSet<string>(_currentCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousCultureChanges.removedCultures = _currentCultureChanges.removedCultures == null || _currentCultureChanges.removedCultures.Count == 0 ? null : new HashSet<string>(_currentCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousCultureChanges.updatedCultures = _currentCultureChanges.updatedCultures == null || _currentCultureChanges.updatedCultures.Count == 0 ? null : new HashSet<string>(_currentCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
             }
             else
             {
@@ -477,8 +477,6 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedContent = (ContentBase)clone;
-
-            //fixme - need to reset change tracking bits
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._cultureInfos != null)
