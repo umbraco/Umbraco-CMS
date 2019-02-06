@@ -17,9 +17,7 @@
                 name: "More"
             };
 
-            scope.openNavigationItem = function (item) {
-                
-                console.log("openNavigationItem", item)
+            scope.openNavigationItem = function(item) {
                 
                 scope.showDropdown = false;
                 runItemAction(item);

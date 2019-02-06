@@ -1,8 +1,7 @@
 <a data-element="sub-view-{{vm.item.alias}}"
     tabindex="-1"
-    class="umb-sub-views-nav-item"
     ng-href=""
-    ng-click="vm.callbackOpen(vm.item)"
+    ng-click="vm.callOpen(vm.item)"
     hotkey="{{vm.index+1}}"
     hotkey-when-hidden="true"
     ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}">

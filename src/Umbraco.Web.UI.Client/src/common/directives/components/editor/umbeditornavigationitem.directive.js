@@ -15,12 +15,12 @@ Use this directive to render tab content. For an example see: {@link umbraco.dir
     
     function UmbEditorNavigationItemController($scope, $element, $attrs) {
         
-        console.log("LINKKK!")
+        $element[0].classList.add('umb-sub-views-nav-item')
+        
         var vm = this;
         
-        this.callbackOpen = function(item) {
-            console.log("callbackOpen")
-            vm.open({item:vm.item});
+        this.callOpen = function() {
+            vm.onOpen({item:vm.item});
         };
     }
     
@@ -32,7 +32,7 @@ Use this directive to render tab content. For an example see: {@link umbraco.dir
             controllerAs: 'vm',
             bindings: {
                 item: '=',
-                open: '&',
+                onOpen: '&',
                 index: '@'
             }
         });

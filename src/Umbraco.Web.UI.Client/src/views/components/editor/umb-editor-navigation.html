@@ -1,11 +1,11 @@
 <ul class="umb-sub-views-nav" ng-show="showNavigation">
 
-    <li ng-repeat="item in navigation | limitTo: itemsLimit ">
-        <div ng-show="item.alias !== 'more'"
-            ng-class="item.errorClass">
+    <li ng-repeat="navItem in navigation | limitTo: itemsLimit ">
+        <div ng-show="navItem.alias !== 'more'"
+            ng-class="navItem.errorClass">
             <umb-editor-navigation-item
-                item="item"
-                open="openNavigationItem"
+                item="navItem"
+                on-open="openNavigationItem(item)"
                 index="{{$index}}">
             </umb-editor-navigation-item>
         </div>
@@ -13,24 +13,27 @@
 
     <li ng-show="showMoreButton" style="position: relative;">
 
-        <a data-element="sub-view-{{moreButton.alias}}"
-            class="umb-sub-views-nav-item umb-sub-views-nav-item-more"
-            href=""
-            ng-click="toggleDropdown()"
-            ng-class="{'is-active': moreButton.active}">
-            <div class="umb-sub-views-nav-item-more__icon"><i></i><i></i><i></i></div>
-            <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
-        </a>
+        <div class="umb-sub-views-nav-item umb-sub-views-nav-item-more">
 
-        <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" class="umb-sub-views-nav-item-more__dropdown">
-            <umb-dropdown-item ng-repeat="item in navigation | limitTo: overflowingItems">
-                <umb-editor-navigation-item
-                    item="item"
-                    open="openNavigationItem"
-                    index="{{$index}}">
-                </umb-editor-navigation-item>
-            </umb-dropdown-item>
-        </umb-dropdown>
+            <a data-element="sub-view-{{moreButton.alias}}"
+                href=""
+                ng-click="toggleDropdown()"
+                ng-class="{'is-active': moreButton.active}">
+                <div class="umb-sub-views-nav-item-more__icon"><i></i><i></i><i></i></div>
+                <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
+            </a>
+
+            <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" class="umb-sub-views-nav-item-more__dropdown">
+                <umb-dropdown-item ng-repeat="navItem in navigation | limitTo: overflowingItems">
+                    <umb-editor-navigation-item
+                        item="navItem"
+                        on-open="openNavigationItem(item)"
+                        index="{{$index}}">
+                    </umb-editor-navigation-item>
+                </umb-dropdown-item>
+            </umb-dropdown>
+
+        </div>
 
     </li>
 
