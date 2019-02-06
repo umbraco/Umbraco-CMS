@@ -472,6 +472,14 @@ namespace Umbraco.Core.Models
                 clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
                 clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
             }
+
+            clonedContent._currentPublishCultureChanges.updatedCultures = null;
+            clonedContent._currentPublishCultureChanges.addedCultures = null;
+            clonedContent._currentPublishCultureChanges.removedCultures = null;
+
+            clonedContent._previousPublishCultureChanges.updatedCultures = null;
+            clonedContent._previousPublishCultureChanges.addedCultures = null;
+            clonedContent._previousPublishCultureChanges.removedCultures = null;
         }
     }
 }

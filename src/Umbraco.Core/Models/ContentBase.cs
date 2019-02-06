@@ -495,6 +495,14 @@ namespace Umbraco.Core.Models
                 clonedContent._properties = (PropertyCollection)_properties.DeepClone(); //manually deep clone
                 clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
             }
+
+            clonedContent._currentCultureChanges.updatedCultures = null;
+            clonedContent._currentCultureChanges.addedCultures = null;
+            clonedContent._currentCultureChanges.removedCultures = null;
+
+            clonedContent._previousCultureChanges.updatedCultures = null;
+            clonedContent._previousCultureChanges.addedCultures = null;
+            clonedContent._previousCultureChanges.removedCultures = null;
         }
     }
 }
