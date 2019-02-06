@@ -10,6 +10,127 @@ namespace Umbraco.Core.Models
     /// </summary>
     internal static class ContentRepositoryExtensions
     {
+        /// <summary>
+        /// Gets the cultures that have been flagged for unpublishing.
+        /// </summary>
+        /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
+        public static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
+        {
+            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
+                return Array.Empty<string>();
+
+            var culturesUnpublishing = content.CultureInfos.Values
+                .Where(x => content.IsPropertyDirty("_unpublishedCulture_" + x.Culture))
+                .Select(x => x.Culture);
+
+            return culturesUnpublishing.ToList();
+        }
+
+        /// <summary>
+        /// Copies values from another document.
+        /// </summary>
+        public static void CopyFrom(this IContent content, IContent other, string culture = "*")
+        {
+            if (other.ContentTypeId != content.ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            culture = culture?.ToLowerInvariant().NullOrWhiteSpaceAsNull();
+
+            // the variation should be supported by the content type properties
+            //  if the content type is invariant, only '*' and 'null' is ok
+            //  if the content type varies, everything is ok because some properties may be invariant
+            if (!content.ContentType.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
+
+            // copying from the same Id and VersionPk
+            var copyingFromSelf = content.Id == other.Id && content.VersionId == other.VersionId;
+            var published = copyingFromSelf;
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties for the specified culture
+            foreach (var property in content.Properties)
+            {
+                // each property type may or may not support the variation
+                if (!property.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (property.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        property.SetValue(null, pvalue.Culture, pvalue.Segment);
+                    }
+            }
+
+            // copy properties from 'other'
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                if (!otherProperty.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                        content.SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                    }
+                }
+            }
+
+            // copy names, too
+
+            if (culture == "*")
+            {
+                content.CultureInfos.Clear();
+                content.CultureInfos = null;
+            }
+                
+
+            if (culture == null || culture == "*")
+                content.Name = other.Name;
+
+            // ReSharper disable once UseDeconstruction
+            foreach (var cultureInfo in other.CultureInfos)
+            {
+                if (culture == "*" || culture == cultureInfo.Culture)
+                    content.SetCultureName(cultureInfo.Name, cultureInfo.Culture);
+            }
+        }
+
+        /// <summary>
+        /// Validates the content item's properties pass variant rules
+        /// </summary>
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        public static Property[] ValidateProperties(this IContentBase content, string culture = "*")
+        {
+            // select invalid properties
+            return content.Properties.Where(x =>
+                {
+                    // if culture is null, we validate invariant properties only
+                    // if culture is '*' we validate both variant and invariant properties, automatically
+                    // if culture is specific eg 'en-US' we both too, but explicitly
+
+                    var varies = x.PropertyType.VariesByCulture();
+
+                    if (culture == null)
+                        return !(varies || x.IsValid(null)); // validate invariant property, invariant culture
+
+                    if (culture == "*")
+                        return !x.IsValid(culture); // validate property, all cultures
+
+                    return varies
+                        ? !x.IsValid(culture) // validate variant property, explicit culture
+                        : !x.IsValid(null); // validate invariant property, explicit culture
+                })
+                .ToArray();
+        }
+
         public static void SetPublishInfo(this IContent content, string culture, string name, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -32,6 +153,8 @@ namespace Umbraco.Core.Models
                 //fixme: Removing the logic here for the old WasCulturePublished and the _publishInfosOrig has broken
                 // the test Can_Rollback_Version_On_Multilingual, but we need to understand what it's doing since I don't
 
+                //fixme: Because this is being called, we end up updating a culture which triggers the dirty change tracking
+                // which ends up in error because the culture is not actually being updated which causes the tests to fail
                 content.PublishCultureInfos.AddOrUpdate(culture, publishInfos.Name, date);
 
                 if (content.CultureInfos.TryGetValue(culture, out var infos))
@@ -147,10 +270,13 @@ namespace Umbraco.Core.Models
             content.PublishCultureInfos.Remove(culture);
 
             // set the culture to be dirty - it's been modified
-            content.TouchCultureInfo(culture);
+            content.TouchCulture(culture);
         }
 
-        public static void TouchCultureInfo(this IContent content, string culture)
+        /// <summary>
+        /// Updates a culture date, if the culture exists.
+        /// </summary>
+        public static void TouchCulture(this IContent content, string culture)
         {
             if (!content.CultureInfos.TryGetValue(culture, out var infos)) return;
             content.CultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);

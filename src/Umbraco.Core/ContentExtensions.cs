@@ -52,27 +52,7 @@ namespace Umbraco.Core
             return ContentStatus.Unpublished;
         }
 
-        /// <summary>
-        /// Gets the cultures that have been flagged for unpublishing.
-        /// </summary>
-        /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
-        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content, IContent persisted)
-        {
-            //TODO: The reason we need a ref to the original persisted IContent is to check if it is published
-            // however, for performance reasons we could pass in a ContentCultureInfosCollection which could be
-            // resolved from the database much more quickly than resolving an entire IContent object.
-            // That said, the GetById on the IContentService will return from cache so might not be something to worry about.
-
-
-            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
-                return Array.Empty<string>();
-
-            var culturesChanging = content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture);
-            return culturesChanging
-                .Where(x => !content.IsCulturePublished(x) && // is not published anymore
-                            persisted != null && persisted.IsCulturePublished(x))   // but was published before
-                .ToList();
-        }
+        
         
         #endregion
 

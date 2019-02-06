@@ -299,6 +299,11 @@
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
+    <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
+    <Compile Include="Events\ContentPublishedEventArgs.cs" />
+    <Compile Include="Events\ContentPublishingEventArgs.cs" />
+    <Compile Include="Events\ContentSavedEventArgs.cs" />
+    <Compile Include="Events\ContentSavingEventArgs.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
@@ -389,7 +394,6 @@
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
-    <Compile Include="Models\ContentCultureInfosCollectionExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />

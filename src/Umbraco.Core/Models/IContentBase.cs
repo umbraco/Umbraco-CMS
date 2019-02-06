@@ -132,33 +132,5 @@ namespace Umbraco.Core.Models
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
 
-        /// <summary>
-        /// Copies values from another document.
-        /// </summary>
-        void CopyFrom(IContent other, string culture = "*");
-
-        /// <summary>
-        /// Validates the content item's properties pass variant rules
-        /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        Property[] ValidateProperties(string culture = "*");
-
-        /// <summary>
-        /// Determines whether a culture is being saved, during a Saving event.
-        /// </summary>
-        /// <remarks>Outside of a Saving event handler, the returned value is unspecified.</remarks>
-        bool IsSavingCulture(string culture);
-
-        /// <summary>
-        /// Determines whether a culture has been saved, during a Saved event.
-        /// </summary>
-        /// <remarks>Outside of a Saved event handler, the returned value is unspecified.</remarks>
-        bool HasSavedCulture(string culture);
-
-        /// <summary>
-        /// Updates a culture date, if the culture exists.
-        /// </summary>
-        void TouchCulture(string culture);
     }
 }

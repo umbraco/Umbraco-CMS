@@ -12,7 +12,7 @@ namespace Umbraco.Core.Events
     public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
     {
         private bool _cancel;
-        private Dictionary<string, object> _eventState;
+        private IDictionary<string, object> _eventState;
 
         private static readonly ReadOnlyDictionary<string, object> EmptyAdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
 
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Returns the EventMessages object which is used to add messages to the message collection for this event
         /// </summary>
-        public EventMessages Messages { get; private set; }
+        public EventMessages Messages { get; }
 
         /// <summary>
         /// In some cases raised evens might need to contain additional arbitrary readonly data which can be read by event subscribers
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Events
         /// This allows for a bit of flexibility in our event raising - it's not pretty but we need to maintain backwards compatibility
         /// so we cannot change the strongly typed nature for some events.
         /// </remarks>
-        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
+        public ReadOnlyDictionary<string, object> AdditionalData { get; internal set; }
 
         /// <summary>
         /// This can be used by event subscribers to store state in the event args so they easily deal with custom state data between a starting ("ing")
@@ -106,7 +106,8 @@ namespace Umbraco.Core.Events
         /// </summary>
         public IDictionary<string, object> EventState
         {
-            get { return _eventState ?? (_eventState = new Dictionary<string, object>()); }
+            get => _eventState ?? (_eventState = new Dictionary<string, object>());
+            internal set => _eventState = value;
         }
 
         public bool Equals(CancellableEventArgs other)

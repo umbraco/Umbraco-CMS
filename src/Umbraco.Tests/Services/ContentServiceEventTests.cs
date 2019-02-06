@@ -47,35 +47,35 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
 
-            var document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
             contentService.Save(document);
 
+            //re-get - dirty properties need resetting
+            document = contentService.GetById(document.Id);
+
             // properties: title, bodyText, keywords, description
             document.SetValue("title", "title-en", "en-US");
 
-            // touch the culture - required for IsSaving/HasSaved to work
-            document.TouchCulture("fr-FR");
-
-            void OnSaving(IContentService sender, SaveEventArgs<IContent> e)
+            void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
                 var saved = e.SavedEntities.First();
 
                 Assert.AreSame(document, saved);
 
-                Assert.IsTrue(saved.IsSavingCulture("fr-FR"));
-                Assert.IsFalse(saved.IsSavingCulture("en-UK"));
+                Assert.IsTrue(e.IsSavingCulture(saved, "fr-FR"));
+                Assert.IsFalse(e.IsSavingCulture(saved, "en-UK"));
             }
 
-            void OnSaved(IContentService sender, SaveEventArgs<IContent> e)
+            void OnSaved(IContentService sender, ContentSavedEventArgs e)
             {
                 var saved = e.SavedEntities.First();
 
                 Assert.AreSame(document, saved);
 
-                Assert.IsTrue(saved.HasSavedCulture("fr-FR"));
-                Assert.IsFalse(saved.HasSavedCulture("en-UK"));
+                Assert.IsTrue(e.HasSavedCulture(saved, "fr-FR"));
+                Assert.IsFalse(e.HasSavedCulture(saved, "en-UK"));
             }
 
             ContentService.Saving += OnSaving;
@@ -103,35 +103,35 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
 
-            var document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
             contentService.Save(document);
 
-            // ensure it works and does not throw
-            Assert.IsFalse(document.WasCulturePublished("fr-FR"));
-            Assert.IsFalse(document.WasCulturePublished("en-US"));
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsFalse(document.IsCulturePublished("en-US"));
 
-            void OnPublishing(IContentService sender, PublishEventArgs<IContent> e)
+            //re-get - dirty properties need resetting
+            document = contentService.GetById(document.Id);
+
+            void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
             {
                 var publishing = e.PublishedEntities.First();
 
                 Assert.AreSame(document, publishing);
 
-                Assert.IsFalse(publishing.IsPublishingCulture("en-US"));
-                Assert.IsTrue(publishing.IsPublishingCulture("fr-FR"));
+                Assert.IsFalse(e.IsPublishingCulture(publishing, "en-US"));
+                Assert.IsTrue(e.IsPublishingCulture(publishing, "fr-FR"));
             }
 
-            void OnPublished(IContentService sender, PublishEventArgs<IContent> e)
+            void OnPublished(IContentService sender, ContentPublishedEventArgs e)
             {
                 var published = e.PublishedEntities.First();
 
                 Assert.AreSame(document, published);
 
-                Assert.IsFalse(published.HasPublishedCulture("en-US"));
-                Assert.IsTrue(published.HasPublishedCulture("fr-FR"));
+                Assert.IsFalse(e.HasPublishedCulture(published, "en-US"));
+                Assert.IsTrue(e.HasPublishedCulture(published, "fr-FR"));
             }
 
             ContentService.Publishing += OnPublishing;
@@ -140,11 +140,9 @@ namespace Umbraco.Tests.Services
             ContentService.Publishing -= OnPublishing;
             ContentService.Published -= OnPublished;
 
-            document = (Content) contentService.GetById(document.Id);
+            document = contentService.GetById(document.Id);
 
             // ensure it works and does not throw
-            Assert.IsTrue(document.WasCulturePublished("fr-FR"));
-            Assert.IsFalse(document.WasCulturePublished("en-US"));
             Assert.IsTrue(document.IsCulturePublished("fr-FR"));
             Assert.IsFalse(document.IsCulturePublished("en-US"));
         }
@@ -165,58 +163,55 @@ namespace Umbraco.Tests.Services
                 propertyType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = (ContentService)ServiceContext.ContentService;
 
-            var document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
             contentService.SaveAndPublish(document);
 
-            // ensure it works and does not throw
-            Assert.IsTrue(document.WasCulturePublished("fr-FR"));
-            Assert.IsTrue(document.WasCulturePublished("en-US"));
             Assert.IsTrue(document.IsCulturePublished("fr-FR"));
             Assert.IsTrue(document.IsCulturePublished("en-US"));
 
-            void OnPublishing(IContentService sender, PublishEventArgs<IContent> e)
+            //re-get - dirty properties need resetting
+            document = contentService.GetById(document.Id);
+
+            void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
             {
                 var publishing = e.PublishedEntities.First();
 
                 Assert.AreSame(document, publishing);
 
-                Assert.IsFalse(publishing.IsPublishingCulture("en-US"));
-                Assert.IsFalse(publishing.IsPublishingCulture("fr-FR"));
+                Assert.IsFalse(e.IsPublishingCulture(publishing, "en-US"));
+                Assert.IsFalse(e.IsPublishingCulture(publishing, "fr-FR"));
 
-                Assert.IsFalse(publishing.IsUnpublishingCulture("en-US"));
-                Assert.IsTrue(publishing.IsUnpublishingCulture("fr-FR"));
+                Assert.IsFalse(e.IsUnpublishingCulture(publishing, "en-US"));
+                Assert.IsTrue(e.IsUnpublishingCulture(publishing, "fr-FR"));
             }
 
-            void OnPublished(IContentService sender, PublishEventArgs<IContent> e)
+            void OnPublished(IContentService sender, ContentPublishedEventArgs e)
             {
                 var published = e.PublishedEntities.First();
 
                 Assert.AreSame(document, published);
 
-                Assert.IsFalse(published.HasPublishedCulture("en-US"));
-                Assert.IsFalse(published.HasPublishedCulture("fr-FR"));
+                Assert.IsFalse(e.HasPublishedCulture(published, "en-US"));
+                Assert.IsFalse(e.HasPublishedCulture(published, "fr-FR"));
 
-                Assert.IsFalse(published.HasUnpublishedCulture("en-US"));
-                Assert.IsTrue(published.HasUnpublishedCulture("fr-FR"));
+                Assert.IsFalse(e.HasUnpublishedCulture(published, "en-US"));
+                Assert.IsTrue(e.HasUnpublishedCulture(published, "fr-FR"));
             }
 
             document.UnpublishCulture("fr-FR");
 
             ContentService.Publishing += OnPublishing;
             ContentService.Published += OnPublished;
-            contentService.SavePublishing(document);
+            contentService.CommitDocumentChanges(document);
             ContentService.Publishing -= OnPublishing;
             ContentService.Published -= OnPublished;
 
-            document = (Content) contentService.GetById(document.Id);
+            document = contentService.GetById(document.Id);
 
-            // ensure it works and does not throw
-            Assert.IsFalse(document.WasCulturePublished("fr-FR"));
-            Assert.IsTrue(document.WasCulturePublished("en-US"));
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsTrue(document.IsCulturePublished("en-US"));
         }

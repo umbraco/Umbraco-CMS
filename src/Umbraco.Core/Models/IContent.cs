@@ -135,29 +135,5 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
         
-
-        /// <summary>
-        /// Determines whether a culture is being published, during a Publishing event.
-        /// </summary>
-        /// <remarks>Outside of a Publishing event handler, the returned value is unspecified.</remarks>
-        bool IsPublishingCulture(string culture);
-
-        /// <summary>
-        /// Determines whether a culture is being unpublished, during a Publishing event.
-        /// </summary>
-        /// <remarks>Outside of a Publishing event handler, the returned value is unspecified.</remarks>
-        bool IsUnpublishingCulture(string culture);
-
-        /// <summary>
-        /// Determines whether a culture has been published, during a Published event.
-        /// </summary>
-        /// <remarks>Outside of a Published event handler, the returned value is unspecified.</remarks>
-        bool HasPublishedCulture(string culture);
-
-        /// <summary>
-        /// Determines whether a culture has been unpublished, during a Published event.
-        /// </summary>
-        /// <remarks>Outside of a Published event handler, the returned value is unspecified.</remarks>
-        bool HasUnpublishedCulture(string culture);
     }
 }
