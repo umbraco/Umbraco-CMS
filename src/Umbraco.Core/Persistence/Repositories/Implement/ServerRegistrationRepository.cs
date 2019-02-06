@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy()
         {
-            // TODO: wtf are we doing with cache here?
+            // TODO: what are we doing with cache here?
             // why are we using disabled cache helper up there?
             //
             // 7.6 says:

@@ -100,7 +100,12 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
             // register the umbraco helper - this is Transient! very important!
-            composition.Register<UmbracoHelper>();
+            // also, if not level.Run, we cannot really use the helper (during upgrade...)
+            // so inject a "void" helper (not exactly pretty but...)
+            if (composition.RuntimeState.Level == RuntimeLevel.Run)
+                composition.Register<UmbracoHelper>();
+            else
+                composition.Register(_ => new UmbracoHelper());
 
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());

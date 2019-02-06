@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Testing
 
             // etc
             ComposeWeb();
-            ComposeWtf();
+            ComposeMisc();
 
             // not sure really
             Compose(Composition);
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Testing
 
         }
 
-        protected virtual void ComposeWtf()
+        protected virtual void ComposeMisc()
         {
             // what else?
             var runtimeStateMock = new Mock<IRuntimeState>();

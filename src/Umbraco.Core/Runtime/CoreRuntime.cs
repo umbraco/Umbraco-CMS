@@ -271,7 +271,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.Level = RuntimeLevel.BootFailed;
                     _state.Reason = RuntimeLevelReason.BootFailedOnException;
-                    timer.Fail();
+                    timer?.Fail();
                     throw;
                 }
             }
@@ -287,7 +287,7 @@ namespace Umbraco.Core.Runtime
                 }
                 catch
                 {
-                    timer.Fail();
+                    timer?.Fail();
                     throw;
                 }
             }

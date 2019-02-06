@@ -4,6 +4,7 @@
     right: 0;
     bottom: 0;
     left: 0;
+    overflow: hidden;
 }
 
 .umb-editor {
@@ -17,7 +18,49 @@
 }
 
 .umb-editor--animating {
-    will-change: transform, width, left;
+    //will-change: transform, width, left;
+}
+.umb-editor--infinityMode {
+    transform: none;
+    will-change: transform;
+    transition: transform 400ms ease-in-out;
+    &.moveRight {
+        transform: translateX(110%);
+    }
+}
+
+.umb-editor--outOfRange {
+    //left:0;
+    transform: none;
+    display: none;
+    will-change: auto;
+    transition: display 0s 320ms;
+}
+.umb-editor--level0 {
+    //left:0;
+    transform: none;
+}
+.umb-editor--level1 {
+    //left:60px;
+    transform: translateX(60px);
+}
+.umb-editor--level2 {
+    //left:120px;
+    transform: translateX(120px);
+}
+.umb-editor--level3 {
+    //left:180px;
+    transform: translateX(180px);
+}
+
+.umb-editor--n1 {
+    right:60px;
+}
+.umb-editor--n2 {
+    right:120px;
+}
+.umb-editor--n3 {
+    right:180px;
 }
 
 // hide all infinite editors by default
@@ -28,20 +71,14 @@
 
 .umb-editor--small {
     width: 500px;
+    will-change: transform;
     left: auto;
-
+    
     .umb-editor-container {
         max-width: 500px;
     }
 }
-@keyframes umb-editor__overlay_fade_opacity {
-    from {
-        opacity:0;
-    }
-    to {
-        opacity:1;
-    }
-}
+
 .umb-editor__overlay {
     position: absolute;
     top: 0;
@@ -50,6 +87,14 @@
     left: 0;
     background: rgba(0,0,0,0.4);
     z-index: @zIndexEditor;
-    
-    animation:umb-editor__overlay_fade_opacity 600ms;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 320ms 20ms, visibility 0s 400ms;
+}
+
+#contentcolumn > .umb-editor__overlay,
+.--notInFront .umb-editor__overlay {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 320ms 20ms, visibility 0s;
 }
