@@ -17,7 +17,7 @@
                     <tr>
                         <th><localize key="general_name">Name</localize></th>
                         <th ng-repeat="column in vm.items[0].translations">{{column.displayName}}</th>
-                    </th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="item in vm.items track by item.id" ng-click="vm.clickItem(item.id)" style="cursor: pointer;">
