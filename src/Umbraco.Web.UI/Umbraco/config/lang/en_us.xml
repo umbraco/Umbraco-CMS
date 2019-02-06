@@ -127,7 +127,7 @@
     <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
     <key alias="saveAndClose">Save and close</key>
-    <key alias="saveAndPublish">Publish</key>
+    <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveAndSchedule">Save and schedule</key>
     <key alias="saveToPublish">Send for approval</key>
     <key alias="saveListView">Save list view</key>

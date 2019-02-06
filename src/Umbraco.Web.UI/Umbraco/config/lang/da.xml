@@ -123,6 +123,7 @@
     <key alias="relations">Redigér relationer</key>
     <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
+    <key alias="saveAndClose">Gem og luk</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
