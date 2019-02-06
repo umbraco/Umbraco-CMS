@@ -11,6 +11,9 @@ namespace Umbraco.Web.Logging
     /// <summary>
     /// Implements <see cref="IProfiler"/> by using the MiniProfiler framework.
     /// </summary>
+    /// <remarks>
+    /// Profiling only runs when the app is in debug mode, see WebRuntime for how this gets created
+    /// </remarks>
     internal class WebProfiler : IProfiler
     {
         private const string BootRequestItemKey = "Umbraco.Core.Logging.WebProfiler__isBootRequest";
@@ -22,10 +25,13 @@ namespace Umbraco.Web.Logging
             // create our own provider, which can provide a profiler even during boot
             _provider = new WebProfilerProvider();
 
-            // settings
-            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
-            MiniProfiler.Settings.StackMaxLength = 5000;
-            MiniProfiler.Settings.ProfilerProvider = _provider;
+            //see https://miniprofiler.com/dotnet/AspDotNet
+            MiniProfiler.Configure(new MiniProfilerOptions
+            {
+                SqlFormatter = new SqlServerFormatter(),
+                StackMaxLength = 5000, 
+                ProfilerProvider = _provider
+            });
         }
 
         public void UmbracoApplicationBeginRequest(object sender, EventArgs e)
@@ -68,29 +74,32 @@ namespace Umbraco.Web.Logging
         /// <inheritdoc/>
         public string Render()
         {
-            return MiniProfiler.RenderIncludes(RenderPosition.Right).ToString();
+            return MiniProfiler.Current.RenderIncludes(RenderPosition.Left).ToString();
         }
 
         /// <inheritdoc/>
         public IDisposable Step(string name)
         {
-            return MiniProfiler.Current.Step(name);
+            return MiniProfiler.Current?.Step(name);
         }
 
         /// <inheritdoc/>
         public void Start()
         {
-            MiniProfiler.Start();
+            MiniProfiler.StartNew();
         }
 
         /// <inheritdoc/>
         public void Stop(bool discardResults = false)
         {
-            MiniProfiler.Stop(discardResults);
+            MiniProfiler.Current?.Stop(discardResults);
         }
 
         private static Attempt<HttpRequestBase> TryGetRequest(object sender)
         {
+            if (sender is HttpRequest httpRequest)
+                return Attempt<HttpRequestBase>.Succeed(new HttpRequestWrapper(httpRequest));
+
             var app = sender as HttpApplication;
             if (app == null) return Attempt<HttpRequestBase>.Fail();
 

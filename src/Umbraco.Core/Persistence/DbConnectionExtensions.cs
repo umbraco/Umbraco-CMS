@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence
             do
             {
                 c = unwrapped;
-                if (unwrapped is ProfiledDbConnection profiled) unwrapped = profiled.InnerConnection;
+                if (unwrapped is ProfiledDbConnection profiled) unwrapped = profiled.WrappedConnection;
                 if (unwrapped is RetryDbConnection retrying) unwrapped = retrying.Inner;
 
             } while (c != unwrapped);

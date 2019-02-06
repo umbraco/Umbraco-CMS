@@ -100,7 +100,7 @@
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.0.1" />
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
-    <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
+    <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="NUnit" Version="3.10.1" />
