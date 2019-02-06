@@ -56,7 +56,7 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="LightInject" Version="5.1.2" />
+    <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core">
