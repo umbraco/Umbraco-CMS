@@ -1,4 +1,4 @@
-<div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
+<div id="examineManagement" class="examine-management" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
 
     <div ng-if="vm.viewState === 'list'">
         <umb-box>
@@ -366,7 +366,7 @@
                                                             disabled="!vm.selectedIndex.canRebuild"
                                                             type="button"
                                                             button-style="success"
-                                                            action="vm.rebuildIndex(vm.selectedIndex)"
+                                                            action="vm.rebuildIndex(vm.selectedIndex, $event)"
                                                             label="Rebuild index">
                                                 </umb-button>
 
