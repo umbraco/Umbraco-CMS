@@ -1,4 +1,4 @@
-function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelper,localizationService, overlayService) {
+function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelper, localizationService, overlayService) {
 
     var vm = this;
 
@@ -25,14 +25,18 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
 
     function showSearchResultDialog(values) {
         if (vm.searchResults) {
-            vm.searchResults.overlay = {
-                title: "Field values",
-                searchResultValues: values,
-                view: "views/dashboard/settings/examinemanagementresults.html",
-                close: function () {
-                    vm.searchResults.overlay = null;
-                }
-            };
+
+            localizationService.localize("examineManagement_fieldValues").then(function (value) {
+
+                vm.searchResults.overlay = {
+                    title: value,
+                    searchResultValues: values,
+                    view: "views/dashboard/settings/examinemanagementresults.html",
+                    close: function () {
+                        vm.searchResults.overlay = null;
+                    }
+                };
+            });
         }
     }
 
