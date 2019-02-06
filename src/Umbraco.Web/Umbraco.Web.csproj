@@ -284,6 +284,7 @@
     <Compile Include="JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
+    <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
@@ -1058,7 +1059,6 @@
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingMediaAttribute.cs" />
-    <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingDateTimeFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />
