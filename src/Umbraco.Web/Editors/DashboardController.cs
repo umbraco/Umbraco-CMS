@@ -31,18 +31,12 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
-        /// </summary>
-        public DashboardController()
-        { }
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
         }

@@ -30,7 +30,8 @@ angular.module("umbraco.directives")
                 promises.push(tinyMceService.getTinyMceEditorConfig({
                     htmlId: scope.uniqueId,
                     stylesheets: scope.configuration ? scope.configuration.stylesheets : null,
-                    toolbar: toolbar
+                    toolbar: toolbar,
+                    mode: scope.configuration.mode
                 }));
 
                 // pin toolbar to top of screen if we have focus and it scrolls off the screen

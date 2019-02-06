@@ -2,6 +2,7 @@
 using System.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Security;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -11,10 +12,10 @@ namespace Umbraco.Web
     public abstract class UmbracoAuthorizedHttpHandler : UmbracoHttpHandler
     {
         protected UmbracoAuthorizedHttpHandler()
-        { }
+        {
+        }
 
-        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, ServiceContext services)
-            : base(umbracoContext, services)
+        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, ServiceContext service, IProfilingLogger plogger) : base(umbracoContext, umbracoHelper, service, plogger)
         {
         }
 

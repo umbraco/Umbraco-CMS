@@ -27,11 +27,12 @@ namespace Umbraco.Web.Trees
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
         protected TreeControllerBase()
-        { }
+        {
+        }
 
-        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
-        { }
+        protected TreeControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
 
         /// <summary>
         /// The method called to render the contents of the tree structure

@@ -30,6 +30,11 @@ using System;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Trees;
 using System.Globalization;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Web.Actions;
 
 namespace Umbraco.Tests.Web.Controllers
@@ -207,17 +212,28 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async Task PostSave_Validate_Existing_Content()
         {
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null); //do not find it
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(propertyEditorCollection);
-                return usersController;
+
+                var controller = new ContentController(
+                    propertyEditorCollection,
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+                
+                return controller;
             }
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
                 content: GetMultiPartRequestContent(PublishJsonInvariant),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
@@ -233,21 +249,31 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async Task PostSave_Validate_At_Least_One_Variant_Flagged_For_Saving()
         {
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(propertyEditorCollection);
-                return usersController;
+                var controller = new ContentController(
+                    propertyEditorCollection,
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+
+                return controller;
             }
 
             var json = JsonConvert.DeserializeObject<JObject>(PublishJsonInvariant);
             //remove all save flaggs
             ((JArray)json["variants"])[0]["save"] = false;
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
                 content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
@@ -264,14 +290,24 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public async Task PostSave_Validate_Properties_Exist()
         {
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(propertyEditorCollection);
-                return usersController;
+                var controller = new ContentController(
+                    propertyEditorCollection,
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+
+                return controller;
             }
 
             var json = JsonConvert.DeserializeObject<JObject>(PublishJsonInvariant);
@@ -284,7 +320,7 @@ namespace Umbraco.Tests.Web.Controllers
                 value = "hello"
             }));
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
                 content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
@@ -298,7 +334,7 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var content = GetMockedContent();
 
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
 
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
@@ -310,11 +346,21 @@ namespace Umbraco.Tests.Web.Controllers
                 contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(() => MockedContentTypes.CreateSimpleContentType());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(propertyEditorCollection);
-                return usersController;
+                var controller = new ContentController(
+                    propertyEditorCollection,
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+
+                return controller;
             }
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
                 content: GetMultiPartRequestContent(PublishJsonInvariant),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
@@ -332,7 +378,7 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var content = GetMockedContent();
 
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
 
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
@@ -344,15 +390,25 @@ namespace Umbraco.Tests.Web.Controllers
                 contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(() => MockedContentTypes.CreateSimpleContentType());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(propertyEditorCollection);
-                return usersController;
+                var controller = new ContentController(
+                    propertyEditorCollection,
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+
+                return controller;
             }
 
             //clear out the name
             var json = JsonConvert.DeserializeObject<JObject>(PublishJsonInvariant);
             json["variants"].ElementAt(0)["name"] = null;
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
                 content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
@@ -370,7 +426,7 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var content = GetMockedContent();
 
-            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
 
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
@@ -382,15 +438,25 @@ namespace Umbraco.Tests.Web.Controllers
                 contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(() => MockedContentTypes.CreateSimpleContentType());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(propertyEditorCollection);
-                return usersController;
+                var controller = new ContentController(
+                    propertyEditorCollection,
+                    Factory.GetInstance<IGlobalSettings>(),
+                    umbracoContext,
+                    Factory.GetInstance<ISqlContext>(),
+                    Factory.GetInstance<ServiceContext>(),
+                    Factory.GetInstance<AppCaches>(),
+                    Factory.GetInstance<IProfilingLogger>(),
+                    Factory.GetInstance<IRuntimeState>(),
+                    helper);
+
+                return controller;
             }
 
             //clear out one of the names
             var json = JsonConvert.DeserializeObject<JObject>(PublishJsonVariant);
             json["variants"].ElementAt(0)["name"] = null;
 
-            var runner = new TestRunner(Factory);
+            var runner = new TestRunner(CtrlFactory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
                 content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),

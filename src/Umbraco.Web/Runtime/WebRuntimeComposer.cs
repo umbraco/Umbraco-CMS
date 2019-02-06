@@ -23,6 +23,7 @@ using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
@@ -33,6 +34,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
+using Umbraco.Web.Templates;
 using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
@@ -86,8 +88,24 @@ namespace Umbraco.Web.Runtime
             // TODO: stop doing this
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
-            // register the umbraco helper
-            composition.RegisterUnique<UmbracoHelper>();
+            composition.Register<IPublishedContentQuery>(factory =>
+            {
+                var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
+                return new PublishedContentQuery(umbCtx.UmbracoContext.ContentCache, umbCtx.UmbracoContext.MediaCache, factory.GetInstance<IVariationContextAccessor>());
+            }, Lifetime.Request);
+            composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
+
+            composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
+            composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
+            composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+
+            // register the umbraco helper - this is Transient! very important!
+            // also, if not level.Run, we cannot really use the helper (during upgrade...)
+            // so inject a "void" helper (not exactly pretty but...)
+            if (composition.RuntimeState.Level == RuntimeLevel.Run)
+                composition.Register<UmbracoHelper>();
+            else
+                composition.Register(_ => new UmbracoHelper());
 
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
