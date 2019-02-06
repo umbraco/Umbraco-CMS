@@ -21,7 +21,6 @@
               not want this to happen as the alpha of the next major is, really, the next major already.
             -->
             <dependency id="UmbracoCms.Core" version="[$version$]" />
-            <dependency id="AutoMapper" version="[7.0.1,7.999999)" />
             <dependency id="ClientDependency" version="[1.9.7,1.999999)" />
             <dependency id="ClientDependency-Mvc5" version="[1.8.0,1.999999)" />
             <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.999999)" />
