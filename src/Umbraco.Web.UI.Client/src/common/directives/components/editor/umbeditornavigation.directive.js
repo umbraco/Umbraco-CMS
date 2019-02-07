@@ -32,6 +32,9 @@
                 if(scope.onAnchorSelect) {
                     scope.onAnchorSelect({"item": item, "anchor": anchor});
                 }
+                if (item.active !== true) {
+                    scope.openNavigationItem(item);
+                }
             };
 
             scope.toggleDropdown = function () {

@@ -318,9 +318,6 @@
          * @param {any} app This is the model of the selected app
          */
         function selectApp(app) {
-            if(app && app.alias) {
-                activeAppAlias = app.alias;
-            }
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": app});
             }
@@ -331,6 +328,14 @@
                 vm.onSelectAppAnchor({"app": app, "anchor": anchor});
             }
         }
+        
+        
+        $scope.$on("editors.apps.appChanged", function($event, $args) {
+            var app = $args.app;
+            if(app && app.alias) {
+                activeAppAlias = app.alias;
+            }
+        });
 
     }
 

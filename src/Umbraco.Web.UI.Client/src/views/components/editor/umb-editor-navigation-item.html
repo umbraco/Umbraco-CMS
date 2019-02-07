@@ -11,7 +11,7 @@
 </a>
 
 <ul class="dropdown-menu umb-sub-views-nav-item__anchor_dropdown" ng-class="{'show': vm.showDropdown}">
-    <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': anchor.active}">
+    <li ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
         <a href="" ng-click="vm.anchorClicked(anchor, $event)">
             {{anchor.label}}
         </a>

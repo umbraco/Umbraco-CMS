@@ -2,7 +2,7 @@
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
-    function tabbedContentDirective() {
+    function tabbedContentDirective($timeout) {
 
         function link($scope, $element, $attrs) {
             
@@ -36,12 +36,30 @@
                 }
                 tab.active = true;
             }
+            function getActiveAnchor() {
+                var i = $scope.content.tabs.length;
+                while(i--) {
+                    if ($scope.content.tabs[i].active === true)
+                        return $scope.content.tabs[i];
+                }
+                return false;
+            }
+            function getScrollPositionFor(id) {
+                if (propertyGroupNodesDictionary[id]) {
+                    return propertyGroupNodesDictionary[id].offsetTop - 20;// currently only relative to closest relatively positioned parent 
+                }
+                return null;
+            }
             function scrollTo(id) {
                 console.log("scrollTo", id);
-                
-                if (propertyGroupNodesDictionary[id]) {
-                    let y = propertyGroupNodesDictionary[id].offsetTop - 20;// currently only relative to closest relatively positioned parent 
-                    
+                var y = getScrollPositionFor(id);
+                if (getScrollPositionFor !== null) {
+                    scrollableNode.scrollTo(0, y);
+                }
+            }
+            function jumpTo(id) {
+                var y = getScrollPositionFor(id);
+                if (getScrollPositionFor !== null) {
                     scrollableNode.scrollTo(0, y);
                 }
             }
@@ -49,6 +67,14 @@
             $scope.registerPropertyGroup = function(element, appAnchor) {
                 propertyGroupNodesDictionary[appAnchor] = element;
             }
+            
+            $scope.$on("editors.apps.appChanged", function($event, $args) {
+                // if app changed to this app, then we want to scroll to the current anchor
+                if($args.app.alias === "umbContent") {
+                    var activeAnchor = getActiveAnchor();
+                    $timeout(jumpTo.bind(null, [activeAnchor.id]));
+                }
+            });
             
             $scope.$on("editors.apps.appAnchorChanged", function($event, $args) {
                 if($args.app.alias === "umbContent") {
@@ -84,7 +110,8 @@
                     if (newValue === true) {
                         $scope.content.isDirty = true;
                     }
-                });
+                }
+            );
         }
 
         var directive = {

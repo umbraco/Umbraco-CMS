@@ -80,16 +80,20 @@
          * @param {any} item
          */
         function selectApp(item) {
-            // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = false;
-            if(item && item.alias !== "umbContent" && item.alias !== "umbInfo") {
-                vm.nameDisabled = true;
-            }
             // call the callback if any is registered
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": item});
             }
         }
+        
+        $scope.$on("editors.apps.appChanged", function($event, $args) {
+            var app = $args.app;
+            // disable the name field if the active content app is not "Content" or "Info"
+            vm.nameDisabled = false;
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                vm.nameDisabled = true;
+            }
+        });
 
         /**
          * Used to proxy a callback

@@ -48,7 +48,7 @@ Use this directive to render tab content. For an example see: {@link umbraco.dir
         
         vm.mouseOut = function() {
             clearTimeout(vm.mouseOutDelay);
-            vm.mouseOutDelay = setTimeout(hideDropdownBind, 1000);
+            vm.mouseOutDelay = setTimeout(hideDropdownBind, 500);
         }
         
         
