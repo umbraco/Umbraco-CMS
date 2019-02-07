@@ -7,6 +7,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
+
+
         /// <summary>
         /// Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
         /// </summary>

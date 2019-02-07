@@ -70,9 +70,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (_publishedDataTypes == null)
                 {
                     var dataTypes = _dataTypeService.GetAll();
-                    _publishedDataTypes = dataTypes.ToDictionary(
-                        x => x.Id,
-                        x => new PublishedDataType(x.Id, x.EditorAlias, x is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => x.Configuration)));
+                    _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
                 }
 
                 publishedDataTypes = _publishedDataTypes;
@@ -89,12 +87,12 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             lock (_publishedDataTypesLocker)
             {
-                foreach (var id in ids)
-                    _publishedDataTypes.Remove(id);
                 var dataTypes = _dataTypeService.GetAll(ids);
-                foreach (var dataType in dataTypes)
-                    _publishedDataTypes[dataType.Id] = new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => dataType.Configuration));
+                _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
             }
         }
+
+        private PublishedDataType CreatePublishedDataType(IDataType dataType)
+            => new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => dataType.Configuration));
     }
 }

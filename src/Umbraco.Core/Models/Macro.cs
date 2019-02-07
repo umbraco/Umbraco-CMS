@@ -142,13 +142,15 @@ namespace Umbraco.Core.Models
         }
 
         public override void ResetDirtyProperties(bool rememberDirty)
-        {
+        {   
+            base.ResetDirtyProperties(rememberDirty);
+
             _addedProperties.Clear();
             _removedProperties.Clear();
-            base.ResetDirtyProperties(rememberDirty);
+
             foreach (var prop in Properties)
             {
-                ((BeingDirtyBase)prop).ResetDirtyProperties(rememberDirty);
+                prop.ResetDirtyProperties(rememberDirty);
             }
         }
 

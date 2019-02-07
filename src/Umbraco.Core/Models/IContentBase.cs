@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the version identifier.
         /// </summary>
-        int VersionId { get; }
+        int VersionId { get; set; }
 
         /// <summary>
         /// Sets the name of the content item for a specified culture.
@@ -62,8 +62,8 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos { get; }
-
+        ContentCultureInfosCollection CultureInfos { get; set; }
+        
         /// <summary>
         /// Gets the available cultures.
         /// </summary>
@@ -125,16 +125,5 @@ namespace Umbraco.Core.Models
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
 
-        /// <summary>
-        /// Copies values from another document.
-        /// </summary>
-        void CopyFrom(IContent other, string culture = "*");
-
-        /// <summary>
-        /// Validates the content item's properties pass variant rules
-        /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        Property[] ValidateProperties(string culture = "*");
     }
 }
