@@ -292,13 +292,14 @@ input.umb-group-builder__group-title-input:disabled:hover {
 
 .umb-group-builder__property-actions {
   flex: 0 0 40px;
-  text-align: center;
   margin: 15px 0 0 15px;
 }
 
 .umb-group-builder__property-action {
-  margin: 0 0 10px 0;
-  display: block;
+  margin: 0 0 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 18px;
   position: relative;
   cursor: pointer;
@@ -438,11 +439,12 @@ input.umb-group-builder__group-sort-value {
         margin-bottom: 10px;
 
         .editor-icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid @gray-8;
             width: 60px;
             height: 60px;
-            text-align: center;
-            line-height: 60px;
             border-radius: 5px;
             float: left;
             margin-right: 20px;

@@ -40,7 +40,7 @@
                                 <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
                             </div>
                         </div>
-                    
+
                         <div class="umb-control-group control-group">
                             <textarea data-element="property-description"
                                     class="editor-description"
@@ -51,40 +51,40 @@
                                     umb-auto-resize>
                         </textarea>
                         </div>
-                    
+
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
-                    
+
                             <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
                                 <localize key="shortcuts_addEditor"></localize>
                             </a>
-                    
+
                             <div class="editor clearfix" ng-if="model.property.editor">
-                    
+
                                 <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
-                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
+                                    <umb-icon icon-name="{{ model.property.dataTypeIcon }}" class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></umb-icon>
                                 </a>
-                    
+
                                 <div class="editor-details">
                                     <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
                                     <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
                                 </div>
-                    
+
                                 <a href class="editor-settings-icon pull-right"
                                 ng-click="vm.openDataTypeSettings(model.property)"
                                 hotkey="alt+shift+d"
                                 ng-if="model.property.editor">
-                                    <i class="icon icon-settings"></i>
+                                    <umb-icon icon-name="icon-settings" class="icon icon-settings"></umb-icon>
                                 </a>
-                    
+
                             </div>
-                    
+
                         </div>
-                    
+
                         <div class="umb-control-group clearfix" ng-if="!model.property.locked">
-                    
+
                             <h5><localize key="validation_validation"></localize></h5>
-                    
-                            <label>                                
+
+                            <label>
                                 <localize key="validation_fieldIsMandatory"></localize>
                             </label>
 
@@ -94,14 +94,14 @@
                             >
                             </umb-toggle>
 
-                            <label class="mt3">                                
+                            <label class="mt3">
                                 <localize key="validation_customValidation"></localize>
                             </label>
-                    
+
                             <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
                                 <option value=""><localize key="validation_noValidation">No validation</localize></option>
                             </select>
-                    
+
                             <textarea class="editor-validation-pattern"
                                     localize="placeholder"
                                     placeholder="@validation_validationRegExp"
@@ -112,12 +112,12 @@
                                     focus-when="{{vm.focusOnPatternField}}"
                                     ng-keypress="vm.submitOnEnter($event)">
                         </textarea>
-                    
+
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
-                           
+
                                     <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
-                             
+
                                     <umb-toggle data-element="permissions-allow-culture-variant"
                                                 checked="model.property.allowCultureVariant"
                                                 on-click="vm.toggleAllowCultureVariants()"
@@ -125,7 +125,7 @@
                                     </umb-toggle>
 
                         </div>
-                    
+
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
 
                             <h5><localize key="general_options"></localize></h5>
@@ -159,7 +159,7 @@
                                         checked="model.property.isSensitiveData"
                                         on-click="vm.toggleIsSensitiveData()">
                             </umb-toggle>
-                                                      
+
 
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                     label-key="general_submit"
                     action="vm.submit(model)">
                 </umb-button>
-        
+
             </umb-editor-footer-content-right>
 
         </umb-editor-footer>
