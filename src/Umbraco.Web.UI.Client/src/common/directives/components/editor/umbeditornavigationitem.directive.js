@@ -17,14 +17,8 @@ Use this directive to render tab content. For an example see: {@link umbraco.dir
         
         var vm = this;
         
-        vm.showDropdown = false;
-        
         vm.clicked = function() {
             vm.onOpen({item:vm.item});
-            
-            //vm.mouseOver();// help touch users get the dropdown.
-            clearTimeout(vm.mouseOutDelay);
-            vm.showDropdown = true;
         };
         
         vm.anchorClicked = function(anchor, $event) {
@@ -34,31 +28,9 @@ Use this directive to render tab content. For an example see: {@link umbraco.dir
             $event.preventDefault();
         };
         
-        vm.mouseOver = function() {
-            clearTimeout(vm.mouseOutDelay);
-            vm.showDropdown = true;
-            $scope.$digest();
-        }
-        
-        var hideDropdown = function() {
-            vm.showDropdown = false;
-            $scope.$digest();
-        }
-        var hideDropdownBind = hideDropdown.bind(vm);
-        
-        vm.mouseOut = function() {
-            clearTimeout(vm.mouseOutDelay);
-            vm.mouseOutDelay = setTimeout(hideDropdownBind, 500);
-        }
-        
-        
-        
         var componentNode = $element[0];
         
         componentNode.classList.add('umb-sub-views-nav-item');
-        
-        componentNode.addEventListener('mouseover', vm.mouseOver.bind(vm));
-        componentNode.addEventListener('mouseout', vm.mouseOut.bind(vm));
         
     }
     

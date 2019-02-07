@@ -13,6 +13,7 @@
             
             var scrollableNode = appRootNode.closest(".umb-scrollable");
             scrollableNode.addEventListener("scroll", onScroll);
+            scrollableNode.addEventListener("mousehweel", cancelScrollTween);
             
             function onScroll(event) {
                 
@@ -21,7 +22,6 @@
                 for(var i in $scope.content.tabs) {
                     var group = $scope.content.tabs[i];
                     var node = propertyGroupNodesDictionary[group.id];
-                    //console.log(node.offsetTop, node.offsetTop + node.clientHeight)
                     if (viewFocusY >= node.offsetTop && viewFocusY <= node.offsetTop + node.clientHeight) {
                         setActiveAnchor(group);
                         return;
@@ -29,6 +29,7 @@
                 }
                 
             }
+            
             function setActiveAnchor(tab) {
                 if (tab.active !== true) {
                     var i = $scope.content.tabs.length;
@@ -55,14 +56,33 @@
             function scrollTo(id) {
                 var y = getScrollPositionFor(id);
                 if (getScrollPositionFor !== null) {
-                    scrollableNode.scrollTo(0, y);
+                    
+                    var viewportHeight = scrollableNode.clientHeight;
+                    var from = scrollableNode.scrollTop;
+                    var to = Math.min(y, scrollableNode.scrollHeight - viewportHeight);
+                    
+                    var animeObject = {_y: from};
+                    $scope.scrollTween = anime({
+                        targets: animeObject,
+                        _y: to,
+                        easing: 'easeOutExpo',
+                        duration: 200 + Math.min(Math.abs(to-from)/viewportHeight*100, 400),
+                        update: () => {
+                            scrollableNode.scrollTo(0, animeObject._y);
+                        }
+                    });
+
                 }
             }
             function jumpTo(id) {
                 var y = getScrollPositionFor(id);
                 if (getScrollPositionFor !== null) {
+                    cancelScrollTween();
                     scrollableNode.scrollTo(0, y);
                 }
+            }
+            function cancelScrollTween() {
+                $scope.scrollTween.pause();
             }
             
             $scope.registerPropertyGroup = function(element, appAnchor) {
