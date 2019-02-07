@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public ISimpleContentType ContentType { get; private set; }
 
-        protected void ChangeContentType(ISimpleContentType contentType)
+        internal void ChangeContentType(ISimpleContentType contentType)
         {
             ContentType = contentType;
             ContentTypeId = contentType.Id;

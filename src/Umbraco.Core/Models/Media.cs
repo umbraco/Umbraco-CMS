@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType">New MediaType for this Media</param>
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        public void ChangeContentType(IMediaType contentType)
+        internal void ChangeContentType(IMediaType contentType)
         {
             ChangeContentType(contentType, false);
         }
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType">New MediaType for this Media</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        public void ChangeContentType(IMediaType contentType, bool clearProperties)
+        internal void ChangeContentType(IMediaType contentType, bool clearProperties)
         {
             ChangeContentType(new SimpleContentType(contentType));
 
@@ -81,16 +81,5 @@ namespace Umbraco.Core.Models
             Properties.CollectionChanged += PropertiesChanged;
         }
 
-        /// <summary>
-        /// Changes the Trashed state of the content object
-        /// </summary>
-        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
-        /// <param name="parentId"> </param>
-        public void ChangeTrashedState(bool isTrashed, int parentId = -20)
-        {
-            Trashed = isTrashed;
-            //The Media Recycle Bin Id is -21 so we correct that here
-            ParentId = parentId == -20 ? -21 : parentId;
-        }
     }
 }
