@@ -12,19 +12,17 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal abstract class TabsAndPropertiesResolver
     {
-        private readonly IContentTypeBaseServiceProvider _contentTypeServiceProvider;
         protected ILocalizedTextService LocalizedTextService { get; }
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
-        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeServiceProvider)
+        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
         {
-            _contentTypeServiceProvider = contentTypeServiceProvider;
             LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = new List<string>();
         }
 
-        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeServiceProvider, IEnumerable<string> ignoreProperties)
-            : this(localizedTextService, contentTypeServiceProvider)
+        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
+            : this(localizedTextService)
         {
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
@@ -52,7 +50,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             // add the generic properties tab, for properties that don't belong to a tab
             // get the properties, map and translate them, then add the tab
-            var noGroupProperties = content.GetNonGroupedProperties(_contentTypeServiceProvider)
+            var noGroupProperties = content.GetNonGroupedProperties()
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
                 .ToList();
             var genericproperties = MapProperties(content, noGroupProperties, context);
@@ -124,8 +122,8 @@ namespace Umbraco.Web.Models.Mapping
     internal class TabsAndPropertiesResolver<TSource, TDestination> : TabsAndPropertiesResolver, IValueResolver<TSource, TDestination, IEnumerable<Tab<ContentPropertyDisplay>>>
         where TSource : IContentBase
     {
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeServiceProvider)
-            : base(localizedTextService, contentTypeServiceProvider)
+        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+            : base(localizedTextService)
         { }
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)

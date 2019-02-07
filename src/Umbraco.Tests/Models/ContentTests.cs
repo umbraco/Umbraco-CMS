@@ -138,9 +138,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateSimpleContent(contentType);
             //need to id the p
 
-            var serviceProvider = new ContentTypeBaseServiceProvider(_contentTypeService, Mock.Of<IMediaTypeService>(), Mock.Of<IMemberTypeService>());
-
-            var nonGrouped = content.GetNonGroupedProperties(serviceProvider);
+            var nonGrouped = content.GetNonGroupedProperties();
 
             Assert.AreEqual(2, nonGrouped.Count());
             Assert.AreEqual(5, content.Properties.Count());
