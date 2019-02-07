@@ -9,7 +9,10 @@ var karmaServer = require('karma').Server;
  **************************/
 
  // Karma test
-gulp.task('test:unit', function() {
+gulp.task('runTests', ["js", "test:unit"]);
+
+gulp.task('test:unit', function () {
+
     new karmaServer({
         configFile: __dirname + "/../../test/config/karma.conf.js",
         keepalive: true
