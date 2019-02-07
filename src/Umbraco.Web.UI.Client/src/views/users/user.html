@@ -10,7 +10,9 @@
                                hide-icon="true"
                                hide-description="true"
                                hide-alias="true"
-                               navigation="vm.user.navigation">
+                               navigation="vm.user.navigation"
+                               on-back="vm.goToPage(vm.breadcrumbs[0])"
+                               show-back-button="vm.showBackButton">
             </umb-editor-header>
             
             <umb-editor-container>

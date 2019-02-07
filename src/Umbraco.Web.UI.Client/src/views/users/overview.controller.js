@@ -14,19 +14,17 @@
         vm.page.navigation = [];
 
         function onInit() {
-
             loadNavigation();
-
-            setPageName();
         }
 
         function loadNavigation() {
 
-            var labels = ["sections_users", "general_groups"];
+            var labels = ["sections_users", "general_groups", "user_userManagement"];
 
             localizationService.localizeMany(labels).then(function (data) {
                 vm.page.labels.users = data[0];
                 vm.page.labels.groups = data[1];
+                vm.page.name = data[2];
 
                 vm.page.navigation = [
                     {
@@ -51,12 +49,6 @@
                     }
                 ];
             });
-        }
-
-        function setPageName() {
-            localizationService.localize("user_userManagement").then(function (data) {
-                vm.page.name = data;
-            })
         }
 
         onInit();
