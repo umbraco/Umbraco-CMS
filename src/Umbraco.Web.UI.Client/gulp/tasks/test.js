@@ -3,13 +3,16 @@
 var config = require('../config');
 var gulp = require('gulp');
 var karmaServer = require('karma').Server;
+var runSequence = require('run-sequence');
 
 /**************************
  * Build tests
  **************************/
 
  // Karma test
-gulp.task('runTests', ["js", "test:unit"]);
+gulp.task('runTests', function(cb) {
+    runSequence(["js"], "test:unit", cb);
+});
 
 gulp.task('test:unit', function () {
 

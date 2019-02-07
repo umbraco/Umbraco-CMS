@@ -310,11 +310,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
             //need to determine which items we already have loaded
             var renderModelIds = _.map($scope.renderModel, function (d) {
-                return $scope.model.config.idType === "udi" ? d.udi : d.id;
+                return ($scope.model.config.idType === "udi" ? d.udi : d.id).toString();
             });
 
             //get the ids that no longer exist
             var toRemove = _.difference(renderModelIds, valueIds);
+
 
             //remove the ones that no longer exist
             for (var j = 0; j < toRemove.length; j++) {
