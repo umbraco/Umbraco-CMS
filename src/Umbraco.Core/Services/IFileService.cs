@@ -18,12 +18,12 @@ namespace Umbraco.Core.Services
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
         IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
-        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
-        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
-        bool DeletePartialView(string path, int userId = 0);
-        bool DeletePartialViewMacro(string path, int userId = 0);
-        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0);
-        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = 0);
+        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
+        bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId);
+        bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
         bool ValidatePartialView(PartialView partialView);
         bool ValidatePartialViewMacro(PartialView partialView);
 
@@ -45,14 +45,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
         /// <param name="userId">Optional id of the user saving the stylesheet</param>
-        void SaveStylesheet(Stylesheet stylesheet, int userId = 0);
+        void SaveStylesheet(Stylesheet stylesheet, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
-        void DeleteStylesheet(string path, int userId = 0);
+        void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Validates a <see cref="Stylesheet"/>
@@ -79,14 +79,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="script"><see cref="Script"/> to save</param>
         /// <param name="userId">Optional id of the user saving the script</param>
-        void SaveScript(Script script, int userId = 0);
+        void SaveScript(Script script, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId">Optional id of the user deleting the script</param>
-        void DeleteScript(string path, int userId = 0);
+        void DeleteScript(string path, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Validates a <see cref="Script"/>
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to save</param>
         /// <param name="userId">Optional id of the user saving the template</param>
-        void SaveTemplate(ITemplate template, int userId = 0);
+        void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates a template for a content type
@@ -198,16 +198,16 @@ namespace Umbraco.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
+        Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId);
 
-        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = 0);
+        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the template</param>
-        void DeleteTemplate(string alias, int userId = 0);
+        void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Validates a <see cref="ITemplate"/>
@@ -221,7 +221,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
-        void SaveTemplate(IEnumerable<ITemplate> templates, int userId = 0);
+        void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets the content of a template as a stream.

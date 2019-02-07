@@ -32,27 +32,27 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a blueprint.
         /// </summary>
-        void SaveBlueprint(IContent content, int userId = 0);
+        void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a blueprint.
         /// </summary>
-        void DeleteBlueprint(IContent content, int userId = 0);
+        void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates a new content item from a blueprint.
         /// </summary>
-        IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
+        IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes blueprints for a content type.
         /// </summary>
-        void DeleteBlueprintsOfType(int contentTypeId, int userId = 0);
+        void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes blueprints for content types.
         /// </summary>
-        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
+        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -237,13 +237,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true);
+        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
 
         /// <summary>
         /// Saves documents.
         /// </summary>
         // TODO: why only 1 result not 1 per content?!
-        OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
+        OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
 
         /// <summary>
         /// Deletes a document.
@@ -252,7 +252,7 @@ namespace Umbraco.Core.Services
         /// <para>This method will also delete associated media files, child content and possibly associated domains.</para>
         /// <para>This method entirely clears the content from the database.</para>
         /// </remarks>
-        OperationResult Delete(IContent content, int userId = 0);
+        OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes all documents of a given document type.
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Services
         /// <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
         /// <para>This operation is potentially dangerous and expensive.</para>
         /// </remarks>
-        void DeleteOfType(int documentTypeId, int userId = 0);
+        void DeleteOfType(int documentTypeId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes all documents of given document types.
@@ -270,17 +270,17 @@ namespace Umbraco.Core.Services
         /// <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
         /// <para>This operation is potentially dangerous and expensive.</para>
         /// </remarks>
-        void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
+        void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes versions of a document prior to a given date.
         /// </summary>
-        void DeleteVersions(int id, DateTime date, int userId = 0);
+        void DeleteVersions(int id, DateTime date, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a version of a document.
         /// </summary>
-        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0);
+        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Moves a document under a new parent.
         /// </summary>
-        void Move(IContent content, int parentId, int userId = 0);
+        void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Copies a document.
@@ -297,7 +297,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>Recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Copies a document.
@@ -305,12 +305,12 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>Optionally recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0);
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Moves a document to the recycle bin.
         /// </summary>
-        OperationResult MoveToRecycleBin(IContent content, int userId = 0);
+        OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Empties the recycle bin.
@@ -320,12 +320,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
 
         #endregion
 
@@ -345,7 +345,7 @@ namespace Umbraco.Core.Services
         /// <param name="culture">The culture to publish.</param>
         /// <param name="userId">The identifier of the user performing the action.</param>
         /// <param name="raiseEvents">A value indicating whether to raise events.</param>
-        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
 
         /// <summary>
         /// Saves and publishes a document.
@@ -359,7 +359,7 @@ namespace Umbraco.Core.Services
         /// <param name="cultures">The cultures to publish.</param>
         /// <param name="userId">The identifier of the user performing the action.</param>
         /// <param name="raiseEvents">A value indicating whether to raise events.</param>
-        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
 
         /// <summary>
         /// Saves and publishes a document branch.
@@ -375,7 +375,7 @@ namespace Umbraco.Core.Services
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
         /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves and publishes a document branch.
@@ -389,7 +389,7 @@ namespace Umbraco.Core.Services
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
         /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves and publishes a document branch.
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Services
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
             Func<IContent, HashSet<string>> shouldPublish,
             Func<IContent, HashSet<string>, bool> publishCultures,
-            int userId = 0);
+            int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Unpublishes a document.
@@ -426,7 +426,7 @@ namespace Umbraco.Core.Services
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
         /// empty. If the content type is invariant, then culture can be either '*' or null or empty.</para>
         /// </remarks>
-        PublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
+        PublishResult Unpublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.
@@ -443,7 +443,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a document and raises the "sent to publication" events.
         /// </summary>
-        bool SendToPublication(IContent content, int userId = 0);
+        bool SendToPublication(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Publishes and unpublishes scheduled documents.
@@ -478,27 +478,27 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = 0);
+        IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, int parentId, string documentTypeAlias, int userId = 0);
+        IContent Create(string name, int parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = 0);
+        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates and saves a document.
         /// </summary>
-        IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0);
+        IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates and saves a document.
         /// </summary>
-        IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0);
+        IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -514,7 +514,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>When no culture is specified, all cultures are rolled back.</para>
         /// </remarks>
-        OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0);
+        OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         #endregion
     }

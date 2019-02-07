@@ -159,7 +159,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
-        public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = 0)
+        public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // TODO: what about culture?
 
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent Create(string name, int parentId, string contentTypeAlias, int userId = 0)
+        public IContent Create(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // TODO: what about culture?
 
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = 0)
+        public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // TODO: what about culture?
 
@@ -243,7 +243,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
+        public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // TODO: what about culture?
 
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0)
+        public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // TODO: what about culture?
 
@@ -749,7 +749,7 @@ namespace Umbraco.Core.Services.Implement
         #region Save, Publish, Unpublish
 
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true)
+        public OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -807,7 +807,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
+        public OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var contentsA = contents.ToArray();
@@ -847,7 +847,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true)
+        public PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -916,7 +916,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult Unpublish(IContent content, string culture = "*", int userId = 0)
+        public PublishResult Unpublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
@@ -981,7 +981,7 @@ namespace Umbraco.Core.Services.Implement
         /// <see cref="CommitDocumentChanges"/> to actually commit the changes to the database.</para>
         /// <para>The document is *always* saved, even when publishing fails.</para>
         /// </remarks>
-        internal PublishResult CommitDocumentChanges(IContent content, int userId = 0, bool raiseEvents = true)
+        internal PublishResult CommitDocumentChanges(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -992,7 +992,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
+        private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
@@ -1359,7 +1359,7 @@ namespace Umbraco.Core.Services.Implement
 
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0)
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId)
         {
             // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
             // and not to == them, else we would be comparing references, and that is a bad thing
@@ -1401,7 +1401,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0)
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
         {
             // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
             // and not to == them, else we would be comparing references, and that is a bad thing
@@ -1441,7 +1441,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
             Func<IContent, HashSet<string>> shouldPublish,
             Func<IContent, HashSet<string>, bool> publishCultures,
-            int userId = 0)
+            int userId = Constants.Security.SuperUserId)
         {
             if (shouldPublish == null) throw new ArgumentNullException(nameof(shouldPublish));
             if (publishCultures == null) throw new ArgumentNullException(nameof(publishCultures));
@@ -1619,7 +1619,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
+        public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1649,7 +1649,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0)
+        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1735,7 +1735,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Optional Id of the User moving the Content</param>
-        public void Move(IContent content, int parentId, int userId = 0)
+        public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
         {
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinContent)
@@ -1911,7 +1911,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId)
         {
             return Copy(content, parentId, relateToOriginal, true, userId);
         }
@@ -1926,7 +1926,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="recursive">A value indicating whether to recursively copy children.</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
         {
             var copy = content.DeepCloneWithResetIdentities();
             copy.ParentId = parentId;
@@ -2029,7 +2029,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Optional Id of the User issuing the send to publication</param>
         /// <returns>True if sending publication was successful otherwise false</returns>
-        public bool SendToPublication(IContent content, int userId = 0)
+        public bool SendToPublication(IContent content, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2083,7 +2083,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>Result indicating what action was taken when handling the command.</returns>
-        public OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
+        public OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -2112,7 +2112,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>Result indicating what action was taken when handling the command.</returns>
-        public OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
+        public OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -2597,7 +2597,7 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="contentTypeIds">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issuing the delete operation</param>
-        public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
         {
             // TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
@@ -2673,7 +2673,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
-        public void DeleteOfType(int contentTypeId, int userId = 0)
+        public void DeleteOfType(int contentTypeId, int userId = Constants.Security.SuperUserId)
         {
             DeleteOfTypes(new[] { contentTypeId }, userId);
         }
@@ -2731,7 +2731,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void SaveBlueprint(IContent content, int userId = 0)
+        public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
         {
             //always ensure the blueprint is at the root
             if (content.ParentId != -1)
@@ -2757,7 +2757,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DeleteBlueprint(IContent content, int userId = 0)
+        public void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2770,7 +2770,7 @@ namespace Umbraco.Core.Services.Implement
 
         private static readonly string[] ArrayOfOneNullString = { null };
 
-        public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0)
+        public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
 
@@ -2819,7 +2819,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2846,7 +2846,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
+        public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId)
         {
             DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
         }
@@ -2855,7 +2855,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Rollback
 
-        public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
+        public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
