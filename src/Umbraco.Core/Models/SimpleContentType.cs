@@ -106,29 +106,29 @@ namespace Umbraco.Core.Models
         // we have to have all this, because we're an IUmbracoEntity, because that is
         // required by the query expression visitor / SimpleContentTypeMapper
 
-        //string ITreeEntity.Name { get => this.Name; set => throw new NotImplementedException(); }
-        //int IEntity.Id { get => this.Id; set => throw new NotImplementedException(); }
-        //bool IEntity.HasIdentity => this.Id != default;
-        //int ITreeEntity.CreatorId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //int ITreeEntity.ParentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //int ITreeEntity.Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //string ITreeEntity.Path { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //int ITreeEntity.SortOrder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //bool ITreeEntity.Trashed => throw new NotImplementedException();
-        //Guid IEntity.Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //DateTime IEntity.CreateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //DateTime IEntity.UpdateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //DateTime? IEntity.DeleteDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        //void ITreeEntity.SetParent(ITreeEntity parent) => throw new NotImplementedException();
-        //object IDeepCloneable.DeepClone() => throw new NotImplementedException();
-        //bool IRememberBeingDirty.WasDirty() => throw new NotImplementedException();
-        //bool IRememberBeingDirty.WasPropertyDirty(string propertyName) => throw new NotImplementedException();
-        //void IRememberBeingDirty.ResetWereDirtyProperties() => throw new NotImplementedException();
-        //void IRememberBeingDirty.ResetDirtyProperties(bool rememberDirty) => throw new NotImplementedException();
-        //IEnumerable<string> IRememberBeingDirty.GetWereDirtyProperties() => throw new NotImplementedException();
-        //bool ICanBeDirty.IsDirty() => throw new NotImplementedException();
-        //bool ICanBeDirty.IsPropertyDirty(string propName) => throw new NotImplementedException();
-        //IEnumerable<string> ICanBeDirty.GetDirtyProperties() => throw new NotImplementedException();
-        //void ICanBeDirty.ResetDirtyProperties() => throw new NotImplementedException();
+        string ITreeEntity.Name { get => this.Name; set => throw new NotImplementedException(); }
+        int IEntity.Id { get => this.Id; set => throw new NotImplementedException(); }
+        bool IEntity.HasIdentity => this.Id != default;
+        int ITreeEntity.CreatorId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        int ITreeEntity.ParentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        int ITreeEntity.Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        string ITreeEntity.Path { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        int ITreeEntity.SortOrder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        bool ITreeEntity.Trashed => throw new NotImplementedException();
+        Guid IEntity.Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        DateTime IEntity.CreateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        DateTime IEntity.UpdateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        DateTime? IEntity.DeleteDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        void ITreeEntity.SetParent(ITreeEntity parent) => throw new NotImplementedException();
+        object IDeepCloneable.DeepClone() => throw new NotImplementedException();
+        bool IRememberBeingDirty.WasDirty() => throw new NotImplementedException();
+        bool IRememberBeingDirty.WasPropertyDirty(string propertyName) => throw new NotImplementedException();
+        void IRememberBeingDirty.ResetWereDirtyProperties() => throw new NotImplementedException();
+        void IRememberBeingDirty.ResetDirtyProperties(bool rememberDirty) => throw new NotImplementedException();
+        IEnumerable<string> IRememberBeingDirty.GetWereDirtyProperties() => throw new NotImplementedException();
+        bool ICanBeDirty.IsDirty() => throw new NotImplementedException();
+        bool ICanBeDirty.IsPropertyDirty(string propName) => throw new NotImplementedException();
+        IEnumerable<string> ICanBeDirty.GetDirtyProperties() => throw new NotImplementedException();
+        void ICanBeDirty.ResetDirtyProperties() => throw new NotImplementedException();
     }
 }

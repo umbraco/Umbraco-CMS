@@ -5,10 +5,10 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a simplified view of a content type.
     /// </summary>
-    public interface ISimpleContentType
+    public interface ISimpleContentType : IUmbracoEntity
     {
-        int Id { get; }
-        string Name { get; }
+        new int Id { get; }
+        new string Name { get; }
 
         /// <summary>
         /// Gets the alias of the content type.
