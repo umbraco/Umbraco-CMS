@@ -106,10 +106,11 @@ namespace Umbraco.Core
         /// Returns properties that do not belong to a group
         /// </summary>
         /// <param name="content"></param>
+        /// <param name="contentTypeBaseService"></param>
         /// <returns></returns>
-        public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content)
+        public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseService)
         {
-            var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(content);
+            var contentType = contentTypeBaseService.GetContentTypeOf(content);
             var propertyIdsInTabs = contentType.PropertyGroups.SelectMany(pg => pg.PropertyTypes);
             return content.Properties
                           .Where(property => propertyIdsInTabs.Contains(property.PropertyType) == false)

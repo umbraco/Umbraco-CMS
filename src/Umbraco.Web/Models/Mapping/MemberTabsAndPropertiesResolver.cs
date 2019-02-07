@@ -29,8 +29,8 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService)
-            : base(localizedTextService)
+        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService, IContentTypeBaseServiceProvider contentTypeServiceProvider)
+            : base(localizedTextService, contentTypeServiceProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));

@@ -12,36 +12,23 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal abstract class TabsAndPropertiesResolver
     {
+        private readonly IContentTypeBaseServiceProvider _contentTypeServiceProvider;
         protected ILocalizedTextService LocalizedTextService { get; }
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
-        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeServiceProvider)
         {
+            _contentTypeServiceProvider = contentTypeServiceProvider;
             LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = new List<string>();
         }
 
-        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
-            : this(localizedTextService)
+        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeServiceProvider, IEnumerable<string> ignoreProperties)
+            : this(localizedTextService, contentTypeServiceProvider)
         {
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
-
-        // TODO: This should deserialize to ListViewConfiguration
-        private static int GetTabNumberFromConfig(IDictionary<string, object> listViewConfig)
-        {
-            if (!listViewConfig.TryGetValue("displayAtTabNumber", out var displayTabNum))
-                return -1;
-            switch (displayTabNum)
-            {
-                case int i:
-                    return i;
-                case string s when int.TryParse(s, out var parsed):
-                    return parsed;
-            }
-            return -1;
-        }
-
+        
         /// <summary>
         /// Returns a collection of custom generic properties that exist on the generic properties tab
         /// </summary>
@@ -65,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             // add the generic properties tab, for properties that don't belong to a tab
             // get the properties, map and translate them, then add the tab
-            var noGroupProperties = content.GetNonGroupedProperties()
+            var noGroupProperties = content.GetNonGroupedProperties(_contentTypeServiceProvider)
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
                 .ToList();
             var genericproperties = MapProperties(content, noGroupProperties, context);
@@ -137,8 +124,8 @@ namespace Umbraco.Web.Models.Mapping
     internal class TabsAndPropertiesResolver<TSource, TDestination> : TabsAndPropertiesResolver, IValueResolver<TSource, TDestination, IEnumerable<Tab<ContentPropertyDisplay>>>
         where TSource : IContentBase
     {
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
-            : base(localizedTextService)
+        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeServiceProvider)
+            : base(localizedTextService, contentTypeServiceProvider)
         { }
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
