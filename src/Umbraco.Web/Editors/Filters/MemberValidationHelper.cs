@@ -7,7 +7,6 @@ using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -23,7 +22,8 @@ namespace Umbraco.Web.Editors.Filters
     {
         private readonly IMemberTypeService _memberTypeService;
 
-        public MemberValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService) : base(logger, umbracoContextAccessor)
+        public MemberValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
+            : base(logger, umbracoContextAccessor)
         {
             _memberTypeService = memberTypeService;
         }

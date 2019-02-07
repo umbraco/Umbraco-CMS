@@ -1,10 +1,6 @@
-﻿using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http.Controllers;
+﻿using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
@@ -20,9 +16,9 @@ namespace Umbraco.Web.Editors.Filters
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMemberTypeService _memberTypeService;
 
-        public MemberSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.MemberTypeService)
-        {
-        }
+        public MemberSaveValidationAttribute()
+            : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.MemberTypeService)
+        { }
 
         public MemberSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
         {

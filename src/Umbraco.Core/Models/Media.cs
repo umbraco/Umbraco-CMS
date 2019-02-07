@@ -80,6 +80,5 @@ namespace Umbraco.Core.Models
             Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
         }
-
     }
 }

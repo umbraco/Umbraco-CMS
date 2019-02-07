@@ -307,26 +307,10 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
         {
-            if (Properties.TryGetValue(propertyTypeAlias, out var property))
-            {
-                property.SetValue(value, culture, segment);
-            }
-            else
-            {
-                //fixme: Can this ever happen? According to the ctor in ContentBase (EnsurePropertyTypes), all properties will be created based on the content type's property types
-                // so how can a property not be resolved by the alias on the content.Properties but it can on the content type?
-                // This maybe can happen if a developer has removed a property with the api and is trying to then set the value of that property again...
-                // BUT, as it turns out the content.Properties.Remove(...) method is NEVER used, because why and how could it? you never remove a property from
-                // a content item directly.
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
+                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
-                var propertyType = AllPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-                if (propertyType == null)
-                    throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
-
-                property = propertyType.CreateProperty();
-                property.SetValue(value, culture, segment);
-                Properties.Add(property);
-            }
+            property.SetValue(value, culture, segment);
 
             //bump the culture to be flagged for updating
             this.TouchCulture(culture);

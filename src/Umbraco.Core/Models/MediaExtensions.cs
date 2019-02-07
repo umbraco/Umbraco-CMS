@@ -2,7 +2,6 @@
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -20,8 +19,8 @@ namespace Umbraco.Core.Models
                 return string.Empty;
 
             // TODO: would need to be adjusted to variations, when media become variants
-            var jsonString = property?.GetValue() as string;
-            if (jsonString == null) return string.Empty;
+            if (!(property.GetValue() is string jsonString))
+                return string.Empty;
 
             if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)
                 return jsonString;

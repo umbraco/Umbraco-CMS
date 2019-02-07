@@ -31,5 +31,12 @@ namespace Umbraco.Core.Services.Implement
                     throw new ArgumentException($"Invalid contentBase type: {contentBase.GetType().FullName}" , nameof(contentBase));
             }
         }
+
+        // note: this should be a default interface method with C# 8
+        public IContentTypeComposition GetContentTypeOf(IContentBase contentBase)
+        {
+            if (contentBase == null) throw new ArgumentNullException(nameof(contentBase));
+            return For(contentBase)?.Get(contentBase.ContentTypeId);
+        }
     }
 }

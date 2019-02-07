@@ -291,7 +291,6 @@
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Composing\RegisterExtensions.cs" />
-    <Compile Include="ContentTypeBaseServiceProviderExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
     <Compile Include="Dashboards\AccessRule.cs" />
     <Compile Include="Dashboards\AccessRuleType.cs" />

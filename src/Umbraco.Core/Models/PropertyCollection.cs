@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Adds or update a property.
+        /// Adds or updates a property.
         /// </summary>
         internal new void Add(Property property)
         {
