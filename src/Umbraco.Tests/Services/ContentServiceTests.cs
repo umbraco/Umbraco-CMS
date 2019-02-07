@@ -1574,7 +1574,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateAllTypesContentType("test", "test");
             ServiceContext.ContentTypeService.Save(contentType, Constants.Security.SuperUserId);
-
+            
             object obj =
                 new
                 {

@@ -227,6 +227,9 @@ namespace Umbraco.Tests.Models
             // now it will work
             contentType.Variations = ContentVariation.Culture;
 
+            // recreate content to re-capture content type variations
+            content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
             // invariant name works
             content.Name = "name";
             Assert.AreEqual("name", content.GetCultureName(null));

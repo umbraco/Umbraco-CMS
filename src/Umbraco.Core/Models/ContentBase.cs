@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
@@ -14,14 +15,14 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentType.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
         private int _contentTypeId;
-        protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
         private ContentCultureInfosCollection _cultureInfos;
+        internal IReadOnlyList<PropertyType> AllPropertyTypes { get; }
 
         #region Used for change tracking
 
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Models
 
         private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
         {
-            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
             // initially, all new instances have
             Id = 0; // no identity
@@ -72,7 +73,21 @@ namespace Umbraco.Core.Models
 
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
-            _properties.EnsurePropertyTypes(PropertyTypes);
+            _properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
+
+            //track all property types on this content type, these can never change during the lifetime of this single instance
+            //there is no real extra memory overhead of doing this since these property types are already cached on this object via the
+            //properties already.
+            AllPropertyTypes = new List<PropertyType>(contentType.CompositionPropertyTypes);
+        }
+
+        [IgnoreDataMember]
+        public ISimpleContentType ContentType { get; private set; }
+
+        internal void ChangeContentType(ISimpleContentType contentType)
+        {
+            ContentType = contentType;
+            ContentTypeId = contentType.Id;
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -103,13 +118,13 @@ namespace Umbraco.Core.Models
             {
                 //There will be cases where this has not been updated to reflect the true content type ID.
                 //This will occur when inserting new content.
-                if (_contentTypeId == 0 && ContentTypeBase != null && ContentTypeBase.HasIdentity)
+                if (_contentTypeId == 0 && ContentType != null)
                 {
-                    _contentTypeId = ContentTypeBase.Id;
+                    _contentTypeId = ContentType.Id;
                 }
                 return _contentTypeId;
             }
-            protected set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, nameof(ContentTypeId));
+            private set => SetPropertyValueAndDetectChanges(value, ref _contentTypeId, nameof(ContentTypeId));
         }
 
         /// <summary>
@@ -130,20 +145,6 @@ namespace Umbraco.Core.Models
                 _properties.CollectionChanged += PropertiesChanged;
             }
         }
-
-        /// <summary>
-        /// Gets the enumeration of property groups for the entity.
-        /// TODO: remove this proxy method
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
-
-        /// <summary>
-        /// Gets the numeration of property types for the entity.
-        /// TODO: remove this proxy method
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
 
         #region Cultures
 
@@ -185,7 +186,7 @@ namespace Umbraco.Core.Models
         public string GetCultureName(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return Name;
-            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (!ContentType.VariesByCulture()) return null;
             if (_cultureInfos == null) return null;
             return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
@@ -194,7 +195,7 @@ namespace Umbraco.Core.Models
         public DateTime? GetUpdateDate(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return null;
-            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (!ContentType.VariesByCulture()) return null;
             if (_cultureInfos == null) return null;
             return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?)null;
         }
@@ -202,7 +203,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public void SetCultureName(string name, string culture)
         {
-            if (ContentTypeBase.VariesByCulture()) // set on variant content type
+            if (ContentType.VariesByCulture()) // set on variant content type
             {
                 if (culture.IsNullOrWhiteSpace()) // invariant is ok
                 {
@@ -306,21 +307,10 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
         {
-            if (Properties.Contains(propertyTypeAlias))
-            {
-                Properties[propertyTypeAlias].SetValue(value, culture, segment);
-                //bump the culture to be flagged for updating
-                this.TouchCulture(culture);
-                return;
-            }
-
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null)
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
-            var property = propertyType.CreateProperty();
             property.SetValue(value, culture, segment);
-            Properties.Add(property);
 
             //bump the culture to be flagged for updating
             this.TouchCulture(culture);
@@ -484,6 +474,9 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedContent = (ContentBase)clone;
+
+            //need to manually clone this since it's not settable
+            clonedContent.ContentType = ContentType;
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._cultureInfos != null)

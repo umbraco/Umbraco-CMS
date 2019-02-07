@@ -169,7 +169,8 @@ namespace Umbraco.Web.Editors.Binders
                 var member = MemberService.CreateGenericMembershipProviderMember(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"));
                 //we'll just remove all properties here otherwise we'll end up with validation errors, we don't want to persist any property data anyways
                 // in this case.
-                FilterContentTypeProperties(member.ContentType, member.ContentType.PropertyTypes.Select(x => x.Alias).ToArray());
+                memberType = _services.MemberTypeService.Get(member.ContentTypeId);
+                FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
                 return member;
             }
         }

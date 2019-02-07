@@ -171,14 +171,16 @@ namespace Umbraco.Web.Security
                 member.Name = model.Name;
             }
 
+            var memberType = _memberTypeService.Get(member.ContentTypeId);
+
             if (model.MemberProperties != null)
             {
                 foreach (var property in model.MemberProperties
                     //ensure the property they are posting exists
-                    .Where(p => member.ContentType.PropertyTypeExists(p.Alias))
+                    .Where(p => memberType.PropertyTypeExists(p.Alias))
                     .Where(property => member.Properties.Contains(property.Alias))
                     //needs to be editable
-                    .Where(p => member.ContentType.MemberCanEditProperty(p.Alias)))
+                    .Where(p => memberType.MemberCanEditProperty(p.Alias)))
                 {
                     member.Properties[property.Alias].SetValue(property.Value);
                 }
@@ -409,7 +411,7 @@ namespace Umbraco.Web.Security
                 model.LastPasswordChangedDate = membershipUser.LastPasswordChangedDate;
 
 
-                var memberType = member.ContentType;
+                var memberType = _memberTypeService.Get(member.ContentTypeId);
 
                 var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
 

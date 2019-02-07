@@ -474,6 +474,7 @@
     <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
+    <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
     <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />

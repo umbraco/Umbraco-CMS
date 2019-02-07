@@ -1231,9 +1231,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            var contentTypeService = _contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
-            if (contentType.VariesByCulture())
+            if (content.ContentType.VariesByCulture())
             {
                 var infos = content is IContent document
                     ? (published
