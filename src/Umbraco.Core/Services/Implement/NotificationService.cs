@@ -345,8 +345,8 @@ namespace Umbraco.Core.Services.Implement
                 {
                     //Create the HTML based summary (ul of culture names)
 
-                    var culturesChanged = content.CultureInfos.Where(x => x.Value.WasDirty())
-                        .Select(x => x.Key)
+                    var culturesChanged = content.CultureInfos.Values.Where(x => x.WasDirty())
+                        .Select(x => x.Culture)
                         .Select(_localizationService.GetLanguageByIsoCode)
                         .WhereNotNull()
                         .Select(x => x.CultureName);
@@ -363,8 +363,8 @@ namespace Umbraco.Core.Services.Implement
                 {
                     //Create the text based summary (csv of culture names)
 
-                    var culturesChanged = string.Join(", ", content.CultureInfos.Where(x => x.Value.WasDirty())
-                        .Select(x => x.Key)
+                    var culturesChanged = string.Join(", ", content.CultureInfos.Values.Where(x => x.WasDirty())
+                        .Select(x => x.Culture)
                         .Select(_localizationService.GetLanguageByIsoCode)
                         .WhereNotNull()
                         .Select(x => x.CultureName));
