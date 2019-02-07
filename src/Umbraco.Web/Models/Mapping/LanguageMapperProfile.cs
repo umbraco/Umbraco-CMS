@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.CultureName))
                 .ForMember(dest => dest.Key, opt => opt.MapFrom(x => x.Key))
                 .ForMember(dest => dest.Alias, opt => opt.MapFrom(x => x.IsoCode))
-                .ForMember(dest => dest.ParentId, opt => opt.UseValue(-1))
+                .ForMember(dest => dest.ParentId, opt => opt.MapFrom(_ => -1))
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())

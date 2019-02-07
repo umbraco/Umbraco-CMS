@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence
             where TConnection : class, IDbConnection
         {
             var profiled = connection as ProfiledDbConnection;
-            return profiled == null ? connection as TConnection : profiled.InnerConnection as TConnection;
+            return profiled == null ? connection as TConnection : profiled.WrappedConnection as TConnection;
         }
 
         /// <summary>
