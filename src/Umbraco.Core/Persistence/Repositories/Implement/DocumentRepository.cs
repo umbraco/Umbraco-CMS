@@ -120,15 +120,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     break;
                 case QueryType.Single:
                 case QueryType.Many:
-                    //fixme: Apparently this is ambiguous?
-                    sql = sql.Select<DocumentDto>(r =>
-                       r.Select(documentDto => documentDto.ContentDto, r1 =>
-                           r1.Select(contentDto => contentDto.NodeDto))
-                        .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
-                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
-                        .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
 
+                    //we've put this in a local function so that the below sql.Select statement doesn't have a problem
+                    //thinking that the call is ambiguous
+                    NPocoSqlExtensions.SqlRef<DocumentDto> SelectStatement(NPocoSqlExtensions.SqlRef<DocumentDto> r) =>
+                        r.Select(documentDto => documentDto.ContentDto, r1 => r1.Select(contentDto => contentDto.NodeDto))
+                            .Select(documentDto => documentDto.DocumentVersionDto, r1 => r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
+                            .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 => r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv"));
+
+                    sql = sql.Select<DocumentDto>(SelectStatement)
                        // select the variant name, coalesce to the invariant name, as "variantName"
                        .AndSelect(VariantNameSqlExpression + " AS variantName");
                     break;
