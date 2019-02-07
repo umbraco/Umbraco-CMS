@@ -18,6 +18,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IContentTypeBaseService For(IContentBase contentBase)
         {
+            if (contentBase == null) throw new ArgumentNullException(nameof(contentBase));
             switch (contentBase)
             {
                 case IContent _:

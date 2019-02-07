@@ -199,8 +199,8 @@ namespace Umbraco.Web.Macros
                 Key = _inner.Key;
 
                 // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-                CreatorName = _inner.GetCreatorProfile().Name;
-                WriterName = _inner.GetWriterProfile().Name;
+                CreatorName = _inner.GetCreatorProfile()?.Name;
+                WriterName = _inner.GetWriterProfile()?.Name;
 
                 var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
                 ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
