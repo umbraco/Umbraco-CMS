@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -27,18 +26,16 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
-        private readonly IMediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
 
         public ContentService(IScopeProvider provider, ILogger logger,
-            IEventMessagesFactory eventMessagesFactory, IMediaFileSystem mediaFileSystem,
+            IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
             : base(provider, logger, eventMessagesFactory)
         {
-            _mediaFileSystem = mediaFileSystem;
             _documentRepository = documentRepository;
             _entityRepository = entityRepository;
             _auditRepository = auditRepository;
@@ -310,15 +307,16 @@ namespace Umbraco.Core.Services.Implement
 
             if (withIdentity)
             {
+                var evtMsgs = EventMessagesFactory.Get();
+
                 // if saving is cancelled, content remains without an identity
-                var saveEventArgs = new SaveEventArgs<IContent>(content);
+                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     return;
 
                 _documentRepository.Save(content);
 
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), "Saved");
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
@@ -761,7 +759,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
+                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
@@ -776,7 +774,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures that have changed
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                    ? content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                     : null;
                 // TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
@@ -787,8 +785,7 @@ namespace Umbraco.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), "Saved");
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
@@ -817,7 +814,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IContent>(contentsA, evtMsgs);
+                var saveEventArgs = new ContentSavingEventArgs(contentsA, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
@@ -838,8 +835,7 @@ namespace Umbraco.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), "Saved");
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
                 Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
@@ -857,7 +853,7 @@ namespace Umbraco.Core.Services.Implement
 
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
+                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
 
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -891,19 +887,46 @@ namespace Umbraco.Core.Services.Implement
 
             // finally, "save publishing"
             // what happens next depends on whether the content can be published or not
-            return SavePublishing(content, userId, raiseEvents);
+            return CommitDocumentChanges(content, userId, raiseEvents);
+        }
+
+        /// <inheritdoc />
+        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true)
+        {
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (cultures == null) throw new ArgumentNullException(nameof(cultures));
+
+            var evtMsgs = EventMessagesFactory.Get();
+
+            var varies = content.ContentType.VariesByCulture();
+            
+            if (cultures.Length == 0)
+            {
+                //no cultures specified and doesn't vary, so publish it, else nothing to publish
+                return !varies
+                    ? SaveAndPublish(content, userId: userId, raiseEvents: raiseEvents)
+                    : new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+            }
+
+            // TODO: currently, no way to know which one failed
+            if (cultures.Select(content.PublishCulture).Any(isValid => !isValid))
+                return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
+
+            return CommitDocumentChanges(content, userId, raiseEvents);
         }
 
         /// <inheritdoc />
         public PublishResult Unpublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
         {
+            if (content == null) throw new ArgumentNullException(nameof(content));
+
             var evtMsgs = EventMessagesFactory.Get();
 
             culture = culture.NullOrWhiteSpaceAsNull();
 
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
+                throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
 
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -925,12 +948,15 @@ namespace Umbraco.Core.Services.Implement
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
-                ((Content)content).PublishedState = PublishedState.Unpublishing;
+                content.PublishedState = PublishedState.Unpublishing;
             }
             else
             {
-                // if the culture we want to unpublish was already unpublished, nothing to do
-                if (!content.WasCulturePublished(culture))
+                // If the culture we want to unpublish was already unpublished, nothing to do.
+                // To check for that we need to lookup the persisted content item
+                var persisted = content.HasIdentity ? GetById(content.Id) : null;
+
+                if (persisted != null && !persisted.IsCulturePublished(culture))
                     return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
 
                 // unpublish the culture
@@ -938,22 +964,35 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // finally, "save publishing"
-            return SavePublishing(content, userId);
+            return CommitDocumentChanges(content, userId);
         }
 
-        /// <inheritdoc />
-        public PublishResult SavePublishing(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
+        /// <summary>
+        /// Saves a document and publishes/unpublishes any pending publishing changes made to the document.
+        /// </summary>
+        /// <remarks>
+        /// <para>This is the underlying logic for both publishing and unpublishing any document</para>
+        /// <para>Pending publishing/unpublishing changes on a document are made with calls to <see cref="IContent.PublishCulture"/> and
+        /// <see cref="IContent.UnpublishCulture"/>.</para>
+        /// <para>When publishing or unpublishing a single culture, or all cultures, use <see cref="SaveAndPublish"/>
+        /// and <see cref="Unpublish"/>. But if the flexibility to both publish and unpublish in a single operation is required
+        /// then this method needs to be used in combination with <see cref="IContent.PublishCulture"/> and <see cref="IContent.UnpublishCulture"/>
+        /// on the content itself - this prepares the content, but does not commit anything - and then, invoke
+        /// <see cref="CommitDocumentChanges"/> to actually commit the changes to the database.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// </remarks>
+        internal PublishResult CommitDocumentChanges(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
-                var result = SavePublishingInternal(scope, content, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
         }
 
-        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
+        private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
@@ -961,7 +1000,7 @@ namespace Umbraco.Core.Services.Implement
 
             // nothing set = republish it all
             if (content.PublishedState != PublishedState.Publishing && content.PublishedState != PublishedState.Unpublishing)
-                ((Content)content).PublishedState = PublishedState.Publishing;
+                content.PublishedState = PublishedState.Publishing;
 
             // state here is either Publishing or Unpublishing
             // (even though, Publishing to unpublish a culture may end up unpublishing everything)
@@ -974,7 +1013,7 @@ namespace Umbraco.Core.Services.Implement
             IReadOnlyList<string> culturesPublishing = null;
             IReadOnlyList<string> culturesUnpublishing = null;
             IReadOnlyList<string> culturesChanging = variesByCulture
-                ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                ? content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
 
             var isNew = !content.HasIdentity;
@@ -982,7 +1021,7 @@ namespace Umbraco.Core.Services.Implement
             var previouslyPublished = content.HasIdentity && content.Published;
 
             // always save
-            var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
+            var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
             if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
 
@@ -990,15 +1029,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 culturesUnpublishing = content.GetCulturesUnpublishing();
                 culturesPublishing = variesByCulture
-                        ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                        ? content.PublishCultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                         : null;
 
                 // ensure that the document can be published, and publish handling events, business rules, etc
-                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs);
+                publishResult = StrategyCanPublish(scope, content, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs, saveEventArgs);
                 if (publishResult.Success)
                 {
                     // note: StrategyPublish flips the PublishedState to Publishing!
-                    publishResult = StrategyPublish(scope, content, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
+                    publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, evtMsgs);
                 }
                 else
                 {
@@ -1017,8 +1056,11 @@ namespace Umbraco.Core.Services.Implement
                     }
 
                     // reset published state from temp values (publishing, unpublishing) to original value
-                    // (published, unpublished) in order to save the document, unchanged
-                    ((Content)content).Published = content.Published;
+                    // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
+                    // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
+                    // PublishState to anything other than Publishing or Unpublishing - which is precisely
+                    // what we want to do here - throws
+                    content.Published = content.Published; 
                 }
             }
 
@@ -1034,14 +1076,17 @@ namespace Umbraco.Core.Services.Implement
                     // handling events, business rules, etc
                     // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                     // note: This unpublishes the entire document (not different variants)
-                    unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
+                    unpublishResult = StrategyCanUnpublish(scope, content, evtMsgs);
                     if (unpublishResult.Success)
                         unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
                     else
                     {
                         // reset published state from temp values (publishing, unpublishing) to original value
-                        // (published, unpublished) in order to save the document, unchanged
-                        ((Content)content).Published = content.Published;
+                        // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
+                        // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
+                        // PublishState to anything other than Publishing or Unpublishing - which is precisely
+                        // what we want to do here - throws
+                        content.Published = content.Published;
                     }
                 }
                 else
@@ -1064,8 +1109,7 @@ namespace Umbraco.Core.Services.Implement
             // raise the Saved event, always
             if (raiseEvents)
             {
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), "Saved");
             }
 
             if (unpublishing) // we have tried to unpublish - won't happen in a branch
@@ -1108,16 +1152,16 @@ namespace Umbraco.Core.Services.Implement
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
                     {
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+                        scope.Events.Dispatch(Published, this, saveEventArgs.ToContentPublishedEventArgs(), nameof(Published));
                     }
 
-                    // if was not published and now is... descendants that were 'published' (but
+                    // it was not published and now is... descendants that were 'published' (but
                     // had an unpublished ancestor) are 're-published' ie not explicitly published
                     // but back as 'published' nevertheless
                     if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
                         var descendants = GetPublishedDescendantsLocked(content).ToArray();
-                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
+                        scope.Events.Dispatch(Published, this, new ContentPublishedEventArgs(descendants, false, evtMsgs), "Published");
                     }
 
                     switch (publishResult.Result)
@@ -1217,7 +1261,7 @@ namespace Umbraco.Core.Services.Implement
                         else if (!publishing)
                             result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
                         else
-                            result = SavePublishing(d, d.WriterId);
+                            result = CommitDocumentChanges(d, d.WriterId);
 
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1261,7 +1305,7 @@ namespace Umbraco.Core.Services.Implement
 
                         if (pendingCultures.Count > 0)
                         {
-                            result = SavePublishing(d, d.WriterId);
+                            result = CommitDocumentChanges(d, d.WriterId);
                             if (result.Success == false)
                                 Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                             yield return result;
@@ -1413,7 +1457,7 @@ namespace Umbraco.Core.Services.Implement
                 if (!document.HasIdentity)
                     throw new InvalidOperationException("Cannot not branch-publish a new document.");
 
-                var publishedState = ((Content)document).PublishedState;
+                var publishedState = document.PublishedState;
                 if (publishedState == PublishedState.Publishing)
                     throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
 
@@ -1466,8 +1510,9 @@ namespace Umbraco.Core.Services.Implement
                 Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 // trigger events for the entire branch
+                // (SaveAndPublishBranchOne does *not* do it)
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
+                scope.Events.Dispatch(Published, this, new ContentPublishedEventArgs(publishedDocuments, false, evtMsgs), nameof(Published));
 
                 scope.Complete();
             }
@@ -1495,7 +1540,7 @@ namespace Umbraco.Core.Services.Implement
             if (!publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
-            var result = SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
+            var result = CommitDocumentChangesInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
             if (result.Success)
                 publishedDocuments.Add(document);
             return result;
@@ -1729,7 +1774,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // however, it had been masked when being trashed, so there's no need for
                     // any special event here - just change its state
-                    ((Content)content).PublishedState = PublishedState.Unpublishing;
+                    content.PublishedState = PublishedState.Unpublishing;
                 }
 
                 PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
@@ -1906,7 +1951,7 @@ namespace Umbraco.Core.Services.Implement
                 // a copy is not published (but not really unpublishing either)
                 // update the create author and last edit author
                 if (copy.Published)
-                    ((Content)copy).Published = false;
+                    copy.Published = false;
                 copy.CreatorId = userId;
                 copy.WriterId = userId;
 
@@ -1950,7 +1995,7 @@ namespace Umbraco.Core.Services.Implement
                             // a copy is not published (but not really unpublishing either)
                             // update the create author and last edit author
                             if (descendantCopy.Published)
-                                ((Content)descendantCopy).Published = false;
+                                descendantCopy.Published = false;
                             descendantCopy.CreatorId = userId;
                             descendantCopy.WriterId = userId;
 
@@ -1997,7 +2042,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures changing for auditing
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    ? string.Join(",", content.CultureInfos.Values.Where(x => x.IsDirty()).Select(x => x.Culture))
                     : null;
 
                 // TODO: Currently there's no way to change track which variant properties have changed, we only have change
@@ -2087,7 +2132,7 @@ namespace Umbraco.Core.Services.Implement
 
         private OperationResult Sort(IScope scope, IContent[] itemsA, int userId, EventMessages evtMsgs, bool raiseEvents)
         {
-            var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
+            var saveEventArgs = new ContentSavingEventArgs(itemsA, evtMsgs);
             if (raiseEvents)
             {
                 //raise cancelable sorting event
@@ -2129,15 +2174,16 @@ namespace Umbraco.Core.Services.Implement
 
             if (raiseEvents)
             {
+                var savedEventsArgs = saveEventArgs.ToContentSavedEventArgs();
                 //first saved, then sorted
-                scope.Events.Dispatch(Saved, this, saveEventArgs, nameof(Saved));
-                scope.Events.Dispatch(Sorted, this, saveEventArgs, nameof(Sorted));
+                scope.Events.Dispatch(Saved, this, savedEventsArgs, nameof(Saved));
+                scope.Events.Dispatch(Sorted, this, savedEventsArgs, nameof(Sorted));
             }
 
             scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
 
             if (raiseEvents && published.Any())
-                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
+                scope.Events.Dispatch(Published, this, new ContentPublishedEventArgs(published, false, evtMsgs), "Published");
 
             Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
             return OperationResult.Succeed(evtMsgs);
@@ -2228,12 +2274,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saving;
+        public static event TypedEventHandler<IContentService, ContentSavingEventArgs> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
+        public static event TypedEventHandler<IContentService, ContentSavedEventArgs> Saved;
 
         /// <summary>
         /// Occurs after Create
@@ -2307,12 +2353,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before publish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Publishing;
+        public static event TypedEventHandler<IContentService, ContentPublishingEventArgs> Publishing;
 
         /// <summary>
         /// Occurs after publish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Published;
+        public static event TypedEventHandler<IContentService, ContentPublishedEventArgs> Published;
 
         /// <summary>
         /// Occurs before unpublish
@@ -2348,14 +2394,16 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="scope"></param>
         /// <param name="content"></param>
-        /// <param name="userId"></param>
         /// <param name="checkPath"></param>
+        /// <param name="culturesUnpublishing"></param>
         /// <param name="evtMsgs"></param>
+        /// <param name="culturesPublishing"></param>
+        /// <param name="savingEventArgs"></param>
         /// <returns></returns>
-        private PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, IReadOnlyList<string> culturesPublishing, IReadOnlyList<string> culturesUnpublishing, EventMessages evtMsgs)
+        private PublishResult StrategyCanPublish(IScope scope, IContent content, bool checkPath, IReadOnlyList<string> culturesPublishing, IReadOnlyCollection<string> culturesUnpublishing, EventMessages evtMsgs, ContentSavingEventArgs savingEventArgs)
         {
             // raise Publishing event
-            if (scope.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
+            if (scope.Events.DispatchCancelable(Publishing, this, savingEventArgs.ToContentPublishingEventArgs()))
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
@@ -2382,7 +2430,7 @@ namespace Umbraco.Core.Services.Implement
 
             // ensure that the document has published values
             // either because it is 'publishing' or because it already has a published version
-            if (((Content)content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
+            if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
                 return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
@@ -2438,20 +2486,20 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Publishes a document
         /// </summary>
-        /// <param name="scope"></param>
         /// <param name="content"></param>
-        /// <param name="userId"></param>
+        /// <param name="culturesUnpublishing"></param>
         /// <param name="evtMsgs"></param>
+        /// <param name="culturesPublishing"></param>
         /// <returns></returns>
         /// <remarks>
         /// It is assumed that all publishing checks have passed before calling this method like <see cref="StrategyCanPublish"/>
         /// </remarks>
-        private PublishResult StrategyPublish(IScope scope, IContent content, int userId,
-            IReadOnlyList<string> culturesPublishing, IReadOnlyList<string> culturesUnpublishing,
+        private PublishResult StrategyPublish(IContent content,
+            IReadOnlyCollection<string> culturesPublishing, IReadOnlyCollection<string> culturesUnpublishing,
             EventMessages evtMsgs)
         {
             // change state to publishing
-            ((Content)content).PublishedState = PublishedState.Publishing;
+            content.PublishedState = PublishedState.Publishing;
 
             //if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
             if (content.ContentType.VariesByCulture())
@@ -2486,10 +2534,9 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="scope"></param>
         /// <param name="content"></param>
-        /// <param name="userId"></param>
         /// <param name="evtMsgs"></param>
         /// <returns></returns>
-        private PublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
+        private PublishResult StrategyCanUnpublish(IScope scope, IContent content, EventMessages evtMsgs)
         {
             // raise Unpublishing event
             if (scope.Events.DispatchCancelable(Unpublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
@@ -2530,7 +2577,7 @@ namespace Umbraco.Core.Services.Implement
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
             // change state to unpublishing
-            ((Content)content).PublishedState = PublishedState.Unpublishing;
+            content.PublishedState = PublishedState.Unpublishing;
 
             Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
             return attempt;
@@ -2548,7 +2595,7 @@ namespace Umbraco.Core.Services.Implement
         /// <para>Deletes content items of the specified type, and only that type. Does *not* handle content types
         /// inheritance and compositions, which need to be managed outside of this method.</para>
         /// </remarks>
-        /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
+        /// <param name="contentTypeIds">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issuing the delete operation</param>
         public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
         {
@@ -2667,7 +2714,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var blueprint = _documentBlueprintRepository.Get(id);
                 if (blueprint != null)
-                    ((Content)blueprint).Blueprint = true;
+                    blueprint.Blueprint = true;
                 return blueprint;
             }
         }
@@ -2679,7 +2726,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var blueprint = _documentBlueprintRepository.Get(id);
                 if (blueprint != null)
-                    ((Content)blueprint).Blueprint = true;
+                    blueprint.Blueprint = true;
                 return blueprint;
             }
         }
@@ -2690,7 +2737,7 @@ namespace Umbraco.Core.Services.Implement
             if (content.ParentId != -1)
                 content.ParentId = -1;
 
-            ((Content)content).Blueprint = true;
+            content.Blueprint = true;
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2735,7 +2782,7 @@ namespace Umbraco.Core.Services.Implement
             content.WriterId = userId;
 
             var now = DateTime.Now;
-            var cultures = blueprint.CultureInfos.Any() ? blueprint.CultureInfos.Select(x=>x.Key) : ArrayOfOneNullString;
+            var cultures = blueprint.CultureInfos.Count > 0 ? blueprint.CultureInfos.Values.Select(x => x.Culture) : ArrayOfOneNullString;
             foreach (var culture in cultures)
             {
                 foreach (var property in blueprint.Properties)
@@ -2766,7 +2813,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 return _documentBlueprintRepository.Get(query).Select(x =>
                 {
-                    ((Content)x).Blueprint = true;
+                    x.Blueprint = true;
                     return x;
                 });
             }
@@ -2785,7 +2832,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var blueprints = _documentBlueprintRepository.Get(query).Select(x =>
                 {
-                    ((Content)x).Blueprint = true;
+                    x.Blueprint = true;
                     return x;
                 }).ToArray();
 

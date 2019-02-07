@@ -1151,7 +1151,6 @@ namespace Umbraco.Web.Editors
         /// Performs the publishing operation for a content item
         /// </summary>
         /// <param name="contentItem"></param>
-        /// <param name="publishStatus"></param>
         /// <param name="wasCancelled"></param>
         /// <param name="successfulCultures">
         /// if the content is variant this will return an array of cultures that will be published (passed validation rules)
@@ -1200,10 +1199,12 @@ namespace Umbraco.Web.Editors
 
             if (canPublish)
             {
+                var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+                
                 //proceed to publish if all validation still succeeds
-                var publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
-                successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+                successfulCultures = culturesToPublish;
                 return publishStatus;
             }
             else
@@ -1222,6 +1223,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentItem"></param>
         /// <param name="cultureVariants"></param>
+        /// <param name="mandatoryCultures"></param>
+        /// <param name="localizationKey"></param>
+        /// <param name="publishingCheck"></param>
+        /// <param name="mandatoryVariants"></param>
         /// <returns></returns>
         private bool ValidatePublishingMandatoryLanguages(
             ContentItemSave contentItem,
@@ -1243,7 +1248,7 @@ namespace Umbraco.Web.Editors
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
                 result.Add((mandatoryVariant, isPublished));
 
-                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant);
+                var isPublishing = isPublished || publishingCheck(mandatoryVariant);
 
                 if (isPublished || isPublishing) continue;
 
@@ -1257,7 +1262,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This will call PublishCulture on the content item for each culture that needs to be published including the invariant culture
+        /// Call PublishCulture on the content item for each culture to get a validation result for each culture
         /// </summary>
         /// <param name="persistentContent"></param>
         /// <param name="cultureVariants"></param>
@@ -1314,7 +1319,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.SavePublishing(foundContent, Security.GetUserId().ResultOr(0));
+            var publishResult = Services.ContentService.SaveAndPublish(foundContent, userId: Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();

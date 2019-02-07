@@ -301,6 +301,12 @@
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EnumExtensions.cs" />
+    <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
+    <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
+    <Compile Include="Events\ContentPublishedEventArgs.cs" />
+    <Compile Include="Events\ContentPublishingEventArgs.cs" />
+    <Compile Include="Events\ContentSavedEventArgs.cs" />
+    <Compile Include="Events\ContentSavingEventArgs.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
@@ -379,6 +385,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RenameUmbracoDomainsTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TablesForScheduledPublishing.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
@@ -393,6 +400,7 @@
     <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
+    <Compile Include="Models\ContentRepositoryExtensions.cs" />
     <Compile Include="Models\ContentSchedule.cs" />
     <Compile Include="Models\ContentScheduleAction.cs" />
     <Compile Include="Models\ContentScheduleCollection.cs" />

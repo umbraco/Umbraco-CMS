@@ -252,8 +252,8 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
-                    return _cultureInfos = _inner.PublishCultureInfos
-                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date));
+                    return _cultureInfos = _inner.PublishCultureInfos.Values
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
                 }
             }
 

@@ -18,9 +18,15 @@ namespace Umbraco.Core.Models
         private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
-        private ContentCultureInfosCollection _publishInfos;
-        private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
+        private ContentCultureInfosCollection _publishInfos;
+
+        #region Used for change tracking
+
+        private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _currentPublishCultureChanges;
+        private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _previousPublishCultureChanges;
+
+        #endregion
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -93,7 +99,7 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                if(_schedule != null)
+                if (_schedule != null)
                     _schedule.CollectionChanged -= ScheduleCollectionChanged;
                 SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
                 if (_schedule != null)
@@ -129,15 +135,16 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets a value indicating whether this content item is published or not.
         /// </summary>
+        /// <remarks>
+        /// the setter is should only be invoked from
+        /// - the ContentFactory when creating a content entity from a dto
+        /// - the ContentRepository when updating a content entity
+        /// </remarks>
         [DataMember]
         public bool Published
         {
             get => _published;
-
-            // the setter is internal and should only be invoked from
-            // - the ContentFactory when creating a content entity from a dto
-            // - the ContentRepository when updating a content entity
-            internal set
+            set
             {
                 SetPropertyValueAndDetectChanges(value, ref _published, nameof(Published));
                 _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
@@ -163,7 +170,7 @@ namespace Umbraco.Core.Models
         }
 
         [IgnoreDataMember]
-        public bool Edited { get; internal set; }
+        public bool Edited { get; set; }
 
         /// <summary>
         /// Gets the ContentType used by this content object
@@ -173,23 +180,27 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public DateTime? PublishDate { get; internal set; } // set by persistence
+        public DateTime? PublishDate { get; set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public int? PublisherId { get; internal set; } // set by persistence
+        public int? PublisherId { get; set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public int? PublishTemplateId { get; internal set; } // set by persistence
+        public int? PublishTemplateId { get; set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public string PublishName { get; internal set; } // set by persistence
+        public string PublishName { get; set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public IEnumerable<string> EditedCultures => CultureInfos.Keys.Where(IsCultureEdited);
+        public IEnumerable<string> EditedCultures
+        {
+            get => CultureInfos.Keys.Where(IsCultureEdited);
+            set => _editedCultures = value == null ? null : new HashSet<string>(value, StringComparer.OrdinalIgnoreCase);
+        }
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -202,32 +213,6 @@ namespace Umbraco.Core.Models
             => _publishInfos != null && _publishInfos.ContainsKey(culture);
 
         /// <inheritdoc />
-        public bool WasCulturePublished(string culture)
-            // just check _publishInfosOrig - a copy of _publishInfos
-            // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
-
-        // adjust dates to sync between version, cultures etc
-        // used by the repo when persisting
-        internal void AdjustDates(DateTime date)
-        {
-            foreach (var culture in PublishedCultures.ToList())
-            {
-                if (_publishInfos == null || !_publishInfos.TryGetValue(culture, out var publishInfos))
-                    continue;
-
-                if (_publishInfosOrig != null && _publishInfosOrig.TryGetValue(culture, out var publishInfosOrig)
-                    && publishInfosOrig.Date == publishInfos.Date)
-                    continue;
-
-                _publishInfos.AddOrUpdate(culture, publishInfos.Name, date);
-
-                if (CultureInfos.TryGetValue(culture, out var infos))
-                    SetCultureInfo(culture, infos.Name, date);
-            }
-        }
-
-        /// <inheritdoc />
         public bool IsCultureEdited(string culture)
             => IsCultureAvailable(culture) && // is available, and
                (!IsCulturePublished(culture) || // is not published, or
@@ -235,7 +220,23 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<string, ContentCultureInfos> PublishCultureInfos => _publishInfos ?? NoInfos;
+        public ContentCultureInfosCollection PublishCultureInfos
+        {
+            get
+            {
+                if (_publishInfos != null) return _publishInfos;
+                _publishInfos = new ContentCultureInfosCollection();
+                _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+                return _publishInfos;
+            }
+            set
+            {
+                if (_publishInfos != null) _publishInfos.CollectionChanged -= PublishNamesCollectionChanged;
+                _publishInfos = value;
+                if (_publishInfos != null)
+                    _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+            }
+        }
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)
@@ -252,67 +253,7 @@ namespace Umbraco.Core.Models
             if (culture.IsNullOrWhiteSpace()) return PublishDate;
             if (!ContentTypeBase.VariesByCulture()) return null;
             if (_publishInfos == null) return null;
-            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
-        }
-
-        // internal for repository
-        internal void SetPublishInfo(string culture, string name, DateTime date)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullOrEmptyException(nameof(name));
-
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
-
-            if (_publishInfos == null)
-            {
-                _publishInfos = new ContentCultureInfosCollection();
-                _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
-            }
-
-            _publishInfos.AddOrUpdate(culture, name, date);
-        }
-
-        private void ClearPublishInfos()
-        {
-            _publishInfos = null;
-        }
-
-        private void ClearPublishInfo(string culture)
-        {
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
-
-            if (_publishInfos == null) return;
-            _publishInfos.Remove(culture);
-            if (_publishInfos.Count == 0) _publishInfos = null;
-
-            // set the culture to be dirty - it's been modified
-            TouchCultureInfo(culture);
-        }
-
-        // sets a publish edited
-        internal void SetCultureEdited(string culture)
-        {
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
-            if (_editedCultures == null)
-                _editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            _editedCultures.Add(culture.ToLowerInvariant());
-        }
-
-        // sets all publish edited
-        internal void SetCultureEdited(IEnumerable<string> cultures)
-        {
-            if (cultures == null)
-            {
-                _editedCultures = null;
-            }
-            else
-            {
-                var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace()), StringComparer.OrdinalIgnoreCase);
-                _editedCultures = editedCultures.Count > 0 ? editedCultures : null;
-            }
+            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?)null;
         }
 
         /// <summary>
@@ -321,94 +262,54 @@ namespace Umbraco.Core.Models
         private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(PublishCultureInfos));
+
+            //we don't need to handle other actions, only add/remove, however we could implement Replace and track updated cultures in _updatedCultures too
+            //which would allows us to continue doing WasCulturePublished, but don't think we need it anymore
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        var cultureInfo = e.NewItems.Cast<ContentCultureInfos>().First();
+                        if (_currentPublishCultureChanges.addedCultures == null) _currentPublishCultureChanges.addedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        if (_currentPublishCultureChanges.updatedCultures == null) _currentPublishCultureChanges.updatedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        _currentPublishCultureChanges.addedCultures.Add(cultureInfo.Culture);
+                        _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                        _currentPublishCultureChanges.removedCultures?.Remove(cultureInfo.Culture);
+                        break;
+                    }
+                case NotifyCollectionChangedAction.Remove:
+                    {
+                        //remove listening for changes
+                        var cultureInfo = e.OldItems.Cast<ContentCultureInfos>().First();
+                        if (_currentPublishCultureChanges.removedCultures == null) _currentPublishCultureChanges.removedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        _currentPublishCultureChanges.removedCultures.Add(cultureInfo.Culture);
+                        _currentPublishCultureChanges.updatedCultures?.Remove(cultureInfo.Culture);
+                        _currentPublishCultureChanges.addedCultures?.Remove(cultureInfo.Culture);
+                        break;
+                    }
+                case NotifyCollectionChangedAction.Replace:
+                    {
+                        //replace occurs when an Update occurs
+                        var cultureInfo = e.NewItems.Cast<ContentCultureInfos>().First();
+                        if (_currentPublishCultureChanges.updatedCultures == null) _currentPublishCultureChanges.updatedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                        break;
+                    }
+            }
         }
 
         [IgnoreDataMember]
-        public int PublishedVersionId { get; internal set; }
+        public int PublishedVersionId { get; set; }
 
         [DataMember]
-        public bool Blueprint { get; internal set; }
-
-        /// <inheritdoc />
-        public bool PublishCulture(string culture = "*")
-        {
-            culture = culture.NullOrWhiteSpaceAsNull();
-
-            // the variation should be supported by the content type properties
-            //  if the content type is invariant, only '*' and 'null' is ok
-            //  if the content type varies, everything is ok because some properties may be invariant
-            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
-
-            // the values we want to publish should be valid
-            if (ValidateProperties(culture).Any())
-                return false;
-
-            var alsoInvariant = false;
-            if (culture == "*") // all cultures
-            {
-                foreach (var c in AvailableCultures)
-                {
-                    var name = GetCultureName(c);
-                    if (string.IsNullOrWhiteSpace(name))
-                        return false;
-                    SetPublishInfo(c, name, DateTime.Now);
-                }
-            }
-            else if (culture == null) // invariant culture
-            {
-                if (string.IsNullOrWhiteSpace(Name))
-                    return false;
-                // PublishName set by repository - nothing to do here
-            }
-            else // one single culture
-            {
-                var name = GetCultureName(culture);
-                if (string.IsNullOrWhiteSpace(name))
-                    return false;
-                SetPublishInfo(culture, name, DateTime.Now);
-                alsoInvariant = true; // we also want to publish invariant values
-            }
-
-            // property.PublishValues only publishes what is valid, variation-wise
-            foreach (var property in Properties)
-            {
-                property.PublishValues(culture);
-                if (alsoInvariant)
-                    property.PublishValues(null);
-            }
-
-            _publishedState = PublishedState.Publishing;
-            return true;
-        }
-
-        /// <inheritdoc />
-        public void UnpublishCulture(string culture = "*")
-        {
-            culture = culture.NullOrWhiteSpaceAsNull();
-
-            // the variation should be supported by the content type properties
-            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
-
-            if (culture == "*") // all cultures
-                ClearPublishInfos();
-            else // one single culture
-                ClearPublishInfo(culture);
-
-            // property.PublishValues only publishes what is valid, variation-wise
-            foreach (var property in Properties)
-                property.UnpublishValues(culture);
-
-            _publishedState = PublishedState.Publishing;
-        }
+        public bool Blueprint { get; set; }
 
         /// <summary>
         /// Changes the <see cref="ContentType"/> for the current content object
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        public void ChangeContentType(IContentType contentType)
+        internal void ChangeContentType(IContentType contentType)
         {
             ContentTypeId = contentType.Id;
             ContentType = new SimpleContentType(contentType);
@@ -425,9 +326,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        public void ChangeContentType(IContentType contentType, bool clearProperties)
+        internal void ChangeContentType(IContentType contentType, bool clearProperties)
         {
-            if(clearProperties)
+            if (clearProperties)
             {
                 ContentTypeId = contentType.Id;
                 ContentType = new SimpleContentType(contentType);
@@ -442,23 +343,89 @@ namespace Umbraco.Core.Models
             ChangeContentType(contentType);
         }
 
+        public override void ResetWereDirtyProperties()
+        {
+            base.ResetWereDirtyProperties();
+            _previousPublishCultureChanges.updatedCultures = null;
+            _previousPublishCultureChanges.removedCultures = null;
+            _previousPublishCultureChanges.addedCultures = null;
+        }
+
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
 
+            if (rememberDirty)
+            {
+                _previousPublishCultureChanges.addedCultures = _currentPublishCultureChanges.addedCultures == null || _currentPublishCultureChanges.addedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.removedCultures = _currentPublishCultureChanges.removedCultures == null || _currentPublishCultureChanges.removedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.updatedCultures = _currentPublishCultureChanges.updatedCultures == null || _currentPublishCultureChanges.updatedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
+            }
+            else
+            {
+                _previousPublishCultureChanges.addedCultures = null;
+                _previousPublishCultureChanges.removedCultures = null;
+                _previousPublishCultureChanges.updatedCultures = null;
+            }
+            _currentPublishCultureChanges.addedCultures?.Clear();
+            _currentPublishCultureChanges.removedCultures?.Clear();
+            _currentPublishCultureChanges.updatedCultures?.Clear();
+
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
-
-            // Make a copy of the _publishInfos, this is purely so that we can detect
-            // if this entity's previous culture publish state (regardless of the rememberDirty flag)
-            _publishInfosOrig = _publishInfos == null
-                ? null
-                : new ContentCultureInfosCollection(_publishInfos);
 
             if (_publishInfos == null) return;
 
             foreach (var infos in _publishInfos)
                 infos.ResetDirtyProperties(rememberDirty);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Overridden to check special keys.</remarks>
+        public override bool IsPropertyDirty(string propertyName)
+        {
+            //Special check here since we want to check if the request is for changed cultures
+            if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
+                return _currentPublishCultureChanges.addedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UnpublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UnpublishedCulture);
+                return _currentPublishCultureChanges.removedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.ChangedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.ChangedCulture);
+                return _currentPublishCultureChanges.updatedCultures?.Contains(culture) ?? false;
+            }
+
+            return base.IsPropertyDirty(propertyName);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Overridden to check special keys.</remarks>
+        public override bool WasPropertyDirty(string propertyName)
+        {
+            //Special check here since we want to check if the request is for changed cultures
+            if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
+                return _previousPublishCultureChanges.addedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UnpublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UnpublishedCulture);
+                return _previousPublishCultureChanges.removedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.ChangedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.ChangedCulture);
+                return _previousPublishCultureChanges.updatedCultures?.Contains(culture) ?? false;
+            }
+
+            return base.WasPropertyDirty(propertyName);
         }
 
         /// <summary>
@@ -484,6 +451,8 @@ namespace Umbraco.Core.Models
 
             var clonedContent = (Content)clone;
 
+            //fixme - need to reset change tracking bits
+
             //need to manually clone this since it's not settable
             clonedContent.ContentType = ContentType;
 
@@ -491,7 +460,7 @@ namespace Umbraco.Core.Models
             if (clonedContent._publishInfos != null)
             {
                 clonedContent._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
-                clonedContent._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
+                clonedContent._publishInfos = (ContentCultureInfosCollection)_publishInfos.DeepClone(); //manually deep clone
                 clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
             }
 
@@ -502,6 +471,14 @@ namespace Umbraco.Core.Models
                 clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
                 clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
             }
+
+            clonedContent._currentPublishCultureChanges.updatedCultures = null;
+            clonedContent._currentPublishCultureChanges.addedCultures = null;
+            clonedContent._currentPublishCultureChanges.removedCultures = null;
+
+            clonedContent._previousPublishCultureChanges.updatedCultures = null;
+            clonedContent._previousPublishCultureChanges.addedCultures = null;
+            clonedContent._previousPublishCultureChanges.removedCultures = null;
         }
     }
 }
