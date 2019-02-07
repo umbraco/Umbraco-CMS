@@ -870,8 +870,10 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root
-                if (toMove.ContentType.AllowedAsRoot == false)
+                //cannot move if the content item is not allowed at the root unless there are
+                //none allowed at root (in which case all should be allowed at root)
+                var mediaTypeService = Services.MediaTypeService;
+                if (toMove.ContentType.AllowedAsRoot == false && mediaTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
                 {
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedAtRoot"), "");

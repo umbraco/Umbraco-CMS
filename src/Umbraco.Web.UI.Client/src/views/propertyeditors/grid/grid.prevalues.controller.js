@@ -96,7 +96,7 @@ angular.module("umbraco")
            $scope.layoutConfigOverlay.rows = $scope.model.value.layouts;
            $scope.layoutConfigOverlay.columns = $scope.model.value.columns;
            $scope.layoutConfigOverlay.show = true;
-
+           
            $scope.layoutConfigOverlay.submit = function(model) {
               $scope.layoutConfigOverlay.show = false;
               $scope.layoutConfigOverlay = null;
@@ -218,8 +218,8 @@ angular.module("umbraco")
            $scope.editConfigCollectionOverlay.show = true;
 
            $scope.editConfigCollectionOverlay.submit = function(model) {
-
-              callback(model.config)
+               
+              callback(model.config);
 
               $scope.editConfigCollectionOverlay.show = false;
               $scope.editConfigCollectionOverlay = null;
