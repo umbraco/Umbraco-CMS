@@ -16,21 +16,17 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static string GetUrl(this IMedia media, string propertyAlias, ILogger logger)
         {
-            var contentType = Current.Services.MediaTypeService.Get(media.ContentTypeId);
-            var propertyType = contentType.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
-            if (propertyType == null) return string.Empty;
-
-            var val = media.Properties[propertyType];
-            if (val == null) return string.Empty;
+            if (!media.Properties.TryGetValue(propertyAlias, out var property))
+                return string.Empty;
 
             // TODO: would need to be adjusted to variations, when media become variants
-            var jsonString = val.GetValue() as string;
+            var jsonString = property?.GetValue() as string;
             if (jsonString == null) return string.Empty;
 
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)
+            if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)
                 return jsonString;
 
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper)
+            if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper)
             {
                 if (jsonString.DetectIsJson() == false)
                     return jsonString;
