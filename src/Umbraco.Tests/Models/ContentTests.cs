@@ -30,7 +30,6 @@ namespace Umbraco.Tests.Models
     public class ContentTests : UmbracoTestBase
     {
         private IContentTypeService _contentTypeService;
-        private IContentTypeBaseServiceProvider _contentTypeServiceProvider;
 
         protected override void Compose()
         {
@@ -57,8 +56,7 @@ namespace Umbraco.Tests.Models
             var mediaTypeService = Mock.Of<IMediaTypeService>();
             var memberTypeService = Mock.Of<IMemberTypeService>();
             Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService, contentTypeBaseServiceProvider: new ContentTypeBaseServiceProvider(_contentTypeService, mediaTypeService, memberTypeService)));
-
-            _contentTypeServiceProvider = new ContentTypeBaseServiceProvider(_contentTypeService, Mock.Of<IMediaTypeService>(), Mock.Of<IMemberTypeService>());
+            
         }
 
         [Test]
@@ -544,7 +542,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            content.PropertyValues(_contentTypeServiceProvider, new { title = "This is the new title"});
+            content.PropertyValues(new { title = "This is the new title"});
 
             // Assert
             Assert.That(content.Properties.Any(), Is.True);

@@ -23,6 +23,7 @@ namespace Umbraco.Core.Models
         private int _writerId;
         private PropertyCollection _properties;
         private ContentCultureInfosCollection _cultureInfos;
+        internal IReadOnlyList<PropertyType> AllPropertyTypes { get; }
 
         #region Used for change tracking
 
@@ -64,6 +65,11 @@ namespace Umbraco.Core.Models
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
             _properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
+
+            //track all property types on this content type, these can never change during the lifetime of this single instance
+            //there is no real extra memory overhead of doing this since these property types are already cached on this object via the
+            //properties already.
+            AllPropertyTypes = new List<PropertyType>(contentType.CompositionPropertyTypes);
         }
 
         [IgnoreDataMember]
@@ -294,22 +300,26 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
         {
-            if (Properties.Contains(propertyTypeAlias))
+            if (Properties.TryGetValue(propertyTypeAlias, out var property))
             {
-                Properties[propertyTypeAlias].SetValue(value, culture, segment);
-                //bump the culture to be flagged for updating
-                this.TouchCulture(culture);
-                return;
+                property.SetValue(value, culture, segment);
             }
+            else
+            {
+                //fixme: Can this ever happen? According to the ctor in ContentBase (EnsurePropertyTypes), all properties will be created based on the content type's property types
+                // so how can a property not be resolved by the alias on the content.Properties but it can on the content type?
+                // This maybe can happen if a developer has removed a property with the api and is trying to then set the value of that property again...
+                // BUT, as it turns out the content.Properties.Remove(...) method is NEVER used, because why and how could it? you never remove a property from
+                // a content item directly.
 
-            var propertyTypes = Current.Services.ContentTypeBaseServices.GetContentTypeOf(this).CompositionPropertyTypes;
-            var propertyType = propertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null)
-                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
+                var propertyType = AllPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+                if (propertyType == null)
+                    throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
-            var property = propertyType.CreateProperty();
-            property.SetValue(value, culture, segment);
-            Properties.Add(property);
+                property = propertyType.CreateProperty();
+                property.SetValue(value, culture, segment);
+                Properties.Add(property);
+            }
 
             //bump the culture to be flagged for updating
             this.TouchCulture(culture);

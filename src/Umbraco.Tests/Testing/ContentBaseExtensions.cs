@@ -9,16 +9,12 @@ namespace Umbraco.Tests.Testing
 {
     public static class ContentBaseExtensions
     {
-        public static void PropertyValues(this IContentBase content, object value, string culture = null, string segment = null)
-        {
-            content.PropertyValues(Current.Services.ContentTypeBaseServices, value, culture, segment);
-        }
-
+        
         /// <summary>
         /// Set property values by alias with an anonymous object.
         /// </summary>
         /// <remarks>Does not support variants.</remarks>
-        public static void PropertyValues(this IContentBase content, IContentTypeBaseServiceProvider contentTypeServiceProvider, object value, string culture = null, string segment = null)
+        public static void PropertyValues(this IContentBase content, object value, string culture = null, string segment = null)
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");
@@ -35,12 +31,13 @@ namespace Umbraco.Tests.Testing
                 else
                 {
 
-                    //TODO: Will this ever happen?? In theory we don't need to lookup the content type here since we can just check if the content contains properties with the correct name,
-                    // however, i think this may be needed in the case where the content type contains property types that do not exist yet as properties on the
-                    // content item? But can that happen? AFAIK it can't/shouldn't because of how we create content items in ContentBase we do _properties.EnsurePropertyTypes!
-
-                    var contentType = contentTypeServiceProvider.GetContentTypeOf(content);
-                    var propertyType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
+                    //fixme: Can this ever happen? According to the ctor in ContentBase (EnsurePropertyTypes), all properties will be created based on the content type's property types
+                    // so how can a property not be resolved by the alias on the content.Properties but it can on the content type?
+                    // This maybe can happen if a developer has removed a property with the api and is trying to then set the value of that property again...
+                    // BUT, as it turns out the content.Properties.Remove(...) method is NEVER used, because why and how could it? you never remove a property from
+                    // a content item directly.
+                    
+                    var propertyType = ((ContentBase)content).AllPropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
                     if (propertyType == null)
                         throw new Exception($"The property alias {propertyInfo.Name} is not valid, because no PropertyType with this alias exists");
                     //Create new Property to add to collection
