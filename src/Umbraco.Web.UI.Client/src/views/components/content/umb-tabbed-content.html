@@ -1,12 +1,12 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-expansion-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
+        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
 
-            <div class="umb-expansion-panel__header">
+            <div class="umb-group-panel__header">
                 <div>{{ group.label }}</div>
             </div>
 
-            <div class="umb-expansion-panel__content">
+            <div class="umb-group-panel__content">
                 <umb-property
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"

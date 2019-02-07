@@ -30,11 +30,13 @@
                 
             }
             function setActiveAnchor(tab) {
-                var i = $scope.content.tabs.length;
-                while(i--) {
-                    $scope.content.tabs[i].active = false;
+                if (tab.active !== true) {
+                    var i = $scope.content.tabs.length;
+                    while(i--) {
+                        $scope.content.tabs[i].active = false;
+                    }
+                    tab.active = true;
                 }
-                tab.active = true;
             }
             function getActiveAnchor() {
                 var i = $scope.content.tabs.length;
@@ -51,7 +53,6 @@
                 return null;
             }
             function scrollTo(id) {
-                console.log("scrollTo", id);
                 var y = getScrollPositionFor(id);
                 if (getScrollPositionFor !== null) {
                     scrollableNode.scrollTo(0, y);
