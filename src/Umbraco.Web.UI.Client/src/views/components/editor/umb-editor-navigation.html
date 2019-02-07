@@ -6,6 +6,7 @@
             <umb-editor-navigation-item
                 item="navItem"
                 on-open="openNavigationItem(item)"
+                on-open-anchor="openAnchorItem(item, anchor)"
                 index="{{$index}}">
             </umb-editor-navigation-item>
         </div>
@@ -28,6 +29,7 @@
                     <umb-editor-navigation-item
                         item="navItem"
                         on-open="openNavigationItem(item)"
+                        on-open-anchor="openAnchorItem(item, anchor)"
                         index="{{$index}}">
                     </umb-editor-navigation-item>
                 </umb-dropdown-item>

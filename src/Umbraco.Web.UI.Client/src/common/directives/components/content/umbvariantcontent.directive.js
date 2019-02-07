@@ -16,7 +16,8 @@
             onCloseSplitView: "&",
             onSelectVariant: "&",
             onOpenSplitView: "&",
-            onSelectApp: "&"
+            onSelectApp: "&",
+            onSelectAppAnchor: "&"
         },
         controllerAs: 'vm',
         controller: umbVariantContentController
@@ -35,6 +36,7 @@
         vm.selectVariant = selectVariant;
         vm.openSplitView = openSplitView;
         vm.selectApp = selectApp;
+        vm.selectAppAnchor = selectAppAnchor;
 
         function onInit() {
             // disable the name field if the active content app is not "Content"
@@ -86,6 +88,17 @@
             // call the callback if any is registered
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": item});
+            }
+        }
+
+        /**
+         * Used to proxy a callback
+         * @param {any} item
+         */
+        function selectAppAnchor(item, anchor) {
+            // call the callback if any is registered
+            if(vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({"app": item, "anchor": anchor});
             }
         }
 

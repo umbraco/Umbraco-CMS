@@ -878,6 +878,23 @@
             }
         };
 
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appAnchorChanged = function (app, anchor) {
+            
+            if ($scope.app !== app) {
+                console.log("Change app")
+                // TODO: Not working..!!!!!!!!
+                $scope.appChanged(app);
+            }
+            
+            //send an event downwards
+            $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
+            
+        };
+
         // methods for infinite editing
         $scope.close = function () {
             if ($scope.infiniteModel.close) {

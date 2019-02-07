@@ -10,7 +10,8 @@
             page: "<",
             content: "<", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
             culture: "<",
-            onSelectApp: "&?"
+            onSelectApp: "&?",
+            onSelectAppAnchor: "&?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentEditorsController
@@ -32,6 +33,7 @@
         vm.closeSplitView = closeSplitView;
         vm.selectVariant = selectVariant;
         vm.selectApp = selectApp;
+        vm.selectAppAnchor = selectAppAnchor;
 
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
@@ -321,6 +323,12 @@
             }
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": app});
+            }
+        }
+        
+        function selectAppAnchor(app, anchor) {
+            if(vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({"app": app, "anchor": anchor});
             }
         }
 

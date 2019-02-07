@@ -19,15 +19,14 @@
             function onInit() {
                 
                 setCurrentVariant();
-                /*
+                
                 angular.forEach(scope.content.apps, (app) => {
                     if (app.alias === "umbContent") {
-                        console.log("content app", app)
-                        app.type = "dropdown";
-                        app.groups = scope.content.tabs;
+                        console.log("app: ", app)
+                        app.anchors = scope.content.tabs;
                     }
                 });
-                */
+                
             }
 
             function setCurrentVariant() {
@@ -53,6 +52,12 @@
             scope.selectNavigationItem = function(item) {
                 if(scope.onSelectNavigationItem) {
                     scope.onSelectNavigationItem({"item": item});
+                }
+            }
+
+            scope.selectAnchorItem = function(item, anchor) {
+                if(scope.onSelectAnchorItem) {
+                    scope.onSelectAnchorItem({"item": item, "anchor": anchor});
                 }
             }
 
@@ -114,6 +119,7 @@
                 openVariants: "<",
                 hideChangeVariant: "<?",
                 onSelectNavigationItem: "&?",
+                onSelectAnchorItem: "&?",
                 showBackButton: "<?",
                 splitViewOpen: "=?",
                 onOpenInSplitView: "&?",

@@ -1,16 +1,15 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-expansion-panel" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
+        <div class="umb-expansion-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
 
-            <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
+            <div class="umb-expansion-panel__header">
                 <div>{{ group.label }}</div>
-                <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !group.open, 'icon-navigation-up': group.open}">&nbsp;</ins>
             </div>
 
-            <div class="umb-expansion-panel__content" ng-show="group.open">
-                <umb-property 
-                    data-element="property-{{property.alias}}" 
-                    ng-repeat="property in group.properties track by property.alias" 
+            <div class="umb-expansion-panel__content">
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in group.properties track by property.alias"
                     property="property"
                     show-inherit="content.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
                     inherits-from="defaultVariant.language.name">

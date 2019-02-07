@@ -28,6 +28,12 @@
                 eventsService.emit("app.tabChange", item);
             };
 
+            scope.openAnchorItem = function(item, anchor) {
+                if(scope.onAnchorSelect) {
+                    scope.onAnchorSelect({"item": item, "anchor": anchor});
+                }
+            };
+
             scope.toggleDropdown = function () {
                 scope.showDropdown = !scope.showDropdown;
             };
@@ -129,7 +135,8 @@
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             scope: {
                 navigation: "=",
-                onSelect: "&"
+                onSelect: "&",
+                onAnchorSelect: "&"
             },
             link: link
         };

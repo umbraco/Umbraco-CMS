@@ -1,7 +1,7 @@
 .umb-sub-views-nav-item {
-    
+    position: relative;
 }
-.umb-sub-views-nav-item a {
+.umb-sub-views-nav-item > a {
   text-align: center;
   cursor: pointer;
   display: block;
@@ -36,16 +36,16 @@
   }
 }
 
-.umb-sub-views-nav-item a:focus {
+.umb-sub-views-nav-item > a:focus {
   outline: none;
 }
 
-.umb-sub-views-nav-item a:hover,
-.umb-sub-views-nav-item a:focus {
+.umb-sub-views-nav-item > a:hover,
+.umb-sub-views-nav-item > a:focus {
   text-decoration: none;
 }
 
-.umb-sub-views-nav-item a.is-active {
+.umb-sub-views-nav-item > a.is-active {
     
     color: @ui-light-active-type;
     
@@ -55,7 +55,7 @@
     }
 }
 
-.show-validation .umb-sub-views-nav-item a.-has-error {
+.show-validation .umb-sub-views-nav-item > a.-has-error {
   color: @red;
 }
 
@@ -97,6 +97,28 @@
   font-size: 12px;
   line-height: 1em;
 }
+
+
+.umb-sub-views-nav-item__anchor_dropdown {// inherits from .dropdown-menu
+    display: none;
+    &.show {
+        display: block;
+    }
+}
+.umb-sub-views-nav-item__anchor_dropdown li a {
+    border-left: 4px solid transparent;
+}
+.umb-sub-views-nav-item__anchor_dropdown li.is-active a {
+    border-left-color: @ui-selected-border;
+}
+.umb-sub-views-nav-item__anchor_dropdown li:hover.is-active a {
+    border-left-color: @ui-selected-border-hover;
+}
+
+
+// --------------------------------
+// item__more, appears when there is not enough room for the visible items.
+// --------------------------------
 
 .umb-sub-views-nav-item-more__icon {
   margin-bottom: 10px;
