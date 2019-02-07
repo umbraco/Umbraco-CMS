@@ -1574,19 +1574,19 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateAllTypesContentType("test", "test");
             ServiceContext.ContentTypeService.Save(contentType, Constants.Security.SuperUserId);
-
+            
             object obj =
                 new
                 {
                     tags = "[\"Hello\",\"World\"]"
                 };
             var content1 = MockedContent.CreateBasicContent(contentType);
-            content1.PropertyValues(obj);
+            content1.PropertyValues(ServiceContext.ContentTypeBaseServices, obj);
             content1.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content1, Constants.Security.SuperUserId);
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content1, userId: 0).Success);
             var content2 = MockedContent.CreateBasicContent(contentType);
-            content2.PropertyValues(obj);
+            content2.PropertyValues(ServiceContext.ContentTypeBaseServices, obj);
             content2.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content2, Constants.Security.SuperUserId);
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, userId: 0).Success);

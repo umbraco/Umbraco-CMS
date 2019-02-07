@@ -9,9 +9,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class SimpleContentType : ISimpleContentType
     {
-        private readonly int _id;
-        private readonly string _name;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleContentType"/> class.
         /// </summary>
@@ -39,13 +36,12 @@ namespace Umbraco.Core.Models
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
 
-            _id = contentType.Id;
+            Id = contentType.Id;
             Alias = contentType.Alias;
             Variations = contentType.Variations;
             Icon = contentType.Icon;
             IsContainer = contentType.IsContainer;
-            Icon = contentType.Icon;
-            _name = contentType.Name;
+            Name = contentType.Name;
             AllowedAsRoot = contentType.AllowedAsRoot;
             IsElement = contentType.IsElement;
         }
@@ -53,12 +49,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public string Alias { get; }
 
-        /// <inheritdoc />
-        public int Id
-        {
-            get => _id;
-            set => throw new NotSupportedException();
-        }
+        public int Id { get; }
 
         /// <inheritdoc />
         public ITemplate DefaultTemplate { get;  }
@@ -71,13 +62,8 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public bool IsContainer { get; }
-
-        /// <inheritdoc />
-        public string Name
-        {
-            get => _name;
-            set => throw new NotSupportedException();
-        }
+        
+        public string Name { get; }
 
         /// <inheritdoc />
         public bool AllowedAsRoot { get; }
@@ -120,30 +106,29 @@ namespace Umbraco.Core.Models
         // we have to have all this, because we're an IUmbracoEntity, because that is
         // required by the query expression visitor / SimpleContentTypeMapper
 
-        public object DeepClone() => throw new NotImplementedException();
-
-        public Guid Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTime CreateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTime UpdateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTime? DeleteDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool HasIdentity => throw new NotImplementedException();
-
-        public int CreatorId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int ParentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public void SetParent(ITreeEntity parent) => throw new NotImplementedException();
-
-        public int Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Path { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int SortOrder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool Trashed => throw new NotImplementedException();
-        public bool IsDirty() => throw new NotImplementedException();
-        public bool IsPropertyDirty(string propName) => throw new NotImplementedException();
-        public IEnumerable<string> GetDirtyProperties() => throw new NotImplementedException();
-        public void ResetDirtyProperties() => throw new NotImplementedException();
-        public bool WasDirty() => throw new NotImplementedException();
-        public bool WasPropertyDirty(string propertyName) => throw new NotImplementedException();
-        public void ResetWereDirtyProperties() => throw new NotImplementedException();
-        public void ResetDirtyProperties(bool rememberDirty) => throw new NotImplementedException();
-        public IEnumerable<string> GetWereDirtyProperties() => throw new NotImplementedException();
+        //string ITreeEntity.Name { get => this.Name; set => throw new NotImplementedException(); }
+        //int IEntity.Id { get => this.Id; set => throw new NotImplementedException(); }
+        //bool IEntity.HasIdentity => this.Id != default;
+        //int ITreeEntity.CreatorId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //int ITreeEntity.ParentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //int ITreeEntity.Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //string ITreeEntity.Path { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //int ITreeEntity.SortOrder { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //bool ITreeEntity.Trashed => throw new NotImplementedException();
+        //Guid IEntity.Key { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //DateTime IEntity.CreateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //DateTime IEntity.UpdateDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //DateTime? IEntity.DeleteDate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //void ITreeEntity.SetParent(ITreeEntity parent) => throw new NotImplementedException();
+        //object IDeepCloneable.DeepClone() => throw new NotImplementedException();
+        //bool IRememberBeingDirty.WasDirty() => throw new NotImplementedException();
+        //bool IRememberBeingDirty.WasPropertyDirty(string propertyName) => throw new NotImplementedException();
+        //void IRememberBeingDirty.ResetWereDirtyProperties() => throw new NotImplementedException();
+        //void IRememberBeingDirty.ResetDirtyProperties(bool rememberDirty) => throw new NotImplementedException();
+        //IEnumerable<string> IRememberBeingDirty.GetWereDirtyProperties() => throw new NotImplementedException();
+        //bool ICanBeDirty.IsDirty() => throw new NotImplementedException();
+        //bool ICanBeDirty.IsPropertyDirty(string propName) => throw new NotImplementedException();
+        //IEnumerable<string> ICanBeDirty.GetDirtyProperties() => throw new NotImplementedException();
+        //void ICanBeDirty.ResetDirtyProperties() => throw new NotImplementedException();
     }
 }
