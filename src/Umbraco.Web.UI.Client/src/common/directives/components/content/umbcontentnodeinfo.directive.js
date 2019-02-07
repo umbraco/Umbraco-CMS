@@ -3,7 +3,7 @@
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
-        function link(scope, umbVariantContentCtrl) {
+        function link(scope) {
 
             var evts = [];
             var isInfoTab = false;
@@ -96,22 +96,17 @@
                     scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
                 }
 
-                //load in the audit trail if we are currently looking at the INFO tab
-                if (umbVariantContentCtrl && umbVariantContentCtrl.editor) {
-                    var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
-                    if (activeApp && activeApp.alias === "umbInfo") {
-                        isInfoTab = true;
-                        loadAuditTrail();
-                        loadRedirectUrls();
-                    }
+                var activeApp = _.find(scope.node.apps, (a) => a.active);
+                if (activeApp.alias === "umbInfo") {
+                    loadRedirectUrls();
+                    loadAuditTrail();
                 }
 
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
                 scope.auditTrailOptions.pageNumber = pageNumber;
-                auditTrailLoaded = false;
-                loadAuditTrail();
+                loadAuditTrail(true);
             };
 
             scope.openDocumentType = function (documentType) {
@@ -192,10 +187,12 @@
                 editorService.rollback(rollback);
             };
 
-            function loadAuditTrail() {
+            function loadAuditTrail(forceReload) {
 
                 //don't load this if it's already done
-                if (auditTrailLoaded) { return; };
+                if (auditTrailLoaded && !forceReload) {
+                    return; 
+                }
 
                 scope.loadingAuditTrail = true;
 
@@ -334,8 +331,7 @@
                 if (newValue === oldValue) { return; }
 
                 if (isInfoTab) {
-                    auditTrailLoaded = false;
-                    loadAuditTrail();
+                    loadAuditTrail(true);
                     loadRedirectUrls();
                     setNodePublishStatus();
                     updateCurrentUrls();

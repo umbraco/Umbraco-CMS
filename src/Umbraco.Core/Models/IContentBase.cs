@@ -19,6 +19,11 @@ namespace Umbraco.Core.Models
         int ContentTypeId { get; }
 
         /// <summary>
+        /// Gets the content type of this content.
+        /// </summary>
+        ISimpleContentType ContentType { get; }
+
+        /// <summary>
         /// Gets the identifier of the writer.
         /// </summary>
         int WriterId { get; set; }
@@ -58,7 +63,7 @@ namespace Umbraco.Core.Models
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
         ContentCultureInfosCollection CultureInfos { get; set; }
-        
+
         /// <summary>
         /// Gets the available cultures.
         /// </summary>
@@ -94,18 +99,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Properties are loaded as part of the Content object graph</remarks>
         PropertyCollection Properties { get; set; }
-
-        /// <summary>
-        /// List of PropertyGroups available on this Content object
-        /// </summary>
-        /// <remarks>PropertyGroups are kind of lazy loaded as part of the object graph</remarks>
-        IEnumerable<PropertyGroup> PropertyGroups { get; }
-
-        /// <summary>
-        /// List of PropertyTypes available on this Content object
-        /// </summary>
-        /// <remarks>PropertyTypes are kind of lazy loaded as part of the object graph</remarks>
-        IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
         /// Gets a value indicating whether the content entity has a property with the supplied alias.

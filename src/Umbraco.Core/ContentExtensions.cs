@@ -109,10 +109,9 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content)
         {
-            var propertyIdsInTabs = content.PropertyGroups.SelectMany(pg => pg.PropertyTypes);
             return content.Properties
-                          .Where(property => propertyIdsInTabs.Contains(property.PropertyType) == false)
-                          .OrderBy(x => x.PropertyType.SortOrder);
+                .Where(x => x.PropertyType.PropertyGroupId == null)
+                .OrderBy(x => x.PropertyType.SortOrder);
         }
 
         /// <summary>
@@ -178,8 +177,7 @@ namespace Umbraco.Core
             var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (property != null) return property;
 
-            var contentTypeService = contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType.CompositionPropertyTypes
                 .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
@@ -208,8 +206,7 @@ namespace Umbraco.Core
         /// </remarks>
         public static string StoreFile(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
-            var contentTypeService = contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -50,8 +49,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="use">Tree use.</param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, TreeUse use = TreeUse.Main)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, [System.Web.Http.ModelBinding.ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 

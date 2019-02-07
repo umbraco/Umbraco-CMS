@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (m.Expression != null
                 && m.Expression.Type != typeof(T)
-                && TypeHelper.IsTypeAssignableFrom<IUmbracoEntity>(m.Expression.Type)
+                && TypeHelper.IsTypeAssignableFrom<IUmbracoEntity>(m.Expression.Type) //TODO: Could this just be `IEntity` ? why does it need to be IUmbracoEntity, we aren't even using the reference to that below
                 && EndsWithConstant(m) == false)
             {
                 //if this is the case, it means we have a sub expression / nested property access, such as: x.ContentType.Alias == "Test";

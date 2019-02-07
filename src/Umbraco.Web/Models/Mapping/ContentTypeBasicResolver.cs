@@ -30,8 +30,7 @@ namespace Umbraco.Web.Models.Mapping
             if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                 && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
-                var contentTypeService = _contentTypeBaseServiceProvider.For(source);
-                var contentType = contentTypeService.Get(source.ContentTypeId);
+                var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
                 var contentTypeBasic =  Mapper.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
 
                 return contentTypeBasic;
