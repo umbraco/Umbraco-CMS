@@ -130,7 +130,6 @@
     <Compile Include="Dashboards\HealthCheckDashboard.cs" />
     <Compile Include="Dashboards\MediaDashboard.cs" />
     <Compile Include="Dashboards\MembersDashboard.cs" />
-    <Compile Include="Dashboards\ModelsBuilderDashboard.cs" />
     <Compile Include="Dashboards\PublishedStatusDashboard.cs" />
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
