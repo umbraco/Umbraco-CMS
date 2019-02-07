@@ -11,7 +11,7 @@ var karmaServer = require('karma').Server;
  // Karma test
 gulp.task('test:unit', function() {
     new karmaServer({
-        configFile: __dirname + "/test/config/karma.conf.js",
+        configFile: __dirname + "/../../test/config/karma.conf.js",
         keepalive: true
     })
     .start();
@@ -19,7 +19,7 @@ gulp.task('test:unit', function() {
 
 gulp.task('test:e2e', function() {
     new karmaServer({
-        configFile: __dirname + "/test/config/e2e.js",
+        configFile: __dirname + "/../../test/config/e2e.js",
         keepalive: true
     })
     .start();
