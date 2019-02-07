@@ -40,7 +40,7 @@ namespace Umbraco.Core
                 public const string RelationType = /*TableNamePrefix*/ "umbraco" + "RelationType";
                 public const string Relation = /*TableNamePrefix*/ "umbraco" + "Relation";
 
-                public const string Domain = /*TableNamePrefix*/ "umbraco" + "Domains";
+                public const string Domain = /*TableNamePrefix*/ "umbraco" + "Domain";
                 public const string Language = /*TableNamePrefix*/ "umbraco" + "Language";
                 public const string DictionaryEntry = /*TableNamePrefix*/ "cms" + "Dictionary";
                 public const string DictionaryValue = /*TableNamePrefix*/ "cms" + "LanguageText";

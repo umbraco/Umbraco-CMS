@@ -126,6 +126,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<UpdateMemberGroupPickerData>("{8A027815-D5CD-4872-8B88-9A51AB5986A6}"); // from 7.14.0
             To<ConvertRelatedLinksToMultiUrlPicker>("{ED28B66A-E248-4D94-8CDB-9BDF574023F0}");
             To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
+            To<RenameUmbracoDomainsTable>("{6017F044-8E70-4E10-B2A3-336949692ADD}");
 
 
             //FINAL
