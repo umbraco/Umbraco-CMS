@@ -578,6 +578,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
+    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
     <key alias="install">Installér</key>
