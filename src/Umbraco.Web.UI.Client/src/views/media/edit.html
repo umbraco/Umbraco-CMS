@@ -47,7 +47,7 @@
                     </umb-button>
 
                     <umb-button alias="returnToList"
-                                ng-if="page.listViewPath"
+                                ng-if="page.listViewPath && !model.infiniteMode"
                                 type="link"
                                 href="#{{page.listViewPath}}"
                                 label-key="buttons_returnToList">
