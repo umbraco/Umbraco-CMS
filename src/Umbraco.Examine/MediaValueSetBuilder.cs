@@ -1,5 +1,6 @@
 ﻿using Examine;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -30,7 +31,7 @@ namespace Umbraco.Examine
                 var urlValue = m.GetUrlSegment(_urlSegmentProviders);
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
-                    {"icon", m.ContentType.Icon.Yield()},
+                    {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
@@ -39,11 +40,11 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {m.SortOrder}},
                     {"createDate", new object[] {m.CreateDate}},
                     {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", m.Name.Yield()},
-                    {"urlName", urlValue.Yield()},
-                    {"path", m.Path.Yield()},
-                    {"nodeType", new object[] {m.ContentType.Id}},
-                    {"creatorName", m.GetCreatorProfile(_userService).Name.Yield()}
+                    {"nodeName", m.Name?.Yield() ?? Enumerable.Empty<string>()},
+                    {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},
+                    {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
+                    {"nodeType", m.ContentType.Id.ToString().Yield() },
+                    {"creatorName", (m.GetCreatorProfile(_userService)?.Name ?? "??").Yield()}
                 };
 
                 foreach (var property in m.Properties)

@@ -14,7 +14,7 @@ describe('Drop down controller tests', function () {
 
         it('should define the default properties on construction', function () {
              
-            controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+            controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                 $scope: scope,
                 $routeParams: routeParams
             });
@@ -32,7 +32,7 @@ describe('Drop down controller tests', function () {
                 }
             };
 
-            controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+            controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                 $scope: scope,
                 $routeParams: routeParams
             });
@@ -57,7 +57,7 @@ describe('Drop down controller tests', function () {
             };
 
             var test = function() {
-                controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+                controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                     $scope: scope,
                     $routeParams: routeParams
                 });
@@ -76,7 +76,7 @@ describe('Drop down controller tests', function () {
             };
 
             var test = function () {
-                controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+                controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                     $scope: scope,
                     $routeParams: routeParams
                 });
