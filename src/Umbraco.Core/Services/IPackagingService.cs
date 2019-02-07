@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
         /// <param name="packageDefinition"></param>
         /// <param name="packageFile"></param>
         /// <param name="userId"></param>
-        IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
+        IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Installs the data, entities, objects contained in an umbraco package file (zip)
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
         /// <param name="packageDefinition"></param>
         /// <param name="packageFile"></param>
         /// <param name="userId"></param>
-        InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0);
+        InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Uninstalls all versions of the package by name
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Services
         /// <param name="packageName"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        UninstallationSummary UninstallPackage(string packageName, int userId = 0);
+        UninstallationSummary UninstallPackage(string packageName, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
         /// <param name="alreadyInstalled">If the package is an upgrade, the original/current PackageDefinition is returned</param>
         /// <returns></returns>
         PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled);
-        void DeleteInstalledPackage(int packageId, int userId = 0);
+        void DeleteInstalledPackage(int packageId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Persists a package definition to storage
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Services
 
         IEnumerable<PackageDefinition> GetAllCreatedPackages();
         PackageDefinition GetCreatedPackageById(int id);
-        void DeleteCreatedPackage(int id, int userId = 0);
+        void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Persists a package definition to storage

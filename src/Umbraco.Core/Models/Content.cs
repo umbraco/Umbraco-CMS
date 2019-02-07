@@ -367,19 +367,19 @@ namespace Umbraco.Core.Models
         public override bool IsPropertyDirty(string propertyName)
         {
             //Special check here since we want to check if the request is for changed cultures
-            if (propertyName.StartsWith("_publishedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
             {
-                var culture = propertyName.TrimStart("_publishedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
                 return _currentPublishCultureChanges.addedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_unpublishedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UnpublishedCulture))
             {
-                var culture = propertyName.TrimStart("_unpublishedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UnpublishedCulture);
                 return _currentPublishCultureChanges.removedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_changedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.ChangedCulture))
             {
-                var culture = propertyName.TrimStart("_changedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.ChangedCulture);
                 return _currentPublishCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 
@@ -391,19 +391,19 @@ namespace Umbraco.Core.Models
         public override bool WasPropertyDirty(string propertyName)
         {
             //Special check here since we want to check if the request is for changed cultures
-            if (propertyName.StartsWith("_publishedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
             {
-                var culture = propertyName.TrimStart("_publishedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
                 return _previousPublishCultureChanges.addedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_unpublishedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UnpublishedCulture))
             {
-                var culture = propertyName.TrimStart("_unpublishedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UnpublishedCulture);
                 return _previousPublishCultureChanges.removedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_changedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.ChangedCulture))
             {
-                var culture = propertyName.TrimStart("_changedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.ChangedCulture);
                 return _previousPublishCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 

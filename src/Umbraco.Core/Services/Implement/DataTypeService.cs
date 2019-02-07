@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Containers
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -186,7 +186,7 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -331,7 +331,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        public void Save(IDataType dataType, int userId = 0)
+        public void Save(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
             dataType.CreatorId = userId;
 
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0)
+        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId)
         {
             Save(dataTypeDefinitions, userId, true);
         }
@@ -413,7 +413,7 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
-        public void Delete(IDataType dataType, int userId = 0)
+        public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

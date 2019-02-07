@@ -18,7 +18,6 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentType.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
-
         private int _contentTypeId;
         private int _writerId;
         private PropertyCollection _properties;
@@ -29,6 +28,16 @@ namespace Umbraco.Core.Models
 
         private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _currentCultureChanges;
         private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _previousCultureChanges;
+
+        public static class ChangeTrackingPrefix
+        {
+            public const string UpdatedCulture = "_updatedCulture_";
+            public const string ChangedCulture = "_changedCulture_";
+            public const string PublishedCulture = "_publishedCulture_";
+            public const string UnpublishedCulture = "_unpublishedCulture_";
+            public const string AddedCulture = "_addedCulture_";
+            public const string RemovedCulture = "_removedCulture_";
+        }
 
         #endregion
 
@@ -85,8 +94,6 @@ namespace Umbraco.Core.Models
         {
             OnPropertyChanged(nameof(Properties));
         }
-
-
 
         /// <summary>
         /// Id of the user who wrote/updated this entity
@@ -408,19 +415,19 @@ namespace Umbraco.Core.Models
                 return true;
 
             //Special check here since we want to check if the request is for changed cultures
-            if (propertyName.StartsWith("_addedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.AddedCulture))
             {
-                var culture = propertyName.TrimStart("_addedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.AddedCulture);
                 return _currentCultureChanges.addedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_removedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.RemovedCulture))
             {
-                var culture = propertyName.TrimStart("_removedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.RemovedCulture);
                 return _currentCultureChanges.removedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_updatedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UpdatedCulture))
             {
-                var culture = propertyName.TrimStart("_updatedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UpdatedCulture);
                 return _currentCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 
@@ -435,19 +442,19 @@ namespace Umbraco.Core.Models
                 return true;
 
             //Special check here since we want to check if the request is for changed cultures
-            if (propertyName.StartsWith("_addedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.AddedCulture))
             {
-                var culture = propertyName.TrimStart("_addedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.AddedCulture);
                 return _previousCultureChanges.addedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_removedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.RemovedCulture))
             {
-                var culture = propertyName.TrimStart("_removedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.RemovedCulture);
                 return _previousCultureChanges.removedCultures?.Contains(culture) ?? false;
             }
-            if (propertyName.StartsWith("_updatedCulture_"))
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UpdatedCulture))
             {
-                var culture = propertyName.TrimStart("_updatedCulture_");
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UpdatedCulture);
                 return _previousCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 

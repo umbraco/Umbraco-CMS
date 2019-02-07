@@ -100,7 +100,7 @@ namespace Umbraco.Core.Services.Implement
 
         public CompiledPackage GetCompiledPackageInfo(FileInfo packageFile) => _packageInstallation.ReadPackage(packageFile);
 
-        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0)
+        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
             if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Services.Implement
             return files;
         }
 
-        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = 0)
+        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
             if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Services.Implement
             return summary;
         }
 
-        public UninstallationSummary UninstallPackage(string packageName, int userId = 0)
+        public UninstallationSummary UninstallPackage(string packageName, int userId = Constants.Security.SuperUserId)
         {
             //this is ordered by descending version
             var allPackageVersions = GetInstalledPackageByName(packageName)?.ToList();
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Created/Installed Package Repositories
 
-        public void DeleteCreatedPackage(int id, int userId = 0)
+        public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
         {
             var package = GetCreatedPackageById(id);
             if (package == null) return;
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Services.Implement
 
         public bool SaveInstalledPackage(PackageDefinition definition) => _installedPackages.SavePackage(definition);
 
-        public void DeleteInstalledPackage(int packageId, int userId = 0)
+        public void DeleteInstalledPackage(int packageId, int userId = Constants.Security.SuperUserId)
         {
             var package = GetInstalledPackageById(packageId);
             if (package == null) return;

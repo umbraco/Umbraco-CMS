@@ -63,7 +63,7 @@ namespace Umbraco.Core.Models
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
         ContentCultureInfosCollection CultureInfos { get; set; }
-        
+
         /// <summary>
         /// Gets the available cultures.
         /// </summary>
