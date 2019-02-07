@@ -1231,9 +1231,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            var contentTypeService = _contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
-            if (contentType.VariesByCulture())
+            if (content.ContentType.VariesByCulture())
             {
                 var infos = content is IContent document
                     ? (published
@@ -1241,10 +1239,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         : document.CultureInfos)
                     : content.CultureInfos;
 
-                foreach (var (culture, info) in infos)
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(culture);
-                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                    cultureData[cultureInfo.Culture] = new CultureVariation { Name = cultureInfo.Name, Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
                 }
             }
 

@@ -159,5 +159,10 @@ namespace Umbraco.Core.Models
         /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
         bool MovePropertyType(string propertyTypeAlias, string propertyGroupName);
+
+        /// <summary>
+        /// Gets an <see cref="ISimpleContentType"/> corresponding to this content type.
+        /// </summary>
+        ISimpleContentType ToSimple();
     }
 }

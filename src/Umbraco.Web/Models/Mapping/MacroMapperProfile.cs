@@ -19,9 +19,9 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IMacro TO EntityBasic
             CreateMap<IMacro, EntityBasic>()
                 .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Macro, content.Key)))
-                  .ForMember(entityBasic => entityBasic.Icon, expression => expression.UseValue("icon-settings-alt"))
-                  .ForMember(dto => dto.ParentId, expression => expression.UseValue(-1))
-                  .ForMember(dto => dto.Path, expression => expression.ResolveUsing(macro => "-1," + macro.Id))
+                  .ForMember(entityBasic => entityBasic.Icon, expression => expression.MapFrom(_ => "icon-settings-alt"))
+                  .ForMember(dto => dto.ParentId, expression => expression.MapFrom(_ => -1))
+                  .ForMember(dto => dto.Path, expression => expression.MapFrom(macro => "-1," + macro.Id))
                   .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                   .ForMember(dto => dto.AdditionalData, expression => expression.Ignore());
 

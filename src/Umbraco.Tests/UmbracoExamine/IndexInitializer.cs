@@ -110,7 +110,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
-                        m.ContentType == Mock.Of<IMediaType>(mt =>
+                        m.ContentType == Mock.Of<ISimpleContentType>(mt =>
                             mt.Alias == (string)x.Attribute("nodeTypeAlias") &&
                             mt.Id == (int)x.Attribute("nodeType"))))
                 .ToArray();

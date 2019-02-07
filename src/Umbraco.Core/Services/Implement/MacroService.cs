@@ -81,7 +81,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the macro</param>
-        public void Delete(IMacro macro, int userId = 0)
+        public void Delete(IMacro macro, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         /// <param name="userId">Optional Id of the user deleting the macro</param>
-        public void Save(IMacro macro, int userId = 0)
+        public void Save(IMacro macro, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

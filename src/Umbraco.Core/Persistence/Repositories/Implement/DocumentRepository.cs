@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -120,6 +119,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     break;
                 case QueryType.Single:
                 case QueryType.Many:
+                    // R# may flag this ambiguous and red-squiggle it, but it is not
                     sql = sql.Select<DocumentDto>(r =>
                        r.Select(documentDto => documentDto.ContentDto, r1 =>
                            r1.Select(contentDto => contentDto.NodeDto))
@@ -380,9 +380,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, infos) in content.CultureInfos)
-                    if (infos.Name != content.GetPublishName(culture))
-                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in content.CultureInfos)
+                    if (cultureInfo.Name != content.GetPublishName(cultureInfo.Culture))
+                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
 
                 // insert content variations
                 Database.BulkInsertRecords(GetContentVariationDtos(content, publishing));
@@ -541,11 +542,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, infos) in content.CultureInfos)
-                    if (infos.Name != content.GetPublishName(culture))
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in content.CultureInfos)
+                    if (cultureInfo.Name != content.GetPublishName(cultureInfo.Culture))
                     {
                         edited = true;
-                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
 
                         // TODO: change tracking
                         // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
@@ -1127,7 +1129,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // TODO: shall we get published properties or not?
                 //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-                var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
+                var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
                 var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
                 var ltemp = new List<TempContent<Content>> { temp };
@@ -1187,12 +1189,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (contentVariations.TryGetValue(content.VersionId, out var contentVariation))
                 foreach (var v in contentVariation)
                     content.SetCultureInfo(v.Culture, v.Name, v.Date);
+
             if (content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
+            {
                 foreach (var v in contentVariation)
                     content.SetPublishInfo(v.Culture, v.Name, v.Date);
+            }
+
             if (documentVariations.TryGetValue(content.Id, out var documentVariation))
-                foreach (var v in documentVariation.Where(x => x.Edited))
-                    content.SetCultureEdited(v.Culture);
+                content.SetCultureEdited(documentVariation.Where(x => x.Edited).Select(x => x.Culture));
         }
 
         private IDictionary<int, List<ContentVariation>> GetContentVariations<T>(List<TempContent<T>> temps)
@@ -1262,14 +1267,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
         {
             // create dtos for the 'current' (non-published) version, all cultures
-            foreach (var (culture, name) in content.CultureInfos)
+            // ReSharper disable once UseDeconstruction
+            foreach (var cultureInfo in content.CultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
-                    LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
-                    Culture = culture,
-                    Name = name.Name,
-                    UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
+                    Culture = cultureInfo.Culture,
+                    Name = cultureInfo.Name,
+                    UpdateDate = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1277,14 +1283,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing) yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
-            foreach (var (culture, name) in content.PublishCultureInfos)
+            // ReSharper disable once UseDeconstruction
+            foreach (var cultureInfo in content.PublishCultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
-                    LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
-                    Culture = culture,
-                    Name = name.Name,
-                    UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
+                    Culture = cultureInfo.Culture,
+                    Name = cultureInfo.Name,
+                    UpdateDate = content.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
 
@@ -1344,7 +1351,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             EnsureVariantNamesAreUnique(content, publishing);
         }
 
-        private void EnsureInvariantNameExists(Content content)
+        private void EnsureInvariantNameExists(IContent content)
         {
             if (content.ContentType.VariesByCulture())
             {
@@ -1358,7 +1365,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)
                     ? cultureName.Name
-                    : content.CultureInfos.First().Value.Name;
+                    : content.CultureInfos[0].Name;
             }
             else
             {
@@ -1368,7 +1375,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        private void EnsureInvariantNameIsUnique(Content content)
+        private void EnsureInvariantNameIsUnique(IContent content)
         {
             content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
         }
@@ -1405,25 +1412,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // of whether the name has changed (ie the culture has been updated) - some saving culture
             // fr-FR could cause culture en-UK name to change - not sure that is clean
 
-            foreach (var (culture, name) in content.CultureInfos)
+            foreach (var cultureInfo in content.CultureInfos)
             {
-                var langId = LanguageRepository.GetIdByIsoCode(culture);
+                var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
                 if (!langId.HasValue) continue;
                 if (!names.TryGetValue(langId.Value, out var cultureNames)) continue;
 
                 // get a unique name
                 var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name.Name);
+                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
 
-                if (uniqueName == content.GetCultureName(culture)) continue;
+                if (uniqueName == content.GetCultureName(cultureInfo.Culture)) continue;
 
                 // update the name, and the publish name if published
-                content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishCultureInfos.ContainsKey(culture))
-                    content.SetPublishInfo(culture, uniqueName, DateTime.Now);
+                content.SetCultureName(uniqueName, cultureInfo.Culture);
+                if (publishing && content.PublishCultureInfos.ContainsKey(cultureInfo.Culture))
+                    content.SetPublishInfo(cultureInfo.Culture, uniqueName, DateTime.Now); //TODO: This is weird, this call will have already been made in the SetCultureName
             }
         }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class CultureNodeName
         {
             public int Id { get; set; }

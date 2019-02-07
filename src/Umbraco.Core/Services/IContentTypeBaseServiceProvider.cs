@@ -18,5 +18,10 @@ namespace Umbraco.Core.Services
         /// to retrieve the content / media / whatever type as <see cref="IContentTypeComposition"/>.</para>
         /// </remarks>
         IContentTypeBaseService For(IContentBase contentBase);
+
+        /// <summary>
+        /// Gets the content type of an <see cref="IContentBase"/> object.
+        /// </summary>
+        IContentTypeComposition GetContentTypeOf(IContentBase contentBase);
     }
 }

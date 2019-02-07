@@ -24,17 +24,19 @@ module.exports = function (config) {
             'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
             'node_modules/lazyload-js/lazyload.min.js',
+            'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
 
             //app bootstrap and loader
             'test/config/app.unit.js',
 
             //application files
-            'src/common/directives/*.js',
-            'src/common/filters/*.js',
-            'src/common/services/*.js',
-            'src/common/interceptors/*.js',
-            'src/common/resources/*.js',
-            'src/views/**/*.controller.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.controllers.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.directives.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.filters.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.services.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.interceptors.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.security.js',
+            '../Umbraco.Web.UI/Umbraco/js/*.resources.js',
 
             //mocked data and routing
             'src/common/mocks/umbraco.servervariables.js',
