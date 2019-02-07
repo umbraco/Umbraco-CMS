@@ -67,20 +67,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Id, member.Id);
             Assert.AreEqual(clone.VersionId, member.VersionId);
             Assert.AreEqual(clone.AdditionalData, member.AdditionalData);
-            Assert.AreNotSame(clone.ContentType, member.ContentType);
             Assert.AreEqual(clone.ContentType, member.ContentType);
-            Assert.AreEqual(clone.ContentType.PropertyGroups.Count, member.ContentType.PropertyGroups.Count);
-            for (var index = 0; index < member.ContentType.PropertyGroups.Count; index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyGroups[index], member.ContentType.PropertyGroups[index]);
-                Assert.AreEqual(clone.ContentType.PropertyGroups[index], member.ContentType.PropertyGroups[index]);
-            }
-            Assert.AreEqual(clone.ContentType.PropertyTypes.Count(), member.ContentType.PropertyTypes.Count());
-            for (var index = 0; index < member.ContentType.PropertyTypes.Count(); index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyTypes.ElementAt(index), member.ContentType.PropertyTypes.ElementAt(index));
-                Assert.AreEqual(clone.ContentType.PropertyTypes.ElementAt(index), member.ContentType.PropertyTypes.ElementAt(index));
-            }
             Assert.AreEqual(clone.ContentTypeId, member.ContentTypeId);
             Assert.AreEqual(clone.CreateDate, member.CreateDate);
             Assert.AreEqual(clone.CreatorId, member.CreatorId);
@@ -111,6 +98,9 @@ namespace Umbraco.Tests.Models
                 Assert.AreNotSame(clone.Properties[index], member.Properties[index]);
                 Assert.AreEqual(clone.Properties[index], member.Properties[index]);
             }
+
+            // this can be the same, it is immutable
+            Assert.AreSame(clone.ContentType, member.ContentType);
 
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();

@@ -73,7 +73,7 @@ namespace Umbraco.Web
         #endregion
 
         // ensures that we can return the specified value
-        T Ensure<T>(T o) where T : class => o ?? throw new InvalidOperationException(""); // fixme
+        T Ensure<T>(T o) where T : class => o ?? throw new InvalidOperationException("This UmbracoHelper instance has not been initialized.");
 
         private IUmbracoComponentRenderer ComponentRenderer => Ensure(_componentRenderer);
         private ICultureDictionaryFactory CultureDictionaryFactory => Ensure(_cultureDictionaryFactory);

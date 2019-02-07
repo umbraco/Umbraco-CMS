@@ -52,36 +52,8 @@ namespace Umbraco.Core
             return ContentStatus.Unpublished;
         }
 
-        /// <summary>
-        /// Gets the cultures that have been flagged for unpublishing.
-        /// </summary>
-        /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
-        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
-        {
-            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
-                return Array.Empty<string>();
-
-            var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);
-            return culturesChanging
-                .Where(x => !content.IsCulturePublished(x) && // is not published anymore
-                            content.WasCulturePublished(x))   // but was published before
-                .ToList();
-        }
-
-        /// <summary>
-        /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is helpful for determining if the published event will execute during the saved event for a content item.
-        /// </remarks>
-        internal static bool JustPublished(this IContent entity)
-        {
-            var dirty = (IRememberBeingDirty)entity;
-            return dirty.WasPropertyDirty("Published") && entity.Published;
-        }
-
+        
+        
         #endregion
 
         /// <summary>
@@ -137,10 +109,9 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content)
         {
-            var propertyIdsInTabs = content.PropertyGroups.SelectMany(pg => pg.PropertyTypes);
             return content.Properties
-                          .Where(property => propertyIdsInTabs.Contains(property.PropertyType) == false)
-                          .OrderBy(x => x.PropertyType.SortOrder);
+                .Where(x => x.PropertyType.PropertyGroupId == null)
+                .OrderBy(x => x.PropertyType.SortOrder);
         }
 
         /// <summary>
@@ -206,8 +177,7 @@ namespace Umbraco.Core
             var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (property != null) return property;
 
-            var contentTypeService = contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType.CompositionPropertyTypes
                 .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
@@ -236,8 +206,7 @@ namespace Umbraco.Core
         /// </remarks>
         public static string StoreFile(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
-            var contentTypeService = contentTypeBaseServiceProvider.For(content);
-            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");

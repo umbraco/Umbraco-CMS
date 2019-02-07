@@ -9,15 +9,15 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
-        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0);
-        Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
         IEnumerable<EntityContainer> GetContainers(IDataType dataType);
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
-        Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0);
-        Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
+        Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its Name
@@ -52,14 +52,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        void Save(IDataType dataType, int userId = 0);
+        void Save(IDataType dataType, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0);
+        void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Id of the user issuing the deletion</param>
-        void Delete(IDataType dataType, int userId = 0);
+        void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its control Id

@@ -91,7 +91,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.ContentCache, umbCtx.UmbracoContext.MediaCache, factory.GetInstance<IVariationContextAccessor>());
+                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>());
             }, Lifetime.Request);
             composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
 

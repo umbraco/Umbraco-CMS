@@ -199,11 +199,11 @@ namespace Umbraco.Web.Macros
                 Key = _inner.Key;
 
                 // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-                CreatorName = _inner.GetCreatorProfile().Name;
-                WriterName = _inner.GetWriterProfile().Name;
+                CreatorName = _inner.GetCreatorProfile()?.Name;
+                WriterName = _inner.GetWriterProfile()?.Name;
 
-                var contentTypeService = Current.Services.ContentTypeBaseServices.For(_inner);
-                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentTypeService.Get(_inner.ContentTypeId));
+                var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
+                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
 
                 _properties = ContentType.PropertyTypes
                     .Select(x =>
@@ -252,8 +252,8 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
-                    return _cultureInfos = _inner.PublishCultureInfos
-                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date));
+                    return _cultureInfos = _inner.PublishCultureInfos.Values
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
                 }
             }
 

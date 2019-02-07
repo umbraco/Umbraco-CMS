@@ -435,8 +435,9 @@ namespace Umbraco.Web.Editors
             //There's only 3 special ones we need to deal with that are part of the MemberSave instance
             if (Security.CurrentUser.HasAccessToSensitiveData() == false)
             {
-                var sensitiveProperties = contentItem.PersistedContent.ContentType
-                    .PropertyTypes.Where(x => contentItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                var memberType = Services.MemberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
+                var sensitiveProperties = memberType
+                    .PropertyTypes.Where(x => memberType.IsSensitiveProperty(x.Alias))
                     .ToList();
 
                 foreach (var sensitiveProperty in sensitiveProperties)

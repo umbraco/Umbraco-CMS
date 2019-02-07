@@ -1,5 +1,6 @@
 ﻿using Examine;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -21,7 +22,7 @@ namespace Umbraco.Examine
             {
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
-                    {"icon", m.ContentType.Icon.Yield()},
+                    {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
@@ -30,11 +31,11 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {m.SortOrder}},
                     {"createDate", new object[] {m.CreateDate}},
                     {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", m.Name.Yield()},
-                    {"path", m.Path.Yield()},
-                    {"nodeType", new object[] {m.ContentType.Id}},
-                    {"loginName", m.Username.Yield()},
-                    {"email", m.Email.Yield()},
+                    {"nodeName", m.Name?.Yield() ?? Enumerable.Empty<string>()},
+                    {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
+                    {"nodeType", m.ContentType.Id.ToString().Yield() },
+                    {"loginName", m.Username?.Yield() ?? Enumerable.Empty<string>()},
+                    {"email", m.Email?.Yield() ?? Enumerable.Empty<string>()},
                 };
 
                 foreach (var property in m.Properties)

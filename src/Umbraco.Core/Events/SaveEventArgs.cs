@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Umbraco.Core.Events
 {
@@ -113,9 +112,6 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Returns all entities that were saved during the operation
         /// </summary>
-        public IEnumerable<TEntity> SavedEntities
-        {
-            get { return EventObject; }
-        }
+        public IEnumerable<TEntity> SavedEntities => EventObject;
     }
 }

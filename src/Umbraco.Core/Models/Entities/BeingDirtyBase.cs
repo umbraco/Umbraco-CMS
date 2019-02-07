@@ -65,7 +65,7 @@ namespace Umbraco.Core.Models.Entities
         }
 
         /// <inheritdoc />
-        public void ResetWereDirtyProperties()
+        public virtual void ResetWereDirtyProperties()
         {
             // note: cannot .Clear() because when memberwise-cloning this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.

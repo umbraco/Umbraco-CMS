@@ -105,11 +105,6 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                     return;
                 }
 
-                if (scope.userDialog) {
-                    closeUserDialog();
-                }
-
-
                 navigationService.hideSearch();
                 navigationService.showTree(section.alias);
 

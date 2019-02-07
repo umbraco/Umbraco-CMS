@@ -121,16 +121,16 @@ namespace Umbraco.Tests.Models.Mapping
                         break;
                     case 1:
                         map
-                            .ForMember(dest => dest.ValueString, opt => opt.ResolveUsing<MemberValueResolver, string>(src => src.ValueString));
+                            .ForMember(dest => dest.ValueString, opt => opt.MapFrom<MemberValueResolver, string>(src => src.ValueString));
                         break;
                     case 2:
                         map
-                            .ForMember(dest => dest.ValueString, opt => opt.ResolveUsing<ValueResolver>());
+                            .ForMember(dest => dest.ValueString, opt => opt.MapFrom<ValueResolver>());
                         break;
                     case 3:
                         // in most cases that should be perfectly enough?
                         map
-                            .ForMember(dest => dest.ValueString, opt => opt.ResolveUsing(source => "!!" + source.ValueString + "!!"));
+                            .ForMember(dest => dest.ValueString, opt => opt.MapFrom(source => "!!" + source.ValueString + "!!"));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(ver));

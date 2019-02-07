@@ -393,7 +393,11 @@ namespace Umbraco.Web.Editors
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
             {
-                types = Services.ContentTypeService.GetAll().Where(x => x.AllowedAsRoot).ToList();
+                var allContentTypes = Services.ContentTypeService.GetAll().ToList();
+                bool AllowedAsRoot(IContentType x) => x.AllowedAsRoot;
+                types = allContentTypes.Any(AllowedAsRoot)
+                    ? allContentTypes.Where(AllowedAsRoot).ToList()
+                    : allContentTypes;
             }
             else
             {
@@ -403,8 +407,7 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var contentTypeService = Services.ContentTypeBaseServices.For(contentItem);
-                var contentType = contentTypeService.Get(contentItem.ContentTypeId);
+                var contentType = Services.ContentTypeBaseServices.GetContentTypeOf(contentItem);
                 var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
