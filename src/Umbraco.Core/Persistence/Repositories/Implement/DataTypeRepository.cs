@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
         }
 
         #endregion
