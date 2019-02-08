@@ -74,11 +74,15 @@ angular.module("umbraco.directives")
                     };
 
                     scope.slide = function (values) {
-                        scope.dimensions.scale.current = values ? values.toString() : null;
+                        if (values) {
+                            scope.dimensions.scale.current = parseFloat(values);
+                        }
                     };
 
                     scope.change = function (values) {
-                        scope.dimensions.scale.current = values ? values.toString() : null;
+                        if (values) {
+                            scope.dimensions.scale.current = parseFloat(values);
+                        }
                     };
 
 					//live rendering of viewport and image styles
