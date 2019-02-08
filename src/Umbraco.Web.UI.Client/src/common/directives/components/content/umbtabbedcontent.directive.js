@@ -82,7 +82,9 @@
                 }
             }
             function cancelScrollTween() {
-                $scope.scrollTween.pause();
+                if($scope.scrollTween) {
+                    $scope.scrollTween.pause();
+                }
             }
             
             $scope.registerPropertyGroup = function(element, appAnchor) {
