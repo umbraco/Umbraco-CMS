@@ -176,6 +176,7 @@
             var value = e.value;
             angularHelper.safeApply($scope, function () {
                 setModelValueFromSlider(value);
+                angularHelper.getCurrentForm($scope).$setDirty();
             });
         }).data('slider');
     }

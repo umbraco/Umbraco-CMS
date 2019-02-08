@@ -69,6 +69,8 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             }
 
             setModelValue();
+            angularHelper.getCurrentForm($scope).$setDirty();
+
 
             if (!$scope.model.config.pickTime) {
                 $element.find("div:first").datetimepicker("hide", 0);
@@ -107,6 +109,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         $scope.hasDatetimePickerValue = false;
         $scope.datetimePickerValue = null;
         $scope.model.value = null;
+        angularHelper.getCurrentForm($scope).$setDirty();
         $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
     }
 
