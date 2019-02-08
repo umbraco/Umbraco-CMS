@@ -6,7 +6,7 @@
 **/
 angular.module("umbraco.directives")
 	.directive('umbImageCrop',
-		function ($timeout, localizationService, cropperHelper,  $log) {
+		function ($timeout, cropperHelper) {
 	    return {
 				restrict: 'E',
 				replace: true,
