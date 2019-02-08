@@ -110,7 +110,7 @@
             $scope.$on('$destroy', function () {
                 cancelScrollTween();
                 scrollableNode.removeEventListener("scroll", onScroll);
-                scrollableNode.removeEventListener("mousehweel", cancelScrollTween);
+                scrollableNode.removeEventListener("mousewheel", cancelScrollTween);
             });
             
         }
