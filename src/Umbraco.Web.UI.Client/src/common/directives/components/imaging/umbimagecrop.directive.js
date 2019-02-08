@@ -45,11 +45,9 @@ angular.module("umbraco.directives")
                         "tooltips": [true],
                         "format": {
                             to: function (value) {
-                                return parseFloat(value).toFixed(3); //Math.round(value);
                                 return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
                             },
                             from: function (value) {
-                                return parseFloat(value).toFixed(3); //Math.round(value);
                                 return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
                             }
                         },
