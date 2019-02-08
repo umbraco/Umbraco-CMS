@@ -176,6 +176,9 @@ angular.module("umbraco.directives")
 						scope.dimensions.scale.min = ratioCalculation.ratio;
                         scope.dimensions.scale.max = 2;
 
+                        // Set slider handle position
+                        sliderRef.noUiSlider.set(scope.dimensions.scale.current);
+
                         // Update slider range min/max
                         sliderRef.noUiSlider.updateOptions({
                             "range": {
