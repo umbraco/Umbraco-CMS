@@ -13,7 +13,7 @@
             
             var scrollableNode = appRootNode.closest(".umb-scrollable");
             scrollableNode.addEventListener("scroll", onScroll);
-            scrollableNode.addEventListener("mousehweel", cancelScrollTween);
+            scrollableNode.addEventListener("mousewheel", cancelScrollTween);
             
             function onScroll(event) {
                 
@@ -87,7 +87,7 @@
             
             $scope.registerPropertyGroup = function(element, appAnchor) {
                 propertyGroupNodesDictionary[appAnchor] = element;
-            }
+            };
             
             $scope.$on("editors.apps.appChanged", function($event, $args) {
                 // if app changed to this app, then we want to scroll to the current anchor
@@ -104,6 +104,12 @@
                 }
             });
             
+            //ensure to unregister from all dom-events
+            $scope.$on('$destroy', function () {
+                cancelScrollTween();
+                scrollableNode.removeEventListener("scroll", onScroll);
+                scrollableNode.removeEventListener("mousehweel", cancelScrollTween);
+            });
             
         }
 

@@ -10,15 +10,25 @@
         };
         
         vm.anchorClicked = function(anchor, $event) {
-            
             vm.onOpenAnchor({item:vm.item, anchor:anchor});
             $event.stopPropagation();
             $event.preventDefault();
         };
         
+        // needed to make sure that we update what anchors are active.
+        vm.mouseOver = function() {
+            $scope.$digest();
+        }
+        
         var componentNode = $element[0];
         
         componentNode.classList.add('umb-sub-views-nav-item');
+        componentNode.addEventListener('mouseover', vm.mouseOver);
+
+        //ensure to unregister from all dom-events
+        $scope.$on('$destroy', function () {
+            componentNode.removeEventListener("mouseover", vm.mouseOver);
+        });
         
     }
     
