@@ -14,14 +14,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class RadioButtonPropertyEditorsMigration : MigrationBase
     {
-        private readonly CacheRefresherCollection _cacheRefreshers;
-        private readonly IServerMessenger _serverMessenger;
-
-        public RadioButtonPropertyEditorsMigration(IMigrationContext context, CacheRefresherCollection cacheRefreshers, IServerMessenger serverMessenger)
+        public RadioButtonPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         {
-            _cacheRefreshers = cacheRefreshers;
-            _serverMessenger = serverMessenger;
         }
 
         public override void Migrate()
@@ -78,8 +73,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (refreshCache)
             {
-                var dataTypeCacheRefresher = _cacheRefreshers[ContentCacheRefresher.UniqueId];
-                _serverMessenger.PerformRefreshAll(dataTypeCacheRefresher);
+                //FIXME: trigger cache rebuild. Currently the data in the database tables is wrong.
             }
 
         }
