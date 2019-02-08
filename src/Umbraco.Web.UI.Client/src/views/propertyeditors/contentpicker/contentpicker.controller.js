@@ -144,7 +144,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
-        idType: "int",
+        idType: "udi",
         //only show the lang selector for content
         showLanguageSelector: $scope.model.config.startNode.type === "content"
     };

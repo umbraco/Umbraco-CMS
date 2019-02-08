@@ -16,7 +16,7 @@ angular.module('umbraco')
             entityType: "Document",
             type: "content",
             treeAlias: "content",
-            idType: "int"
+            idType: "udi"
         };
 
         //combine the config with any values returned from the server
