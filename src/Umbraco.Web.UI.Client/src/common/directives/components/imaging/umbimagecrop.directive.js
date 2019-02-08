@@ -69,7 +69,7 @@ angular.module("umbraco.directives")
 
                     scope.setup = function (slider) {
                         sliderRef = slider;
-                    }
+                    };
 
                     scope.change = function (values) {
                         scope.dimensions.scale.current = values ? values.toString() : null;
