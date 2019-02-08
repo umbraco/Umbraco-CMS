@@ -6,14 +6,35 @@
 		</div>
 	</div>
 
+    Scale value: {{dimensions.scale.current}}<br>
+
 	<div class="crop-slider">
-		<i class="icon-picture"></i>
-			<input
-				type="range" 
-				min="{{dimensions.scale.min}}" 
-				max="{{dimensions.scale.max}}" 
-				step="0.001" 
-				ng-model="dimensions.scale.current" />			
-				<i class="icon-picture" style="font-size: 22px"></i>	
+
+        <!-- Old slider -->
+        <div>
+            <i class="icon-picture"></i>
+            <input type="range"
+                   min="{{dimensions.scale.min}}"
+                   max="{{dimensions.scale.max}}"
+                   step="0.001"
+                   ng-model="dimensions.scale.current" />
+            <i class="icon-picture" style="font-size: 22px"></i>
+        </div>
+        <br>
+
+        <div class="slider-wrapper" style="width: 100%; display: flex; align-items: center; justify-content: center;">
+            <i class="icon-picture"></i>
+            <div style="padding-top: 50px; padding-bottom: 40px; width: 66.6%">
+            
+                <umb-range-slider
+                    ng-model="sliderValue"
+                    options="sliderOptions"
+                    on-setup="setup(slider)"
+                    on-change="change(values)">
+                </umb-range-slider>
+            	
+            </div>
+            <i class="icon-picture" style="font-size: 22px"></i>
+        </div>
 	</div>		
 </div>
