@@ -885,18 +885,8 @@
          * @param {any} app
          */
         $scope.appAnchorChanged = function (app, anchor) {
-            /*
-            // This is how it should be done — but because of the current architecture, i had to give the responsibilty to 'activate' the content-app to the menu, cause thats the only place you currently can change the active content-app.
-            // proposal. Make sure that the content-app-menu dosnt do anything. Just make it callback when menu-item are clicked, then make the controller of the view handle what to be done. Then the controller should broadcast a local event, notifying that the current content-app has been changed.
-            // read more on this issue: https://github.com/umbraco/Umbraco-CMS/issues/4467
-            if ($scope.app !== app) {
-                // TODO: Not working..!!!!!!!!
-                $scope.appChanged(app);
-            }
-            */
             //send an event downwards
             $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
-            
         };
 
         // methods for infinite editing
