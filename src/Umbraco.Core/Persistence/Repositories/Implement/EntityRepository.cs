@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var page = Database.Page<BaseDto>(pageIndex + 1, pageSize, sql);
             var dtos = page.Items;
             var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
-            
+
             if (isContent)
                 BuildVariants(entities.Cast<DocumentEntitySlim>());
 
@@ -198,7 +198,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
-            var sql = Sql().Select<NodeDto>(x => x.NodeId, x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
+            // NodeId is named Id on TreeEntityPath = use an alias
+            var sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
             filter?.Invoke(sql);
             return Database.Fetch<TreeEntityPath>(sql);
         }
@@ -405,7 +406,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
                 .OrderBy<PropertyDataDto>(x => x.VersionId);
-        }      
+        }
 
         // gets the base SELECT + FROM [+ filter] sql
         // always from the 'current' content version
