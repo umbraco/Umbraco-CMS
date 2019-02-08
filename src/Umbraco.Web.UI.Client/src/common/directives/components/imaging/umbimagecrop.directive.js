@@ -71,6 +71,10 @@ angular.module("umbraco.directives")
                         sliderRef = slider;
                     };
 
+                    scope.slide = function (values) {
+                        scope.dimensions.scale.current = values ? values.toString() : null;
+                    };
+
                     scope.change = function (values) {
                         scope.dimensions.scale.current = values ? values.toString() : null;
                     };
@@ -271,15 +275,12 @@ angular.module("umbraco.directives")
 					});
 
 					var throttledResizing = _.throttle(function(){
-						resizeImageToScale(scope.dimensions.scale.current);
+                        resizeImageToScale(scope.dimensions.scale.current);
 						calculateCropBox();
 					}, 100);
 
 					// Happens when we change the scale
                     scope.$watch("dimensions.scale.current", function (newValue, oldValue) {
-                        if (newValue && newValue !== oldValue) {
-                            sliderRef.noUiSlider.set(newValue);
-                        }
 						if (scope.loaded) {
 							throttledResizing();
 						}
