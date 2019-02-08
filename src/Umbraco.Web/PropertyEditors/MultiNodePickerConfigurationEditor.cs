@@ -28,6 +28,14 @@ namespace Umbraco.Web.PropertyEditors
             return output;
         }
 
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        {
+            ["multiPicker"] = true,
+            ["showEditButton"] = false,
+            ["showPathOnHover"] = false,
+            ["idType"] = "udi"
+        };
+
         /// <inheritdoc />
         public override IDictionary<string, object> ToValueEditor(object configuration)
         {

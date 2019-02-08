@@ -12,6 +12,13 @@ namespace Umbraco.Web.PropertyEditors
                 .Config = new Dictionary<string, object> { { "idType", "udi" } };
         }
 
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        {
+            ["idType"] = "udi",
+            ["showEditButton"] = false,
+            ["showPathOnHover"] = false,
+        };
+
         public override IDictionary<string, object> ToValueEditor(object configuration)
         {
             // these are not configuration fields, but constants required by the value editor

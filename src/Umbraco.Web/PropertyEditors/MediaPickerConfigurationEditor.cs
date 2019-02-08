@@ -20,6 +20,11 @@ namespace Umbraco.Web.PropertyEditors
                 };
         }
 
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        {
+            ["idType"] = "udi"
+        };
+
         public override IDictionary<string, object> ToValueEditor(object configuration)
         {
             var d = base.ToValueEditor(configuration);
