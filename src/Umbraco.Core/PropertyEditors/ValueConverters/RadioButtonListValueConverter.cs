@@ -17,10 +17,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            var intAttempt = source.TryConvertTo<string>();
+            var attempt = source.TryConvertTo<string>();
 
-            if (intAttempt.Success)
-                return intAttempt.Result;
+            if (attempt.Success)
+                return attempt.Result;
 
             return null;
         }

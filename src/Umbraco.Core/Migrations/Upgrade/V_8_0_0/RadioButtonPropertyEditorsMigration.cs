@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Sync;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class RadioButtonPropertyEditorsMigration : MigrationBase
     {
-        public RadioButtonPropertyEditorsMigration(IMigrationContext context)
+        private readonly CacheRefresherCollection _cacheRefreshers;
+        private readonly IServerMessenger _serverMessenger;
+
+        public RadioButtonPropertyEditorsMigration(IMigrationContext context, CacheRefresherCollection cacheRefreshers, IServerMessenger serverMessenger)
             : base(context)
         {
+            _cacheRefreshers = cacheRefreshers;
+            _serverMessenger = serverMessenger;
         }
 
         public override void Migrate()
@@ -23,6 +32,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 .From<DataTypeDto>()
                 .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.RadioButtonList"));
 
+            var refreshCache = false;
             foreach (var dataType in dataTypes)
             {
                 ValueListConfiguration config;
@@ -60,15 +70,42 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
                     // persist changes
                     foreach (var propertyDataDto in updatedDtos) Database.Update(propertyDataDto);
+
+                    UpdateDataType(dataType);
+                    refreshCache = true;
                 }
             }
+
+            if (refreshCache)
+            {
+                var dataTypeCacheRefresher = _cacheRefreshers[ContentCacheRefresher.UniqueId];
+                _serverMessenger.PerformRefreshAll(dataTypeCacheRefresher);
+            }
+
+        }
+
+        private void UpdateDataType(DataTypeDto dataType)
+        {
+            dataType.DbType = ValueStorageType.Nvarchar.ToString();
+            Database.Update(dataType);
         }
 
         private bool UpdatePropertyDataDto(PropertyDataDto propData, ValueListConfiguration config)
         {
             //Get the INT ids stored for this property/drop down
             int[] ids = null;
-            if (propData.IntegerValue.HasValue) ids = new[] {propData.IntegerValue.Value};
+            if (!propData.VarcharValue.IsNullOrWhiteSpace())
+            {
+                ids = ConvertStringValues(propData.VarcharValue);
+            }
+            else if (!propData.TextValue.IsNullOrWhiteSpace())
+            {
+                ids = ConvertStringValues(propData.TextValue);
+            }
+            else if (propData.IntegerValue.HasValue)
+            {
+                ids = new[] { propData.IntegerValue.Value };
+            }
 
             //if there are INT ids, convert them to values based on the configuration
             if (ids == null || ids.Length <= 0) return false;
@@ -100,6 +137,22 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         private class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
         {
+        }
+
+        private int[] ConvertStringValues(string val)
+        {
+            var splitVals = val.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            var intVals = splitVals
+                .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)
+                .Where(x => x != int.MinValue)
+                .ToArray();
+
+            //only return if the number of values are the same (i.e. All INTs)
+            if (splitVals.Length == intVals.Length)
+                return intVals;
+
+            return null;
         }
     }
 }
