@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors.Filters
             {
                 //now do each validation step
                 if (contentItemValidator.ValidateExistingContent(model, actionContext))
-                    if (!contentItemValidator.ValidateProperties(model, model, actionContext))
+                    if (contentItemValidator.ValidateProperties(model, model, actionContext))
                         contentItemValidator.ValidatePropertyData(model, model, model.PropertyCollectionDto, actionContext.ModelState);
             }
         }

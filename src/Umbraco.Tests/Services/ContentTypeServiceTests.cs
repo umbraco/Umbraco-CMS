@@ -554,7 +554,6 @@ namespace Umbraco.Tests.Services
             IContent contentItem = MockedContent.CreateTextpageContent(contentType1, "Testing", -1);
             ServiceContext.ContentService.SaveAndPublish(contentItem);
             var initProps = contentItem.Properties.Count;
-            var initPropTypes = contentItem.PropertyTypes.Count();
 
             //remove a property
             contentType1.RemovePropertyType(contentType1.PropertyTypes.First().Alias);
@@ -563,7 +562,6 @@ namespace Umbraco.Tests.Services
             //re-load it from the db
             contentItem = ServiceContext.ContentService.GetById(contentItem.Id);
 
-            Assert.AreEqual(initPropTypes - 1, contentItem.PropertyTypes.Count());
             Assert.AreEqual(initProps - 1, contentItem.Properties.Count);
         }
 

@@ -1830,8 +1830,10 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root
-                if (toMove.ContentType.AllowedAsRoot == false)
+                //cannot move if the content item is not allowed at the root unless there are
+                //none allowed at root (in which case all should be allowed at root)
+                var contentTypeService = Services.ContentTypeService;
+                if (toMove.ContentType.AllowedAsRoot == false && contentTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
@@ -1846,8 +1848,7 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var contentTypeService = Services.ContentTypeBaseServices.For(parent);
-                var parentContentType = contentTypeService.Get(parent.ContentTypeId);
+                var parentContentType = Services.ContentTypeService.Get(parent.ContentTypeId);
                 //check if the item is allowed under this one
                 if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)

@@ -1,12 +1,15 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Events
 {
+    /// <summary>
+    /// Represent event data for the Saving event.
+    /// </summary>
     public class ContentSavingEventArgs : SaveEventArgs<IContent>
     {
         #region Factory Methods
+
         /// <summary>
         /// Converts <see cref="ContentSavingEventArgs"/> to <see cref="ContentSavedEventArgs"/> while preserving all args state
         /// </summary>
@@ -43,24 +46,32 @@ namespace Umbraco.Core.Events
                 EventState = EventState,
                 AdditionalData = AdditionalData
             };
-        } 
+        }
+
         #endregion
 
         #region Constructors
 
-        public ContentSavingEventArgs(IEnumerable<IContent> eventObject, EventMessages eventMessages) : base(eventObject, eventMessages)
-        {
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentSavingEventArgs"/> class.
+        /// </summary>
+        public ContentSavingEventArgs(IEnumerable<IContent> eventObject, EventMessages eventMessages)
+            : base(eventObject, eventMessages)
+        { }
 
-        public ContentSavingEventArgs(IContent eventObject, EventMessages eventMessages) : base(eventObject, eventMessages)
-        {
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentSavingEventArgs"/> class.
+        /// </summary>
+        public ContentSavingEventArgs(IContent eventObject, EventMessages eventMessages)
+            : base(eventObject, eventMessages)
+        { }
 
         #endregion
 
         /// <summary>
         /// Determines whether a culture is being saved, during a Saving event.
         /// </summary>
-        public bool IsSavingCulture(IContent content, string culture) => content.CultureInfos.TryGetValue(culture, out var cultureInfo) && cultureInfo.IsDirty();
+        public bool IsSavingCulture(IContent content, string culture)
+            => content.CultureInfos.TryGetValue(culture, out var cultureInfo) && cultureInfo.IsDirty();
     }
 }

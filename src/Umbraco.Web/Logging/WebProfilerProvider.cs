@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Web;
 using StackExchange.Profiling;
+using StackExchange.Profiling.Internal;
 
 namespace Umbraco.Web.Logging
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Web.Logging
     /// Once the boot phase is changed to BootPhase.BootRequest then the base class (default) provider will handle all
     /// profiling data and this sub class no longer performs any logic.
     /// </remarks>
-    internal class WebProfilerProvider : WebRequestProfilerProvider
+    internal class WebProfilerProvider : AspNetRequestProvider
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private MiniProfiler _startupProfiler;
@@ -81,21 +82,14 @@ namespace Umbraco.Web.Logging
         /// - assuming profiling is enabled, on every BeginRequest that should be profiled,
         /// - except for the very first one which is the boot request.</para>
         /// </remarks>
-        public override MiniProfiler Start(string sessionName = null)
+        public override MiniProfiler Start(string profilerName, MiniProfilerBaseOptions options)
         {
             var first = Interlocked.Exchange(ref _first, 1) == 0;
-            if (first == false) return base.Start(sessionName);
+            if (first == false) return base.Start(profilerName, options);
 
-            _startupProfiler = new MiniProfiler("http://localhost/umbraco-startup") { Name = "StartupProfiler" };
-            SetProfilerActive(_startupProfiler);
+            _startupProfiler = new MiniProfiler("StartupProfiler", options);
+            CurrentProfiler = _startupProfiler;
             return _startupProfiler;
-        }
-
-        // obsolete but that's the one that's called ;-(
-        [Obsolete]
-        public override MiniProfiler Start(ProfileLevel level, string sessionName = null)
-        {
-            return Start(sessionName);
         }
 
         /// <summary>
@@ -105,23 +99,27 @@ namespace Umbraco.Web.Logging
         /// If the boot phase is not Booted, then this will return the startup profiler (this), otherwise
         /// returns the base class
         /// </remarks>
-        public override MiniProfiler GetCurrentProfiler()
+        public override MiniProfiler CurrentProfiler
         {
-            // if not booting then just use base (fast)
-            // no lock, _bootPhase is volatile
-            if (_bootPhase == BootPhase.Booted)
-                return base.GetCurrentProfiler();
+            get
+            {
+                // if not booting then just use base (fast)
+                // no lock, _bootPhase is volatile
+                if (_bootPhase == BootPhase.Booted)
+                    return base.CurrentProfiler;
 
-            // else
-            try
-            {
-                var current = base.GetCurrentProfiler();
-                return current ?? _startupProfiler;
+                // else
+                try
+                {
+                    var current = base.CurrentProfiler;
+                    return current ?? _startupProfiler;
+                }
+                catch
+                {
+                    return _startupProfiler;
+                }
             }
-            catch
-            {
-                return _startupProfiler;
-            }
+            
         }
     }
 }

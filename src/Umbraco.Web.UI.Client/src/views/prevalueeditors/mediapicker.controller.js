@@ -18,7 +18,7 @@ function mediaPickerController($scope, entityResource, iconHelper, editorService
         entityType: "Media",
         section: "media",
         treeAlias: "media",
-        idType: "int"
+        idType: "udi"
     };
 
     //combine the dialogOptions with any values returned from the server

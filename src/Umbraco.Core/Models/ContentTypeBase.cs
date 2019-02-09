@@ -67,6 +67,8 @@ namespace Umbraco.Core.Models
             _variations = ContentVariation.Nothing;
         }
 
+        public abstract ISimpleContentType ToSimple();
+
         /// <summary>
         /// Gets a value indicating whether the content type is publishing.
         /// </summary>

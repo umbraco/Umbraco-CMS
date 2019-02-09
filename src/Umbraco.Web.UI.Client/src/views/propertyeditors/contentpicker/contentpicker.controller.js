@@ -144,7 +144,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
-        idType: "int"
+        idType: "udi"
     };
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected abstract TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings);
+        protected abstract TreeNodeCollection GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings);
 
         /// <summary>
         /// Returns the menu structure for the node
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected abstract MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings);
+        protected abstract MenuItemCollection GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings);
 
         /// <summary>
         /// The name to display on the root node
@@ -86,8 +87,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNode GetRootNode(FormDataCollection queryStrings)
+        public TreeNode GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
             var node = CreateRootNode(queryStrings);
@@ -126,8 +126,7 @@ namespace Umbraco.Web.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNodeCollection GetNodes(string id, FormDataCollection queryStrings)
+        public TreeNodeCollection GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
             var nodes = GetTreeNodes(id, queryStrings);
@@ -158,8 +157,7 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public MenuItemCollection GetMenu(string id, FormDataCollection queryStrings)
+        public MenuItemCollection GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
             var menu = GetMenuForNode(id, queryStrings);

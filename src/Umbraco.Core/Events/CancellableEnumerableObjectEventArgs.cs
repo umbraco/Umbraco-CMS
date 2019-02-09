@@ -1,34 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
 
 namespace Umbraco.Core.Events
 {
-    [HostProtection(SecurityAction.LinkDemand, SharedState = true)]
-    public class CancellableEnumerableObjectEventArgs<T> : CancellableObjectEventArgs<IEnumerable<T>>, IEquatable<CancellableEnumerableObjectEventArgs<T>>
+    /// <summary>
+    /// Represents event data, for events that support cancellation, and expose impacted objects.
+    /// </summary>
+    /// <typeparam name="TEventObject">The type of the exposed, impacted objects.</typeparam>
+    public class CancellableEnumerableObjectEventArgs<TEventObject> : CancellableObjectEventArgs<IEnumerable<TEventObject>>, IEquatable<CancellableEnumerableObjectEventArgs<TEventObject>>
     {
-        public CancellableEnumerableObjectEventArgs(IEnumerable<T> eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
+        public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
             : base(eventObject, canCancel, messages, additionalData)
         { }
 
-        public CancellableEnumerableObjectEventArgs(IEnumerable<T> eventObject, bool canCancel, EventMessages eventMessages)
+        public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel, EventMessages eventMessages)
             : base(eventObject, canCancel, eventMessages)
         { }
 
-        public CancellableEnumerableObjectEventArgs(IEnumerable<T> eventObject, EventMessages eventMessages)
+        public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, EventMessages eventMessages)
             : base(eventObject, eventMessages)
         { }
 
-        public CancellableEnumerableObjectEventArgs(IEnumerable<T> eventObject, bool canCancel)
+        public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel)
             : base(eventObject, canCancel)
         { }
 
-        public CancellableEnumerableObjectEventArgs(IEnumerable<T> eventObject)
+        public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject)
             : base(eventObject)
         { }
 
-        public bool Equals(CancellableEnumerableObjectEventArgs<T> other)
+        public bool Equals(CancellableEnumerableObjectEventArgs<TEventObject> other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -41,7 +43,7 @@ namespace Umbraco.Core.Events
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((CancellableEnumerableObjectEventArgs<T>)obj);
+            return Equals((CancellableEnumerableObjectEventArgs<TEventObject>)obj);
         }
 
         public override int GetHashCode()

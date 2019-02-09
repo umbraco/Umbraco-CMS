@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(user);
-                
+
 
                 // Assert
                 Assert.That(user.HasIdentity, Is.True);
@@ -96,9 +96,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(user1);
-                
+
                 repository.Save(use2);
-                
+
 
                 // Assert
                 Assert.That(user1.HasIdentity, Is.True);
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var user = MockedUser.CreateUser();
                 repository.Save(user);
-                
+
 
                 // Act
                 var resolved = repository.Get((int)user.Id);
@@ -132,9 +132,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_UserRepository()
         {
             var ct = MockedContentTypes.CreateBasicContentType("test");
-            var content = MockedContent.CreateBasicContent(ct);
             var mt = MockedContentTypes.CreateSimpleMediaType("testmedia", "TestMedia");
-            var media = MockedMedia.CreateSimpleMedia(mt, "asdf", -1);
 
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
@@ -147,11 +145,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 contentTypeRepo.Save(ct);
                 mediaTypeRepo.Save(mt);
-                
+
+                var content = MockedContent.CreateBasicContent(ct);
+                var media = MockedMedia.CreateSimpleMedia(mt, "asdf", -1);
 
                 contentRepository.Save(content);
                 mediaRepository.Save(media);
-                
 
                 var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);
 
@@ -171,7 +170,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.Username = "newName";
 
                 userRepository.Save(resolved);
-                
+
                 var updatedItem = (User) userRepository.Get(user.Id);
 
                 // Assert
@@ -204,13 +203,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(user);
-                
+
                 var id = user.Id;
 
                 var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
 
                 repository2.Delete(user);
-                
+
 
                 var resolved = repository2.Get((int) id);
 
@@ -373,7 +372,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
-            
+
         }
 
         [Test]
@@ -429,7 +428,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var user = MockedUser.CreateUser();
             repository.Save(user);
-            
+
 
             var group = MockedUserGroup.CreateUserGroup();
             userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });

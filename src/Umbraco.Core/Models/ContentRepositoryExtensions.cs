@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models
                 return Array.Empty<string>();
 
             var culturesUnpublishing = content.CultureInfos.Values
-                .Where(x => content.IsPropertyDirty("_unpublishedCulture_" + x.Culture))
+                .Where(x => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + x.Culture))
                 .Select(x => x.Culture);
 
             return culturesUnpublishing.ToList();
@@ -88,8 +88,7 @@ namespace Umbraco.Core.Models
             {
                 content.CultureInfos.Clear();
                 content.CultureInfos = null;
-            }
-                
+            }                
 
             if (culture == null || culture == "*")
                 content.Name = other.Name;
@@ -158,8 +157,9 @@ namespace Umbraco.Core.Models
                 if (!content.PublishCultureInfos.TryGetValue(culture, out var publishInfos))
                     continue;
 
+                // if it's not dirty, it means it hasn't changed so there's nothing to adjust
                 if (!publishInfos.IsDirty())
-                    continue; //if it's not dirty, it means it hasn't changed so there's nothing to adjust
+                    continue; 
                 
                 content.PublishCultureInfos.AddOrUpdate(culture, publishInfos.Name, date);
 

@@ -5,11 +5,11 @@
         for (var property in obj) {
             if (obj.hasOwnProperty(property)) {
                 
-                if (property.startsWith(propertyPrefix) && obj[property]) {
+                if (property.startsWith(propertyPrefix) && obj[property] !== undefined) {
                     obj[property] = undefined;
                 }
                 
-                if (typeof obj[property] == "object") {
+                if (typeof obj[property] === "object") {
                     removeProperty(obj[property], propertyPrefix);
                 }
             }

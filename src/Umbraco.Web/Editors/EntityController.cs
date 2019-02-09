@@ -14,6 +14,7 @@ using System.Reflection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -609,8 +610,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [HttpQueryStringFilter("queryStrings")]
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, FormDataCollection queryStrings)
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
         }
