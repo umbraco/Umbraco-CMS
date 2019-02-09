@@ -48,28 +48,4 @@ namespace Umbraco.Web.WebApi.Filters
             base.OnActionExecuting(actionContext);
         }
     }
-
-    public sealed class UnwrapClientCultureFilterAttribute : ActionFilterAttribute
-    {
-        private readonly string _parameterName;
-
-        public UnwrapClientCultureFilterAttribute(string parameterName = "culture")
-        {
-            if (string.IsNullOrEmpty(parameterName))
-                throw new ArgumentException("ParameterName is required.");
-            _parameterName = parameterName;
-        }
-
-        public override void OnActionExecuting(HttpActionContext actionContext)
-        {
-            if (actionContext.ActionArguments.ContainsKey(_parameterName) && string.IsNullOrWhiteSpace(actionContext.ActionArguments[_parameterName]?.ToString()) == false)
-            {
-                return;
-            }
-
-            actionContext.ActionArguments[_parameterName] = actionContext.Request.ClientCulture();
-
-            base.OnActionExecuting(actionContext);
-        }
-    }
 }
