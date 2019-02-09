@@ -503,7 +503,7 @@ namespace Umbraco.Web.Editors
                     return new PagedResult<EntityBasic>(0, 0, 0);
                 }
 
-                var culture = Request.ClientCulture();
+                var culture = ClientCulture();
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
                     Items = entities.Select(entity => Mapper.Map<IEntitySlim, EntityBasic>(entity, options =>
@@ -1045,15 +1045,17 @@ namespace Umbraco.Web.Editors
 
         private Func<object, EntityBasic> MapEntities(string culture = null)
         {
-            culture = culture ?? Request.ClientCulture();
+            culture = culture ?? ClientCulture();
             return x => MapEntity(x, culture);
         }
 
         private EntityBasic MapEntity(object entity, string culture = null)
         {
-            culture = culture ?? Request.ClientCulture();
+            culture = culture ?? ClientCulture();
             return Mapper.Map<EntityBasic>(entity, opts => { opts.SetCulture(culture); });
         }
+
+        private string ClientCulture() => Request.ClientCulture();
 
         #region Methods to get all dictionary items
         private IEnumerable<EntityBasic> GetAllDictionaryItems()
