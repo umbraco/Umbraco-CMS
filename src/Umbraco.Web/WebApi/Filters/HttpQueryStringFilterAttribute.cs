@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
@@ -32,10 +33,41 @@ namespace Umbraco.Web.WebApi.Filters
                 var queryStrings = actionContext.Request.Properties["MS_QueryNameValuePairs"] as IEnumerable<KeyValuePair<string, string>>;
                 if (queryStrings == null) return;
 
-                var formData = new FormDataCollection(queryStrings);
+                var queryStringKeys = queryStrings.Select(kvp => kvp.Key).ToArray();
+                var additionalParameters = new Dictionary<string, string>();
+
+                if(queryStringKeys.Contains("culture") == false) {
+                    additionalParameters["culture"] = actionContext.Request.ClientCulture();
+                }
+
+                var formData = new FormDataCollection(queryStrings.Union(additionalParameters));
 
                 actionContext.ActionArguments[ParameterName] = formData;
             }
+
+            base.OnActionExecuting(actionContext);
+        }
+    }
+
+    public sealed class UnwrapClientCultureFilterAttribute : ActionFilterAttribute
+    {
+        private readonly string _parameterName;
+
+        public UnwrapClientCultureFilterAttribute(string parameterName = "culture")
+        {
+            if (string.IsNullOrEmpty(parameterName))
+                throw new ArgumentException("ParameterName is required.");
+            _parameterName = parameterName;
+        }
+
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            if (actionContext.ActionArguments.ContainsKey(_parameterName) && string.IsNullOrWhiteSpace(actionContext.ActionArguments[_parameterName]?.ToString()) == false)
+            {
+                return;
+            }
+
+            actionContext.ActionArguments[_parameterName] = actionContext.Request.ClientCulture();
 
             base.OnActionExecuting(actionContext);
         }
