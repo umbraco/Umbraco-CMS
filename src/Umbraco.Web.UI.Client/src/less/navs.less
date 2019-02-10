@@ -220,6 +220,7 @@
 // DROPDOWNS
 // ---------
 .dropdown-menu {
+    display: block;
   border-radius: @dropdownBorderRadius;
   box-shadow: 0 5px 20px rgba(0,0,0,.3);
   padding-top: 0;
@@ -233,6 +234,12 @@
 
 .dropdown-menu > li > a {
     padding: 8px 20px;
+    color: @ui-option-type;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+    color: @ui-option-type-hover;
+    background: @ui-option-hover;
 }
 
 .nav-tabs .dropdown-menu {

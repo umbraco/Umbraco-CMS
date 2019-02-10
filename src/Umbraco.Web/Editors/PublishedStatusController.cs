@@ -17,9 +17,6 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public string GetPublishedStatusUrl()
         {
-            if (_publishedSnapshotService is PublishedCache.XmlPublishedCache.PublishedSnapshotService)
-                return "views/dashboard/settings/xmldataintegrityreport.html";
-
             //if (service is PublishedCache.PublishedNoCache.PublishedSnapshotService)
             //    return "views/dashboard/developer/nocache.html";
 

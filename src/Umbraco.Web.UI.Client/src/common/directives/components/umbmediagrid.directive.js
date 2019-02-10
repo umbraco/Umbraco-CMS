@@ -140,11 +140,11 @@ Use this directive to generate a thumbnail grid of media items.
                     }
 
                 }
-
+                
                 if (scope.items.length > 0) {
                     setFlexValues(scope.items);
                 }
-
+                
             }
 
             function setItemData(item) {
@@ -157,7 +157,8 @@ Use this directive to generate a thumbnail grid of media items.
                     item.isFolder = !mediaHelper.hasFilePropertyType(item);
                 }
 
-                if (!item.isFolder) {
+                // if it's not a folder, get the thumbnail, extension etc. if we haven't already
+                if (!item.isFolder && !item.thumbnail) {
 
                     // handle entity
                     if(item.image) {
@@ -235,7 +236,7 @@ Use this directive to generate a thumbnail grid of media items.
                 }
 
             }
-
+            
             function setFlexValues(mediaItems) {
 
                 var flexSortArray = mediaItems;
@@ -269,12 +270,12 @@ Use this directive to generate a thumbnail grid of media items.
                         "min-height": itemMinHeight + "px"
                     };
 
-                    mediaItem.flexStyle = flexStyle;
+                        mediaItem.flexStyle = flexStyle;
 
                 }
 
             }
-
+            
             scope.clickItem = function(item, $event, $index) {
                 if (scope.onClick) {
                     scope.onClick(item, $event, $index);

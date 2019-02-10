@@ -116,7 +116,7 @@ When building a custom infinite editor view you can use the same components as a
                     </umb-button>
                     <umb-button
                         type="button"
-                        button-style="success"
+                        button-style="action"
                         label-key="general_submit"
                         action="vm.submit(model)">
                     </umb-button>

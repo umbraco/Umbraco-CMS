@@ -47,7 +47,7 @@
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
-                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "udi",
                     submit: function (model) {
                         select(model.selection[0]);
                         editorService.close();

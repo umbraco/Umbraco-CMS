@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using umbraco.cms.presentation.create.controls;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -86,7 +83,6 @@ namespace Umbraco.Tests.Services
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
             var initProps = member.Properties.Count;
-            var initPropTypes = member.PropertyTypes.Count();
 
             //remove a property (NOT ONE OF THE DEFAULTS)
             var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
@@ -96,7 +92,6 @@ namespace Umbraco.Tests.Services
             //re-load it from the db
             member = ServiceContext.MemberService.GetById(member.Id);
 
-            Assert.AreEqual(initPropTypes - 1, member.PropertyTypes.Count());
             Assert.AreEqual(initProps - 1, member.Properties.Count);
         }
 

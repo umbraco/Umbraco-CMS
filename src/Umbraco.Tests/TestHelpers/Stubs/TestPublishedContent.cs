@@ -48,6 +48,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public string GetUrl(string culture = null) => throw new NotSupportedException();
         public PublishedItemType ItemType => ContentType.ItemType;
         public bool IsDraft(string culture = null) => false;
+        public bool IsPublished(string culture = null) => true;
         public IPublishedContent Parent { get; set; }
         public IEnumerable<IPublishedContent> Children { get; set; }
 

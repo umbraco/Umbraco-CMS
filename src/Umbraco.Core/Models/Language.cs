@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
 using Umbraco.Core.Configuration;
@@ -16,8 +14,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Language : EntityBase, ILanguage
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
         private string _isoCode;
         private string _cultureName;
         private bool _isDefaultVariantLanguage;
@@ -29,22 +25,12 @@ namespace Umbraco.Core.Models
             IsoCode = isoCode;
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo IsoCodeSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.IsoCode);
-            public readonly PropertyInfo CultureNameSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.CultureName);
-            public readonly PropertyInfo IsDefaultVariantLanguageSelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.IsDefault);
-            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.IsMandatory);
-            public readonly PropertyInfo FallbackLanguageSelector = ExpressionHelper.GetPropertyInfo<Language, int?>(x => x.FallbackLanguageId);
-        }
-
         /// <inheritdoc />
         [DataMember]
         public string IsoCode
         {
             get => _isoCode;
-            set => SetPropertyValueAndDetectChanges(value, ref _isoCode, Ps.Value.IsoCodeSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _isoCode, nameof(IsoCode));
         }
 
         /// <inheritdoc />
@@ -67,7 +53,7 @@ namespace Umbraco.Core.Models
             // culture
             //
             // I assume that, on a site, all language names should be in the SAME language, in DB,
-            // and that would be the umbracoDefaultUILanguage (app setting) - BUT if by accident
+            // and that would be the Umbraco.Core.DefaultUILanguage (app setting) - BUT if by accident
             // ANY culture has been retrieved with another current thread culture - it's now corrupt
             //
             // so, the logic below ensures that the name always end up being the correct name
@@ -102,7 +88,7 @@ namespace Umbraco.Core.Models
                 }
             }
 
-            set => SetPropertyValueAndDetectChanges(value, ref _cultureName, Ps.Value.CultureNameSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _cultureName, nameof(CultureName));
         }
 
         /// <inheritdoc />
@@ -113,21 +99,21 @@ namespace Umbraco.Core.Models
         public bool IsDefault
         {
             get => _isDefaultVariantLanguage;
-            set => SetPropertyValueAndDetectChanges(value, ref _isDefaultVariantLanguage, Ps.Value.IsDefaultVariantLanguageSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _isDefaultVariantLanguage, nameof(IsDefault));
         }
 
         /// <inheritdoc />
         public bool IsMandatory
         {
             get => _mandatory;
-            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(IsMandatory));
         }
 
         /// <inheritdoc />
         public int? FallbackLanguageId
         {
             get => _fallbackLanguageId;
-            set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageId, Ps.Value.FallbackLanguageSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageId, nameof(FallbackLanguageId));
         }
     }
 }

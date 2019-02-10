@@ -24,7 +24,7 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO:  We'll need to be careful about the security on this controller, when we start implementing
+    // TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
 
@@ -37,8 +37,7 @@ namespace Umbraco.Web.Editors
     [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
-        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        public MediaTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(cultureDictionaryFactory, globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
 
@@ -92,7 +91,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the avilable compositions for this content type
+        /// Returns the available compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
         /// <param name="filter.contentTypeId"></param>
@@ -154,7 +153,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a media type container wth a given ID
+        /// Deletes a media type container with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -231,7 +230,8 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var contentType = Services.MediaTypeService.Get(contentItem.ContentTypeId);
+                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 

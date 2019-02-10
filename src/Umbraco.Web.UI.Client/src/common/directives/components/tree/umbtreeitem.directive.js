@@ -60,10 +60,13 @@ angular.module("umbraco.directives")
                 if (!node) {
                     return '';
                 }
-
-                //TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
+                
+                // TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
 
+                //is this the current action node (this is not the same as the current selected node!)
+                var actionNode = appState.getMenuState("currentNode");
+                
                 var css = [];                
                 if (node.cssClasses) {
                     _.each(node.cssClasses, function(c) {
@@ -73,17 +76,27 @@ angular.module("umbraco.directives")
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
                 }
+                if (node == scope.currentNode) {
+                    css.push("current");
+                    if (actionNode && actionNode.id !== node.id) {
+                        css.push("current-not-active");// when its the current node, but its not the active(current node for the given action)
+                    }
+                }
+                if (node.hasChildren) {
+                    css.push("has-children");
+                }
+                if (node.deleteAnimations) {
+                    css.push("umb-tree-item--deleted");
+                }
 
-                //is this the current action node (this is not the same as the current selected node!)
-                var actionNode = appState.getMenuState("currentNode");
                 if (actionNode) {
-                    if (actionNode.id === node.id && String(actionNode.id) !== "-1") {
+                    if (actionNode.id === node.id && String(node.id) !== "-1") {
                         css.push("active");
                     }
-
+                    
                     // special handling of root nodes with id -1 
                     // as there can be many nodes with id -1 in a tree we need to check the treeAlias instead
-                    if (String(actionNode.id) === "-1" && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
+                    if (String(node.id) === "-1" && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
                         css.push("active");
                     }
                 }
@@ -141,6 +154,7 @@ angular.module("umbraco.directives")
               defined on the tree
             */
             scope.altSelect = function(n, ev) {
+                if(ev.altKey) return false;
                 umbTreeCtrl.emitEvent("treeNodeAltSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
             

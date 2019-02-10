@@ -1,9 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -31,14 +27,6 @@ namespace Umbraco.Core.Models
             _originalPath = _path;
             GetFileContent = getFileContent;
             _content = getFileContent != null ? null : string.Empty;
-        }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Content);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Path);
         }
 
         private string _alias;
@@ -96,7 +84,7 @@ namespace Umbraco.Core.Models
                 _alias = null;
                 _name = null;
 
-                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, Ps.Value.PathSelector);
+                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, nameof(Path));
             }
         }
 
@@ -138,7 +126,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(
                     value ?? string.Empty, // cannot set to null
-                    ref _content, Ps.Value.ContentSelector);
+                    ref _content, nameof(Content));
             }
         }
 

@@ -73,7 +73,7 @@
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 
     &:hover {
-        border-color: @turquoise;
+        border-color: @blueMid;
     }
 }
 
@@ -236,10 +236,13 @@
 }
 
 
-.umb-packages-category:hover,
-.umb-packages-category.-active {
+.umb-packages-category:hover {
+    color: @ui-active-type-hover;
     text-decoration: none;
-    color: @turquoise;
+}
+.umb-packages-category.-active {
+    color: @ui-active-type;
+    background-color: @ui-active;
 }
 
 .umb-packages-category.-first {
@@ -403,7 +406,7 @@ a.umb-package-details__back-link {
 
 .umb-gallery__thumbnail {
     flex: 0 1 100px;
-    border: 1px solid @gray-8;
+    border: 1px solid @ui-action-disgrete-border;
     border-radius: 3px;
     margin: 5px;
     padding: 10px;
@@ -413,7 +416,7 @@ a.umb-package-details__back-link {
 
 .umb-gallery__thumbnail:hover {
     cursor: pointer;
-    border-color: @turquoise;
+    border-color: @ui-action-disgrete-border-hover;
 }
 
 /* PACKAGE LIST */

@@ -36,6 +36,24 @@ namespace Umbraco.Core.Events
         /// </returns>
         public static Attempt<EventNameExtractorResult> FindEvent(Type senderType, Type argsType, Func<string, bool> exclude)
         {
+            var events = FindEvents(senderType, argsType, exclude);
+
+            switch (events.Length)
+            {
+                case 0:
+                    return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.NoneFound));
+
+                case 1:
+                    return Attempt.Succeed(new EventNameExtractorResult(events[0]));
+
+                default:
+                    //there's more than one left so it's ambiguous!
+                    return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.Ambiguous));
+            }
+        }
+
+        internal static string[] FindEvents(Type senderType, Type argsType, Func<string, bool> exclude)
+        {
             var found = MatchedEventNames.GetOrAdd(new Tuple<Type, Type>(senderType, argsType), tuple =>
             {
                 var events = CandidateEvents.GetOrAdd(senderType, t =>
@@ -78,16 +96,7 @@ namespace Umbraco.Core.Events
                 }).Select(x => x.EventInfo.Name).ToArray();
             });
 
-            var filtered = found.Where(x => exclude(x) == false).ToArray();
-
-            if (filtered.Length == 0)
-                return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.NoneFound));
-
-            if (filtered.Length == 1)
-                return Attempt.Succeed(new EventNameExtractorResult(filtered[0]));
-
-            //there's more than one left so it's ambiguous!
-            return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.Ambiguous));
+            return found.Where(x => exclude(x) == false).ToArray();
         }
 
         /// <summary>

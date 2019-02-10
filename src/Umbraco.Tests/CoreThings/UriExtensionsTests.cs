@@ -33,7 +33,6 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/umbrac", "", false)]
         [TestCase("http://www.domain.com/test", "", false)]
         [TestCase("http://www.domain.com/test/umbraco", "", false)]        
-        [TestCase("http://www.domain.com/Umbraco/restServices/blah", "", true)]
         [TestCase("http://www.domain.com/Umbraco/Backoffice/blah", "", true)]
         [TestCase("http://www.domain.com/Umbraco/anything", "", true)]
         [TestCase("http://www.domain.com/Umbraco/anything/", "", true)]
@@ -42,8 +41,6 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/myvdir/umbraco/api/blah", "myvdir", false)]
         [TestCase("http://www.domain.com/MyVdir/umbraco/api/blah", "/myvdir", false)]
         [TestCase("http://www.domain.com/MyVdir/Umbraco/", "myvdir", true)]
-        [TestCase("http://www.domain.com/MyVdir/Umbraco/restServices/blah", "/myvdir", true)]
-        [TestCase("http://www.domain.com/umbraco/webservices/legacyAjaxCalls.asmx/js", "", true)]
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {

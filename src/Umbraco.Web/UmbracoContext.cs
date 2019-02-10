@@ -41,7 +41,7 @@ namespace Umbraco.Web
         /// <param name="replace">A value indicating whether to replace the existing context.</param>
         ///  <returns>The "current" UmbracoContext.</returns>
         ///  <remarks>
-        ///  todo - this needs to be clarified
+        ///  TODO: this needs to be clarified
         ///
         ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
         ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
@@ -260,7 +260,7 @@ namespace Umbraco.Web
         /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
         /// since the UmbracoContext itself doesn't use this.
         ///
-        /// TODO The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
+        /// TODO: The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
         /// </remarks>
         internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
             => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));
@@ -281,29 +281,7 @@ namespace Umbraco.Web
                         || string.IsNullOrEmpty(request["umbdebug"]) == false);
             }
         }
-
-        /// <summary>
-        /// Gets the current page ID, or <c>null</c> if no page ID is available (e.g. a custom page).
-        /// </summary>
-        public int? PageId
-        {
-            get
-            {
-                try
-                {
-                    // This was changed but the comments used to refer to
-                    // macros in the backoffice not working with this Id
-                    // it's probably not a problem any more though. Old comment:
-                    // https://github.com/umbraco/Umbraco-CMS/blob/7a615133ff9de84ee667fb7794169af65e2b4d7a/src/Umbraco.Web/UmbracoContext.cs#L256
-                    return Current.PublishedRequest.PublishedContent.Id;
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
@@ -312,7 +290,7 @@ namespace Umbraco.Web
             get
             {
                 if (_previewing.HasValue == false) DetectPreviewMode();
-                return _previewing.Value;
+                return _previewing ?? false;
             }
             private set => _previewing = value;
         }

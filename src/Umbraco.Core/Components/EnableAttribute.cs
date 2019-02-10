@@ -9,9 +9,8 @@ namespace Umbraco.Core.Components
     /// <para>If a type is specified, enables the composer of that type, else enables the composer marked with the attribute.</para>
     /// <para>This attribute is *not* inherited.</para>
     /// <para>This attribute applies to classes only, it is not possible to enable/disable interfaces.</para>
-    /// <para>If a composer ends up being both enabled and disabled: attributes marking the composer itself have lower priority
-    /// than attributes on *other* composers, eg if a composer declares itself as disabled it is possible to enable it from
-    /// another composer. Anything else is unspecified.</para>
+    /// <para>Assembly-level <see cref="DisableComposerAttribute"/> has greater priority than <see cref="DisableAttribute"/>
+    /// attribute when it is marking the composer itself, but lower priority that when it is referencing another composer.</para>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class EnableAttribute : Attribute

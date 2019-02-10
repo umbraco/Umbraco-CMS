@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
-            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
             return repository;
         }
 
@@ -61,8 +61,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 udb.EnableSqlCount = false;
 
                 var mediaType = MockedContentTypes.CreateSimpleMediaType("umbTextpage1", "Textpage");
-                var media = MockedMedia.CreateSimpleMedia(mediaType, "hello", -1);
                 mediaTypeRepository.Save(mediaType);
+
+                var media = MockedMedia.CreateSimpleMedia(mediaType, "hello", -1);
                 repository.Save(media);
 
                 udb.EnableSqlCount = true;
@@ -271,7 +272,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
                     repository.Save(folder);
                 }
-                
+
 
                 var types = new[] { 1031 };
                 var query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentTypeId));
@@ -302,7 +303,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
                     repository.Save(folder);
                 }
-                
+
 
                 var types = new[] { "Folder" };
                 var query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentType.Alias));

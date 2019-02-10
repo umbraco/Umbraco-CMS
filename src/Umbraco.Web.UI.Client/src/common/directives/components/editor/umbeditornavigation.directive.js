@@ -17,14 +17,24 @@
                 name: "More"
             };
 
-            scope.clickNavigationItem = function (selectedItem) {
+            scope.openNavigationItem = function(item) {
+                
                 scope.showDropdown = false;
-                runItemAction(selectedItem);
-                setItemToActive(selectedItem);
+                runItemAction(item);
+                setItemToActive(item);
                 if(scope.onSelect) {
-                    scope.onSelect({"item": selectedItem});
+                    scope.onSelect({"item": item});
                 }
-                eventsService.emit("app.tabChange", selectedItem);
+                eventsService.emit("app.tabChange", item);
+            };
+
+            scope.openAnchorItem = function(item, anchor) {
+                if(scope.onAnchorSelect) {
+                    scope.onAnchorSelect({"item": item, "anchor": anchor});
+                }
+                if (item.active !== true) {
+                    scope.openNavigationItem(item);
+                }
             };
 
             scope.toggleDropdown = function () {
@@ -128,7 +138,8 @@
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             scope: {
                 navigation: "=",
-                onSelect: "&"
+                onSelect: "&",
+                onAnchorSelect: "&"
             },
             link: link
         };

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Trees
             //to convert a filepath to a tree syncing path string.
 
             //removes the basepath from the path
-            //and normalises paths - / is used consistently between trees and editors
+            //and normalizes paths - / is used consistently between trees and editors
             basePath = basePath.TrimStart("~");
             virtualPath = virtualPath.TrimStart("~");
             virtualPath = virtualPath.Substring(basePath.Length);

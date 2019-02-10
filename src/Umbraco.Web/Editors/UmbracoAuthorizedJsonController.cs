@@ -20,24 +20,11 @@ namespace Umbraco.Web.Editors
     [AngularJsonOnlyConfiguration]
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoAuthorizedJsonController"/> with auto dependencies.
-        /// </summary>
         protected UmbracoAuthorizedJsonController()
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoAuthorizedJsonController"/> class with all its dependencies.
-        /// </summary>
-        /// <param name="globalSettings"></param>
-        /// <param name="umbracoContext"></param>
-        /// <param name="sqlContext"></param>
-        /// <param name="services"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="logger"></param>
-        /// <param name="runtimeState"></param>
-        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
     }

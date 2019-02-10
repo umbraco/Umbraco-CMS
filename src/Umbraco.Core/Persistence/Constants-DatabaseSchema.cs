@@ -14,8 +14,8 @@ namespace Umbraco.Core
 
                 public const string Node = /*TableNamePrefix*/ "umbraco" + "Node";
                 public const string NodeData = /*TableNamePrefix*/ "cms" + "ContentNu";
-                public const string NodeXml = /*TableNamePrefix*/ "cms" + "ContentXml"; // todo get rid of these with the xml cache
-                public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // todo get rid of these with the xml cache
+                public const string NodeXml = /*TableNamePrefix*/ "cms" + "ContentXml"; // TODO: get rid of these with the xml cache
+                public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // TODO: get rid of these with the xml cache
 
                 public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType";
                 public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
@@ -40,7 +40,7 @@ namespace Umbraco.Core
                 public const string RelationType = /*TableNamePrefix*/ "umbraco" + "RelationType";
                 public const string Relation = /*TableNamePrefix*/ "umbraco" + "Relation";
 
-                public const string Domain = /*TableNamePrefix*/ "umbraco" + "Domains";
+                public const string Domain = /*TableNamePrefix*/ "umbraco" + "Domain";
                 public const string Language = /*TableNamePrefix*/ "umbraco" + "Language";
                 public const string DictionaryEntry = /*TableNamePrefix*/ "cms" + "Dictionary";
                 public const string DictionaryValue = /*TableNamePrefix*/ "cms" + "LanguageText";

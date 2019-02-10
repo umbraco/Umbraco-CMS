@@ -3,7 +3,6 @@ using System.Linq;
 using System.Web.UI;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using umbraco;
 
 namespace Umbraco.Tests.Cache
 {
@@ -104,9 +103,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Get_By_Search()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("Test1", () => cacheContent1);
             AppCache.Get("Tester2", () => cacheContent2);
@@ -123,9 +122,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Clear_By_Expression()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("TTes1t", () => cacheContent1);
             AppCache.Get("Tester2", () => cacheContent2);
@@ -142,9 +141,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Clear_By_Search()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("Test1", () => cacheContent1);
             AppCache.Get("Tester2", () => cacheContent2);
@@ -161,9 +160,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Clear_By_Key()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("Test1", () => cacheContent1);
             AppCache.Get("Test2", () => cacheContent2);
@@ -181,9 +180,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Clear_All_Items()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("Test1", () => cacheContent1);
             AppCache.Get("Test2", () => cacheContent2);
@@ -200,7 +199,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Add_When_Not_Available()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
+            var cacheContent1 = new MacroCacheContent();
             AppCache.Get("Test1", () => cacheContent1);
             Assert.AreEqual(1, GetTotalItemCount);
         }
@@ -208,7 +207,7 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Get_When_Available()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
+            var cacheContent1 = new MacroCacheContent();
             var result = AppCache.Get("Test1", () => cacheContent1);
             var result2 = AppCache.Get("Test1", () => cacheContent1);
             Assert.AreEqual(1, GetTotalItemCount);
@@ -218,9 +217,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Remove_By_Type_Name()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("Test1", () => cacheContent1);
             AppCache.Get("Test2", () => cacheContent2);
@@ -238,9 +237,9 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Can_Remove_By_Strong_Type()
         {
-            var cacheContent1 = new MacroCacheContent(new LiteralControl(), "Test1");
-            var cacheContent2 = new MacroCacheContent(new LiteralControl(), "Test2");
-            var cacheContent3 = new MacroCacheContent(new LiteralControl(), "Test3");
+            var cacheContent1 = new MacroCacheContent();
+            var cacheContent2 = new MacroCacheContent();
+            var cacheContent3 = new MacroCacheContent();
             var cacheContent4 = new LiteralControl();
             AppCache.Get("Test1", () => cacheContent1);
             AppCache.Get("Test2", () => cacheContent2);
@@ -252,6 +251,11 @@ namespace Umbraco.Tests.Cache
             AppCache.ClearOfType<MacroCacheContent>();
 
             Assert.AreEqual(1, GetTotalItemCount);
+        }
+
+        //just used for these tests
+        private class MacroCacheContent
+        {
         }
     }
 }

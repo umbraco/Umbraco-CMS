@@ -109,7 +109,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
 
-            //TODO: PUT lock here!!
+            // TODO: PUT lock here!!
 
             User user;
             using (var scope = ScopeProvider.CreateScope())
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException)
                 {
-                    // todo - refactor users/upgrade
+                    // TODO: refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
@@ -705,7 +705,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException)
                 {
-                    // todo - refactor users/upgrade
+                    // TODO: refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
@@ -1218,7 +1218,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletedUserGroup;
 
-        //TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
+        // TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
         // event on the ContentService since there's a method there to modify node permissions too, or we can proxy events if needed.
         internal static event TypedEventHandler<IUserService, SaveEventArgs<EntityPermission>> UserGroupPermissionsAssigned;
     }

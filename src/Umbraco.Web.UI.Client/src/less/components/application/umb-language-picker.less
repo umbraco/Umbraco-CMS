@@ -16,16 +16,21 @@
     border-bottom: 1px solid @gray-9;
     height: @editorHeaderHeight;
     box-sizing: border-box;
-}
-
-.umb-language-picker__toggle:hover {
-    background: @gray-10;
+    color: @ui-option-type;
 }
 
 .umb-language-picker__expand {
-    color: @gray-6;
     font-size: 14px;
 }
+
+.umb-language-picker__toggle:hover {
+    background: @ui-option-hover;
+    color:@ui-option-type-hover;
+    .umb-language-picker__expand {
+        color: @ui-option-type-hover;
+    }
+}
+
 
 .umb-language-picker__dropdown {
     width: 100%;
@@ -46,11 +51,14 @@
 
 .umb-language-picker__dropdown a:hover, 
 .umb-language-picker__dropdown a:focus {
-    background: @gray-10;
+    background: @ui-option-hover;
     text-decoration: none;
+    color:@ui-option-type-hover;
 }
 
-.umb-language-picker__dropdown-item--current {
-    background-color: @gray-10;
-    border-left: 2px solid @turquoise;
+.umb-language-picker__dropdown a.umb-language-picker__dropdown-item--current {
+    //background-color: @gray-10;
+    padding-left: 16px;
+    border-left: 4px solid @ui-light-active-border;
+    color:@ui-light-active-type;
 }

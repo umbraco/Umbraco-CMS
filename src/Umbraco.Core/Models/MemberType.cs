@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
@@ -12,7 +11,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
         public const bool IsPublishingConst = false;
 
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
@@ -34,6 +32,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
+
+        /// <inheritdoc />
         public override bool IsPublishing => IsPublishingConst;
 
         public override ContentVariation Variations
@@ -44,12 +45,6 @@ namespace Umbraco.Core.Models
 
             get => base.Variations;
             set => throw new NotSupportedException("Variations are not supported on members.");
-        }
-
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
         }
 
         /// <summary>
@@ -66,7 +61,7 @@ namespace Umbraco.Core.Models
                 // leading underscores which we don't want in this case.
                 // see : http://issues.umbraco.org/issue/U4-3968
 
-                //TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
+                // TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
                 // .ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase)
                 // Need to ask Stephen
 
@@ -74,7 +69,7 @@ namespace Umbraco.Core.Models
                         ? value
                         : (value == null ? string.Empty : value.ToSafeAlias());
 
-                SetPropertyValueAndDetectChanges(newVal, ref _alias, Ps.Value.AliasSelector);
+                SetPropertyValueAndDetectChanges(newVal, ref _alias, nameof(Alias));
             }
         }
 

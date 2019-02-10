@@ -4,15 +4,20 @@ using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.Composers;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models.Mapping
@@ -21,11 +26,37 @@ namespace Umbraco.Tests.Models.Mapping
     [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
+        private IContentTypeService _contentTypeService;
+
+
         protected override void Compose()
         {
             base.Compose();
 
             Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
+
+            Composition.Register(_ => Mock.Of<ILogger>());
+            Composition.ComposeFileSystems();
+
+            Composition.Register(_ => Mock.Of<IDataTypeService>());
+            Composition.Register(_ => Mock.Of<IContentSection>());
+
+            // all this is required so we can validate properties...
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>()) { Alias = "test" };
+            Composition.Register(_ => new DataEditorCollection(new[] { editor }));
+            Composition.Register<PropertyEditorCollection>();
+            var dataType = Mock.Of<IDataType>();
+            Mock.Get(dataType).Setup(x => x.Configuration).Returns(() => new object());
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns(() => dataType);
+
+            _contentTypeService = Mock.Of<IContentTypeService>();
+            var mediaTypeService = Mock.Of<IMediaTypeService>();
+            var memberTypeService = Mock.Of<IMemberTypeService>();
+            Composition.RegisterUnique(_ => _contentTypeService);
+            Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService, contentTypeBaseServiceProvider: new ContentTypeBaseServiceProvider(_contentTypeService, mediaTypeService, memberTypeService)));
         }
 
         [DataEditor("Test.Test", "Test", "~/Test.html")]
@@ -52,6 +83,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void To_Media_Item_Simple()
         {
             var contentType = MockedContentTypes.CreateImageMediaType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedMedia.CreateMediaImage(contentType, -1);
             FixUsers(content);
 
@@ -69,6 +102,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void To_Content_Item_Simple()
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 
@@ -86,6 +121,8 @@ namespace Umbraco.Tests.Models.Mapping
         public void To_Content_Item_Dto()
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 
@@ -116,12 +153,17 @@ namespace Umbraco.Tests.Models.Mapping
         public void To_Display_Model()
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+            Mock.Get(_contentTypeService).Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = MockedContent.CreateSimpleContent(contentType);
+
+
             FixUsers(content);
 
             // need ids for tabs
             var id = 1;
-            foreach (var g in content.PropertyGroups)
+            foreach (var g in contentType.CompositionPropertyGroups)
                 g.Id = id++;
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
@@ -135,7 +177,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(invariantContent, p);
             }
 
-            Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count());
+            Assert.AreEqual(contentType.CompositionPropertyGroups.Count(), invariantContent.Tabs.Count());
             Assert.IsTrue(invariantContent.Tabs.First().IsActive);
             Assert.IsTrue(invariantContent.Tabs.Except(new[] { invariantContent.Tabs.First() }).All(x => x.IsActive == false));
         }
@@ -145,6 +187,9 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             contentType.PropertyGroups.Clear();
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+            Mock.Get(_contentTypeService).Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
             var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
@@ -158,7 +203,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(invariantContent, p);
             }
 
-            Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count());
+            Assert.AreEqual(contentType.CompositionPropertyGroups.Count(), invariantContent.Tabs.Count());
         }
 
         [Test]
@@ -176,6 +221,10 @@ namespace Umbraco.Tests.Models.Mapping
                 p.Id = idSeed;
                 idSeed++;
             }
+            Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+            Mock.Get(_contentTypeService).Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
+
+
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 
@@ -186,7 +235,7 @@ namespace Umbraco.Tests.Models.Mapping
             }
             //need ids for tabs
             var id = 1;
-            foreach (var g in content.PropertyGroups)
+            foreach (var g in contentType.CompositionPropertyGroups)
             {
                 g.Id = id;
                 id++;
@@ -207,7 +256,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(invariantContent, p);
             }
 
-            Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count() - 1);
+            Assert.AreEqual(contentType.CompositionPropertyGroups.Count(), invariantContent.Tabs.Count() - 1);
             Assert.IsTrue(invariantContent.Tabs.Any(x => x.Label == Current.Services.TextService.Localize("general/properties")));
             Assert.AreEqual(2, invariantContent.Tabs.Where(x => x.Label == Current.Services.TextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }

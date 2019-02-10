@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Scoping
 
             // the cache refresher component needs to trigger to refresh caches
             // but then, it requires a lot of plumbing ;(
-            // fixme - and we cannot inject a DistributedCache yet
+            // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
             Composition.RegisterUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
             Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
@@ -80,6 +80,7 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var contentTypeServiceBaseFactory = Current.Services.ContentTypeBaseServices;
 
             return new PublishedSnapshotService(
                 options,
@@ -90,12 +91,13 @@ namespace Umbraco.Tests.Scoping
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
+                Mock.Of<IUmbracoContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(), contentTypeServiceBaseFactory,
                 Factory.GetInstance<IEntityXmlSerializer>());
         }
 

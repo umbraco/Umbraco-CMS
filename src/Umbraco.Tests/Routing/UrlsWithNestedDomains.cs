@@ -6,9 +6,9 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.Routing
 {
@@ -31,12 +31,9 @@ namespace Umbraco.Tests.Routing
         public void DoNotPolluteCache()
         {
             var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
 
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
-            var request = Mock.Get(settings.RequestHandler);
-            request.Setup(x => x.UseDomainPrefixes).Returns(true);
 
             SetDomains1();
 

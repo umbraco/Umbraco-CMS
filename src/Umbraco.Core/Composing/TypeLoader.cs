@@ -211,7 +211,7 @@ namespace Umbraco.Core.Composing
         /// file properties (false) or the file contents (true).</remarks>
         private static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, IProfilingLogger logger)
         {
-            using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
                 // get the distinct file infos to hash
                 var uniqInfos = new HashSet<string>();
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Composing
         // internal for tests
         internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
         {
-            using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
+            using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
                 using (var generator = new HashGenerator())
                 {
@@ -666,7 +666,7 @@ namespace Umbraco.Core.Composing
             var name = GetName(baseType, attributeType);
 
             lock (_locko)
-            using (_logger.TraceDuration<TypeLoader>(
+            using (_logger.DebugDuration<TypeLoader>(
                 "Getting " + name,
                 "Got " + name)) // cannot contain typesFound.Count as it's evaluated before the find
             {

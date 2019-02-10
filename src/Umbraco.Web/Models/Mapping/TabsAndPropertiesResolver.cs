@@ -27,21 +27,6 @@ namespace Umbraco.Web.Models.Mapping
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
         
-        //TODO: This should deserialize to ListViewConfiguration
-        private static int GetTabNumberFromConfig(IDictionary<string, object> listViewConfig)
-        {
-            if (!listViewConfig.TryGetValue("displayAtTabNumber", out var displayTabNum))
-                return -1;
-            switch (displayTabNum)
-            {
-                case int i:
-                    return i;
-                case string s when int.TryParse(s, out var parsed):
-                    return parsed;
-            }
-            return -1;
-        }
-
         /// <summary>
         /// Returns a collection of custom generic properties that exist on the generic properties tab
         /// </summary>
@@ -58,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="tabs"></param>
         /// <param name="context"></param>
         /// <remarks>
-        /// The generic properties tab is responsible for 
+        /// The generic properties tab is responsible for
         /// setting up the properties such as Created date, updated date, template selected, etc...
         /// </remarks>
         protected virtual void MapGenericProperties(IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, ResolutionContext context)
@@ -98,10 +83,10 @@ namespace Umbraco.Web.Models.Mapping
             //re-assign
             genericProps.Properties = contentProps;
 
-            //Show or hide properties tab based on wether it has or not any properties 
+            //Show or hide properties tab based on whether it has or not any properties
             if (genericProps.Properties.Any() == false)
             {
-                //loop throug the tabs, remove the one with the id of zero and exit the loop
+                //loop through the tabs, remove the one with the id of zero and exit the loop
                 for (var i = 0; i < tabs.Count; i++)
                 {
                     if (tabs[i].Id != 0) continue;
@@ -145,11 +130,13 @@ namespace Umbraco.Web.Models.Mapping
         {
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
+            var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(source);
+
             // add the tabs, for properties that belong to a tab
             // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,
             // and there might be duplicates (content does not work like contentType and there is no
             // content.CompositionPropertyGroups).
-            var groupsGroupsByName = source.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
+            var groupsGroupsByName = contentType.CompositionPropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
             foreach (var groupsByName in groupsGroupsByName)
             {
                 var properties = new List<Property>();

@@ -30,9 +30,9 @@ namespace Umbraco.Core.Security
         IUserTwoFactorStore<BackOfficeIdentityUser, int>,
         IUserSessionStore<BackOfficeIdentityUser, int>
 
-    //TODO: This would require additional columns/tables for now people will need to implement this on their own
+    // TODO: This would require additional columns/tables for now people will need to implement this on their own
     //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
-    //TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
+    // TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
     //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Security
 
             UpdateMemberProperties(userEntity, user);
 
-            //TODO: We should deal with Roles --> User Groups here which we currently are not doing
+            // TODO: We should deal with Roles --> User Groups here which we currently are not doing
 
             _userService.Save(userEntity);
 
@@ -720,7 +720,7 @@ namespace Umbraco.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            //TODO: Fix this for Groups too
+            // TODO: Fix this for Groups too
             if (identityUser.IsPropertyDirty("Roles") || identityUser.IsPropertyDirty("Groups"))
             {
                 var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();

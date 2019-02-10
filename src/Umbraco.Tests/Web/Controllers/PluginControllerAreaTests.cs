@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin1Controller : PluginController
         {
             public Plugin1Controller(UmbracoContext umbracoContext)
-                : base(umbracoContext, null, null, null, null, null)
+                : base(umbracoContext, null, null, null, null, null, null)
             {
             }
         }
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin2Controller : PluginController
         {
             public Plugin2Controller(UmbracoContext umbracoContext)
-                : base(umbracoContext, null, null, null, null, null)
+                : base(umbracoContext, null, null, null, null, null, null)
             {
             }
         }
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin3Controller : PluginController
         {
             public Plugin3Controller(UmbracoContext umbracoContext)
-                : base(umbracoContext, null, null, null, null, null)
+                : base(umbracoContext, null, null, null, null, null, null)
             {
             }
         }
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin4Controller : PluginController
         {
             public Plugin4Controller(UmbracoContext umbracoContext)
-                : base(umbracoContext, null, null, null, null, null)
+                : base(umbracoContext, null, null, null, null, null, null)
             {
             }
         }

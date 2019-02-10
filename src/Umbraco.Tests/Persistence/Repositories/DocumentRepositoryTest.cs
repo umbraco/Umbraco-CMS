@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, templateRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
-            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 
@@ -130,10 +130,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 ServiceContext.FileService.SaveTemplate(hasPropertiesContentType.DefaultTemplate); // else, FK violation on contentType!
 
+                contentTypeRepository.Save(hasPropertiesContentType);
+
                 IContent content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
                 // save = create the initial version
-                contentTypeRepository.Save(hasPropertiesContentType);
                 repository.Save(content1);
 
                 versions.Add(content1.VersionId); // the first version
@@ -301,13 +302,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var emptyContentType = MockedContentTypes.CreateBasicContentType();
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
+                contentTypeRepository.Save(emptyContentType);
+                contentTypeRepository.Save(hasPropertiesContentType);
+
                 ServiceContext.FileService.SaveTemplate(hasPropertiesContentType.DefaultTemplate); // else, FK violation on contentType!
                 var content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
                 var content2 = MockedContent.CreateBasicContent(emptyContentType);
                 var content3 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
-                contentTypeRepository.Save(emptyContentType);
-                contentTypeRepository.Save(hasPropertiesContentType);
+
                 repository.Save(content1);
                 repository.Save(content2);
                 repository.Save(content3);
@@ -397,9 +400,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                contentTypeRepository.Save(contentType);
+
                 IContent textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.Save(contentType);
                 repository.Save(textpage);
                 scope.Complete();
 
@@ -423,9 +427,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 contentType.AllowedTemplates = Enumerable.Empty<ITemplate>(); // because CreateSimpleContentType assigns one already
                 contentType.SetDefaultTemplate(template);
-                var textpage = MockedContent.CreateSimpleContent(contentType);
-
                 contentTypeRepository.Save(contentType);
+
+                var textpage = MockedContent.CreateSimpleContent(contentType);
                 repository.Save(textpage);
 
 
@@ -485,9 +489,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                contentTypeRepository.Save(contentType);
+
                 var textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.Save(contentType);
                 repository.Save(textpage);
 
 

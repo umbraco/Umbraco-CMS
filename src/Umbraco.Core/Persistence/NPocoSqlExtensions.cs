@@ -496,7 +496,7 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> On<TLeft, TRight>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin,
             Expression<Func<TLeft, object>> leftField, Expression<Func<TRight, object>> rightField)
         {
-            // todo - ugly - should define on SqlContext!
+            // TODO: ugly - should define on SqlContext!
 
             var xLeft = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(leftField);
             var xRight = new Sql<ISqlContext>(sqlJoin.SqlContext).Columns(rightField);
@@ -1180,7 +1180,7 @@ namespace Umbraco.Core.Persistence
 
         private static string GetTableName(this Type type)
         {
-            // todo: returning string.Empty for now
+            // TODO: returning string.Empty for now
             // BUT the code bits that calls this method cannot deal with string.Empty so we
             // should either throw, or fix these code bits...
             var attr = type.FirstAttribute<TableNameAttribute>();

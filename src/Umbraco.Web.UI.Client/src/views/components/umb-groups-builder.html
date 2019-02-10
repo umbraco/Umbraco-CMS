@@ -9,7 +9,7 @@
                 alias="compositions"
                 ng-if="compositions !== false"
                 type="button"
-                button-style="outline"
+                button-style="action"
                 label-key="contentTypeEditor_compositions"
                 icon="icon-merge"
                 action="openCompositionsDialog()"
@@ -21,7 +21,7 @@
                 alias="reorder"
                 ng-if="sorting !== false"
                 type="button"
-                button-style="outline"
+                button-style="action"
                 label-key="{{sortingButtonKey}}"
                 icon="icon-navigation"
                 action="toggleSortingMode();"
@@ -210,6 +210,11 @@
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.isSensitiveData">
                                         <i class="icon-lock umb-group-builder__property-tag-icon"></i>
                                         <localize key="contentTypeEditor_isSensitiveData"></localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.allowCultureVariant">
+                                        <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_variantsHeading"></localize>
                                     </div>
 
                                 </div>

@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models
         [ReadOnly(true)]
         public string Name { get; set; }
 
-        //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers can just render their own inside the view
+        // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers can just render their own inside the view
 
         ///// <summary>
         ///// This can dynamically be set to a custom template name to change

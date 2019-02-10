@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Components;
 
-namespace Umbraco.Web.Redirects
+namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// Implements an Application Event Handler for managing redirect urls tracking.
@@ -12,6 +12,6 @@ namespace Umbraco.Web.Redirects
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class RedirectTrackingComposer : ComponentComposer<RelateOnCopyComponent>, ICoreComposer
+    public class RedirectTrackingComposer : ComponentComposer<RedirectTrackingComponent>, ICoreComposer
     { }
 }

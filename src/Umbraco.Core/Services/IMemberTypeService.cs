@@ -5,7 +5,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Manages <see cref="IMemberType"/> objects.
     /// </summary>
-    public interface IMemberTypeService : IContentTypeServiceBase<IMemberType>
+    public interface IMemberTypeService : IContentTypeBaseService<IMemberType>
     {
         string GetDefault();
     }

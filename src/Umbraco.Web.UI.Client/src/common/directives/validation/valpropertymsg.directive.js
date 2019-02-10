@@ -42,12 +42,12 @@ function valPropertyMsg(serverValidationManager) {
                         return err.errorMsg;
                     }
                     else {
-                        //TODO: localize
+                        // TODO: localize
                         return scope.currentProperty.propertyErrorMessage ? scope.currentProperty.propertyErrorMessage : "Property has errors";
                     }
 
                 }
-                //TODO: localize
+                // TODO: localize
                 return "Property has errors";
             }
 

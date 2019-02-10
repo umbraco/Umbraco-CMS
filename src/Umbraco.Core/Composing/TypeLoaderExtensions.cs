@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Core.Composing
 {

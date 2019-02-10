@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
-using umbraco;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Templates
@@ -21,94 +21,83 @@ namespace Umbraco.Web.Templates
     /// This is used purely for the RenderTemplate functionality in Umbraco
     /// </summary>
     /// <remarks>
-    /// This allows you to render either an MVC or Webforms template based purely off of a node id and an optional alttemplate id as string output.
+    /// This allows you to render an MVC template based purely off of a node id and an optional alttemplate id as string output.
     /// </remarks>
-    internal class TemplateRenderer
+    internal class TemplateRenderer : ITemplateRenderer
     {
-        private readonly UmbracoContext _umbracoContext;
-        private object _oldPageElements;
-        private PublishedRequest _oldPublishedRequest;
-        private object _oldAltTemplate;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedRouter _publishedRouter;
+        private readonly IFileService _fileService;
+        private readonly ILocalizationService _languageService;
+        private readonly IWebRoutingSection _webRoutingSection;
 
-        public TemplateRenderer(UmbracoContext umbracoContext, int pageId, int? altTemplateId)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection)
         {
-            PageId = pageId;
-            AltTemplateId = altTemplateId;
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
         }
-
-        private IFileService FileService => Current.Services.FileService; // todo inject
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>(); // todo inject
-
-
-        /// <summary>
-        /// Gets/sets the page id for the template to render
-        /// </summary>
-        public int PageId { get; }
-
-        /// <summary>
-        /// Gets/sets the alt template to render if there is one
-        /// </summary>
-        public int? AltTemplateId { get; }
-
-        public void Render(StringWriter writer)
+        
+        public void Render(int pageId, int? altTemplateId, StringWriter writer)
         {
             if (writer == null) throw new ArgumentNullException(nameof(writer));
 
             // instantiate a request and process
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url, though this isn't going to matter
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
-            var contentRequest = PublishedRouter.CreateRequest(_umbracoContext);
+            var contentRequest = _publishedRouter.CreateRequest(_umbracoContextAccessor.UmbracoContext);
 
-            var doc = contentRequest.UmbracoContext.ContentCache.GetById(PageId);
+            var doc = contentRequest.UmbracoContext.ContentCache.GetById(pageId);
 
             if (doc == null)
             {
-                writer.Write("<!-- Could not render template for Id {0}, the document was not found -->", PageId);
+                writer.Write("<!-- Could not render template for Id {0}, the document was not found -->", pageId);
                 return;
             }
 
             //in some cases the UmbracoContext will not have a PublishedContentRequest assigned to it if we are not in the
             //execution of a front-end rendered page. In this case set the culture to the default.
             //set the culture to the same as is currently rendering
-            if (_umbracoContext.PublishedRequest == null)
+            if (_umbracoContextAccessor.UmbracoContext.PublishedRequest == null)
             {
-                var defaultLanguage = Current.Services.LocalizationService.GetAllLanguages().FirstOrDefault();
+                var defaultLanguage = _languageService.GetAllLanguages().FirstOrDefault();
                 contentRequest.Culture = defaultLanguage == null
                     ? CultureInfo.CurrentUICulture
                     : defaultLanguage.CultureInfo;
             }
             else
             {
-                contentRequest.Culture = _umbracoContext.PublishedRequest.Culture;
+                contentRequest.Culture = _umbracoContextAccessor.UmbracoContext.PublishedRequest.Culture;
             }
 
             //set the doc that was found by id
             contentRequest.PublishedContent = doc;
             //set the template, either based on the AltTemplate found or the standard template of the doc
-            var templateId = Current.Configs.Settings().WebRouting.DisableAlternativeTemplates || !AltTemplateId.HasValue
+            var templateId = _webRoutingSection.DisableAlternativeTemplates || !altTemplateId.HasValue
                 ? doc.TemplateId
-                : AltTemplateId.Value;
+                : altTemplateId.Value;
             if (templateId.HasValue)
-                contentRequest.TemplateModel = FileService.GetTemplate(templateId.Value);
+                contentRequest.TemplateModel = _fileService.GetTemplate(templateId.Value);
 
             //if there is not template then exit
             if (contentRequest.HasTemplate == false)
             {
-                if (AltTemplateId.HasValue == false)
+                if (altTemplateId.HasValue == false)
                 {
                     writer.Write("<!-- Could not render template for Id {0}, the document's template was not found with id {0}-->", doc.TemplateId);
                 }
                 else
                 {
-                    writer.Write("<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->", AltTemplateId);
+                    writer.Write("<!-- Could not render template for Id {0}, the altTemplate was not found with id {0}-->", altTemplateId);
                 }
                 return;
             }
 
             //First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
             //after this page has rendered.
-            SaveExistingItems();
+            SaveExistingItems(out var oldPublishedRequest, out var oldAltTemplate);
 
             try
             {
@@ -121,7 +110,7 @@ namespace Umbraco.Web.Templates
             finally
             {
                 //restore items on context objects to continuing rendering the parent template
-                RestoreItems();
+                RestoreItems(oldPublishedRequest, oldAltTemplate);
             }
 
         }
@@ -136,36 +125,22 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            switch (request.RenderingEngine)
+            var requestContext = new RequestContext(_umbracoContextAccessor.UmbracoContext.HttpContext, new RouteData()
             {
-                case RenderingEngine.Mvc:
-                    var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
-                    {
-                        Route = RouteTable.Routes["Umbraco_default"]
-                    });
-                    var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
-                    var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
-                    var renderModel = new ContentModel(request.PublishedContent);
-                    //manually add the action/controller, this is required by mvc
-                    requestContext.RouteData.Values.Add("action", routeDef.ActionName);
-                    requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
-                    //add the rest of the required route data
-                    routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
+                Route = RouteTable.Routes["Umbraco_default"]
+            });
+            var routeHandler = new RenderRouteHandler(_umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory());
+            var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
+            var renderModel = new ContentModel(request.PublishedContent);
+            //manually add the action/controller, this is required by mvc
+            requestContext.RouteData.Values.Add("action", routeDef.ActionName);
+            requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
+            //add the rest of the required route data
+            routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
 
-                    var stringOutput = RenderUmbracoRequestToString(requestContext);
+            var stringOutput = RenderUmbracoRequestToString(requestContext);
 
-                    sw.Write(stringOutput);
-                    break;
-                case RenderingEngine.WebForms:
-                default:
-                    var webFormshandler = (UmbracoDefault) BuildManager
-                        .CreateInstanceFromVirtualPath("~/default.aspx", typeof(UmbracoDefault));
-                    //the 'true' parameter will ensure that the current query strings are carried through, we don't have
-                    // to build up the url again, it will just work.
-                    _umbracoContext.HttpContext.Server.Execute(webFormshandler, sw, true);
-                    break;
-            }
-
+            sw.Write(stringOutput);
         }
 
         /// <summary>
@@ -177,7 +152,7 @@ namespace Umbraco.Web.Templates
         /// <returns></returns>
         /// <remarks>
         /// To achieve this we temporarily change the output text writer of the current HttpResponse, then
-        ///   execute the controller via the handler which innevitably writes the result to the text writer
+        ///   execute the controller via the handler which inevitably writes the result to the text writer
         ///   that has been assigned to the response. Then we change the response textwriter back to the original
         ///   before continuing .
         /// </remarks>
@@ -197,34 +172,29 @@ namespace Umbraco.Web.Templates
 
         private void SetNewItemsOnContextObjects(PublishedRequest request)
         {
-            // handlers like default.aspx will want it and most macros currently need it
-            request.UmbracoPage = new page(request);
             //now, set the new ones for this page execution
-            _umbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
-            _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
-            _umbracoContext.PublishedRequest = request;
+            _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
+            _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
         }
 
         /// <summary>
         /// Save all items that we know are used for rendering execution to variables so we can restore after rendering
         /// </summary>
-        private void SaveExistingItems()
+        private void SaveExistingItems(out PublishedRequest oldPublishedRequest, out object oldAltTemplate)
         {
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
-            _oldPageElements = _umbracoContext.HttpContext.Items["pageElements"];
-            _oldPublishedRequest = _umbracoContext.PublishedRequest;
-            _oldAltTemplate = _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
+            oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
+            oldAltTemplate = _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
         }
 
         /// <summary>
         /// Restores all items back to their context's to continue normal page rendering execution
         /// </summary>
-        private void RestoreItems()
+        private void RestoreItems(PublishedRequest oldPublishedRequest, object oldAltTemplate)
         {
-            _umbracoContext.PublishedRequest = _oldPublishedRequest;
-            _umbracoContext.HttpContext.Items["pageElements"] = _oldPageElements;
-            _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = _oldAltTemplate;
+            _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
+            _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Umbraco.Web.PublishedCache
          * to find out how to get that navigator.
          *
          * Because a cache such as NuCache is contextual i.e. it has a "snapshot" thing and remains
-         * consistent over the snapshot, the navigator has to come come from the "current" snapshot.
+         * consistent over the snapshot, the navigator has to come from the "current" snapshot.
          *
          * So although everything should be injected... we also need a notion of "the current published
          * snapshot". This is provided by the IPublishedSnapshotAccessor.
@@ -105,7 +105,7 @@ namespace Umbraco.Web.PublishedCache
          * rely on cache refreshers CacheUpdated events to update itself, as these events are external
          * and the order-of-execution of the handlers cannot be guaranteed, which means that some
          * user code may run before Umbraco is finished updating itself. Instead, the cache refreshers
-         * explicitely notify the service of changes.
+         * explicitly notify the service of changes.
          *
          */
 

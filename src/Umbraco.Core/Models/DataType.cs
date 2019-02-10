@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Core.Models.Entities;
@@ -15,8 +14,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class DataType : TreeEntityBase, IDataType
     {
-        private static PropertySelectors _selectors;
-
         private IDataEditor _editor;
         private ValueStorageType _databaseType;
         private object _configuration;
@@ -35,15 +32,6 @@ namespace Umbraco.Core.Models
             Configuration = _editor.GetConfigurationEditor().DefaultConfigurationObject;
         }
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo Editor = ExpressionHelper.GetPropertyInfo<DataType, IDataEditor>(x => x.Editor);
-            public readonly PropertyInfo DatabaseType = ExpressionHelper.GetPropertyInfo<DataType, ValueStorageType>(x => x.DatabaseType);
-            public readonly PropertyInfo Configuration = ExpressionHelper.GetPropertyInfo<DataType, object>(x => x.Configuration);
-        }
-
         /// <inheritdoc />
         [IgnoreDataMember]
         public IDataEditor Editor
@@ -53,7 +41,7 @@ namespace Umbraco.Core.Models
             {
                 // ignore if no change
                 if (_editor.Alias == value.Alias) return;
-                OnPropertyChanged(Selectors.Editor);
+                OnPropertyChanged(nameof(Editor));
 
                 // try to map the existing configuration to the new configuration
                 // simulate saving to db and reloading (ie go via json)
@@ -73,7 +61,7 @@ namespace Umbraco.Core.Models
         public ValueStorageType DatabaseType
         {
             get => _databaseType;
-            set => SetPropertyValueAndDetectChanges(value, ref _databaseType, Selectors.DatabaseType);
+            set => SetPropertyValueAndDetectChanges(value, ref _databaseType, nameof(DatabaseType));
         }
 
         /// <inheritdoc />
@@ -124,7 +112,7 @@ namespace Umbraco.Core.Models
                 _configurationJson = null;
 
                 // it's always a change
-                OnPropertyChanged(Selectors.Configuration);
+                OnPropertyChanged(nameof(Configuration));
             }
         }
 

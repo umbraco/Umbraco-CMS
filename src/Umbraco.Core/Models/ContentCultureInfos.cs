@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
@@ -13,7 +12,6 @@ namespace Umbraco.Core.Models
     {
         private DateTime _date;
         private string _name;
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentCultureInfos"/> class.
@@ -46,7 +44,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -55,7 +53,7 @@ namespace Umbraco.Core.Models
         public DateTime Date
         {
             get => _date;
-            set => SetPropertyValueAndDetectChanges(value, ref _date, Ps.Value.DateSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _date, nameof(Date));
         }
 
         /// <inheritdoc />
@@ -101,13 +99,6 @@ namespace Umbraco.Core.Models
         {
             Deconstruct(out culture, out name);
             date = Date;
-        }
-
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentCultureInfos, string>(x => x.Name);
-            public readonly PropertyInfo DateSelector = ExpressionHelper.GetPropertyInfo<ContentCultureInfos, DateTime>(x => x.Date);
         }
     }
 }

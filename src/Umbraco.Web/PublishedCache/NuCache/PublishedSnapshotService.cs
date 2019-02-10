@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Web;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -32,6 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IScopeProvider _scopeProvider;
         private readonly IDataSource _dataSource;
         private readonly ILogger _logger;
@@ -40,6 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
@@ -58,18 +62,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
         // means faster execution, but uses memory - not sure if we want it
-        // so making it configureable.
+        // so making it configurable.
         public static readonly bool FullCacheWhenPreviewing = true;
 
         // define constant - determines whether to cache the published content
         // objects (in the elements cache, or snapshot cache, depending on preview)
-        // or to refetch them all the time. caching is faster but uses more
+        // or to re-fetch them all the time. caching is faster but uses more
         // memory. not sure what we want.
         public static readonly bool CachePublishedContentChildren = true;
 
         // define constant - determines whether to cache the content cache root
         // objects (in the elements cache, or snapshot cache, depending on preview)
-        // or to refecth them all the time. caching is faster but uses more
+        // or to re-fetch them all the time. caching is faster but uses more
         // memory - not sure what we want.
         public static readonly bool CacheContentCacheRoots = true;
 
@@ -80,18 +84,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedSnapshotService(Options options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
-            ILogger logger, IScopeProvider scopeProvider,
+            IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper,
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IEntityXmlSerializer entitySerializer)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
-            //    throw new Exception("Singleton must be instancianted only once!");
+            //    throw new Exception("Singleton must be instantiated only once!");
 
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _dataSource = dataSource;
             _logger = logger;
             _scopeProvider = scopeProvider;
@@ -101,6 +106,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -136,25 +142,50 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (registered)
                 {
-                    var localContentDbPath = IOHelper.MapPath("~/App_Data/NuCache.Content.db");
-                    var localMediaDbPath = IOHelper.MapPath("~/App_Data/NuCache.Media.db");
+                    string path;
+                    var tempLocation = globalSettings.LocalTempStorageLocation;
+                    switch (tempLocation)
+                    {
+                        case LocalTempStorage.AspNetTemp:
+                            path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "NuCache");
+                            break;
+                        case LocalTempStorage.EnvironmentTemp:
+                            // TODO: why has this to be repeated everywhere?!
+                            // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                            // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                            var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
+                            path = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash, "NuCache");
+                            break;
+                        //case LocalTempStorage.Default:
+                        //case LocalTempStorage.Unknown:
+                        default:
+                            path = IOHelper.MapPath("~/App_Data/TEMP/NuCache");
+                            break;
+                    }
+
+                    if (!Directory.Exists(path))
+                        Directory.CreateDirectory(path);
+
+                    var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+                    var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
 
-                    // if both local dbs exist then GetTree will open them, else new dbs will be created
+                    // if both local databases exist then GetTree will open them, else new databases will be created
                     _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
                     _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
                 }
 
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
-                // figure out whether it can read the dbs or it should populate them from sql
-                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
+                // figure out whether it can read the databases or it should populate them from sql
+                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _umbracoContextAccessor, logger, _localContentDb);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _umbracoContextAccessor, logger, _localMediaDb);
             }
             else
             {
-                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _umbracoContextAccessor, logger);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _umbracoContextAccessor, logger);
             }
 
             _domainStore = new SnapDictionary<int, Domain>();
@@ -194,14 +225,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
                 }
 
-                // finaly, cache is ready!
+                // finally, cache is ready!
                 _isReady = true;
             }
         }
 
         private void InitializeRepositoryEvents()
         {
-            //todo: The reason these events are in the repository is for legacy, the events should exist at the service
+            // TODO: The reason these events are in the repository is for legacy, the events should exist at the service
             // level now since we can fire these events within the transaction... so move the events to service level
 
             // plug repository event handlers
@@ -253,7 +284,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //
             //// indicates that the snapshot cache should reuse the application request cache
             //// otherwise a new cache object would be created for the snapshot specifically,
-            //// which is the default - web boot manager uses this to optimze facades
+            //// which is the default - web boot manager uses this to optimize facades
             //public bool PublishedSnapshotCacheIsApplicationRequestCache;
 
             public bool IgnoreLocalDb;
@@ -584,7 +615,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     continue;
                 }
 
-                // todo- should we do some RV check here? (later)
+                // TODO: should we do some RV check here? (later)
 
                 var capture = payload;
                 using (var scope = _scopeProvider.CreateScope())
@@ -674,7 +705,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     continue;
                 }
 
-                // todo- should we do some RV checks here? (later)
+                // TODO: should we do some RV checks here? (later)
 
                 var capture = payload;
                 using (var scope = _scopeProvider.CreateScope())
@@ -773,7 +804,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (_contentStore.GetWriter(_scopeProvider))
             using (_mediaStore.GetWriter(_scopeProvider))
             {
-                // todo - need to add a datatype lock
+                // TODO: need to add a datatype lock
                 // this is triggering datatypes reload in the factory, and right after we create some
                 // content types by loading them ... there's a race condition here, which would require
                 // some locking on datatypes
@@ -1015,7 +1046,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _umbracoContextAccessor, _entitySerializer),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache
@@ -1200,7 +1231,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
 
             // sanitize - names should be ok but ... never knows
-            if (content.GetContentType().VariesByCulture())
+            if (content.ContentType.VariesByCulture())
             {
                 var infos = content is IContent document
                     ? (published
@@ -1208,10 +1239,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         : document.CultureInfos)
                     : content.CultureInfos;
 
-                foreach (var (culture, info) in infos)
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(culture);
-                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
+                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                    cultureData[cultureInfo.Culture] = new CultureVariation { Name = cultureInfo.Name, Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue, IsDraft = cultureIsDraft };
                 }
             }
 

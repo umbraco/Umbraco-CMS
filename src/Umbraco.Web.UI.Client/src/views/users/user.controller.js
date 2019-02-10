@@ -205,7 +205,7 @@
         }
 
         function goToPage(ancestor) {
-            $location.path(ancestor.path).search("subview", ancestor.subView);
+            $location.path(ancestor.path);
         }
 
         function openUserGroupPicker() {
@@ -458,8 +458,7 @@
             vm.breadcrumbs = [
                 {
                     "name": vm.labels.users,
-                    "path": "/users/users/overview",
-                    "subView": "users"
+                    "path": "/users/users/users"
                 },
                 {
                     "name": vm.user.name

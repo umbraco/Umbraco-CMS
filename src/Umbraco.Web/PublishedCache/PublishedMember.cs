@@ -19,7 +19,11 @@ namespace Umbraco.Web.PublishedCache
         private readonly IPublishedProperty[] _properties;
         private readonly PublishedContentType _publishedMemberType;
 
-        public PublishedMember(IMember member, PublishedContentType publishedMemberType)
+        public PublishedMember(
+            IMember member,
+            PublishedContentType publishedMemberType,
+            IUmbracoContextAccessor umbracoContextAccessor)
+            :base(umbracoContextAccessor)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;
@@ -77,6 +81,8 @@ namespace Umbraco.Web.PublishedCache
         public override PublishedItemType ItemType => PublishedItemType.Member;
 
         public override bool IsDraft(string culture = null) => false;
+
+        public override bool IsPublished(string culture = null) => true;
 
         public override IPublishedContent Parent => null;
 
@@ -138,10 +144,10 @@ namespace Umbraco.Web.PublishedCache
 
         public override string UrlSegment => throw new NotSupportedException();
 
-        //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string WriterName => _member.GetCreatorProfile().Name;
 
-        //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
+        // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string CreatorName => _member.GetCreatorProfile().Name;
 
         public override int WriterId => _member.CreatorId;

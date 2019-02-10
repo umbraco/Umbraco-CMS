@@ -1,7 +1,8 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
 
     <!-- navigation container -->
-    <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize>
+    <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
+    ng-class="{'--notInFront': infiniteMode}">
 
         <div class="navigation-inner-container">
 
@@ -38,14 +39,14 @@
 
             <umb-context-dialog
                 ng-if="showContextMenuDialog"
-                title="menuDialogTitle"
+                dialog-title="menuDialogTitle"
                 current-node="menuNode"
                 view="dialogTemplateUrl">
             </umb-context-dialog>
 
         </div>
 
-        <div class="umb-editor__overlay" ng-show="infiniteMode"></div>
+        <div class="umb-editor__overlay"></div>
 
     </div>
 

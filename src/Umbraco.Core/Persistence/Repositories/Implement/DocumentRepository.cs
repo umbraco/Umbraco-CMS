@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -30,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
 
-        public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IContentSection settings)
+        public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
             : base(scopeAccessor, appCaches, languageRepository, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
@@ -39,12 +38,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _appCaches = appCaches;
             _scopeAccessor = scopeAccessor;
             _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, appCaches, logger);
-            EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
         protected override DocumentRepository This => this;
 
-        public bool EnsureUniqueNaming { get; set; }
+        /// <summary>
+        /// Default is to always ensure all documents have unique names
+        /// </summary>
+        protected virtual bool EnsureUniqueNaming { get; } = true;
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository
@@ -118,6 +119,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     break;
                 case QueryType.Single:
                 case QueryType.Many:
+                    // R# may flag this ambiguous and red-squiggle it, but it is not
                     sql = sql.Select<DocumentDto>(r =>
                        r.Select(documentDto => documentDto.ContentDto, r1 =>
                            r1.Select(contentDto => contentDto.NodeDto))
@@ -148,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
                     .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv")
 
-                // todo - should we be joining this when the query type is not single/many?
+                // TODO: should we be joining this when the query type is not single/many?
                 // left join on optional culture variation
                 //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
                 .LeftJoin<ContentVersionCultureVariationDto>(nested =>
@@ -260,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
-            // fixme/task - sort out IContent vs Content
+            // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4234 - sort out IContent vs Content
             // however, it's not just so we have access to AddingEntity
             // there are tons of things at the end of the methods, that can only work with a true Content
             // and basically, the repository requires a Content, not an IContent
@@ -277,7 +279,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             SanitizeNames(content, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // todo - do we really want to keep doing this here?
+            // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
@@ -378,9 +380,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, infos) in content.CultureInfos)
-                    if (infos.Name != content.GetPublishName(culture))
-                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in content.CultureInfos)
+                    if (cultureInfo.Name != content.GetPublishName(cultureInfo.Culture))
+                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
 
                 // insert content variations
                 Database.BulkInsertRecords(GetContentVariationDtos(content, publishing));
@@ -466,7 +469,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             SanitizeNames(content, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
-            // todo - do we really want to keep doing this here?
+            // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // if parent has changed, get path, level and sort order
@@ -539,13 +542,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, infos) in content.CultureInfos)
-                    if (infos.Name != content.GetPublishName(culture))
+                // ReSharper disable once UseDeconstruction
+                foreach (var cultureInfo in content.CultureInfos)
+                    if (cultureInfo.Name != content.GetPublishName(cultureInfo.Culture))
                     {
                         edited = true;
-                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
 
-                        // todo - change tracking
+                        // TODO: change tracking
                         // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
                         // culture has just been edited or not, so we don't update its update date - that date only changes
                         // when the name is set, and it all works because the controller does it - but, if someone uses a
@@ -561,7 +565,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == content.Id);
                 Database.Execute(deleteDocumentVariations);
 
-                // todo NPoco InsertBulk issue?
+                // TODO: NPoco InsertBulk issue?
                 // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
                 // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
                 // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
@@ -622,8 +626,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ClearEntityTags(entity, _tagRepository);
             }
 
-            // note re. tags: explicitly unpublished entities have cleared tags,
-            // but masked or trashed entities *still* have tags in the db todo so what?
+            // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
 
             entity.ResetDirtyProperties();
 
@@ -837,7 +840,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         // reading repository purely for looking up by GUID
-        // todo - ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
         private class ContentByGuidReadRepository : NPocoRepositoryBase<Guid, IContent>
         {
             private readonly DocumentRepository _outerRepo;
@@ -1124,9 +1127,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // get properties - indexed by version id
                 var versionId = dto.DocumentVersionDto.Id;
 
-                // todo - shall we get published properties or not?
+                // TODO: shall we get published properties or not?
                 //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-                var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
+                var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
                 var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
                 var ltemp = new List<TempContent<Content>> { temp };
@@ -1186,12 +1189,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (contentVariations.TryGetValue(content.VersionId, out var contentVariation))
                 foreach (var v in contentVariation)
                     content.SetCultureInfo(v.Culture, v.Name, v.Date);
+
             if (content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
+            {
                 foreach (var v in contentVariation)
                     content.SetPublishInfo(v.Culture, v.Name, v.Date);
+            }
+
             if (documentVariations.TryGetValue(content.Id, out var documentVariation))
-                foreach (var v in documentVariation.Where(x => x.Edited))
-                    content.SetCultureEdited(v.Culture);
+                content.SetCultureEdited(documentVariation.Where(x => x.Edited).Select(x => x.Culture));
         }
 
         private IDictionary<int, List<ContentVariation>> GetContentVariations<T>(List<TempContent<T>> temps)
@@ -1261,14 +1267,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
         {
             // create dtos for the 'current' (non-published) version, all cultures
-            foreach (var (culture, name) in content.CultureInfos)
+            // ReSharper disable once UseDeconstruction
+            foreach (var cultureInfo in content.CultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
-                    LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
-                    Culture = culture,
-                    Name = name.Name,
-                    UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
+                    Culture = cultureInfo.Culture,
+                    Name = cultureInfo.Name,
+                    UpdateDate = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1276,14 +1283,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing) yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
-            foreach (var (culture, name) in content.PublishCultureInfos)
+            // ReSharper disable once UseDeconstruction
+            foreach (var cultureInfo in content.PublishCultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
-                    LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
-                    Culture = culture,
-                    Name = name.Name,
-                    UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    LanguageId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture) ?? throw new InvalidOperationException("Not a valid culture."),
+                    Culture = cultureInfo.Culture,
+                    Name = cultureInfo.Name,
+                    UpdateDate = content.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
 
@@ -1343,7 +1351,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             EnsureVariantNamesAreUnique(content, publishing);
         }
 
-        private void EnsureInvariantNameExists(Content content)
+        private void EnsureInvariantNameExists(IContent content)
         {
             if (content.ContentType.VariesByCulture())
             {
@@ -1357,7 +1365,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)
                     ? cultureName.Name
-                    : content.CultureInfos.First().Value.Name;
+                    : content.CultureInfos[0].Name;
             }
             else
             {
@@ -1367,7 +1375,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        private void EnsureInvariantNameIsUnique(Content content)
+        private void EnsureInvariantNameIsUnique(IContent content)
         {
             content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
         }
@@ -1404,25 +1412,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // of whether the name has changed (ie the culture has been updated) - some saving culture
             // fr-FR could cause culture en-UK name to change - not sure that is clean
 
-            foreach (var (culture, name) in content.CultureInfos)
+            foreach (var cultureInfo in content.CultureInfos)
             {
-                var langId = LanguageRepository.GetIdByIsoCode(culture);
+                var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
                 if (!langId.HasValue) continue;
                 if (!names.TryGetValue(langId.Value, out var cultureNames)) continue;
 
                 // get a unique name
                 var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name.Name);
+                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
 
-                if (uniqueName == content.GetCultureName(culture)) continue;
+                if (uniqueName == content.GetCultureName(cultureInfo.Culture)) continue;
 
                 // update the name, and the publish name if published
-                content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishCultureInfos.ContainsKey(culture))
-                    content.SetPublishInfo(culture, uniqueName, DateTime.Now);
+                content.SetCultureName(uniqueName, cultureInfo.Culture);
+                if (publishing && content.PublishCultureInfos.ContainsKey(cultureInfo.Culture))
+                    content.SetPublishInfo(cultureInfo.Culture, uniqueName, DateTime.Now); //TODO: This is weird, this call will have already been made in the SetCultureName
             }
         }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class CultureNodeName
         {
             public int Id { get; set; }

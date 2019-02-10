@@ -122,7 +122,7 @@ namespace Umbraco.Tests.IO
         }
 
 
-        // fixme - don't make sense anymore
+        // FIXME: don't make sense anymore
         /*
         [Test]
         public void Cannot_Get_InvalidFileSystem()

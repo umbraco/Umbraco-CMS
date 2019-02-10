@@ -2,7 +2,6 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -22,9 +21,6 @@ namespace Umbraco.Core
         public static IUmbracoSettingsSection Settings(this Configs configs)
             => configs.GetConfig<IUmbracoSettingsSection>();
 
-        public static IDashboardSection Dashboards(this Configs configs)
-            => configs.GetConfig<IDashboardSection>();
-
         public static IHealthChecks HealthChecks(this Configs configs)
             => configs.GetConfig<IHealthChecks>();
 
@@ -40,7 +36,6 @@ namespace Umbraco.Core
 
             configs.Add<IGlobalSettings>(() => new GlobalSettings());
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
-            configs.Add<IDashboardSection>("umbracoConfiguration/dashBoard");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
             configs.Add(() => new CoreDebug());

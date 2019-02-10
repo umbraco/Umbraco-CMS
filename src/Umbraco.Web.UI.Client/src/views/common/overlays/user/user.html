@@ -4,18 +4,18 @@
 
        <h5><localize key="user_yourProfile" /></h5>
 
-       <p class="muted">
+       <!--<p class="muted">
            <small>
                <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
            </small>
-       </p>
+       </p>-->
 
         <umb-button
             alias="editUser"
             type="link"
             href="#/users/users/user/{{user.id}}"
             action="model.close()"
-            button-style="primary"
+            button-style="action"
             label="Edit"
             label-key="general_edit"
             ng-if="canEditProfile">
@@ -25,6 +25,7 @@
             alias="changePassword"
             type="button"
             action="togglePasswordFields()"
+            button-style="action"
             label="Change password"
             label-key="general_changePassword"
             button-style="success">

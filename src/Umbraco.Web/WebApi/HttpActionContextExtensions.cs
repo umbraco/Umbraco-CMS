@@ -74,7 +74,7 @@ namespace Umbraco.Web.WebApi
             // But it deadlocks. See https://stackoverflow.com/questions/15201255 for details, which
             // points to https://msdn.microsoft.com/en-us/magazine/jj991977.aspx which contains more
             // details under "Async All the Way" - see also https://olitee.com/2015/01/c-async-await-common-deadlock-scenario/
-            // which contains a simplified explaination: ReadAsMultipartAsync is meant to be awaited,
+            // which contains a simplified explanation: ReadAsMultipartAsync is meant to be awaited,
             // not used in the non-async .Result way, and there is nothing we can do about it.
             //
             // Alas, model binders cannot be async "all the way", so we have to wrap in a task, to
