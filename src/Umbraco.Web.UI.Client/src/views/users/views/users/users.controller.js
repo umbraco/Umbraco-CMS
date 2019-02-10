@@ -33,6 +33,11 @@
             });
         });
 
+        vm.labels = {};
+        localizationService.localizeMany(["user_stateAll"]).then(function (data) {
+            vm.labels.all = data[0];
+        });
+
         vm.userStatesFilter = [];
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
@@ -399,7 +404,7 @@
         }
 
         function getFilterName(array) {
-            var name = "All";
+            var name = vm.labels.all;
             var found = false;
             angular.forEach(array, function (item) {
                 if (item.selected) {
