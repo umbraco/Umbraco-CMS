@@ -10,7 +10,6 @@
 // --------
 // For clearing floats like a boss h5bp.com/q
 .clearfix {
-  *zoom: 1;
   &:before,
   &:after {
     display: table;
@@ -165,18 +164,6 @@
     background-color: @backgroundColor;
     border-color: @textColor;
   }
-  //SD: We could do this but need to get the colors right
-  /*input.ng-invalid {
-    &:-moz-placeholder {
-        color: lighten(@textColor, 50%) !important;
-    }
-    &:-ms-input-placeholder {
-        color: lighten(@textColor, 50%) !important;
-    }
-    &::-webkit-input-placeholder {
-        color: lighten(@textColor, 50%) !important;
-    }
-  }*/
 }
 
 // CSS3 PROPERTIES
@@ -490,7 +477,7 @@
   border-color: @startColor @startColor darken(@startColor, 15%);
   border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
   
-  background-color: @startColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+  background-color: @startColor;
   .reset-filter();
   
   .caret {
@@ -614,17 +601,14 @@
 
     .offset (@columns) {
       margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth*2);
-  	  *margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%) + (@fluidGridGutterWidth*2) - (.5 / @gridRowWidth * 100 * 1%);
     }
 
     .offsetFirstChild (@columns) {
       margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth);
-      *margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%) + @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
     }
 
     .span (@columns) {
       width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
-      *width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%);
     }
 
     .row-fluid {
@@ -634,7 +618,6 @@
         .input-block-level();
         float: left;
         margin-left: @fluidGridGutterWidth;
-        *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
       }
       [class*="span"]:first-child {
         margin-left: 0;
