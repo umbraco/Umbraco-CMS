@@ -1467,6 +1467,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="backToUsers">Tilbage til brugere</key>
     <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
     <key alias="inviteEmailCopyFormat"><![CDATA[<html><body><p>Hej %0%, du er blevet inviteret af %1% til Umbraco backoffice.</p><p>Besked fra %1%: <em>%2%</em></p><p>Klik på dette <a href="%3%" target="_blank">link</a> for acceptere invitationen</p><p><small>Hvis du ikke kan klikke på linket, så kopier og indsæt denne URL i dit browservindue<br/><br/>%3%</small></p></body></html>]]></key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateDisabled">Deaktiveret</key>
+    <key alias="stateLockedOut">Låst ude</key>
+    <key alias="stateInvited">Inviteret</key>
+    <key alias="stateInactive">Inaktiv</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validering</key>

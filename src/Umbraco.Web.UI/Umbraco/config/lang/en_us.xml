@@ -1886,6 +1886,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="defaultInvitationMessage">Resending invitation...</key>
     <key alias="deleteUser">Delete User</key>
     <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
+    <key alias="stateActive">Active</key>
+    <key alias="stateDisabled">Disabled</key>
+    <key alias="stateLockedOut">Locked out</key>
+    <key alias="stateInvited">Invited</key>
+    <key alias="stateInactive">Inactive</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
