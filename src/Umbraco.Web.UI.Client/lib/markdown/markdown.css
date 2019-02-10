@@ -2,27 +2,21 @@
 	width: 100%;
 }
 
-.wmd-input { 
+.wmd-input {
 	height: 300px;
 	width: 100%;
 	box-sizing: border-box;
-	-webkit-box-sizing:border-box;
-	-moz-box-sizing: border-box;
-	-ms-box-sizing: border-box;
 }
 
-.wmd-preview { 
+.wmd-preview {
 	.well;
 	width: 100%;
 	box-sizing: border-box;
-	-webkit-box-sizing:border-box;
-	-moz-box-sizing: border-box;
-	-ms-box-sizing: border-box;
 }
 
 .wmd-panel .btn-toolbar {
 	margin-bottom: 0;
-	padding: 0;  
+	padding: 0;
 	width: 100%;
 }
 
