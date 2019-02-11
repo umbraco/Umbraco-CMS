@@ -112,7 +112,7 @@ namespace Umbraco.Web.PropertyEditors
                             Target = dto.Target,
                             Trashed = false,
                             Udi = dto.Udi,
-                            Url = dto.Url,
+                            Url = dto.Url ?? "",
                         };
 
                         links.Add(link);
