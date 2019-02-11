@@ -1247,6 +1247,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="sections">
     <key alias="content">Content</key>
     <key alias="forms">Forms</key>
+    <key alias="formsInstaller">Forms</key>
     <key alias="media">Media</key>
     <key alias="member">Members</key>
     <key alias="packages">Packages</key>
@@ -1388,7 +1389,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
     <key alias="tabCode">Code</key>
-    <key alias="tabRules">Rich Text Editor</key>   
+    <key alias="tabRules">Rich Text Editor</key>
   </area>
   <area alias="template">
     <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>

@@ -45,7 +45,7 @@
             /// <summary>
             /// Application alias for the forms section.
             /// </summary>
-            public const string Forms = "forms";
+            public const string FormsInstaller = "formsInstaller";
         }
 
         /// <summary>
@@ -77,7 +77,7 @@
             /// alias for the macro tree.
             /// </summary>
             public const string Macros = "macros";
-            
+
             /// <summary>
             /// alias for the datatype tree.
             /// </summary>
@@ -92,7 +92,7 @@
             /// alias for the dictionary tree.
             /// </summary>
             public const string Dictionary = "dictionary";
-            
+
             public const string Stylesheets = "stylesheets";
 
             /// <summary>
@@ -121,7 +121,7 @@
             public const string Templates = "templates";
 
             public const string RelationTypes = "relationTypes";
-            
+
             public const string Languages = "languages";
 
             /// <summary>
@@ -138,6 +138,7 @@
             /// alias for the users tree.
             /// </summary>
             public const string Users = "users";
+            public const string Forms = "formsInstaller";
 
             public const string Scripts = "scripts";
 
