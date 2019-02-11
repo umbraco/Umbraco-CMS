@@ -109,6 +109,7 @@ namespace Umbraco.Web.PropertyEditors
                         Target = dto.Target,
                         Trashed = trashed,
                         Published = published,
+                        QueryString = dto.QueryString,
                         Udi = udi,
                         Url = url ?? ""
                     });
@@ -140,6 +141,7 @@ namespace Umbraco.Web.PropertyEditors
                     select new MultiUrlPickerValueEditor.LinkDto
                     {
                         Name = link.Name,
+                        QueryString = link.QueryString,
                         Target = link.Target,
                         Udi = link.Udi,
                         Url = link.Udi == null ? link.Url : null, // only save the url for external links
@@ -171,6 +173,9 @@ namespace Umbraco.Web.PropertyEditors
 
             [DataMember(Name = "url")]
             public string Url { get; set; }
+
+            [DataMember(Name = "queryString")]
+            public string QueryString { get; set; }
         }
     }
 }
