@@ -44,7 +44,8 @@
                     "prompt_doctypeChangeWarning",
                     "general_history",
                     "auditTrails_historyIncludingVariants",
-                    "content_itemNotPublished"
+                    "content_itemNotPublished",
+                    "general_choose"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -59,6 +60,7 @@
                         labels.notPublished = data[9];
 
                         scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
+                        scope.chooseLabel = data[10];
 
                         setNodePublishStatus();
 
