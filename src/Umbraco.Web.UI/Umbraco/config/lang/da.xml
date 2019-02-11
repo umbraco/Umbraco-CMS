@@ -1473,6 +1473,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="stateLockedOut">Låst ude</key>
     <key alias="stateInvited">Inviteret</key>
     <key alias="stateInactive">Inaktiv</key>
+    <key alias="sortNameAscending">Navn (A-Å)</key>
+    <key alias="sortNameDescending">Navn (Å-A)</key>
+    <key alias="sortCreateDateAscending">Nyeste</key>
+    <key alias="sortCreateDateDescending">Ældste</key>
+    <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validering</key>

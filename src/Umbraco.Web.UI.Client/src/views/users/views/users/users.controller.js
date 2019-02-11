@@ -21,14 +21,14 @@
             { label: "Last login", key: "LastLoginDate", direction: "Descending" }
         ];
 
-        angular.forEach(vm.userSortData, function (userSortData) {
-            var key = "user_sort" + userSortData.key + userSortData.direction;
-            localizationService.localize(key).then(function (value) {
-                var reg = /^\[[\S\s]*]$/g;
-                var result = reg.test(value);
-                if (result === false) {
+        localizationService.localizeMany(_.map(vm.userSortData, function (userSort) {
+            return "user_sort" + userSort.key + userSort.direction;
+        })).then(function (data) {
+            var reg = /^\[[\S\s]*]$/g;
+            _.each(data, function (value, index) {
+                if (!reg.test(value)) {
                     // Only translate if key exists
-                    userSortData.label = value;
+                    vm.userSortData[index].label = value;
                 }
             });
         });

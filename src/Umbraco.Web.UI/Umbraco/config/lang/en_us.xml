@@ -1892,6 +1892,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="stateLockedOut">Locked out</key>
     <key alias="stateInvited">Invited</key>
     <key alias="stateInactive">Inactive</key>
+    <key alias="sortNameAscending">Name (A-Z)</key>
+    <key alias="sortNameDescending">Name (Z-A)</key>
+    <key alias="sortCreateDateAscending">Newest</key>
+    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortLastLoginDateDescending">Last login</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
