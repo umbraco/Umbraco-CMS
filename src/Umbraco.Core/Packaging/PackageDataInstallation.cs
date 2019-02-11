@@ -294,7 +294,20 @@ namespace Umbraco.Core.Packaging
                              where property.Attribute("isDoc") == null
                              select property;
 
+            //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
+            // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
             var template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
+
+            //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
+            if (template != null)
+            {
+                if (!contentType.IsAllowedTemplate(template.Alias))
+                {
+                    //well this is awkward, we'll set the template to null and it will be wired up to the default template
+                    // when it's persisted in the document repository
+                    template = null;
+                }
+            }
 
             IContent content = parent == null
                 ? new Content(nodeName, parentId, contentType)
@@ -312,6 +325,8 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
+            var propTypes = contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
+
             foreach (var property in properties)
             {
                 string propertyTypeAlias = property.Name.LocalName;
@@ -319,10 +334,11 @@ namespace Umbraco.Core.Packaging
                 {
                     var propertyValue = property.Value;
 
-                    var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
-
-                    //set property value
-                    content.SetValue(propertyTypeAlias, propertyValue);
+                    if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
+                    {
+                        //set property value
+                        content.SetValue(propertyTypeAlias, propertyValue);
+                    }
                 }
             }
 
