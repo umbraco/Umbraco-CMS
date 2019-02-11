@@ -1,10 +1,13 @@
-﻿using System;
-using System.Web.Http;
-using System.Xml;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
+using System.Text.RegularExpressions;
+using System.Web.Http;
+using System.Xml;
 using umbraco.businesslogic.Exceptions;
+using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -12,7 +15,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
-using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
 {
@@ -126,15 +128,40 @@ namespace Umbraco.Web.Editors
         public IHttpActionResult AddRedirect(string url, int contentId)
         {
             var user = Umbraco.UmbracoContext.Security.CurrentUser;
+            
+
+            //Validate user
+            var permissions = Services.UserService.GetPermissions(user, contentId);
+            if(!permissions.Any(p => p.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString())))
+            {
+                return Unauthorized();
+            }
+            //Validate url            
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return BadRequest("Url is required");
+            }
+
+            url = url.Trim().TrimEnd("/");
+            var validUrlRegx = new Regex(@"^([\/]{1})[^\/].*(?<!\/)$");
+            if (!validUrlRegx.IsMatch(url))
+            {
+                return BadRequest("Url is not valid");
+            }
+
+            //ensure url does not point to a file as redirector adds a trailing slash
+            if (url.IndexOf('.') > -1)
+            {
+                return BadRequest("Url can not contain a dot.");
+            }
+
+            //ensure url does not have a query string            
+            if (url.IndexOf("?") > -1)
+            {
+                return BadRequest("Url can not contain a querystring.");
+            }
+
             var target = Services.ContentService.GetById(contentId);
-
-            //TODO: Validate user
-            //TODO: Validate url
-
-            //TODO: ensure url does not have a query string
-            //TODO: ensure url does not end in a trailing slash
-            //TODO: ensure url does not point to a file as redirector adds a trailing slash
-
             Services.RedirectUrlService.Register(url, target.Key);
             return Ok(string.Format("Url {0} now redirects to {1}", url, target.Name));
         }
