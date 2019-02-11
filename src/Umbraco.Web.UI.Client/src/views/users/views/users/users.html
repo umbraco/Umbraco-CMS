@@ -63,7 +63,7 @@
             <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
                 <umb-button
                     style="margin-right: 5px;"
-                    ng-if="vm.allowSetUserGroup"
+                    disabled="!vm.allowSetUserGroup"
                     type="button"
                     size="xs"
                     button-style="white"
@@ -74,7 +74,7 @@
 
                 <umb-button
                     style="margin-right: 5px;"
-                    ng-if="vm.allowEnableUser"
+                    disabled="!vm.allowEnableUser"
                     type="button"
                     size="xs"
                     button-style="white"
@@ -86,7 +86,7 @@
 
                 <umb-button
                     style="margin-right: 5px;"
-                    ng-if="vm.allowUnlockUser"
+                    disabled="!vm.allowUnlockUser"
                     type="button"
                     size="xs"
                     button-style="white"
@@ -97,7 +97,7 @@
                 </umb-button>
 
                 <umb-button
-                    ng-if="vm.allowDisableUser"
+                    disabled="!vm.allowDisableUser"
                     type="button"
                     size="xs"
                     button-style="white"
@@ -242,9 +242,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
+                    <tr ng-repeat="user in vm.users track by user.key"
+                        ng-click="vm.selectUser(user, vm.selection, $event)"
+                        ng-class="{'--selected': user.selected}"
+                        style="cursor: pointer;"
+                        ng-mouseenter="user.hover = true"
+                        ng-mouseleave="user.hover = false">
                         <td style="padding-left: 10px;">
-                            <div ng-if="!user.isCurrentUser" ng-click="vm.selectUser(user, vm.selection, $event)">
+                            <div ng-if="!user.isCurrentUser">
                                 <umb-checkmark
                                     ng-if="vm.selection.length > 0 || user.hover"
                                     checked="user.selected"
@@ -252,7 +257,7 @@
                                 </umb-checkmark>
                             </div>
                         </td>
-                        <td scope="row">
+                        <td scope="row" ng-click="vm.clickUser(user)">
                             <umb-avatar
                                 size="xs"
                                 color="secondary"
@@ -261,7 +266,7 @@
                                 img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
                             </umb-avatar>
                         </td>
-                        <td class="bold">{{user.name}}</td>
+                        <td class="bold" ng-click="vm.clickUser(user)">{{user.name}}</td>
                         <td><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></td>
                         <td>{{ user.formattedLastLogin }}</td>
                         <td style="text-transform: capitalize;">
