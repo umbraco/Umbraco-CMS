@@ -2216,7 +2216,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="enableUrlTracker">Enable URL tracker</key>
         <key alias="originalUrl">Original URL</key>
         <key alias="originalUrlDescription"><![CDATA[A valid URL should look like /page or /page/subpage]]></key>
-        <key alias="originalUrlPatternValidation">Does not match pattern /page or /page/subpage</key>
+        <key alias="originalUrlPatternValidation"><![CDATA[Does not match pattern /page or /page/subpage]]></key>
+        <key alias="originalUrlDotValidation"><![CDATA[Url can not contain a .]]></key>
         <key alias="redirectedTo">Redirected To</key>
         <key alias="redirectTo">Redirect To</key>
         <key alias="redirectUrlManagement">Redirect Url Management</key>

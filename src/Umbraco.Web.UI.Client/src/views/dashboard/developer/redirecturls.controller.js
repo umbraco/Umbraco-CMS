@@ -38,8 +38,7 @@
             vm.addRedirectOverlay = {
                 view: "redirecturlpicker",                
                 show: true,
-                submit: function (model) {
-                    console.log(model);
+                submit: function (model) {                    
                     redirectUrlsResource.addRedirect(model.originalUrl, model.entityId).then(function () {
                         vm.search();
                         vm.addRedirectOverlay.show = false;
