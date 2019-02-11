@@ -110,7 +110,7 @@ namespace Umbraco.Web.PropertyEditors
                         Trashed = trashed,
                         Published = published,
                         Udi = udi,
-                        Url = url
+                        Url = url ?? ""
                     });
                 }
                 return result;
