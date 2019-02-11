@@ -15,7 +15,6 @@
         localizationService.localizeMany(_.map(userStates, function (userState) {
             return "user_state" + userState.key;
         })).then(function (data) {
-            console.log("Localized", data)
             var reg = /^\[[\S\s]*]$/g;
             _.each(data, function (value, index) {
                 if (!reg.test(value)) {
