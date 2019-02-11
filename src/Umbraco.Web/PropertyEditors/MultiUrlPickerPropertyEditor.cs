@@ -15,7 +15,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultiUrlPickerAlias, "Multi Url Picker", PropertyEditorValueTypes.Json, "multiurlpicker", Group = "pickers", Icon = "icon-link", IsParameterEditor = true)]
+    [PropertyEditor(Constants.PropertyEditors.MultiUrlPickerAlias, "Multi Url Picker", PropertyEditorValueTypes.Json, "multiurlpicker", Group = "pickers", Icon = "icon-link")]
     public class MultiUrlPickerPropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()
