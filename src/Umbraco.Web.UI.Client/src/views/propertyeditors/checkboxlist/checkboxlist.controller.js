@@ -54,7 +54,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             $scope.selectedItems = [];
 
             for (var i = 0; i < configItems.length; i++) {
-                var isChecked = _.contains($scope.model.value, configItems[i].id);
+                var isChecked = _.contains($scope.model.value, configItems[i].value);
                 $scope.selectedItems.push({
                     checked: isChecked,
                     key: configItems[i].id,
@@ -68,11 +68,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 function (v) {
                     return v === item.key;
                 });
-
+            
             if (item.checked) {
                 //if it doesn't exist in the model, then add it
                 if (index < 0) {
-                    $scope.model.value.push(item.key);
+                    $scope.model.value.push(item.val);
                 }
             }
             else {

@@ -128,6 +128,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
             To<RenameUmbracoDomainsTable>("{6017F044-8E70-4E10-B2A3-336949692ADD}");
             To<RadioButtonPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}");
+            To<CheckBoxListPropertyEditorsMigration>("{C62C9BF1-833E-4866-B959-C8AB59E43E51}");
 
 
             //FINAL

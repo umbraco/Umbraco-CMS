@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Cache;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
-    public class RadioButtonPropertyEditorsMigration : MigrationBase
+    public class CheckBoxListPropertyEditorsMigration : MigrationBase
     {
-        public RadioButtonPropertyEditorsMigration(IMigrationContext context)
+        public CheckBoxListPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         {
         }
@@ -25,7 +23,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var dataTypes = Database.Fetch<DataTypeDto>(Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.RadioButtonList)));
+                .Where<DataTypeDto>(x => x.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.CheckBoxList)));
 
             var refreshCache = false;
             foreach (var dataType in dataTypes)
@@ -123,7 +121,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (!canConvert) return false;
 
-            propData.VarcharValue = values.FirstOrDefault() ?? string.Empty;
+            propData.VarcharValue = JsonConvert.SerializeObject(values);
             propData.TextValue = null;
             propData.IntegerValue = null;
             return true;
@@ -135,7 +133,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         private int[] ConvertStringValues(string val)
         {
-            var splitVals = new []{ val.Trim() };
+            var splitVals = JsonConvert.DeserializeObject<string[]>(val);
 
             var intVals = splitVals
                 .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)

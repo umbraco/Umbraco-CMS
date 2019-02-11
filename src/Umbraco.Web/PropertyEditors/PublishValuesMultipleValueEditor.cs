@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -36,8 +35,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
-            var delimited = base.ToEditor(property, dataTypeService, culture, segment).ToString();
-            return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var json = base.ToEditor(property, dataTypeService, culture, segment).ToString();
+            return JsonConvert.DeserializeObject<string[]>(json) ?? Array.Empty<string>();
         }
 
         /// <summary>
@@ -55,9 +54,9 @@ namespace Umbraco.Web.PropertyEditors
                 return null;
             }
 
-            var values = json.Select(item => item.Value<string>()).ToList();
-            //change to delimited
-            return string.Join(",", values);
+            var values = json.Select(item => item.Value<string>()).ToArray();
+
+            return JsonConvert.SerializeObject(values);
         }
     }
 }
