@@ -199,14 +199,14 @@
             vm.activeLayout = selectedLayout;
         }
 
-        function selectUser(user, selection, event) {
+        function selectUser(user, event) {
 
-            // prevent the current user to be selected
-            if (!user.isCurrentUser) {
+            // prevent the current user to be selected, why?
+            //if (!user.isCurrentUser) {
 
                 if (user.selected) {
-                    var index = selection.indexOf(user.id);
-                    selection.splice(index, 1);
+                    var index = vm.selection.indexOf(user.id);
+                    vm.selection.splice(index, 1);
                     user.selected = false;
                 } else {
                     user.selected = true;
@@ -219,7 +219,7 @@
                     event.preventDefault();
                     event.stopPropagation();
                 }
-            }
+            //}
         }
 
         function clearSelection() {
@@ -230,11 +230,7 @@
         }
 
         function clickUser(user) {
-            if (vm.selection.length > 0) {
-                selectUser(user, vm.selection);
-            } else {
-                goToUser(user.id);
-            }
+            goToUser(user.id);
         }
 
         function disableUsers() {

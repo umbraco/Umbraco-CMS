@@ -8,12 +8,30 @@
     box-sizing: border-box;
     max-width: 100%;
     display: flex;
+    position: relative;
+    user-select: none;
 }
 
 .umb-user-card:hover,
 .umb-user-card:focus {
     outline: none;
     text-decoration: none !important;
+}
+.umb-user-card.-selected {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
+    }
+    
 }
 
 .umb-user-card__content {
@@ -30,9 +48,12 @@
     max-width: 100%;
 }
 
-.umb-user-card__content:hover,
-.umb-user-card:focus .umb-user-card__content {
-    border-color: @turquoise;
+.umb-user-card__goToUser {
+    &:hover {
+        .umb-user-card__name {
+        text-decoration: underline;
+        }
+    }
 }
 
 .umb-user-card__avatar {
@@ -47,24 +68,13 @@
     left: 10px;
 }
 
+
 .umb-user-card__name {
     font-size: 15px;
     font-weight: bold;
     text-align: center;
     margin-bottom: 2px;
-    word-wrap: break-word; 
-}
-
-.umb-user-card__checkmark {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: none;
-}
-
-.umb-user-card:hover .umb-user-card__checkmark,
-.umb-user-card__checkmark--visible {
-    display: block;
+    word-wrap: break-word;
 }
 
 .umb-user-card__group {

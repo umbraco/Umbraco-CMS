@@ -62,6 +62,15 @@ table {
 }
 
 
+.table tr > td:first-child {
+    border-left: 4px solid transparent;
+}
+.table tr.--selected > td:first-child {
+    border-left-color:@ui-selected-border;
+}
+
+
+
 
 // CONDENSED TABLE W/ HALF PADDING
 // -------------------------------
