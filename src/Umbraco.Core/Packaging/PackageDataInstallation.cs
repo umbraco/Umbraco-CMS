@@ -102,8 +102,8 @@ namespace Umbraco.Core.Packaging
             {
                 // TODO: I don't think this ordering is necessary
                 var orderedTypes = (from contentType in contentTypes
-                                   orderby contentType.ParentId descending, contentType.Id descending
-                                   select contentType).ToList();
+                                    orderby contentType.ParentId descending, contentType.Id descending
+                                    select contentType).ToList();
                 removedContentTypes.AddRange(orderedTypes);
                 contentTypeService.Delete(orderedTypes, userId);
             }
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Packaging
                 DictionaryItemsUninstalled = removedDictionaryItems,
                 DataTypesUninstalled = removedDataTypes,
                 LanguagesUninstalled = removedLanguages,
-                
+
             };
 
             return summary;
@@ -188,8 +188,8 @@ namespace Umbraco.Core.Packaging
             var element = packageDocument.XmlData;
 
             var roots = from doc in element.Elements()
-                where (string)doc.Attribute("isDoc") == ""
-                select doc;
+                        where (string)doc.Attribute("isDoc") == ""
+                        select doc;
 
             var contents = ParseDocumentRootXml(roots, parentId, importedDocumentTypes).ToList();
             if (contents.Any())
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Packaging
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
             var templateId = element.AttributeValue<int?>("template");
-            
+
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
@@ -325,7 +325,11 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
-            var propTypes = contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
+            //Here we make sure that we take composition properties in account as well
+            //otherwise we would skip them and end up losing content
+            var propTypes = contentType.CompositionPropertyTypes.Any()
+                ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
+                : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
 
             foreach (var property in properties)
             {
@@ -351,7 +355,7 @@ namespace Umbraco.Core.Packaging
 
         public IEnumerable<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
         {
-            return ImportDocumentTypes(new []{ docTypeElement }, userId);
+            return ImportDocumentTypes(new[] { docTypeElement }, userId);
         }
 
         /// <summary>
@@ -375,7 +379,7 @@ namespace Umbraco.Core.Packaging
         public IEnumerable<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
         {
             var importedContentTypes = new Dictionary<string, IContentType>();
-            
+
             //When you are importing a single doc type we have to assume that the dependencies are already there.
             //Otherwise something like uSync won't work.
             var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
@@ -468,7 +472,7 @@ namespace Umbraco.Core.Packaging
                 if (updatedContentTypes.Any())
                     _contentTypeService.Save(updatedContentTypes, userId);
             }
-            
+
             return list;
         }
 
@@ -870,7 +874,7 @@ namespace Umbraco.Core.Packaging
             {
                 _dataTypeService.Save(dataTypes, userId, true);
             }
-            
+
             return dataTypes;
         }
 
@@ -953,7 +957,7 @@ namespace Umbraco.Core.Packaging
             var items = new List<IDictionaryItem>();
             foreach (var dictionaryItemElement in dictionaryItemElementList)
                 items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId));
-            
+
             return items;
         }
 
@@ -1040,7 +1044,7 @@ namespace Umbraco.Core.Packaging
                 _localizationService.Save(langauge, userId);
                 list.Add(langauge);
             }
-            
+
             return list;
         }
 
@@ -1203,7 +1207,7 @@ namespace Umbraco.Core.Packaging
 
         public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
         {
-            return ImportTemplates(new[] {templateElement}, userId);
+            return ImportTemplates(new[] { templateElement }, userId);
         }
 
         /// <summary>
@@ -1250,7 +1254,7 @@ namespace Umbraco.Core.Packaging
                 var alias = templateElement.Element("Alias").Value;
                 var design = templateElement.Element("Design").Value;
                 var masterElement = templateElement.Element("Master");
-                
+
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
                 var template = existingTemplate ?? new Template(templateName, alias);
                 template.Content = design;
