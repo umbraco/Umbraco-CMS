@@ -161,6 +161,10 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
             }, function (response) {
 
+                if (!response) {
+                    return; //sometimes oddly this happens, nothing we can do
+                }
+
                 if (!response.status && response.message && response.stack) {
                     //this is a JS/angular error that we should deal with
                     return $q.reject({
