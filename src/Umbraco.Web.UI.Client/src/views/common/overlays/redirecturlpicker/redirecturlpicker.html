@@ -8,10 +8,17 @@
                class="umb-editor umb-textstring"
                ng-model="model.originalUrl"
                required
-               ng-pattern="urlRegex"
+               validate-url
                name="originalUrl" />
-        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="required"><localize key="general_required"></localize></span>
-        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="pattern"><localize key="redirectUrls_originalUrlPatternValidation"></localize></span>
+        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="required && !dotPath">
+            <localize key="general_required"></localize>
+        </span>
+        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="path">
+            <localize key="redirectUrls_originalUrlPatternValidation"></localize>
+        </span>
+        <span class="help-inline" val-msg-for="originalUrl" val-toggle-msg="dotPath">            
+            <localize key="redirectUrls_originalUrlDotValidation"></localize>
+        </span>
     </umb-control-group>
     <umb-control-group label="@redirectUrls_redirectTo" required="true">
         <input type="hidden" ng-required="true" ng-model="model.entityId" name="entityId" />

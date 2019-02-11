@@ -7,8 +7,8 @@
 
             var evts = [];
             var isInfoTab = false;
-            scope.publishStatus = {};
-
+            
+            scope.publishStatus = {};            
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
 
             function onInit() {
@@ -156,8 +156,19 @@
                 });
             }
 
-            scope.deleteRedirect = function (redirectUrl) {
-                console.log(redirectUrl);
+            scope.deleteRedirect = function (redirectToDelete) {
+                localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, scope.node.name]).then(function (value) {
+                    var toggleConfirm = confirm(value);
+
+                    if (toggleConfirm) {
+                        redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
+                            loadRedirectUrls();
+                            notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
+                        }, function (error) {
+                            notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
+                        });
+                    }
+                });
             }
 
             scope.redirectUrlPageChange = function (pageNumber) {

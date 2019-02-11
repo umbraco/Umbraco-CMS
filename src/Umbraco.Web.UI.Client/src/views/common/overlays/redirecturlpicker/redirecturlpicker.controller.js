@@ -1,8 +1,40 @@
 ﻿(function () {
     "use strict";
+    function validateUrl() {
+        var pathRegex = new RegExp("^([\/]{1})[^\/].*(?<!\/)$")
+        return {
+            require: 'ngModel',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.unshift(function (viewValue) {
+
+                    viewValue = viewValue.trim();
+
+                    if (viewValue.length == 0) { return viewValue; }
+                    if (viewValue.endsWith("/")) {
+                        viewValue = viewValue.slice(0, -1);
+                    }
+                    if (pathRegex.test(viewValue)) {
+                        ctrl.$setValidity('path', true);
+                    }
+                    else {
+                        ctrl.$setValidity('path', false);
+                        return undefined;
+                    }
+
+                    if (viewValue.indexOf(".") < 0) {
+                        ctrl.$setValidity('dotPath', true);
+                    }
+                    else {
+                        ctrl.$setValidity('dotPath', false);                        
+                        return undefined;
+                    }
+                    return viewValue;
+                });            
+            }
+        };
+    }
     function RedirectUrlPickerController($scope, entityResource, editorState) {
 
-        $scope.urlRegex = new RegExp("([\/]{1})[^\/](.*)");
         $scope.contentItem = null;
         $scope.loaded = false;
         $scope.enablePicker = editorState == null || editorState.current == null;
@@ -54,7 +86,6 @@
                 $scope.loaded = true;
                 return;
             }
-            console.log($scope.model.entityId);
             entityResource.getById($scope.model.entityId, "Document").then(function (ent) {
                 $scope.contentItem = ent;
                 getContentItemUrl().then(function (url) {
@@ -67,4 +98,5 @@
         init();
     }
     angular.module("umbraco").controller("Umbraco.Overlays.RedirectUrlPickerController", RedirectUrlPickerController);
+    angular.module("umbraco").directive('validateUrl', validateUrl);
 })();
