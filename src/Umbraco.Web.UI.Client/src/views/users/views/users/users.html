@@ -23,21 +23,20 @@
                         ng-if="vm.layouts"
                         layouts="vm.layouts"
                         active-layout="vm.activeLayout"
-                        on-layout-select="vm.selectLayout">
+                        on-layout-select="vm.selectLayout(layout)">
                     </umb-layout-selector>
                 </umb-editor-sub-header-section>
                 <umb-editor-sub-header-section>
                     <div class="form-search -no-margin-bottom pull-right">
                         <div class="inner-addon left-addon">
                             <i class="icon icon-search"></i>
-                            <input
-                                class="form-control search-input"
-                                type="text" localize="placeholder"
-                                placeholder="@general_typeToSearch"
-                                ng-model="vm.usersOptions.filter"
-                                ng-change="vm.searchUsers()"
-                                prevent-enter-submit
-                                no-dirty-check>
+                            <input class="form-control search-input"
+                                   type="text" localize="placeholder"
+                                   placeholder="@general_typeToSearch"
+                                   ng-model="vm.usersOptions.filter"
+                                   ng-change="vm.searchUsers()"
+                                   prevent-enter-submit
+                                   no-dirty-check>
                         </div>
                     </div>
                 </umb-editor-sub-header-section>
@@ -227,7 +226,7 @@
         <!-- Layout: Table -->
         <div ng-if="vm.activeLayout.path === '2'">
 
-      <table class="table table-hover">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th style="padding-left: 10px; width: 10px;">
