@@ -18,6 +18,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Cache;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 
 namespace Umbraco.Tests.Services
 {

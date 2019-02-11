@@ -50,8 +50,6 @@ namespace Umbraco.Core.Migrations.Install
             typeof (MemberTypeDto),
             typeof (MemberDto),
             typeof (Member2MemberGroupDto),
-            typeof (ContentXmlDto),
-            typeof (PreviewXmlDto),
             typeof (PropertyTypeGroupDto),
             typeof (PropertyTypeDto),
             typeof (PropertyDataDto),

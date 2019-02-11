@@ -379,6 +379,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropPreValueTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTaskTables.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTemplateDesignColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DropXmlTables.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MakeRedirectUrlVariant.cs" />
@@ -826,7 +827,6 @@
     <Compile Include="Persistence\Dtos\ContentTypeDto.cs" />
     <Compile Include="Persistence\Dtos\ContentTypeTemplateDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionDto.cs" />
-    <Compile Include="Persistence\Dtos\ContentXmlDto.cs" />
     <Compile Include="Persistence\Dtos\DataTypeDto.cs" />
     <Compile Include="Persistence\Dtos\DictionaryDto.cs" />
     <Compile Include="Persistence\Dtos\DocumentDto.cs" />
@@ -846,7 +846,6 @@
     <Compile Include="Persistence\Dtos\MemberTypeDto.cs" />
     <Compile Include="Persistence\Dtos\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Persistence\Dtos\NodeDto.cs" />
-    <Compile Include="Persistence\Dtos\PreviewXmlDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyDataDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeGroupDto.cs" />
