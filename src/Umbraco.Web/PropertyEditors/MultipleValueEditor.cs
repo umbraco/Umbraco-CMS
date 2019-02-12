@@ -1,33 +1,32 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Custom value editor to handle posted json data and to return json data for the multiple selected items
+    /// A value editor to handle posted json array data and to return array data for the multiple selected csv items
     /// </summary>
     /// <remarks>
     /// This is re-used by editors such as the multiple drop down list or check box list
     /// </remarks>
-    internal class PublishValuesMultipleValueEditor : DataValueEditor
+    internal class MultipleValueEditor : DataValueEditor
     {
         private readonly ILogger _logger;
 
-        internal PublishValuesMultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
+        internal MultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
             : base(attribute)
         {
             _logger = logger;
         }
 
         /// <summary>
-        /// Override so that we can return a json array to the editor for multi-select values
+        /// Override so that we can return an array to the editor for multi-select values
         /// </summary>
         /// <param name="property"></param>
         /// <param name="dataTypeService"></param>
@@ -36,8 +35,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
-            var delimited = base.ToEditor(property, dataTypeService, culture, segment).ToString();
-            return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var json = base.ToEditor(property, dataTypeService, culture, segment).ToString();
+            return JsonConvert.DeserializeObject<string[]>(json) ?? Array.Empty<string>();
         }
 
         /// <summary>
@@ -55,9 +54,9 @@ namespace Umbraco.Web.PropertyEditors
                 return null;
             }
 
-            var values = json.Select(item => item.Value<string>()).ToList();
-            //change to delimited
-            return string.Join(",", values);
+            var values = json.Select(item => item.Value<string>()).ToArray();
+
+            return JsonConvert.SerializeObject(values);
         }
     }
 }
