@@ -1,5 +1,19 @@
-function RowConfigController($scope) {
+function RowConfigController($scope, localizationService) {
 
+    function init() {
+        setTitle();
+    }
+
+    function setTitle() {
+        if (!$scope.model.title) {
+            localizationService.localize("grid_addRowConfiguration")
+                .then(function(data){
+                    $scope.model.title = data;
+                });
+        }
+    }
+    
+    
     $scope.currentRow = $scope.model.currentRow;
     $scope.editors = $scope.model.editors;
     $scope.columns = $scope.model.columns;
@@ -69,6 +83,12 @@ function RowConfigController($scope) {
     $scope.closeArea = function() {
         $scope.currentCell = undefined;
     };
+    
+    $scope.close = function() {
+        if($scope.model.close) {
+            $scope.model.close();
+        }
+    }
 
     $scope.nameChanged = false;
     var originalName = $scope.currentRow.name;
@@ -92,6 +112,10 @@ function RowConfigController($scope) {
             }
         }
     }, true);
+
+    
+    init();
+    
 
 }
 
