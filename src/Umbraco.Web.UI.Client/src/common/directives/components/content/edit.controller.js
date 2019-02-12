@@ -871,11 +871,22 @@
             
             $scope.app = app;
             
+            $scope.$broadcast("editors.apps.appChanged", { app: app });
+            
             if (infiniteMode) {
                 createInfiniteModeButtons($scope.content);
             } else {
                 createButtons($scope.content);
             }
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appAnchorChanged = function (app, anchor) {
+            //send an event downwards
+            $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
         };
 
         // methods for infinite editing
