@@ -464,6 +464,16 @@ namespace Umbraco.Web.Editors
         {
             long totalChildren;
             List<IContent> children;
+
+            // Sets the culture to the only existing culture if we only have one culture.
+            if (string.IsNullOrWhiteSpace(cultureName))
+            {
+                if (_allLangs.Value.Count == 1)
+                {
+                    cultureName = _allLangs.Value.First().Key;
+                }
+            }
+
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IContent> queryFilter = null;
@@ -1200,7 +1210,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
-                
+
                 //proceed to publish if all validation still succeeds
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
