@@ -29,6 +29,8 @@
         let typeahead;
         let tagsHound;
 
+        let initLoad = true;
+
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
         vm.$onDestroy = onDestroy;
@@ -138,9 +140,17 @@
             if (changes.value) {
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
-                    configureViewModel();
-                    reValidate()
-
+                    if (initLoad) {
+                        //this occurs if we have to re-format the model on the init load, so set the flag to false
+                        //so the next time it actually changes we process it.
+                        initLoad = false;
+                        //we need to reset the form since it actually hasn't changed but it will be detected as changed
+                        vm.tagEditorForm.$setPristine();
+                    }
+                    else {
+                        configureViewModel();
+                        reValidate();
+                    }
                 }
             }
         }
@@ -161,6 +171,7 @@
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
                         updateModelValue(vm.viewModel);
+                        return;
                     }
                     else {
                         //csv storage
@@ -175,13 +186,15 @@
                         });
 
                         updateModelValue(vm.viewModel);
-                        
+                        return;
                     }
                 }
                 else if (angular.isArray(vm.value)) {
                     vm.viewModel = vm.value;
                 }
             }
+            //if we've made it here we haven't had to re-format the model so we'll set this to false
+            initLoad = false;
         }
 
         function updateModelValue(val) {
