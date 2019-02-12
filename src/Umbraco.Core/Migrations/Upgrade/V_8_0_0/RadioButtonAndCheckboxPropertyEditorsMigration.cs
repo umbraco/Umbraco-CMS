@@ -1,81 +1,98 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
-    public class RadioButtonPropertyEditorsMigration : MigrationBase
+    public class RadioButtonAndCheckboxPropertyEditorsMigration : MigrationBase
     {
-        public RadioButtonPropertyEditorsMigration(IMigrationContext context)
+        public RadioButtonAndCheckboxPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         {
         }
 
         public override void Migrate()
         {
-            //need to convert the old drop down data types to use the new one
-            var dataTypes = Database.Fetch<DataTypeDto>(Sql()
-                .Select<DataTypeDto>()
-                .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.RadioButtonList"));
+            MigrateRadioButtons();
+            MigrateCheckBoxes();
+        }
+
+        private void MigrateCheckBoxes()
+        {
+            //fixme: complete this
+
+            var dataTypes = GetDataTypes(Constants.PropertyEditors.Aliases.CheckBoxList);
+
+
+        }
+
+        private void MigrateRadioButtons()
+        {
+            var dataTypes = GetDataTypes(Constants.PropertyEditors.Aliases.RadioButtonList);
 
             var refreshCache = false;
             foreach (var dataType in dataTypes)
             {
                 ValueListConfiguration config;
 
-                if (!dataType.Configuration.IsNullOrWhiteSpace())
+                if (dataType.Configuration.IsNullOrWhiteSpace())
+                    continue;
+
+                // parse configuration, and update everything accordingly
+                try
                 {
-                    // parse configuration, and update everything accordingly
-                    try
-                    {
-                        config = (ValueListConfiguration) new ValueListConfigurationEditor().FromDatabase(
-                            dataType.Configuration);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error<DropDownPropertyEditorsMigration>(
-                            ex,
-                            "Invalid drop down configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
-                            dataType.Configuration);
-
-                        continue;
-                    }
-
-                    // get property data dtos
-                    var propertyDataDtos = Database.Fetch<PropertyDataDto>(Sql()
-                        .Select<PropertyDataDto>()
-                        .From<PropertyDataDto>()
-                        .InnerJoin<PropertyTypeDto>()
-                        .On<PropertyTypeDto, PropertyDataDto>((pt, pd) => pt.Id == pd.PropertyTypeId)
-                        .InnerJoin<DataTypeDto>()
-                        .On<DataTypeDto, PropertyTypeDto>((dt, pt) => dt.NodeId == pt.DataTypeId)
-                        .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
-
-                    // update dtos
-                    var updatedDtos = propertyDataDtos.Where(x => UpdatePropertyDataDto(x, config));
-
-                    // persist changes
-                    foreach (var propertyDataDto in updatedDtos) Database.Update(propertyDataDto);
-
-                    UpdateDataType(dataType);
-                    refreshCache = true;
+                    config = (ValueListConfiguration)new ValueListConfigurationEditor().FromDatabase(
+                        dataType.Configuration);
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error<DropDownPropertyEditorsMigration>(
+                        ex,
+                        "Invalid radio button configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
+                        dataType.Configuration);
+
+                    continue;
+                }
+
+                // get property data dtos
+                var propertyDataDtos = Database.Fetch<PropertyDataDto>(Sql()
+                    .Select<PropertyDataDto>()
+                    .From<PropertyDataDto>()
+                    .InnerJoin<PropertyTypeDto>()
+                    .On<PropertyTypeDto, PropertyDataDto>((pt, pd) => pt.Id == pd.PropertyTypeId)
+                    .InnerJoin<DataTypeDto>()
+                    .On<DataTypeDto, PropertyTypeDto>((dt, pt) => dt.NodeId == pt.DataTypeId)
+                    .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
+
+                // update dtos
+                var updatedDtos = propertyDataDtos.Where(x => UpdatePropertyDataDto(x, config));
+
+                // persist changes
+                foreach (var propertyDataDto in updatedDtos) Database.Update(propertyDataDto);
+
+                UpdateDataType(dataType);
+                refreshCache = true;
             }
 
             if (refreshCache)
             {
                 //FIXME: trigger cache rebuild. Currently the data in the database tables is wrong.
             }
+        }
 
+        private List<DataTypeDto> GetDataTypes(string editorAlias)
+        {
+            //need to convert the old drop down data types to use the new one
+            var dataTypes = Database.Fetch<DataTypeDto>(Sql()
+                .Select<DataTypeDto>()
+                .From<DataTypeDto>()
+                .Where<DataTypeDto>(x => x.EditorAlias == editorAlias));
+            return dataTypes;
         }
 
         private void UpdateDataType(DataTypeDto dataType)
@@ -123,7 +140,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (!canConvert) return false;
 
-            propData.VarcharValue = string.Join(",", values);
+            //The radio button only supports selecting a single value, so if there are multiple for some insane reason we can only use the first
+            propData.VarcharValue = values.Count > 0 ? values[0] : string.Empty;
             propData.TextValue = null;
             propData.IntegerValue = null;
             return true;

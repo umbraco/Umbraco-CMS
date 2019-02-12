@@ -860,7 +860,7 @@
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
+    <Compile Include="PropertyEditors\MultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
