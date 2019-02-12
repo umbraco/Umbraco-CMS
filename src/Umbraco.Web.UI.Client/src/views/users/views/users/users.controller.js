@@ -59,13 +59,10 @@
             }
         ];
 
-        vm.activeLayout = {
-            "icon": "icon-thumbnails-small",
-            "path": "1",
-            "selected": true
-        };
+        // Set card layout to active by default
+        vm.activeLayout = vm.layouts[0];
 
-        //don't show the invite button if no email is configured
+        // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
                 labelKey: "user_inviteUser",
