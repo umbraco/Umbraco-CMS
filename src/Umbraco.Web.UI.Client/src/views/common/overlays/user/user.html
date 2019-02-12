@@ -78,7 +78,7 @@
 
 
     <div class="umb-control-group" ng-if="!showPasswordFields && history.length">
-        <h5><localize key="user_yourHistory" /></h5
+        <h5><localize key="user_yourHistory" /></h5>
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
                 <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
