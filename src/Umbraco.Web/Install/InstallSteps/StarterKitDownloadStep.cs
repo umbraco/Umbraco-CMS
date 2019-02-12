@@ -74,16 +74,9 @@ namespace Umbraco.Web.Install.InstallSteps
             
             _packageService.SaveInstalledPackage(packageDefinition);
 
-            InstallPackageFiles(packageDefinition, compiledPackage.PackageFile);
+            _packageService.InstallCompiledPackageFiles(packageDefinition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(-1));
 
             return (compiledPackage.PackageFile.Name, packageDefinition.Id);
-        }
-
-        private void InstallPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-
-            _packageService.InstallCompiledPackageData(packageDefinition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
         }
 
         public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;
