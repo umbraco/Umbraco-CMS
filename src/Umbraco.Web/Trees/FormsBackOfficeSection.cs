@@ -8,7 +8,7 @@ namespace Umbraco.Web.Trees
     /// </summary>
     public class FormsBackOfficeSection : IBackOfficeSection
     {
-        public string Alias => Constants.Applications.FormsInstaller;
+        public string Alias => Constants.Applications.Forms;
         public string Name => "Forms";
     }
 }

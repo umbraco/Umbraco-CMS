@@ -45,7 +45,7 @@
             /// <summary>
             /// Application alias for the forms section.
             /// </summary>
-            public const string FormsInstaller = "formsInstaller";
+            public const string Forms = "forms";
         }
 
         /// <summary>
@@ -138,7 +138,6 @@
             /// alias for the users tree.
             /// </summary>
             public const string Users = "users";
-            public const string Forms = "formsInstaller";
 
             public const string Scripts = "scripts";
 

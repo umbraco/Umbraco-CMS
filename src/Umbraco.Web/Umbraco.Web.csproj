@@ -215,7 +215,6 @@
     <Compile Include="Templates\ITemplateRenderer.cs" />
     <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
     <Compile Include="Trees\FormsBackOfficeSection.cs" />
-    <Compile Include="Trees\FormsTreeController.cs" />
     <Compile Include="Trees\MediaBackOfficeSection.cs" />
     <Compile Include="Trees\MembersBackOfficeSection.cs" />
     <Compile Include="Trees\PackagesBackOfficeSection.cs" />
