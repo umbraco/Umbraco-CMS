@@ -622,7 +622,7 @@
                     return;
                 }
                 
-                console.log("CHECK")
+                
                 // if the current user is selected prevent any bulk actions with the user included
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
