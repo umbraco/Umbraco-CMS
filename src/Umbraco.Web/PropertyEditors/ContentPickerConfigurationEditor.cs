@@ -8,24 +8,23 @@ namespace Umbraco.Web.PropertyEditors
         public ContentPickerConfigurationEditor()
         {
             // configure fields
+            // this is not part of ContentPickerConfiguration,
+            // but is required to configure the UI editor (when editing the configuration)
             Field(nameof(ContentPickerConfiguration.StartNodeId))
                 .Config = new Dictionary<string, object> { { "idType", "udi" } };
         }
 
-        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
-        {
-            ["idType"] = "udi",
-            ["showEditButton"] = false,
-            ["showPathOnHover"] = false,
-        };
-
         public override IDictionary<string, object> ToValueEditor(object configuration)
         {
-            // these are not configuration fields, but constants required by the value editor
+            // get the configuration fields
             var d = base.ToValueEditor(configuration);
+
+            // add extra fields
+            // not part of ContentPickerConfiguration but used to configure the UI editor
             d["showEditButton"] = false;
             d["showPathOnHover"] = false;
-            d["idType"] = "udi";
+            d["idType"] = "udi"; 
+
             return d;
         }
     }

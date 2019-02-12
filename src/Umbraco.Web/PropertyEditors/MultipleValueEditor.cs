@@ -10,23 +10,23 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Custom value editor to handle posted json data and to return json data for the multiple selected items
+    /// A value editor to handle posted json array data and to return array data for the multiple selected csv items
     /// </summary>
     /// <remarks>
     /// This is re-used by editors such as the multiple drop down list or check box list
     /// </remarks>
-    internal class PublishValuesMultipleValueEditor : DataValueEditor
+    internal class MultipleValueEditor : DataValueEditor
     {
         private readonly ILogger _logger;
 
-        internal PublishValuesMultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
+        internal MultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
             : base(attribute)
         {
             _logger = logger;
         }
 
         /// <summary>
-        /// Override so that we can return a json array to the editor for multi-select values
+        /// Override so that we can return an array to the editor for multi-select values
         /// </summary>
         /// <param name="property"></param>
         /// <param name="dataTypeService"></param>

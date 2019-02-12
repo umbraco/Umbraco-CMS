@@ -42,7 +42,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                         return f.checked;
                     }),
                 function(m) {
-                    return m.key;
+                    return m.value;
                 });
             //get all of the same values between the arrays
             var same = _.intersection($scope.model.value, selectedVals);
@@ -66,13 +66,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         function changed(item) {
             var index = _.findIndex($scope.model.value,
                 function (v) {
-                    return v === item.key;
+                    return v === item.value;
                 });
             
             if (item.checked) {
                 //if it doesn't exist in the model, then add it
                 if (index < 0) {
-                    $scope.model.value.push(item.val);
+                    $scope.model.value.push(item.value);
                 }
             }
             else {
