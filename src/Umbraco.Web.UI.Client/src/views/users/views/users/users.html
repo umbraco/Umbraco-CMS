@@ -5,7 +5,7 @@
 
         <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
-        <umb-editor-sub-header>
+        <umb-editor-sub-header ng-class="{'--state-selection':(vm.selection.length > 0)}">
 
             <!-- No selection -->
             <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
@@ -48,7 +48,7 @@
                     <umb-button
                         type="button"
                         size="xs"
-                        button-style="outline"
+                        button-style="white"
                         label-key="buttons_clearSelection"
                         action="vm.clearSelection()"
                         disabled="actionInProgress">
@@ -57,16 +57,16 @@
                 <umb-editor-sub-header-section>
                     <strong>{{ vm.selection.length }} <localize key="general_of">of</localize> {{ vm.users.length }} <localize key="general_selected">selected</localize></strong>
                 </umb-editor-sub-header-section>
-                
+
             </umb-editor-sub-header-content-left>
 
             <umb-editor-sub-header-content-right ng-if="vm.selection.length > 0">
                 <umb-button
                     style="margin-right: 5px;"
-                    ng-if="vm.allowSetUserGroup"
-                    type="button" 
+                    disabled="!vm.allowSetUserGroup"
+                    type="button"
                     size="xs"
-                    button-style="outline"
+                    button-style="white"
                     label-key="actions_setGroup"
                     icon="icon-users"
                     action="vm.openBulkUserGroupPicker()">
@@ -74,22 +74,22 @@
 
                 <umb-button
                     style="margin-right: 5px;"
-                    ng-if="vm.allowEnableUser"
+                    disabled="!vm.allowEnableUser"
                     type="button"
                     size="xs"
-                    button-style="outline"
+                    button-style="white"
                     state="vm.enableUserButtonState"
                     label-key="actions_enable"
                     icon="icon-check"
                     action="vm.enableUsers()">
                 </umb-button>
-      
+
                 <umb-button
                     style="margin-right: 5px;"
-                    ng-if="vm.allowUnlockUser"
+                    disabled="!vm.allowUnlockUser"
                     type="button"
                     size="xs"
-                    button-style="outline"
+                    button-style="white"
                     state="vm.unlockUserButtonState"
                     label-key="actions_unlock"
                     icon="icon-unlocked"
@@ -97,10 +97,10 @@
                 </umb-button>
 
                 <umb-button
-                    ng-if="vm.allowDisableUser"
+                    disabled="!vm.allowDisableUser"
                     type="button"
                     size="xs"
-                    button-style="outline"
+                    button-style="white"
                     state="vm.disableUserButtonState"
                     label-key="actions_disable"
                     icon="icon-block"
@@ -123,7 +123,7 @@
                 <!-- State filter -->
                 <div style="position: relative;" ng-if="vm.userStatesFilter.length > 0">
                     <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('state')">
-                        <span><localize key="general_status">Status</localize>:</span> 
+                        <span><localize key="general_status">Status</localize>:</span>
                         <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
                         <span class="caret"></span>
                     </a>
@@ -167,7 +167,7 @@
                 <!-- Order By -->
                 <div style="position: relative;">
                     <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('orderBy')">
-                        <span><localize key="general_orderBy">Order by</localize>:</span> 
+                        <span><localize key="general_orderBy">Order by</localize>:</span>
                         <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
                         <span class="caret"></span>
                     </a>
@@ -191,20 +191,18 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <a href="" class="umb-user-card" ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)">
-                <div class="umb-user-card__content" ng-class="{'umb-user-card__content--selected': user.selected}">
-                    <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
-                        {{ user.userDisplayState.name }}
-                    </umb-badge>
-                    <div class="umb-user-card__avatar">
-                        <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
-                        </umb-avatar>
+            <div class="umb-user-card" ng-class="{'-selected': user.selected}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user)">
+                <div class="umb-user-card__content">
+                    <div class="umb-user-card__goToUser" ng-click="vm.clickUser(user)">
+                        <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
+                            {{ user.userDisplayState.name }}
+                        </umb-badge>
+                        <div class="umb-user-card__avatar">
+                            <umb-avatar size="l" color="secondary" name="{{user.name}}" img-src="{{user.avatars[2]}}" img-srcset="{{user.avatars[3]}} 2x, {{user.avatars[4]}} 3x">
+                            </umb-avatar>
+                        </div>
+                        <div class="umb-user-card__name">{{user.name}}</div>
                     </div>
-                    <div class="umb-user-card__checkmark" ng-class="{'umb-user-card__checkmark--visible': user.selected || vm.selection.length > 0 }"
-                        ng-click="vm.selectUser(user, vm.selection, $event)">
-                        <umb-checkmark ng-if="!user.isCurrentUser" checked="user.selected" size="s"></umb-checkmark>
-                    </div>
-                    <div class="umb-user-card__name" href="">{{user.name}}</div>
                     <div class="umb-user-card__group">
                         <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                     </div>
@@ -222,7 +220,7 @@
                         </div>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
 
         <!-- Layout: Table -->
@@ -244,9 +242,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
+                    <tr ng-repeat="user in vm.users track by user.key"
+                        ng-click="vm.selectUser(user, vm.selection, $event)"
+                        ng-class="{'--selected': user.selected}"
+                        style="cursor: pointer;"
+                        ng-mouseenter="user.hover = true"
+                        ng-mouseleave="user.hover = false">
                         <td style="padding-left: 10px;">
-                            <div ng-if="!user.isCurrentUser" ng-click="vm.selectUser(user, vm.selection, $event)">
+                            <div ng-if="!user.isCurrentUser">
                                 <umb-checkmark
                                     ng-if="vm.selection.length > 0 || user.hover"
                                     checked="user.selected"
@@ -254,7 +257,7 @@
                                 </umb-checkmark>
                             </div>
                         </td>
-                        <td scope="row">
+                        <td scope="row" ng-click="vm.clickUser(user)">
                             <umb-avatar
                                 size="xs"
                                 color="secondary"
@@ -263,7 +266,7 @@
                                 img-srcset="{{user.avatars[1]}} 2x, {{user.avatars[2]}} 3x">
                             </umb-avatar>
                         </td>
-                        <td class="bold">{{user.name}}</td>
+                        <td class="bold" ng-click="vm.clickUser(user)">{{user.name}}</td>
                         <td><span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span></td>
                         <td>{{ user.formattedLastLogin }}</td>
                         <td style="text-transform: capitalize;">
@@ -331,7 +334,7 @@
                                 <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                                 <span class="help-inline" ng-message="valServerField">{{addUserForm.name.errorMsg}}</span>
                             </span>
-                            
+
                         </umb-control-group>
 
                         <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
@@ -341,7 +344,7 @@
                                 <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                                 <span class="help-inline" ng-message="valServerField">{{addUserForm.username.errorMsg}}</span>
                             </span>
-                            
+
                         </umb-control-group>
 
                         <umb-control-group label="@general_email" label-for="email" required="true">
@@ -355,7 +358,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="@user_usergroup" description="@user_groupsHelp" required="true">
-                            
+
                             <umb-user-group-preview
                                 ng-repeat="group in vm.newUser.userGroups"
                                 icon="group.icon"
@@ -417,18 +420,18 @@
 
     <!-- Create user success -->
     <div ng-if="vm.usersViewState === 'createUserSuccess'">
-        
+
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
                 <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
-        
+
         <div class="flex justify-center">
 
             <umb-box style="max-width: 500px;">
                 <umb-box-content>
-                
+
                     <!-- Success text -->
                     <div class="flex items-center" style="margin-bottom: 15px;">
                         <umb-checkmark
@@ -442,7 +445,7 @@
                     </div>
 
                     <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userCreatedSuccessHelp"></localize></p>
-                    
+
                     <!-- New password -->
                     <div>
                         <label class="bold"><localize key="user_password">Password</localize></label>
@@ -510,7 +513,7 @@
 
             <umb-box style="max-width: 500px;">
                 <umb-box-content>
-                    
+
                 <!-- Success text -->
                 <div class="flex items-center" style="margin-bottom: 15px;">
                     <umb-checkmark
