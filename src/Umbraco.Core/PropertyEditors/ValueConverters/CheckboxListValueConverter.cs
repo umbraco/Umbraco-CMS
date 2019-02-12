@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -8,8 +9,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class CheckboxListValueConverter : PropertyValueConverterBase
     {
-        private static readonly char[] Comma = { ',' };
-
         public override bool IsConverter(PublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.CheckBoxList);
 
@@ -26,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (string.IsNullOrEmpty(sourceString))
                 return Enumerable.Empty<string>();
 
-            return sourceString.Split(Comma, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+            return JsonConvert.DeserializeObject<string[]>(sourceString);
         }
     }
 }
