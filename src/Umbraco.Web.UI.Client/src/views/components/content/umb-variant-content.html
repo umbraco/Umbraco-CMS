@@ -1,19 +1,19 @@
 ﻿<div>
-    <umb-load-indicator 
+    <umb-load-indicator
         ng-if="vm.editor.loading">
     </umb-load-indicator>
 
     <div class="umb-split-view__content" ng-show="!vm.editor.loading">
 
         <ng-form name="contentHeaderForm">
-            <umb-editor-content-header 
+            <umb-editor-content-header
                 menu="vm.page.menu"
                 hide-menu="vm.page.hideActionsMenu"
                 name="vm.editor.content.name"
                 name-disabled="vm.nameDisabled"
-                navigation="vm.editor.content.apps"
+                content="vm.editor.content"
                 on-select-navigation-item="vm.selectApp(item)"
-                variants="vm.editor.content.variants"
+                on-select-anchor-item="vm.selectAppAnchor(item, anchor)"
                 open-variants="vm.openVariants"
                 hide-change-variant="vm.page.hideChangeVariant"
                 show-back-button="vm.page.listViewPath !== null"

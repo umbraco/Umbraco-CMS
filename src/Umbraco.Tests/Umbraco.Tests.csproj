@@ -80,7 +80,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="Castle.Core" Version="4.3.1" />
-    <PackageReference Include="Examine" Version="1.0.0-beta078" />
+    <PackageReference Include="Examine" Version="1.0.0-beta079" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
     </PackageReference>
@@ -126,6 +126,8 @@
     <Compile Include="CoreThings\GuidUtilsTests.cs" />
     <Compile Include="CoreThings\HexEncoderTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Logging\LogviewerTests.cs" />
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />

@@ -124,7 +124,7 @@ namespace Umbraco.Web.Editors
             // When rendering the macro in the backoffice the default setting would be to use the Culture of the logged in user.
             // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
             // to set the current culture to the culture related to the content item. This is hacky but it works.
-            
+
             var culture = publishedContent.GetCulture();
             _variationContextAccessor.VariationContext = new VariationContext(); //must have an active variation context!
             if (culture != null)
@@ -156,7 +156,8 @@ namespace Umbraco.Web.Editors
             {
                 Alias = macroName.ToSafeAlias(),
                 Name = macroName,
-                MacroSource = model.VirtualPath.EnsureStartsWith("~")
+                MacroSource = model.VirtualPath.EnsureStartsWith("~"),
+                MacroType = MacroTypes.PartialView
             };
 
             _macroService.Save(macro); // may throw

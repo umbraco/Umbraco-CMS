@@ -192,10 +192,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             LoadCaches();
 
+            Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
+            int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
+
             if (idkMap != null)
             {
-                idkMap.SetMapper(UmbracoObjectTypes.Document, id => _contentStore.LiveSnapshot.Get(id).Uid, uid => _contentStore.LiveSnapshot.Get(uid).Id);
-                idkMap.SetMapper(UmbracoObjectTypes.Media, id => _mediaStore.LiveSnapshot.Get(id).Uid, uid => _mediaStore.LiveSnapshot.Get(uid).Id);
+                idkMap.SetMapper(UmbracoObjectTypes.Document, id => GetUid(_contentStore, id), uid => GetId(_contentStore, uid));
+                idkMap.SetMapper(UmbracoObjectTypes.Media, id => GetUid(_mediaStore, id), uid => GetId(_mediaStore, uid));
             }
         }
 
