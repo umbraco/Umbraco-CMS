@@ -32,23 +32,11 @@ namespace Umbraco.Web.Install.InstallSteps
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
             var packageId = Convert.ToInt32(previousStep.AdditionalData["packageId"]);
 
-            InstallFiles(packageId);
-            UmbracoApplication.Restart(_httContext);
-
             InstallBusinessLogic(packageId);
+
             UmbracoApplication.Restart(_httContext);
 
             return Task.FromResult<InstallSetupResult>(null);
-        }
-
-        private void InstallFiles(int packageId)
-        {
-            var definition = _packagingService.GetInstalledPackageById(packageId);
-            if (definition == null) throw new InvalidOperationException("Not package definition found with id " + packageId);
-
-            var packageFile = new FileInfo(definition.PackagePath);
-
-            _packagingService.InstallCompiledPackageFiles(definition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(-1));
         }
 
         private void InstallBusinessLogic(int packageId)
@@ -58,7 +46,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var packageFile = new FileInfo(definition.PackagePath);
 
-            _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(-1));
+            _packagingService.InstallCompiledPackageData(definition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
         }
 
         public override bool RequiresExecution(object model)
