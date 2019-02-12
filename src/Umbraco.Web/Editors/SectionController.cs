@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
             
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data
-            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContext, SqlContext, Services, AppCaches, Logger, RuntimeState, _treeService, Umbraco)
+            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContext, SqlContext, Services, AppCaches, Logger, RuntimeState, _treeService, _sectionService, Umbraco)
             {
                 ControllerContext = ControllerContext
             };
