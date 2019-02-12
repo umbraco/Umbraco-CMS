@@ -70,6 +70,8 @@ namespace Umbraco.Web.Install.InstallSteps
             //add an entry to the installedPackages.config
             var compiledPackage = _packageService.GetCompiledPackageInfo(packageFile);
             var packageDefinition = PackageDefinition.FromCompiledPackage(compiledPackage);
+            packageDefinition.PackagePath = packageFile.FullName;
+            
             _packageService.SaveInstalledPackage(packageDefinition);
 
             InstallPackageFiles(packageDefinition, compiledPackage.PackageFile);
