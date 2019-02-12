@@ -629,7 +629,7 @@
                     vm.allowEnableUser = false;
                     vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
-                    console.log("IS CURRENT!")
+                    
                     return false;
                 }
 
