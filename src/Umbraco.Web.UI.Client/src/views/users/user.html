@@ -12,9 +12,9 @@
                                hide-alias="true"
                                navigation="vm.user.navigation">
             </umb-editor-header>
-            
+
             <umb-editor-container>
-                
+
                 <div ng-if="!vm.loading" class="umb-user-details-view-wrapper" style="padding: 0;">
 
                     <umb-editor-sub-views
@@ -42,6 +42,7 @@
 
                     <umb-button type="button"
                                 action="vm.goToPage(vm.breadcrumbs[0])"
+                                button-style="link"
                                 label="Return to list"
                                 label-key="buttons_returnToList"
                                 disabled="vm.loading">

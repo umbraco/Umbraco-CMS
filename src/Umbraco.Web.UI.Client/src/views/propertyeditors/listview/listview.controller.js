@@ -142,7 +142,6 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     $scope.options = {
-        displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: '',

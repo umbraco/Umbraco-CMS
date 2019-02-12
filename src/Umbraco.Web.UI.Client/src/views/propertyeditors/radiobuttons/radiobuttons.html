@@ -3,7 +3,7 @@
         <li ng-repeat="item in configItems track by item.id">
             <label class="radio">
                 <input type="radio" name="{{htmlId}}"
-                       value="{{item.id}}"
+                       value="{{item.value}}"
                        ng-model="model.value" />
                 {{item.value}}
             </label>
