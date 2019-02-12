@@ -10,9 +10,9 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
-    public class RadioButtonAndCheckboxPropertyEditorsMigration : MigrationBase
+    public class RadioAndCheckboxAndDropdownPropertyEditorsMigration : MigrationBase
     {
-        public RadioButtonAndCheckboxPropertyEditorsMigration(IMigrationContext context)
+        public RadioAndCheckboxAndDropdownPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         {
         }
@@ -21,8 +21,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             var refreshCache = false;
 
-            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.RadioButtonList, str => str.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries));
-            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.CheckBoxList, JsonConvert.DeserializeObject<string[]>);
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.RadioButtonList, (dto, configuration) =>  UpdateRadioOrCheckboxPropertyDataDto(dto, configuration, true));
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.CheckBoxList, (dto, configuration) =>  UpdateRadioOrCheckboxPropertyDataDto(dto, configuration, false));
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.DropDownListFlexible, UpdateDropDownPropertyDataDto);
 
             if (refreshCache)
             {
@@ -30,7 +31,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             }
         }
 
-        private bool Migrate(string editorAlias, Func<string, string[]> splitValuesFunc)
+        private bool Migrate(string editorAlias, Func<PropertyDataDto, ValueListConfiguration, bool> updateRadioPropertyDataFunc)
         {
             var refreshCache = false;
             var dataTypes = GetDataTypes(editorAlias);
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
 
                 // update dtos
-                var updatedDtos = propertyDataDtos.Where(x => UpdateRadioPropertyDataDto(x, config, splitValuesFunc));
+                var updatedDtos = propertyDataDtos.Where(x => updateRadioPropertyDataFunc(x, config));
 
                 // persist changes
                 foreach (var propertyDataDto in updatedDtos) Database.Update(propertyDataDto);
@@ -97,16 +98,22 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Database.Update(dataType);
         }
 
-        private bool UpdateRadioPropertyDataDto(PropertyDataDto propData, ValueListConfiguration config,
-            Func<string, string[]> splitValuesFunc)
+        private bool UpdateRadioOrCheckboxPropertyDataDto(PropertyDataDto propData, ValueListConfiguration config, bool singleValue)
         {
             //Get the INT ids stored for this property/drop down
             int[] ids = null;
             if (!propData.VarcharValue.IsNullOrWhiteSpace())
-                ids = ConvertStringValues(propData.VarcharValue, splitValuesFunc);
+            {
+                ids = ConvertStringValues(propData.VarcharValue);
+            }
             else if (!propData.TextValue.IsNullOrWhiteSpace())
-                ids = ConvertStringValues(propData.TextValue, splitValuesFunc);
-            else if (propData.IntegerValue.HasValue) ids = new[] {propData.IntegerValue.Value};
+            {
+                ids = ConvertStringValues(propData.TextValue);
+            }
+            else if (propData.IntegerValue.HasValue)
+            {
+                ids = new[] {propData.IntegerValue.Value};
+            }
 
             //if there are INT ids, convert them to values based on the configuration
             if (ids == null || ids.Length <= 0) return false;
@@ -131,15 +138,30 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             if (!canConvert) return false;
 
             //The radio button only supports selecting a single value, so if there are multiple for some insane reason we can only use the first
-            propData.VarcharValue = values.Count > 0 ? values[0] : string.Empty;
+            propData.VarcharValue = singleValue ? values[0] : JsonConvert.SerializeObject(values);
             propData.TextValue = null;
             propData.IntegerValue = null;
             return true;
         }
 
-        private int[] ConvertStringValues(string val, Func<string, string[]> splitValuesFunc)
+        private bool UpdateDropDownPropertyDataDto(PropertyDataDto propData, ValueListConfiguration config)
         {
-            var splitVals = splitValuesFunc(val);
+            //Get the INT ids stored for this property/drop down
+            var values = propData.VarcharValue.Split(new []{","}, StringSplitOptions.RemoveEmptyEntries);
+
+            //if there are INT ids, convert them to values based on the configuration
+            if (values == null || values.Length <= 0) return false;
+
+            //The radio button only supports selecting a single value, so if there are multiple for some insane reason we can only use the first
+            propData.VarcharValue = JsonConvert.SerializeObject(values);
+            propData.TextValue = null;
+            propData.IntegerValue = null;
+            return true;
+        }
+
+        private int[] ConvertStringValues(string val)
+        {
+            var splitVals = val.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 
             var intVals = splitVals
                 .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)
