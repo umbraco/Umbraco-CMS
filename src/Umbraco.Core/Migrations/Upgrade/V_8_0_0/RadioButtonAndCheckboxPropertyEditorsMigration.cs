@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -18,24 +19,22 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            MigrateRadioButtons();
-            MigrateCheckBoxes();
-        }
-
-        private void MigrateCheckBoxes()
-        {
-            //fixme: complete this
-
-            var dataTypes = GetDataTypes(Constants.PropertyEditors.Aliases.CheckBoxList);
-
-
-        }
-
-        private void MigrateRadioButtons()
-        {
-            var dataTypes = GetDataTypes(Constants.PropertyEditors.Aliases.RadioButtonList);
-
             var refreshCache = false;
+
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.RadioButtonList, str => str.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries));
+            refreshCache |= Migrate(Constants.PropertyEditors.Aliases.CheckBoxList, JsonConvert.DeserializeObject<string[]>);
+
+            if (refreshCache)
+            {
+                //FIXME: trigger cache rebuild. Currently the data in the database tables is wrong.
+            }
+        }
+
+        private bool Migrate(string editorAlias, Func<string, string[]> splitValuesFunc)
+        {
+            var refreshCache = false;
+            var dataTypes = GetDataTypes(editorAlias);
+
             foreach (var dataType in dataTypes)
             {
                 ValueListConfiguration config;
@@ -46,7 +45,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 // parse configuration, and update everything accordingly
                 try
                 {
-                    config = (ValueListConfiguration)new ValueListConfigurationEditor().FromDatabase(
+                    config = (ValueListConfiguration) new ValueListConfigurationEditor().FromDatabase(
                         dataType.Configuration);
                 }
                 catch (Exception ex)
@@ -70,7 +69,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
 
                 // update dtos
-                var updatedDtos = propertyDataDtos.Where(x => UpdatePropertyDataDto(x, config));
+                var updatedDtos = propertyDataDtos.Where(x => UpdateRadioPropertyDataDto(x, config, splitValuesFunc));
 
                 // persist changes
                 foreach (var propertyDataDto in updatedDtos) Database.Update(propertyDataDto);
@@ -79,10 +78,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 refreshCache = true;
             }
 
-            if (refreshCache)
-            {
-                //FIXME: trigger cache rebuild. Currently the data in the database tables is wrong.
-            }
+            return refreshCache;
         }
 
         private List<DataTypeDto> GetDataTypes(string editorAlias)
@@ -101,22 +97,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Database.Update(dataType);
         }
 
-        private bool UpdatePropertyDataDto(PropertyDataDto propData, ValueListConfiguration config)
+        private bool UpdateRadioPropertyDataDto(PropertyDataDto propData, ValueListConfiguration config,
+            Func<string, string[]> splitValuesFunc)
         {
             //Get the INT ids stored for this property/drop down
             int[] ids = null;
             if (!propData.VarcharValue.IsNullOrWhiteSpace())
-            {
-                ids = ConvertStringValues(propData.VarcharValue);
-            }
+                ids = ConvertStringValues(propData.VarcharValue, splitValuesFunc);
             else if (!propData.TextValue.IsNullOrWhiteSpace())
-            {
-                ids = ConvertStringValues(propData.TextValue);
-            }
-            else if (propData.IntegerValue.HasValue)
-            {
-                ids = new[] { propData.IntegerValue.Value };
-            }
+                ids = ConvertStringValues(propData.TextValue, splitValuesFunc);
+            else if (propData.IntegerValue.HasValue) ids = new[] {propData.IntegerValue.Value};
 
             //if there are INT ids, convert them to values based on the configuration
             if (ids == null || ids.Length <= 0) return false;
@@ -147,13 +137,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             return true;
         }
 
-        private class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
+        private int[] ConvertStringValues(string val, Func<string, string[]> splitValuesFunc)
         {
-        }
-
-        private int[] ConvertStringValues(string val)
-        {
-            var splitVals = val.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var splitVals = splitValuesFunc(val);
 
             var intVals = splitVals
                 .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)
@@ -165,6 +151,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 return intVals;
 
             return null;
+        }
+
+        private class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
+        {
         }
     }
 }

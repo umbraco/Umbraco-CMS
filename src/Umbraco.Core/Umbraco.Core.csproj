@@ -367,7 +367,6 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\CheckBoxListPropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddUserLoginDtoDateIndex.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\ConvertRelatedLinksToMultiUrlPicker.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentTypeIsElementColumn.cs" />
