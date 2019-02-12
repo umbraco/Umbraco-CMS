@@ -622,14 +622,14 @@
                     return;
                 }
                 
-                console.log("CHECK")
+                
                 // if the current user is selected prevent any bulk actions with the user included
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
                     vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
-                    console.log("IS CURRENT!")
+                    
                     return false;
                 }
 
