@@ -17,6 +17,7 @@ function contentCreateController($scope,
   var mainCulture = $routeParams.mculture ? $routeParams.mculture : null;
 
   function initialize() {
+    $scope.allowedTypes = null;
     contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
       $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
@@ -80,7 +81,13 @@ function contentCreateController($scope,
   $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
   $scope.createFromBlueprint = createFromBlueprint;
 
-  initialize();
+  // the current node changes behind the scenes when the context menu is clicked without closing 
+  // the default menu first, so we must watch the current node and re-initialize accordingly
+  var unbindModelWatcher = $scope.$watch("currentNode", initialize);
+  $scope.$on('$destroy', function () {
+    unbindModelWatcher();
+  });
+
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Content.CreateController", contentCreateController);
