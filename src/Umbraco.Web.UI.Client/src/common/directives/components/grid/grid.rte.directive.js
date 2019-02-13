@@ -13,6 +13,10 @@ angular.module("umbraco.directives")
                 // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
                 var promises = [];
+                
+                var d = new Date();
+                var n = d.getTime();
+                scope.textAreaHtmlId = scope.uniqueId + "_" + n + "_rte";
 
                 //queue file loading
                 if (typeof (tinymce) === "undefined") {
@@ -28,7 +32,7 @@ angular.module("umbraco.directives")
                 var tinyMceEditor = null;
 
                 promises.push(tinyMceService.getTinyMceEditorConfig({
-                    htmlId: scope.uniqueId,
+                    htmlId: scope.textAreaHtmlId,
                     stylesheets: scope.configuration ? scope.configuration.stylesheets : null,
                     toolbar: toolbar,
                     mode: scope.configuration.mode
@@ -132,17 +136,11 @@ angular.module("umbraco.directives")
                         }
 
                     });
-
-                    //listen for formSubmitting event (the result is callback used to remove the event subscription)
-                    var formSubmittingListener = scope.$on("formSubmitting", function () {
-                        scope.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
-                    });
-
+                    
                     //when the element is disposed we need to unsubscribe!
                     // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                     // element might still be there even after the modal has been hidden.
                     scope.$on('$destroy', function () {
-                        formSubmittingListener();
                         eventsService.unsubscribe(tabShownListener);
                         //ensure we unbind this in case the blur doesn't fire above
                         $('.umb-panel-body').off('scroll', pinToolbar);
