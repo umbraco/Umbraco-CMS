@@ -13,12 +13,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class RadioAndCheckboxAndDropdownPropertyEditorsMigration : MigrationBase
     {
-        private readonly IMigrationContext _context;
-
         public RadioAndCheckboxAndDropdownPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         {
-            _context = context;
         }
 
         public override void Migrate()
@@ -31,7 +28,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (refreshCache)
             {
-                _context.AddPostMigration<RebuildPublishedSnapshot>();
+                Context.AddPostMigration<RebuildPublishedSnapshot>();
             }
         }
 
