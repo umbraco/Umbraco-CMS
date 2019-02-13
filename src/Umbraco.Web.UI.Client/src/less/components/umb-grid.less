@@ -128,9 +128,10 @@
     position: relative;
     margin-bottom: 40px;
     padding-top: 10px;
+    border: 1px solid @grayLighter;
 
     &:hover {
-        background-color: @grayLighter;
+        border-color: @grayLight;
     }
 
     &[ng-click],
@@ -161,15 +162,16 @@
 }
 
 .umb-grid .umb-row .umb-cell-placeholder {
-    min-height: 130px;
-    background-color: @gray-10;
-    border-width: 2px;
+    min-height: 88px;
+    border-width: 1px;
     border-style: dashed;
-    border-color: @gray-8;
+    border-color: @ui-action-disgrete-border;
+    color: @ui-action-disgrete-type;
     transition: border-color 100ms linear;
 
     &:hover {
-        border-color: @blueMid;
+        border-color: @ui-action-disgrete-border-hover;
+        color: @ui-action-disgrete-type-hover;
         cursor: pointer;
     }
 }
@@ -207,9 +209,9 @@
 }
 
 .umb-grid .cell-tools-add {
-    color: @ui-action-type;
+    color: @ui-action-disgrete-type;
     &:focus, &:hover {
-        color: @ui-action-type-hover;
+        color: @ui-action-disgrete-type-hover;
         text-decoration: none;
     }
 }
@@ -219,16 +221,18 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: @ui-action-type;
+    color: @ui-action-disgrete-type;
 }
 
 .umb-grid .cell-tools-add.-bar {
     display: block;
-    background: @gray-10;
     text-align: center;
     padding: 5px;
-    border: 1px dashed @gray-7;
+    border: 1px dashed @ui-action-disgrete-border;
     margin: 10px;
+    &:focus, &:hover {
+        border-color: @ui-action-disgrete-border-hover;
+    }
 }
 
 
@@ -249,7 +253,6 @@
 
 .umb-grid .cell-tools-edit {
     display: inline-block;
-    color: @white;
 }
 
 .umb-grid .drop-overlay {
@@ -412,12 +415,12 @@
 
 // Row states
 .umb-grid .umb-row.-active {
-    background-color: @ui-action-type;
+    border-color: @ui-action-type;
 
     .umb-row-title-bar {
         cursor: move;
     }
-
+    /*
     .row-tool,
     .umb-row-title {
         color: @white;
@@ -436,12 +439,13 @@
     .umb-cell .umb-cell-content {
         border-color: transparent;
     }
+    */
 }
 
 
 .umb-grid .umb-row.-active-child {
     background-color: @gray-10;
-
+    
     .umb-row-title-bar {
         cursor: inherit;
     }
@@ -449,7 +453,7 @@
     .umb-row-title {
         color: @gray-3;
     }
-
+    /*
     .row-tool {
         color: fade(@black, 23);
     }
@@ -465,6 +469,7 @@
             border-color: fade(@gray, 44);
         }
     }
+    */
 }
 
 

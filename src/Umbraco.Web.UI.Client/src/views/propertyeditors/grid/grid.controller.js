@@ -14,11 +14,16 @@ angular.module("umbraco")
         // Grid status variables
         var placeHolder = "";
         var currentForm = angularHelper.getCurrentForm($scope);
-
+        
+        $scope.currentRowWithActiveChild = null;
+        $scope.currentCellWithActiveChild = null;
+        $scope.active = null;
+        
         $scope.currentRow = null;
         $scope.currentCell = null;
         $scope.currentToolsControl = null;
         $scope.currentControl = null;
+        
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
         $scope.showRowConfigurations = true;
@@ -235,10 +240,16 @@ angular.module("umbraco")
                 }, 500, false);
 
                 $scope.$apply(function () {
-
+                    
+                    console.log("$apply function called...")
+                    
                     var cell = $(e.target).scope().area;
-                    cell.hasActiveChild = hasActiveChild(cell, cell.controls);
-                    cell.active = false;
+                    
+                    if(hasActiveChild(cell, cell.controls)) {
+                        $scope.currentCellWithActiveChild = cell;
+                    }
+                    $scope.active = cell;
+                    
                 });
             }
 
@@ -307,12 +318,13 @@ angular.module("umbraco")
         // Row management function
         // *********************************************
 
-        $scope.clickRow = function(index, rows) {
-            rows[index].active = true;
-        };
-
-        $scope.clickOutsideRow = function(index, rows) {
-            rows[index].active = false;
+        $scope.clickRow = function(index, rows, $event) {
+            console.log("clickRow")
+            //rows[index].active = true;
+            $scope.currentRowWithActiveChild = null;
+            $scope.active = rows[index];
+            
+            $event.stopPropagation();
         };
 
         function getAllowedLayouts(section) {
@@ -359,6 +371,7 @@ angular.module("umbraco")
             if (section.rows.length > 0) {
                 section.rows.splice($index, 1);
                 $scope.currentRow = null;
+                $scope.currentRowWithActiveChild = null;
                 $scope.openRTEToolbarId = null;
                 currentForm.$setDirty();
             }
@@ -513,14 +526,13 @@ angular.module("umbraco")
         // Area management functions
         // *********************************************
 
-        $scope.clickCell = function(index, cells, row) {
-            cells[index].active = true;
-            row.hasActiveChild = true;
-        };
-
-        $scope.clickOutsideCell = function(index, cells, row) {
-            cells[index].active = false;
-            row.hasActiveChild = hasActiveChild(row, cells);
+        $scope.clickCell = function(index, cells, row, $event) {
+            
+            $scope.currentCellWithActiveChild = null;
+            
+            $scope.active = cells[index];
+            $scope.currentRowWithActiveChild = row;
+            $event.stopPropagation();
         };
 
         $scope.cellPreview = function (cell) {
@@ -536,14 +548,14 @@ angular.module("umbraco")
         // *********************************************
         // Control management functions
         // *********************************************
-        $scope.clickControl = function (index, controls, cell) {
-            controls[index].active = true;
-            cell.hasActiveChild = true;
-        };
-
-        $scope.clickOutsideControl = function (index, controls, cell) {
-            controls[index].active = false;
-            cell.hasActiveChild = hasActiveChild(cell, controls);
+        $scope.clickControl = function (index, controls, cell, $event) {
+            
+            console.log("clickControl");
+            
+            $scope.active = controls[index];
+            $scope.currentCellWithActiveChild = cell;
+            
+            $event.stopPropagation();
         };
 
         function hasActiveChild(item, children) {
@@ -594,8 +606,8 @@ angular.module("umbraco")
             if (index === undefined) {
                 index = cell.controls.length;
             }
-
-            newControl.active = true;
+            
+            $scope.active = newControl;
 
             //populate control
             $scope.initControl(newControl, index + 1);
