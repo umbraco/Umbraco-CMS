@@ -981,14 +981,12 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Domyślny szablon</key>
-    <key alias="dictionary editor egenskab">Klucz słownika</key>
     <key alias="importDocumentTypeHelp">By zaimportować typ dokumentu, wskaż plik ".udt" na swoim komputerze, klikając przycisk "Przeglądaj" i kliknij "Importuj" (zostaniesz poproszony o potwierdzenie w następnym kroku)</key>
     <key alias="newtabname">Nazwa nowej zakładki</key>
     <key alias="nodetype">Typ węzła</key>
     <key alias="objecttype">Typ</key>
     <key alias="stylesheet">Arkusz styli</key>
     <key alias="script">Skrypt</key>
-    <key alias="stylesheet editor egenskab">Właściwości arkusza styli</key>
     <key alias="tab">Zakładka</key>
     <key alias="tabname">Nazwa zakładki</key>
     <key alias="tabs">Zakładki</key>

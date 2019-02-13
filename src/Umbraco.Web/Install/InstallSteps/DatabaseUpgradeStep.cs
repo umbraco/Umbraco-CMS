@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Migrations;
+using Umbraco.Web.Migrations.PostMigrations;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -34,7 +37,10 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var result = _databaseBuilder.UpgradeSchemaAndData();
+                var plan = new UmbracoPlan();
+                plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
+
+                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
                 if (result.Success == false)
                 {

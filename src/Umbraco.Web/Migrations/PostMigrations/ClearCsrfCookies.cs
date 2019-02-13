@@ -1,21 +1,16 @@
 ﻿using System.Web;
-using Semver;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Scoping;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.Web.Migrations
+namespace Umbraco.Web.Migrations.PostMigrations
 {
     /// <summary>
-    /// After upgrade we clear out the csrf tokens
+    /// Clears Csrf tokens.
     /// </summary>
-    public class ClearCsrfCookiesAfterUpgrade : IPostMigration
+    public class ClearCsrfCookies : IMigration
     {
-        public void Execute(string name, IScope scope, SemVersion originVersion, SemVersion targetVersion, ILogger logger)
+        public void Migrate()
         {
-            if (name != Constants.System.UmbracoUpgradePlanName) return;
             if (HttpContext.Current == null) return;
 
             var http = new HttpContextWrapper(HttpContext.Current);

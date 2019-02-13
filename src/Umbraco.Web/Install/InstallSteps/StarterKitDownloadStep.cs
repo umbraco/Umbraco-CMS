@@ -70,20 +70,18 @@ namespace Umbraco.Web.Install.InstallSteps
             //add an entry to the installedPackages.config
             var compiledPackage = _packageService.GetCompiledPackageInfo(packageFile);
             var packageDefinition = PackageDefinition.FromCompiledPackage(compiledPackage);
+            packageDefinition.PackagePath = packageFile.FullName;
+            
             _packageService.SaveInstalledPackage(packageDefinition);
 
-            InstallPackageFiles(packageDefinition, compiledPackage.PackageFile);
+            _packageService.InstallCompiledPackageFiles(packageDefinition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(-1));
 
             return (compiledPackage.PackageFile.Name, packageDefinition.Id);
         }
 
-        private void InstallPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-
-            _packageService.InstallCompiledPackageData(packageDefinition, packageFile, _umbracoContext.Security.GetUserId().ResultOr(0));
-        }
-
+        /// <summary>
+        /// Don't show the view if there's already packages installed
+        /// </summary>
         public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;
 
         public override bool RequiresExecution(Guid? model)
@@ -94,6 +92,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
+            //Don't continue if there's already packages installed
             if (_packageService.GetAllInstalledPackages().Any())
                 return false;
 
