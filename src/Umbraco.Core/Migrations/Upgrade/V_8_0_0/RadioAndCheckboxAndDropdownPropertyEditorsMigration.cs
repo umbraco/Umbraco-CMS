@@ -53,7 +53,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     Logger.Error<DropDownPropertyEditorsMigration>(
                         ex,
-                        "Invalid radio button configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
+                        "Invalid property editor configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
                         dataType.Configuration);
 
                     continue;
