@@ -307,7 +307,7 @@ namespace Umbraco.Core.Services.Implement
                     summary.Append("<table style=\"width: 100 %; \">");
                     foreach (var p in content.Properties)
                     {
-                        //todo doesn't take into account variants
+                        // TODO: doesn't take into account variants
 
                         var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
                         var oldText = newText;
@@ -345,8 +345,8 @@ namespace Umbraco.Core.Services.Implement
                 {
                     //Create the HTML based summary (ul of culture names)
 
-                    var culturesChanged = content.CultureInfos.Where(x => x.Value.WasDirty())
-                        .Select(x => x.Key)
+                    var culturesChanged = content.CultureInfos.Values.Where(x => x.WasDirty())
+                        .Select(x => x.Culture)
                         .Select(_localizationService.GetLanguageByIsoCode)
                         .WhereNotNull()
                         .Select(x => x.CultureName);
@@ -363,8 +363,8 @@ namespace Umbraco.Core.Services.Implement
                 {
                     //Create the text based summary (csv of culture names)
 
-                    var culturesChanged = string.Join(", ", content.CultureInfos.Where(x => x.Value.WasDirty())
-                        .Select(x => x.Key)
+                    var culturesChanged = string.Join(", ", content.CultureInfos.Values.Where(x => x.WasDirty())
+                        .Select(x => x.Culture)
                         .Select(_localizationService.GetLanguageByIsoCode)
                         .WhereNotNull()
                         .Select(x => x.CultureName));
@@ -394,7 +394,7 @@ namespace Umbraco.Core.Services.Implement
                 content.Id.ToString(CultureInfo.InvariantCulture),
                 string.Format("{2}://{0}/{1}",
                     string.Concat(siteUri.Authority),
-                    //TODO: RE-enable this so we can have a nice url
+                    // TODO: RE-enable this so we can have a nice url
                     /*umbraco.library.NiceUrl(documentObject.Id))*/
                     string.Concat(content.Id, ".aspx"),
                     protocol),

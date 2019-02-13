@@ -196,7 +196,7 @@ namespace Umbraco.Web.Cache
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
 
-        // todo our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
         private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
         private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
@@ -267,7 +267,7 @@ namespace Umbraco.Web.Cache
         #region LocalizationService / Language
 
         /// <summary>
-        /// Fires when a langauge is deleted
+        /// Fires when a language is deleted
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -278,7 +278,7 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Fires when a langauge is saved
+        /// Fires when a language is saved
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -307,7 +307,7 @@ namespace Umbraco.Web.Cache
             _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
         }
 
-        // todo our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
         private void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
         private void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
@@ -321,7 +321,7 @@ namespace Umbraco.Web.Cache
 
         private void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
         {
-            //TODO: Not sure if we need this yet depends if we start caching permissions
+            // TODO: Not sure if we need this yet depends if we start caching permissions
             //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
             //foreach (var groupId in groupIds)
             //{
@@ -379,7 +379,7 @@ namespace Umbraco.Web.Cache
                 _distributedCache.RefreshTemplateCache(entity.Id);
         }
 
-        // todo our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e) { }
         private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e) { }
 
@@ -408,7 +408,7 @@ namespace Umbraco.Web.Cache
             _distributedCache.RefreshMediaCache(args.Changes.ToArray());
         }
 
-        // todo our weird events handling wants this for now
+        // TODO: our weird events handling wants this for now
         private void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
         private void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
         private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }

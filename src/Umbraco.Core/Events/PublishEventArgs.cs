@@ -10,12 +10,10 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <param name="eventObject"></param>
         /// <param name="canCancel"></param>
-        /// <param name="isAllPublished"></param>
         /// <param name="eventMessages"></param>
-        public PublishEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, bool isAllPublished, EventMessages eventMessages)
+        public PublishEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, EventMessages eventMessages)
             : base(eventObject, canCancel, eventMessages)
         {
-            IsAllRepublished = isAllPublished;
         }
 
         /// <summary>
@@ -43,12 +41,10 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <param name="eventObject"></param>
         /// <param name="canCancel"></param>
-        /// <param name="isAllPublished"></param>
         /// <param name="eventMessages"></param>
-        public PublishEventArgs(TEntity eventObject, bool canCancel, bool isAllPublished, EventMessages eventMessages)
+        public PublishEventArgs(TEntity eventObject, bool canCancel, EventMessages eventMessages)
             : base(new List<TEntity> { eventObject }, canCancel, eventMessages)
         {
-            IsAllRepublished = isAllPublished;
         }
 
         /// <summary>
@@ -60,7 +56,6 @@ namespace Umbraco.Core.Events
         public PublishEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, bool isAllPublished)
             : base(eventObject, canCancel)
         {
-            IsAllRepublished = isAllPublished;
         }
 
         /// <summary>
@@ -90,24 +85,18 @@ namespace Umbraco.Core.Events
         public PublishEventArgs(TEntity eventObject, bool canCancel, bool isAllPublished)
             : base(new List<TEntity> { eventObject }, canCancel)
         {
-            IsAllRepublished = isAllPublished;
         }
 
         /// <summary>
         /// Returns all entities that were published during the operation
         /// </summary>
-        public IEnumerable<TEntity> PublishedEntities
-        {
-            get { return EventObject; }
-        }
-
-        public bool IsAllRepublished { get; private set; }
+        public IEnumerable<TEntity> PublishedEntities => EventObject;
 
         public bool Equals(PublishEventArgs<TEntity> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && IsAllRepublished == other.IsAllRepublished;
+            return base.Equals(other);
         }
 
         public override bool Equals(object obj)
@@ -122,7 +111,7 @@ namespace Umbraco.Core.Events
         {
             unchecked
             {
-                return (base.GetHashCode() * 397) ^ IsAllRepublished.GetHashCode();
+                return (base.GetHashCode() * 397);
             }
         }
 

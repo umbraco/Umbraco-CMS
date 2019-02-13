@@ -62,18 +62,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ApplyOrdering(ref sql, ordering);
             }
 
-            //todo - we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
+            // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
             //no matter what we always must have node id ordered at the end
             sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
 
             var page = Database.Page<BaseDto>(pageIndex + 1, pageSize, sql);
             var dtos = page.Items;
             var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
-            
+
             if (isContent)
                 BuildVariants(entities.Cast<DocumentEntitySlim>());
 
-            //todo - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+            // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
             if (isMedia)
                 BuildProperties(entities, dtos);
 
@@ -166,7 +166,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var entities = dtos.Select(x => BuildEntity(false, isMedia, x)).ToArray();
 
-            //todo- see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+            // TODO: See https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
             if (isMedia && loadMediaProperties)
                 BuildProperties(entities, dtos);
 
@@ -198,7 +198,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
-            var sql = Sql().Select<NodeDto>(x => x.NodeId, x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
+            // NodeId is named Id on TreeEntityPath = use an alias
+            var sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
             filter?.Invoke(sql);
             return Database.Fetch<TreeEntityPath>(sql);
         }
@@ -227,7 +228,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetEntities(sql, isContent, isMedia, true);
         }
 
-        //todo- see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+        // TODO: See https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         internal IEnumerable<IEntitySlim> GetMediaByQueryWithoutPropertyData(IQuery<IUmbracoEntity> query)
         {
             var isContent = false;
@@ -266,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
-        //todo - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+        // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         private void BuildProperties(EntitySlim entity, BaseDto dto)
         {
             var pdtos = Database.Fetch<PropertyDataDto>(GetPropertyData(dto.VersionId));
@@ -274,7 +275,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 BuildProperty(entity, pdto);
         }
 
-        //todo - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+        // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         private void BuildProperties(EntitySlim[] entities, List<BaseDto> dtos)
         {
             var versionIds = dtos.Select(x => x.VersionId).Distinct().ToList();
@@ -290,7 +291,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        //todo - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+        // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         private void BuildProperty(EntitySlim entity, PropertyDataDto pdto)
         {
             // explain ?!
@@ -405,7 +406,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
                 .OrderBy<PropertyDataDto>(x => x.VersionId);
-        }      
+        }
 
         // gets the base SELECT + FROM [+ filter] sql
         // always from the 'current' content version
@@ -539,7 +540,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-            //todo - although this works for name, it probably doesn't work for others without an alias of some sort
+            // TODO: although this works for name, it probably doesn't work for others without an alias of some sort
             var orderBy = ordering.OrderBy;
 
             if (ordering.Direction == Direction.Ascending)

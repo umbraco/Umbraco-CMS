@@ -164,6 +164,13 @@ app.config(function ($routeProvider) {
                     return;
                 }
 
+                //special case for the users section
+                var usersPages = ["user", "group"];
+                if ($routeParams.section.toLowerCase() === "users" && $routeParams.tree.toLowerCase() === "users" && usersPages.indexOf($routeParams.method.toLowerCase()) === -1) {
+                    $scope.templateUrl = "views/users/overview.html";
+                    return;
+                }
+
                 // Here we need to figure out if this route is for a user's package tree and if so then we need
                 // to change it's convention view path to:
                 // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html

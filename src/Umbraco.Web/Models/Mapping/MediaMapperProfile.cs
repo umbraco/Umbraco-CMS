@@ -16,8 +16,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MediaMapperProfile : Profile
     {
-        public MediaMapperProfile(
-            TabsAndPropertiesResolver<IMedia, MediaItemDisplay> tabsAndPropertiesResolver,
+        public MediaMapperProfile(TabsAndPropertiesResolver<IMedia, MediaItemDisplay> tabsAndPropertiesResolver,
             ContentTreeNodeUrlResolver<IMedia, MediaTreeController> contentTreeNodeUrlResolver,
             MediaAppResolver mediaAppResolver,
             IUserService userService,
@@ -25,47 +24,48 @@ namespace Umbraco.Web.Models.Mapping
             IDataTypeService dataTypeService,
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
-            ILogger logger)
+            ILogger logger,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             // create, capture, cache
             var mediaOwnerResolver = new OwnerResolver<IMedia>(userService);
             var childOfListViewResolver = new MediaChildOfListViewResolver(mediaService, mediaTypeService);
-            var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>();
+            var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>(contentTypeBaseServiceProvider);
 
             //FROM IMedia TO MediaItemDisplay
             CreateMap<IMedia, MediaItemDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Media, content.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => mediaOwnerResolver.Resolve(src)))
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => mediaOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(content => content.ContentType.Icon))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(content => content.ContentType.Alias))
-                .ForMember(dest => dest.IsChildOfListView, opt => opt.ResolveUsing(childOfListViewResolver))
+                .ForMember(dest => dest.IsChildOfListView, opt => opt.MapFrom(childOfListViewResolver))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(content => content.Trashed))
                 .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(content => content.ContentType.Name))
                 .ForMember(dest => dest.Properties, opt => opt.Ignore())
-                .ForMember(dest => dest.TreeNodeUrl, opt => opt.ResolveUsing(contentTreeNodeUrlResolver))
+                .ForMember(dest => dest.TreeNodeUrl, opt => opt.MapFrom(contentTreeNodeUrlResolver))
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Errors, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.UseValue<ContentSavedState?>(null))
+                .ForMember(dest => dest.State, opt => opt.MapFrom<ContentSavedState?>(_ => null))
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
-                .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver))
+                .ForMember(dest => dest.Tabs, opt => opt.MapFrom(tabsAndPropertiesResolver))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.ContentType, opt => opt.ResolveUsing(mediaTypeBasicResolver))
-                .ForMember(dest => dest.MediaLink, opt => opt.ResolveUsing(content => string.Join(",", content.GetUrls(Current.Configs.Settings().Content, logger))))
-                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver))
+                .ForMember(dest => dest.ContentType, opt => opt.MapFrom(mediaTypeBasicResolver))
+                .ForMember(dest => dest.MediaLink, opt => opt.MapFrom(content => string.Join(",", content.GetUrls(Current.Configs.Settings().Content, logger))))
+                .ForMember(dest => dest.ContentApps, opt => opt.MapFrom(mediaAppResolver))
                 .ForMember(dest => dest.VariesByCulture, opt => opt.MapFrom(src => src.ContentType.VariesByCulture()));
 
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic>>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Media, src.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => mediaOwnerResolver.Resolve(src)))
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => mediaOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
-                .ForMember(dest => dest.State, opt => opt.UseValue<ContentSavedState?>(null))
+                .ForMember(dest => dest.State, opt => opt.MapFrom<ContentSavedState?>(_ => null))
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IMedia TO ContentItemDto<IMedia>
             CreateMap<IMedia, ContentPropertyCollectionDto>();
             //.ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Media, src.Key)))
-            //.ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => mediaOwnerResolver.Resolve(src)))
+            //.ForMember(dest => dest.Owner, opt => opt.MapFrom(src => mediaOwnerResolver.Resolve(src)))
             //.ForMember(dest => dest.Published, opt => opt.Ignore())
             //.ForMember(dest => dest.Edited, opt => opt.Ignore())
             //.ForMember(dest => dest.Updater, opt => opt.Ignore())

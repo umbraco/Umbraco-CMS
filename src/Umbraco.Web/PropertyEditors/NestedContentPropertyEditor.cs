@@ -172,18 +172,16 @@ namespace Umbraco.Web.PropertyEditors
                             try
                             {
                                 // create a temp property with the value
+                                // - force it to be culture invariant as NC can't handle culture variant element properties
+                                propType.Variations = ContentVariation.Nothing;
                                 var tempProp = new Property(propType);
-                                // if the property varies by culture, make sure we save using the current culture
-                                var propCulture = propType.VariesByCulture() || propType.VariesByCultureAndSegment()
-                                    ? culture
-                                    : null;
-                                tempProp.SetValue(propValues[propAlias] == null ? null : propValues[propAlias].ToString(), propCulture);
+                                tempProp.SetValue(propValues[propAlias] == null ? null : propValues[propAlias].ToString());
 
                                 // convert that temp property, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ToEditor(tempProp, dataTypeService, propCulture);
+                                var convValue = valEditor.ToEditor(tempProp, dataTypeService);
                                 propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
                             }
                             catch (InvalidOperationException)

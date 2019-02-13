@@ -19,7 +19,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
@@ -30,6 +29,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.TestHelpers
@@ -102,10 +102,10 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             var profilingLogger = Factory.TryGetInstance<IProfilingLogger>();
-            var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // fixme move that one up
+            var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // FIXME: move that one up
             try
             {
-                // fixme - should we first kill all scopes?
+                // FIXME: should we first kill all scopes?
                 if (Options.Database == UmbracoTestOptions.Database.NewSchemaPerTest)
                     RemoveDatabaseFile();
 
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Create database."))
             {
-                CreateSqlCeDatabase(); // todo faster!
+                CreateSqlCeDatabase(); // TODO: faster!
             }
 
             // ensure the configuration matches the current version for tests
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.TestHelpers
 
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Initialize database."))
             {
-                InitializeDatabase(); // todo faster!
+                InitializeDatabase(); // TODO: faster!
             }
         }
 
@@ -229,7 +229,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected IPublishedSnapshotService PublishedSnapshotService { get; set; }
 
-        protected override void Initialize() // fixme - should NOT be here!
+        protected override void Initialize() // FIXME: should NOT be here!
         {
             base.Initialize();
 
@@ -264,6 +264,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IPublishedContentTypeFactory>(),
                 ScopeProvider,
                 cache, publishedSnapshotAccessor, variationContextAccessor,
+                Factory.GetInstance<IUmbracoContextAccessor>(),
                 Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
                 Logger,
@@ -306,6 +307,13 @@ namespace Umbraco.Tests.TestHelpers
                     var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
+
+                    //Special case, we need to create the xml cache tables manually since they are not part of the default
+                    //setup.
+                    //TODO: Remove this when we update all tests to use nucache
+                    schemaHelper.CreateTable<ContentXmlDto>();
+                    schemaHelper.CreateTable<PreviewXmlDto>();
+
                     scope.Complete();
                 }
 
@@ -313,7 +321,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        // fixme is this needed?
+        // FIXME: is this needed?
         private void CloseDbConnections(IUmbracoDatabase database)
         {
             //Ensure that any database connections from a previous test is disposed.

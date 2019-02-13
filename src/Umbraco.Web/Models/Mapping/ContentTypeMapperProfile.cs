@@ -134,6 +134,10 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
+            CreateMap<IContentTypeComposition, ContentTypeBasic>()
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
+                .ForMember(dest => dest.Blueprints, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
             CreateMap<IMemberType, ContentTypeBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(source => Udi.Create(Constants.UdiEntityType.MemberType, source.Key)))
                 .ForMember(dest => dest.Blueprints, opt => opt.Ignore())
@@ -149,7 +153,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<PropertyTypeBasic, PropertyType>()
 
-                .ConstructUsing(propertyTypeBasic =>
+                .ConstructUsing((propertyTypeBasic, context) =>
                 {
                     var dataType = dataTypeService.GetDataType(propertyTypeBasic.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
@@ -164,7 +168,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
                 .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
 
-                .ForMember(dto => dto.Variations, opt => opt.ResolveUsing<PropertyTypeVariationsResolver>())
+                .ForMember(dto => dto.Variations, opt => opt.MapFrom<PropertyTypeVariationsResolver>())
 
                 //only map if it is actually set
                 .ForMember(dest => dest.Id, opt => opt.Condition(source => source.Id > 0))

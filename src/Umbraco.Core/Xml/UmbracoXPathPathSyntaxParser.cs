@@ -31,7 +31,7 @@ namespace Umbraco.Core.Xml
             Func<int, bool> publishedContentExists)
         {
 
-            //TODO: This should probably support some of the old syntax and token replacements, currently
+            // TODO: This should probably support some of the old syntax and token replacements, currently
             // it does not, there is a ticket raised here about it: http://issues.umbraco.org/issue/U4-6364
             // previous tokens were: "$currentPage", "$ancestorOrSelf", "$parentPage" and I believe they were
             // allowed 'inline', not just at the beginning... whether or not we want to support that is up
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Xml
                 });
             }
 
-            //TODO: This used to just replace $root with string.Empty BUT, that would never work
+            // TODO: This used to just replace $root with string.Empty BUT, that would never work
             // the root is always "/root . Need to confirm with Per why this was string.Empty before!
             vars.Add("$root", q => q.Replace("$root", "/root"));
 

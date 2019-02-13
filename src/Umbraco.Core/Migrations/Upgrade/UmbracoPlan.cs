@@ -36,8 +36,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             get
             {
                 // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
-                    throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
+                if (!SemVersion.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus], out var currentVersion))
+                    throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
                 // we currently support upgrading from 7.10.0 and later
                 if (currentVersion < new SemVersion(7, 10))
@@ -124,7 +124,16 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<MakeRedirectUrlVariant>("{64EBCE53-E1F0-463A-B40B-E98EFCCA8AE2}");
             To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
             To<UpdateMemberGroupPickerData>("{8A027815-D5CD-4872-8B88-9A51AB5986A6}"); // from 7.14.0
-
+            To<ConvertRelatedLinksToMultiUrlPicker>("{ED28B66A-E248-4D94-8CDB-9BDF574023F0}");
+            To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
+            To<RenameUmbracoDomainsTable>("{6017F044-8E70-4E10-B2A3-336949692ADD}");
+            To<AddUserLoginDtoDateIndex>("{98339BEF-E4B2-48A8-B9D1-D173DC842BBE}");
+            
+            Merge()
+                .To<DropXmlTables>("{CDBEDEE4-9496-4903-9CF2-4104E00FF960}")
+            .With()
+                .To<RadioAndCheckboxAndDropdownPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
+            .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             //FINAL
 

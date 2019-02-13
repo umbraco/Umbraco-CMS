@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var baseQuery = GetBaseQuery(false);
 
-            // todo why is this different from content/media?!
+            // TODO: why is this different from content/media?!
             // check if the query is based on properties or not
 
             var wheres = query.GetWhereClauses();
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = SqlContext.Sql();
 
-            switch (queryType) // todo pretend we still need these queries for now
+            switch (queryType) // TODO: pretend we still need these queries for now
             {
                 case QueryType.Count:
                     sql = sql.SelectCount();
@@ -143,18 +143,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return sql;
         }
 
-        // todo - move that one up to Versionable! or better: kill it!
+        // TODO: move that one up to Versionable! or better: kill it!
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        protected override string GetBaseWhereClause() // todo - can we kill / refactor this?
+        protected override string GetBaseWhereClause() // TODO: can we kill / refactor this?
         {
             return "umbracoNode.id = @id";
         }
 
-        // todo document/understand that one
+        // TODO: document/understand that one
         protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData()
         {
             return Sql()
@@ -188,7 +188,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
                 "DELETE FROM cmsMember WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM cmsContentXml WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
                 "DELETE FROM umbracoNode WHERE id = @id"
             };
@@ -237,7 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             member.AddingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
-            // todo - do we really want to keep doing this here?
+            // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
@@ -329,7 +328,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             member.UpdatingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
-            // todo - do we really want to keep doing this here?
+            // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // if parent has changed, get path, level and sort order
@@ -460,7 +459,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var subQuery = Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
 
             var sql = GetBaseQuery(false)
-                //TODO: An inner join would be better, though I've read that the query optimizer will always turn a
+                // TODO: An inner join would be better, though I've read that the query optimizer will always turn a
                 // subquery with an IN clause into an inner join anyways.
                 .Append("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments)
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)

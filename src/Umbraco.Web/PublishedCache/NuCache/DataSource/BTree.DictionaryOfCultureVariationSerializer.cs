@@ -36,7 +36,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // write each variation
             foreach (var (culture, variation) in variations)
             {
-                // todo - it's weird we're dealing with cultures here, and languageId in properties
+                // TODO: it's weird we're dealing with cultures here, and languageId in properties
 
                 PrimitiveSerializer.String.WriteTo(culture, stream); // should never be null
                 WriteObject(variation.Name, stream); // write an object in case it's null (though... should not happen)

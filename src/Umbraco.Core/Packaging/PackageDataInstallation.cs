@@ -100,10 +100,10 @@ namespace Umbraco.Core.Packaging
             //Order the DocumentTypes before removing them
             if (contentTypes.Any())
             {
-                //TODO: I don't think this ordering is necessary
+                // TODO: I don't think this ordering is necessary
                 var orderedTypes = (from contentType in contentTypes
-                                   orderby contentType.ParentId descending, contentType.Id descending
-                                   select contentType).ToList();
+                                    orderby contentType.ParentId descending, contentType.Id descending
+                                    select contentType).ToList();
                 removedContentTypes.AddRange(orderedTypes);
                 contentTypeService.Delete(orderedTypes, userId);
             }
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Packaging
                 DictionaryItemsUninstalled = removedDictionaryItems,
                 DataTypesUninstalled = removedDataTypes,
                 LanguagesUninstalled = removedLanguages,
-                
+
             };
 
             return summary;
@@ -188,8 +188,8 @@ namespace Umbraco.Core.Packaging
             var element = packageDocument.XmlData;
 
             var roots = from doc in element.Elements()
-                where (string)doc.Attribute("isDoc") == ""
-                select doc;
+                        where (string)doc.Attribute("isDoc") == ""
+                        select doc;
 
             var contents = ParseDocumentRootXml(roots, parentId, importedDocumentTypes).ToList();
             if (contents.Any())
@@ -289,12 +289,25 @@ namespace Umbraco.Core.Packaging
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
             var templateId = element.AttributeValue<int?>("template");
-            
+
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
 
+            //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
+            // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
             var template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
+
+            //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
+            if (template != null)
+            {
+                if (!contentType.IsAllowedTemplate(template.Alias))
+                {
+                    //well this is awkward, we'll set the template to null and it will be wired up to the default template
+                    // when it's persisted in the document repository
+                    template = null;
+                }
+            }
 
             IContent content = parent == null
                 ? new Content(nodeName, parentId, contentType)
@@ -312,6 +325,12 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
+            //Here we make sure that we take composition properties in account as well
+            //otherwise we would skip them and end up losing content
+            var propTypes = contentType.CompositionPropertyTypes.Any()
+                ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
+                : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
+
             foreach (var property in properties)
             {
                 string propertyTypeAlias = property.Name.LocalName;
@@ -319,10 +338,11 @@ namespace Umbraco.Core.Packaging
                 {
                     var propertyValue = property.Value;
 
-                    var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
-
-                    //set property value
-                    content.SetValue(propertyTypeAlias, propertyValue);
+                    if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
+                    {
+                        //set property value
+                        content.SetValue(propertyTypeAlias, propertyValue);
+                    }
                 }
             }
 
@@ -335,7 +355,7 @@ namespace Umbraco.Core.Packaging
 
         public IEnumerable<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
         {
-            return ImportDocumentTypes(new []{ docTypeElement }, userId);
+            return ImportDocumentTypes(new[] { docTypeElement }, userId);
         }
 
         /// <summary>
@@ -359,7 +379,7 @@ namespace Umbraco.Core.Packaging
         public IEnumerable<IContentType> ImportDocumentTypes(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId)
         {
             var importedContentTypes = new Dictionary<string, IContentType>();
-            
+
             //When you are importing a single doc type we have to assume that the dependencies are already there.
             //Otherwise something like uSync won't work.
             var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
@@ -452,7 +472,7 @@ namespace Umbraco.Core.Packaging
                 if (updatedContentTypes.Any())
                     _contentTypeService.Save(updatedContentTypes, userId);
             }
-            
+
             return list;
         }
 
@@ -710,7 +730,7 @@ namespace Umbraco.Core.Packaging
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    //TODO: We should expose this to the UI during install!
+                    // TODO: We should expose this to the UI during install!
                     _logger.Warn<PackagingService>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
@@ -854,7 +874,7 @@ namespace Umbraco.Core.Packaging
             {
                 _dataTypeService.Save(dataTypes, userId, true);
             }
-            
+
             return dataTypes;
         }
 
@@ -937,7 +957,7 @@ namespace Umbraco.Core.Packaging
             var items = new List<IDictionaryItem>();
             foreach (var dictionaryItemElement in dictionaryItemElementList)
                 items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId));
-            
+
             return items;
         }
 
@@ -1024,7 +1044,7 @@ namespace Umbraco.Core.Packaging
                 _localizationService.Save(langauge, userId);
                 list.Add(langauge);
             }
-            
+
             return list;
         }
 
@@ -1187,7 +1207,7 @@ namespace Umbraco.Core.Packaging
 
         public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
         {
-            return ImportTemplates(new[] {templateElement}, userId);
+            return ImportTemplates(new[] { templateElement }, userId);
         }
 
         /// <summary>
@@ -1234,7 +1254,7 @@ namespace Umbraco.Core.Packaging
                 var alias = templateElement.Element("Alias").Value;
                 var design = templateElement.Element("Design").Value;
                 var masterElement = templateElement.Element("Master");
-                
+
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
                 var template = existingTemplate ?? new Template(templateName, alias);
                 template.Content = design;

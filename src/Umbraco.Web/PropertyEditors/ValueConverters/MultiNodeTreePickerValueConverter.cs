@@ -66,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return null;
             }
 
-            //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
+            // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
             if (UmbracoContext.Current != null)
             {
                 if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
@@ -98,7 +98,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                     break;
                             }
 
-                            if (multiNodeTreePickerItem != null)
+                            if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ItemType != PublishedItemType.Element)
                             {
                                 multiNodeTreePicker.Add(multiNodeTreePickerItem);
                             }

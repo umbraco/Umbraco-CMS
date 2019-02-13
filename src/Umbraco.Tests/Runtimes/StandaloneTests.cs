@@ -52,14 +52,14 @@ namespace Umbraco.Tests.Runtimes
 
             // settings
             // reset the current version to 0.0.0, clear connection strings
-            ConfigurationManager.AppSettings["umbracoConfigurationStatus"] = "";
-            // fixme we need a better management of settings here (and, true config files?)
+            ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus] = "";
+            // FIXME: we need a better management of settings here (and, true config files?)
 
             // create the very basic and essential things we need
             var logger = new ConsoleLogger();
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            var appCaches = new AppCaches(); // fixme has HttpRuntime stuff?
+            var appCaches = new AppCaches(); // FIXME: has HttpRuntime stuff?
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
             var typeLoader = new TypeLoader(appCaches.RuntimeCache, LocalTempStorage.Default, profilingLogger);
             var mainDom = new SimpleMainDom();
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Runtimes
             composers.Compose();
 
             // must registers stuff that WebRuntimeComponent would register otherwise
-            // fixme UmbracoContext creates a snapshot that it does not register with the accessor
+            // FIXME: UmbracoContext creates a snapshot that it does not register with the accessor
             //  and so, we have to use the UmbracoContextPublishedSnapshotAccessor
             //  the UmbracoContext does not know about the accessor
             //  else that would be a catch-22 where they both know about each other?
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("test", content.Name);
 
             // need an UmbracoCOntext to access the cache
-            // fixme - not exactly pretty, should not depend on HttpContext
+            // FIXME: not exactly pretty, should not depend on HttpContext
             var httpContext = Mock.Of<HttpContextBase>();
             var withUmbracoContext = UmbracoContext.EnsureContext(httpContext);
             var umbracoContext = Umbraco.Web.Composing.Current.UmbracoContext;

@@ -8,38 +8,42 @@
         <owners>Umbraco HQ</owners>
         <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
         <projectUrl>http://umbraco.com/</projectUrl>
-        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+        <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
-            <!--
-              note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
-              the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
-              not want this to happen as the alpha of the next major is, really, the next major already.
-            -->
-            <dependency id="AutoMapper" version="[7.0.1,7.999999)" />
-            <dependency id="LightInject" version="[5.1.2,5.999999)" />
-            <dependency id="LightInject.Annotation" version="[1.1.0,1.999999)" />
-            <dependency id="LightInject.Web" version="[2.0.0,2.999999)" />
-            <dependency id="Microsoft.AspNet.Identity.Core" version="[2.2.2,2.999999)" />
-            <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.6,5.999999)" />
-            <dependency id="Microsoft.Owin" version="[4.0.0,4.999999)" />
-            <dependency id="MiniProfiler" version="[3.2.0.157,3.999999)" />
-            <dependency id="Newtonsoft.Json" version="[11.0.2,11.999999)" />
-            <dependency id="Semver" version="[2.0.4,2.999999)" />
-            <dependency id="Serilog" version="[2.7.1,2.999999)" />
-            <dependency id="Serilog.Enrichers.Process" version="[2.0.1,2.999999)" />
-            <dependency id="Serilog.Enrichers.Thread" version="[3.0.0,3.999999)" />
-            <dependency id="Serilog.Filters.Expressions" version="[2.0.0,2.999999)" />
-            <dependency id="Serilog.Formatting.Compact" version="[1.0.0,1.999999)" />
-            <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.2,1.999999)" />
-            <dependency id="Serilog.Settings.AppSettings" version="[2.2.2,2.999999)" />
-            <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
-            <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" />
-            <dependency id="NPoco" version="[3.9.4,3.999999)" />
+
+            <group targetFramework="net472">
+                <!--
+                  note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
+                  the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
+                  not want this to happen as the alpha of the next major is, really, the next major already.
+                -->
+                <dependency id="AutoMapper" version="[8.0.0,8.999999)" />
+                <dependency id="LightInject" version="[5.4.0,5.999999)" />
+                <dependency id="LightInject.Annotation" version="[1.1.0,1.999999)" />
+                <dependency id="LightInject.Web" version="[2.0.0,2.999999)" />
+                <dependency id="Microsoft.AspNet.Identity.Core" version="[2.2.2,2.999999)" />
+                <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.7,5.999999)" />
+                <dependency id="Microsoft.Owin" version="[4.0.1,4.999999)" />
+                <dependency id="MiniProfiler" version="[4.0.138,4.999999)" />
+                <dependency id="Newtonsoft.Json" version="[12.0.1,12.999999)" />
+                <dependency id="Semver" version="[2.0.4,2.999999)" />
+                <dependency id="Serilog" version="[2.8.0,2.999999)" />
+                <dependency id="Serilog.Enrichers.Process" version="[2.0.1,2.999999)" />
+                <dependency id="Serilog.Enrichers.Thread" version="[3.0.0,3.999999)" />
+                <dependency id="Serilog.Filters.Expressions" version="[2.0.0,2.999999)" />
+                <dependency id="Serilog.Formatting.Compact" version="[1.0.0,1.999999)" />
+                <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.3,1.999999)" />
+                <dependency id="Serilog.Settings.AppSettings" version="[2.2.2,2.999999)" />
+                <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
+                <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" />
+                <dependency id="NPoco" version="[3.9.4,3.999999)" />
+            </group>
+            
         </dependencies>
     </metadata>
     <files>

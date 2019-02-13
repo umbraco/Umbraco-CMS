@@ -18,6 +18,7 @@
                            type="checkbox"
                            ng-model="variant.publish"
                            ng-change="vm.changeSelection(variant)"
+                           ng-disabled="(vm.isNew && variant.language.isMandatory) || (variant.canSave === false)"
                            style="margin-right: 8px;"
                            val-server-field="{{variant.htmlId}}" />
                     <div>

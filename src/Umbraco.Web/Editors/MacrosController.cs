@@ -1,27 +1,27 @@
 ﻿using Umbraco.Core.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Web.Http;
-
-    using Umbraco.Core;
-    using Umbraco.Core.IO;
-    using Umbraco.Core.Logging;
-    using Umbraco.Core.Models;
-    using Umbraco.Web.Composing;
-    using Umbraco.Web.Models.ContentEditing;
-    using Umbraco.Web.Mvc;
-    using Umbraco.Web.UI;
-    using Umbraco.Web.WebApi;
-    using Umbraco.Web.WebApi.Filters;
-
-    using Constants = Umbraco.Core.Constants;
+{   
 
     /// <summary>
     /// The API controller used for editing dictionary items
@@ -32,9 +32,9 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMacroService _macroService;
 
-        public MacrosController(IMacroService macroService)
+        public MacrosController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
-            _macroService = macroService;
+            _macroService = Services.MacroService;
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Editors
 
                 macroDisplay.Notifications.Clear();
 
-                macroDisplay.Notifications.Add(new Models.ContentEditing.Notification("Success", "Macro saved", SpeechBubbleIcon.Success));
+                macroDisplay.Notifications.Add(new Models.ContentEditing.Notification("Success", "Macro saved", NotificationStyle.Success));
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
             }

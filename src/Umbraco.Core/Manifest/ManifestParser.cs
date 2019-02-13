@@ -8,8 +8,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Trees;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -102,7 +100,7 @@ namespace Umbraco.Core.Manifest
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<ManifestContentAppDefinition>();
-            var dashboards = new List<ManifestDashboardDefinition>();
+            var dashboards = new List<ManifestDashboard>();
             var sections = new List<ManifestBackOfficeSection>();
 
             foreach (var manifest in manifests)

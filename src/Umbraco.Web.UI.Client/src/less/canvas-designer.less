@@ -45,7 +45,6 @@ h4 {
 
 h5 {
     margin: 0 0 6px 0;
-    color: #535353;
     font-size: 12px;
 }
 
@@ -113,7 +112,7 @@ a, a:hover{
     -webkit-box-shadow: none;
     box-shadow: none;
 }
-
+/*
 .btn-success {
     color: #ffffff;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
@@ -133,7 +132,7 @@ a, a:hover{
 .btn-success:hover {
     color: #ffffff;
 }
-
+*/
 .btn-group > .btn + .dropdown-toggle {
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -177,6 +176,7 @@ a, a:hover{
 
 .dropdown-menu {
     position: absolute;
+    display: block;
     top: auto;
     right: 0;
     z-index: 1000;
@@ -207,14 +207,14 @@ a, a:hover{
     clear: both;
     font-weight: normal;
     line-height: 20px;
-    color: #343434;
+    color: black;
     white-space: nowrap;
     cursor:pointer;
 }
 
 .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
     color: #000000;
-    background: #f8f8f8;
+    background: #e4e0dd;
 }
 
 /****************************/
@@ -276,7 +276,7 @@ a, a:hover{
     font-family: "Lato", Helvetica, Arial, sans-serif;
     font-size: 13px;
     line-height: 16px;
-    background: #413659;
+    background: #1b264f;
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
@@ -307,7 +307,7 @@ a, a:hover{
 
 ul.sections {
     display: block;
-    background: #413659;
+    background: #1b264f;
     height: 100%;
     position:absolute;
     top: 90px;
@@ -323,7 +323,7 @@ ul.sections {
 
 ul.sections li {
     display: block;
-    border-left: 4px #413659 solid;
+    border-left: 4px #1b264f solid;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
     transition: all .3s linear;
@@ -331,7 +331,8 @@ ul.sections li {
 
 .fix-left-menu ul.sections li a span,
 .fix-left-menu ul.sections li a i {
-    color: #8d869b;
+    color: #fff;
+    opacity: .7;
     -webkit-transition: all .3s linear;
     -moz-transition: all .3s linear;
     transition: all .3s linear;
@@ -346,6 +347,11 @@ ul.sections li a {
     text-align: center;
     text-decoration: none;
     border-bottom: 1px solid #2E2246;
+    &:hover {
+        span, i {
+            opacity: 1;
+        }
+    }
 }
 
 ul.sections li a i {
@@ -368,7 +374,7 @@ ul.sections li.current a i {
 }
 
 ul.sections li.current, ul.sections li:hover {
-    border-left: 4px #00AEA2 solid;
+    border-left: 4px #f5c1bc solid;
 }
 
 .fix-left-menu:hover ul.sections li a span,

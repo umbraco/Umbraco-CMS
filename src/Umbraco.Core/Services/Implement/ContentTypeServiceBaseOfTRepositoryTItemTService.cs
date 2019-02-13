@@ -13,10 +13,10 @@ using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services.Implement
 {
-    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeServiceBase<TItem>
+    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeBaseService<TItem>
         where TRepository : IContentTypeRepositoryBase<TItem>
         where TItem : class, IContentTypeComposition
-        where TService : class, IContentTypeServiceBase<TItem>
+        where TService : class, IContentTypeBaseService<TItem>
     {
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityContainerRepository _containerRepository;
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Services.Implement
                 var dirty = (IRememberBeingDirty)contentType;
 
                 // skip new content types
-                //TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
+                // TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
                 var isNewContentType = dirty.WasPropertyDirty("Id");
                 if (isNewContentType)
                 {
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Services.Implement
                         throw new Exception("oops");
 
                     // skip new properties
-                    //TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
+                    // TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
                     var isNewProperty = dirtyProperty.WasPropertyDirty("Id");
                     if (isNewProperty) return false;
 
@@ -210,6 +210,11 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Get, Has, Is, Count
+
+        IContentTypeComposition IContentTypeBaseService.Get(int id)
+        {
+            return Get(id);
+        }
 
         public TItem Get(int id)
         {
@@ -353,7 +358,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<TItem> GetComposedOf(int id)
         {
             // GetAll is cheap, repository has a full dataset cache policy
-            // todo - still, because it uses the cache, race conditions!
+            // TODO: still, because it uses the cache, race conditions!
             var allContentTypes = GetAll(Array.Empty<int>());
             return GetComposedOf(id, allContentTypes);
         }
@@ -371,7 +376,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        public void Save(TItem item, int userId = 0)
+        public void Save(TItem item, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -409,7 +414,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Save(IEnumerable<TItem> items, int userId = 0)
+        public void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
         {
             var itemsA = items.ToArray();
 
@@ -455,7 +460,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Delete
 
-        public void Delete(TItem item, int userId = 0)
+        public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -509,7 +514,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Delete(IEnumerable<TItem> items, int userId = 0)
+        public void Delete(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
         {
             var itemsA = items.ToArray();
 
@@ -594,7 +599,7 @@ namespace Umbraco.Core.Services.Implement
             //var originalb = (ContentTypeCompositionBase)original;
             // but we *know* it has to be a ContentTypeCompositionBase anyways
             var originalb = (ContentTypeCompositionBase) (object) original;
-            var clone = (TItem) originalb.DeepCloneWithResetIdentities(alias);
+            var clone = (TItem) (object) originalb.DeepCloneWithResetIdentities(alias);
 
             clone.Name = name;
 
@@ -645,7 +650,7 @@ namespace Umbraco.Core.Services.Implement
                     //var copyingb = (ContentTypeCompositionBase) copying;
                     // but we *know* it has to be a ContentTypeCompositionBase anyways
                     var copyingb = (ContentTypeCompositionBase) (object)copying;
-                    copy = (TItem) copyingb.DeepCloneWithResetIdentities(alias);
+                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
 
                     copy.Name = copy.Name + " (copy)"; // might not be unique
 
@@ -730,7 +735,7 @@ namespace Umbraco.Core.Services.Implement
 
         protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -758,7 +763,7 @@ namespace Umbraco.Core.Services.Implement
 
                     saveEventArgs.CanCancel = false;
                     OnSavedContainer(scope, saveEventArgs);
-                    //TODO: Audit trail ?
+                    // TODO: Audit trail ?
 
                     return OperationResult.Attempt.Succeed(evtMsgs, container);
                 }
@@ -770,7 +775,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -805,7 +810,7 @@ namespace Umbraco.Core.Services.Implement
                 OnSavedContainer(scope, args);
             }
 
-            //TODO: Audit trail ?
+            // TODO: Audit trail ?
 
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
@@ -864,7 +869,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -897,11 +902,11 @@ namespace Umbraco.Core.Services.Implement
                 OnDeletedContainer(scope, deleteEventArgs);
 
                 return OperationResult.Attempt.Succeed(evtMsgs);
-                //TODO: Audit trail ?
+                // TODO: Audit trail ?
             }
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -951,5 +956,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+
     }
 }

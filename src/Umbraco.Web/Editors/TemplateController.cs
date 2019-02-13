@@ -4,8 +4,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -17,6 +23,10 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
     public class TemplateController : BackOfficeNotificationsController
     {
+        public TemplateController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// Gets data type by alias
         /// </summary>
@@ -52,7 +62,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a template wth a given ID
+        /// Deletes a template with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -184,7 +194,7 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var template = Services.FileService.CreateTemplateWithIdentity(display.Alias, display.Content, master);
+                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Alias, display.Content, master);
                 Mapper.Map(template, display);
             }
 

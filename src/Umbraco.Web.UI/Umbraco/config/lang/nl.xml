@@ -376,7 +376,6 @@
     <key alias="contentTypeAliasAndNameNotNull">Zowel de alias als de naam van het nieuwe eigenschappentype moeten worden ingevuld!</key>
     <key alias="filePermissionsError">Er is een probleem met de lees/schrijfrechten op een bestand of map</key>
     <key alias="macroErrorLoadingPartialView">Error bij het laden van Partial View script (file: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">Error bij het laden van userControl '%0%'</key>
     <key alias="missingTitle">Vul een titel in</key>
     <key alias="missingType">Selecteer een type</key>
     <key alias="pictureResizeBiggerThanOrg">U wilt een afbeelding groter maken dan de originele afmetingen. Weet je zeker dat je wilt doorgaan?</key>

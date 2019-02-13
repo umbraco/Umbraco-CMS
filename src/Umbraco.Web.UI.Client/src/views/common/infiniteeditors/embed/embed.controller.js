@@ -54,21 +54,22 @@
 
                     $scope.model.embed.preview = "";
 
-                    switch (response.data.Status) {
+
+                    switch (response.data.OEmbedStatus) {
                         case 0:
-                        //not supported
-                        $scope.model.embed.info = "Not supported";
-                        break;
+                            //not supported
+                            $scope.model.embed.info = "Not supported";
+                            break;
                         case 1:
-                        //error
-                        $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
-                        break;
+                            //error
+                            $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
+                            break;
                         case 2:
-                        $scope.model.embed.preview = response.data.Markup;
-                        vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
-                        $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
-                        $scope.model.embed.success = true;
-                        break;
+                            $scope.model.embed.preview = response.data.Markup;
+                            vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
+                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
+                            $scope.model.embed.success = true;
+                            break;
                     }
                 }, function() {
                     $scope.model.embed.supportsDimensions = false;

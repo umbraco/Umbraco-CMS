@@ -71,7 +71,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         //$scope.model.config.contentTypes;
         //$scope.model.config.minItems;
         //$scope.model.config.maxItems;
-        //console.log($scope);
 
         var inited = false;
 
@@ -300,7 +299,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
-                                    //TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
+                                    // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
                                     property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
                                 }
                             });
@@ -433,7 +432,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             unsubscribe();
         });
 
-        //TODO: Move this into a shared location?
+        // TODO: Move this into a shared location?
         var UUID = (function () {
             var self = {};
             var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? '0' : '') + (i).toString(16); }

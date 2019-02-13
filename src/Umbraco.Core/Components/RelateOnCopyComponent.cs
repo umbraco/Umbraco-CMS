@@ -5,7 +5,7 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Components
 {
-    //TODO: This should just exist in the content service/repo!
+    // TODO: This should just exist in the content service/repo!
     public sealed class RelateOnCopyComponent : IComponent
     {
         public void Initialize()

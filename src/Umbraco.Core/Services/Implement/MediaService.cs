@@ -112,7 +112,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = 0)
+        public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var parent = GetById(parentId);
             return CreateMedia(name, parent, mediaTypeAlias, userId);
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0)
+        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = 0)
+        public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // not locking since not saving anything
 
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
+        public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = 0)
+        public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
+        public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
@@ -632,7 +632,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IMedia media, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -677,7 +677,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var mediasA = medias.ToArray();
@@ -724,7 +724,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public Attempt<OperationResult> Delete(IMedia media, int userId = 0)
+        public Attempt<OperationResult> Delete(IMedia media, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -773,8 +773,7 @@ namespace Umbraco.Core.Services.Implement
             DoDelete(media);
         }
 
-        //TODO:
-        // both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
+        //TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
         // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
         // if that's not the case, then the file will never be deleted, because when we delete the media,
         // the version referencing the file will not be there anymore. SO, we can leak files.
@@ -786,7 +785,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
-        public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
+        public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -810,7 +809,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        private void DeleteVersions(IScope scope, bool wlock, int id, DateTime versionDate, int userId = 0)
+        private void DeleteVersions(IScope scope, bool wlock, int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
             var args = new DeleteRevisionsEventArgs(id, dateToRetain: versionDate);
             if (scope.Events.DispatchCancelable(DeletingVersions, this, args))
@@ -833,7 +832,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
-        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0)
+        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -873,7 +872,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = 0)
+        public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<Tuple<IMedia, string>>();
@@ -882,7 +881,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MediaTree);
 
-                // todo - missing 7.6 "ensure valid path" thing here?
+                // TODO: missing 7.6 "ensure valid path" thing here?
                 // but then should be in PerformMoveLocked on every moved item?
 
                 var originalPath = media.Path;
@@ -917,7 +916,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        public Attempt<OperationResult> Move(IMedia media, int parentId, int userId = 0)
+        public Attempt<OperationResult> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1031,7 +1030,7 @@ namespace Umbraco.Core.Services.Implement
         {
             var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
-            var evtMsgs = EventMessagesFactory.Get(); // todo - and then?
+            var evtMsgs = EventMessagesFactory.Get(); // TODO: and then?
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1085,7 +1084,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IMedia> items, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             var itemsA = items.ToArray();
             if (itemsA.Length == 0) return true;
@@ -1274,9 +1273,9 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="mediaTypeIds">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
-        public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0)
+        public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = Constants.Security.SuperUserId)
         {
-            //TODO: This currently this is called from the ContentTypeService but that needs to change,
+            // TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
             // This method will recursively go lookup every content item, check if any of it's descendants are
             // of a different type, move them to the recycle bin, then permanently delete the content items.
@@ -1339,7 +1338,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
-        public void DeleteMediaOfType(int mediaTypeId, int userId = 0)
+        public void DeleteMediaOfType(int mediaTypeId, int userId = Constants.Security.SuperUserId)
         {
             DeleteMediaOfTypes(new[] { mediaTypeId }, userId);
         }

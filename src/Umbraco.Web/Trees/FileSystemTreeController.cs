@@ -28,7 +28,10 @@ namespace Umbraco.Web.Trees
         /// Inheritors can override this method to modify the folder node that is created.
         /// </summary>
         /// <param name="treeNode"></param>
-        protected virtual void OnRenderFolderNode(ref TreeNode treeNode) { }
+        protected virtual void OnRenderFolderNode(ref TreeNode treeNode) {
+            // TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+            treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+        }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {

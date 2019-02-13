@@ -4,9 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -23,6 +26,10 @@ namespace Umbraco.Web.Editors
     [JsonDateTimeFormatAttribute]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
+        protected ContentControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
+
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
         {
             ModelState.AddModelError("id", $"content with id: {id} was not found");
@@ -101,7 +108,7 @@ namespace Umbraco.Web.Editors
 
         protected virtual void HandleInvalidModelState(IErrorModel display)
         {
-            //lastly, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             if (!ModelState.IsValid)
             {
                 display.Errors = ModelState.ToErrorDictionary();
@@ -117,7 +124,7 @@ namespace Umbraco.Web.Editors
         /// <param name="getFromService"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is useful for when filters have alraedy looked up a persisted entity and we don't want to have
+        /// This is useful for when filters have already looked up a persisted entity and we don't want to have
         /// to look it up again.
         /// </remarks>
         protected TPersisted GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
@@ -148,7 +155,7 @@ namespace Umbraco.Web.Editors
             string[] messageParams = null)
         {
             //if there's already a default event message, don't add our default one
-            //todo inject
+            // TODO: inject
             var msgs = Current.EventMessages;
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 

@@ -86,7 +86,7 @@ namespace Umbraco.Core.Models.PublishedContent
             }
         }
 
-        // todo - this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
+        // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
         private static readonly Dictionary<string, (int, string)> BuiltinMemberProperties = new Dictionary<string, (int, string)>
         {
             { "Email", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.TextBox) },
@@ -148,7 +148,8 @@ namespace Umbraco.Core.Models.PublishedContent
             return -1;
         }
 
-        // virtual for unit tests - todo explain why
+        // virtual for unit tests
+        // TODO: explain why
         /// <summary>
         /// Gets a property type.
         /// </summary>
@@ -158,7 +159,8 @@ namespace Umbraco.Core.Models.PublishedContent
             return GetPropertyType(index);
         }
 
-        // virtual for unit tests - todo explain why
+        // virtual for unit tests
+        // TODO: explain why
         /// <summary>
         /// Gets a property type.
         /// </summary>

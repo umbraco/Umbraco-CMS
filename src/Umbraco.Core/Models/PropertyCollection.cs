@@ -93,11 +93,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Adds a property.
+        /// Adds or updates a property.
         /// </summary>
         internal new void Add(Property property)
         {
-            lock (_addLocker) // todo - why are we locking here and not everywhere else?!
+            lock (_addLocker) // TODO: why are we locking here and not everywhere else?!
             {
                 var key = GetKeyForItem(property);
                 if (key != null)

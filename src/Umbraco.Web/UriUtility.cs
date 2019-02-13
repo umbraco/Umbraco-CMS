@@ -64,13 +64,8 @@ namespace Umbraco.Web
         {
             var path = uri.GetSafeAbsolutePath();
 
-            if (path != "/")
-            {
-                if (!globalSettings.UseDirectoryUrls)
-                    path += ".aspx";
-                else if (requestConfig.AddTrailingSlash)
-				    path = path.EnsureEndsWith("/");
-            }
+            if (path != "/" && requestConfig.AddTrailingSlash)
+                path = path.EnsureEndsWith("/");
 
             path = ToAbsolute(path);
 
@@ -223,7 +218,7 @@ namespace Umbraco.Web
         #endregion
 
         /// <summary>
-        /// Returns an faull url with the host, port, etc...
+        /// Returns an full url with the host, port, etc...
         /// </summary>
         /// <param name="absolutePath">An absolute path (i.e. starts with a '/' )</param>
         /// <param name="httpContext"> </param>

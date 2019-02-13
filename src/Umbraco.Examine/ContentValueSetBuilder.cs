@@ -1,5 +1,6 @@
 ﻿using Examine;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -29,7 +30,7 @@ namespace Umbraco.Examine
         /// <inheritdoc />
         public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
         {
-            //TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
+            // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
             // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
             // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
             // references and then each array is an array of `FieldValue[]` and values are assigned accordingly. Not sure if it will make a difference or not.
@@ -41,7 +42,7 @@ namespace Umbraco.Examine
                 var urlValue = c.GetUrlSegment(_urlSegmentProviders); //Always add invariant urlName
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
-                    {"icon", c.ContentType.Icon.Yield()},
+                    {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {c.Key}},
@@ -51,12 +52,12 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {c.SortOrder}},
                     {"createDate", new object[] {c.CreateDate}},    //Always add invariant createDate
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
-                    {"nodeName", PublishedValuesOnly               //Always add invariant nodeName
-                        ? c.PublishName.Yield()
-                        : c.Name.Yield()},
-                    {"urlName", urlValue.Yield()},                  //Always add invariant urlName
-                    {"path", c.Path.Yield()},
-                    {"nodeType", new object[] {c.ContentType.Id}},
+                    {"nodeName", (PublishedValuesOnly               //Always add invariant nodeName
+                        ? c.PublishName?.Yield()
+                        : c?.Name.Yield()) ?? Enumerable.Empty<string>()},
+                    {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},                  //Always add invariant urlName
+                    {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
+                    {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},
                     {"creatorName", (c.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
@@ -72,14 +73,14 @@ namespace Umbraco.Examine
                     {
                         var variantUrl = c.GetUrlSegment(_urlSegmentProviders, culture);
                         var lowerCulture = culture.ToLowerInvariant();
-                        values[$"urlName_{lowerCulture}"] = variantUrl.Yield();
-                        values[$"nodeName_{lowerCulture}"] = PublishedValuesOnly
-                            ? c.GetPublishName(culture).Yield()
-                            : c.GetCultureName(culture).Yield();
+                        values[$"urlName_{lowerCulture}"] = variantUrl?.Yield() ?? Enumerable.Empty<string>();
+                        values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
+                            ? c.GetPublishName(culture)?.Yield()
+                            : c.GetCultureName(culture)?.Yield()) ?? Enumerable.Empty<string>();
                         values[$"{UmbracoExamineIndex.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? "y" : "n").Yield<object>();
-                        values[$"updateDate_{lowerCulture}"] = PublishedValuesOnly
-                            ? c.GetPublishDate(culture).Yield<object>()
-                            : c.GetUpdateDate(culture).Yield<object>();
+                        values[$"updateDate_{lowerCulture}"] = (PublishedValuesOnly
+                            ? c.GetPublishDate(culture)
+                            : c.GetUpdateDate(culture))?.Yield<object>() ?? Enumerable.Empty<object>();
                     }
                 }
 

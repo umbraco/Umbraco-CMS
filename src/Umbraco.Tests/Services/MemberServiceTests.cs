@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Security.Providers;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Services
         {
             base.SetUp();
 
-            //hack! but we have no choice until we remove the SavePassword method from IMemberService
+            // HACK: but we have no choice until we remove the SavePassword method from IMemberService
             var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService, ServiceContext.MemberTypeService) { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);

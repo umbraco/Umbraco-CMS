@@ -9,11 +9,11 @@ namespace Umbraco.Web.Install
 {
     /// <summary>
     /// Ensures authorization occurs for the installer if it has already completed.
-    /// If install has not yet occured then the authorization is successful.
+    /// If install has not yet occurred then the authorization is successful.
     /// </summary>
     internal class HttpInstallAuthorizeAttribute : AuthorizeAttribute
     {
-        // todo - cannot inject UmbracoContext nor RuntimeState in the attribute, read:
+        // TODO: cannot inject UmbracoContext nor RuntimeState in the attribute, read:
         // http://stackoverflow.com/questions/30096903/dependency-injection-inside-a-filterattribute-in-asp-net-mvc-6
         //  https://www.cuttingedge.it/blogs/steven/pivot/entry.php?id=98 - don't do it!
         //  http://blog.ploeh.dk/2014/06/13/passive-attributes/ - passive attributes

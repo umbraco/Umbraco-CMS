@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence
         //
         // works in READ COMMITED, TSQL & SQLCE lock the constraint even if it does not exist, so INSERT is OK
         //
-        // todo: use the proper database syntax, not this kludge
+        // TODO: use the proper database syntax, not this kludge
 
         /// <summary>
         /// Safely inserts a record, or updates if it exists, based on a unique constraint.
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence
             if (poco == null)
                 throw new ArgumentNullException(nameof(poco));
 
-            // todo - NPoco has a Save method that works with the primary key
+            // TODO: NPoco has a Save method that works with the primary key
             //  in any case, no point trying to update if there's no primary key!
 
             // try to update
@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence
             where TConnection : class, IDbConnection
         {
             var profiled = connection as ProfiledDbConnection;
-            return profiled == null ? connection as TConnection : profiled.InnerConnection as TConnection;
+            return profiled == null ? connection as TConnection : profiled.WrappedConnection as TConnection;
         }
 
         /// <summary>

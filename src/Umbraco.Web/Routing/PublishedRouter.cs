@@ -5,8 +5,8 @@ using System.Threading;
 using System.Globalization;
 using System.IO;
 using System.Web.Security;
-using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -14,13 +14,15 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
-using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-    // todo - making sense to have an interface?
-    public class PublishedRouter
+    /// <summary>
+    /// Provides the default <see cref="IPublishedRouter"/> implementation.
+    /// </summary>
+    public class PublishedRouter : IPublishedRouter
     {
         private readonly IWebRoutingSection _webRoutingSection;
         private readonly ContentFinderCollection _contentFinders;
@@ -48,16 +50,9 @@ namespace Umbraco.Web.Routing
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
-
-            GetRolesForLogin = s => Roles.Provider.GetRolesForUser(s);
         }
 
-        // todo
-        // in 7.7 this is cached in the PublishedContentRequest, which ... makes little sense
-        // killing it entirely, if we need cache, just implement it properly !!
-        // this is all soooo weird
-        public Func<string, IEnumerable<string>> GetRolesForLogin { get; }
-
+        /// <inheritdoc />
         public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
         {
             return new PublishedRequest(this, umbracoContext, uri ?? umbracoContext.CleanedUmbracoUrl);
@@ -65,10 +60,8 @@ namespace Umbraco.Web.Routing
 
         #region Request
 
-        /// <summary>
-        /// Tries to route the request.
-        /// </summary>
-        internal bool TryRouteRequest(PublishedRequest request)
+        /// <inheritdoc />
+        public bool TryRouteRequest(PublishedRequest request)
         {
             // disabled - is it going to change the routing?
             //_pcr.OnPreparing();
@@ -98,12 +91,7 @@ namespace Umbraco.Web.Routing
             _variationContextAccessor.VariationContext = new VariationContext(culture);
         }
 
-        /// <summary>
-        /// Prepares the request.
-        /// </summary>
-        /// <returns>
-        /// Returns false if the request was not successfully prepared
-        /// </returns>
+        /// <inheritdoc />
         public bool PrepareRequest(PublishedRequest request)
         {
             // note - at that point the original legacy module did something do handle IIS custom 404 errors
@@ -207,19 +195,13 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the request
             // handlers like default.aspx will want it and most macros currently need it
-            frequest.UmbracoPage = new page(frequest);
-
-            // used by many legacy objects
-            frequest.UmbracoContext.HttpContext.Items["pageElements"] = frequest.UmbracoPage.Elements;
+            frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest);
 
             return true;
         }
 
-        /// <summary>
-        /// Updates the request when there is no template to render the content.
-        /// </summary>
-        /// <remarks>This is called from Mvc when there's a document to render but no template.</remarks>
-        public void UpdateRequestOnMissingTemplate(PublishedRequest request)
+        /// <inheritdoc />
+        public void UpdateRequestToNotFound(PublishedRequest request)
         {
             // clear content
             var content = request.PublishedContent;
@@ -253,10 +235,8 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
-            request.UmbracoPage = new page(request);
-
-            // this is used by many legacy objects
-            request.UmbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
+            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
+            
         }
 
         #endregion
@@ -366,29 +346,6 @@ namespace Umbraco.Web.Routing
 
         #region Rendering engine
 
-        /// <summary>
-        /// Finds the rendering engine to use to render a template specified by its alias.
-        /// </summary>
-        /// <param name="alias">The alias of the template.</param>
-        /// <returns>The rendering engine, or Unknown if the template was not found.</returns>
-        internal RenderingEngine FindTemplateRenderingEngine(string alias)
-        {
-            if (string.IsNullOrWhiteSpace(alias))
-                return RenderingEngine.Unknown;
-
-            alias = alias.Replace('\\', '/'); // forward slashes only
-
-            // NOTE: we could start with what's the current default?
-
-            // todo - bad - we probably should be using the appropriate filesystems!
-
-            if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
-                    alias, new[] { ".cshtml", ".vbhtml" }))
-                return RenderingEngine.Mvc;
-
-            return RenderingEngine.Unknown;
-        }
-
         internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
         {
             if (directory == null || directory.Exists == false)
@@ -411,11 +368,7 @@ namespace Umbraco.Web.Routing
 
         #region Document and template
 
-        /// <summary>
-        /// Gets a template.
-        /// </summary>
-        /// <param name="alias">The template alias</param>
-        /// <returns>The template.</returns>
+        /// <inheritdoc />
         public ITemplate GetTemplate(string alias)
         {
             return _services.FileService.GetTemplate(alias);
@@ -632,7 +585,7 @@ namespace Umbraco.Web.Routing
                     if (loginPageId != request.PublishedContent.Id)
                         request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(loginPageId);
                 }
-                else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, GetRolesForLogin(membershipHelper.CurrentUserName)) == false)
+                else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, membershipHelper.GetCurrentUserRoles()) == false)
                 {
                     _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
                     var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
@@ -691,7 +644,7 @@ namespace Umbraco.Web.Routing
             // read the alternate template alias, from querystring, form, cookie or server vars,
             // only if the published content is the initial once, else the alternate template
             // does not apply
-            // + optionnally, apply the alternate template on internal redirects
+            // + optionally, apply the alternate template on internal redirects
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate

@@ -2,13 +2,13 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <umb-editor-sub-header>
-            
+    <umb-editor-sub-header ng-class="{'--state-selection':(vm.selection.length > 0)}">
+
         <!-- No selection -->
         <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
             <umb-button
                 type="button"
-                button-style="success"
+                button-style="action"
                 action="vm.createUserGroup()"
                 label="Create Group"
                 label-key="actions_createGroup">
@@ -40,6 +40,7 @@
                 <umb-button
                     type="button"
                     label-key="buttons_clearSelection"
+                    button-style="white"
                     action="vm.clearSelection()"
                     size="xs">
                 </umb-button>
@@ -54,6 +55,7 @@
                 type="button"
                 label="Delete"
                 label-key="general_delete"
+                button-style="white"
                 icon="icon-trash"
                 action="vm.deleteUserGroups()"
                 size="xs">
@@ -64,7 +66,7 @@
 
     <div style="margin-bottom: 20px;" class="flex items-center">
         <div style="font-size: 16px;">
-            <span class="bold"><localize key="general_groups">Groups</localize> </span> <span>({{vm.userGroups.length}})</span> 
+            <span class="bold"><localize key="general_groups">Groups</localize> </span> <span>({{vm.userGroups.length}})</span>
         </div>
     </div>
 
@@ -76,19 +78,20 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="group in vm.userGroups | filter:vm.filter" 
-                ng-click="vm.goToUserGroup(group)" 
-                ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}">
-                
-                <td style="width: 20px; padding-right: 5px">
+            <tr ng-repeat="group in vm.userGroups | filter:vm.filter"
+                ng-click="vm.goToUserGroup(group)"
+                ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess, '--selected': group.selected}">
+
+                <td style="padding-right: 5px">
                     <input
                         ng-show="group.hasAccess && group.group.alias !== 'admin' && group.group.alias !== 'translator'"
-                        type="checkbox" 
+                        type="checkbox"
                         ng-model="group.selected"
-                        ng-click="vm.selectUserGroup(group, vm.selection, $event)" />
+                        ng-click="vm.selectUserGroup(group, vm.selection, $event)"
+                        style="width: 20px; height: 100px;"/>
                 </td>
                 <td>
-                    <umb-user-group-preview 
+                    <umb-user-group-preview
                         style="border-bottom: none; margin-bottom: 0; padding: 0;"
                         icon="group.group.icon"
                         name="group.group.name"

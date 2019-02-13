@@ -1,4 +1,4 @@
-<div class="umb-property-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
+<div class="umb-property-editor umb-mediapicker" ng-class="{'umb-mediapicker-multi':isMultiPicker, 'umb-mediapicker-single':!isMultiPicker}" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
 
     <p ng-if="(mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>

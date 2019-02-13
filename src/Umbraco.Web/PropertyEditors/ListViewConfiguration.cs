@@ -13,7 +13,6 @@ namespace Umbraco.Web.PropertyEditors
             // initialize defaults
 
             PageSize = 10;
-            DisplayAtTabNumber = 1;
             OrderBy = "SortOrder";
             OrderDirection = "asc";
 
@@ -43,9 +42,6 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
         public int PageSize { get; set; }
         
-        [ConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
-        public int DisplayAtTabNumber { get; set; }
-
         [ConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
             Description = "The default sort order for the list")]
         public string OrderBy { get; set; }
@@ -62,9 +58,9 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
             Description = "The bulk actions that are allowed from the list view")]
-        public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // todomanaging defaults?
+        public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 
-        [ConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
+        [ConfigurationField("tabName", "Content app name", "textstring", Description = "The name of the listview content app (default if empty: 'Child Items')")]
         public string TabName { get; set; }
 
         public class Property
@@ -76,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors
             public string Header { get; set; }
 
             [JsonProperty("isSystem")]
-            public int IsSystem { get; set; } // todo bool
+            public int IsSystem { get; set; } // TODO: bool
         }
 
         public class Layout
@@ -91,7 +87,7 @@ namespace Umbraco.Web.PropertyEditors
             public string Icon { get; set; }
 
             [JsonProperty("isSystem")]
-            public int IsSystem { get; set; } // todo bool
+            public int IsSystem { get; set; } // TODO: bool
 
             [JsonProperty("selected")]
             public bool Selected { get; set; }

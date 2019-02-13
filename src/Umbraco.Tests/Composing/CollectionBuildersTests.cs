@@ -263,6 +263,40 @@ namespace Umbraco.Tests.Composing
         }
 
         [Test]
+        public void CanInsertIntoBuilderAfter()
+        {
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
+                .Append<Resolved1>()
+                .Append<Resolved2>()
+                .InsertAfter<Resolved1, Resolved3>();
+
+            Assert.IsTrue(builder.Has<Resolved1>());
+            Assert.IsTrue(builder.Has<Resolved2>());
+            Assert.IsTrue(builder.Has<Resolved3>());
+
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
+            AssertCollection(col, typeof(Resolved1), typeof(Resolved3), typeof(Resolved2));
+        }
+
+        [Test]
+        public void CanInsertIntoBuilderAfterLast()
+        {
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
+                .Append<Resolved1>()
+                .Append<Resolved2>()
+                .InsertAfter<Resolved2, Resolved3>();
+
+            Assert.IsTrue(builder.Has<Resolved1>());
+            Assert.IsTrue(builder.Has<Resolved2>());
+            Assert.IsTrue(builder.Has<Resolved3>());
+
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
+            AssertCollection(col, typeof(Resolved1), typeof(Resolved2), typeof(Resolved3));
+        }
+
+        [Test]
         public void CannotInsertIntoBuilderBeforeOnceCollectionIsCreated()
         {
             var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
@@ -314,7 +348,7 @@ namespace Umbraco.Tests.Composing
             var factory = _composition.CreateFactory();
 
             using (factory.BeginScope())
-            { 
+            {
                 var col1 = factory.GetInstance<TestCollection>();
                 AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
@@ -453,7 +487,7 @@ namespace Umbraco.Tests.Composing
         public class Resolved1 : Resolved
         { }
 
-        [Weight(5)] // default is 10
+        [Weight(50)] // default is 100
         public class Resolved2 : Resolved
         { }
 

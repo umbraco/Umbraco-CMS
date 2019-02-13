@@ -79,33 +79,6 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Appends a type after another type.
-        /// </summary>
-        /// <typeparam name="TAfter">The other type.</typeparam>
-        /// <typeparam name="T">The type to append.</typeparam>
-        /// <returns>The builder.</returns>
-        /// <remarks>Throws if both types are identical, or if the other type does not already belong to the collection.</remarks>
-        public TBuilder AppendAfter<TAfter, T>()
-            where TAfter : TItem
-            where T : TItem
-        {
-            Configure(types =>
-            {
-                var typeAfter = typeof (TAfter);
-                var type = typeof(T);
-                if (typeAfter == type) throw new InvalidOperationException();
-
-                var index = types.IndexOf(typeAfter);
-                if (index < 0) throw new InvalidOperationException();
-
-                if (types.Contains(type)) types.Remove(type);
-                index = types.IndexOf(typeAfter); // in case removing type changed index
-                types.Insert(index + 1, type);
-            });
-            return This;
-        }
-
-        /// <summary>
         /// Inserts a type into the collection.
         /// </summary>
         /// <typeparam name="T">The type to insert.</typeparam>
@@ -202,6 +175,69 @@ namespace Umbraco.Core.Composing
                 if (types.Contains(type)) types.Remove(type);
                 index = types.IndexOf(typeBefore); // in case removing type changed index
                 types.Insert(index, type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Inserts a type after another type.
+        /// </summary>
+        /// <typeparam name="TAfter">The other type.</typeparam>
+        /// <typeparam name="T">The type to append.</typeparam>
+        /// <returns>The builder.</returns>
+        /// <remarks>Throws if both types are identical, or if the other type does not already belong to the collection.</remarks>
+        public TBuilder InsertAfter<TAfter, T>()
+            where TAfter : TItem
+            where T : TItem
+        {
+            Configure(types =>
+            {
+                var typeAfter = typeof(TAfter);
+                var type = typeof(T);
+                if (typeAfter == type) throw new InvalidOperationException();
+
+                var index = types.IndexOf(typeAfter);
+                if (index < 0) throw new InvalidOperationException();
+
+                if (types.Contains(type)) types.Remove(type);
+                index = types.IndexOf(typeAfter); // in case removing type changed index
+                index += 1; // insert here
+
+                if (index == types.Count)
+                    types.Add(type);
+                else
+                    types.Insert(index, type);
+            });
+            return This;
+        }
+
+        /// <summary>
+        /// Inserts a type after another type.
+        /// </summary>
+        /// <param name="typeAfter">The other type.</param>
+        /// <param name="type">The type to insert.</param>
+        /// <returns>The builder.</returns>
+        /// <remarks>Throws if both types are identical, or if the other type does not already belong to the collection.</remarks>
+        public TBuilder InsertAfter(Type typeAfter, Type type)
+        {
+            Configure(types =>
+            {
+                EnsureType(typeAfter, "find");
+                EnsureType(type, "register");
+
+                if (typeAfter == type) throw new InvalidOperationException();
+
+                var index = types.IndexOf(typeAfter);
+                if (index < 0) throw new InvalidOperationException();
+
+                if (types.Contains(type)) types.Remove(type);
+                index = types.IndexOf(typeAfter); // in case removing type changed index
+                index += 1; // insert here
+
+                if (index == types.Count)
+                    types.Add(type);
+                else
+                    types.Insert(index, type);
             });
             return This;
         }

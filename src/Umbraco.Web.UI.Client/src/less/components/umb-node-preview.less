@@ -71,12 +71,12 @@
     margin-right: 5px;
     font-size: 13px;
     font-weight: bold;
-    color: @gray-5;
+    color: @ui-action-type;
     cursor: pointer;
 }
 
 .umb-node-preview__action:hover {
-    color: @turquoise;
+    color: @ui-action-type-hover;
     text-decoration: none;
     opacity: 1;
 }
@@ -89,15 +89,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px dashed @gray-7;
-    color: @turquoise-d1;
+    border: 1px dashed @ui-action-disgrete-border;
+    color: @ui-action-disgrete-type;
     font-weight: bold;
     padding: 5px 15px;
     box-sizing: border-box;
 }
 
 .umb-node-preview-add:hover {
-    color: @turquoise-d1;
+    color: @ui-action-disgrete-type-hover;
+    border-color: @ui-action-disgrete-border-hover;
+    text-decoration: none;
 }
 
 .umb-editor-wrapper .umb-node-preview-add {

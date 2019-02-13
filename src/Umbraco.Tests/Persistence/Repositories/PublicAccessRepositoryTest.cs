@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //now remove a few rules from a few of the items and then add some more, this will put things 'out of order' which
                 //we need to verify our sort order is working for the relator
-                // fixme - no "relator" in v8?!
+                // FIXME: no "relator" in v8?!
                 for (int i = 0; i < allEntries.Count; i++)
                 {
                     //all the even ones
@@ -309,7 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var tagRepository = new TagRepository(accessor, AppCaches, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, templateRepository);
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
 

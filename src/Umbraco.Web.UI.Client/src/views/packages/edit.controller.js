@@ -198,7 +198,7 @@
                 treeAlias: "files",
                 entityType: "file",
                 multiPicker: true,
-                onlyInitialized: false,
+                isDialog: true,
                 select: function(node) {
                     node.selected = !node.selected;
 

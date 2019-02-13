@@ -11,19 +11,16 @@ namespace Umbraco.Web.PropertyEditors
         public MultiNodePickerConfigurationEditor()
         {
             Field(nameof(MultiNodePickerConfiguration.TreeSource))
-                .Config = new Dictionary<string, object>
-                {
-                    { "idType", "udi" }
-                };
+                .Config = new Dictionary<string, object> { { "idType", "udi" } };
         }
 
         /// <inheritdoc />
         public override Dictionary<string, object> ToConfigurationEditor(MultiNodePickerConfiguration configuration)
         {
-            // sanitize configuraiton
+            // sanitize configuration
             var output = base.ToConfigurationEditor(configuration);
 
-            output["multiPicker"] = configuration.MaxNumber > 1 ? true : false;
+            output["multiPicker"] = configuration.MaxNumber > 1;
 
             return output;
         }

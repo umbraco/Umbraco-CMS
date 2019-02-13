@@ -119,9 +119,9 @@ Use this directive make an element sticky and follow the page when scrolling.
             }
 
             function calculateSize() {
+                var width = bar.innerWidth();
                 clonedBar.css({
-                    width: bar.outerWidth(),
-                    height: bar.height()
+                    width: width
                 });
             }
 

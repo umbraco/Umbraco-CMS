@@ -16,8 +16,7 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
     vm.page.loading = false;
     vm.page.saveButtonState = "init";
     vm.page.menu = {}
-
- 
+    vm.labels = {};
 
     function toggleValue(key) {
         vm.macro[key] = !vm.macro[key];
@@ -132,21 +131,32 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
             vm.page.loading = false;
         });
 
-        vm.page.navigation = [
-            {
-                "name": "Settings",
-                "alias": "settings",
-                "icon": "icon-settings",
-                "view": "views/macros/views/settings.html",
-                "active": true
-            },
-            {
-                "name": "Parameters",
-                "alias": "parameters",
-                "icon": "icon-list",
-                "view": "views/macros/views/parameters.html"
-            }
+        var labelKeys = [
+            "general_settings",
+            "macro_parameters"
         ];
+
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            // navigation
+            vm.labels.settings = values[0];
+            vm.labels.parameters = values[1];
+
+            vm.page.navigation = [
+                {
+                    "name": vm.labels.settings,
+                    "alias": "settings",
+                    "icon": "icon-settings",
+                    "view": "views/macros/views/settings.html",
+                    "active": true
+                },
+                {
+                    "name": vm.labels.parameters,
+                    "alias": "parameters",
+                    "icon": "icon-list",
+                    "view": "views/macros/views/parameters.html"
+                }
+            ];
+        });
     }
 
     init();      

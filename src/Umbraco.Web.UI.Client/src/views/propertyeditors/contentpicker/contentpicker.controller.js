@@ -105,6 +105,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     };
 
     if ($scope.model.config) {
+        //special case, if the `startNode` is falsy on the server config delete it entirely so the default value is merged in
+        if (!$scope.model.config.startNode) {
+            delete $scope.model.config.startNode;
+        }
         //merge the server config on top of the default config, then set the server config to use the result
         $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
     }
@@ -144,7 +148,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
-        idType: "int",
+        idType: "udi",
         //only show the lang selector for content
         showLanguageSelector: $scope.model.config.startNode.type === "content"
     };
@@ -310,11 +314,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
             //need to determine which items we already have loaded
             var renderModelIds = _.map($scope.renderModel, function (d) {
-                return $scope.model.config.idType === "udi" ? d.udi : d.id;
+                return ($scope.model.config.idType === "udi" ? d.udi : d.id).toString();
             });
 
             //get the ids that no longer exist
             var toRemove = _.difference(renderModelIds, valueIds);
+
 
             //remove the ones that no longer exist
             for (var j = 0; j < toRemove.length; j++) {

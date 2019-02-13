@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function mediaPickerController($scope, entityResource, iconHelper, editorService) {
+function mediaPickerController($scope, entityResource, iconHelper, editorService, angularHelper) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -18,7 +18,7 @@ function mediaPickerController($scope, entityResource, iconHelper, editorService
         entityType: "Media",
         section: "media",
         treeAlias: "media",
-        idType: "int"
+        idType: "udi"
     };
 
     //combine the dialogOptions with any values returned from the server
@@ -50,10 +50,12 @@ function mediaPickerController($scope, entityResource, iconHelper, editorService
 
     $scope.remove =function(index){
         $scope.renderModel.splice(index, 1);
+        syncModelValue();
     };
 
     $scope.clear = function() {
         $scope.renderModel = [];
+        syncModelValue();
     };
 
     $scope.add = function (item) {
@@ -76,19 +78,17 @@ function mediaPickerController($scope, entityResource, iconHelper, editorService
             });
 
         }	
+
+        syncModelValue();
     };
 
-    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+    function syncModelValue() {
         var currIds = _.map($scope.renderModel, function (i) {
             return dialogOptions.idType === "udi" ? i.udi : i.id;
         });
         $scope.model.value = trim(currIds.join(), ",");
-    });
-
-    //when the scope is destroyed we need to unsubscribe
-    $scope.$on('$destroy', function () {
-        unsubscribe();
-    });
+        angularHelper.getCurrentForm($scope).$setDirty();
+    }
 
     //load media data
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];

@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Services
     [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
     public class PerformanceTests : TestWithDatabaseBase
     {
-        // fixme probably making little sense in places due to scope creating a transaction?!
+        // FIXME: probably making little sense in places due to scope creating a transaction?!
 
         protected override string GetDbConnectionString()
         {

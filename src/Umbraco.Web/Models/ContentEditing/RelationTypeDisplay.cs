@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string ParentObjectTypeName { get; set; }
 
         /// <summary>
-        /// Gets or sets the Childs object type id
+        /// Gets or sets the Child's object type id
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember(Name = "childObjectType", IsRequired = true)]

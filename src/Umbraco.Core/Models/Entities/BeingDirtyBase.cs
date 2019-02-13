@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.Entities
@@ -66,7 +65,7 @@ namespace Umbraco.Core.Models.Entities
         }
 
         /// <inheritdoc />
-        public void ResetWereDirtyProperties()
+        public virtual void ResetWereDirtyProperties()
         {
             // note: cannot .Clear() because when memberwise-cloning this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.
@@ -108,7 +107,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Registers that a property has changed.
         /// </summary>
-        protected virtual void OnPropertyChanged(PropertyInfo propertyInfo)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
             if (_withChanges == false)
                 return;
@@ -116,9 +115,9 @@ namespace Umbraco.Core.Models.Entities
             if (_currentChanges == null)
                 _currentChanges = new Dictionary<string, bool>();
 
-            _currentChanges[propertyInfo.Name] = true;
+            _currentChanges[propertyName] = true;
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -143,9 +142,9 @@ namespace Umbraco.Core.Models.Entities
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The new value.</param>
         /// <param name="valueRef">A reference to the value to set.</param>
-        /// <param name="propertySelector">The property selector.</param>
+        /// <param name="propertyName">The property name.</param>
         /// <param name="comparer">A comparer to compare property values.</param>
-        protected void SetPropertyValueAndDetectChanges<T>(T value, ref T valueRef, PropertyInfo propertySelector, IEqualityComparer<T> comparer = null)
+        protected void SetPropertyValueAndDetectChanges<T>(T value, ref T valueRef, string propertyName, IEqualityComparer<T> comparer = null)
         {
             if (comparer == null)
             {
@@ -165,7 +164,7 @@ namespace Umbraco.Core.Models.Entities
 
             // handle change
             if (changed)
-                OnPropertyChanged(propertySelector);
+                OnPropertyChanged(propertyName);
         }
 
         /// <summary>
@@ -174,17 +173,17 @@ namespace Umbraco.Core.Models.Entities
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The new value.</param>
         /// <param name="orig">The original value.</param>
-        /// <param name="propertySelector">The property selector.</param>
+        /// <param name="propertyName">The property name.</param>
         /// <param name="comparer">A comparer to compare property values.</param>
         /// <param name="changed">A value indicating whether we know values have changed and no comparison is required.</param>
-        protected void DetectChanges<T>(T value, T orig, PropertyInfo propertySelector, IEqualityComparer<T> comparer, bool changed)
+        protected void DetectChanges<T>(T value, T orig, string propertyName, IEqualityComparer<T> comparer, bool changed)
         {
             // compare values
             changed = _withChanges && (changed || !comparer.Equals(orig, value));
 
             // handle change
             if (changed)
-                OnPropertyChanged(propertySelector);
+                OnPropertyChanged(propertyName);
         }
 
         #endregion

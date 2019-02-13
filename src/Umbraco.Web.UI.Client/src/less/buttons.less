@@ -189,11 +189,24 @@ input[type="button"] {
 }
 // Success appears as green
 .btn-success {
-  .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+  .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight, @btnSuccessType);
 }
-// Info appears as a neutral blue
+// Info appears as a sand color
 .btn-info {
-  .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight);
+  .buttonBackground(@sand-5, @sand-6, @blueExtraDark, @blueMid);
+}
+// Made for Umbraco, 2019
+.btn-action {
+  .buttonBackground(@blueExtraDark, @blueDark, @white, @u-white);
+}
+// Made for Umbraco, 2019
+.btn-selection {
+    @btnSelectionBackgroundHover: darken(@pinkLight, 10%);
+  .buttonBackground(@pinkLight, @btnSelectionBackgroundHover, @blueExtraDark, @blueDark);
+}
+// Made for Umbraco, 2019, used for buttons that has to stand back.
+.btn-white {
+  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover);
 }
 // Inverse appears as dark gray
 .btn-inverse {
@@ -223,28 +236,30 @@ input[type="button"] {
     padding: 15px 50px;
     font-size: 16px;
     border: none;
-    background: @green;
+    background: @ui-btn-positive;
     color: @white;
     font-weight: bold;
-      &:hover {
-        background: @green-d1;
-		}
+    &:hover {
+        background: @ui-btn-positive-hover;
+    }
 }
 
 // outlined
 .btn-outline {
-  border: 1px solid @gray-8;
+  border: 1px solid;
+  border-color: @gray-7;
   background: @white;
-  color: @black;
+  color: @blueExtraDark;
   padding: 5px 13px;
+  transition: all .2s linear;
 }
 
 .btn-outline:hover,
 .btn-outline:focus,
 .btn-outline:active {
-  border-color: @gray-7;
-  background: transparent;
-  color: @black;
+  border-color: @ui-light-type-hover;
+  color: @ui-light-type-hover;
+  background: @white;
 }
 
 // Cross-browser Jank

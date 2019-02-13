@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Benchmarks
     {
         private static byte[] _initDbBytes;
 
-        // fixme - should run on LocalDb same as NPoco tests!
+        // FIXME: should run on LocalDb same as NPoco tests!
 
         private IUmbracoDatabase GetSqlServerDatabase(ILogger logger)
         {

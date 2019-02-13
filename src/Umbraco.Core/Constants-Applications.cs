@@ -77,7 +77,7 @@
             /// alias for the macro tree.
             /// </summary>
             public const string Macros = "macros";
-            
+
             /// <summary>
             /// alias for the datatype tree.
             /// </summary>
@@ -92,7 +92,7 @@
             /// alias for the dictionary tree.
             /// </summary>
             public const string Dictionary = "dictionary";
-            
+
             public const string Stylesheets = "stylesheets";
 
             /// <summary>
@@ -121,7 +121,7 @@
             public const string Templates = "templates";
 
             public const string RelationTypes = "relationTypes";
-            
+
             public const string Languages = "languages";
 
             /// <summary>
@@ -156,7 +156,7 @@
                 public const string ThirdParty = "thirdPartyGroup";
             }
 
-            //TODO: Fill in the rest!
+            // TODO: Fill in the rest!
         }
     }
 }

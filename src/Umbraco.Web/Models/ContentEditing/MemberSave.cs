@@ -37,6 +37,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool IsApproved { get; set; }
         
 
-        //TODO: Need to add question / answer support
+        // TODO: Need to add question / answer support
     }
 }

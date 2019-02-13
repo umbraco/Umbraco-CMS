@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -13,7 +12,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.Redirects
+namespace Umbraco.Web.Routing
 {
     /// Implements an Application Event Handler for managing redirect urls tracking.
     /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old url</para>
@@ -39,13 +38,21 @@ namespace Umbraco.Web.Redirects
         {
             get
             {
-                var oldRoutes =
-                    (Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>) UmbracoContext.Current.HttpContext.Items[
-                        ContextKey3];
+                var oldRoutes = (Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>) UmbracoContext.Current.HttpContext.Items[ContextKey3];
                 if (oldRoutes == null)
-                    UmbracoContext.Current.HttpContext.Items[ContextKey3] =
-                        oldRoutes = new Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>();
+                    UmbracoContext.Current.HttpContext.Items[ContextKey3] = oldRoutes = new Dictionary<ContentIdAndCulture, ContentKeyAndOldRoute>();
                 return oldRoutes;
+            }
+        }
+
+        private static bool HasOldRoutes
+        {
+            get
+            {
+                if (Current.UmbracoContext == null) return false;
+                if (Current.UmbracoContext.HttpContext == null) return false;
+                if (Current.UmbracoContext.HttpContext.Items[ContextKey3] == null) return false;
+                return true;
             }
         }
 
@@ -92,14 +99,14 @@ namespace Umbraco.Web.Redirects
             // we cannot rely only on ContentCacheRefresher because when CacheUpdated triggers the old
             // route is gone
             //
-            // this is all verrrry weird but it seems to work
+            // this is all very weird but it seems to work
 
             ContentService.Publishing += ContentService_Publishing;
             ContentService.Published += ContentService_Published;
             ContentService.Moving += ContentService_Moving;
             ContentService.Moved += ContentService_Moved;
-            ContentCacheRefresher.CacheUpdated += ContentCacheRefresher_CacheUpdated;
 
+            ContentCacheRefresher.CacheUpdated += ContentCacheRefresher_CacheUpdated;
 
             // kill all redirects once a content is deleted
             //ContentService.Deleted += ContentService_Deleted;
@@ -112,21 +119,26 @@ namespace Umbraco.Web.Redirects
         public void Terminate()
         { }
 
-        private static void ContentCacheRefresher_CacheUpdated(ContentCacheRefresher sender,
-            CacheRefresherEventArgs args)
+        private static void ContentCacheRefresher_CacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
+            // that event is a distributed even that triggers on all nodes
+            // BUT it should totally NOT run on nodes other that the one that handled the other events
+            // and besides, it cannot run on a background thread!
+            if (!HasOldRoutes)
+                return;
+
             // sanity checks
             if (args.MessageType != MessageType.RefreshByPayload)
             {
                 throw new InvalidOperationException("ContentCacheRefresher MessageType should be ByPayload.");
             }
+
             if (args.MessageObject == null)
             {
                 return;
             }
 
-            var payloads = args.MessageObject as ContentCacheRefresher.JsonPayload[];
-            if (payloads == null)
+            if (!(args.MessageObject is ContentCacheRefresher.JsonPayload[]))
             {
                 throw new InvalidOperationException("ContentCacheRefresher MessageObject should be JsonPayload[].");
             }
@@ -138,8 +150,7 @@ namespace Umbraco.Web.Redirects
             {
                 // assuming we cannot have 'CacheUpdated' for only part of the infos else we'd need
                 // to set a flag in 'Published' to indicate which entities have been refreshed ok
-                CreateRedirect(oldRoute.Key.ContentId, oldRoute.Key.Culture, oldRoute.Value.ContentKey,
-                    oldRoute.Value.OldRoute);
+                CreateRedirect(oldRoute.Key.ContentId, oldRoute.Key.Culture, oldRoute.Value.ContentKey, oldRoute.Value.OldRoute);
                 removeKeys.Add(oldRoute.Key);
             }
 
@@ -182,7 +193,7 @@ namespace Umbraco.Web.Redirects
 
         private static void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> e)
         {
-            //TODO: Use the new e.EventState to track state between Moving/Moved events!
+            // TODO: Use the new e.EventState to track state between Moving/Moved events!
             Moving = true;
         }
 

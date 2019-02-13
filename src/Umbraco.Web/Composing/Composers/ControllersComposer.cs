@@ -32,8 +32,7 @@ namespace Umbraco.Web.Composing.Composers
             // UmbracoApiController is fast-ish because they both are IDiscoverable. Scanning for IController or IHttpController
             // is a full, non-cached scan = expensive, we do it only for 1 assembly.
             //
-            // TODO
-            // find a way to scan for IController *and* IHttpController in one single pass
+            // TODO: find a way to scan for IController *and* IHttpController in one single pass
             // or, actually register them manually so don't require a full scan for these
             // 5 are IController but not PluginController
             //  Umbraco.Web.Mvc.RenderMvcController

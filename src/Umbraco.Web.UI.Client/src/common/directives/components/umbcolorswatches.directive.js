@@ -36,10 +36,14 @@ Use this directive to generate color swatches to pick from.
             scope.setColor = function (color, $index, $event) {
                 scope.selectedColor = color;
                 if (scope.onSelect) {
-                    scope.onSelect(color, $index, $event);
+                    scope.onSelect({color: color, $index: $index, $event: $event});
                     $event.stopPropagation();
                 }
             };
+
+            scope.isSelectedColor = function (color) {
+                return scope.selectedColor && color.value === scope.selectedColor.value;
+            }
         }
 
         var directive = {
@@ -51,7 +55,7 @@ Use this directive to generate color swatches to pick from.
                 colors: '=?',
                 size: '@',
                 selectedColor: '=',
-                onSelect: '=',
+                onSelect: '&',
                 useLabel: '=',
                 useColorClass: '=?'
             },

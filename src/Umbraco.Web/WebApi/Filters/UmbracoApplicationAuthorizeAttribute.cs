@@ -18,7 +18,7 @@ namespace Umbraco.Web.WebApi.Filters
         private readonly string[] _appNames;
 
         /// <summary>
-        /// Constructor to set any number of applications that the user needs access to to be authorized
+        /// Constructor to set any number of applications that the user needs access to be authorized
         /// </summary>
         /// <param name="appName">
         /// If the user has access to any of the specified apps, they will be authorized.

@@ -364,7 +364,6 @@
     <key alias="contentTypeAliasAndNameNotNull">请为新的属性类型填写名称和别名！</key>
     <key alias="filePermissionsError">权限有问题，访问指定文件或文件夹失败！</key>
     <key alias="macroErrorLoadingPartialView">加载Partial视图脚本时出错(文件: %0%)</key>
-    <key alias="macroErrorLoadingUsercontrol">加载 userControl 时出错 '%0%'</key>
     <key alias="missingTitle">请输入标题</key>
     <key alias="missingType">请选择类型</key>
     <key alias="pictureResizeBiggerThanOrg">图片尺寸大于原始尺寸不会提高图片质量，您确定要把图片尺寸变大吗?</key>

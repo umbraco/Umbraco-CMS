@@ -14,8 +14,8 @@
     a, a:hover {
         outline: none;
         text-decoration: none;
-
-        // TODO => confirm not in use
+        
+        // TODO: => confirm not in use
 //        &.noSpr {
 //            background-position: 0
 //        }
@@ -28,10 +28,11 @@
         visibility: hidden;
         text-decoration: none;
         font-size: 12px;
-        transition: opacity 120ms ease;
+        transition: color 120ms;
 
         &:hover {
-            opacity: .7;
+            //opacity: .7;
+            color: @ui-option-type-hover;
         }
     }
 
@@ -93,16 +94,28 @@ body.touch .umb-tree {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-
-    &.active {
-        background: @gray-10;
+    
+    border:2px solid transparent;
+    
+    color: @ui-option-type;
+    a {
+        color: @ui-option-type;
     }
-
+    
     &:hover {
-        background: @gray-10;
-
+        background: @ui-option-hover;
+        
+        color: @ui-option-type-hover;
+        a {
+            color: @ui-option-type-hover;
+        }
+        
         > .umb-options {
             visibility: visible;
+        }
+        
+        .umb-tree-icon {
+            color: @ui-option-type-hover;
         }
     }
 }
@@ -219,43 +232,40 @@ body.touch .umb-tree {
     }
 }
 
-.protected,
-.has-unpublished-version,
-.is-container,
-.locked {
+.umb-tree-item__annotation {
     &::before {
         font-family: 'icomoon';
         position: absolute;
-        font-size: 20px;
-        padding-left: 7px;
-        padding-top: 7px;
         bottom: 0;
     }
 }
 
-.protected::before {
-    content: "\e256";
-    color: @red;
-}
-
-.has-unpublished-version::before {
+.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e25a";
     color: @green;
+    font-size: 20px;
+    margin-left: -25px;
 }
 
-.is-container::before {
+.is-container > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e04e";
-    color: @turquoise;
-    font-size: 8px;
-    padding-left: 13px;
-    padding-top: 8px;
-    pointer-events: none;
+    color: @blue;
+    font-size: 9px;
+    margin-left: -20px;
 }
 
+.protected > .umb-tree-item__inner > .umb-tree-item__annotation::before {
+    content: "\e256";
+    color: @red;
+    font-size: 20px;
+    margin-left: -25px;
+}
 
-.locked::before {
+.locked > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e0a7";
     color: @red;
+    font-size: 9px;
+    margin-left: -20px;
 }
 
 .no-access {
@@ -273,7 +283,8 @@ body.touch .umb-tree {
 .umb-tree-icon { 
     vertical-align: middle;
     margin: 0 13px 0 0;
-    color: @gray-1;
+    //color: @gray-1;
+    color: @ui-option-type;
     font-size: 20px;   
     
     &.blue {

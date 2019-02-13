@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Net;
 using System.Web.Http;
 using AutoMapper;
@@ -11,11 +10,11 @@ using Umbraco.Web.Mvc;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Reflection;
 using Umbraco.Core.Models;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
-using Examine;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -24,12 +23,14 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Search;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
+using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
@@ -43,12 +44,16 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {
         private readonly ITreeService _treeService;
+        private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly SearchableTreeCollection _searchableTreeCollection;
 
         public EntityController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            ITreeService treeService)
-            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState)
+            ITreeService treeService, UmbracoHelper umbracoHelper, SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
+            : base(globalSettings, umbracoContext, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
+            _searchableTreeCollection = searchableTreeCollection;
+            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -67,15 +72,6 @@ namespace Umbraco.Web.Editors
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
-        }
-
-        private readonly UmbracoTreeSearcher _treeSearcher;
-        private readonly SearchableTreeCollection _searchableTreeCollection;
-
-        public EntityController(SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
-        {
-            _searchableTreeCollection = searchableTreeCollection;
-            _treeSearcher = treeSearcher;
         }
 
         /// <summary>
@@ -107,11 +103,13 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
         {
-            //TODO: Should we restrict search results based on what app the user has access to?
+            // TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
 
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
+
+            //TODO: This uses the internal UmbracoTreeSearcher, this instead should delgate to the ISearchableTree implementation for the type
 
             return ExamineSearch(query, type, searchFrom);
         }
@@ -207,7 +205,7 @@ namespace Umbraco.Web.Editors
         /// Gets the url of an entity
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
-        /// <param name="type">The tpye of entity such as Document, Media, Member</param>
+        /// <param name="type">The type of entity such as Document, Media, Member</param>
         /// <returns>The URL or path to the item</returns>
         public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type)
         {
@@ -242,7 +240,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
-     
+
         /// <summary>
         /// Gets an entity by a xpath query
         /// </summary>
@@ -252,11 +250,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
-            //TODO: Rename this!!! It's misleading, it should be GetByXPath
+            // TODO: Rename this!!! It's misleading, it should be GetByXPath
 
 
             if (type != UmbracoEntityTypes.Document)
-                throw new ArgumentException("Get by query is only compatible with enitities of type Document");
+                throw new ArgumentException("Get by query is only compatible with entities of type Document");
 
 
             var q = ParseXPathQuery(query, nodeContextId);
@@ -268,7 +266,7 @@ namespace Umbraco.Web.Editors
             return GetById(node.Id, type);
         }
 
-        //PP: wip in progress on the query parser
+        // PP: Work in progress on the query parser
         private string ParseXPathQuery(string query, int id)
         {
             return UmbracoXPathPathSyntaxParser.ParseXPathQuery(
@@ -456,6 +454,9 @@ namespace Umbraco.Web.Editors
             //the EntityService cannot search members of a certain type, this is currently not supported and would require
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
+            //TODO: We should really fix this in the EntityService but if we don't we should allow the ISearchableTree for the members controller
+            // to be used for this search instead of the built in/internal searcher
+
             var searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out long total, id);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
@@ -605,8 +606,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [HttpQueryStringFilter("queryStrings")]
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, FormDataCollection queryStrings)
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
         }
@@ -628,7 +628,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support hierarchic here, some might not.
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 return Services.EntityService.GetChildren(id, objectType.Value)
                     .WhereNotNull()
@@ -651,7 +651,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Need to check for Object types that support hierarchic here, some might not.
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
 
@@ -863,9 +863,15 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type">The type of entity.</param>
+        /// <param name="postFilter">Optional filter - Format like: "BoolVariable==true&IntVariable>=6". Invalid filters are ignored.</param>
+        /// <returns></returns>
+        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter)
         {
-            return GetResultForAll(type, postFilter, postFilterParams);
+            return GetResultForAll(type, postFilter);
         }
 
         /// <summary>
@@ -873,29 +879,28 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="entityType"></param>
         /// <param name="postFilter">A string where filter that will filter the results dynamically with linq - optional</param>
-        /// <param name="postFilterParams">the parameters to fill in the string where filter - optional</param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> GetResultForAll(UmbracoEntityTypes entityType, string postFilter = null, IDictionary<string, object> postFilterParams = null)
+        private IEnumerable<EntityBasic> GetResultForAll(UmbracoEntityTypes entityType, string postFilter = null)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                //TODO: Should we order this by something ?
+                // TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
-                return ExecutePostFilter(entities, postFilter, postFilterParams);
+                return ExecutePostFilter(entities, postFilter);
             }
             //now we need to convert the unknown ones
             switch (entityType)
             {
                 case UmbracoEntityTypes.Template:
                     var templates = Services.FileService.GetTemplates();
-                    var filteredTemplates = ExecutePostFilter(templates, postFilter, postFilterParams);
+                    var filteredTemplates = ExecutePostFilter(templates, postFilter);
                     return filteredTemplates.Select(Mapper.Map<EntityBasic>);
 
                 case UmbracoEntityTypes.Macro:
                     //Get all macros from the macro service
                     var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
-                    var filteredMacros = ExecutePostFilter(macros, postFilter, postFilterParams);
+                    var filteredMacros = ExecutePostFilter(macros, postFilter);
                     return filteredMacros.Select(Mapper.Map<EntityBasic>);
 
                 case UmbracoEntityTypes.PropertyType:
@@ -906,7 +911,7 @@ namespace Umbraco.Web.Editors
                                                 .ToArray()
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
-                    var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter, postFilterParams);
+                    var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
                     return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
 
                 case UmbracoEntityTypes.PropertyGroup:
@@ -917,32 +922,32 @@ namespace Umbraco.Web.Editors
                                                 .ToArray()
                                                 .SelectMany(x => x.PropertyGroups)
                                                 .DistinctBy(composition => composition.Name);
-                    var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter, postFilterParams);
+                    var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter);
                     return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
 
                 case UmbracoEntityTypes.User:
 
                     var users = Services.UserService.GetAll(0, int.MaxValue, out _);
-                    var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
+                    var filteredUsers = ExecutePostFilter(users, postFilter);
                     return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
 
                 case UmbracoEntityTypes.Stylesheet:
 
-                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                    if (!postFilter.IsNullOrWhiteSpace())
                         throw new NotSupportedException("Filtering on stylesheets is not currently supported");
 
                     return Services.FileService.GetStylesheets().Select(Mapper.Map<EntityBasic>);
-                
+
                 case UmbracoEntityTypes.Language:
 
-                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
+                    if (!postFilter.IsNullOrWhiteSpace() )
                         throw new NotSupportedException("Filtering on languages is not currently supported");
 
                     return Services.LocalizationService.GetAllLanguages().Select(Mapper.Map<EntityBasic>);
                 case UmbracoEntityTypes.DictionaryItem:
 
-                    if (!postFilter.IsNullOrWhiteSpace() || (postFilterParams != null && postFilterParams.Count > 0))
-                        throw new NotSupportedException("Filtering on languages is not currently supported");
+                    if (!postFilter.IsNullOrWhiteSpace())
+                        throw new NotSupportedException("Filtering on dictionary items is not currently supported");
 
                     return GetAllDictionaryItems();
 
@@ -952,19 +957,89 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<T> ExecutePostFilter<T>(IEnumerable<T> entities, string postFilter, IDictionary<string, object> postFilterParams)
+        private IEnumerable<T> ExecutePostFilter<T>(IEnumerable<T> entities, string postFilter)
         {
-            // if a post filter is assigned then try to execute it
-            if (postFilter.IsNullOrWhiteSpace() == false)
+            if (postFilter.IsNullOrWhiteSpace()) return entities;
+
+            var postFilterConditions = postFilter.Split('&');
+
+            foreach (var postFilterCondition in postFilterConditions)
             {
-                // fixme/task/critical - trouble is, we've killed the dynamic Where thing!
-                throw new NotImplementedException("oops");
-                //return postFilterParams == null
-                //               ? entities.AsQueryable().Where(postFilter).ToArray()
-                //               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
+                var queryCondition = BuildQueryCondition<T>(postFilterCondition);
+
+                if (queryCondition != null)
+                {
+                    var whereClauseExpression = queryCondition.BuildCondition<T>("x");
+
+                    entities = entities.Where(whereClauseExpression.Compile());
+                }
+
             }
             return entities;
         }
+
+        private static QueryCondition BuildQueryCondition<T>(string postFilter)
+        {
+            var postFilterParts = postFilter.Split(new[]
+            {
+                "=",
+                "==",
+                "!=",
+                "<>",
+                ">",
+                "<",
+                ">=",
+                "<="
+            }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+            if (postFilterParts.Length != 2)
+            {
+                return null;
+            }
+
+            var propertyName = postFilterParts[0];
+            var constraintValue = postFilterParts[1];
+            var stringOperator = postFilter.Substring(propertyName.Length,
+                postFilter.Length - propertyName.Length - constraintValue.Length);
+            Operator binaryOperator;
+
+            try
+            {
+                binaryOperator = OperatorFactory.FromString(stringOperator);
+            }
+            catch (ArgumentException)
+            {
+                // unsupported operators are ignored
+                return null;
+            }
+
+            var type = typeof(T);
+            var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+
+            if (property == null)
+            {
+                return null;
+            }
+
+            var queryCondition = new QueryCondition()
+            {
+                Term = new OperatorTerm()
+                {
+                    Operator = binaryOperator
+                },
+                ConstraintValue = constraintValue,
+                Property = new PropertyModel()
+                {
+                    Alias = propertyName,
+                    Name = propertyName,
+                    Type = property.PropertyType.Name
+                }
+            };
+
+            return queryCondition;
+        }
+
+
 
 
         #region Methods to get all dictionary items
@@ -993,7 +1068,7 @@ namespace Umbraco.Web.Editors
 
                 GetChildItemsForList(childItem, list);
             }
-        } 
+        }
         #endregion
 
     }

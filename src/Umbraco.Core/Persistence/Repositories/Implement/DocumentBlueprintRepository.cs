@@ -17,11 +17,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </remarks>
     internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
     {
-        public DocumentBlueprintRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IContentSection settings)
-            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, settings)
+        public DocumentBlueprintRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
+            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository)
         {
-            EnsureUniqueNaming = false; // duplicates are allowed
         }
+
+        protected override bool EnsureUniqueNaming => false; // duplicates are allowed
 
         protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentBlueprint;
     }

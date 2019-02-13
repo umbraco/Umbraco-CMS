@@ -24,10 +24,12 @@
 
     function umbTagsEditorController($rootScope, assetsService, umbRequestHelper, angularHelper, $timeout, $element) {
 
-        var vm = this;
+        let vm = this;
 
-        var typeahead;
-        var tagsHound;
+        let typeahead;
+        let tagsHound;
+
+        let initLoad = true;
 
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
@@ -52,50 +54,52 @@
 
                 vm.isLoading = false;
 
-                configureViewModel();
+                //ensure that the models are formatted correctly
+                configureViewModel(true);
 
                 // Set the visible prompt to -1 to ensure it will not be visible
                 vm.promptIsVisible = "-1";
 
                 tagsHound = new Bloodhound({
-                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                    initialize: false,
+                    identify: function (obj) { return obj.id; },
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
                     queryTokenizer: Bloodhound.tokenizers.whitespace,
                     //pre-fetch the tags for this category
                     prefetch: {
                         url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture }),
                         //TTL = 5 minutes
-                        ttl: 300000,
-                        transform: dataTransform
+                        ttl: 300000
                     },
                     //dynamically get the tags for this category (they may have changed on the server)
                     remote: {
-                        url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture }),
-                        transform: dataTransform
+                        url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: vm.config.group, culture: vm.culture, query: "%QUERY" }),
+                        wildcard: "%QUERY"
                     }
                 });
 
-                tagsHound.initialize(true);
+                tagsHound.initialize().then(function() {
 
-                //configure the type ahead
-                $timeout(function () {
-
+                    //configure the type ahead
+                    
                     var sources = {
                         //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
-                        // name = the data set name, we'll make this the tag group name
-                        name: vm.config.group,
-                        display: "value",
+                        // name = the data set name, we'll make this the tag group name + culture
+                        name: vm.config.group + (vm.culture ? vm.culture : ""),
+                        display: "text",
                         //source: tagsHound
-                        source: function (query, cb) {
+                        source: function (query, syncCallback, asyncCallback) {
                             tagsHound.search(query,
                                 function(suggestions) {
-                                    cb(removeCurrentTagsFromSuggestions(suggestions));
+                                    syncCallback(removeCurrentTagsFromSuggestions(suggestions));
+                                }, function(suggestions) {
+                                    asyncCallback(removeCurrentTagsFromSuggestions(suggestions));
                                 });
                         }
                     };
 
                     var opts = {
-                        //This causes some strangeness as it duplicates the textbox, best leave off for now.
-                        hint: false,
+                        hint: true,
                         highlight: true,
                         cacheKey: new Date(),  // Force a cache refresh each time the control is initialized
                         minLength: 1
@@ -104,34 +108,40 @@
                     typeahead = $element.find('.tags-' + vm.htmlId).typeahead(opts, sources)
                         .bind("typeahead:selected", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
-                                addTagInternal(datum["value"]);
+                                addTagInternal(datum["text"]);
                                 vm.tagToAdd = "";
                                 // clear the typed text
                                 typeahead.typeahead('val', '');
                             });
                         }).bind("typeahead:autocompleted", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
-                                addTagInternal(datum["value"]);
+                                addTagInternal(datum["text"]);
                                 vm.tagToAdd = "";
+                                // clear the typed text
+                                typeahead.typeahead('val', '');
                             });
 
                         }).bind("typeahead:opened", function (obj) {
-                            console.log("opened ");
-                        });
-                });
 
+                        });
+
+                });
+                
             });
         }
 
+        /**
+         * Watch for value changes
+         * @param {any} changes
+         */
         function onChanges(changes) {
 
-            // watch for value changes externally
+            //when the model 'value' changes, sync the viewModel object
             if (changes.value) {
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
                     configureViewModel();
-                    reValidate()
-
+                    reValidate();
                 }
             }
         }
@@ -145,13 +155,19 @@
             $element.find('.tags-' + vm.htmlId).typeahead('destroy');
         }
 
-        function configureViewModel() {
+        function configureViewModel(isInitLoad) {
             if (vm.value) {
                 if (angular.isString(vm.value) && vm.value.length > 0) {
                     if (vm.config.storageType === "Json") {
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
-                        updateModelValue(vm.viewModel);
+
+                        //if this is the first load, we are just re-formatting the underlying model to be consistent
+                        //we don't want to notify the component parent of any changes, that will occur if the user actually
+                        //changes a value. If we notify at this point it will signal a form dirty change which we don't want.
+                        if (!isInitLoad) {
+                            updateModelValue(vm.viewModel);
+                        }
                     }
                     else {
                         //csv storage
@@ -165,7 +181,12 @@
                             return self.indexOf(v) === i;
                         });
 
-                        updateModelValue(vm.viewModel);
+                        //if this is the first load, we are just re-formatting the underlying model to be consistent
+                        //we don't want to notify the component parent of any changes, that will occur if the user actually
+                        //changes a value. If we notify at this point it will signal a form dirty change which we don't want.
+                        if (!isInitLoad) {
+                            updateModelValue(vm.viewModel);
+                        }
                     }
                 }
                 else if (angular.isArray(vm.value)) {
@@ -175,12 +196,10 @@
         }
 
         function updateModelValue(val) {
-            if (val) {
-                vm.onValueChanged({ value: val });
-            }
-            else {
-                vm.onValueChanged({ value: [] });
-            }
+
+            val = val ? val : [];
+
+            vm.onValueChanged({ value: val });
 
             reValidate();
         }
@@ -252,29 +271,19 @@
         function hidePrompt() {
             vm.promptIsVisible = "-1";
         }
-
-        //helper method to format the data for bloodhound
-        function dataTransform(list) {
-            //transform the result to what bloodhound wants
-            var tagList = _.map(list, function (i) {
-                return { value: i.text };
-            });
-            // remove current tags from the list
-            return $.grep(tagList, function (tag) {
-                return ($.inArray(tag.value, vm.viewModel) === -1);
-            });
-        }
-
+        
         // helper method to remove current tags
         function removeCurrentTagsFromSuggestions(suggestions) {
             return $.grep(suggestions, function (suggestion) {
-                return ($.inArray(suggestion.value, vm.viewModel) === -1);
+                return ($.inArray(suggestion.text, vm.viewModel) === -1);
             });
         }
 
         function reValidate() {
-            //this is required to re-validate
-            vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+            //this is required to re-validate for the mandatory validation
+            if (vm.tagEditorForm && vm.tagEditorForm.tagCount) {
+                vm.tagEditorForm.tagCount.$setViewValue(vm.viewModel.length);
+            }
         }
 
     }

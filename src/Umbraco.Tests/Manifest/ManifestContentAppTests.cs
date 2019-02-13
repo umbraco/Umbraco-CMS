@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Manifest
             var contentType = Mock.Of<IContentType>();
             Mock.Get(contentType).Setup(x => x.Alias).Returns("type1");
             var content = Mock.Of<IContent>();
-            Mock.Get(content).Setup(x => x.ContentType).Returns(contentType);
+            Mock.Get(content).Setup(x => x.ContentType).Returns(new SimpleContentType(contentType));
 
             var group1 = Mock.Of<IReadOnlyUserGroup>();
             Mock.Get(group1).Setup(x => x.Alias).Returns("group1");
