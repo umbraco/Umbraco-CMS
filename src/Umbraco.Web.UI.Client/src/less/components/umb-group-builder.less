@@ -16,10 +16,6 @@
   box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 }
 
-.umb-group-builder__group.-active {
-  border-color: @ui-active;
-}
-
 .umb-group-builder__group.-inherited {
   border-color: @gray-9;
   animation: fadeIn 0.5s;
@@ -33,6 +29,7 @@
   align-items: center;
   cursor: pointer;
   border: 1px dashed @gray-7;
+  background-color: transparent;
   color: @ui-action-type;
   font-weight: bold;
   position: relative;
@@ -253,24 +250,38 @@ input.umb-group-builder__group-title-input:disabled:hover {
 }
 
 .umb-group-builder__property-preview {
-  flex: 1;
-  height: 30px;
-  overflow: hidden;
-  position: relative;
-  padding: 35px 10px 25px 10px;
-  background-color: @gray-10;
+    flex: 1;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+    padding: 35px 10px 25px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.1);
+        transition: opacity 120ms;
+    }
 }
 
 .umb-group-builder__property-preview:hover {
-  cursor: pointer;
+    &::after {
+        opacity: .8;
+    }
 }
 
 .umb-group-builder__property-preview:focus {
-  outline: none;
+    outline: none;
 }
 
-.umb-group-builder__property-preview.-not-clickable:hover {
-  cursor: auto;
+.umb-group-builder__property-preview.-not-clickable {
+    cursor: auto;
 }
 
 .umb-group-builder__property-preview .help-inline {
@@ -312,8 +323,8 @@ input.umb-group-builder__group-title-input:disabled:hover {
 .umb-group-builder__property-tags {
     position: absolute;
     z-index: 20;
-    top: 0;
-    left: 0;
+    top: 4px;
+    left: 4px;
     display: flex;
     flex-direction: row;
 }
@@ -326,9 +337,10 @@ input.umb-group-builder__group-title-input:disabled:hover {
 .umb-group-builder__property-tag {
     font-size: 12px;
     background-color: @gray-8;
-    margin-left: 10px;
+    margin-left: 4px;
     padding: 0 4px;
     display: flex;
+    border-radius: 3px;
 }
 
 .umb-group-builder__property-tag:first-child {
