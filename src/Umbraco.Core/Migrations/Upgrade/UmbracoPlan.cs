@@ -56,7 +56,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             }
         }
 
-         // define the plan
+        // define the plan
         protected void DefinePlan()
         {
             // MODIFYING THE PLAN
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<UpdatePickerIntegerValuesToUdi>("{38C809D5-6C34-426B-9BEA-EFD39162595C}");
             To<RenameUmbracoDomainsTable>("{6017F044-8E70-4E10-B2A3-336949692ADD}");
             To<AddUserLoginDtoDateIndex>("{98339BEF-E4B2-48A8-B9D1-D173DC842BBE}");
-            
+
             Merge()
                 .To<DropXmlTables>("{CDBEDEE4-9496-4903-9CF2-4104E00FF960}")
             .With()
