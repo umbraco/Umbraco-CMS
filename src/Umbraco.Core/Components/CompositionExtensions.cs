@@ -111,13 +111,6 @@ namespace Umbraco.Core.Components
             => composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
         /// <summary>
-        /// Gets the post-migrations collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        internal static PostMigrationCollectionBuilder PostMigrations(this Composition composition)
-            => composition.WithCollectionBuilder<PostMigrationCollectionBuilder>();
-
-        /// <summary>
         /// Gets the components collection builder.
         /// </summary>
         public static ComponentCollectionBuilder Components(this Composition composition)

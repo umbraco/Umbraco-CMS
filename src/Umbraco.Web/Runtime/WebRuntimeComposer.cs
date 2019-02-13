@@ -9,6 +9,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -249,6 +251,9 @@ namespace Umbraco.Web.Runtime
                 .Append<Soundcloud>()
                 .Append<Issuu>()
                 .Append<Hulu>();
+
+            // replace with web implementation
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
         }
     }
 }
