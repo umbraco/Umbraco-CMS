@@ -21,13 +21,13 @@
     </NuGetPackageImportStamp>
     <Use64BitIISExpress />
     <TargetFrameworkProfile />
-    <!-- 
+    <!--
       for some weird reason, and because Web.config is created only during BeforeBuild,
       the web.config configuration file would not be picked, and the build system would
       try to use a traditional app.config, thus missing all the binding redirects.
-      
+
       this ensures that the build system things that the config file is web.config.
-      
+
       (see FindAppConfigFile target in detailed build output)
     -->
     <AppConfig>Web.config</AppConfig>
@@ -188,18 +188,18 @@
     <Content Include="Config\serilog.user.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\serilog.user.Release.config">
+    <None Include="Config\serilog.user.Release.config">
         <DependentUpon>serilog.user.config</DependentUpon>
         <SubType>Designer</SubType>
-    </Content>
+    </None>
     <Content Include="Config\serilog.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\serilog.Release.config">
+    <None Include="Config\serilog.Release.config">
         <DependentUpon>serilog.config</DependentUpon>
         <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Config\logviewer.searches.config.js" />    
+    </None>
+    <Content Include="Config\logviewer.searches.config.js" />
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
