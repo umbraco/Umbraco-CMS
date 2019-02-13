@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -12,9 +13,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class RadioAndCheckboxAndDropdownPropertyEditorsMigration : MigrationBase
     {
+        private readonly IMigrationContext _context;
+
         public RadioAndCheckboxAndDropdownPropertyEditorsMigration(IMigrationContext context)
             : base(context)
         {
+            _context = context;
         }
 
         public override void Migrate()
@@ -27,7 +31,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             if (refreshCache)
             {
-                //FIXME: trigger cache rebuild. Currently the data in the database tables is wrong.
+                _context.AddPostMigration<RebuildPublishedSnapshot>();
             }
         }
 
