@@ -611,13 +611,11 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Modelo padrão</key>
-    <key alias="dictionary editor egenskab">Chave do Dicionário</key>
     <key alias="importDocumentTypeHelp">Para importar um tipo de documento encontre o arquivo ".udt" em seu computador clicando em "Navegar" e depois clicando em "Importar"(você pode confirmar na próxima tela)</key>
     <key alias="newtabname">Novo Título da Guia</key>
     <key alias="nodetype">Tipo de Nó</key>
     <key alias="objecttype">Tipo</key>
     <key alias="stylesheet">Stylesheet</key>
-    <key alias="stylesheet editor egenskab">Propriedade de Stylesheet</key>
     <key alias="tab">Guia</key>
     <key alias="tabname">Título da Guia</key>
     <key alias="tabs">Guias</key>
