@@ -198,11 +198,14 @@ namespace Umbraco.Web.Models.Mapping
 
             foreach (var p in properties.Where(x => x.DataTypeId != 0).OrderBy(x => x.SortOrder))
             {
+
                 var propertyEditor = _propertyEditors[p.PropertyEditorAlias];
-                var configuration = _dataTypeService.GetDataType(p.DataTypeId).Configuration;
+                var dataType = _dataTypeService.GetDataType(p.DataTypeId);
 
                 if (propertyEditor == null)
                     throw new InvalidOperationException("No property editor could be resolved with the alias: " + p.PropertyEditorAlias + ", ensure all packages are installed correctly.");
+
+                var config = dataType.Editor.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
 
                 mappedProperties.Add(new TPropertyType
                 {
@@ -213,7 +216,7 @@ namespace Umbraco.Web.Models.Mapping
                     Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
                     Label = p.Name,
                     View = propertyEditor.GetValueEditor().View,
-                    Config = propertyEditor.GetConfigurationEditor().ToConfigurationEditor(configuration),
+                    Config = config,
                     //Value = "",
                     GroupId = groupId,
                     Inherited = inherited,
