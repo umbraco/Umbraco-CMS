@@ -18,7 +18,8 @@
             onOpenSplitView: "&",
             onSelectApp: "&",
             onSelectAppAnchor: "&",
-            onBack: "&?"
+            onBack: "&?",
+            showBack: "<?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentController
@@ -51,7 +52,7 @@
         }
         
         function showBackButton() {
-            return vm.page.listViewPath !== null
+            return vm.page.listViewPath !== null && vm.showBack;
         }
         
         /** Called when the component has linked all elements, this is when the form controller is available */

@@ -116,7 +116,7 @@
                 name: "=",
                 nameDisabled: "<?",
                 menu: "=",
-                hideMenu: "<?",
+                hideActionsMenu: "<?",
                 content: "=",
                 openVariants: "<",
                 hideChangeVariant: "<?",

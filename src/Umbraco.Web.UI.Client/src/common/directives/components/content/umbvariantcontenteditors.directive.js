@@ -12,7 +12,8 @@
             culture: "<",
             onSelectApp: "&?",
             onSelectAppAnchor: "&?",
-            onBack: "&?"
+            onBack: "&?",
+            showBack: "<?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentEditorsController
