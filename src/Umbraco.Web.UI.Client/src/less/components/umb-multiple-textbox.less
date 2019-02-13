@@ -26,6 +26,7 @@
 
 .umb-multiple-textbox .textbox-wrapper i.handle {
     margin-left: 5px;
+    cursor: move;
 }
 
 .umb-multiple-textbox .textbox-wrapper a.remove {
@@ -35,6 +36,10 @@
 
 .umb-multiple-textbox .add-link {
     &:extend(.umb-node-preview-add);
+}
+
+.umb-multiple-textbox .add-link:hover {
+    &:extend(.umb-node-preview-add:hover);
 }
 
 .umb-editor-wrapper .umb-multiple-textbox .add-link {
