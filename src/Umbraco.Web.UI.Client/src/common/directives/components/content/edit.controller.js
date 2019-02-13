@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, relationResource, overlayService) {
+        editorState, $http, eventsService, relationResource, overlayService, $location) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -22,7 +22,7 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
-        $scope.page.hideChangeVariant = infiniteMode ? true : false;
+        $scope.page.hideChangeVariant = false;
         $scope.allowOpen = true;
         $scope.app = null;
 
@@ -213,24 +213,7 @@
             $scope.page.showPreviewButton = true;
 
         }
-
-        // create infinite editing buttons
-        function createInfiniteModeButtons(content) {
-
-            $scope.page.allowInfinitePublishAndClose = false;
-            $scope.page.allowInfiniteSaveAndClose = false;
-
-            // check for publish rights
-            if (_.contains(content.allowedActions, "U")) {
-                $scope.page.allowInfinitePublishAndClose = true;
-
-                // check for save rights
-            } else if (_.contains(content.allowedActions, "A")) {
-                $scope.page.allowInfiniteSaveAndClose = true;
-            }
-
-        }
-
+        
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(content, path, initialLoad) {
 
@@ -873,11 +856,8 @@
             
             $scope.$broadcast("editors.apps.appChanged", { app: app });
             
-            if (infiniteMode) {
-                createInfiniteModeButtons($scope.content);
-            } else {
-                createButtons($scope.content);
-            }
+            createButtons($scope.content);
+            
         };
 
         /**
@@ -893,6 +873,18 @@
         $scope.close = function () {
             if ($scope.infiniteModel.close) {
                 $scope.infiniteModel.close($scope.infiniteModel);
+            }
+        };
+        
+        /**
+         * Call back when user click the back-icon
+         */
+        $scope.onBack = function() {
+            if ($scope.infiniteModel && $scope.infiniteModel.close) {
+                $scope.infiniteModel.close($scope.infiniteModel);
+            } else {
+                // navigate backwards if content has a parent.
+                $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + $scope.content.parentId);
             }
         };
 

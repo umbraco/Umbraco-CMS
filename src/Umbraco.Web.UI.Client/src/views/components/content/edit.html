@@ -11,7 +11,8 @@
                 content="content"
                 culture="culture"
                 on-select-app="appChanged(app)"
-                on-select-app-anchor="appAnchorChanged(app, anchor)">
+                on-select-app-anchor="appAnchorChanged(app, anchor)"
+                on-back="onBack()">
             </umb-variant-content-editors>
 
             <umb-editor-footer>
@@ -59,7 +60,7 @@
                     </umb-button>
 
                     <umb-button-group
-                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode"
+                        ng-if="defaultButton && !content.trashed"
                         button-style="success"
                         default-button="defaultButton"
                         sub-buttons="subButtons"
