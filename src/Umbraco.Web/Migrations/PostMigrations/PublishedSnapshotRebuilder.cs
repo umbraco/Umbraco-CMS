@@ -15,7 +15,6 @@ namespace Umbraco.Web.Migrations.PostMigrations
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedSnapshotRebuilder"/> class.
         /// </summary>
-        /// <param name="publishedSnapshotService"></param>
         public PublishedSnapshotRebuilder(IPublishedSnapshotService publishedSnapshotService, DistributedCache distributedCache)
         {
             _publishedSnapshotService = publishedSnapshotService;

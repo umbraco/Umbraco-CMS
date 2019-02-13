@@ -27,6 +27,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
+using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -142,31 +143,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (registered)
                 {
-                    string path;
-                    var tempLocation = globalSettings.LocalTempStorageLocation;
-                    switch (tempLocation)
-                    {
-                        case LocalTempStorage.AspNetTemp:
-                            path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "NuCache");
-                            break;
-                        case LocalTempStorage.EnvironmentTemp:
-                            // TODO: why has this to be repeated everywhere?!
-                            // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                            // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                            // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-                            var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
-                            path = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash, "NuCache");
-                            break;
-                        //case LocalTempStorage.Default:
-                        //case LocalTempStorage.Unknown:
-                        default:
-                            path = IOHelper.MapPath("~/App_Data/TEMP/NuCache");
-                            break;
-                    }
-
-                    if (!Directory.Exists(path))
-                        Directory.CreateDirectory(path);
-
+                    var path = GetLocalFilesPath();
                     var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
                     var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
@@ -295,13 +272,69 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
+        #region Local files
+
+        private string GetLocalFilesPath()
+        {
+            string path;
+            var tempLocation = _globalSettings.LocalTempStorageLocation;
+            switch (tempLocation)
+            {
+                case LocalTempStorage.AspNetTemp:
+                    path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "NuCache");
+                    break;
+                case LocalTempStorage.EnvironmentTemp:
+                    // TODO: why has this to be repeated everywhere?!
+                    // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                    // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                    // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                    var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
+                    path = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash, "NuCache");
+                    break;
+                //case LocalTempStorage.Default:
+                //case LocalTempStorage.Unknown:
+                default:
+                    path = IOHelper.MapPath("~/App_Data/TEMP/NuCache");
+                    break;
+            }
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            return path;
+        }
+
+        private void DeleteLocalFilesForContent()
+        {
+            if (_isReady && _localContentDb != null)
+                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
+
+            var path = GetLocalFilesPath();
+            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+            if (File.Exists(localContentDbPath))
+                File.Delete(localContentDbPath);
+        }
+
+        private void DeleteLocalFilesForMedia()
+        {
+            if (_isReady && _localMediaDb != null)
+                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
+
+            var path = GetLocalFilesPath();
+            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+            if (File.Exists(localMediaDbPath))
+                File.Delete(localMediaDbPath);
+        }
+
+        #endregion
+
         #region Environment
 
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
-            var ok = FilePermissionHelper.TryCreateDirectory(SystemDirectories.Data);
-            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local DB files." };
+            var ok = FilePermissionHelper.TryCreateDirectory(GetLocalFilesPath());
+            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
             return ok;
         }
 
@@ -560,10 +593,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, nothing we can do
+            // no cache, trash everything
             if (_isReady == false)
             {
-                draftChanged = publishedChanged = false;
+                DeleteLocalFilesForContent();
+                draftChanged = publishedChanged = true;
                 return;
             }
 
@@ -655,10 +689,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, nothing we can do
+            // no cache, trash everything
             if (_isReady == false)
             {
-                anythingChanged = false;
+                DeleteLocalFilesForMedia();
+                anythingChanged = true;
                 return;
             }
 
@@ -1279,6 +1314,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Rebuild()
         {
+            _logger.Debug<PublishedSnapshotService>("Rebuilding...");
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);

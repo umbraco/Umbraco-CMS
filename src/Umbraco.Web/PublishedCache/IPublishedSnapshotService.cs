@@ -51,7 +51,7 @@ namespace Umbraco.Web.PublishedCache
         #region Rebuild
 
         /// <summary>
-        /// Rebuilds caches.
+        /// Rebuilds internal caches (but does not reload).
         /// </summary>
         /// <remarks>
         /// <para>Forces the snapshot service to rebuild its internal caches. For instance, some caches
