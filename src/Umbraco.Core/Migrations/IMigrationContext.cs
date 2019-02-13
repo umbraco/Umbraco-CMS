@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations
@@ -32,5 +34,13 @@ namespace Umbraco.Core.Migrations
         /// Gets or sets a value indicating whether an expression is being built.
         /// </summary>
         bool BuildingExpression { get; set; }
+
+        /// <summary>
+        /// Gets the post-migrations.
+        /// </summary>
+        /// <remarks>
+        /// <para>Types in this must implement <see cref="IMigration"/>.</para>
+        /// </remarks>
+        List<Type> PostMigrations { get; }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations
 {
     /// <summary>
-    /// Represents a migration context.
+    /// Implements <see cref="IMigrationContext"/>.
     /// </summary>
     internal class MigrationContext : IMigrationContext
     {
@@ -32,5 +33,8 @@ namespace Umbraco.Core.Migrations
 
         /// <inheritdoc />
         public bool BuildingExpression { get; set; }
+
+        /// <inheritdoc />
+        public List<Type> PostMigrations { get; } = new List<Type>();
     }
 }

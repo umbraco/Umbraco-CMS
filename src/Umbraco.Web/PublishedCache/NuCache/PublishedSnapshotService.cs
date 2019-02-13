@@ -1277,6 +1277,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Rebuild Database PreCache
 
+        public override void Rebuild()
+        {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                scope.ReadLock(Constants.Locks.MediaTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
+                RebuildContentDbCacheLocked(scope, 5000, null);
+                RebuildMediaDbCacheLocked(scope, 5000, null);
+                RebuildMemberDbCacheLocked(scope, 5000, null);
+                scope.Complete();
+            }
+        }
+
         public void RebuildContentDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
