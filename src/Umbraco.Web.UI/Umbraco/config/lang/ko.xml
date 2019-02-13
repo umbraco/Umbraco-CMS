@@ -622,13 +622,11 @@
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">기본 템플릿</key>
-    <key alias="dictionary editor egenskab">사전 키</key>
     <key alias="importDocumentTypeHelp">문서를 가져오시려면 사용하시는 컴퓨터에 ".udt"를 찾아 선택하시고 "가져오기"를 클릭하세요(다음 단계에서 확인여부를 문의합니다)</key>
     <key alias="newtabname">새 색인 제목</key>
     <key alias="nodetype">노드타입</key>
     <key alias="objecttype">타입</key>
     <key alias="stylesheet">스타일시트</key>
-    <key alias="stylesheet editor egenskab">스타일시트 속성</key>
     <key alias="tab">색인</key>
     <key alias="tabname">색인 제목</key>
     <key alias="tabs">색인</key>

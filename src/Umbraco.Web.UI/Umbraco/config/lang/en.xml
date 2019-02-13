@@ -1260,14 +1260,12 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
-    <key alias="dictionary editor egenskab">Dictionary Key</key>
     <key alias="importDocumentTypeHelp">To import a document type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Stylesheet property</key>
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab Title</key>
     <key alias="tabs">Tabs</key>

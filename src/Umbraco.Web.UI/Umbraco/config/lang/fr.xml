@@ -1156,14 +1156,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Modèle par défaut</key>
-    <key alias="dictionary editor egenskab">Clé de dictionnaire</key>
     <key alias="importDocumentTypeHelp">Pour importer un type de document, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Parcourir" et cliquez sur "Importer" (une confirmation vous sera demandée à l'écran suivant)</key>
     <key alias="newtabname">Titre du nouvel onglet</key>
     <key alias="nodetype">Type de noeud</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Feuille de style</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Propriété de feuille de style</key>
     <key alias="tab">Onglet</key>
     <key alias="tabname">Titre de l'onglet</key>
     <key alias="tabs">Onglets</key>
