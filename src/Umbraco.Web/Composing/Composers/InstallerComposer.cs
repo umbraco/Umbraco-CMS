@@ -20,10 +20,9 @@ namespace Umbraco.Web.Composing.Composers
             composition.Register<DatabaseInstallStep>(Lifetime.Scope);
             composition.Register<DatabaseUpgradeStep>(Lifetime.Scope);
 
-            // TODO: Add these back once we have a compatible starter kit
-            //container.Register<StarterKitDownloadStep>(Lifetime.Scope);
-            //container.Register<StarterKitInstallStep>(Lifetime.Scope);
-            //container.Register<StarterKitCleanupStep>(Lifetime.Scope);
+            composition.Register<StarterKitDownloadStep>(Lifetime.Scope);
+            composition.Register<StarterKitInstallStep>(Lifetime.Scope);
+            composition.Register<StarterKitCleanupStep>(Lifetime.Scope);
 
             composition.Register<SetUmbracoVersionStep>(Lifetime.Scope);
 
