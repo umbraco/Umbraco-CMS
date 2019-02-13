@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Migrations
             {
                 MigrateCount++;
 
-                Context.PostMigrations.Add(typeof(TestPostMigration));
+                Context.AddPostMigration<TestPostMigration>();
             }
         }
 

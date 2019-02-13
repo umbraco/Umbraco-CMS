@@ -34,7 +34,14 @@ namespace Umbraco.Core.Migrations
         /// <inheritdoc />
         public bool BuildingExpression { get; set; }
 
-        /// <inheritdoc />
+        // this is only internally exposed
         public List<Type> PostMigrations { get; } = new List<Type>();
+
+        /// <inheritdoc />
+        public void AddPostMigration<TMigration>()
+            where TMigration : IMigration
+        {
+            PostMigrations.Add(typeof(TMigration));
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Migrations.PostMigrations
@@ -9,20 +10,23 @@ namespace Umbraco.Web.Migrations.PostMigrations
     public class PublishedSnapshotRebuilder : IPublishedSnapshotRebuilder
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly DistributedCache _distributedCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedSnapshotRebuilder"/> class.
         /// </summary>
         /// <param name="publishedSnapshotService"></param>
-        public PublishedSnapshotRebuilder(IPublishedSnapshotService publishedSnapshotService)
+        public PublishedSnapshotRebuilder(IPublishedSnapshotService publishedSnapshotService, DistributedCache distributedCache)
         {
             _publishedSnapshotService = publishedSnapshotService;
+            _distributedCache = distributedCache;
         }
 
         /// <inheritdoc />
         public void Rebuild()
         {
             _publishedSnapshotService.Rebuild();
+            _distributedCache.RefreshAllPublishedSnapshot();
         }
     }
 }

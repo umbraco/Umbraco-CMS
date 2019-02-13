@@ -36,11 +36,9 @@ namespace Umbraco.Core.Migrations
         bool BuildingExpression { get; set; }
 
         /// <summary>
-        /// Gets the post-migrations.
+        /// Adds a post-migrations.
         /// </summary>
-        /// <remarks>
-        /// <para>Types in this must implement <see cref="IMigration"/>.</para>
-        /// </remarks>
-        List<Type> PostMigrations { get; }
+        void AddPostMigration<TMigration>()
+            where TMigration : IMigration;
     }
 }

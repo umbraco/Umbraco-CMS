@@ -307,15 +307,9 @@ namespace Umbraco.Core.Migrations
             }
 
             // prepare and de-duplicate post-migrations, only keeping the 1st occurence
-            bool EnsureMigrationType(Type type)
-            {
-                if (!typeof(IMigration).IsAssignableFrom(type))
-                    throw new InvalidOperationException($"Type {type.FullName} does not implement {typeof(IMigration).FullName}.");
-                return true;
-            }
             var temp = new HashSet<Type>();
             var postMigrationTypes = PreparePostMigrations(context.PostMigrations)
-                .Where(x => !temp.Contains(x) && EnsureMigrationType(x))
+                .Where(x => !temp.Contains(x))
                 .Select(x => { temp.Add(x); return x; });
 
             // run post-migrations
