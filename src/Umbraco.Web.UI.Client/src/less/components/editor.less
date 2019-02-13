@@ -63,14 +63,14 @@
 // header
 
 .umb-editor-header {
-	background: @white;
-	position: absolute;
-	padding-left: 20px;
-	z-index: @zIndexEditor;
-	border-bottom: 1px solid @gray-9;
-	width: 100%;
-	box-sizing: border-box;
-	height: @editorHeaderHeight;
+    background: @white;
+    position: absolute;
+    padding-left: 20px;
+    z-index: @zIndexEditor;
+    border-bottom: 1px solid @gray-9;
+    width: 100%;
+    box-sizing: border-box;
+    height: @editorHeaderHeight;
 }
 
 .umb-editor-header__back {
@@ -81,6 +81,14 @@
 .umb-editor-header__name-wrapper {
 	position: relative;
 	display: flex;
+}
+
+.umb-editor-header__name-and-description {
+    margin-right: 20px;
+}
+
+.-split-view-active .umb-editor-header__name-and-description {
+    margin-right: 0;
 }
 
 .umb-editor-header__name-wrapper ng-form {
