@@ -79,6 +79,9 @@ namespace Umbraco.Web.Install.InstallSteps
             return (compiledPackage.PackageFile.Name, packageDefinition.Id);
         }
 
+        /// <summary>
+        /// Don't show the view if there's already packages installed
+        /// </summary>
         public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;
 
         public override bool RequiresExecution(Guid? model)
@@ -89,6 +92,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
+            //Don't continue if there's already packages installed
             if (_packageService.GetAllInstalledPackages().Any())
                 return false;
 
