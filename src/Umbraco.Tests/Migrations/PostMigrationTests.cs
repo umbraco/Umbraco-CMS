@@ -2,10 +2,9 @@
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Semver;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
@@ -18,14 +17,9 @@ namespace Umbraco.Tests.Migrations
     public class PostMigrationTests
     {
         [Test]
-        public void Executes_For_Any_Product_Name_When_Not_Specified()
+        public void ExecutesPlanPostMigration()
         {
             var logger = Mock.Of<ILogger>();
-
-            var changed1 = new Args { CountExecuted = 0 };
-            var post1 = new TestPostMigration(changed1);
-
-            var posts = new PostMigrationCollection(new [] { post1 });
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -34,8 +28,10 @@ namespace Umbraco.Tests.Migrations
                 {
                     switch (t.Name)
                     {
-                        case "NoopMigration":
+                        case nameof(NoopMigration):
                             return new NoopMigration();
+                        case nameof(TestPostMigration):
+                            return new TestPostMigration();
                         default:
                             throw new NotSupportedException();
                     }
@@ -50,25 +46,22 @@ namespace Umbraco.Tests.Migrations
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var u1 = new MigrationTests.TestUpgraderWithPostMigrations(
-                new MigrationPlan("Test").From(string.Empty).To("done"));
-            u1.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger, posts);
+            var plan = new MigrationPlan("Test")
+                .From(string.Empty).To("done");
 
-            Assert.AreEqual(1, changed1.CountExecuted);
+            plan.AddPostMigration<TestPostMigration>();
+            TestPostMigration.MigrateCount = 0;
+
+            var upgrader = new Upgrader(plan);
+            upgrader.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
+
+            Assert.AreEqual(1, TestPostMigration.MigrateCount);
         }
 
         [Test]
-        public void Executes_Only_For_Specified_Product_Name()
+        public void MigrationCanAddPostMigration()
         {
             var logger = Mock.Of<ILogger>();
-
-            var changed1 = new Args { CountExecuted = 0};
-            var post1 = new TestPostMigration("Test1", changed1);
-
-            var changed2 = new Args { CountExecuted = 0 };
-            var post2 = new TestPostMigration("Test2", changed2);
-
-            var posts = new PostMigrationCollection(new [] { post1, post2 });
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -77,8 +70,12 @@ namespace Umbraco.Tests.Migrations
                 {
                     switch (t.Name)
                     {
-                        case "NoopMigration":
+                        case nameof(NoopMigration):
                             return new NoopMigration();
+                        case nameof(TestMigration):
+                            return new TestMigration(c);
+                        case nameof(TestPostMigration):
+                            return new TestPostMigration();
                         default:
                             throw new NotSupportedException();
                     }
@@ -93,52 +90,44 @@ namespace Umbraco.Tests.Migrations
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var u1 = new MigrationTests.TestUpgraderWithPostMigrations(
-                new MigrationPlan("Test1").From(string.Empty).To("done"));
-            u1.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger, posts);
+            var plan = new MigrationPlan("Test")
+                .From(string.Empty).To<TestMigration>("done");
 
-            Assert.AreEqual(1, changed1.CountExecuted);
-            Assert.AreEqual(0, changed2.CountExecuted);
+            TestMigration.MigrateCount = 0;
+            TestPostMigration.MigrateCount = 0;
 
-            var u2 = new MigrationTests.TestUpgraderWithPostMigrations(
-                new MigrationPlan("Test2").From(string.Empty).To("done"));
-            u2.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger, posts);
+            new MigrationContext(database, logger);
 
-            Assert.AreEqual(1, changed1.CountExecuted);
-            Assert.AreEqual(1, changed2.CountExecuted);
+            var upgrader = new Upgrader(plan);
+            upgrader.Execute(scopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
+
+            Assert.AreEqual(1, TestMigration.MigrateCount);
+            Assert.AreEqual(1, TestPostMigration.MigrateCount);
         }
 
-        public class Args
+        public class TestMigration : MigrationBase
         {
-            public int CountExecuted { get; set; }
+            public TestMigration(IMigrationContext context)
+                : base(context)
+            { }
+
+            public static int MigrateCount { get; set; }
+
+            public override void Migrate()
+            {
+                MigrateCount++;
+
+                Context.AddPostMigration<TestPostMigration>();
+            }
         }
 
-        public class TestPostMigration : IPostMigration
+        public class TestPostMigration : IMigration
         {
-            private readonly string _prodName;
-            private readonly Args _changed;
+            public static int MigrateCount { get; set; }
 
-            // need that one else it breaks IoC
-            public TestPostMigration()
+            public void Migrate()
             {
-                _changed = new Args();
-            }
-
-            public TestPostMigration(Args changed)
-            {
-                _changed = changed;
-            }
-
-            public TestPostMigration(string prodName, Args changed)
-            {
-                _prodName = prodName;
-                _changed = changed;
-            }
-
-            public void Execute(string name, IScope scope, SemVersion originVersion, SemVersion targetVersion, ILogger logger)
-            {
-                if (_prodName.IsNullOrWhiteSpace() == false && name != _prodName) return;
-                _changed.CountExecuted++;
+                MigrateCount++;
             }
         }
     }
