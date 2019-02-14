@@ -15,6 +15,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.Scoping
             var item = new Content("name", -1, contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"
@@ -204,7 +205,7 @@ namespace Umbraco.Tests.Scoping
             Current.Services.ContentTypeService.Save(contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"

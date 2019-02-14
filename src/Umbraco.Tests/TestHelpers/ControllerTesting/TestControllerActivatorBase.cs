@@ -135,16 +135,17 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var umbracoContextAccessor = Umbraco.Web.Composing.Current.UmbracoContextAccessor;
 
-            var umbCtx = UmbracoContext.EnsureContext(
+            var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,
-                httpContext,
                 publishedSnapshotService.Object,
-                webSecurity.Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
                 new TestVariationContextAccessor(),
-                true); //replace it
+                new TestDefaultCultureAccessor(),
+                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
+                globalSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                Mock.Of<IUserService>());
+
+            var umbCtx = umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
 
             var urlHelper = new Mock<IUrlProvider>();
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))

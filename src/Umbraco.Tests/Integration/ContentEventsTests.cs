@@ -13,6 +13,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
 using Umbraco.Web.Cache;
 using static Umbraco.Tests.Cache.DistributedCache.DistributedCacheTests;
 
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Integration
         {
             base.SetUp();
 
-            _h1 = new DistributedCacheBinder(new DistributedCache(), Mock.Of<ILogger>());
+            _h1 = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _h1.BindEvents(true);
 
             _events = new List<EventInstance>();
