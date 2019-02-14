@@ -77,6 +77,10 @@
     <key alias="update">Tillad adgang til at gemme en node</key>
     <key alias="createblueprint">Tillad adgang til at oprette en indholdsskabelon</key>
   </area>
+  <area alias="apps">
+    <key alias="umbContent">Indhold</key>
+    <key alias="umbInfo">Info</key>
+  </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Tilladelse nægtet.</key>
     <key alias="addNew">Tilføj nyt domæne</key>
