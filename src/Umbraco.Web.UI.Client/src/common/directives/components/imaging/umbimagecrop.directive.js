@@ -54,18 +54,8 @@ angular.module("umbraco.directives")
                         "range": {
                             "min": scope.dimensions.scale.min,
                             "max": scope.dimensions.scale.max
-                        },
-                        "pips": {
-                            mode: 'range',
-                            density: 100,
-                            filter: filterPips
                         }
                     };
-
-                    function filterPips(value) {
-                        // show a pip for min and maximum value
-                        return value === scope.dimensions.scale.min || value === scope.dimensions.scale.max ? 1 : -1;
-                    }
 
                     scope.setup = function (slider) {
                         sliderRef = slider;
