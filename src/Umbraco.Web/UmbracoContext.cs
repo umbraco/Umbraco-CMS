@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Web;
-using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
@@ -17,117 +13,6 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
-    public interface IUmbracoContextFactory
-    {
-        UmbracoContextReference EnsureUmbracoContext(HttpContextBase httpContext = null);
-    }
-
-    public class UmbracoContextReference : IDisposable
-    {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private bool _disposed;
-
-        internal UmbracoContextReference(UmbracoContext umbracoContext, bool isRoot, IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            UmbracoContext = umbracoContext;
-            IsRoot = isRoot;
-
-            _umbracoContextAccessor = umbracoContextAccessor;
-        }
-
-        public UmbracoContext UmbracoContext { get; }
-
-        public bool IsRoot { get; }
-
-        public void Dispose()
-        {
-            if (_disposed)
-                return;
-            _disposed = true;
-
-            if (IsRoot)
-            {
-                UmbracoContext.Dispose();
-                _umbracoContextAccessor.UmbracoContext = null;
-            }
-
-            GC.SuppressFinalize(this);
-        }
-    }
-
-    public class UmbracoContextFactory : IUmbracoContextFactory
-    {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly IDefaultCultureAccessor _defaultCultureAccessor;
-
-        private readonly IUmbracoSettingsSection _umbracoSettings;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IEnumerable<IUrlProvider> _urlProviders;
-        private readonly IUserService _userService;
-
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, IEnumerable<IUrlProvider> urlProviders, IUserService userService)
-        {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
-            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
-
-            _umbracoSettings = umbracoSettings ?? throw new ArgumentNullException(nameof(umbracoSettings));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _urlProviders = urlProviders ?? throw new ArgumentNullException(nameof(urlProviders));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        }
-
-        public UmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
-        {
-            // make sure we have a variation context
-            if (_variationContextAccessor.VariationContext == null)
-                _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
-
-            var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _globalSettings, _variationContextAccessor);
-        }
-
-        public UmbracoContext EnsureUmbracoContext___(HttpContextBase httpContext)
-        {
-            var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (currentUmbracoContext != null)
-            {
-                currentUmbracoContext.Dispose();
-                _umbracoContextAccessor.UmbracoContext = null;
-            }
-
-            var umbracoContext = CreateUmbracoContext(httpContext);
-            _umbracoContextAccessor.UmbracoContext = umbracoContext;
-            return umbracoContext;
-        }
-
-        public UmbracoContextReference EnsureUmbracoContext(HttpContextBase httpContext = null)
-        {
-            var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (currentUmbracoContext != null) return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
-
-            httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("nul.aspx", "", NulWriter.Instance)));
-
-            var umbracoContext = CreateUmbracoContext(httpContext);
-            _umbracoContextAccessor.UmbracoContext = umbracoContext;
-
-            return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
-        }
-
-        private class NulWriter : TextWriter
-        {
-            private NulWriter()
-            { }
-
-            public static NulWriter Instance { get; } = new NulWriter();
-
-            public override Encoding Encoding => Encoding.UTF8;
-        }
-    }
-
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
