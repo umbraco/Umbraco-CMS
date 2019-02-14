@@ -207,7 +207,7 @@
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
-    <Compile Include="Mvc\OnlyLocalRequestsAttribute.cs" />
+    <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
