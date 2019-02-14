@@ -6,7 +6,8 @@
 			<h3>Umbraco Forms</h3>
 		</div>
 
-		<div class="step-one" ng-hide="state"> <!-- STEP one -->
+        <!-- STEP one -->
+		<div class="step-one" ng-hide="state">
 
 			<p class="step-text">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</p>
 
@@ -20,15 +21,16 @@
 
 		</div>
 
-		<div class="step-two" ng-if="state"> <!-- STEP two -->
+        <!-- STEP two -->
+		<div class="step-two" ng-if="state">
 			<p id="installer" class="step-text">Installing...</p>
 
-			<div class="installing">
-				<div style="width: 99%; overflow: hidden" ng-if="state">
-					<div class="umb-loader"></div>
-					<small>{{state}}</small>
-				</div>
-			</div>
+            <div class="installing">
+
+                <umb-load-indicator ng-if="state">
+                </umb-load-indicator>
+
+            </div>
 		</div>
 	</div>
 </div>
