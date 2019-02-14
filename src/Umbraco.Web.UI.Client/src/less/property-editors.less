@@ -555,7 +555,7 @@
     text-align: center;
 }
 
-.umb-cropper .crop-slider {
+.umb-cropper .crop-slider-wrapper {
     padding: 10px;
     border-top: 1px solid @gray-10;
     margin-top: 10px;
@@ -563,25 +563,28 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
+
     @media (min-width: 769px) {
         padding: 10px 50px 10px 50px;
     }
+
+    .crop-slider {
+        padding: 50px 15px 40px 15px;
+        width: 66.6%;
+
+        i {
+            color: @gray-3;
+            flex: 0 0 25px;
+            padding: 0 5px;
+            box-sizing: border-box;
+
+            &:first-of-type {
+                text-align: right;
+            }
+        }
+    }
 }
 
-.umb-cropper .crop-slider i {
-    color: @gray-3;
-    flex: 0 0 25px;
-    padding: 0 5px;
-    box-sizing: border-box;
-}
-
-.umb-cropper .crop-slider i:first-of-type {
-    text-align: right;
-}
-
-.umb-cropper .crop-slider input {
-    flex: 0 1 auto;
-}
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
         max-width: 100%;
