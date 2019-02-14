@@ -56,5 +56,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             protected override void DisposeResources()
             { }
         }
+
+        public void Dispose()
+        { }
     }
 }

@@ -347,7 +347,7 @@ namespace Umbraco.Web
             // (but don't create caches just to dispose them)
             // context is not multi-threaded
             if (_publishedSnapshot.IsValueCreated)
-                _publishedSnapshot.Value.DisposeIfDisposable();
+                _publishedSnapshot.Value.Dispose();
         }
     }
 }
