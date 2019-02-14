@@ -388,7 +388,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
         {
-            throw new NotImplementedException();
+            return GetAtRoot()
+                    .SelectMany(x => x.DescendantsOrSelf())
+                    .Where(x => x.ContentType == contentType);
         }
 
         #endregion
