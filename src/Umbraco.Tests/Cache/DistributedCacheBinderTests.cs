@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
