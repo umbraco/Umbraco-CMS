@@ -1,5 +1,5 @@
 ﻿(function() {
-   'use strict';
+    'use strict';
 
     /**
      * Used to set the current client culture on all requests API requests
@@ -9,9 +9,12 @@
     function cultureRequestInterceptor($q, $routeParams) {
         return {
             //dealing with requests:
-            'request': function(config) {
-                var apiPattern = /\/umbraco\/backoffice\//;
-                if (!apiPattern.test(config.url)) {
+            'request': function (config) {
+                if (!Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath) {
+                    // no settings available, we're probably on the login screen
+                    return config;
+                }
+                if (!config.url.match(RegExp(Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + "\/backoffice\/", "i"))) {
                     // it's not an API request, no handling
                     return config;
                 }
@@ -20,7 +23,7 @@
                 return config;
             }
         };
-   }
+    }
 
     angular.module('umbraco.interceptors').factory('cultureRequestInterceptor', cultureRequestInterceptor);
 
