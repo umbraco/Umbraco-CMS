@@ -78,6 +78,10 @@
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
   </area>
+  <area alias="apps">
+    <key alias="umbContent">Content</key>
+    <key alias="umbInfo">Info</key>
+  </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
     <key alias="addNew">Add new Domain</key>
@@ -128,6 +132,7 @@
     <key alias="relations">Edit relations</key>
     <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
+    <key alias="saveAndClose">Save and close</key>
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveAndSchedule">Save and schedule</key>
     <key alias="saveToPublish">Save and send for approval</key>
@@ -171,6 +176,7 @@
     <key alias="smallSendToPublish">Send To Publish</key>
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
+    <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -457,6 +463,9 @@
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
   </area>
+  <area alias="dictionary">
+    <key alias="noItems">There are no dictionary items.</key>
+  </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
       Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
@@ -466,6 +475,29 @@
       The key '%0%' already exists.
    ]]></key>
     <key alias="overviewTitle">Dictionary overview</key>
+  </area>
+  <area alias="examineManagement">
+    <key alias="configuredSearchers">Configured Searchers</key>
+    <key alias="configuredSearchersDescription">Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</key>
+    <key alias="fieldValues">Field values</key>
+    <key alias="healthStatus">Health status</key>
+    <key alias="healthStatusDescription">The health status of the index and if it can be read</key>
+    <key alias="indexers">Indexers</key>
+    <key alias="indexInfo">Index info</key>
+    <key alias="indexInfoDescription">Lists the properties of the index</key>
+    <key alias="manageIndexes">Manage Examine's indexes</key>
+    <key alias="manageIndexesDescription">Allows you to view the details of each index and provides some tools for managing the indexes</key>
+    <key alias="rebuildIndex">Rebuild index</key>
+    <key alias="rebuildIndexWarning"><![CDATA[
+      This will cause the index to be rebuilt.<br />
+      Depending on how much content there is in your site this could take a while.<br />
+      It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.
+     ]]>
+    </key>
+    <key alias="searchers">Searchers</key>
+    <key alias="searchDescription">Search the index and view the results</key>
+    <key alias="tools">Tools</key>
+    <key alias="toolsDescription">Tools to manage the index</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -480,7 +512,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
-    <key alias="email">Enter your email...</key>
+    <key alias="email">Enter your email</key>
     <key alias="enterMessage">Enter a message...</key>
     <key alias="usernameHint">Your username is usually your email</key>
     <key alias="anchor">#value or ?key=value</key>
@@ -554,7 +586,6 @@
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
   </area>
   <area alias="general">
-    <key alias="options">Options</key>
     <key alias="about">About</key>
     <key alias="action">Action</key>
     <key alias="actions">Actions</key>
@@ -563,6 +594,7 @@
     <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
     <key alias="back">Back</key>
+    <key alias="backToOverview">Back to overview</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
@@ -574,6 +606,7 @@
     <key alias="confirm">Confirm</key>
     <key alias="constrain">Constrain</key>
     <key alias="constrainProportions">Constrain proportions</key>
+    <key alias="content">Content</key>
     <key alias="continue">Continue</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
@@ -593,6 +626,7 @@
     <key alias="elements">Elements</key>
     <key alias="email">Email</key>
     <key alias="error">Error</key>
+    <key alias="field">Field</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
     <key alias="general">General</key>
@@ -604,6 +638,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
@@ -632,6 +667,7 @@
     <key alias="off">Off</key>
     <key alias="ok">OK</key>
     <key alias="open">Open</key>
+    <key alias="options">Options</key>
     <key alias="on">On</key>
     <key alias="or">or</key>
     <key alias="orderBy">Order by</key>
@@ -640,9 +676,11 @@
     <key alias="pleasewait">One moment please...</key>
     <key alias="previous">Previous</key>
     <key alias="properties">Properties</key>
+    <key alias="rebuild">Rebuild</key>
     <key alias="reciept">Email to receive form data</key>
     <key alias="recycleBin">Recycle Bin</key>
     <key alias="recycleBinEmpty">Your recycle bin is empty</key>
+    <key alias="reload">Reload</key>
     <key alias="remaining">Remaining</key>
     <key alias="remove">Remove</key>
     <key alias="rename">Rename</key>
@@ -690,7 +728,6 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1073,6 +1110,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notifications">Notifications</key>
   </area>
   <area alias="packager">
+    <key alias="actions">Actions</key>
     <key alias="created">Created</key>
     <key alias="createPackage">Create package</key>
     <key alias="chooseLocalPackageText"><![CDATA[
@@ -1081,15 +1119,17 @@ To manage your website, simply open the Umbraco back office and start adding con
       ]]></key>
     <key alias="deletewarning">This will delete the package</key>
     <key alias="dropHere">Drop to upload</key>
+    <key alias="includeAllChildNodes">Include all child nodes</key>
     <key alias="orClickHereToUpload">or click here to choose package file</key>
     <key alias="uploadPackage">Upload package</key>
     <key alias="localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</key>
     <key alias="uploadAnother">Upload another package</key>
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
-    <key alias="packageLicense">License</key>
     <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
-    <key alias="packageInstall">Install package</key>
+    
+    <key alias="pathToFile">Path to file</key>
+    <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
     <key alias="installedPackages">Installed packages</key>
     <key alias="installLocal">Install local</key>
@@ -1098,6 +1138,15 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
+    <key alias="packageActions">Package Actions</key>
+    <key alias="packageAuthorUrl">Author URL</key>
+    <key alias="packageContent">Package Content</key>
+    <key alias="packageFiles">Package Files</key>
+    <key alias="packageIconUrl">Icon URL</key>
+    <key alias="packageInstall">Install package</key>
+    <key alias="packageLicense">License</key>
+    <key alias="packageLicenseUrl">License URL</key>
+    <key alias="packageProperties">Package Properties</key>
     <key alias="packageSearch">Search for packages</key>
     <key alias="packageSearchResults">Results for</key>
     <key alias="packageNoResults">We couldn’t find anything for</key>
@@ -1260,14 +1309,12 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
-    <key alias="dictionary editor egenskab">Dictionary Key</key>
     <key alias="importDocumentTypeHelp">To import a document type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Stylesheet property</key>
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab Title</key>
     <key alias="tabs">Tabs</key>
@@ -1563,6 +1610,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
     <key alias="editParameter">Edit parameter</key>
+    <key alias="enterMacroName">Enter macro name</key>
     <key alias="parameters">Parameters</key>
     <key alias="parametersDescription">Define the parameters that should be available when using this macro.</key>
   </area>
@@ -2005,10 +2053,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="panelInformation">The following URLs redirect to this content item:</key>
     <key alias="noRedirects">No redirects have been made</key>
     <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
-    <key alias="removeButton">Remove</key>
     <key alias="confirmRemove">Are you sure you want to remove the redirect from '%0%' to '%1%'?</key>
     <key alias="redirectRemoved">Redirect URL removed.</key>
     <key alias="redirectRemoveError">Error removing redirect URL.</key>
+    <key alias="redirectRemoveWarning">This will remove the redirect</key>
     <key alias="confirmDisable">Are you sure you want to disable the URL tracker?</key>
     <key alias="disabledConfirm">URL tracker has now been disabled.</key>
     <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
@@ -2039,6 +2087,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="created">Created</key>
     <key alias="comment">Comment</key>
     <key alias="name">Name</key>
+    <key alias="noRelations">No relations for this relation type.</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
   </area>

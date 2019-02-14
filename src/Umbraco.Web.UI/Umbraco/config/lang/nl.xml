@@ -819,14 +819,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standaard template</key>
-    <key alias="dictionary editor egenskab">Woordenboek sleutel</key>
     <key alias="importDocumentTypeHelp">Om een bestaand documenttype te importeren, zoek het betreffende “.udt” bestand door op browse en import te klikken. (Je ziet een bevestigingspagina voordat de import start. Als het documenttype al bestaat dan wordt het bijgewerkt.)</key>
     <key alias="newtabname">Nieuwe tabtitel</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Stylesheet eigenschap</key>
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab titel</key>
     <key alias="tabs">Tabs</key>
@@ -1399,7 +1397,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="redirectedTo">Doorgestuurd naar</key>
     <key alias="noRedirects">Er zijn geen redirects</key>
     <key alias="noRedirectsDescription">Er wordt automatisch een redirect aangemaakt als een gepubliceerde pagina hernoemd of verplaatst wordt.</key>
-    <key alias="removeButton">Verwijder</key>
     <key alias="confirmRemove">Weet je zeker dat je de redirect van '%0%' naar '%1%' wilt verwijderen?</key>
     <key alias="redirectRemoved">Redirect URL verwijderd.</key>
     <key alias="redirectRemoveError">Fout bij verwijderen redirect URL.</key>

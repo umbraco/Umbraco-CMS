@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: @editorHeaderHeight;
+  height: calc(~'@{editorHeaderHeight}' - ~'1px'); // need to offset the 1px border-bottom on .umb-editor-header - avoids overflowing top of the container
   position: relative;
   
   color: @ui-active-type;

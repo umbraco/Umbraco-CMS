@@ -48,18 +48,20 @@
     .form-search {
         flex: 1;
 
-        &__toggle{
+        &__toggle {
             margin: 10px 0;
             display: flex;
             align-items: center;
 
-            input {
-                margin: 0;
-            }
-    
             label {
+                display: flex;
+                align-items: center;
                 margin-left: 5px;
                 margin-bottom: 0;
+
+                input[type="checkbox"] {
+                    margin: 0 5px 0 0;
+                }
             }
         }
     }
@@ -344,10 +346,16 @@
   justify-content: center;
   align-items: center;
   background: @white;
-  border: 1px solid @gray-8;
+  border: 1px solid @ui-action-disgrete-border;
   animation: fadeIn 0.5s;
   border-radius: 3px;
   width: 50px;
+  &:hover {
+      .icon {
+          opacity: 0.8;
+      }
+      border-color: @ui-action-disgrete-border-hover;
+  }
 }
 
 .umb-panel-header-title-wrapper {
@@ -380,8 +388,9 @@
 }
 
 .umb-panel-header-icon .icon {
-  font-size: 30px;
-  color: @gray-7;
+    font-size: 30px;
+    color: @gray-7;
+    transition: opacity 120ms;
 }
 
 .umb-panel-header-icon-text {

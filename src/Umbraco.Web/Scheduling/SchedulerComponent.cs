@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;

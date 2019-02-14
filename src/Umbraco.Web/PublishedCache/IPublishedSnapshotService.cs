@@ -48,6 +48,21 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
+        #region Rebuild
+
+        /// <summary>
+        /// Rebuilds internal caches (but does not reload).
+        /// </summary>
+        /// <remarks>
+        /// <para>Forces the snapshot service to rebuild its internal caches. For instance, some caches
+        /// may rely on a database table to store pre-serialized version of documents.</para>
+        /// <para>This does *not* reload the caches. Caches need to be reloaded, for instance via
+        /// <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.</para>
+        /// </remarks>
+        void Rebuild();
+
+        #endregion
+
         #region Preview
 
         /* Later on we can imagine that EnterPreview would handle a "level" that would be either

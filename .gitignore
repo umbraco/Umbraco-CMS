@@ -72,6 +72,8 @@ src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
 src/Umbraco.Web.UI/web.config
 src/Umbraco.Web.UI/[Cc]onfig/ClientDependency.config
+src/Umbraco.Web.UI/[Cc]onfig/serilog.config
+src/Umbraco.Web.UI/[Cc]onfig/serilog.user.config
 src/Umbraco.Tests/config/404handlers.config
 src/Umbraco.Web.UI/[Vv]iews/*.cshtml
 src/Umbraco.Web.UI/[Vv]iews/*.vbhtml
@@ -158,3 +160,4 @@ build/temp/
 
 
 # eof
+/src/Umbraco.Web.UI.Client/TESTS-*.xml

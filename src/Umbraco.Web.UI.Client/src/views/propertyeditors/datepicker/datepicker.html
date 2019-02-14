@@ -13,12 +13,15 @@
                 <div class="input-append">
                     <input
                         name="datepicker"
-                        id="{{model.alias}}" 
-                        type="text" 
+                        id="{{model.alias}}"
+                        type="text"
                         ng-model="model.datetimePickerValue"
                         ng-required="model.validation.mandatory"
-                        val-server="value" 
+                        val-server="value"
                         class="datepickerinput">
+                    <span class="on-top" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
+                        <i class="icon-delete"></i>
+                    </span>
                     <span class="add-on">
                         <i class="icon-calendar"></i>
                     </span>
@@ -37,9 +40,6 @@
         <p ng-if="model.config.offsetTime === '1' && serverTimeNeedsOffsetting && model.value" class="muted">
             <small><localize key="content_scheduledPublishServerTime">This translates to the following time on the server:</localize> {{serverTime}}</small><br />
             <small><localize key="content_scheduledPublishDocumentation">What does this mean?</localize></small>
-        </p>
-        <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
-            <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
         </p>
 
     </ng-form>

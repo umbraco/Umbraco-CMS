@@ -4,11 +4,12 @@ using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -16,7 +17,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing.Composers;
+using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
@@ -220,6 +221,7 @@ namespace Umbraco.Web.Runtime
                 .Append<PackagesBackOfficeSection>()
                 .Append<UsersBackOfficeSection>()
                 .Append<MembersBackOfficeSection>()
+                .Append<FormsBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
@@ -248,6 +250,9 @@ namespace Umbraco.Web.Runtime
                 .Append<Soundcloud>()
                 .Append<Issuu>()
                 .Append<Hulu>();
+
+            // replace with web implementation
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
         }
     }
 }
