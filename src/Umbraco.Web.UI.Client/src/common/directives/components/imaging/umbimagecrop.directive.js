@@ -42,7 +42,7 @@ angular.module("umbraco.directives")
                     scope.sliderOptions = {
                         "start": scope.dimensions.scale.current,
                         "step": 0.001,
-                        "tooltips": [true],
+                        "tooltips": [false],
                         "format": {
                             to: function (value) {
                                 return parseFloat(parseFloat(value).toFixed(3)); //Math.round(value);
