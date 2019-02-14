@@ -444,6 +444,9 @@
     <key alias="selectSnippet">Vælg snippet</key>
     <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så afpublicér det i stedet.</key>
   </area>
+  <area alias="dictionary">
+    <key alias="noItems">Der er ingen ordbogselementer.</key>
+  </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
       Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
@@ -452,7 +455,7 @@
     <key alias="changeKeyError"><![CDATA[
       Navnet '%0%' eksisterer allerede.
    ]]></key>
-    <key alias="overviewTitle">Ordbog</key>
+    <key alias="overviewTitle">Ordbogsoversigt</key>
   </area>
   <area alias="examineManagement">
     <key alias="configuredSearchers">Konfigurerede søgere</key>
