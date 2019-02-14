@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Dashboard.FormsDashboardController" class="umb-dashboards-forms-install">
+<div ng-controller="Umbraco.Dashboard.FormsDashboardController as vm" class="umb-dashboards-forms-install">
 	<div class="installer-wrapper">
 
 		<div class="installer-intro">
@@ -7,7 +7,7 @@
 		</div>
 
         <!-- STEP one -->
-		<div class="step-one" ng-hide="state">
+		<div class="step-one" ng-hide="vm.state">
 
 			<p class="step-text">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</p>
 
@@ -16,18 +16,18 @@
 				type="button"
 				button-style="success"
 				label="Install"
-				action="installForms()">
+				action="vm.installForms()">
 			</umb-button>
 
 		</div>
 
         <!-- STEP two -->
-		<div class="step-two" ng-if="state">
+		<div class="step-two" ng-if="vm.state">
 			<p id="installer" class="step-text">Installing...</p>
 
             <div class="installing">
 
-                <umb-load-indicator ng-if="state">
+                <umb-load-indicator ng-if="vm.state">
                 </umb-load-indicator>
 
             </div>
