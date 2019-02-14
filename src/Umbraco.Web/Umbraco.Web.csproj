@@ -60,32 +60,32 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.0-beta078" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
+    <PackageReference Include="Examine" Version="1.0.0-beta079" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.6.2.25</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="5.1.2" />
+    <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.2.3" />
-    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
-    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
-    <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
+    <PackageReference Include="MiniProfiler" Version="4.0.138" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="Semver" Version="2.0.4" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.8.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
@@ -130,7 +130,6 @@
     <Compile Include="Dashboards\HealthCheckDashboard.cs" />
     <Compile Include="Dashboards\MediaDashboard.cs" />
     <Compile Include="Dashboards\MembersDashboard.cs" />
-    <Compile Include="Dashboards\ModelsBuilderDashboard.cs" />
     <Compile Include="Dashboards\PublishedStatusDashboard.cs" />
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
@@ -197,6 +196,7 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
@@ -215,6 +215,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
     <Compile Include="Templates\ITemplateRenderer.cs" />
     <Compile Include="Trees\BackOfficeSectionCollectionBuilder.cs" />
+    <Compile Include="Trees\FormsBackOfficeSection.cs" />
     <Compile Include="Trees\MediaBackOfficeSection.cs" />
     <Compile Include="Trees\MembersBackOfficeSection.cs" />
     <Compile Include="Trees\PackagesBackOfficeSection.cs" />
@@ -284,6 +285,7 @@
     <Compile Include="JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
+    <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
@@ -860,7 +862,7 @@
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
+    <Compile Include="PropertyEditors\MultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
@@ -884,7 +886,7 @@
     <Compile Include="Security\BackOfficeCookieManager.cs" />
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
-    <Compile Include="Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
+    <Compile Include="Migrations\PostMigrations\ClearCsrfCookies.cs" />
     <Compile Include="Components\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
@@ -1058,7 +1060,6 @@
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingMediaAttribute.cs" />
-    <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingDateTimeFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\GuidNoHyphenConverter.cs" />

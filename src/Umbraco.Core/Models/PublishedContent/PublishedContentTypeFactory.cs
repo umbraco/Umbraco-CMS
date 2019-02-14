@@ -87,8 +87,20 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             lock (_publishedDataTypesLocker)
             {
-                var dataTypes = _dataTypeService.GetAll(ids);
-                _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
+                if (_publishedDataTypes == null)
+                {
+                    var dataTypes = _dataTypeService.GetAll();
+                    _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
+                }
+                else
+                {
+                    foreach (var id in ids)
+                        _publishedDataTypes.Remove(id);
+
+                    var dataTypes = _dataTypeService.GetAll(ids);
+                    foreach (var dataType in dataTypes)
+                        _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
+                }
             }
         }
 

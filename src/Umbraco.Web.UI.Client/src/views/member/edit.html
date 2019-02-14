@@ -24,13 +24,13 @@
                     <div>{{ group.label }}</div>
                     <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !group.open, 'icon-navigation-up': group.open}" class="icon-navigation-right">&nbsp;</ins>
                 </div>
-        
+
                 <div class="umb-expansion-panel__content" ng-show="group.open">
                     <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties track by property.alias" property="property">
                         <umb-property-editor model="property"></umb-property-editor>
                     </umb-property>
                 </div>
-        
+
             </div>
 
          </umb-editor-container>
@@ -38,8 +38,8 @@
          <umb-editor-footer>
 
             <umb-editor-footer-content-left>
-                <umb-breadcrumbs 
-                  ng-if="ancestors && ancestors.length > 0" 
+                <umb-breadcrumbs
+                  ng-if="ancestors && ancestors.length > 0"
                   ancestors="ancestors">
                 </umb-breadcrumbs>
             </umb-editor-footer-content-left>
@@ -51,6 +51,7 @@
                   ng-if="page.listViewPath"
                   type="link"
                   href="#{{page.listViewPath}}"
+                  button-style="link"
                   label="Return to list"
                   label-key="buttons_returnToList">
                </umb-button>

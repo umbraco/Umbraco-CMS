@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -120,15 +119,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     break;
                 case QueryType.Single:
                 case QueryType.Many:
+                    // R# may flag this ambiguous and red-squiggle it, but it is not
+                    sql = sql.Select<DocumentDto>(r =>
+                       r.Select(documentDto => documentDto.ContentDto, r1 =>
+                           r1.Select(contentDto => contentDto.NodeDto))
+                        .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
+                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
+                        .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
+                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
 
-                    //we've put this in a local function so that the below sql.Select statement doesn't have a problem
-                    //thinking that the call is ambiguous
-                    NPocoSqlExtensions.SqlRef<DocumentDto> SelectStatement(NPocoSqlExtensions.SqlRef<DocumentDto> r) =>
-                        r.Select(documentDto => documentDto.ContentDto, r1 => r1.Select(contentDto => contentDto.NodeDto))
-                            .Select(documentDto => documentDto.DocumentVersionDto, r1 => r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
-                            .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 => r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv"));
-
-                    sql = sql.Select<DocumentDto>(SelectStatement)
                        // select the variant name, coalesce to the invariant name, as "variantName"
                        .AndSelect(VariantNameSqlExpression + " AS variantName");
                     break;
@@ -203,10 +202,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                "DELETE FROM cmsPreviewXml WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM cmsContentXml WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
@@ -954,8 +951,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        
-
         protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
             // note: 'updater' is the user who created the latest draft version,
@@ -1187,17 +1182,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return result;
         }
 
-
         private void SetVariations(Content content, IDictionary<int, List<ContentVariation>> contentVariations, IDictionary<int, List<DocumentVariation>> documentVariations)
         {
             if (contentVariations.TryGetValue(content.VersionId, out var contentVariation))
                 foreach (var v in contentVariation)
                     content.SetCultureInfo(v.Culture, v.Name, v.Date);
+
             if (content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
             {
                 foreach (var v in contentVariation)
                     content.SetPublishInfo(v.Culture, v.Name, v.Date);
             }
+
             if (documentVariations.TryGetValue(content.Id, out var documentVariation))
                 content.SetCultureEdited(documentVariation.Where(x => x.Edited).Select(x => x.Culture));
         }

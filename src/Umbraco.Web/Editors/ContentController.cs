@@ -464,6 +464,16 @@ namespace Umbraco.Web.Editors
         {
             long totalChildren;
             List<IContent> children;
+
+            // Sets the culture to the only existing culture if we only have one culture.
+            if (string.IsNullOrWhiteSpace(cultureName))
+            {
+                if (_allLangs.Value.Count == 1)
+                {
+                    cultureName = _allLangs.Value.First().Key;
+                }
+            }
+
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IContent> queryFilter = null;
@@ -1200,7 +1210,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
-                
+
                 //proceed to publish if all validation still succeeds
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
@@ -1830,8 +1840,10 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root
-                if (toMove.ContentType.AllowedAsRoot == false)
+                //cannot move if the content item is not allowed at the root unless there are
+                //none allowed at root (in which case all should be allowed at root)
+                var contentTypeService = Services.ContentTypeService;
+                if (toMove.ContentType.AllowedAsRoot == false && contentTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
@@ -1846,8 +1858,7 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var contentTypeService = Services.ContentTypeBaseServices.For(parent);
-                var parentContentType = contentTypeService.Get(parent.ContentTypeId);
+                var parentContentType = Services.ContentTypeService.Get(parent.ContentTypeId);
                 //check if the item is allowed under this one
                 if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)

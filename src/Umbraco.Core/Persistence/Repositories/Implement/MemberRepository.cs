@@ -188,7 +188,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
                 "DELETE FROM cmsMember WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM cmsContentXml WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
                 "DELETE FROM umbracoNode WHERE id = @id"
             };

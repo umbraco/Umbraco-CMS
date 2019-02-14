@@ -105,6 +105,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     };
 
     if ($scope.model.config) {
+        //special case, if the `startNode` is falsy on the server config delete it entirely so the default value is merged in
+        if (!$scope.model.config.startNode) {
+            delete $scope.model.config.startNode;
+        }
         //merge the server config on top of the default config, then set the server config to use the result
         $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
     }
@@ -144,7 +148,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
-        idType: "int",
+        idType: "udi",
         //only show the lang selector for content
         showLanguageSelector: $scope.model.config.startNode.type === "content"
     };

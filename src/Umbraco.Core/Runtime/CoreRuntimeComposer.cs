@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence;
@@ -113,13 +114,13 @@ namespace Umbraco.Core.Runtime
             composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
-            composition.WithCollectionBuilder<PostMigrationCollectionBuilder>()
-                .Add(() => composition.TypeLoader.GetTypes<IPostMigration>());
-
             composition.RegisterUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             // by default, register a noop factory
             composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
+
+            // by default, register a noop rebuilder
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
         }
     }
 }

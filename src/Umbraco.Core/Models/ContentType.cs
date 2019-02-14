@@ -42,6 +42,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
+
+        /// <inheritdoc />
         public override bool IsPublishing => IsPublishingConst;
 
         //Custom comparer for enumerable
@@ -97,8 +100,8 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateId else False</returns>
         public bool IsAllowedTemplate(int templateId)
         {
-            return AllowedTemplates == null 
-                ? false 
+            return AllowedTemplates == null
+                ? false
                 : AllowedTemplates.Any(t => t.Id == templateId);
         }
 

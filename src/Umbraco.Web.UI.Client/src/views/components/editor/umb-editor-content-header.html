@@ -29,7 +29,7 @@
                             autocomplete="off" />
                     </ng-form>
 
-                    <a ng-if="variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                    <a ng-if="content.variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                         <span>{{vm.currentVariant.language.name}}</span>
                         <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
                     </a>
@@ -39,7 +39,7 @@
                     </span>
 
                     <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
-                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active, 'umb-variant-switcher_item--not-allowed': variantIsOpen(variant.language.culture)}" ng-repeat="variant in variants">
+                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active, 'umb-variant-switcher_item--not-allowed': variantIsOpen(variant.language.culture)}" ng-repeat="variant in content.variants">
                             <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
                                 <span class="umb-variant-switcher__name" ng-class="{'bold': variant.language.isDefault}">{{variant.language.name}}</span>
                                 <umb-variant-state variant="variant" class="umb-variant-switcher__state"></umb-variant-state>
@@ -60,11 +60,12 @@
             </a>
         </div>
 
-        <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
+        <div ng-if="content.apps && splitViewOpen !== true" style="margin-left: 20px;">
             <umb-editor-navigation
                 data-element="editor-sub-views"
-                navigation="navigation"
-                on-select="selectNavigationItem(item)">
+                navigation="content.apps"
+                on-select="selectNavigationItem(item)"
+                on-anchor-select="selectAnchorItem(item, anchor)">
             </umb-editor-navigation>
         </div>
 
