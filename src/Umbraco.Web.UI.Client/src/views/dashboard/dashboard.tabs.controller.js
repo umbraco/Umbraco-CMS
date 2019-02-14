@@ -129,7 +129,9 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
-function FormsController($scope, $route, $cookies, packageResource, localizationService) {
+function FormsController($scope, $cookies, packageResource, localizationService) {
+
+    var vm = this;
 
     var labels = {};
     var labelKeys = [
@@ -140,7 +142,7 @@ function FormsController($scope, $route, $cookies, packageResource, localization
         "packager_installStateComplete"
     ];
 
-    localizationService.localizeMany(labelKeys).then(function(values){
+    localizationService.localizeMany(labelKeys).then(function(values) {
         labels.installStateDownloading = values[0];
         labels.installStateImporting = values[1];
         labels.installStateInstalling = values[2];
@@ -148,52 +150,47 @@ function FormsController($scope, $route, $cookies, packageResource, localization
         labels.installStateComplete = values[4];
     });
 
-    $scope.installForms = function(){
-        $scope.state = labels.installStateDownloading;
+    vm.installForms = function() {
+        vm.state = labels.installStateDownloading;
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack) {
-                    $scope.state = labels.installStateImporting;
+                    vm.state = labels.installStateImporting;
                     return packageResource.import(pack);
-                },
-                $scope.error)
+                }, vm.error)
             .then(function(pack) {
-                $scope.state = labels.installStateInstalling;
+                vm.state = labels.installStateInstalling;
                     return packageResource.installFiles(pack);
-                },
-                $scope.error)
+                }, vm.error)
             .then(function(pack) {
-                $scope.state = labels.installStateRestarting;
+                vm.state = labels.installStateRestarting;
                     return packageResource.installData(pack);
-                },
-                $scope.error)
+                }, vm.error)
             .then(function(pack) {
-                $scope.state = installStateComplete;
+                vm.state = installStateComplete;
                     return packageResource.cleanUp(pack);
-                },
-                $scope.error)
-            .then($scope.complete, $scope.error);
+                }, vm.error)
+            .then(vm.complete, vm.error);
     };
 
-    $scope.complete = function(result){
-        var url = window.location.href + "?init=true";
+    vm.complete = function(result) {
+        window.location.href + "?init=true";
         $cookies.putObject("umbPackageInstallId", result.packageGuid);
         window.location.reload(true);
     };
 
-    $scope.error = function(err){
-        $scope.state = undefined;
-        $scope.error = err;
-        //This will return a rejection meaning that the promise change above will stop
+    vm.error = function(err) {
+        vm.state = undefined;
+        vm.error = err;
+        // This will return a rejection meaning that the promise change above will stop
         return $q.reject();
     };
-
 
     function Video_player (videoId) {
       // Get dom elements
       this.container      = document.getElementById(videoId);
 
-      //Create controls
+      // Create controls
       this.controls = document.createElement('div');
       this.controls.className="video-controls";
 
