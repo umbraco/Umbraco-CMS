@@ -20,7 +20,7 @@
                 <div class="umb-expansion-panel">
 
                     <div class="umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
-                        <div>Package Properties</div>
+                        <div><localize key="packager_packageProperties">Package Properties</localize></div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</ins>
                     </div>
 
@@ -44,7 +44,7 @@
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="Icon URL">
+                        <umb-control-group label="@packager_packageIconUrl">
                             <input class="umb-property-editor" name="iconUrl" type="text" ng-model="vm.package.iconUrl" />
                         </umb-control-group>
 
@@ -61,7 +61,7 @@
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="Author name" required="true">
+                        <umb-control-group label="@packager_packageAuthor" required="true">
                             <input class="umb-property-editor" name="author" type="text" ng-model="vm.package.author" val-server-field="model.Author" required />
 
                             <span ng-messages="editPackageForm.author.$error" show-validation-on-submit >
@@ -70,7 +70,7 @@
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="Author URL" required="true">
+                        <umb-control-group label="@packager_packageAuthorUrl" required="true">
                             <input class="umb-property-editor" name="authorUrl" type="text" ng-model="vm.package.authorUrl" val-server-field="model.AuthorUrl" required />
 
                             <span ng-messages="editPackageForm.authorUrl.$error" show-validation-on-submit >
@@ -79,15 +79,21 @@
                             </span>
                         </umb-control-group>
 
-                        <umb-control-group label="License">
+                        <umb-control-group label="@packager_packageContrib" ng-if="vm.contributorsEditor">
+                            <umb-property property="vm.contributorsEditor">
+                                <umb-property-editor model="vm.contributorsEditor"></umb-property-editor>
+                            </umb-property>
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageLicense">
                             <input class="umb-property-editor" name="license" type="text" ng-model="vm.package.license" />
                         </umb-control-group>
 
-                        <umb-control-group label="License URL">
+                        <umb-control-group label="@packager_packageLicenseUrl">
                             <input class="umb-property-editor" name="licenseUrl" type="text" ng-model="vm.package.licenseUrl" />
                         </umb-control-group>
 
-                        <umb-control-group label="Readme">
+                        <umb-control-group label="@packager_packageReadme">
                             <textarea class="umb-property-editor" name="readme" rows="10" ng-model="vm.package.readme"></textarea>
                         </umb-control-group>
 
@@ -98,13 +104,13 @@
                 <div class="umb-expansion-panel">
 
                     <div class="umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
-                        <div>Package Content</div>
+                        <div><localize key="packager_packageContent">Package Content</localize></div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</ins>
                     </div>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
 
-                        <umb-control-group label="Content">
+                        <umb-control-group label="@general_content">
 
                             <umb-node-preview
                                 ng-if="vm.package.contentNodeId"
@@ -127,12 +133,12 @@
 
                             <label style="padding-left: 0;">
                                 <input type="checkbox" ng-model="vm.package.contentLoadChildNodes" ng-disabled="!vm.package.contentNodeId" />
-                                Include all child nodes
+                                <localize key="packager_includeAllChildNodes">Include all child nodes</localize>
                             </label>
 
                         </umb-control-group>
 
-                        <umb-control-group label="Document Types">
+                        <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
                                 <label>
                                     <input
@@ -145,7 +151,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Templates">
+                        <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
                                 <label>
                                     <input
@@ -157,7 +163,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Stylesheets">
+                        <umb-control-group label="@treeHeaders_stylesheets">
                             <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
                                 <label>
                                     <input
@@ -169,7 +175,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Macros">
+                        <umb-control-group label="@treeHeaders_macros">
                             <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
                                 <label>
                                     <input type="checkbox"
@@ -181,7 +187,7 @@
 
                         </umb-control-group>
 
-                        <umb-control-group label="Languages">
+                        <umb-control-group label="@treeHeaders_languages">
                             <div ng-repeat="language in ::vm.languages | orderBy:'name'">
                                 <label>
                                     <input
@@ -193,7 +199,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Dictionary Items">
+                        <umb-control-group label="@treeHeaders_dictionary">
                             <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
                                 <label>
                                     <input
@@ -205,7 +211,7 @@
                             </div>
                         </umb-control-group>
 
-                        <umb-control-group label="Data Types">
+                        <umb-control-group label="@treeHeaders_dataTypes">
                             <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
                                 <label>
                                     <input
@@ -224,7 +230,7 @@
                 <div class="umb-expansion-panel">
 
                     <div class="umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
-                        <div>Package Files</div>
+                        <div><localize key="packager_packageFiles">Package Files</localize></div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</ins>
                     </div>
 
@@ -233,8 +239,8 @@
                         <p>Remember: .xslt and .ascx files for your macros will be added automaticly, but you will still need to add assemblies, images and script files manually to the list below.</p>
                         -->
                         <umb-control-group
-                            label="Path to file"
-                            description="Absolute path to file (ie: /bin/umbraco.bin)">
+                            label="@packager_pathToFile"
+                            description="@packager_pathToFileDescription">
 
                             <umb-node-preview
                                 ng-if="vm.package.files"
@@ -283,12 +289,12 @@
 
                 <div class="umb-expansion-panel">
                     <div class="umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
-                        <div>Package Actions</div>
+                        <div><localize key="packager_packageActions">Package Actions</localize></div>
                         <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</ins>
                     </div>
                     <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
                         <umb-control-group
-                            label="Actions"
+                            label="@packager_actions"
                             description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
                             All actions are formed as a xml node, containing data for the action to be performed.">
                             <div>
