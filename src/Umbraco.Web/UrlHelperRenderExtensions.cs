@@ -296,7 +296,7 @@ namespace Umbraco.Web
 
             var encryptedRoute = UmbracoHelper.CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
 
-            var result = UmbracoContext.Current.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
+            var result = Current.UmbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
             return result;
         }
 
@@ -339,7 +339,7 @@ namespace Umbraco.Web
 
             var encryptedRoute = UmbracoHelper.CreateEncryptedRouteString(metaData.ControllerName, action, area, additionalRouteVals);
 
-            var result = UmbracoContext.Current.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
+            var result = Current.UmbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
             return result;
         }
 

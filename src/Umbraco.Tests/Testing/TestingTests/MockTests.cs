@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Testing.TestingTests
         public void Can_Mock_Umbraco_Context()
         {
             var umbracoContext = TestObjects.GetUmbracoContextMock(Current.UmbracoContextAccessor);
-            Assert.AreEqual(umbracoContext, UmbracoContext.Current);
+            Assert.AreEqual(umbracoContext, Current.UmbracoContext);
         }
 
         [Test]

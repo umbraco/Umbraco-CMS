@@ -175,12 +175,6 @@ namespace Umbraco.Web
         #endregion
 
         /// <summary>
-        /// Gets the current Umbraco Context.
-        /// </summary>
-        // note: obsolete, use Current.UmbracoContext... then obsolete Current too, and inject!
-        public static UmbracoContext Current => Composing.Current.UmbracoContext;
-
-        /// <summary>
         /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
         /// object is instantiated which in the web site is created during the BeginRequest phase.
         /// We can then determine complete rendering time from that.
@@ -281,7 +275,7 @@ namespace Umbraco.Web
                         || string.IsNullOrEmpty(request["umbdebug"]) == false);
             }
         }
-        
+
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>

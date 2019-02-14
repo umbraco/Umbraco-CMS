@@ -124,10 +124,10 @@ namespace Umbraco.Web
             if (httpContext.Request.Url.IsClientSideRequest())
                 return;
 
-            if (UmbracoContext.Current == null)
-                throw new InvalidOperationException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
+            if (Current.UmbracoContext == null)
+                throw new InvalidOperationException("The Current.UmbracoContext is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
 
-            var umbracoContext = UmbracoContext.Current;
+            var umbracoContext = Current.UmbracoContext;
 
             // re-write for the default back office path
             if (httpContext.Request.Url.IsDefaultBackOfficeRequest(_globalSettings))
@@ -491,14 +491,14 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+                if (Current.UmbracoContext != null && Current.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId);
 
-                    _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+                    _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
-                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
+                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext, new HttpContextWrapper(httpContext)));
 
                 DisposeHttpContextItems(httpContext);
             };

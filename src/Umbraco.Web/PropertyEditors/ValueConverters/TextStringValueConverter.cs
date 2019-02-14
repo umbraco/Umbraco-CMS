@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -31,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, UmbracoContext.Current);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             return sourceString;
