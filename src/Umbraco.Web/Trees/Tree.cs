@@ -10,12 +10,12 @@ namespace Umbraco.Web.Trees
         public Tree(int sortOrder, string applicationAlias, string group, string alias, string title, TreeUse use, Type treeControllerType, bool isSingleNodeTree)
         {
             SortOrder = sortOrder;
-            SectionAlias = applicationAlias;
+            SectionAlias = applicationAlias ?? throw new ArgumentNullException(nameof(applicationAlias));
             TreeGroup = group;
-            TreeAlias = alias;
-            TreeTitle = title;
+            TreeAlias = alias ?? throw new ArgumentNullException(nameof(alias));
+            TreeTitle = title ?? throw new ArgumentNullException(nameof(title));
             TreeUse = use;
-            TreeControllerType = treeControllerType;
+            TreeControllerType = treeControllerType ?? throw new ArgumentNullException(nameof(treeControllerType));
             IsSingleNodeTree = isSingleNodeTree;
         }
 
