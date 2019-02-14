@@ -1,9 +1,11 @@
-﻿using Moq;
+﻿using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -21,7 +23,9 @@ namespace Umbraco.Tests.Persistence
             using (var scope = ScopeProvider.CreateScope())
             {
                 var schema = new DatabaseSchemaCreator(scope.Database, Logger);
-                result = schema.ValidateSchema();
+                result = schema.ValidateSchema(
+                    //TODO: When we remove the xml cache from tests we can remove this too
+                    DatabaseSchemaCreator.OrderedTables.Concat(new []{typeof(ContentXmlDto), typeof(PreviewXmlDto)}));
             }
 
             // Assert

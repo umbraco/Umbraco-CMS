@@ -10,17 +10,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.RadioButtonList);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (int);
+            => typeof (string);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            var intAttempt = source.TryConvertTo<int>();
+            var attempt = source.TryConvertTo<string>();
 
-            if (intAttempt.Success)
-                return intAttempt.Result;
+            if (attempt.Success)
+                return attempt.Result;
 
             return null;
         }

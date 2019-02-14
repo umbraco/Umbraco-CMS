@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// A property editor to allow the individual selection of pre-defined items.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.RadioButtonList, "Radio button list", "radiobuttons", ValueType = ValueTypes.Integer, Group="lists", Icon="icon-target")]
+    [DataEditor(Constants.PropertyEditors.Aliases.RadioButtonList, "Radio button list", "radiobuttons", ValueType = ValueTypes.String, Group="lists", Icon="icon-target")]
     public class RadioButtonsPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;

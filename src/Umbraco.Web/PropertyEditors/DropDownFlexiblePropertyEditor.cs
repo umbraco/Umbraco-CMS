@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor()
         {
-            return new PublishValuesMultipleValueEditor(Logger, Attribute);
+            return new MultipleValueEditor(Logger, Attribute);
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new DropDownFlexibleConfigurationEditor(_textService);

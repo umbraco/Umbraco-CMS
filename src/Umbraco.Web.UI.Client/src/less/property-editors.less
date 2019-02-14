@@ -284,7 +284,6 @@
 
   line-height: 36px;
   text-align: center;
-  -moz-border-radius: 15px;
   border-radius: 15px;
 
   height: 32px;
@@ -306,10 +305,8 @@
     position: relative;
     display: flex;
     -ms-flex-direction: row;
-    -webkit-flex-direction: row;
     flex-direction: row;
     -ms-flex-wrap: wrap;
-    -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
     justify-content: flex-start;
 }
@@ -534,11 +531,7 @@
     width: 100%;
     height: 100%;
     z-index: @zindexCropperOverlay - 1;
-    -moz-opacity: .75;
     opacity: .75;
-    filter: alpha(opacity=7);
-    -webkit-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
-    -moz-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
     box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
 }
 
@@ -885,6 +878,23 @@
 .bootstrap-datetimepicker-widget .btn{padding: 0;}
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
+.umb-datepicker .input-append .on-top {
+    position: absolute;
+    margin-left: -31px;
+    margin-top: 1px;
+    display: inline-block;
+    height: 22px;
+    padding: 5px 6px 3px 6px;
+    font-size: @baseFontSize;
+    font-weight: normal;
+    line-height: @baseLineHeight;
+    text-align: center;
+    background-color: @white;
+    color: @ui-option-type;
+    &:hover {
+        color: @ui-option-type-hover;
+    }
+}
 .umb-datepicker p {margin-top:10px;}
 .umb-datepicker p a{color: @gray-3;}
 

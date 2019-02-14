@@ -1,14 +1,15 @@
-﻿function publishedStatusController($scope, umbRequestHelper, $log, $http, $q, $timeout) {
+﻿function publishedStatusController($scope, $http, umbRequestHelper) {
+
+    var vm = this;
 
     // note: must defined base url in BackOfficeController
-
     umbRequestHelper.resourcePromise(
         $http.get(umbRequestHelper.getApiUrl('publishedStatusBaseUrl', 'GetPublishedStatusUrl')),
         'Failed to get published status url')
     .then(function (result) {
 
         //result = 'views/dashboard/developer/nucache.html'
-        $scope.includeUrl = result;
+        vm.includeUrl = result;
     });
 
 }

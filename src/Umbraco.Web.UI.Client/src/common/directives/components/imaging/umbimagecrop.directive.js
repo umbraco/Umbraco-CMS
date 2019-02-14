@@ -287,7 +287,7 @@ angular.module("umbraco.directives")
 					var throttledResizing = _.throttle(function(){
                         resizeImageToScale(scope.dimensions.scale.current);
 						calculateCropBox();
-					}, 100);
+					}, 15);
 
 					// Happens when we change the scale
                     scope.$watch("dimensions.scale.current", function (newValue, oldValue) {

@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
