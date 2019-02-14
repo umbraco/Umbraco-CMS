@@ -847,14 +847,12 @@
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">默认模板</key>
-    <key alias="dictionary editor egenskab">字典键</key>
     <key alias="importDocumentTypeHelp">要导入文档类型，请点击“浏览”按钮，再点击“导入”，然后在您电脑上查找 ".udt"文件导入（下一页中需要您再次确认）</key>
     <key alias="newtabname">新建选项卡标题</key>
     <key alias="nodetype">节点类型</key>
     <key alias="objecttype">类型</key>
     <key alias="stylesheet">样式表</key>
     <key alias="script">脚本</key>
-    <key alias="stylesheet editor egenskab">样式表属性</key>
     <key alias="tab">选项卡</key>
     <key alias="tabname">选项卡标题</key>
     <key alias="tabs">选项卡</key>

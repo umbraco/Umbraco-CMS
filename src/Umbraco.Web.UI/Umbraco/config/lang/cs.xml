@@ -723,14 +723,12 @@
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Výchozí šablona</key>
-    <key alias="dictionary editor egenskab">Klíč slovníku</key>
     <key alias="importDocumentTypeHelp">Pro importování typu dokumentu vyhledejte soubor ".udt" ve svém počítači tak, že kliknete na tlačítko "Prohledat" a pak kliknete na "Import" (na následující obrazovce budete vyzváni k potvrzení)</key>
     <key alias="newtabname">Název nové záložky</key>
     <key alias="nodetype">Typ uzlu</key>
     <key alias="objecttype">Typ</key>
     <key alias="stylesheet">Stylopis</key>
     <key alias="script">Skript</key>
-    <key alias="stylesheet editor egenskab">Vlastnost stylopisu</key>
     <key alias="tab">Záložka</key>
     <key alias="tabname">Název záložky</key>
     <key alias="tabs">Záložky</key>

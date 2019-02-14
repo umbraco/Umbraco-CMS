@@ -228,6 +228,7 @@ namespace Umbraco.Tests.Testing
                 .Append<PackagesBackOfficeSection>()
                 .Append<UsersBackOfficeSection>()
                 .Append<MembersBackOfficeSection>()
+                .Append<FormsBackOfficeSection>()
                 .Append<TranslationBackOfficeSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 

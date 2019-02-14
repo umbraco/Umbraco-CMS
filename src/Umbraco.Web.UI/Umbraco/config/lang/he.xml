@@ -639,13 +639,11 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">תבנית ברירת מחדל</key>
-    <key alias="dictionary editor egenskab">מפתח מילון</key>
     <key alias="importDocumentTypeHelp">על מנת לייבא סוג מסמך,מצא את הקובץ ".udt" במחשב שלך על ידי לחיצה על 'סייר' ואז 'ייבא' (ייתכן ותצטרך לבצע אימות במסך הבא)</key>
     <key alias="newtabname">כותרת לשונית חדשה</key>
     <key alias="nodetype">סוג פריט תוכן</key>
     <key alias="objecttype">סוג</key>
     <key alias="stylesheet">גליונות סגנון</key>
-    <key alias="stylesheet editor egenskab">תכונות גליונות סגנון</key>
     <key alias="tab">לשונית</key>
     <key alias="tabname">כותרת לשונית</key>
     <key alias="tabs">לשוניות</key>

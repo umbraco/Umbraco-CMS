@@ -1222,7 +1222,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var aceEditor = {
                     content: args.editor.getContent(),
                     view: 'views/propertyeditors/rte/codeeditor.html',
-                    size: 'small',
                     submit: function (model) {
                         args.editor.setContent(model.content);
                         editorService.close();

@@ -1,12 +1,13 @@
 ﻿using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
-    [TableName(Constants.DatabaseSchema.Tables.NodePreviewXml)]
+    [TableName("cmsContentXml")]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
-    internal class PreviewXmlDto
+    internal class ContentXmlDto
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

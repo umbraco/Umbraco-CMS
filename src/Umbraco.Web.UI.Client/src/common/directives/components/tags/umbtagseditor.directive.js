@@ -29,6 +29,8 @@
         let typeahead;
         let tagsHound;
 
+        let initLoad = true;
+
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
         vm.$onDestroy = onDestroy;
@@ -53,7 +55,7 @@
                 vm.isLoading = false;
 
                 //ensure that the models are formatted correctly
-                configureViewModel();
+                configureViewModel(true);
 
                 // Set the visible prompt to -1 to ensure it will not be visible
                 vm.promptIsVisible = "-1";
@@ -139,8 +141,7 @@
                 if (!changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
                     configureViewModel();
-                    reValidate()
-
+                    reValidate();
                 }
             }
         }
@@ -154,13 +155,19 @@
             $element.find('.tags-' + vm.htmlId).typeahead('destroy');
         }
 
-        function configureViewModel() {
+        function configureViewModel(isInitLoad) {
             if (vm.value) {
                 if (angular.isString(vm.value) && vm.value.length > 0) {
                     if (vm.config.storageType === "Json") {
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
-                        updateModelValue(vm.viewModel);
+
+                        //if this is the first load, we are just re-formatting the underlying model to be consistent
+                        //we don't want to notify the component parent of any changes, that will occur if the user actually
+                        //changes a value. If we notify at this point it will signal a form dirty change which we don't want.
+                        if (!isInitLoad) {
+                            updateModelValue(vm.viewModel);
+                        }
                     }
                     else {
                         //csv storage
@@ -174,8 +181,12 @@
                             return self.indexOf(v) === i;
                         });
 
-                        updateModelValue(vm.viewModel);
-                        
+                        //if this is the first load, we are just re-formatting the underlying model to be consistent
+                        //we don't want to notify the component parent of any changes, that will occur if the user actually
+                        //changes a value. If we notify at this point it will signal a form dirty change which we don't want.
+                        if (!isInitLoad) {
+                            updateModelValue(vm.viewModel);
+                        }
                     }
                 }
                 else if (angular.isArray(vm.value)) {

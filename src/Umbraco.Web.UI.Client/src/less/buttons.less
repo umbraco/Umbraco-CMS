@@ -191,13 +191,13 @@ input[type="button"] {
 .btn-success {
   .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight, @btnSuccessType);
 }
-// Info appears as a neutral blue
+// Info appears as a sand color
 .btn-info {
-  .buttonBackground(@sand-5, @blueDark, @blueExtraDark, @u-white);
+  .buttonBackground(@sand-5, @sand-6, @blueExtraDark, @blueMid);
 }
 // Made for Umbraco, 2019
 .btn-action {
-  .buttonBackground(@blueExtraDark, @blueDark, @pinkLight, @u-white);
+  .buttonBackground(@blueExtraDark, @blueDark, @white, @u-white);
 }
 // Made for Umbraco, 2019
 .btn-selection {
@@ -236,11 +236,11 @@ input[type="button"] {
     padding: 15px 50px;
     font-size: 16px;
     border: none;
-    background: @green;
+    background: @ui-btn-positive;
     color: @white;
     font-weight: bold;
     &:hover {
-        background: @green-d1;
+        background: @ui-btn-positive-hover;
     }
 }
 
