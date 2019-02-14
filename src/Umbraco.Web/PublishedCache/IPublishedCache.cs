@@ -208,7 +208,12 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>The content type, or null.</returns>
         /// <remarks>The alias is case-insensitive.</remarks>
         PublishedContentType GetContentType(string alias);
-        
+
+        /// <summary>
+        /// Gets contents of a given content type.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>The contents.</returns>
         IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType);
     }
 }
