@@ -22,7 +22,6 @@
                 
                 angular.forEach(scope.content.apps, (app) => {
                     if (app.alias === "umbContent") {
-                        console.log("app: ", app)
                         app.anchors = scope.content.tabs;
                     }
                 });

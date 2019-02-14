@@ -23,7 +23,7 @@ namespace Umbraco.Core.Composing
         {
             using (_logger.DebugDuration<ComponentCollection>($"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
             {
-                foreach (var component in this.Reverse()) // terminate components in reverse order
+                foreach (var component in this)
                 {
                     var componentType = component.GetType();
                     using (_logger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))

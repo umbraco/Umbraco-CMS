@@ -2,11 +2,9 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Web
 {
