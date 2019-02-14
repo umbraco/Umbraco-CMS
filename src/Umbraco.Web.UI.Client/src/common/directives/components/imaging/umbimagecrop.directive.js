@@ -286,16 +286,6 @@ angular.module("umbraco.directives")
 						}
 					});
 
-					// IE hack
-					if(window.navigator.userAgent.indexOf("MSIE ") >= 0){
-						var ranger = element.find("input");
-						ranger.on("change",function(){
-							scope.$apply(function(){
-								scope.dimensions.scale.current = ranger.val();
-							});
-						});
-					}
-
 					// Init
 					$image.on("load", function(){
 						$timeout(function(){
