@@ -21,9 +21,7 @@
      overflow: hidden;
      padding: 5px;
      border-radius:5px;
-     -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-     -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-     box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
  }
 
  .usky-grid .ui-sortable-helper *{
@@ -91,8 +89,6 @@
  .usky-grid  .td.last {
      border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
  }
- .usky-grid  .tr {
- }
 
  .usky-grid  .middle {
      text-align: center;
@@ -103,17 +99,6 @@
  }
  .usky-grid  .mainTd {
      position:relative;
- }
-
-
-
- // COLUMN
- // -------------------------
- .usky-grid  .usky-column {
-
- }
- .usky-grid  .usky-column.last {
-
  }
 
 
@@ -128,12 +113,6 @@
     border-bottom:1px dashed rgba(182, 182, 182, 0) !important;
 }
 
-/*
-.usky-grid .selectedRow {
-     border: 1px solid rgba(182, 182, 182, 0.3);
-}*/
-
-
 
 
 // CELL
@@ -146,8 +125,6 @@
 
 .usky-grid  .cell-tools {
     transition: all .20s ease-in-out;
-    -moz-transition: all .20s ease-in-out;
-    -webkit-transition: all .20s ease-in-out;
     position: absolute;
     bottom: 0;
     top: 0;
@@ -217,31 +194,11 @@
 // CONTROL
 // -------------------------
 .usky-grid .usky-control {
-    /*transition: all .20s ease-in-out;
-    -moz-transition: all .20s ease-in-out;
-    -webkit-transition: all .20s ease-in-out;*/
     position:relative;
     display:block;
-
-    /*
-    border: 1px dashed rgba(255, 0, 0, .0);
-    border-bottom-width: 1px;
-    */
-
-    -webkit-background-clip: padding-box; /* for Safari */
-    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+    background-clip: padding-box;
 
     margin: 10px 0 0 0;
-}
-
-.usky-grid  .usky-control:hover{
-    /*border: 1px solid rgba(182, 182, 182, 0.3);*/
-    /*border-bottom: 1px solid rgba(182, 182, 182, 0.3);*/
-}
-
-.usky-grid  .usky-control-placeholder:hover{
-    /*border: 1px solid rgba(182, 182, 182, 0);*/
-    /*border-bottom:1px solid rgba(182, 182, 182, 0.0) !important;*/
 }
 
 .usky-grid .warnhighlight, .usky-grid  .td.last.warnhighlight{
@@ -395,10 +352,10 @@
   }
 
  .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
-          background: @blueMid !important;
-          color: @white !important;
-          border-color: @blueMid !important;
-          text-decoration:none;
+    background: @blueMid !important;
+    color: @white !important;
+    border-color: @blueMid !important;
+    text-decoration:none;
  }
 
  .usky-grid  .iconBox a:hover {
@@ -408,20 +365,14 @@
 
  .usky-grid  .iconBox.selected {
      -webkit-appearance: none;
-     background-image: -moz-linear-gradient(top,#e6e6e6,#bfbfbf);
      background-image: -webkit-gradient(linear,0 0,0 100%,from(#e6e6e6),to(#bfbfbf));
      background-image: -webkit-linear-gradient(top,#e6e6e6,#bfbfbf);
-     background-image: -o-linear-gradient(top,#e6e6e6,#bfbfbf);
      background-image: linear-gradient(to bottom,#e6e6e6,#bfbfbf);
      background-repeat: repeat-x;
      zoom: 1;
      border-color: #bfbfbf #bfbfbf #999;
      border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
-     -webkit-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
-     -moz-box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
      box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
-     -webkit-border-radius: 3px;
-     -moz-border-radius: 3px;
      border-radius: 3px;
      background: transparent;
  }
@@ -481,8 +432,6 @@
      padding: -1px;
      position: absolute;
      margin: -1px -1px 0 -1px;
-     -webkit-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
-     -moz-box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
      box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
      z-index: 9999999;
  }
@@ -650,8 +599,6 @@
 
 		display: inline-block;
 		position: relative;
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
 		box-sizing: border-box;
 		width: 125px;
 		margin: 35px 40px 15px 0;
@@ -718,8 +665,6 @@
 
 		    display: block;
 		    float: left;
-		    -webkit-box-sizing: border-box;
-		    -moz-box-sizing: border-box;
 		    box-sizing: border-box;
 		    width: 33.3%; /* temp value */
 		    height: 10px;
@@ -771,9 +716,7 @@
      top: 0;
      left: 50%;
      z-index: 6660;
-     -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-     -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-     box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
  }
 
 
