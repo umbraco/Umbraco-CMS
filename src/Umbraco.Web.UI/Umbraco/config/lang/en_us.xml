@@ -131,7 +131,7 @@
     <key alias="returnToList">Return to list</key>
     <key alias="save">Save</key>
     <key alias="saveAndClose">Save and close</key>
-    <key alias="saveAndPublish">Publish</key>
+    <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveAndSchedule">Save and schedule</key>
     <key alias="saveToPublish">Send for approval</key>
     <key alias="saveListView">Save list view</key>
@@ -641,6 +641,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
@@ -729,7 +730,6 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>

@@ -127,6 +127,7 @@
     <key alias="relations">Redigér relationer</key>
     <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
+    <key alias="saveAndClose">Gem og luk</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
@@ -613,6 +614,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
+    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
     <key alias="install">Installér</key>

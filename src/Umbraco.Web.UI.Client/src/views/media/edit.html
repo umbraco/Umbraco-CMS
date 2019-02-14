@@ -40,10 +40,11 @@
                 <umb-editor-footer-content-right>
 
                     <umb-button ng-if="model.infiniteMode"
-                                action="close()"
+                                type="button"
                                 button-style="link"
                                 label-key="general_close"
-                                type="button">
+                                shortcut="esc"
+                                action="close()">
                     </umb-button>
 
                     <umb-button alias="returnToList"
@@ -56,10 +57,10 @@
                     <!-- label-key="buttons_save" -->
                     <umb-button alias="save"
                                 type="submit"
-                                label-key="{{page.submitButtonLabelKey}}"
                                 button-style="success"
-                                shortcut="ctrl+s"
-                                state="page.saveButtonState">
+                                state="page.saveButtonState"
+                                label-key="{{page.submitButtonLabelKey}}"
+                                shortcut="ctrl+s">
                     </umb-button>
 
                 </umb-editor-footer-content-right>
