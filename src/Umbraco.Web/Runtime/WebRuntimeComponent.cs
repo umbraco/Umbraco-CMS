@@ -280,7 +280,7 @@ namespace Umbraco.Web.Runtime
 
             // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
             // want to access HttpContext.Current, which doesn't exist
-            if (HttpContext.Current != null)
+            if (IOHelper.IsHosted)
                 ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
         }
     }
