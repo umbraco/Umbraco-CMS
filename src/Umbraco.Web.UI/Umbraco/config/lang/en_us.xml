@@ -78,6 +78,10 @@
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
   </area>
+  <area alias="apps">
+    <key alias="umbContent">Content</key>
+    <key alias="umbInfo">Info</key>
+  </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
     <key alias="addNew">Add new Domain</key>

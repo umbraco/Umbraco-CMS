@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -92,6 +92,13 @@ namespace Umbraco.Web.PublishedCache
 
         public abstract PublishedContentType GetContentType(string alias);
 
-        public abstract IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType);
+        public virtual IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
+        {
+            // this is probably not super-efficient, but works
+            // some cache implementation may want to override it, though
+            return GetAtRoot()
+                .SelectMany(x => x.DescendantsOrSelf())
+                .Where(x => x.ContentType.Id == contentType.Id);
+        }
     }
 }

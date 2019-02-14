@@ -620,7 +620,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override IEnumerable<IPublishedContent> GetByContentType(PublishedContentType contentType)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         #endregion
