@@ -497,13 +497,17 @@
         });
 
         // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
-        $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowedTemplates.length + vm.contentType.isContainer", function (newVal, oldVal) {
-            if (oldVal === undefined) {
-                // still initializing, ignore
-                return;
+        $scope.$watch(
+            "vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowCultureVariant + vm.contentType.isElement + " +
+            "vm.contentType.allowedTemplates.length + vm.contentType.isContainer + vm.contentType.compositeContentTypes.length",
+            function(newVal, oldVal) {
+                if (oldVal === undefined) {
+                    // still initializing, ignore
+                    return;
+                }
+                angularHelper.getCurrentForm($scope).$setDirty();
             }
-            angularHelper.getCurrentForm($scope).$setDirty();
-        });
+        );
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.DocumentTypes.EditController", DocumentTypesEditController);
