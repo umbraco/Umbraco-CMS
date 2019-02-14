@@ -475,6 +475,29 @@
    ]]></key>
     <key alias="overviewTitle">Dictionary overview</key>
   </area>
+  <area alias="examineManagement">
+    <key alias="configuredSearchers">Configured Searchers</key>
+    <key alias="configuredSearchersDescription">Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</key>
+    <key alias="fieldValues">Field values</key>
+    <key alias="healthStatus">Health status</key>
+    <key alias="healthStatusDescription">The health status of the index and if it can be read</key>
+    <key alias="indexers">Indexers</key>
+    <key alias="indexInfo">Index info</key>
+    <key alias="indexInfoDescription">Lists the properties of the index</key>
+    <key alias="manageIndexes">Manage Examine's indexes</key>
+    <key alias="manageIndexesDescription">Allows you to view the details of each index and provides some tools for managing the indexes</key>
+    <key alias="rebuildIndex">Rebuild index</key>
+    <key alias="rebuildIndexWarning"><![CDATA[
+      This will cause the index to be rebuilt.<br />
+      Depending on how much content there is in your site this could take a while.<br />
+      It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.
+     ]]>
+    </key>
+    <key alias="searchers">Searchers</key>
+    <key alias="searchDescription">Search the index and view the results</key>
+    <key alias="tools">Tools</key>
+    <key alias="toolsDescription">Tools to manage the index</key>
+  </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
@@ -571,6 +594,7 @@
     <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
     <key alias="back">Back</key>
+    <key alias="backToOverview">Back to overview</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
@@ -602,6 +626,7 @@
     <key alias="elements">Elements</key>
     <key alias="email">Email</key>
     <key alias="error">Error</key>
+    <key alias="field">Field</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
     <key alias="general">General</key>
