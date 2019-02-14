@@ -12,7 +12,7 @@ namespace Umbraco.Web
     /// it disposes the <see cref="UmbracoContext"/> and clears the
     /// <see cref="IUmbracoContextAccessor"/>.</para>
     /// </remarks>
-    public class UmbracoContextReference : IDisposable
+    public class UmbracoContextReference : IDisposable //fixme - should we inherit from DisposableObjectSlim?
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private bool _disposed;

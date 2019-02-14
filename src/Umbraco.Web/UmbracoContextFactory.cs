@@ -19,7 +19,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContextFactory : IUmbracoContextFactory
     {
-        private static readonly NulWriter NulWriterInstance = new NulWriter();
+        private static readonly NullWriter NullWriterInstance = new NullWriter();
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
@@ -65,7 +65,8 @@ namespace Umbraco.Web
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
-            httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("nul.aspx", "", NulWriterInstance)));
+            
+            httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
 
             var umbracoContext = CreateUmbracoContext(httpContext);
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
@@ -74,7 +75,7 @@ namespace Umbraco.Web
         }
 
         // dummy TextWriter that does not write
-        private class NulWriter : TextWriter
+        private class NullWriter : TextWriter
         {
             public override Encoding Encoding => Encoding.UTF8;
         }

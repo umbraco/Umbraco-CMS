@@ -16,7 +16,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
+    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;

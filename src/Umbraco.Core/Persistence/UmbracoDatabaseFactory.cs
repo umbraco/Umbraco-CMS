@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     // TODO: these comments are not true anymore
     // TODO: this class needs not be disposable!
-    internal class UmbracoDatabaseFactory : DisposableObject, IUmbracoDatabaseFactory
+    internal class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
     {
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
