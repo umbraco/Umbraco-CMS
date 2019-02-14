@@ -167,6 +167,7 @@
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
     <key alias="smallSort">Sorteret</key>
+    <key alias="historyIncludingVariants">Historik (alle sprog)</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -573,6 +574,7 @@
     <key alias="error">Fejl</key>
     <key alias="findDocument">Find</key>
     <key alias="first">Første</key>
+    <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
@@ -684,7 +686,7 @@
     <key alias="copyLineDown">Copy Lines Down</key>
     <key alias="moveLineUp">Move Lines Up</key>
     <key alias="moveLineDown">Move Lines Down</key>
-    <key alias="generalHeader">General</key>
+    <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
   </area>
   <area alias="graphicheadline">
