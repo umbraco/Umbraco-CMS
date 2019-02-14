@@ -34,7 +34,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeAlias"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
+        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var guidUdi = parentId as GuidUdi;
             if (guidUdi == null)

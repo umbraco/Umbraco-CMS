@@ -50,8 +50,6 @@ namespace Umbraco.Core.Migrations.Install
             typeof (MemberTypeDto),
             typeof (MemberDto),
             typeof (Member2MemberGroupDto),
-            typeof (ContentXmlDto),
-            typeof (PreviewXmlDto),
             typeof (PropertyTypeGroupDto),
             typeof (PropertyTypeDto),
             typeof (PropertyDataDto),
@@ -140,12 +138,17 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         internal DatabaseSchemaResult ValidateSchema()
         {
+            return ValidateSchema(OrderedTables);
+        }
+
+        internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
+        {
             var result = new DatabaseSchemaResult(SqlSyntax);
 
             result.IndexDefinitions.AddRange(SqlSyntax.GetDefinedIndexes(_database)
                 .Select(x => new DbIndexDefinition(x)));
 
-            result.TableDefinitions.AddRange(OrderedTables
+            result.TableDefinitions.AddRange(orderedTables
                 .Select(x => DefinitionFactory.GetTableDefinition(x, SqlSyntax)));
 
             ValidateDbTables(result);

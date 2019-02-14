@@ -158,7 +158,7 @@ namespace Umbraco.Core.Services
             // multiple times, but we don't lock the cache while accessing the database = better
 
             int? val = null;
-             
+
             if (_dictionary.TryGetValue(umbracoObjectType, out var mappers))
                 if ((val = mappers.key2id(key)) == default(int)) val = null;
 

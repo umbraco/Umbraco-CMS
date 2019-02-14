@@ -77,6 +77,10 @@
     <key alias="update">Tillad adgang til at gemme en node</key>
     <key alias="createblueprint">Tillad adgang til at oprette en indholdsskabelon</key>
   </area>
+  <area alias="apps">
+    <key alias="umbContent">Indhold</key>
+    <key alias="umbInfo">Info</key>
+  </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Tilladelse nægtet.</key>
     <key alias="addNew">Tilføj nyt domæne</key>
@@ -163,6 +167,7 @@
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
     <key alias="smallSort">Sorteret</key>
+    <key alias="historyIncludingVariants">Historik (alle sprog)</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -243,6 +248,7 @@
     <key alias="type">Type</key>
     <key alias="unpublish">Afpublicér</key>
     <key alias="unpublished">Afpubliceret</key>
+    <key alias="notCreated">Ikke oprettet</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
@@ -451,6 +457,29 @@
    ]]></key>
     <key alias="overviewTitle">Ordbogsoversigt</key>
   </area>
+  <area alias="examineManagement">
+    <key alias="configuredSearchers">Konfigurerede søgere</key>
+    <key alias="configuredSearchersDescription">Viser egenskaber og værktøjer til enhver konfigureret søger (dvs. som en multi-indekssøger)</key>
+    <key alias="fieldValues">Feltværdier</key>
+    <key alias="healthStatus">Sundhedstilstand</key>
+    <key alias="healthStatusDescription">Indeksets sundhedstilstand, og hvis det kan læses</key>
+    <key alias="indexers">Indeksører</key>
+    <key alias="indexInfo">Indeksinfo</key>
+    <key alias="indexInfoDescription">Viser indeksets egenskaber</key>
+    <key alias="manageIndexes">Administrer Examine indekserne</key>
+    <key alias="manageIndexesDescription">Giver dig mulighed for at se detaljerne for hvert indeks og giver nogle værktøjer til styring af indeksørerne</key>
+    <key alias="rebuildIndex">Genopbyg indeks</key>
+    <key alias="rebuildIndexWarning"><![CDATA[
+        Dette vil medføre, at indekset genopbygges.<br />
+        Afhængigt af hvor meget indhold der er på dit website, kan det tage et stykke tid.<br />
+        Det anbefales ikke at genopbygge et indeks i perioder med høj websitetrafik eller når redaktører redigerer indhold.
+     ]]>
+    </key>
+    <key alias="searchers">Søgere</key>
+    <key alias="searchDescription">Søg i indekset og se resultaterne</key>
+    <key alias="tools">Værktøjer</key>
+    <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
+  </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
     <key alias="password">Indtast dit kodeord</key>
@@ -542,6 +571,7 @@
     <key alias="alias">Alias</key>
     <key alias="areyousure">Er du sikker?</key>
     <key alias="back">Tilbage</key>
+    <key alias="backToOverview">Tilbage til oversigt</key>
     <key alias="border">Kant</key>
     <key alias="by">af</key>
     <key alias="cancel">Fortryd</key>
@@ -552,6 +582,7 @@
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
     <key alias="constrainProportions">Behold proportioner</key>
+    <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
     <key alias="copy">Kopiér</key>
     <key alias="create">Opret</key>
@@ -570,8 +601,10 @@
     <key alias="elements">Elementer</key>
     <key alias="email">E-mail</key>
     <key alias="error">Fejl</key>
+    <key alias="field">Felt</key>
     <key alias="findDocument">Find</key>
     <key alias="first">Første</key>
+    <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
@@ -611,9 +644,11 @@
     <key alias="pleasewait">Et øjeblik...</key>
     <key alias="previous">Forrige</key>
     <key alias="properties">Egenskaber</key>
+    <key alias="rebuild">Genopbyg</key>
     <key alias="reciept">E-mail der skal modtage indhold af formular</key>
     <key alias="recycleBin">Papirkurv</key>
     <key alias="recycleBinEmpty">Din papirkurv er tom</key>
+    <key alias="reload">Genindlæs</key>
     <key alias="remaining">Mangler</key>
     <key alias="remove">Fjern</key>
     <key alias="rename">Omdøb</key>
@@ -683,7 +718,7 @@
     <key alias="copyLineDown">Copy Lines Down</key>
     <key alias="moveLineUp">Move Lines Up</key>
     <key alias="moveLineDown">Move Lines Down</key>
-    <key alias="generalHeader">General</key>
+    <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
   </area>
   <area alias="graphicheadline">
@@ -836,20 +871,22 @@ Mange hilsner fra Umbraco robotten
     <key alias="notifications">Notificeringer</key>
   </area>
   <area alias="packager">
+    <key alias="actions">Handlinger</key>
     <key alias="created">Oprettet</key>
     <key alias="createPackage">Opret pakke</key>
     <key alias="chooseLocalPackageText">Vælg pakken fra din computer. Umbraco pakker er oftest en ".zip" fil</key>
     <key alias="deletewarning">Dette vil slette pakken</key>
     <key alias="dropHere">Slip her for at uploade</key>
+    <key alias="includeAllChildNodes">Inkludér alle underliggende sider</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
     <key alias="uploadPackage">Upload pakke</key>
     <key alias="localPackageDescription">Installer en lokal pakke ved at vælge den fra din computer. Installer kun pakker fra kilder, du kender og stoler på</key>
     <key alias="uploadAnother">Upload en anden pakke</key>
     <key alias="cancelAndUploadAnother">Annuller og upload en anden pakke</key>
-    <key alias="packageLicense">Licens</key>
     <key alias="accept">Jeg accepterer</key>
     <key alias="termsOfUse">betingelser for anvendelse</key>
-    <key alias="packageInstall">Installér pakke</key>
+    <key alias="pathToFile">Sti til fil</key>
+    <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
     <key alias="installedPackages">Installeret pakker</key>
     <key alias="installLocal">Installér lokal</key>
@@ -858,6 +895,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="noPackagesCreated">Der er ikke blevet oprettet nogle pakker endnu</key>
     <key alias="noPackages">Du har ingen pakker installeret</key>
     <key alias="noPackagesDescription"><![CDATA[Du har ikke nogen pakker installeret. Du kan enten installere en lokal pakke ved at vælge den fra din computer eller gennemse de tilgængelige pakker ved hjælp af ikonet <strong>'Pakker'</strong> øverst til højre på din skærm]]></key>
+    <key alias="packageActions">Pakkehandlinger</key>
+    <key alias="packageAuthorUrl">Forfatter URL</key>
+    <key alias="packageContent">Pakkeindhold</key>
+    <key alias="packageFiles">Pakkefiler</key>
+    <key alias="packageIconUrl">Ikon URL</key>
+    <key alias="packageInstall">Installér pakke</key>
+    <key alias="packageLicense">Licens</key>
+    <key alias="packageLicenseUrl">Licens URL</key>
+    <key alias="packageProperties">Pakkeegenskaber</key>
     <key alias="packageSearch">Søg efter pakker</key>
     <key alias="packageSearchResults">Resultater for</key>
     <key alias="packageNoResults">Vi kunne ikke finde resultater for</key>
@@ -1006,14 +1052,12 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardskabelon</key>
-    <key alias="dictionary editor egenskab">Ordbogsnøgle</key>
     <key alias="importDocumentTypeHelp">For at importere en dokumenttype, find ".udt"-filen på din computer ved at klikke på "Gennemse"-knappen og klik "Import" (Du vil blive bedt om bekræftelse på næste skærmbillede)</key>
     <key alias="newtabname">Ny titel på faneblad</key>
     <key alias="nodetype">Nodetype</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
     <key alias="script">Script</key>
-    <key alias="stylesheet editor egenskab">Stylesheetegenskab</key>
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
     <key alias="tabs">Faneblade</key>
@@ -1286,6 +1330,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
     <key alias="editParameter">Rediger parameter</key>
+    <key alias="enterMacroName">Indtast makronavn</key>
     <key alias="parameters">Parametre</key>
     <key alias="parametersDescription">Definer de parametre, der skal være tilgængelige, når du bruger denne makro.</key>
   </area>
@@ -1494,10 +1539,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="redirectedTo">Viderestillet til</key>
     <key alias="noRedirects">Der er ikke lavet nogen viderestillinger</key>
     <key alias="noRedirectsDescription">Når en udgivet side bliver omdøbt eller flyttet, vil en viderestilling automatisk blive lavet til den nye side.</key>
-    <key alias="removeButton">Fjern</key>
     <key alias="confirmRemove">Er du sikker på at du vil fjerne viderestillingen fra '%0%' til '%1%'?</key>
     <key alias="redirectRemoved">Viderestillings URL fjernet.</key>
     <key alias="redirectRemoveError">Fejl under fjernelse af viderestillings URL.</key>
+    <key alias="redirectRemoveWarning">Dette vil fjerne viderestillingen</key>
     <key alias="confirmDisable">Er du sikker på at du vil slå URL trackeren fra?</key>
     <key alias="disabledConfirm">URL tracker er nu slået fra.</key>
     <key alias="disableError">Der opstod en fejl under forsøget på at slå URL trackeren fra, der findes mere information i logfilen.</key>
@@ -1516,5 +1561,32 @@ Mange hilsner fra Umbraco robotten
     <key alias="itemCannotBeRestored">Kan ikke automatisk genoprette dette element</key>
     <key alias="itemCannotBeRestoredHelpText">Der er ikke nogen placering hvor dette element automatisk kan genoprettes. Du kan flytte elementet manuelt i træet nedenfor.</key>
     <key alias="wasRestored">blev genoprettet under</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">Retning</key>
+    <key alias="parentToChild">Forælder til barn</key>
+    <key alias="bidirectional">Tovejs</key>
+    <key alias="parent">Forælder</key>
+    <key alias="child">Barn</key>
+    <key alias="count">Antal</key>
+    <key alias="relations">Relationer</key>
+    <key alias="created">Oprettet</key>
+    <key alias="comment">Kommentar</key>
+    <key alias="name">Navn</key>
+    <key alias="noRelations">Der er ingen relationer for denne relationstype.</key>
+    <key alias="tabRelationType">Relationstype</key>
+    <key alias="tabRelations">Relationer</key>
+  </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">Kom godt i gang</key>
+    <key alias="contentRedirectManager">Redirects håndtering</key>
+    <key alias="mediaFolderBrowser">Indhold</key>
+    <key alias="settingsWelcome">Velkommen</key>
+    <key alias="settingsExamine">Examine Management</key>
+    <key alias="settingsPublishedStatus">Published Status</key>
+    <key alias="settingsModelsBuilder">Models Builder</key>
+    <key alias="settingsHealthCheck">Health Check</key>
+    <key alias="memberIntro">Kom godt i gang</key>
+    <key alias="formsInstall">Installer Umbraco Forms</key>
   </area>
 </language>

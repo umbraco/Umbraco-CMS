@@ -174,8 +174,8 @@
          */
         function createButtons(content) {
 
-            // for trashed items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed ? "primary" : "info";
+            // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
+            $scope.page.saveButtonStyle = content.trashed || content.isElement ? "primary" : "info";
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
@@ -871,11 +871,22 @@
             
             $scope.app = app;
             
+            $scope.$broadcast("editors.apps.appChanged", { app: app });
+            
             if (infiniteMode) {
                 createInfiniteModeButtons($scope.content);
             } else {
                 createButtons($scope.content);
             }
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appAnchorChanged = function (app, anchor) {
+            //send an event downwards
+            $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
         };
 
         // methods for infinite editing

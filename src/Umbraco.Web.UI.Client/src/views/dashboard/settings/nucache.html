@@ -1,54 +1,44 @@
-﻿<div id="nuCache" ng-controller="Umbraco.Dashboard.NuCacheController">
+﻿<div id="nuCache" style="position: relative;" ng-controller="Umbraco.Dashboard.NuCacheController as vm">
 
-    <div ng-show="loading">
-        Loading...
+    <div ng-show="vm.loading || vm.working" style="background: rgba(255, 255, 255, 0.60); position: absolute; left: 0; right: 0; top: 0; bottom: 0;">
+        <umb-load-indicator></umb-load-indicator>
     </div>
 
     <p>You are running the brand new NuCache!</p>
 
-    <p style="min-height: 120px; background: #f8f8f8; padding: 4px;">
-        <!-- ng-if or ng-show? -->
-        <span ng-if="working">NuCache is working.</span>
-        <span ng-if="!working">NuCache says: {{status}}</span>
+    <p style="min-height: 120px; background: #f8f8f8; padding: 10px;">
+        <span ng-show="vm.working">NuCache is working.</span>
+        <span ng-show="!vm.working">NuCache says: {{vm.status}}</span>
     </p>
 
-    <p>
-        This lets you refresh the status, or collect snapshots (after running a CLR GC).
-    </p>
+    <p>This lets you refresh the status, or collect snapshots (after running a CLR GC).</p>
+
     <div>
-        <button type="button" ng-click="verify()" class="btn btn-warning">
-            <span>Refresh</span>
-        </button>
-        <button type="button" ng-click="collect()" class="btn btn-warning">
-            <span>Collect</span>
-        </button>
+        <button type="button" ng-click="vm.verify()" class="btn btn-warning">Refresh</button>
+        <button type="button" ng-click="vm.collect()" class="btn btn-warning">Collect</button>
     </div>
 
-    <p></p>
+    <br>
+
     <p>
         This lets you rebuild the database cache (status above), ie the content of the cmsContentNu table.
         Rebuilding can be expensive.
     </p>
+
     <div>
-        <button type="button" ng-click="rebuild()" class="btn btn-warning">
-            <span>Rebuild</span>
-        </button>
+        <button type="button" ng-click="vm.rebuild()" class="btn btn-warning">Rebuild</button>
     </div>
 
-    <p></p>
+    <br>
+
     <p>
         This lets you reload the in-memory and local file cache by entirely reloading it from
         the data in the cmsContentNu table, but it does not rebuild that table. This is relatively
         fast. Triggers the reload on all servers in an LB environment.
     </p>
-    <div>
-        <button type="button" ng-click="reload()" class="btn btn-warning">
-            <span>Reload</span>
-        </button>
-    </div>
 
-    <div class="umb-loader-wrapper" ng-show="working">
-        <div class="umb-loader"></div>
+    <div>
+        <button type="button" ng-click="vm.reload($event)" class="btn btn-warning">Reload</button>
     </div>
 
 </div>

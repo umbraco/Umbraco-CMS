@@ -464,6 +464,16 @@ namespace Umbraco.Web.Editors
         {
             long totalChildren;
             List<IContent> children;
+
+            // Sets the culture to the only existing culture if we only have one culture.
+            if (string.IsNullOrWhiteSpace(cultureName))
+            {
+                if (_allLangs.Value.Count == 1)
+                {
+                    cultureName = _allLangs.Value.First().Key;
+                }
+            }
+
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IContent> queryFilter = null;
@@ -1151,7 +1161,6 @@ namespace Umbraco.Web.Editors
         /// Performs the publishing operation for a content item
         /// </summary>
         /// <param name="contentItem"></param>
-        /// <param name="publishStatus"></param>
         /// <param name="wasCancelled"></param>
         /// <param name="successfulCultures">
         /// if the content is variant this will return an array of cultures that will be published (passed validation rules)
@@ -1200,10 +1209,12 @@ namespace Umbraco.Web.Editors
 
             if (canPublish)
             {
+                var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+
                 //proceed to publish if all validation still succeeds
-                var publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
-                successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+                successfulCultures = culturesToPublish;
                 return publishStatus;
             }
             else
@@ -1222,6 +1233,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentItem"></param>
         /// <param name="cultureVariants"></param>
+        /// <param name="mandatoryCultures"></param>
+        /// <param name="localizationKey"></param>
+        /// <param name="publishingCheck"></param>
+        /// <param name="mandatoryVariants"></param>
         /// <returns></returns>
         private bool ValidatePublishingMandatoryLanguages(
             ContentItemSave contentItem,
@@ -1243,7 +1258,7 @@ namespace Umbraco.Web.Editors
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
                 result.Add((mandatoryVariant, isPublished));
 
-                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant);
+                var isPublishing = isPublished || publishingCheck(mandatoryVariant);
 
                 if (isPublished || isPublishing) continue;
 
@@ -1257,7 +1272,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This will call PublishCulture on the content item for each culture that needs to be published including the invariant culture
+        /// Call PublishCulture on the content item for each culture to get a validation result for each culture
         /// </summary>
         /// <param name="persistentContent"></param>
         /// <param name="cultureVariants"></param>
@@ -1314,7 +1329,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.SavePublishing(foundContent, Security.GetUserId().ResultOr(0));
+            var publishResult = Services.ContentService.SaveAndPublish(foundContent, userId: Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -1825,8 +1840,10 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root
-                if (toMove.ContentType.AllowedAsRoot == false)
+                //cannot move if the content item is not allowed at the root unless there are
+                //none allowed at root (in which case all should be allowed at root)
+                var contentTypeService = Services.ContentTypeService;
+                if (toMove.ContentType.AllowedAsRoot == false && contentTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
@@ -1841,8 +1858,7 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var contentTypeService = Services.ContentTypeBaseServices.For(parent);
-                var parentContentType = contentTypeService.Get(parent.ContentTypeId);
+                var parentContentType = Services.ContentTypeService.Get(parent.ContentTypeId);
                 //check if the item is allowed under this one
                 if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)
@@ -2039,7 +2055,7 @@ namespace Umbraco.Web.Editors
         private ContentItemDisplay MapToDisplay(IContent content)
         {
             var display = Mapper.Map<ContentItemDisplay>(content);
-            display.AllowPreview = display.AllowPreview && content.Trashed == false;
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
 

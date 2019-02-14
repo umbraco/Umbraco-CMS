@@ -130,10 +130,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 ServiceContext.FileService.SaveTemplate(hasPropertiesContentType.DefaultTemplate); // else, FK violation on contentType!
 
+                contentTypeRepository.Save(hasPropertiesContentType);
+
                 IContent content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
                 // save = create the initial version
-                contentTypeRepository.Save(hasPropertiesContentType);
                 repository.Save(content1);
 
                 versions.Add(content1.VersionId); // the first version
@@ -399,9 +400,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                contentTypeRepository.Save(contentType);
+
                 IContent textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.Save(contentType);
                 repository.Save(textpage);
                 scope.Complete();
 
@@ -487,9 +489,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                contentTypeRepository.Save(contentType);
+
                 var textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.Save(contentType);
                 repository.Save(textpage);
 
 

@@ -1,5 +1,5 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -12,6 +12,6 @@ namespace Umbraco.Web.Routing
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class RedirectTrackingComposer : ComponentComposer<RelateOnCopyComponent>, ICoreComposer
+    public class RedirectTrackingComposer : ComponentComposer<RedirectTrackingComponent>, ICoreComposer
     { }
 }

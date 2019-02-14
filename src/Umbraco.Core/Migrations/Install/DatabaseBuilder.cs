@@ -27,7 +27,6 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IRuntimeState _runtime;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
-        private readonly PostMigrationCollection _postMigrations;
         private readonly ILogger _logger;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
@@ -35,7 +34,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseBuilder"/> class.
         /// </summary>
-        public DatabaseBuilder(IScopeProvider scopeProvider, IGlobalSettings globalSettings, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations)
+        public DatabaseBuilder(IScopeProvider scopeProvider, IGlobalSettings globalSettings, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService)
         {
             _scopeProvider = scopeProvider;
             _globalSettings = globalSettings;
@@ -44,7 +43,6 @@ namespace Umbraco.Core.Migrations.Install
             _logger = logger;
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
-            _postMigrations = postMigrations;
         }
 
         #region Status
@@ -483,7 +481,7 @@ namespace Umbraco.Core.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result UpgradeSchemaAndData()
+        public Result UpgradeSchemaAndData(MigrationPlan plan)
         {
             try
             {
@@ -496,8 +494,8 @@ namespace Umbraco.Core.Migrations.Install
                 _logger.Info<DatabaseBuilder>("Database upgrade started");
 
                 // upgrade
-                var upgrader = new UmbracoUpgrader();
-                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger, _postMigrations);
+                var upgrader = new Upgrader(plan);
+                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger);
 
                 var message = "<p>Upgrade completed!</p>";
 

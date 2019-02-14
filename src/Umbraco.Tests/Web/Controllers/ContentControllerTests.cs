@@ -43,6 +43,14 @@ namespace Umbraco.Tests.Web.Controllers
     [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
     public class ContentControllerTests : TestWithDatabaseBase
     {
+        private IContentType _contentTypeForMockedContent;
+
+        public override void SetUp()
+        {
+            base.SetUp();
+            _contentTypeForMockedContent = null;
+        }
+
         protected override void ComposeApplication(bool withApplication)
         {
             base.ComposeApplication(withApplication);
@@ -115,23 +123,42 @@ namespace Umbraco.Tests.Web.Controllers
             };
         }
 
-        private IContent GetMockedContent()
+        private IContentType GetMockedContentType()
         {
-            var content = MockedContent.CreateSimpleContent(MockedContentTypes.CreateSimpleContentType());
-            content.Id = 123;
-            content.Path = "-1,123";
+            var contentType = MockedContentTypes.CreateSimpleContentType();
             //ensure things have ids
             var ids = 888;
-            foreach (var g in content.PropertyGroups)
+            foreach (var g in contentType.CompositionPropertyGroups)
             {
                 g.Id = ids;
                 ids++;
             }
-            foreach (var p in content.PropertyTypes)
+            foreach (var p in contentType.CompositionPropertyGroups)
             {
                 p.Id = ids;
                 ids++;
             }
+
+            return contentType;
+        }
+
+        private IContent GetMockedContent()
+        {
+            if (_contentTypeForMockedContent == null)
+            {
+                _contentTypeForMockedContent = GetMockedContentType();
+                Mock.Get(Current.Services.ContentTypeService)
+                    .Setup(x => x.Get(_contentTypeForMockedContent.Id))
+                    .Returns(_contentTypeForMockedContent);
+                Mock.Get(Current.Services.ContentTypeService)
+                    .As<IContentTypeBaseService>()
+                    .Setup(x => x.Get(_contentTypeForMockedContent.Id))
+                    .Returns(_contentTypeForMockedContent);
+            }
+
+            var content = MockedContent.CreateSimpleContent(_contentTypeForMockedContent);
+            content.Id = 123;
+            content.Path = "-1,123";
             return content;
         }
 
@@ -229,7 +256,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper);
-                
+
                 return controller;
             }
 
@@ -251,9 +278,6 @@ namespace Umbraco.Tests.Web.Controllers
         {
             ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
-                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
-
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
                     propertyEditorCollection,
@@ -336,14 +360,10 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
-
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
-
-                var contentTypeServiceMock = Mock.Get(Current.Services.ContentTypeService);
-                contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(() => MockedContentTypes.CreateSimpleContentType());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
@@ -369,8 +389,6 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(HttpStatusCode.OK, response.Item1.StatusCode);
             var display = JsonConvert.DeserializeObject<ContentItemDisplay>(response.Item2);
             Assert.AreEqual(1, display.Variants.Count());
-            Assert.AreEqual(content.PropertyGroups.Count(), display.Variants.ElementAt(0).Tabs.Count());
-            Assert.AreEqual(content.PropertyTypes.Count(), display.Variants.ElementAt(0).Tabs.ElementAt(0).Properties.Count());
         }
 
         [Test]
@@ -380,14 +398,10 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
-
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
-
-                var contentTypeServiceMock = Mock.Get(Current.Services.ContentTypeService);
-                contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(() => MockedContentTypes.CreateSimpleContentType());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
@@ -428,14 +442,10 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController CtrlFactory(HttpRequestMessage message, UmbracoContext umbracoContext, UmbracoHelper helper)
             {
-
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
-
-                var contentTypeServiceMock = Mock.Get(Current.Services.ContentTypeService);
-                contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(() => MockedContentTypes.CreateSimpleContentType());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(

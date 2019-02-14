@@ -574,14 +574,19 @@ div.help {
     width: auto;
     height: 22px;
     min-width: 18px;
-    padding: 4px 6px;
+    padding: 5px 6px 3px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
     text-align: center;
-    text-shadow: 0 1px 0 @white;
-    background-color: @gray-10;
-    border: 1px solid @purple-l3;
+    //text-shadow: 0 1px 0 @white;
+    background-color: @white;
+    border: 1px solid @inputBorder;
+    color: @ui-option-type;
+    &:hover {
+        border-color:@inputBorderFocus;
+        color: @ui-option-type-hover;
+    }
   }
   .add-on,
   .btn,

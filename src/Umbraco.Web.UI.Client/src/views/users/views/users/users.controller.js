@@ -59,13 +59,10 @@
             }
         ];
 
-        vm.activeLayout = {
-            "icon": "icon-thumbnails-small",
-            "path": "1",
-            "selected": true
-        };
+        // Set card layout to active by default
+        vm.activeLayout = vm.layouts[0];
 
-        //don't show the invite button if no email is configured
+        // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
                 labelKey: "user_inviteUser",
@@ -199,27 +196,23 @@
             vm.activeLayout = selectedLayout;
         }
 
-        function selectUser(user, selection, event) {
-
-            // prevent the current user to be selected
-            if (!user.isCurrentUser) {
-
-                if (user.selected) {
-                    var index = selection.indexOf(user.id);
-                    selection.splice(index, 1);
-                    user.selected = false;
-                } else {
-                    user.selected = true;
-                    vm.selection.push(user.id);
-                }
-
-                setBulkActions(vm.users);
-
-                if (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
+        function selectUser(user) {
+            
+            if (user.isCurrentUser) {
+                return;
             }
+            
+            if (user.selected) {
+                var index = vm.selection.indexOf(user.id);
+                vm.selection.splice(index, 1);
+                user.selected = false;
+            } else {
+                user.selected = true;
+                vm.selection.push(user.id);
+            }
+            
+            setBulkActions(vm.users);
+            
         }
 
         function clearSelection() {
@@ -230,11 +223,7 @@
         }
 
         function clickUser(user) {
-            if (vm.selection.length > 0) {
-                selectUser(user, vm.selection);
-            } else {
-                goToUser(user.id);
-            }
+            goToUser(user.id);
         }
 
         function disableUsers() {
@@ -628,18 +617,20 @@
             var firstSelectedUserGroups;
 
             angular.forEach(users, function (user) {
-
+                
                 if (!user.selected) {
                     return;
                 }
-
+                
+                
                 // if the current user is selected prevent any bulk actions with the user included
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
                     vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
-                    return;
+                    
+                    return false;
                 }
 
                 if (user.userDisplayState && user.userDisplayState.key === "Disabled") {
@@ -663,16 +654,17 @@
                 }
 
                 // store the user group aliases of the first selected user
-                if (!firstSelectedUserGroups) {
-                    firstSelectedUserGroups = user.userGroups.map(function (ug) { return ug.alias; });
-                    vm.allowSetUserGroup = true;
-                } else if (vm.allowSetUserGroup === true) {
-                    // for 2nd+ selected user, compare the user group aliases to determine if we should allow bulk editing.
-                    // we don't allow bulk editing of users not currently having the same assigned user groups, as we can't
-                    // really support that in the user group picker.
-                    var userGroups = user.userGroups.map(function (ug) { return ug.alias; });
-                    if (_.difference(firstSelectedUserGroups, userGroups).length > 0) {
-                        vm.allowSetUserGroup = false;
+                if (vm.allowSetUserGroup === true) {
+                    if (!firstSelectedUserGroups) {
+                        firstSelectedUserGroups = user.userGroups.map(function (ug) { return ug.alias; });
+                    } else {
+                        // for 2nd+ selected user, compare the user group aliases to determine if we should allow bulk editing.
+                        // we don't allow bulk editing of users not currently having the same assigned user groups, as we can't
+                        // really support that in the user group picker.
+                        var userGroups = user.userGroups.map(function (ug) { return ug.alias; });
+                        if (_.difference(firstSelectedUserGroups, userGroups).length > 0) {
+                            vm.allowSetUserGroup = false;
+                        }
                     }
                 }
             });

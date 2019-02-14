@@ -219,56 +219,53 @@ body.touch .umb-tree {
 // Tree item states
 // -------------------------
 .not-published {
-    > i.icon,
-    a {
+    > .umb-tree-item__inner > i.icon,
+    > .umb-tree-item__inner > a {
         opacity: 0.6;
     }
 }
 
 .not-allowed {
-    > i.icon,
-    a {
+    > .umb-tree-item__inner > i.icon,
+    > .umb-tree-item__inner > a {
         cursor: not-allowed;
     }
 }
 
-.protected,
-.has-unpublished-version,
-.is-container,
-.locked {
+.umb-tree-item__annotation {
     &::before {
         font-family: 'icomoon';
         position: absolute;
-        font-size: 20px;
-        padding-left: 7px;
-        padding-top: 7px;
         bottom: 0;
     }
 }
 
-.protected::before {
-    content: "\e256";
-    color: @red;
-}
-
-.has-unpublished-version::before {
+.has-unpublished-version > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e25a";
     color: @green;
+    font-size: 20px;
+    margin-left: -25px;
 }
 
-.is-container::before {
+.is-container > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e04e";
     color: @blue;
-    font-size: 8px;
-    padding-left: 13px;
-    padding-top: 8px;
-    pointer-events: none;
+    font-size: 9px;
+    margin-left: -20px;
 }
 
+.protected > .umb-tree-item__inner > .umb-tree-item__annotation::before {
+    content: "\e256";
+    color: @red;
+    font-size: 20px;
+    margin-left: -25px;
+}
 
-.locked::before {
+.locked > .umb-tree-item__inner > .umb-tree-item__annotation::before {
     content: "\e0a7";
     color: @red;
+    font-size: 9px;
+    margin-left: -20px;
 }
 
 .no-access {

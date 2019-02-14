@@ -13,7 +13,6 @@ namespace Umbraco.Web.PropertyEditors
             // initialize defaults
 
             PageSize = 10;
-            DisplayAtTabNumber = 1;
             OrderBy = "SortOrder";
             OrderDirection = "asc";
 
@@ -43,9 +42,6 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
         public int PageSize { get; set; }
         
-        [ConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
-        public int DisplayAtTabNumber { get; set; }
-
         [ConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
             Description = "The default sort order for the list")]
         public string OrderBy { get; set; }
@@ -64,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
             Description = "The bulk actions that are allowed from the list view")]
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 
-        [ConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
+        [ConfigurationField("tabName", "Content app name", "textstring", Description = "The name of the listview content app (default if empty: 'Child Items')")]
         public string TabName { get; set; }
 
         public class Property

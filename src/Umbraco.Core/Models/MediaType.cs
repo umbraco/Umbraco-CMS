@@ -42,6 +42,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
+
+        /// <inheritdoc />
         public override bool IsPublishing => IsPublishingConst;
 
         /// <inheritdoc />

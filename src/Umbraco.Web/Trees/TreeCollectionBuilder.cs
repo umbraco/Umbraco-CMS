@@ -16,6 +16,20 @@ namespace Umbraco.Web.Trees
 
         public void RegisterWith(IRegister register) => register.Register(CreateCollection, Lifetime.Singleton);
 
+        /// <summary>
+        /// Registers a custom tree definition
+        /// </summary>
+        /// <param name="treeDefinition"></param>
+        /// <remarks>
+        /// This is useful if a developer wishes to have a single tree controller for different tree aliases. In this case the tree controller
+        /// cannot be decorated with the TreeAttribute (since then it will be auto-registered).
+        /// </remarks>
+        public void AddTree(Tree treeDefinition)
+        {
+            if (treeDefinition == null) throw new ArgumentNullException(nameof(treeDefinition));
+            _trees.Add(treeDefinition);
+        }
+
         public void AddTreeController<TController>()
             where TController : TreeControllerBase
             => AddTreeController(typeof(TController));
@@ -25,7 +39,7 @@ namespace Umbraco.Web.Trees
             if (!typeof(TreeControllerBase).IsAssignableFrom(controllerType))
                 throw new ArgumentException($"Type {controllerType} does not inherit from {typeof(TreeControllerBase).FullName}.");
 
-            // no all TreeControllerBase are meant to be used here,
+            // not all TreeControllerBase are meant to be used here,
             // ignore those that don't have the attribute
 
             var attribute = controllerType.GetCustomAttribute<TreeAttribute>(false);

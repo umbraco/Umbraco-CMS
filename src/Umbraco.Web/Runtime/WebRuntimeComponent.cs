@@ -13,7 +13,6 @@ using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Umbraco.Core;
-using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -278,7 +277,10 @@ namespace Umbraco.Web.Runtime
                 { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
             });
 
-            ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
+            // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
+            // want to access HttpContext.Current, which doesn't exist
+            if (IOHelper.IsHosted)
+                ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
         }
     }
 }
