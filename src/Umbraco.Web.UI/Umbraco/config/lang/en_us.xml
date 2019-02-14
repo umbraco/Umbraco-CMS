@@ -2022,10 +2022,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="panelInformation">The following URLs redirect to this content item:</key>
     <key alias="noRedirects">No redirects have been made</key>
     <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
-    <key alias="removeButton">Remove</key>
     <key alias="confirmRemove">Are you sure you want to remove the redirect from '%0%' to '%1%'?</key>
     <key alias="redirectRemoved">Redirect URL removed.</key>
     <key alias="redirectRemoveError">Error removing redirect URL.</key>
+    <key alias="redirectRemoveWarning">This will remove the redirect</key>
     <key alias="confirmDisable">Are you sure you want to disable the URL tracker?</key>
     <key alias="disabledConfirm">URL tracker has now been disabled.</key>
     <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>

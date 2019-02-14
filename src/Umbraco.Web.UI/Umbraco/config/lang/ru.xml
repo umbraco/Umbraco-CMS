@@ -1286,7 +1286,6 @@
     <key alias="redirectedTo">Перенаправлен в</key>
     <key alias="noRedirects">На данный момент нет ни одного перенаправления</key>
     <key alias="noRedirectsDescription">Если опубликованный документ переименовывается или меняет свое расположение в дереве, а следовательно, меняется адрес (URL), автоматически создается перенаправление на новое местоположение этого документа.</key>
-    <key alias="removeButton">Удалить</key>
     <key alias="confirmRemove">Вы уверены, что хотите удалить перенаправление с '%0%' на '%1%'?</key>
     <key alias="redirectRemoved">Перенаправление удалено.</key>
     <key alias="redirectRemoveError">Ошибка удаления перенаправления.</key>
