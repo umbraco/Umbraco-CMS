@@ -13,7 +13,7 @@ namespace Umbraco.Web.Trees
             SectionAlias = applicationAlias ?? throw new ArgumentNullException(nameof(applicationAlias));
             TreeGroup = group;
             TreeAlias = alias ?? throw new ArgumentNullException(nameof(alias));
-            TreeTitle = title ?? throw new ArgumentNullException(nameof(title));
+            TreeTitle = title;
             TreeUse = use;
             TreeControllerType = treeControllerType ?? throw new ArgumentNullException(nameof(treeControllerType));
             IsSingleNodeTree = isSingleNodeTree;
