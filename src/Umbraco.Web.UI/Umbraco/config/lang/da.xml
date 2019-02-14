@@ -616,9 +616,11 @@
     <key alias="pleasewait">Et øjeblik...</key>
     <key alias="previous">Forrige</key>
     <key alias="properties">Egenskaber</key>
+    <key alias="rebuild">Genopbyg</key>
     <key alias="reciept">E-mail der skal modtage indhold af formular</key>
     <key alias="recycleBin">Papirkurv</key>
     <key alias="recycleBinEmpty">Din papirkurv er tom</key>
+    <key alias="reload">Genindlæs</key>
     <key alias="remaining">Mangler</key>
     <key alias="remove">Fjern</key>
     <key alias="rename">Omdøb</key>

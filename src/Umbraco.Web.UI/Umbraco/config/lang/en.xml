@@ -646,9 +646,11 @@
     <key alias="pleasewait">One moment please...</key>
     <key alias="previous">Previous</key>
     <key alias="properties">Properties</key>
+    <key alias="rebuild">Rebuild</key>
     <key alias="reciept">Email to receive form data</key>
     <key alias="recycleBin">Recycle Bin</key>
     <key alias="recycleBinEmpty">Your recycle bin is empty</key>
+    <key alias="reload">Reload</key>
     <key alias="remaining">Remaining</key>
     <key alias="remove">Remove</key>
     <key alias="rename">Rename</key>
