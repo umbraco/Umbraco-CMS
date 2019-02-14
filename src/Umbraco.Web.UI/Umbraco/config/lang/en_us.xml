@@ -488,7 +488,7 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
-    <key alias="email">Enter your email...</key>
+    <key alias="email">Enter your email</key>
     <key alias="enterMessage">Enter a message...</key>
     <key alias="usernameHint">Your username is usually your email</key>
     <key alias="anchor">#value or ?key=value</key>
