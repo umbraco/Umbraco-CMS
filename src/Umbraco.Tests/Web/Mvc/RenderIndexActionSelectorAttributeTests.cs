@@ -76,7 +76,8 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new TestVariationContextAccessor(),
                 true);
-            var ctrl = new MatchesDefaultIndexController { UmbracoContext = umbCtx };
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbCtx);
+            var ctrl = new MatchesDefaultIndexController { UmbracoContextAccessor = umbracoContextAccessor };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
                 GetRenderMvcControllerIndexMethodFromCurrentType(ctrl.GetType()));
@@ -100,7 +101,9 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new TestVariationContextAccessor(),
                 true);
-            var ctrl = new MatchesOverriddenIndexController { UmbracoContext = umbCtx };
+
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbCtx);
+            var ctrl = new MatchesOverriddenIndexController { UmbracoContextAccessor = umbracoContextAccessor };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
                 GetRenderMvcControllerIndexMethodFromCurrentType(ctrl.GetType()));
@@ -124,7 +127,9 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new TestVariationContextAccessor(),
                 true);
-            var ctrl = new MatchesCustomIndexController { UmbracoContext = umbCtx };
+
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbCtx);
+            var ctrl = new MatchesCustomIndexController { UmbracoContextAccessor = umbracoContextAccessor };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
                 GetRenderMvcControllerIndexMethodFromCurrentType(ctrl.GetType()));
@@ -148,7 +153,9 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new TestVariationContextAccessor(),
                 true);
-            var ctrl = new MatchesAsyncIndexController { UmbracoContext = umbCtx };
+
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbCtx);
+            var ctrl = new MatchesAsyncIndexController { UmbracoContextAccessor = umbracoContextAccessor };
             var controllerCtx = new ControllerContext(req, ctrl);
             var result = attr.IsValidForRequest(controllerCtx,
                 GetRenderMvcControllerIndexMethodFromCurrentType(ctrl.GetType()));
